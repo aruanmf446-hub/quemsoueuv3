@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "status": "proposal_only_not_deployed",
+  "authority": "authenticated_server",
+  "tables_proposed": [
+    {
+      "name": "player_profiles",
+      "primary_key": [
+        "user_id"
+      ],
+      "owner_field": "user_id",
+      "client_write_policy": "display_name_only; no unlock/progress fields"
+    },
+    {
+      "name": "campaign_progress",
+      "primary_key": [
+        "user_id",
+        "campaign_id"
+      ],
+      "owner_field": "user_id",
+      "client_write_policy": "none; server transactions only"
+    },
+    {
+      "name": "phase_completions",
+      "primary_key": [
+        "user_id",
+        "campaign_id",
+        "phase_id"
+      ],
+      "owner_field": "user_id",
+      "client_write_policy": "none; verified completion only"
+    },
+    {
+      "name": "character_unlocks",
+      "primary_key": [
+        "user_id",
+        "character_id"
+      ],
+      "owner_field": "user_id",
+      "client_write_policy": "none; initial catalogue or verified achievement"
+    },
+    {
+      "name": "player_loadout",
+      "primary_key": [
+        "user_id"
+      ],
+      "owner_field": "user_id",
+      "client_write_policy": "equip_character operation only; composite FK to owned unlock"
+    },
+    {
+      "name": "player_achievements",
+      "primary_key": [
+        "user_id",
+        "achievement_id"
+      ],
+      "owner_field": "user_id",
+      "client_write_policy": "none; server awards only"
+    },
+    {
+      "name": "phase_attempts",
+      "primary_key": [
+        "attempt_id"
+      ],
+      "owner_field": "user_id",
+      "client_write_policy": "none; server binds attempt to player, phase and expiry"
+    },
+    {
+      "name": "processed_requests",
+      "primary_key": [
+        "user_id",
+        "request_id"
+      ],
+      "owner_field": "user_id",
+      "client_write_policy": "none; idempotency records with request digest"
+    }
+  ],
+  "operations_proposed": [
+    {
+      "name": "get_player_state",
+      "input_schema": null,
+      "output_schema": "res://data/contracts/player_state.schema.json",
+      "rule": "Return only authenticated player state"
+    },
+    {
+      "name": "begin_phase",
+      "input_schema": "res://data/contracts/progress_operation.schema.json",
+      "output_schema": "res://data/contracts/phase_attempt.schema.json",
+      "rule": "Check prerequisites; issue server-bound expiring attempt; attempt_id alone is not completion proof"
+    },
+    {
+      "name": "complete_phase",
+      "input_schema": "res://data/contracts/progress_operation.schema.json",
+      "output_schema": "res://data/contracts/player_state.schema.json",
+      "rule": "Check attempt, independent completion evidence and prerequisites; commit progress, achievement and unlock atomically"
+    },
+    {
+      "name": "equip_character",
+      "input_schema": "res://data/contracts/progress_operation.schema.json",
+      "output_schema": "res://data/contracts/player_state.schema.json",
+      "rule": "Reject enemies/bosses and unowned/locked characters; no client-supplied user_id"
+    }
+  ],
+  "completion_policy": {
+    "campaign_id": "desert_campaign",
+    "required_phase_ids": [
+      "desert_phase_01",
+      "desert_phase_02",
+      "desert_phase_03",
+      "desert_phase_04",
+      "desert_phase_05",
+      "desert_phase_06",
+      "desert_phase_07",
+      "desert_phase_08",
+      "desert_phase_09",
+      "desert_phase_10"
+    ],
+    "final_phase_id": "desert_phase_10",
+    "required_boss_id": "malagueta",
+    "achievement_id": "desert_campaign_completed",
+    "unlock_character_id": "el_fuego",
+    "legacy_flag_is_proof": false
+  },
+  "transactions": {
+    "idempotency_scope": [
+      "authenticated_user_id",
+      "request_id"
+    ],
+    "different_payload_same_request_id": "reject",
+    "concurrent_completion": "unique constraints and transaction lock",
+    "retry_after_commit": "return committed result without duplicate grants"
+  },
+  "verification_status": "Design only; no authoritative gameplay evidence service implemented",
+  "migration_status": "not_applied",
+  "credentials_included": false
+}

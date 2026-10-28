@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "authority": {
+      "const": "server"
+    },
+    "attempt_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "campaign_id": {
+      "const": "desert_campaign"
+    },
+    "phase_id": {
+      "type": "string",
+      "pattern": "^desert_phase_(0[1-9]|10)$"
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "verification_policy_id": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "authority",
+    "attempt_id",
+    "campaign_id",
+    "phase_id",
+    "issued_at",
+    "expires_at",
+    "verification_policy_id"
+  ],
+  "additionalProperties": false
+}

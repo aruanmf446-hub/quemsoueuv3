@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "status": {
+      "const": "draft_local_not_uploaded"
+    },
+    "release_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "baseline_commit": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "asset_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_path": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^res://[^\\\\]+$"
+          },
+          "character_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "realm_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "variant": {
+            "const": "source"
+          },
+          "format": {
+            "enum": [
+              "fbx",
+              "obj",
+              "glb",
+              "mtl",
+              "png",
+              "jpg",
+              "svg"
+            ]
+          },
+          "size_bytes": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "sha256": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "proposed_object_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "publication_status": {
+            "const": "not_uploaded"
+          },
+          "runtime_ready": {
+            "const": false
+          }
+        },
+        "required": [
+          "asset_id",
+          "source_path",
+          "character_id",
+          "realm_id",
+          "variant",
+          "format",
+          "size_bytes",
+          "sha256",
+          "proposed_object_key",
+          "publication_status",
+          "runtime_ready"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "status",
+    "release_id",
+    "baseline_commit",
+    "assets"
+  ],
+  "additionalProperties": false
+}

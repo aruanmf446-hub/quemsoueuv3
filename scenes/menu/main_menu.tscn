@@ -22,6 +22,10 @@
 [ext_resource type="Texture2D" uid="uid://df7rxgp54l2b4" path="res://assets/processed/textures/textura_verde.png" id="17_fgrcj"]
 [ext_resource type="PackedScene" uid="uid://d1a00m0hqe223" path="res://scenes/skins/skins_panel.tscn" id="19_3h20m"]
 
+[ext_resource type="Script" path="res://scripts/services/player_services.gd" id="30_services"]
+[ext_resource type="Script" path="res://scripts/ui/navigation_manager.gd" id="31_navigation"]
+[ext_resource type="Script" path="res://scripts/ui/orientation_guard.gd" id="32_orientation"]
+
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_uaj4g"]
 texture = ExtResource("5_vxdmp")
 
@@ -212,6 +216,9 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_247la")
 
+[node name="Services" type="Node" parent="."]
+script = ExtResource("30_services")
+
 [node name="Background" type="TextureRect" parent="." unique_id=1000286985]
 layout_mode = 0
 anchor_right = 1.0
@@ -357,7 +364,7 @@ theme_override_colors/font_color = Color(1, 0.9529412, 0.76862746, 1)
 theme_override_colors/font_outline_color = Color(0.2901961, 0.16470589, 0, 1)
 theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 22
-text = "2.350  +"
+text = "—"
 
 [node name="GemPill" type="PanelContainer" parent="TopBar" unique_id=791331894]
 custom_minimum_size = Vector2(130, 46)
@@ -383,7 +390,7 @@ theme_override_colors/font_color = Color(0.49411765, 0.8901961, 1, 1)
 theme_override_colors/font_outline_color = Color(0.019607844, 0.1254902, 0.22745098, 1)
 theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 22
-text = "180  +"
+text = "—"
 
 [node name="MailButton" type="Button" parent="TopBar" unique_id=763511601]
 custom_minimum_size = Vector2(46, 46)
@@ -494,18 +501,19 @@ theme_override_constants/separation = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 20
-text = "AventureiroBR"
+text = "Demonstração local"
 
 [node name="Level" type="Label" parent="ProfileCard/Content/Info" unique_id=575903798]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8117647, 0.9019608, 1, 1)
 theme_override_font_sizes/font_size = 15
-text = "Nível 28"
+text = "Entre para acessar seu perfil"
 
 [node name="Xp" type="ProgressBar" parent="ProfileCard/Content/Info" unique_id=266094133]
 custom_minimum_size = Vector2(130, 8)
 layout_mode = 2
-value = 60.0
+value = 0.0
+visible = false
 show_percentage = false
 
 [node name="FriendsPanel" type="Control" parent="." unique_id=574836991]
@@ -559,41 +567,11 @@ layout_mode = 2
 size_flags_horizontal = 10
 theme_override_colors/font_color = Color(0.23921569, 0.8627451, 0.36078432, 1)
 theme_override_font_sizes/font_size = 16
-text = "5 online"
+text = "—"
 
 [node name="FriendList" type="VBoxContainer" parent="FriendsPanel/Margin/Content" unique_id=331536337]
 layout_mode = 2
 theme_override_constants/separation = 4
-
-[node name="FriendLuna" parent="FriendsPanel/Margin/Content/FriendList" unique_id=370442676 instance=ExtResource("3_hj162")]
-layout_mode = 2
-friend_name = "LunaSolis"
-status_text = "No Modo História"
-badge_color = Color(0.84705883, 0.6039216, 0.10980392, 1)
-
-[node name="FriendDragao" parent="FriendsPanel/Margin/Content/FriendList" unique_id=58025579 instance=ExtResource("3_hj162")]
-layout_mode = 2
-friend_name = "DragaoAzul"
-status_text = "No Lobby"
-
-[node name="FriendCaio" parent="FriendsPanel/Margin/Content/FriendList" unique_id=422807206 instance=ExtResource("3_hj162")]
-layout_mode = 2
-friend_name = "CaioRPG"
-status_text = "Em Duelo"
-status_color = Color(1, 0.3647059, 0.3647059, 1)
-badge_color = Color(0.7529412, 0.22352941, 0.16862746, 1)
-
-[node name="FriendMare" parent="FriendsPanel/Margin/Content/FriendList" unique_id=771007498 instance=ExtResource("3_hj162")]
-layout_mode = 2
-friend_name = "MaréViva"
-status_text = "Online"
-badge_color = Color(0.16470589, 0.6313726, 0.59607846, 1)
-
-[node name="FriendEstrela" parent="FriendsPanel/Margin/Content/FriendList" unique_id=1574101351 instance=ExtResource("3_hj162")]
-layout_mode = 2
-friend_name = "EstrelaGui"
-status_text = "No Lobby"
-badge_color = Color(0.5568628, 0.36078432, 0.8509804, 1)
 
 [node name="ViewAllButton" type="Button" parent="FriendsPanel/Margin/Content" unique_id=2110005369]
 custom_minimum_size = Vector2(0, 40)
@@ -607,9 +585,20 @@ theme_override_styles/focus = SubResource("StyleBoxTexture_o4h6x")
 text = "Ver todos os amigos"
 
 [node name="SkinsPanel" parent="." unique_id=2048242588 instance=ExtResource("19_3h20m")]
-layout_mode = 0
-anchors_preset = 0
-anchor_right = 0.0
-anchor_bottom = 0.0
-grow_horizontal = 1
-grow_vertical = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Navigation" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("31_navigation")
+
+[node name="OrientationGuard" type="CanvasLayer" parent="."]
+script = ExtResource("32_orientation")

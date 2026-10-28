@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "status": "proposal_not_loaded_by_game",
+  "id": "desert_phase_04",
+  "campaign_id": "desert_campaign",
+  "realm_id": "desert",
+  "order": 4,
+  "name": "Ruínas Esquecidas",
+  "narrative_description": "Inscrições nas ruínas revelam uma passagem antiga usada para abastecer os Cactus.",
+  "environment": "Arcos e terraços de pedra, corredores parcialmente desabados.",
+  "protagonist_id": "el_fuego",
+  "difficulty": {
+    "progression_rank": 4,
+    "label": "moderada",
+    "balance_status": "not_playtested"
+  },
+  "obstacle_types_planned": [
+    "vertical_routes",
+    "broken_stairs",
+    "planned_moving_platforms"
+  ],
+  "enemies_planned": [
+    {
+      "character_id": "cactus",
+      "role": "desert_troop",
+      "placement_status": "not_defined"
+    }
+  ],
+  "boss_id": null,
+  "prerequisite_phase_ids": [
+    "desert_phase_03"
+  ],
+  "checkpoints_planned": [
+    {
+      "id": "desert_phase_04_checkpoint_01",
+      "location_description": "No pátio de entrada",
+      "implementation_status": "not_implemented"
+    },
+    {
+      "id": "desert_phase_04_checkpoint_02",
+      "location_description": "Após o trecho vertical das ruínas",
+      "implementation_status": "not_implemented"
+    }
+  ],
+  "completion": {
+    "type": "reach_exit",
+    "required_boss_id": null,
+    "persisted_by": "future_verified_progress_service",
+    "checkpoint_is_completion": false
+  },
+  "future_rewards": [
+    {
+      "type": "phase_completion",
+      "target_id": "desert_phase_04",
+      "status": "future"
+    },
+    {
+      "type": "next_phase_access",
+      "target_id": "desert_phase_05",
+      "status": "future"
+    }
+  ],
+  "resources_required": [
+    "el_fuego_model",
+    "cactus_model",
+    "checkpoint_presentation",
+    "desert_audio",
+    "desert_story_text",
+    "desert_ruins"
+  ],
+  "implementation_dependencies": [
+    "campaign_navigation",
+    "level_builder",
+    "checkpoint_system",
+    "phase_progression",
+    "cactus_reuse",
+    "asset_import_validation",
+    "playtest_and_accessibility",
+    "moving_platforms"
+  ],
+  "existing_runtime": {
+    "scene": null,
+    "config": null,
+    "status": "not_implemented"
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "const": "begin_phase"
+        },
+        "campaign_id": {
+          "const": "desert_campaign"
+        },
+        "phase_id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^desert_phase_(0[1-9]|10)$"
+        }
+      },
+      "required": [
+        "request_id",
+        "type",
+        "campaign_id",
+        "phase_id"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "const": "complete_phase"
+        },
+        "attempt_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "completion_evidence_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "request_id",
+        "type",
+        "attempt_id",
+        "completion_evidence_id"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "const": "equip_character"
+        },
+        "character_id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*$"
+        }
+      },
+      "required": [
+        "request_id",
+        "type",
+        "character_id"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}

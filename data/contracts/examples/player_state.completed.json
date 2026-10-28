@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "authority": "server",
+  "revision": 10,
+  "profile": {
+    "user_id": "00000000-0000-4000-8000-000000000001",
+    "display_name": "Jogador de exemplo",
+    "created_at": "2026-10-28T12:00:00Z",
+    "updated_at": "2026-10-28T12:00:00Z"
+  },
+  "campaigns": [
+    {
+      "campaign_id": "desert_campaign",
+      "status": "completed",
+      "completed_phase_ids": [
+        "desert_phase_01",
+        "desert_phase_02",
+        "desert_phase_03",
+        "desert_phase_04",
+        "desert_phase_05",
+        "desert_phase_06",
+        "desert_phase_07",
+        "desert_phase_08",
+        "desert_phase_09",
+        "desert_phase_10"
+      ],
+      "current_phase_id": null,
+      "completed_at": "2026-10-28T13:00:00Z"
+    }
+  ],
+  "phase_completions": [
+    {
+      "completion_id": "00000000-0000-4000-8000-000000000010",
+      "campaign_id": "desert_campaign",
+      "phase_id": "desert_phase_01",
+      "completed_at": "2026-10-28T13:00:00Z",
+      "verified": true
+    },
+    {
+      "completion_id": "00000000-0000-4000-8000-000000000011",
+      "campaign_id": "desert_campaign",
+      "phase_id": "desert_phase_02",
+      "completed_at": "2026-10-28T13:00:00Z",
+      "verified": true
+    },
+    {
+      "completion_id": "00000000-0000-4000-8000-000000000012",
+      "campaign_id": "desert_campaign",
+      "phase_id": "desert_phase_03",
+      "completed_at": "2026-10-28T13:00:00Z",
+      "verified": true
+    },
+    {
+      "completion_id": "00000000-0000-4000-8000-000000000013",
+      "campaign_id": "desert_campaign",
+      "phase_id": "desert_phase_04",
+      "completed_at": "2026-10-28T13:00:00Z",
+      "verified": true
+    },
+    {
+      "completion_id": "00000000-0000-4000-8000-000000000014",
+      "campaign_id": "desert_campaign",
+      "phase_id": "desert_phase_05",
+      "completed_at": "2026-10-28T13:00:00Z",
+      "verified": true
+    },
+    {
+      "completion_id": "00000000-0000-4000-8000-000000000015",
+      "campaign_id": "desert_campaign",
+      "phase_id": "desert_phase_06",
+      "completed_at": "2026-10-28T13:00:00Z",
+      "verified": true
+    },
+    {
+      "completion_id": "00000000-0000-4000-8000-000000000016",
+      "campaign_id": "desert_campaign",
+      "phase_id": "desert_phase_07",
+      "completed_at": "2026-10-28T13:00:00Z",
+      "verified": true
+    },
+    {
+      "completion_id": "00000000-0000-4000-8000-000000000017",
+      "campaign_id": "desert_campaign",
+      "phase_id": "desert_phase_08",
+      "completed_at": "2026-10-28T13:00:00Z",
+      "verified": true
+    },
+    {
+      "completion_id": "00000000-0000-4000-8000-000000000018",
+      "campaign_id": "desert_campaign",
+      "phase_id": "desert_phase_09",
+      "completed_at": "2026-10-28T13:00:00Z",
+      "verified": true
+    },
+    {
+      "completion_id": "00000000-0000-4000-8000-000000000019",
+      "campaign_id": "desert_campaign",
+      "phase_id": "desert_phase_10",
+      "completed_at": "2026-10-28T13:00:00Z",
+      "verified": true
+    }
+  ],
+  "character_unlocks": [
+    {
+      "character_id": "cowboy",
+      "source": "initial_catalog",
+      "source_achievement_id": null,
+      "unlocked_at": "2026-10-28T12:00:00Z"
+    },
+    {
+      "character_id": "michelly",
+      "source": "initial_catalog",
+      "source_achievement_id": null,
+      "unlocked_at": "2026-10-28T12:00:00Z"
+    },
+    {
+      "character_id": "rodrigo",
+      "source": "initial_catalog",
+      "source_achievement_id": null,
+      "unlocked_at": "2026-10-28T12:00:00Z"
+    },
+    {
+      "character_id": "lorena",
+      "source": "initial_catalog",
+      "source_achievement_id": null,
+      "unlocked_at": "2026-10-28T12:00:00Z"
+    },
+    {
+      "character_id": "gus",
+      "source": "initial_catalog",
+      "source_achievement_id": null,
+      "unlocked_at": "2026-10-28T12:00:00Z"
+    },
+    {
+      "character_id": "lana",
+      "source": "initial_catalog",
+      "source_achievement_id": null,
+      "unlocked_at": "2026-10-28T12:00:00Z"
+    },
+    {
+      "character_id": "halloween",
+      "source": "initial_catalog",
+      "source_achievement_id": null,
+      "unlocked_at": "2026-10-28T12:00:00Z"
+    },
+    {
+      "character_id": "el_fuego",
+      "source": "achievement",
+      "source_achievement_id": "desert_campaign_completed",
+      "unlocked_at": "2026-10-28T13:00:00Z"
+    }
+  ],
+  "equipped_character_id": "el_fuego",
+  "achievements": [
+    {
+      "id": "desert_campaign_completed",
+      "source_campaign_id": "desert_campaign",
+      "awarded_at": "2026-10-28T13:00:00Z"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "routes": {
+    "profile": "res://scenes/player/profile.tscn",
+    "public_profile": "res://scenes/player/public_profile.tscn",
+    "settings": "res://scenes/player/settings.tscn",
+    "friends": "res://scenes/player/friends.tscn",
+    "wallet": "res://scenes/player/wallet.tscn",
+    "skins": "res://scenes/skins/skins_panel.tscn",
+    "story": "res://scenes/player/story.tscn",
+    "account": "res://scenes/player/account.tscn"
+  }
+}

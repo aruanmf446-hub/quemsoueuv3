@@ -1,0 +1,264 @@
+{
+  "schema_version": 1,
+  "status": "proposal_not_loaded_by_game",
+  "runtime_catalog": "res://data/characters.json",
+  "runtime_schema_version": 2,
+  "entries": [
+    {
+      "id": "cowboy",
+      "name": "Cowboy",
+      "roles": [
+        "lobby_playable"
+      ],
+      "runtime_group": "playable",
+      "runtime_source": {
+        "path": "res://data/characters.json",
+        "entry_id": "cowboy"
+      },
+      "lobby": {
+        "equippable": true,
+        "initially_unlocked": true,
+        "unlock_achievement": null
+      },
+      "story": {
+        "campaign_ids": [],
+        "role": null,
+        "exclusive_to_story": false,
+        "available_before_lobby_unlock": false
+      },
+      "asset_directory": "res://assets/characters/Cowboy",
+      "model_candidate": "res://assets/characters/Cowboy/1.fbx"
+    },
+    {
+      "id": "michelly",
+      "name": "Michelly",
+      "roles": [
+        "lobby_playable"
+      ],
+      "runtime_group": "playable",
+      "runtime_source": {
+        "path": "res://data/characters.json",
+        "entry_id": "michelly"
+      },
+      "lobby": {
+        "equippable": true,
+        "initially_unlocked": true,
+        "unlock_achievement": null
+      },
+      "story": {
+        "campaign_ids": [],
+        "role": null,
+        "exclusive_to_story": false,
+        "available_before_lobby_unlock": false
+      },
+      "asset_directory": "res://assets/characters/Michelly",
+      "model_candidate": "res://assets/characters/Michelly/1.fbx"
+    },
+    {
+      "id": "rodrigo",
+      "name": "Rodrigo",
+      "roles": [
+        "lobby_playable"
+      ],
+      "runtime_group": "playable",
+      "runtime_source": {
+        "path": "res://data/characters.json",
+        "entry_id": "rodrigo"
+      },
+      "lobby": {
+        "equippable": true,
+        "initially_unlocked": true,
+        "unlock_achievement": null
+      },
+      "story": {
+        "campaign_ids": [],
+        "role": null,
+        "exclusive_to_story": false,
+        "available_before_lobby_unlock": false
+      },
+      "asset_directory": "res://assets/characters/Rodrigo",
+      "model_candidate": "res://assets/characters/Rodrigo/1.fbx"
+    },
+    {
+      "id": "lorena",
+      "name": "Lorena",
+      "roles": [
+        "lobby_playable"
+      ],
+      "runtime_group": "playable",
+      "runtime_source": {
+        "path": "res://data/characters.json",
+        "entry_id": "lorena"
+      },
+      "lobby": {
+        "equippable": true,
+        "initially_unlocked": true,
+        "unlock_achievement": null
+      },
+      "story": {
+        "campaign_ids": [],
+        "role": null,
+        "exclusive_to_story": false,
+        "available_before_lobby_unlock": false
+      },
+      "asset_directory": "res://assets/characters/Lorena",
+      "model_candidate": "res://assets/characters/Lorena/1.fbx"
+    },
+    {
+      "id": "gus",
+      "name": "Gus",
+      "roles": [
+        "lobby_playable"
+      ],
+      "runtime_group": "playable",
+      "runtime_source": {
+        "path": "res://data/characters.json",
+        "entry_id": "gus"
+      },
+      "lobby": {
+        "equippable": true,
+        "initially_unlocked": true,
+        "unlock_achievement": null
+      },
+      "story": {
+        "campaign_ids": [],
+        "role": null,
+        "exclusive_to_story": false,
+        "available_before_lobby_unlock": false
+      },
+      "asset_directory": "res://assets/characters/Gus",
+      "model_candidate": "res://assets/characters/Gus/1.fbx"
+    },
+    {
+      "id": "lana",
+      "name": "Lana",
+      "roles": [
+        "lobby_playable"
+      ],
+      "runtime_group": "playable",
+      "runtime_source": {
+        "path": "res://data/characters.json",
+        "entry_id": "lana"
+      },
+      "lobby": {
+        "equippable": true,
+        "initially_unlocked": true,
+        "unlock_achievement": null
+      },
+      "story": {
+        "campaign_ids": [],
+        "role": null,
+        "exclusive_to_story": false,
+        "available_before_lobby_unlock": false
+      },
+      "asset_directory": "res://assets/characters/Lana",
+      "model_candidate": "res://assets/characters/Lana/1.fbx"
+    },
+    {
+      "id": "halloween",
+      "name": "Halloween",
+      "roles": [
+        "lobby_playable"
+      ],
+      "runtime_group": "playable",
+      "runtime_source": {
+        "path": "res://data/characters.json",
+        "entry_id": "halloween"
+      },
+      "lobby": {
+        "equippable": true,
+        "initially_unlocked": true,
+        "unlock_achievement": null
+      },
+      "story": {
+        "campaign_ids": [],
+        "role": null,
+        "exclusive_to_story": false,
+        "available_before_lobby_unlock": false
+      },
+      "asset_directory": "res://assets/characters/Hallowen",
+      "model_candidate": "res://assets/characters/Hallowen/1.fbx"
+    },
+    {
+      "id": "el_fuego",
+      "name": "El Fuego",
+      "roles": [
+        "unlockable",
+        "story_protagonist"
+      ],
+      "runtime_group": "unlockable",
+      "runtime_source": {
+        "path": "res://data/characters.json",
+        "entry_id": "el_fuego"
+      },
+      "lobby": {
+        "equippable": true,
+        "initially_unlocked": false,
+        "unlock_achievement": "desert_campaign_completed"
+      },
+      "story": {
+        "campaign_ids": [
+          "desert_campaign"
+        ],
+        "role": "protagonist",
+        "exclusive_to_story": false,
+        "available_before_lobby_unlock": true
+      },
+      "asset_directory": "res://assets/characters/El fuego",
+      "model_candidate": "res://assets/characters/El fuego/Correr.fbx"
+    },
+    {
+      "id": "cactus",
+      "name": "Cactus",
+      "roles": [
+        "enemy",
+        "story_only"
+      ],
+      "runtime_group": "enemy",
+      "runtime_source": {
+        "path": "res://data/desert_enemies.json",
+        "entry_id": "cactus"
+      },
+      "lobby": {
+        "equippable": false,
+        "initially_unlocked": false,
+        "unlock_achievement": null
+      },
+      "story": {
+        "campaign_ids": [
+          "desert_campaign"
+        ],
+        "role": "enemy",
+        "exclusive_to_story": true,
+        "available_before_lobby_unlock": false
+      },
+      "asset_directory": "res://assets/characters/cactus",
+      "model_candidate": "res://assets/characters/cactus/andar.fbx"
+    },
+    {
+      "id": "malagueta",
+      "name": "Malagueta",
+      "roles": [
+        "boss",
+        "story_only"
+      ],
+      "runtime_group": "asset_only",
+      "runtime_source": null,
+      "lobby": {
+        "equippable": false,
+        "initially_unlocked": false,
+        "unlock_achievement": null
+      },
+      "story": {
+        "campaign_ids": [
+          "desert_campaign"
+        ],
+        "role": "boss",
+        "exclusive_to_story": true,
+        "available_before_lobby_unlock": false
+      },
+      "asset_directory": "res://assets/characters/malagueta",
+      "model_candidate": "res://assets/characters/malagueta/ataque de baixo pra cima.fbx"
+    }
+  ]
+}

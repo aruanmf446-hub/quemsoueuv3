@@ -1,0 +1,37 @@
+{
+  "base": "d90dcb57e253a95e5ef13f05ea2b8c0f6024660f",
+  "routes": 8,
+  "scenes_scanned": 16,
+  "scripts_parsed": 42,
+  "previous_files": 490,
+  "justified_ui_changes": [
+    "data/characters.json",
+    "project.godot",
+    "scenes/menu/main_menu.tscn",
+    "scenes/skins/skins_panel.tscn",
+    "scripts/lobby/lobby_area.gd",
+    "scripts/lobby/lobby_stage.gd",
+    "scripts/menu/main_menu.gd",
+    "scripts/progress/player_progress.gd",
+    "scripts/skins/skins_panel.gd"
+  ],
+  "previous_offline_deliveries_unchanged": 82,
+  "godot_executed": false,
+  "remote_database_connected": false,
+  "sql_parser": "pglast",
+  "gdscript_parser": "gdtoolkit 4.5; não verifica tipos/APIs do motor",
+  "tests": {
+    "static": 21,
+    "postgresql_17_local": 34,
+    "progression_v2_regression": 80,
+    "total": 135,
+    "failed": 0
+  },
+  "database_test_scope": "isolated local PostgreSQL; SQL surfaces of Auth and Realtime only",
+  "godot_typechecking": false,
+  "godot_rendering": false,
+  "gameplay_tests": false,
+  "websocket_service_tests": false,
+  "remote_migrations_applied": false,
+  "android_web_builds": false
+}

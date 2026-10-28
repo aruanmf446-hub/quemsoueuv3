@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "status": "proposal_not_loaded_by_game",
+  "id": "desert_phase_01",
+  "campaign_id": "desert_campaign",
+  "realm_id": "desert",
+  "order": 1,
+  "name": "Entrada do Deserto",
+  "narrative_description": "El Fuego cruza os marcos de entrada e descobre patrulhas Cactus bloqueando a rota para o interior.",
+  "environment": "Borda rochosa do reino, caminhos abertos e sinalização de orientação.",
+  "protagonist_id": "el_fuego",
+  "difficulty": {
+    "progression_rank": 1,
+    "label": "introdutória",
+    "balance_status": "not_playtested"
+  },
+  "obstacle_types_planned": [
+    "small_gaps",
+    "low_ledges",
+    "double_jump_teaching"
+  ],
+  "enemies_planned": [
+    {
+      "character_id": "cactus",
+      "role": "desert_troop",
+      "placement_status": "not_defined"
+    }
+  ],
+  "boss_id": null,
+  "prerequisite_phase_ids": [],
+  "checkpoints_planned": [
+    {
+      "id": "desert_phase_01_checkpoint_01",
+      "location_description": "Depois do primeiro conjunto de saltos",
+      "implementation_status": "not_implemented"
+    },
+    {
+      "id": "desert_phase_01_checkpoint_02",
+      "location_description": "Antes da patrulha que guarda a saída",
+      "implementation_status": "not_implemented"
+    }
+  ],
+  "completion": {
+    "type": "reach_exit",
+    "required_boss_id": null,
+    "persisted_by": "future_verified_progress_service",
+    "checkpoint_is_completion": false
+  },
+  "future_rewards": [
+    {
+      "type": "phase_completion",
+      "target_id": "desert_phase_01",
+      "status": "future"
+    },
+    {
+      "type": "next_phase_access",
+      "target_id": "desert_phase_02",
+      "status": "future"
+    }
+  ],
+  "resources_required": [
+    "el_fuego_model",
+    "cactus_model",
+    "checkpoint_presentation",
+    "desert_audio",
+    "desert_story_text",
+    "desert_entrance"
+  ],
+  "implementation_dependencies": [
+    "campaign_navigation",
+    "level_builder",
+    "checkpoint_system",
+    "phase_progression",
+    "cactus_reuse",
+    "asset_import_validation",
+    "playtest_and_accessibility"
+  ],
+  "existing_runtime": {
+    "scene": "res://scenes/desert/phase_01.tscn",
+    "config": "res://data/desert/phase_01.json",
+    "status": "prototype_preserved"
+  }
+}

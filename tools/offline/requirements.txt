@@ -1,0 +1,2 @@
+# Somente verificações JSON offline; não é dependência do jogo.
+jsonschema==4.26.0

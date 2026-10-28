@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "status": "proposal_not_loaded_by_game",
+  "id": "desert_phase_05",
+  "campaign_id": "desert_campaign",
+  "realm_id": "desert",
+  "order": 5,
+  "name": "Pontes do Abismo",
+  "narrative_description": "El Fuego atravessa um desfiladeiro que separa as ruínas dos acessos à fortaleza.",
+  "environment": "Pontes suspensas e apoios de pedra com leitura clara dos vãos.",
+  "protagonist_id": "el_fuego",
+  "difficulty": {
+    "progression_rank": 5,
+    "label": "moderada",
+    "balance_status": "not_playtested"
+  },
+  "obstacle_types_planned": [
+    "bridge_gaps",
+    "moving_supports",
+    "timed_crossings"
+  ],
+  "enemies_planned": [
+    {
+      "character_id": "cactus",
+      "role": "desert_troop",
+      "placement_status": "not_defined"
+    }
+  ],
+  "boss_id": null,
+  "prerequisite_phase_ids": [
+    "desert_phase_04"
+  ],
+  "checkpoints_planned": [
+    {
+      "id": "desert_phase_05_checkpoint_01",
+      "location_description": "Na primeira margem protegida",
+      "implementation_status": "not_implemented"
+    },
+    {
+      "id": "desert_phase_05_checkpoint_02",
+      "location_description": "No apoio central do desfiladeiro",
+      "implementation_status": "not_implemented"
+    }
+  ],
+  "completion": {
+    "type": "reach_exit",
+    "required_boss_id": null,
+    "persisted_by": "future_verified_progress_service",
+    "checkpoint_is_completion": false
+  },
+  "future_rewards": [
+    {
+      "type": "phase_completion",
+      "target_id": "desert_phase_05",
+      "status": "future"
+    },
+    {
+      "type": "next_phase_access",
+      "target_id": "desert_phase_06",
+      "status": "future"
+    }
+  ],
+  "resources_required": [
+    "el_fuego_model",
+    "cactus_model",
+    "checkpoint_presentation",
+    "desert_audio",
+    "desert_story_text",
+    "desert_bridges"
+  ],
+  "implementation_dependencies": [
+    "campaign_navigation",
+    "level_builder",
+    "checkpoint_system",
+    "phase_progression",
+    "cactus_reuse",
+    "asset_import_validation",
+    "playtest_and_accessibility",
+    "moving_platforms"
+  ],
+  "existing_runtime": {
+    "scene": null,
+    "config": null,
+    "status": "not_implemented"
+  }
+}

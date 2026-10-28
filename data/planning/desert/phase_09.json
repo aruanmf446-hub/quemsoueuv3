@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "status": "proposal_not_loaded_by_game",
+  "id": "desert_phase_09",
+  "campaign_id": "desert_campaign",
+  "realm_id": "desert",
+  "order": 9,
+  "name": "Laboratório Proibido",
+  "narrative_description": "El Fuego interrompe a rota de abastecimento e alcança o acesso ao refúgio de Malagueta.",
+  "environment": "Máquinas, condutos e pistas narrativas ligando laboratório e chefe.",
+  "protagonist_id": "el_fuego",
+  "difficulty": {
+    "progression_rank": 9,
+    "label": "muito alta",
+    "balance_status": "not_playtested"
+  },
+  "obstacle_types_planned": [
+    "telegraphed_hazards_planned",
+    "mechanism_routes",
+    "guarded_exit"
+  ],
+  "enemies_planned": [
+    {
+      "character_id": "cactus",
+      "role": "desert_troop",
+      "placement_status": "not_defined"
+    }
+  ],
+  "boss_id": null,
+  "prerequisite_phase_ids": [
+    "desert_phase_08"
+  ],
+  "checkpoints_planned": [
+    {
+      "id": "desert_phase_09_checkpoint_01",
+      "location_description": "Após a zona de contenção",
+      "implementation_status": "not_implemented"
+    },
+    {
+      "id": "desert_phase_09_checkpoint_02",
+      "location_description": "Antes do último mecanismo de acesso",
+      "implementation_status": "not_implemented"
+    }
+  ],
+  "completion": {
+    "type": "reach_exit",
+    "required_boss_id": null,
+    "persisted_by": "future_verified_progress_service",
+    "checkpoint_is_completion": false
+  },
+  "future_rewards": [
+    {
+      "type": "phase_completion",
+      "target_id": "desert_phase_09",
+      "status": "future"
+    },
+    {
+      "type": "next_phase_access",
+      "target_id": "desert_phase_10",
+      "status": "future"
+    }
+  ],
+  "resources_required": [
+    "el_fuego_model",
+    "cactus_model",
+    "checkpoint_presentation",
+    "desert_audio",
+    "desert_story_text",
+    "desert_laboratory"
+  ],
+  "implementation_dependencies": [
+    "campaign_navigation",
+    "level_builder",
+    "checkpoint_system",
+    "phase_progression",
+    "cactus_reuse",
+    "asset_import_validation",
+    "playtest_and_accessibility",
+    "laboratory_hazards"
+  ],
+  "existing_runtime": {
+    "scene": null,
+    "config": null,
+    "status": "not_implemented"
+  }
+}

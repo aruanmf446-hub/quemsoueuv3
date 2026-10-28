@@ -143,8 +143,8 @@
 			"pose": "base",
 			"pose_time": 0.0,
 			"unlock": {
-				"type": "flag",
-				"flag": "desert_stage_completed",
+				"type": "achievement",
+				"achievement_id": "desert_campaign_completed",
 				"label": "Conclua o Reino do Deserto"
 			}
 		}

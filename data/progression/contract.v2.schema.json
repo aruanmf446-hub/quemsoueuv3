@@ -1,0 +1,1054 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Progressão V3 — contrato v2 isolado",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/state"
+    },
+    {
+      "$ref": "#/$defs/save"
+    },
+    {
+      "$ref": "#/$defs/request"
+    },
+    {
+      "$ref": "#/$defs/response"
+    },
+    {
+      "$ref": "#/$defs/server_store"
+    },
+    {
+      "$ref": "#/$defs/rules"
+    },
+    {
+      "$ref": "#/$defs/migration_policy"
+    }
+  ],
+  "$defs": {
+    "state": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": 2
+        },
+        "rules_version": {
+          "const": "desert_progression_2.0.0"
+        },
+        "player_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "completed_phase_ids": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "desert_phase_01",
+              "desert_phase_02",
+              "desert_phase_03",
+              "desert_phase_04",
+              "desert_phase_05",
+              "desert_phase_06",
+              "desert_phase_07",
+              "desert_phase_08",
+              "desert_phase_09",
+              "desert_phase_10"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "active_phase_id": {
+          "anyOf": [
+            {
+              "enum": [
+                "desert_phase_01",
+                "desert_phase_02",
+                "desert_phase_03",
+                "desert_phase_04",
+                "desert_phase_05",
+                "desert_phase_06",
+                "desert_phase_07",
+                "desert_phase_08",
+                "desert_phase_09",
+                "desert_phase_10"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "checkpoint": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "phase_id": {
+                  "enum": [
+                    "desert_phase_01",
+                    "desert_phase_02",
+                    "desert_phase_03",
+                    "desert_phase_04",
+                    "desert_phase_05",
+                    "desert_phase_06",
+                    "desert_phase_07",
+                    "desert_phase_08",
+                    "desert_phase_09",
+                    "desert_phase_10"
+                  ]
+                },
+                "checkpoint_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^[a-z][a-z0-9_]*$"
+                }
+              },
+              "required": [
+                "phase_id",
+                "checkpoint_id"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "achievement_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "uniqueItems": true
+        },
+        "unlocked_character_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "uniqueItems": true
+        },
+        "equipped_character_id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*$"
+        }
+      },
+      "required": [
+        "schema_version",
+        "rules_version",
+        "player_id",
+        "revision",
+        "completed_phase_ids",
+        "active_phase_id",
+        "checkpoint",
+        "achievement_ids",
+        "unlocked_character_ids",
+        "equipped_character_id"
+      ],
+      "additionalProperties": false
+    },
+    "save": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": 2
+        },
+        "kind": {
+          "const": "local_save"
+        },
+        "rules_version": {
+          "const": "desert_progression_2.0.0"
+        },
+        "player_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "mode": {
+          "enum": [
+            "offline_reference",
+            "online_authoritative"
+          ]
+        },
+        "local_revision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "local_state": {
+          "$ref": "#/$defs/state"
+        },
+        "server_cache": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/state"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "outbox": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "request": {
+                "$ref": "#/$defs/request"
+              },
+              "status": {
+                "enum": [
+                  "pending",
+                  "applied",
+                  "noop",
+                  "conflict",
+                  "rejected",
+                  "superseded"
+                ]
+              },
+              "last_response_code": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^[a-z][a-z0-9_]*$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "superseded_by": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "request",
+              "status",
+              "last_response_code",
+              "superseded_by"
+            ],
+            "additionalProperties": false
+          },
+          "uniqueItems": true
+        },
+        "migration_receipt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "migration_version": {
+                  "const": "legacy_to_local_save_2.0.0"
+                },
+                "migration_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "source_sha256": {
+                  "type": "object",
+                  "minProperties": 1,
+                  "additionalProperties": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                },
+                "source_formats": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "uniqueItems": true
+                },
+                "claimed_flags": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "boolean"
+                  }
+                },
+                "claimed_completed_phase_ids": {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "desert_phase_01",
+                      "desert_phase_02",
+                      "desert_phase_03",
+                      "desert_phase_04",
+                      "desert_phase_05",
+                      "desert_phase_06",
+                      "desert_phase_07",
+                      "desert_phase_08",
+                      "desert_phase_09",
+                      "desert_phase_10"
+                    ]
+                  },
+                  "uniqueItems": true
+                },
+                "prior_equipped_character_id": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^[a-z][a-z0-9_]*$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "review_required": {
+                  "type": "boolean"
+                },
+                "disposition": {
+                  "const": "unverified_local_import"
+                }
+              },
+              "required": [
+                "migration_version",
+                "migration_id",
+                "source_sha256",
+                "source_formats",
+                "claimed_flags",
+                "claimed_completed_phase_ids",
+                "prior_equipped_character_id",
+                "review_required",
+                "disposition"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "integrity": {
+          "type": "object",
+          "properties": {
+            "algorithm": {
+              "const": "sha256"
+            },
+            "digest": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "algorithm",
+            "digest"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schema_version",
+        "kind",
+        "rules_version",
+        "player_id",
+        "mode",
+        "local_revision",
+        "local_state",
+        "server_cache",
+        "outbox",
+        "migration_receipt",
+        "integrity"
+      ],
+      "additionalProperties": false
+    },
+    "request": {
+      "type": "object",
+      "properties": {
+        "protocol_version": {
+          "const": 2
+        },
+        "rules_version": {
+          "const": "desert_progression_2.0.0"
+        },
+        "request_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "expected_revision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "operation": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "const": "start_phase"
+                },
+                "phase_id": {
+                  "enum": [
+                    "desert_phase_01",
+                    "desert_phase_02",
+                    "desert_phase_03",
+                    "desert_phase_04",
+                    "desert_phase_05",
+                    "desert_phase_06",
+                    "desert_phase_07",
+                    "desert_phase_08",
+                    "desert_phase_09",
+                    "desert_phase_10"
+                  ]
+                }
+              },
+              "required": [
+                "type",
+                "phase_id"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "const": "record_checkpoint"
+                },
+                "phase_id": {
+                  "enum": [
+                    "desert_phase_01",
+                    "desert_phase_02",
+                    "desert_phase_03",
+                    "desert_phase_04",
+                    "desert_phase_05",
+                    "desert_phase_06",
+                    "desert_phase_07",
+                    "desert_phase_08",
+                    "desert_phase_09",
+                    "desert_phase_10"
+                  ]
+                },
+                "checkpoint_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^[a-z][a-z0-9_]*$"
+                }
+              },
+              "required": [
+                "type",
+                "phase_id",
+                "checkpoint_id"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "const": "complete_phase"
+                },
+                "phase_id": {
+                  "enum": [
+                    "desert_phase_01",
+                    "desert_phase_02",
+                    "desert_phase_03",
+                    "desert_phase_04",
+                    "desert_phase_05",
+                    "desert_phase_06",
+                    "desert_phase_07",
+                    "desert_phase_08",
+                    "desert_phase_09",
+                    "desert_phase_10"
+                  ]
+                },
+                "attempt_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "evidence_id": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "required": [
+                "type",
+                "phase_id",
+                "attempt_id",
+                "evidence_id"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "const": "equip_character"
+                },
+                "character_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^[a-z][a-z0-9_]*$"
+                }
+              },
+              "required": [
+                "type",
+                "character_id"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": [
+        "protocol_version",
+        "rules_version",
+        "request_id",
+        "expected_revision",
+        "operation"
+      ],
+      "additionalProperties": false
+    },
+    "response": {
+      "type": "object",
+      "properties": {
+        "protocol_version": {
+          "const": 2
+        },
+        "rules_version": {
+          "const": "desert_progression_2.0.0"
+        },
+        "request_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "status": {
+          "enum": [
+            "applied",
+            "noop",
+            "conflict",
+            "rejected"
+          ]
+        },
+        "code": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9_]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "snapshot": {
+          "$ref": "#/$defs/state"
+        }
+      },
+      "required": [
+        "protocol_version",
+        "rules_version",
+        "request_id",
+        "status",
+        "code",
+        "snapshot"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "applied",
+                  "noop"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "code": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "code": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "conflict"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "code": {
+                "const": "revision_conflict"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "server_store": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": 2
+        },
+        "kind": {
+          "const": "server_reference_store"
+        },
+        "rules_version": {
+          "const": "desert_progression_2.0.0"
+        },
+        "player_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "state": {
+          "$ref": "#/$defs/state"
+        },
+        "journal": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "request": {
+                "$ref": "#/$defs/request"
+              },
+              "request_digest": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "response": {
+                "$ref": "#/$defs/response"
+              }
+            },
+            "required": [
+              "request",
+              "request_digest",
+              "response"
+            ],
+            "additionalProperties": false
+          },
+          "uniqueItems": true
+        },
+        "evidence_ledger": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "phase_id": {
+                "enum": [
+                  "desert_phase_01",
+                  "desert_phase_02",
+                  "desert_phase_03",
+                  "desert_phase_04",
+                  "desert_phase_05",
+                  "desert_phase_06",
+                  "desert_phase_07",
+                  "desert_phase_08",
+                  "desert_phase_09",
+                  "desert_phase_10"
+                ]
+              },
+              "attempt_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "evidence_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "request_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "phase_id",
+              "attempt_id",
+              "evidence_id",
+              "request_id"
+            ],
+            "additionalProperties": false
+          },
+          "uniqueItems": true
+        },
+        "integrity": {
+          "type": "object",
+          "properties": {
+            "algorithm": {
+              "const": "sha256"
+            },
+            "digest": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "algorithm",
+            "digest"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schema_version",
+        "kind",
+        "rules_version",
+        "player_id",
+        "state",
+        "journal",
+        "evidence_ledger",
+        "integrity"
+      ],
+      "additionalProperties": false
+    },
+    "rules": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": 2
+        },
+        "rules_version": {
+          "const": "desert_progression_2.0.0"
+        },
+        "base_commit": {
+          "const": "943c890519111c83aab3c5bdf85bcb120dc02f72"
+        },
+        "campaign_id": {
+          "const": "desert_campaign"
+        },
+        "protagonist_id": {
+          "const": "el_fuego"
+        },
+        "achievement_id": {
+          "const": "desert_campaign_completed"
+        },
+        "unlock_character_id": {
+          "const": "el_fuego"
+        },
+        "classifications": {
+          "type": "object",
+          "properties": {
+            "playable_heroes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              "uniqueItems": true
+            },
+            "unlockable_heroes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              "uniqueItems": true
+            },
+            "common_enemies": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              "uniqueItems": true
+            },
+            "minibosses": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              "uniqueItems": true
+            },
+            "final_bosses": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              "uniqueItems": true
+            },
+            "campaign_only_characters": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "playable_heroes",
+            "unlockable_heroes",
+            "common_enemies",
+            "minibosses",
+            "final_bosses",
+            "campaign_only_characters"
+          ],
+          "additionalProperties": false
+        },
+        "characters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "classification": {
+                "enum": [
+                  "playable_hero",
+                  "unlockable_hero",
+                  "common_enemy",
+                  "miniboss",
+                  "final_boss",
+                  "campaign_only_character"
+                ]
+              },
+              "scope": {
+                "enum": [
+                  "campaign_only",
+                  "lobby_and_optional_campaign"
+                ]
+              },
+              "lobby_initially_unlocked": {
+                "type": "boolean"
+              },
+              "required_achievement_id": {
+                "enum": [
+                  null,
+                  "desert_campaign_completed"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "classification",
+              "scope",
+              "lobby_initially_unlocked",
+              "required_achievement_id"
+            ],
+            "additionalProperties": false
+          },
+          "uniqueItems": true,
+          "minItems": 10,
+          "maxItems": 10
+        },
+        "phases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "enum": [
+                  "desert_phase_01",
+                  "desert_phase_02",
+                  "desert_phase_03",
+                  "desert_phase_04",
+                  "desert_phase_05",
+                  "desert_phase_06",
+                  "desert_phase_07",
+                  "desert_phase_08",
+                  "desert_phase_09",
+                  "desert_phase_10"
+                ]
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "order": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10
+              },
+              "checkpoint_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^[a-z][a-z0-9_]*$"
+                },
+                "uniqueItems": true,
+                "minItems": 1
+              },
+              "boss_id": {
+                "enum": [
+                  null,
+                  "malagueta"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "order",
+              "checkpoint_ids",
+              "boss_id"
+            ],
+            "additionalProperties": false
+          },
+          "uniqueItems": true,
+          "minItems": 10,
+          "maxItems": 10
+        },
+        "content_sources_sha256": {
+          "type": "object",
+          "properties": {
+            "data/planning/character_registry.json": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "data/planning/desert_campaign.json": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "data/contracts/player_state.schema.json": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "data/planning/desert/phase_01.json": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "data/planning/desert/phase_02.json": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "data/planning/desert/phase_03.json": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "data/planning/desert/phase_04.json": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "data/planning/desert/phase_05.json": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "data/planning/desert/phase_06.json": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "data/planning/desert/phase_07.json": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "data/planning/desert/phase_08.json": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "data/planning/desert/phase_09.json": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "data/planning/desert/phase_10.json": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "data/planning/character_registry.json",
+            "data/planning/desert_campaign.json",
+            "data/contracts/player_state.schema.json",
+            "data/planning/desert/phase_01.json",
+            "data/planning/desert/phase_02.json",
+            "data/planning/desert/phase_03.json",
+            "data/planning/desert/phase_04.json",
+            "data/planning/desert/phase_05.json",
+            "data/planning/desert/phase_06.json",
+            "data/planning/desert/phase_07.json",
+            "data/planning/desert/phase_08.json",
+            "data/planning/desert/phase_09.json",
+            "data/planning/desert/phase_10.json"
+          ],
+          "additionalProperties": false
+        },
+        "scope": {
+          "const": "isolated_reference_not_connected_to_godot"
+        }
+      },
+      "required": [
+        "schema_version",
+        "rules_version",
+        "base_commit",
+        "campaign_id",
+        "protagonist_id",
+        "achievement_id",
+        "unlock_character_id",
+        "classifications",
+        "characters",
+        "phases",
+        "content_sources_sha256",
+        "scope"
+      ],
+      "additionalProperties": false
+    },
+    "migration_policy": {
+      "const": {
+        "schema_version": 2,
+        "migration_version": "legacy_to_local_save_2.0.0",
+        "target_save_version": 2,
+        "supported_json_versions": [
+          1,
+          2
+        ],
+        "legacy_cfg_version": 0,
+        "legacy_flags": [
+          "desert_stage_completed",
+          "desert_campaign_completed"
+        ],
+        "flags_are_completion_evidence": false,
+        "legacy_equipment_is_entitlement": false,
+        "legacy_phase_claims": "preserve_for_review_without_automatic_grants",
+        "server_cache_trusted_on_load": false,
+        "unknown_future_version": "quarantine_without_overwrite",
+        "corrupt_save": "quarantine_original_bytes_without_creating_progress",
+        "output_policy": "new_directory_only_preserve_originals_verbatim",
+        "integrity": "sha256_for_corruption_detection_not_authentication"
+      }
+    }
+  }
+}

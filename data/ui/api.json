@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "transport": "authenticated_postgrest_rpc",
+  "rpc_schema": "public",
+  "subject_source": "Supabase Auth JWT, never a client user_id",
+  "endpoints": {
+    "qse_profile_self": {
+      "parameters": [],
+      "response_schema": "services.schema.json",
+      "response_definition": "profile"
+    },
+    "qse_profile_update": {
+      "parameters": [
+        "p_nickname"
+      ],
+      "response_schema": "services.schema.json",
+      "response_definition": "profile"
+    },
+    "qse_account_preferences": {
+      "parameters": [
+        "p_discoverable"
+      ],
+      "response_schema": "services.schema.json",
+      "response_definition": "account_preferences"
+    },
+    "qse_profile_public": {
+      "parameters": [
+        "p_public_id"
+      ],
+      "response_schema": "services.schema.json",
+      "response_definition": "public_profile"
+    },
+    "qse_find_players": {
+      "parameters": [
+        "p_term"
+      ],
+      "response_schema": "services.schema.json",
+      "response_definition": "search"
+    },
+    "qse_friends": {
+      "parameters": [],
+      "response_schema": "services.schema.json",
+      "response_definition": "friends"
+    },
+    "qse_friend_action": {
+      "parameters": [
+        "p_action",
+        "p_target",
+        "p_request_id"
+      ],
+      "response_schema": "services.schema.json",
+      "response_definition": "friend_action"
+    },
+    "qse_wallet_history": {
+      "parameters": [
+        "p_before"
+      ],
+      "response_schema": "services.schema.json",
+      "response_definition": "history"
+    },
+    "qse_wallet": {
+      "parameters": [],
+      "response_schema": "services.schema.json",
+      "response_definition": "wallet"
+    },
+    "qse_progression_snapshot": {
+      "parameters": [],
+      "response_schema": "../progression/contract.v2.schema.json",
+      "response_definition": "state"
+    },
+    "qse_progression_command": {
+      "parameters": [
+        "p_request"
+      ],
+      "response_schema": "../progression/contract.v2.schema.json",
+      "response_definition": "response"
+    }
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "status": "proposal_not_loaded_by_game",
+  "dependencies": [
+    {
+      "id": "campaign_navigation",
+      "description": "Navegação do menu para campanha e seleção de fase",
+      "status": "not_implemented",
+      "existing_files": [
+        "res://scripts/menu/main_menu.gd"
+      ]
+    },
+    {
+      "id": "level_builder",
+      "description": "Instanciação futura do planejamento sem substituir o layout da fase 1",
+      "status": "prototype_only",
+      "existing_files": [
+        "res://scripts/desert/phase_01.gd"
+      ]
+    },
+    {
+      "id": "checkpoint_system",
+      "description": "Registro e restauração de checkpoints por tentativa",
+      "status": "not_implemented",
+      "existing_files": []
+    },
+    {
+      "id": "phase_progression",
+      "description": "Pré-requisitos e conclusão das dez fases",
+      "status": "not_implemented",
+      "existing_files": [
+        "res://data/desert/phase_01.json"
+      ]
+    },
+    {
+      "id": "cactus_reuse",
+      "description": "Reutilizar o Cactus atual; balanceamento futuro separado",
+      "status": "prototype_only",
+      "existing_files": [
+        "res://scripts/desert/cactus_enemy.gd"
+      ]
+    },
+    {
+      "id": "asset_import_validation",
+      "description": "Verificar importação, materiais, trilhas e sockets no Godot",
+      "status": "requires_godot",
+      "existing_files": [
+        "res://scripts/lobby/character_slot.gd"
+      ]
+    },
+    {
+      "id": "moving_platforms",
+      "description": "Plataformas móveis, trajetórias e colisões",
+      "status": "not_implemented",
+      "existing_files": []
+    },
+    {
+      "id": "sandstorm_effect",
+      "description": "Vento/areia e acessibilidade visual, sem definir física nesta tarefa",
+      "status": "not_implemented",
+      "existing_files": []
+    },
+    {
+      "id": "laboratory_hazards",
+      "description": "Telegráficos e estados dos mecanismos do laboratório",
+      "status": "not_implemented",
+      "existing_files": []
+    },
+    {
+      "id": "malagueta_encounter",
+      "description": "Comportamento e condições do chefe final",
+      "status": "not_implemented",
+      "existing_files": []
+    },
+    {
+      "id": "verified_progress_service",
+      "description": "Conclusões autoritativas e idempotentes no servidor",
+      "status": "proposal_only",
+      "existing_files": []
+    },
+    {
+      "id": "unlock_migration",
+      "description": "Migrar flag antiga sem liberar El Fuego por progresso incompleto",
+      "status": "proposal_only",
+      "existing_files": [
+        "res://data/progress_contract.json"
+      ]
+    },
+    {
+      "id": "playtest_and_accessibility",
+      "description": "Percurso, câmera, dificuldade e controles em dispositivos-alvo",
+      "status": "requires_godot",
+      "existing_files": []
+    }
+  ]
+}

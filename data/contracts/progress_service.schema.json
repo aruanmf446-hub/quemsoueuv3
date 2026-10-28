@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "status": {
+      "const": "proposal_only_not_deployed"
+    },
+    "authority": {
+      "const": "authenticated_server"
+    },
+    "tables_proposed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "primary_key": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9_]*$"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "owner_field": {
+            "const": "user_id"
+          },
+          "client_write_policy": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "name",
+          "primary_key",
+          "owner_field",
+          "client_write_policy"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "operations_proposed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "enum": [
+              "get_player_state",
+              "begin_phase",
+              "complete_phase",
+              "equip_character"
+            ]
+          },
+          "input_schema": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^res://data/contracts/[^/]+\\.schema\\.json$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "output_schema": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^res://data/contracts/[^/]+\\.schema\\.json$"
+          },
+          "rule": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "name",
+          "input_schema",
+          "output_schema",
+          "rule"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "completion_policy": {
+      "type": "object",
+      "properties": {
+        "campaign_id": {
+          "const": "desert_campaign"
+        },
+        "required_phase_ids": {
+          "const": [
+            "desert_phase_01",
+            "desert_phase_02",
+            "desert_phase_03",
+            "desert_phase_04",
+            "desert_phase_05",
+            "desert_phase_06",
+            "desert_phase_07",
+            "desert_phase_08",
+            "desert_phase_09",
+            "desert_phase_10"
+          ]
+        },
+        "final_phase_id": {
+          "const": "desert_phase_10"
+        },
+        "required_boss_id": {
+          "const": "malagueta"
+        },
+        "achievement_id": {
+          "const": "desert_campaign_completed"
+        },
+        "unlock_character_id": {
+          "const": "el_fuego"
+        },
+        "legacy_flag_is_proof": {
+          "const": false
+        }
+      },
+      "required": [
+        "campaign_id",
+        "required_phase_ids",
+        "final_phase_id",
+        "required_boss_id",
+        "achievement_id",
+        "unlock_character_id",
+        "legacy_flag_is_proof"
+      ],
+      "additionalProperties": false
+    },
+    "transactions": {
+      "type": "object",
+      "properties": {
+        "idempotency_scope": {
+          "const": [
+            "authenticated_user_id",
+            "request_id"
+          ]
+        },
+        "different_payload_same_request_id": {
+          "const": "reject"
+        },
+        "concurrent_completion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "retry_after_commit": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "idempotency_scope",
+        "different_payload_same_request_id",
+        "concurrent_completion",
+        "retry_after_commit"
+      ],
+      "additionalProperties": false
+    },
+    "verification_status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "migration_status": {
+      "const": "not_applied"
+    },
+    "credentials_included": {
+      "const": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "status",
+    "authority",
+    "tables_proposed",
+    "operations_proposed",
+    "completion_policy",
+    "transactions",
+    "verification_status",
+    "migration_status",
+    "credentials_included"
+  ],
+  "additionalProperties": false
+}

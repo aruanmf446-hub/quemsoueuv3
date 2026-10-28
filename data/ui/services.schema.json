@@ -1,0 +1,298 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:qse:player-ui:services:1",
+  "title": "Respostas das RPCs de interface, v1; progressão conserva o contrato v2",
+  "$defs": {
+    "public_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "user_id",
+        "public_id",
+        "nickname",
+        "level",
+        "equipped_character_id"
+      ],
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "public_id": {
+          "type": "string",
+          "pattern": "^QSE-[0-9a-f]{32}$"
+        },
+        "nickname": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 24
+        },
+        "level": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "equipped_character_id": {
+          "enum": [
+            "cowboy",
+            "michelly",
+            "rodrigo",
+            "lorena",
+            "gus",
+            "lana",
+            "halloween",
+            "el_fuego"
+          ]
+        }
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "user_id",
+        "public_id",
+        "nickname",
+        "level",
+        "equipped_character_id",
+        "experience",
+        "statistics",
+        "discoverable"
+      ],
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "public_id": {
+          "type": "string",
+          "pattern": "^QSE-[0-9a-f]{32}$"
+        },
+        "nickname": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 24
+        },
+        "level": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "equipped_character_id": {
+          "enum": [
+            "cowboy",
+            "michelly",
+            "rodrigo",
+            "lorena",
+            "gus",
+            "lana",
+            "halloween",
+            "el_fuego"
+          ]
+        },
+        "experience": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9]+$"
+        },
+        "statistics": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "discoverable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "transaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "transaction_id",
+        "sequence",
+        "currency",
+        "amount",
+        "balance_after",
+        "reason",
+        "created_at"
+      ],
+      "properties": {
+        "transaction_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sequence": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]*$"
+        },
+        "currency": {
+          "enum": [
+            "coins",
+            "gems"
+          ]
+        },
+        "amount": {
+          "type": "string",
+          "pattern": "^-?[1-9][0-9]*$"
+        },
+        "balance_after": {
+          "type": "string",
+          "pattern": "^[0-9]+$"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "history": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "transactions",
+        "next_cursor"
+      ],
+      "properties": {
+        "transactions": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "$ref": "#/$defs/transaction"
+          }
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[1-9][0-9]*$"
+        }
+      }
+    },
+    "wallet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "transactions",
+        "next_cursor",
+        "coins",
+        "gems",
+        "revision"
+      ],
+      "properties": {
+        "transactions": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "$ref": "#/$defs/transaction"
+          }
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[1-9][0-9]*$"
+        },
+        "coins": {
+          "type": "string",
+          "pattern": "^[0-9]+$"
+        },
+        "gems": {
+          "type": "string",
+          "pattern": "^[0-9]+$"
+        },
+        "revision": {
+          "type": "string",
+          "pattern": "^[0-9]+$"
+        }
+      }
+    },
+    "friends": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "friends",
+        "incoming",
+        "outgoing"
+      ],
+      "properties": {
+        "friends": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/public_profile"
+          }
+        },
+        "incoming": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/public_profile"
+          }
+        },
+        "outgoing": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/public_profile"
+          }
+        }
+      }
+    },
+    "search": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "players"
+      ],
+      "properties": {
+        "players": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "$ref": "#/$defs/public_profile"
+          }
+        }
+      }
+    },
+    "account_preferences": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "discoverable"
+      ],
+      "properties": {
+        "discoverable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "friend_action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "applied",
+            "noop"
+          ]
+        }
+      }
+    }
+  }
+}

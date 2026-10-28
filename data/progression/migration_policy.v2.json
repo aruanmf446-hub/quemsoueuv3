@@ -1,0 +1,22 @@
+{
+  "schema_version": 2,
+  "migration_version": "legacy_to_local_save_2.0.0",
+  "target_save_version": 2,
+  "supported_json_versions": [
+    1,
+    2
+  ],
+  "legacy_cfg_version": 0,
+  "legacy_flags": [
+    "desert_stage_completed",
+    "desert_campaign_completed"
+  ],
+  "flags_are_completion_evidence": false,
+  "legacy_equipment_is_entitlement": false,
+  "legacy_phase_claims": "preserve_for_review_without_automatic_grants",
+  "server_cache_trusted_on_load": false,
+  "unknown_future_version": "quarantine_without_overwrite",
+  "corrupt_save": "quarantine_original_bytes_without_creating_progress",
+  "output_policy": "new_directory_only_preserve_originals_verbatim",
+  "integrity": "sha256_for_corruption_detection_not_authentication"
+}

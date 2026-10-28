@@ -1,0 +1,300 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "status": {
+      "const": "proposal_not_loaded_by_game"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^desert_phase_(0[1-9]|10)$"
+    },
+    "campaign_id": {
+      "const": "desert_campaign"
+    },
+    "realm_id": {
+      "const": "desert"
+    },
+    "order": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "narrative_description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "environment": {
+      "type": "string",
+      "minLength": 1
+    },
+    "protagonist_id": {
+      "const": "el_fuego"
+    },
+    "difficulty": {
+      "type": "object",
+      "properties": {
+        "progression_rank": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "balance_status": {
+          "const": "not_playtested"
+        }
+      },
+      "required": [
+        "progression_rank",
+        "label",
+        "balance_status"
+      ],
+      "additionalProperties": false
+    },
+    "obstacle_types_planned": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^[a-z][a-z0-9_]*$"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "enemies_planned": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "character_id": {
+            "const": "cactus"
+          },
+          "role": {
+            "const": "desert_troop"
+          },
+          "placement_status": {
+            "const": "not_defined"
+          }
+        },
+        "required": [
+          "character_id",
+          "role",
+          "placement_status"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "boss_id": {
+      "anyOf": [
+        {
+          "const": "malagueta"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "prerequisite_phase_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^[a-z][a-z0-9_]*$"
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "checkpoints_planned": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "location_description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "implementation_status": {
+            "const": "not_implemented"
+          }
+        },
+        "required": [
+          "id",
+          "location_description",
+          "implementation_status"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "completion": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "reach_exit",
+            "defeat_boss_then_reach_exit"
+          ]
+        },
+        "required_boss_id": {
+          "anyOf": [
+            {
+              "const": "malagueta"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "persisted_by": {
+          "const": "future_verified_progress_service"
+        },
+        "checkpoint_is_completion": {
+          "const": false
+        }
+      },
+      "required": [
+        "type",
+        "required_boss_id",
+        "persisted_by",
+        "checkpoint_is_completion"
+      ],
+      "additionalProperties": false
+    },
+    "future_rewards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "enum": [
+              "phase_completion",
+              "next_phase_access",
+              "achievement",
+              "character_unlock"
+            ]
+          },
+          "target_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "status": {
+            "const": "future"
+          }
+        },
+        "required": [
+          "type",
+          "target_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "resources_required": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^[a-z][a-z0-9_]*$"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "implementation_dependencies": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^[a-z][a-z0-9_]*$"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "existing_runtime": {
+      "type": "object",
+      "properties": {
+        "scene": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^res://[^\\\\]+$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "config": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^res://[^\\\\]+$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "prototype_preserved",
+            "not_implemented"
+          ]
+        }
+      },
+      "required": [
+        "scene",
+        "config",
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "status",
+    "id",
+    "campaign_id",
+    "realm_id",
+    "order",
+    "name",
+    "narrative_description",
+    "environment",
+    "protagonist_id",
+    "difficulty",
+    "obstacle_types_planned",
+    "enemies_planned",
+    "boss_id",
+    "prerequisite_phase_ids",
+    "checkpoints_planned",
+    "completion",
+    "future_rewards",
+    "resources_required",
+    "implementation_dependencies",
+    "existing_runtime"
+  ],
+  "additionalProperties": false
+}

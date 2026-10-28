@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "authority": {
+      "const": "server"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "profile": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "display_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "user_id",
+        "display_name",
+        "created_at",
+        "updated_at"
+      ],
+      "additionalProperties": false
+    },
+    "campaigns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "campaign_id": {
+            "const": "desert_campaign"
+          },
+          "status": {
+            "enum": [
+              "not_started",
+              "in_progress",
+              "completed"
+            ]
+          },
+          "completed_phase_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^desert_phase_(0[1-9]|10)$"
+            },
+            "minItems": 0,
+            "uniqueItems": true
+          },
+          "current_phase_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^desert_phase_(0[1-9]|10)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "campaign_id",
+          "status",
+          "completed_phase_ids",
+          "current_phase_id",
+          "completed_at"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "phase_completions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "completion_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "campaign_id": {
+            "const": "desert_campaign"
+          },
+          "phase_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^desert_phase_(0[1-9]|10)$"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "verified": {
+            "const": true
+          }
+        },
+        "required": [
+          "completion_id",
+          "campaign_id",
+          "phase_id",
+          "completed_at",
+          "verified"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "character_unlocks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "character_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "source": {
+            "enum": [
+              "initial_catalog",
+              "achievement"
+            ]
+          },
+          "source_achievement_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "unlocked_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "character_id",
+          "source",
+          "source_achievement_id",
+          "unlocked_at"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "equipped_character_id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "achievements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "source_campaign_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "awarded_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "source_campaign_id",
+          "awarded_at"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "authority",
+    "revision",
+    "profile",
+    "campaigns",
+    "phase_completions",
+    "character_unlocks",
+    "equipped_character_id",
+    "achievements"
+  ],
+  "additionalProperties": false
+}

@@ -35,9 +35,13 @@ var _zoom: float = 1.0
 
 
 func _ready() -> void:
+	add_to_group("player_preview_stages")
 	# No lobby o palco não captura cliques; no visualizador ele precisa receber arraste e roda.
 	mouse_filter = Control.MOUSE_FILTER_STOP if interactive else Control.MOUSE_FILTER_IGNORE
-	apply_profile(profile_name if profile_name != "" else GraphicsProfile.default_for_platform())
+	var preferred := GraphicsProfile.default_for_platform()
+	if PlayerServices.current != null and PlayerServices.current.preferences != null:
+		preferred = PlayerServices.current.preferences.values.quality
+	apply_profile(profile_name if profile_name != "" else preferred)
 
 
 func apply_profile(name: String) -> void:

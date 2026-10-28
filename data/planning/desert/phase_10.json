@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "status": "proposal_not_loaded_by_game",
+  "id": "desert_phase_10",
+  "campaign_id": "desert_campaign",
+  "realm_id": "desert",
+  "order": 10,
+  "name": "Confronto com Malagueta",
+  "narrative_description": "El Fuego enfrenta Malagueta e encerra a campanha do Reino do Deserto.",
+  "environment": "Arena final com área de preparação, limites legíveis e saída narrativa.",
+  "protagonist_id": "el_fuego",
+  "difficulty": {
+    "progression_rank": 10,
+    "label": "clímax",
+    "balance_status": "not_playtested"
+  },
+  "obstacle_types_planned": [
+    "boss_telegraphs_planned",
+    "arena_safe_routes",
+    "final_exit_after_boss"
+  ],
+  "enemies_planned": [
+    {
+      "character_id": "cactus",
+      "role": "desert_troop",
+      "placement_status": "not_defined"
+    }
+  ],
+  "boss_id": "malagueta",
+  "prerequisite_phase_ids": [
+    "desert_phase_09"
+  ],
+  "checkpoints_planned": [
+    {
+      "id": "desert_phase_10_checkpoint_01",
+      "location_description": "Na entrada segura da arena, antes do confronto",
+      "implementation_status": "not_implemented"
+    }
+  ],
+  "completion": {
+    "type": "defeat_boss_then_reach_exit",
+    "required_boss_id": "malagueta",
+    "persisted_by": "future_verified_progress_service",
+    "checkpoint_is_completion": false
+  },
+  "future_rewards": [
+    {
+      "type": "phase_completion",
+      "target_id": "desert_phase_10",
+      "status": "future"
+    },
+    {
+      "type": "achievement",
+      "target_id": "desert_campaign_completed",
+      "status": "future"
+    },
+    {
+      "type": "character_unlock",
+      "target_id": "el_fuego",
+      "status": "future"
+    }
+  ],
+  "resources_required": [
+    "el_fuego_model",
+    "cactus_model",
+    "checkpoint_presentation",
+    "desert_audio",
+    "desert_story_text",
+    "malagueta_model",
+    "malagueta_arena",
+    "campaign_completion_ui"
+  ],
+  "implementation_dependencies": [
+    "campaign_navigation",
+    "level_builder",
+    "checkpoint_system",
+    "phase_progression",
+    "cactus_reuse",
+    "asset_import_validation",
+    "playtest_and_accessibility",
+    "malagueta_encounter",
+    "verified_progress_service",
+    "unlock_migration"
+  ],
+  "existing_runtime": {
+    "scene": null,
+    "config": null,
+    "status": "not_implemented"
+  }
+}

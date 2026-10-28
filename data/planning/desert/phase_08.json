@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "status": "proposal_not_loaded_by_game",
+  "id": "desert_phase_08",
+  "campaign_id": "desert_campaign",
+  "realm_id": "desert",
+  "order": 8,
+  "name": "Cavernas de Cristal",
+  "narrative_description": "Uma rota de cristais conduz El Fuego sob a fortaleza, revelando a origem da energia do laboratório.",
+  "environment": "Galerias subterrâneas e cristais com sinalização de profundidade.",
+  "protagonist_id": "el_fuego",
+  "difficulty": {
+    "progression_rank": 8,
+    "label": "alta",
+    "balance_status": "not_playtested"
+  },
+  "obstacle_types_planned": [
+    "narrow_ledges",
+    "vertical_crystal_routes",
+    "planned_moving_platforms"
+  ],
+  "enemies_planned": [
+    {
+      "character_id": "cactus",
+      "role": "desert_troop",
+      "placement_status": "not_defined"
+    }
+  ],
+  "boss_id": null,
+  "prerequisite_phase_ids": [
+    "desert_phase_07"
+  ],
+  "checkpoints_planned": [
+    {
+      "id": "desert_phase_08_checkpoint_01",
+      "location_description": "Na galeria de entrada",
+      "implementation_status": "not_implemented"
+    },
+    {
+      "id": "desert_phase_08_checkpoint_02",
+      "location_description": "Após a câmara de travessia vertical",
+      "implementation_status": "not_implemented"
+    }
+  ],
+  "completion": {
+    "type": "reach_exit",
+    "required_boss_id": null,
+    "persisted_by": "future_verified_progress_service",
+    "checkpoint_is_completion": false
+  },
+  "future_rewards": [
+    {
+      "type": "phase_completion",
+      "target_id": "desert_phase_08",
+      "status": "future"
+    },
+    {
+      "type": "next_phase_access",
+      "target_id": "desert_phase_09",
+      "status": "future"
+    }
+  ],
+  "resources_required": [
+    "el_fuego_model",
+    "cactus_model",
+    "checkpoint_presentation",
+    "desert_audio",
+    "desert_story_text",
+    "desert_crystals"
+  ],
+  "implementation_dependencies": [
+    "campaign_navigation",
+    "level_builder",
+    "checkpoint_system",
+    "phase_progression",
+    "cactus_reuse",
+    "asset_import_validation",
+    "playtest_and_accessibility",
+    "moving_platforms"
+  ],
+  "existing_runtime": {
+    "scene": null,
+    "config": null,
+    "status": "not_implemented"
+  }
+}

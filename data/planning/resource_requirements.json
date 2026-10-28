@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "status": "proposal_not_loaded_by_game",
+  "resources": [
+    {
+      "id": "el_fuego_model",
+      "kind": "character",
+      "description": "Malha-base e oito FBXs de El Fuego",
+      "availability": "available_unverified",
+      "existing_files": [
+        "res://assets/characters/El fuego/Correr.fbx"
+      ]
+    },
+    {
+      "id": "cactus_model",
+      "kind": "character",
+      "description": "Tropa Cactus, malha-base e animações",
+      "availability": "available_unverified",
+      "existing_files": [
+        "res://assets/characters/cactus/andar.fbx"
+      ]
+    },
+    {
+      "id": "malagueta_model",
+      "kind": "character",
+      "description": "Base skinned de Malagueta e quatro clips sem malha",
+      "availability": "available_unverified",
+      "existing_files": [
+        "res://assets/characters/malagueta/ataque de baixo pra cima.fbx"
+      ]
+    },
+    {
+      "id": "desert_entrance",
+      "kind": "environment",
+      "description": "Entrada, rochas e sinalização do Deserto",
+      "availability": "missing",
+      "existing_files": []
+    },
+    {
+      "id": "desert_dunes",
+      "kind": "environment",
+      "description": "Dunas e marcos de orientação",
+      "availability": "missing",
+      "existing_files": []
+    },
+    {
+      "id": "desert_oasis",
+      "kind": "environment",
+      "description": "Oásis noturno, água e vegetação",
+      "availability": "missing",
+      "existing_files": []
+    },
+    {
+      "id": "desert_ruins",
+      "kind": "environment",
+      "description": "Ruínas e módulos de pedra",
+      "availability": "missing",
+      "existing_files": []
+    },
+    {
+      "id": "desert_bridges",
+      "kind": "environment",
+      "description": "Pontes, suportes e desfiladeiro",
+      "availability": "missing",
+      "existing_files": []
+    },
+    {
+      "id": "desert_sandstorm",
+      "kind": "effects",
+      "description": "Areia e vento com leitura de obstáculos preservada",
+      "availability": "missing",
+      "existing_files": []
+    },
+    {
+      "id": "cactus_fortress",
+      "kind": "environment",
+      "description": "Fortaleza e insígnias Cactus",
+      "availability": "missing",
+      "existing_files": []
+    },
+    {
+      "id": "desert_crystals",
+      "kind": "environment",
+      "description": "Caverna e cristais legíveis em movimento",
+      "availability": "missing",
+      "existing_files": []
+    },
+    {
+      "id": "desert_laboratory",
+      "kind": "environment",
+      "description": "Laboratório e pistas da ligação com Malagueta",
+      "availability": "missing",
+      "existing_files": []
+    },
+    {
+      "id": "malagueta_arena",
+      "kind": "environment",
+      "description": "Arena final, entrada e saída narrativa",
+      "availability": "missing",
+      "existing_files": []
+    },
+    {
+      "id": "checkpoint_presentation",
+      "kind": "ui",
+      "description": "Marcador visual/sonoro de checkpoint",
+      "availability": "missing",
+      "existing_files": []
+    },
+    {
+      "id": "desert_audio",
+      "kind": "audio",
+      "description": "Ambientes, ações, música e créditos/licenças",
+      "availability": "missing",
+      "existing_files": []
+    },
+    {
+      "id": "desert_story_text",
+      "kind": "narrative",
+      "description": "Textos revisados e localizáveis da campanha",
+      "availability": "planned",
+      "existing_files": []
+    },
+    {
+      "id": "campaign_completion_ui",
+      "kind": "ui",
+      "description": "Conclusão, conquista e desbloqueio de El Fuego",
+      "availability": "missing",
+      "existing_files": []
+    }
+  ]
+}

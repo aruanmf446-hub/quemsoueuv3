@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "status": "proposal_not_loaded_by_game",
+  "id": "desert_phase_07",
+  "campaign_id": "desert_campaign",
+  "realm_id": "desert",
+  "order": 7,
+  "name": "Fortaleza dos Cactus",
+  "narrative_description": "El Fuego entra na fortaleza e descobre que Malagueta mantém um laboratório além das galerias subterrâneas.",
+  "environment": "Muralhas, pátios e passagens internas da tropa Cactus.",
+  "protagonist_id": "el_fuego",
+  "difficulty": {
+    "progression_rank": 7,
+    "label": "alta",
+    "balance_status": "not_playtested"
+  },
+  "obstacle_types_planned": [
+    "guarded_gates",
+    "patrol_sequences",
+    "elevated_platforms"
+  ],
+  "enemies_planned": [
+    {
+      "character_id": "cactus",
+      "role": "desert_troop",
+      "placement_status": "not_defined"
+    }
+  ],
+  "boss_id": null,
+  "prerequisite_phase_ids": [
+    "desert_phase_06"
+  ],
+  "checkpoints_planned": [
+    {
+      "id": "desert_phase_07_checkpoint_01",
+      "location_description": "Após os portões externos",
+      "implementation_status": "not_implemented"
+    },
+    {
+      "id": "desert_phase_07_checkpoint_02",
+      "location_description": "No pátio anterior à saída subterrânea",
+      "implementation_status": "not_implemented"
+    }
+  ],
+  "completion": {
+    "type": "reach_exit",
+    "required_boss_id": null,
+    "persisted_by": "future_verified_progress_service",
+    "checkpoint_is_completion": false
+  },
+  "future_rewards": [
+    {
+      "type": "phase_completion",
+      "target_id": "desert_phase_07",
+      "status": "future"
+    },
+    {
+      "type": "next_phase_access",
+      "target_id": "desert_phase_08",
+      "status": "future"
+    }
+  ],
+  "resources_required": [
+    "el_fuego_model",
+    "cactus_model",
+    "checkpoint_presentation",
+    "desert_audio",
+    "desert_story_text",
+    "cactus_fortress"
+  ],
+  "implementation_dependencies": [
+    "campaign_navigation",
+    "level_builder",
+    "checkpoint_system",
+    "phase_progression",
+    "cactus_reuse",
+    "asset_import_validation",
+    "playtest_and_accessibility"
+  ],
+  "existing_runtime": {
+    "scene": null,
+    "config": null,
+    "status": "not_implemented"
+  }
+}

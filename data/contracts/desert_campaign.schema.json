@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "status": {
+      "const": "proposal_not_loaded_by_game"
+    },
+    "id": {
+      "const": "desert_campaign"
+    },
+    "realm_id": {
+      "const": "desert"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "protagonist_id": {
+      "const": "el_fuego"
+    },
+    "phase_count": {
+      "const": 10
+    },
+    "phase_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^[a-z][a-z0-9_]*$"
+      },
+      "minItems": 10,
+      "uniqueItems": true,
+      "maxItems": 10
+    },
+    "phase_files": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^res://[^\\\\]+$"
+      },
+      "minItems": 10,
+      "uniqueItems": true,
+      "maxItems": 10
+    },
+    "enemy_character_ids": {
+      "const": [
+        "cactus"
+      ]
+    },
+    "final_boss_id": {
+      "const": "malagueta"
+    },
+    "completion": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "all_phases_completed_and_final_boss_defeated"
+        },
+        "required_phase_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "minItems": 10,
+          "uniqueItems": true,
+          "maxItems": 10
+        },
+        "final_phase_id": {
+          "const": "desert_phase_10"
+        },
+        "required_boss_id": {
+          "const": "malagueta"
+        },
+        "achievement_id": {
+          "const": "desert_campaign_completed"
+        },
+        "unlocks_character_id": {
+          "const": "el_fuego"
+        },
+        "authority": {
+          "const": "server"
+        }
+      },
+      "required": [
+        "type",
+        "required_phase_ids",
+        "final_phase_id",
+        "required_boss_id",
+        "achievement_id",
+        "unlocks_character_id",
+        "authority"
+      ],
+      "additionalProperties": false
+    },
+    "legacy_compatibility": {
+      "type": "object",
+      "properties": {
+        "runtime_catalog": {
+          "const": "res://data/characters.json"
+        },
+        "runtime_unlock_flag": {
+          "const": "desert_stage_completed"
+        },
+        "canonical_achievement": {
+          "const": "desert_campaign_completed"
+        },
+        "automatic_legacy_grant": {
+          "const": false
+        },
+        "migration_status": {
+          "const": "not_applied"
+        }
+      },
+      "required": [
+        "runtime_catalog",
+        "runtime_unlock_flag",
+        "canonical_achievement",
+        "automatic_legacy_grant",
+        "migration_status"
+      ],
+      "additionalProperties": false
+    },
+    "economy": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "const": "not_defined"
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "status",
+        "note"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "status",
+    "id",
+    "realm_id",
+    "name",
+    "protagonist_id",
+    "phase_count",
+    "phase_ids",
+    "phase_files",
+    "enemy_character_ids",
+    "final_boss_id",
+    "completion",
+    "legacy_compatibility",
+    "economy"
+  ],
+  "additionalProperties": false
+}

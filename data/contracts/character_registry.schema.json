@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "status": {
+      "const": "proposal_not_loaded_by_game"
+    },
+    "runtime_catalog": {
+      "const": "res://data/characters.json"
+    },
+    "runtime_schema_version": {
+      "const": 2
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "lobby_playable",
+                "unlockable",
+                "story_protagonist",
+                "enemy",
+                "boss",
+                "story_only"
+              ]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "runtime_group": {
+            "enum": [
+              "playable",
+              "unlockable",
+              "enemy",
+              "asset_only"
+            ]
+          },
+          "runtime_source": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^res://[^\\\\]+$"
+                  },
+                  "entry_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^[a-z][a-z0-9_]*$"
+                  }
+                },
+                "required": [
+                  "path",
+                  "entry_id"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lobby": {
+            "type": "object",
+            "properties": {
+              "equippable": {
+                "type": "boolean"
+              },
+              "initially_unlocked": {
+                "type": "boolean"
+              },
+              "unlock_achievement": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^[a-z][a-z0-9_]*$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "equippable",
+              "initially_unlocked",
+              "unlock_achievement"
+            ],
+            "additionalProperties": false
+          },
+          "story": {
+            "type": "object",
+            "properties": {
+              "campaign_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^[a-z][a-z0-9_]*$"
+                },
+                "minItems": 0,
+                "uniqueItems": true
+              },
+              "role": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "protagonist",
+                      "enemy",
+                      "boss"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "exclusive_to_story": {
+                "type": "boolean"
+              },
+              "available_before_lobby_unlock": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "campaign_ids",
+              "role",
+              "exclusive_to_story",
+              "available_before_lobby_unlock"
+            ],
+            "additionalProperties": false
+          },
+          "asset_directory": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^res://[^\\\\]+$"
+          },
+          "model_candidate": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^res://[^\\\\]+$"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "roles",
+          "runtime_group",
+          "runtime_source",
+          "lobby",
+          "story",
+          "asset_directory",
+          "model_candidate"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "status",
+    "runtime_catalog",
+    "runtime_schema_version",
+    "entries"
+  ],
+  "additionalProperties": false
+}

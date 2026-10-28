@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "status": "proposal_not_loaded_by_game",
+  "id": "desert_campaign",
+  "realm_id": "desert",
+  "name": "Reino do Deserto",
+  "protagonist_id": "el_fuego",
+  "phase_count": 10,
+  "phase_ids": [
+    "desert_phase_01",
+    "desert_phase_02",
+    "desert_phase_03",
+    "desert_phase_04",
+    "desert_phase_05",
+    "desert_phase_06",
+    "desert_phase_07",
+    "desert_phase_08",
+    "desert_phase_09",
+    "desert_phase_10"
+  ],
+  "phase_files": [
+    "res://data/planning/desert/phase_01.json",
+    "res://data/planning/desert/phase_02.json",
+    "res://data/planning/desert/phase_03.json",
+    "res://data/planning/desert/phase_04.json",
+    "res://data/planning/desert/phase_05.json",
+    "res://data/planning/desert/phase_06.json",
+    "res://data/planning/desert/phase_07.json",
+    "res://data/planning/desert/phase_08.json",
+    "res://data/planning/desert/phase_09.json",
+    "res://data/planning/desert/phase_10.json"
+  ],
+  "enemy_character_ids": [
+    "cactus"
+  ],
+  "final_boss_id": "malagueta",
+  "completion": {
+    "type": "all_phases_completed_and_final_boss_defeated",
+    "required_phase_ids": [
+      "desert_phase_01",
+      "desert_phase_02",
+      "desert_phase_03",
+      "desert_phase_04",
+      "desert_phase_05",
+      "desert_phase_06",
+      "desert_phase_07",
+      "desert_phase_08",
+      "desert_phase_09",
+      "desert_phase_10"
+    ],
+    "final_phase_id": "desert_phase_10",
+    "required_boss_id": "malagueta",
+    "achievement_id": "desert_campaign_completed",
+    "unlocks_character_id": "el_fuego",
+    "authority": "server"
+  },
+  "legacy_compatibility": {
+    "runtime_catalog": "res://data/characters.json",
+    "runtime_unlock_flag": "desert_stage_completed",
+    "canonical_achievement": "desert_campaign_completed",
+    "automatic_legacy_grant": false,
+    "migration_status": "not_applied"
+  },
+  "economy": {
+    "status": "not_defined",
+    "note": "Sem moedas, preços, XP ou quantidades de recompensa definidos nesta proposta."
+  }
+}

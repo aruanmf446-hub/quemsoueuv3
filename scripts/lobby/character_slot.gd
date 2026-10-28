@@ -1,65 +1,71 @@
-@tool
 class_name CharacterSlot
 extends Node3D
 
-## Carrega somente o personagem selecionado e acrescenta animações de outros FBX
-## que compartilham o mesmo rig (Mixamo). Cada entrada de `animation_sources`
-## é um PackedScene cujo primeiro AnimationPlayer tem a animação `source_animation`.
+## Carrega um único personagem por vez a partir de uma entrada do catálogo.
+## - Normaliza a altura do modelo para `height`, sem depender da escala do FBX.
+## - Acrescenta as animações nomeadas do catálogo ao AnimationPlayer do modelo.
+## - Expõe `get_framing()` com altura e centro verticais para o enquadramento da câmera.
+## - Expõe `get_socket()` com BoneAttachment3D para armas e acessórios.
 
-@export var model: PackedScene:
-	set(value):
-		model = value
-		if is_node_ready():
-			load_character()
-@export var animation_sources: Array[PackedScene] = []
-@export var source_animation: StringName = &"mixamo_com"
-@export var idle_animation: StringName = &"idle"
-@export var model_scale: float = 1.0
+signal loaded(character_id: StringName)
 
-## Nome do osso (Skeleton3D) usado como ponto de fixação para cada socket futuro.
+const DEFAULT_HEIGHT := 1.8
+
+## Ossos Mixamo verificados no esqueleto do Cowboy (ver mixamorig_* no Skeleton3D).
 const SOCKET_BONES := {
 	&"hand_right": &"mixamorig_RightHand",
 	&"hand_left": &"mixamorig_LeftHand",
 	&"back": &"mixamorig_Spine2",
 }
 
+var character_id: StringName = &""
+var is_static_pose: bool = false
+
 var _model_root: Node3D
 var _anim_player: AnimationPlayer
 var _skeleton: Skeleton3D
 var _sockets: Dictionary = {}
+var _framing: Dictionary = {}
 
 
-func _ready() -> void:
-	if not Engine.is_editor_hint():
-		load_character()
+## Substitui o personagem atual pelo descrito em `entry`. Libera o anterior antes de carregar.
+func load_entry(entry: Dictionary) -> void:
+	unload()
+	character_id = StringName(entry["id"])
 
-
-## Substitui o personagem atual pelo modelo informado. Libera o anterior.
-func load_character() -> void:
-	if _model_root:
-		_model_root.queue_free()
-		_model_root = null
-		_anim_player = null
-		_skeleton = null
-		_sockets.clear()
+	var model := load(entry["model"]) as PackedScene
 	if model == null:
+		push_error("Modelo não encontrado: %s" % entry["model"])
 		return
 
 	_model_root = model.instantiate() as Node3D
-	_model_root.scale = Vector3.ONE * model_scale
 	add_child(_model_root)
-
 	_anim_player = _find_node_of_type(_model_root, AnimationPlayer) as AnimationPlayer
 	_skeleton = _find_node_of_type(_model_root, Skeleton3D) as Skeleton3D
-	if _anim_player == null:
-		push_warning("CharacterSlot: modelo sem AnimationPlayer: %s" % model.resource_path)
-		return
 
-	_merge_animation_sources()
-	if _anim_player.has_animation(idle_animation):
-		var idle := _anim_player.get_animation(idle_animation)
-		idle.loop_mode = Animation.LOOP_LINEAR
-		_anim_player.play(idle_animation)
+	_normalize_height(float(entry.get("height", DEFAULT_HEIGHT)))
+	if _anim_player:
+		_merge_animations(entry)
+		_play_idle(entry)
+	loaded.emit(character_id)
+
+
+## Remove o personagem atual e libera seus recursos da cena.
+func unload() -> void:
+	if _model_root:
+		remove_child(_model_root)
+		_model_root.queue_free()
+	_model_root = null
+	_anim_player = null
+	_skeleton = null
+	_sockets.clear()
+	_framing.clear()
+	is_static_pose = false
+
+
+## Altura e centro vertical do personagem já normalizado, em metros locais do slot.
+func get_framing() -> Dictionary:
+	return _framing
 
 
 ## Retorna um BoneAttachment3D fixado ao osso do socket, criado sob demanda.
@@ -76,18 +82,87 @@ func get_socket(socket_name: StringName) -> BoneAttachment3D:
 	return attachment
 
 
-func _merge_animation_sources() -> void:
-	var target_library := _anim_player.get_animation_library(&"")
-	for source_scene in animation_sources:
-		if source_scene == null:
-			continue
-		var source_root := source_scene.instantiate()
-		var source_player := _find_node_of_type(source_root, AnimationPlayer) as AnimationPlayer
-		if source_player and source_player.has_animation(source_animation):
-			var animation_name := StringName(source_scene.resource_path.get_file().get_basename())
-			var clip := source_player.get_animation(source_animation).duplicate() as Animation
-			target_library.add_animation(animation_name, clip)
-		source_root.free()
+func _normalize_height(target_height: float) -> void:
+	_model_root.scale = Vector3.ONE
+	_model_root.position = Vector3.ZERO
+	var bounds := _measure_bounds()
+	if bounds.size.y <= 0.0:
+		return
+	_model_root.scale = Vector3.ONE * (target_height / bounds.size.y)
+	bounds = _measure_bounds()
+	_model_root.position.y = -bounds.position.y
+	_framing = {"height": target_height, "center_y": target_height * 0.5}
+
+
+## AABB combinada de todas as malhas do modelo, em coordenadas do slot.
+func _measure_bounds() -> AABB:
+	var combined := AABB()
+	var first := true
+	var meshes := _find_all_of_type(_model_root, MeshInstance3D)
+	for mesh_instance: MeshInstance3D in meshes:
+		var local_to_slot := global_transform.affine_inverse() * mesh_instance.global_transform
+		var box: AABB = local_to_slot * mesh_instance.get_aabb()
+		if first:
+			combined = box
+			first = false
+		else:
+			combined = combined.merge(box)
+	return combined
+
+
+func _merge_animations(entry: Dictionary) -> void:
+	var library := _anim_player.get_animation_library(&"")
+	if library == null:
+		return
+	var animations: Dictionary = entry.get("animations", {})
+	for anim_name: String in animations:
+		var source_path: String = animations[anim_name]
+		var clip: Animation = null
+		if source_path == entry["model"]:
+			clip = _first_animation_of(_anim_player)
+		else:
+			clip = _extract_clip(source_path)
+		if clip:
+			library.add_animation(StringName(anim_name), clip)
+
+
+## Carrega o FBX de origem, copia a primeira animação e libera a cena temporária.
+func _extract_clip(source_path: String) -> Animation:
+	var source := load(source_path) as PackedScene
+	if source == null:
+		push_warning("Animação não encontrada: %s" % source_path)
+		return null
+	var source_root := source.instantiate()
+	var source_player := _find_node_of_type(source_root, AnimationPlayer) as AnimationPlayer
+	var clip: Animation = null
+	if source_player:
+		clip = _first_animation_of(source_player)
+	source_root.free()
+	return clip
+
+
+func _first_animation_of(player: AnimationPlayer) -> Animation:
+	var names := player.get_animation_list()
+	if names.is_empty():
+		return null
+	return player.get_animation(names[0]).duplicate() as Animation
+
+
+func _play_idle(entry: Dictionary) -> void:
+	var idle: String = entry.get("idle", "")
+	var library := _anim_player.get_animation_library(&"")
+	if idle != "" and library and library.has_animation(idle):
+		var idle_clip := library.get_animation(idle)
+		idle_clip.loop_mode = Animation.LOOP_LINEAR
+		_anim_player.play(idle)
+		return
+	# Sem idle verificado: pose estática temporária (primeiro quadro da animação indicada).
+	var pose: String = entry.get("pose", "base")
+	if library and library.has_animation(pose):
+		_anim_player.play(pose)
+		_anim_player.seek(float(entry.get("pose_time", 0.0)), true)
+		_anim_player.pause()
+		is_static_pose = true
 
 
 func _find_node_of_type(root: Node, type: Variant) -> Node:
@@ -98,3 +173,12 @@ func _find_node_of_type(root: Node, type: Variant) -> Node:
 		if found:
 			return found
 	return null
+
+
+func _find_all_of_type(root: Node, type: Variant) -> Array:
+	var found: Array = []
+	if is_instance_of(root, type):
+		found.append(root)
+	for child in root.get_children():
+		found.append_array(_find_all_of_type(child, type))
+	return found

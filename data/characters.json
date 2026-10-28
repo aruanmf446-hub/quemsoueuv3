@@ -1,0 +1,136 @@
+{
+	"characters": [
+		{
+			"id": "cowboy",
+			"name": "Cowboy",
+			"model": "res://assets/characters/Cowboy/1.fbx",
+			"height": 1.7,
+			"animations": {
+				"base": "res://assets/characters/Cowboy/1.fbx",
+				"anim_2": "res://assets/characters/Cowboy/2.fbx",
+				"anim_3": "res://assets/characters/Cowboy/3.fbx",
+				"anim_4": "res://assets/characters/Cowboy/4.fbx"
+			},
+			"idle": "",
+			"idle_verified": false,
+			"pose": "base",
+			"pose_time": 0.0
+		},
+		{
+			"id": "michelly",
+			"name": "Michelly",
+			"model": "res://assets/characters/Michelly/1.fbx",
+			"height": 1.8,
+			"animations": {
+				"base": "res://assets/characters/Michelly/1.fbx",
+				"anim_2": "res://assets/characters/Michelly/2.fbx",
+				"anim_3": "res://assets/characters/Michelly/3.fbx",
+				"anim_4": "res://assets/characters/Michelly/4.fbx"
+			},
+			"idle": "",
+			"idle_verified": false,
+			"pose": "base",
+			"pose_time": 0.0
+		},
+		{
+			"id": "rodrigo",
+			"name": "Rodrigo",
+			"model": "res://assets/characters/Rodrigo/1.fbx",
+			"height": 1.7,
+			"animations": {
+				"base": "res://assets/characters/Rodrigo/1.fbx",
+				"anim_2": "res://assets/characters/Rodrigo/2.fbx",
+				"anim_3": "res://assets/characters/Rodrigo/3.fbx",
+				"anim_4": "res://assets/characters/Rodrigo/4.fbx"
+			},
+			"idle": "",
+			"idle_verified": false,
+			"pose": "base",
+			"pose_time": 0.0
+		},
+		{
+			"id": "lorena",
+			"name": "Lorena",
+			"model": "res://assets/characters/Lorena/1.fbx",
+			"height": 1.85,
+			"animations": {
+				"base": "res://assets/characters/Lorena/1.fbx",
+				"anim_2": "res://assets/characters/Lorena/2.fbx",
+				"anim_3": "res://assets/characters/Lorena/3.fbx",
+				"anim_4": "res://assets/characters/Lorena/4.fbx"
+			},
+			"idle": "",
+			"idle_verified": false,
+			"pose": "base",
+			"pose_time": 0.0
+		},
+		{
+			"id": "gus",
+			"name": "Gus",
+			"model": "res://assets/characters/Gus/1.fbx",
+			"height": 1.8,
+			"animations": {
+				"base": "res://assets/characters/Gus/1.fbx",
+				"anim_2": "res://assets/characters/Gus/2.fbx",
+				"anim_3": "res://assets/characters/Gus/3.fbx",
+				"anim_4": "res://assets/characters/Gus/4.fbx"
+			},
+			"idle": "",
+			"idle_verified": false,
+			"pose": "base",
+			"pose_time": 0.0
+		},
+		{
+			"id": "el_fuego",
+			"name": "El Fuego",
+			"model": "res://assets/characters/El fuego/Correr.fbx",
+			"height": 1.4,
+			"animations": {
+				"base": "res://assets/characters/El fuego/Correr.fbx",
+				"agachado": "res://assets/characters/El fuego/agachado.fbx",
+				"ataque": "res://assets/characters/El fuego/ataque.fbx",
+				"defesa": "res://assets/characters/El fuego/defesa.fbx",
+				"morte": "res://assets/characters/El fuego/morte.fbx",
+				"pulo_duplo": "res://assets/characters/El fuego/pulo duplo.fbx",
+				"pulo": "res://assets/characters/El fuego/pulo.fbx",
+				"retorno": "res://assets/characters/El fuego/retorno.fbx"
+			},
+			"idle": "",
+			"idle_verified": false,
+			"pose": "base",
+			"pose_time": 0.0
+		},
+		{
+			"id": "lana",
+			"name": "Lana",
+			"model": "res://assets/characters/Lana/1.fbx",
+			"height": 1.8,
+			"animations": {
+				"base": "res://assets/characters/Lana/1.fbx",
+				"anim_2": "res://assets/characters/Lana/2.fbx",
+				"anim_3": "res://assets/characters/Lana/3.fbx",
+				"anim_4": "res://assets/characters/Lana/4.fbx"
+			},
+			"idle": "",
+			"idle_verified": false,
+			"pose": "base",
+			"pose_time": 0.0
+		},
+		{
+			"id": "halloween",
+			"name": "Halloween",
+			"model": "res://assets/characters/Hallowen/1.fbx",
+			"height": 1.85,
+			"animations": {
+				"base": "res://assets/characters/Hallowen/1.fbx",
+				"anim_2": "res://assets/characters/Hallowen/2.fbx",
+				"anim_3": "res://assets/characters/Hallowen/3.fbx",
+				"anim_4": "res://assets/characters/Hallowen/4.fbx"
+			},
+			"idle": "",
+			"idle_verified": false,
+			"pose": "base",
+			"pose_time": 0.0
+		}
+	]
+}

@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://c0m77lrhy6l25"]
 
+[ext_resource type="Script" uid="uid://mp2mru6hw0cv" path="res://scripts/lobby/lobby_stage.gd" id="1_3lb3l"]
 [ext_resource type="PackedScene" uid="uid://csl767uv84o3m" path="res://scenes/lobby/character_slot.tscn" id="1_gnweo"]
 
 [sub_resource type="Environment" id="Environment_3lb3l"]
@@ -11,21 +12,11 @@ tonemap_mode = 2
 glow_enabled = true
 glow_intensity = 0.6
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6axya"]
-transparency = 1
-albedo_color = Color(0.2, 0.6, 1, 0.6)
-emission_enabled = true
-emission = Color(0.2, 0.7, 1, 1)
-emission_energy_multiplier = 2.5
-
-[sub_resource type="TorusMesh" id="TorusMesh_lcptl"]
-inner_radius = 0.55
-outer_radius = 0.8
-
 [node name="LobbyStage" type="SubViewportContainer" unique_id=439807160]
 custom_minimum_size = Vector2(640, 760)
 mouse_filter = 2
 stretch = true
+script = ExtResource("1_3lb3l")
 
 [node name="Viewport" type="SubViewport" parent="." unique_id=45234840]
 own_world_3d = true
@@ -57,7 +48,3 @@ light_energy = 2.5
 omni_range = 6.0
 
 [node name="Character" parent="Viewport/World" unique_id=808239936 instance=ExtResource("1_gnweo")]
-
-[node name="PedestalRing" type="MeshInstance3D" parent="Viewport/World" unique_id=63329808]
-material_override = SubResource("StandardMaterial3D_6axya")
-mesh = SubResource("TorusMesh_lcptl")

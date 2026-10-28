@@ -1,0 +1,7 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/player/components/screen_frame.tscn" id="1"]
+[ext_resource type="Script" path="res://scripts/ui/screens/wallet_screen.gd" id="2"]
+
+[node name="Wallet" instance=ExtResource("1")]
+script = ExtResource("2")

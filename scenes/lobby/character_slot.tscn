@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://csl767uv84o3m"]
+
+[ext_resource type="Script" uid="uid://bs36k4gotgpqq" path="res://scripts/lobby/character_slot.gd" id="1_mjmiv"]
+[ext_resource type="PackedScene" uid="uid://ctkulusr30xb1" path="res://assets/characters/Cowboy/1.fbx" id="2_ahsvi"]
+[ext_resource type="PackedScene" uid="uid://rk72u7a6f5pj" path="res://assets/characters/Cowboy/2.fbx" id="3_e1ui0"]
+[ext_resource type="PackedScene" uid="uid://huyvmpp116uw" path="res://assets/characters/Cowboy/3.fbx" id="4_wrqmv"]
+[ext_resource type="PackedScene" uid="uid://xixgh0w14ypx" path="res://assets/characters/Cowboy/4.fbx" id="5_et13b"]
+
+[node name="CharacterSlot" type="Node3D" unique_id=808239936]
+script = ExtResource("1_mjmiv")
+model = ExtResource("2_ahsvi")
+animation_sources = Array[PackedScene]([ExtResource("3_e1ui0"), ExtResource("4_wrqmv"), ExtResource("5_et13b")])
+idle_animation = &"mixamo_com"
+model_scale = 100.0

@@ -1,0 +1,63 @@
+[gd_scene format=3 uid="uid://c0m77lrhy6l25"]
+
+[ext_resource type="PackedScene" uid="uid://csl767uv84o3m" path="res://scenes/lobby/character_slot.tscn" id="1_gnweo"]
+
+[sub_resource type="Environment" id="Environment_3lb3l"]
+background_mode = 1
+ambient_light_source = 2
+ambient_light_color = Color(0.62, 0.58, 0.55, 1)
+ambient_light_energy = 0.8
+tonemap_mode = 2
+glow_enabled = true
+glow_intensity = 0.6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6axya"]
+transparency = 1
+albedo_color = Color(0.2, 0.6, 1, 0.6)
+emission_enabled = true
+emission = Color(0.2, 0.7, 1, 1)
+emission_energy_multiplier = 2.5
+
+[sub_resource type="TorusMesh" id="TorusMesh_lcptl"]
+inner_radius = 0.55
+outer_radius = 0.8
+
+[node name="LobbyStage" type="SubViewportContainer" unique_id=439807160]
+custom_minimum_size = Vector2(640, 760)
+mouse_filter = 2
+stretch = true
+
+[node name="Viewport" type="SubViewport" parent="." unique_id=45234840]
+own_world_3d = true
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(640, 760)
+render_target_update_mode = 4
+
+[node name="World" type="Node3D" parent="Viewport" unique_id=1696690880]
+
+[node name="Environment" type="WorldEnvironment" parent="Viewport/World" unique_id=1585462789]
+environment = SubResource("Environment_3lb3l")
+
+[node name="Camera" type="Camera3D" parent="Viewport/World" unique_id=472607383]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 3.3)
+current = true
+fov = 38.0
+
+[node name="KeyLight" type="DirectionalLight3D" parent="Viewport/World" unique_id=391603603]
+transform = Transform3D(0.8660254, 0.3213938, -0.38302222, 0, 0.76604444, 0.6427876, 0.5, -0.55667037, 0.66341394, 0, 0, 0)
+light_color = Color(1, 0.95, 0.85, 1)
+light_energy = 1.6
+shadow_enabled = true
+
+[node name="RimLight" type="OmniLight3D" parent="Viewport/World" unique_id=1515496112]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 2.2, -1.6)
+light_color = Color(0.45, 0.7, 1, 1)
+light_energy = 2.5
+omni_range = 6.0
+
+[node name="Character" parent="Viewport/World" unique_id=808239936 instance=ExtResource("1_gnweo")]
+
+[node name="PedestalRing" type="MeshInstance3D" parent="Viewport/World" unique_id=63329808]
+material_override = SubResource("StandardMaterial3D_6axya")
+mesh = SubResource("TorusMesh_lcptl")

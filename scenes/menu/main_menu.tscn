@@ -2,235 +2,141 @@
 
 [ext_resource type="Script" uid="uid://cckmelvnkfepu" path="res://scripts/menu/main_menu.gd" id="1_247la"]
 [ext_resource type="PackedScene" uid="uid://bsrusk2vn40uu" path="res://scenes/menu/components/menu_card_button.tscn" id="2_kiqgm"]
+[ext_resource type="Texture2D" uid="uid://blqufp2molbkr" path="res://assets/processed/backgrounds/bg_lobby_fantasia.png" id="2_pstia"]
+[ext_resource type="Texture2D" uid="uid://bt31d2ljy0f0a" path="res://assets/processed/logos/logo_menu_principal.png" id="3_41tvm"]
 [ext_resource type="PackedScene" uid="uid://q7fgofghdik7" path="res://scenes/menu/components/friend_row.tscn" id="3_hj162"]
+[ext_resource type="PackedScene" uid="uid://c0m77lrhy6l25" path="res://scenes/lobby/lobby_stage.tscn" id="4_41tvm"]
+[ext_resource type="Texture2D" uid="uid://8547hwerpb5t" path="res://assets/processed/buttons/btn_modo_historia.png" id="5_vxdmp"]
+[ext_resource type="Texture2D" uid="uid://cdgfhpravddbf" path="res://assets/processed/buttons/btn_modo_duelo.png" id="6_3h20m"]
+[ext_resource type="Texture2D" uid="uid://c20wwe45t1blx" path="res://assets/processed/buttons/btn_skins.png" id="7_uaj4g"]
+[ext_resource type="Texture2D" uid="uid://dwe2p4tnfnq42" path="res://assets/processed/buttons/btn_amizades.png" id="8_si58d"]
+[ext_resource type="Texture2D" uid="uid://brydajbxj2apv" path="res://assets/processed/buttons/btn_configuracoes.png" id="9_anexq"]
+[ext_resource type="Texture2D" uid="uid://dnsbduf8kvi1s" path="res://assets/processed/textures/textura_dourada.png" id="10_qvxhw"]
+[ext_resource type="Texture2D" uid="uid://cenbmrvi5ekbp" path="res://assets/processed/textures/textura_azul.png" id="11_do53f"]
+[ext_resource type="Texture2D" uid="uid://c73oiqf2nycya" path="res://assets/processed/frames/frame_botao_cabecalho.png" id="12_1bw8o"]
+[ext_resource type="Texture2D" uid="uid://pqn58j5c61u7" path="res://assets/processed/frames/frame_card_perfil.png" id="13_q78k2"]
+[ext_resource type="Texture2D" uid="uid://bgeyvq7mnwhdf" path="res://assets/processed/frames/frame_avatar_anel.png" id="14_neoyv"]
+[ext_resource type="Texture2D" uid="uid://bsn468v8nr867" path="res://assets/processed/frames/frame_painel_amizades.png" id="15_wof4p"]
+[ext_resource type="Texture2D" uid="uid://df7rxgp54l2b4" path="res://assets/processed/textures/textura_verde.png" id="17_fgrcj"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_247la"]
-bg_color = Color(0.105882354, 0.22745098, 0.54901963, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(1, 0.827451, 0.3019608, 1)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_41tvm"]
+texture = ExtResource("5_vxdmp")
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kiqgm"]
-bg_color = Color(0.38117647, 0.2717647, 0.049411763, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.84705883, 0.6039216, 0.10980392, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_vxdmp"]
+texture = ExtResource("5_vxdmp")
+modulate_color = Color(0.82, 0.82, 0.82, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hj162"]
-bg_color = Color(0.25411767, 0.18117648, 0.032941177, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.84705883, 0.6039216, 0.10980392, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_3h20m"]
+texture = ExtResource("5_vxdmp")
+modulate_color = Color(1.12, 1.12, 1.12, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xn6kt"]
-bg_color = Color(0.55058825, 0.392549, 0.071372546, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.84705883, 0.6039216, 0.10980392, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_uaj4g"]
+texture = ExtResource("6_3h20m")
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_isoef"]
-bg_color = Color(0.33882353, 0.10058823, 0.07588235, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.7529412, 0.22352941, 0.16862746, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_si58d"]
+texture = ExtResource("6_3h20m")
+modulate_color = Color(0.82, 0.82, 0.82, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qgo02"]
-bg_color = Color(0.22588237, 0.067058824, 0.05058824, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.7529412, 0.22352941, 0.16862746, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_anexq"]
+texture = ExtResource("6_3h20m")
+modulate_color = Color(1.12, 1.12, 1.12, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vovv2"]
-bg_color = Color(0.48941174, 0.14529411, 0.109607846, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.7529412, 0.22352941, 0.16862746, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_qvxhw"]
+texture = ExtResource("7_uaj4g")
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1k4da"]
-bg_color = Color(0.22058824, 0.105882354, 0.35470587, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.49019608, 0.23529412, 0.7882353, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_do53f"]
+texture = ExtResource("7_uaj4g")
+modulate_color = Color(0.82, 0.82, 0.82, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bbqo6"]
-bg_color = Color(0.14705883, 0.07058824, 0.2364706, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.49019608, 0.23529412, 0.7882353, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_1bw8o"]
+texture = ExtResource("7_uaj4g")
+modulate_color = Color(1.12, 1.12, 1.12, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d4hu8"]
-bg_color = Color(0.31862745, 0.15294117, 0.51235294, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.49019608, 0.23529412, 0.7882353, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_q78k2"]
+texture = ExtResource("8_si58d")
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p1nwe"]
-bg_color = Color(0.08117647, 0.27882352, 0.13058823, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.18039216, 0.61960787, 0.2901961, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_neoyv"]
+texture = ExtResource("8_si58d")
+modulate_color = Color(0.82, 0.82, 0.82, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_prbor"]
-bg_color = Color(0.05411765, 0.18588236, 0.08705883, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.18039216, 0.61960787, 0.2901961, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_wof4p"]
+texture = ExtResource("8_si58d")
+modulate_color = Color(1.12, 1.12, 1.12, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_27h4x"]
-bg_color = Color(0.1172549, 0.4027451, 0.18862745, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.18039216, 0.61960787, 0.2901961, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_fgrcj"]
+texture = ExtResource("9_anexq")
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gdhp0"]
-bg_color = Color(0.082941175, 0.19588235, 0.3670588, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.18431373, 0.43529412, 0.8156863, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_idlmi"]
+texture = ExtResource("9_anexq")
+modulate_color = Color(0.82, 0.82, 0.82, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pstia"]
-bg_color = Color(0.055294123, 0.13058825, 0.2447059, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.18431373, 0.43529412, 0.8156863, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_parxl"]
+texture = ExtResource("9_anexq")
+modulate_color = Color(1.12, 1.12, 1.12, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_41tvm"]
-bg_color = Color(0.11980392, 0.28294116, 0.5301961, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.18431373, 0.43529412, 0.8156863, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ofc3y"]
+content_margin_left = 14.0
+content_margin_right = 14.0
+texture = ExtResource("10_qvxhw")
+modulate_color = Color(0.85, 0.85, 0.85, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uaj4g"]
-bg_color = Color(0.047058824, 0.101960786, 0.18039216, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.84705883, 0.6039216, 0.10980392, 1)
-corner_radius_top_left = 23
-corner_radius_top_right = 23
-corner_radius_bottom_right = 23
-corner_radius_bottom_left = 23
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_fau4l"]
+content_margin_left = 14.0
+content_margin_right = 14.0
+texture = ExtResource("11_do53f")
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_si58d"]
-bg_color = Color(0.047058824, 0.101960786, 0.18039216, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.2901961, 0.78431374, 1, 1)
-corner_radius_top_left = 23
-corner_radius_top_right = 23
-corner_radius_bottom_right = 23
-corner_radius_bottom_left = 23
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_42qp1"]
+texture = ExtResource("12_1bw8o")
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_anexq"]
-bg_color = Color(0.047058824, 0.101960786, 0.18039216, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.23137255, 0.43529412, 0.65882355, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_12yd3"]
+texture = ExtResource("12_1bw8o")
+modulate_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_26v5e"]
+texture = ExtResource("12_1bw8o")
+modulate_color = Color(1.15, 1.15, 1.15, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_rp6ip"]
+texture = ExtResource("12_1bw8o")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_dckix"]
+texture = ExtResource("12_1bw8o")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_co4ci"]
+texture = ExtResource("12_1bw8o")
+modulate_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_d66xx"]
+texture = ExtResource("12_1bw8o")
+modulate_color = Color(1.15, 1.15, 1.15, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_cmcyx"]
+texture = ExtResource("12_1bw8o")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_7iyuo"]
+texture = ExtResource("12_1bw8o")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_406qy"]
+texture = ExtResource("12_1bw8o")
+modulate_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_83b5w"]
+texture = ExtResource("12_1bw8o")
+modulate_color = Color(1.15, 1.15, 1.15, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_gy47a"]
+texture = ExtResource("12_1bw8o")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_8gjrb"]
+content_margin_left = 40.0
+content_margin_top = 22.0
+content_margin_right = 28.0
+content_margin_bottom = 12.0
+texture = ExtResource("13_q78k2")
+texture_margin_left = 90.0
+texture_margin_top = 60.0
+texture_margin_right = 90.0
+texture_margin_bottom = 60.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vxdmp"]
 bg_color = Color(0.16470589, 0.2901961, 0.43137255, 1)
@@ -244,17 +150,19 @@ corner_radius_top_right = 27
 corner_radius_bottom_right = 27
 corner_radius_bottom_left = 27
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qvxhw"]
-bg_color = Color(0.047058824, 0.101960786, 0.18039216, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.23137255, 0.43529412, 0.65882355, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_lsxs6"]
+texture = ExtResource("17_fgrcj")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_unoev"]
+texture = ExtResource("17_fgrcj")
+modulate_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_7wy5f"]
+texture = ExtResource("17_fgrcj")
+modulate_color = Color(1.15, 1.15, 1.15, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_o4h6x"]
+texture = ExtResource("17_fgrcj")
 
 [node name="MainMenu" type="Control" unique_id=1956077792]
 layout_mode = 3
@@ -265,105 +173,117 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_247la")
 
-[node name="Background" type="ColorRect" parent="." unique_id=235729961]
+[node name="Background" type="TextureRect" parent="." unique_id=1000286985]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.16470589, 0.43529412, 0.61960787, 1)
+texture = ExtResource("2_pstia")
+expand_mode = 1
+stretch_mode = 6
 
-[node name="LogoBanner" type="Panel" parent="." unique_id=1427860668]
-custom_minimum_size = Vector2(452, 150)
+[node name="Logo" type="TextureRect" parent="." unique_id=2014745637]
+custom_minimum_size = Vector2(520, 168)
 layout_mode = 0
-offset_left = 24.0
-offset_top = 22.0
-offset_right = 24.0
-offset_bottom = 22.0
+offset_left = 20.0
+offset_top = 8.0
+offset_right = 20.0
+offset_bottom = 8.0
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_247la")
+texture = ExtResource("3_41tvm")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="Logo" type="Label" parent="." unique_id=973639710]
+[node name="LobbyStage" parent="." unique_id=439807160 instance=ExtResource("4_41tvm")]
 layout_mode = 0
-offset_left = 46.0
-offset_top = 68.0
-offset_right = 581.0
-offset_bottom = 156.0
-theme_override_colors/font_color = Color(1, 0.827451, 0.3019608, 1)
-theme_override_colors/font_outline_color = Color(0.101960786, 0.0627451, 0.1882353, 1)
-theme_override_constants/outline_size = 10
-theme_override_font_sizes/font_size = 46
-text = "MENU PRINCIPAL"
+offset_left = 640.0
+offset_top = 180.0
+offset_right = 640.0
+offset_bottom = 180.0
 
 [node name="MenuButtons" type="VBoxContainer" parent="." unique_id=212160107]
 layout_mode = 0
 offset_left = 36.0
-offset_top = 248.0
-offset_right = 36.0
-offset_bottom = 248.0
-theme_override_constants/separation = 12
+offset_top = 258.0
+offset_right = 696.0
+offset_bottom = 882.0
+theme_override_constants/separation = 8
 
 [node name="BtnStory" parent="MenuButtons" unique_id=1921252774 instance=ExtResource("2_kiqgm")]
+custom_minimum_size = Vector2(600, 122)
 layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_kiqgm")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_hj162")
-theme_override_styles/hover = SubResource("StyleBoxFlat_xn6kt")
-theme_override_styles/focus = SubResource("StyleBoxFlat_kiqgm")
+size_flags_horizontal = 0
+theme_override_styles/normal = SubResource("StyleBoxTexture_41tvm")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_vxdmp")
+theme_override_styles/hover = SubResource("StyleBoxTexture_3h20m")
+theme_override_styles/focus = SubResource("StyleBoxTexture_41tvm")
 button_id = &"story"
 title = "Modo História"
 subtitle = "Viva uma grande aventura
 nos quatro reinos."
 accent_color = Color(0.84705883, 0.6039216, 0.10980392, 1)
+art_texture = ExtResource("5_vxdmp")
 
 [node name="BtnDuel" parent="MenuButtons" unique_id=86780443 instance=ExtResource("2_kiqgm")]
+custom_minimum_size = Vector2(600, 122)
 layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_isoef")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_qgo02")
-theme_override_styles/hover = SubResource("StyleBoxFlat_vovv2")
-theme_override_styles/focus = SubResource("StyleBoxFlat_isoef")
+size_flags_horizontal = 0
+theme_override_styles/normal = SubResource("StyleBoxTexture_uaj4g")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_si58d")
+theme_override_styles/hover = SubResource("StyleBoxTexture_anexq")
+theme_override_styles/focus = SubResource("StyleBoxTexture_uaj4g")
 button_id = &"duel"
 title = "Modo Duelo"
 subtitle = "Desafie outros jogadores
 e prove suas habilidades."
 accent_color = Color(0.7529412, 0.22352941, 0.16862746, 1)
+art_texture = ExtResource("6_3h20m")
 
 [node name="BtnSkins" parent="MenuButtons" unique_id=982841425 instance=ExtResource("2_kiqgm")]
+custom_minimum_size = Vector2(600, 122)
 layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_1k4da")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_bbqo6")
-theme_override_styles/hover = SubResource("StyleBoxFlat_d4hu8")
-theme_override_styles/focus = SubResource("StyleBoxFlat_1k4da")
+size_flags_horizontal = 0
+theme_override_styles/normal = SubResource("StyleBoxTexture_qvxhw")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_do53f")
+theme_override_styles/hover = SubResource("StyleBoxTexture_1bw8o")
+theme_override_styles/focus = SubResource("StyleBoxTexture_qvxhw")
 button_id = &"skins"
 title = "Skins"
 subtitle = "Personalize seu herói
 com visuais únicos."
 accent_color = Color(0.49019608, 0.23529412, 0.7882353, 1)
+art_texture = ExtResource("7_uaj4g")
 
 [node name="BtnFriends" parent="MenuButtons" unique_id=1298851961 instance=ExtResource("2_kiqgm")]
+custom_minimum_size = Vector2(600, 122)
 layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_p1nwe")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_prbor")
-theme_override_styles/hover = SubResource("StyleBoxFlat_27h4x")
-theme_override_styles/focus = SubResource("StyleBoxFlat_p1nwe")
+size_flags_horizontal = 0
+theme_override_styles/normal = SubResource("StyleBoxTexture_q78k2")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_neoyv")
+theme_override_styles/hover = SubResource("StyleBoxTexture_wof4p")
+theme_override_styles/focus = SubResource("StyleBoxTexture_q78k2")
 button_id = &"friends"
 title = "Amizades"
 subtitle = "Jogue com seus amigos
 e forme sua equipe."
 accent_color = Color(0.18039216, 0.61960787, 0.2901961, 1)
+art_texture = ExtResource("8_si58d")
 
 [node name="BtnSettings" parent="MenuButtons" unique_id=407469799 instance=ExtResource("2_kiqgm")]
-custom_minimum_size = Vector2(490, 104)
+custom_minimum_size = Vector2(470, 100)
 layout_mode = 2
 size_flags_horizontal = 0
-theme_override_styles/normal = SubResource("StyleBoxFlat_gdhp0")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_pstia")
-theme_override_styles/hover = SubResource("StyleBoxFlat_41tvm")
-theme_override_styles/focus = SubResource("StyleBoxFlat_gdhp0")
+theme_override_styles/normal = SubResource("StyleBoxTexture_fgrcj")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_idlmi")
+theme_override_styles/hover = SubResource("StyleBoxTexture_parxl")
+theme_override_styles/focus = SubResource("StyleBoxTexture_fgrcj")
 button_id = &"settings"
 title = "Configurações"
 subtitle = "Ajuste o jogo do seu jeito."
 accent_color = Color(0.18431373, 0.43529412, 0.8156863, 1)
+art_texture = ExtResource("9_anexq")
 
 [node name="TopBar" type="HBoxContainer" parent="." unique_id=759648291]
 layout_mode = 0
@@ -377,11 +297,13 @@ theme_override_constants/separation = 10
 [node name="CoinPill" type="PanelContainer" parent="TopBar" unique_id=143717158]
 custom_minimum_size = Vector2(150, 46)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_uaj4g")
+theme_override_styles/panel = SubResource("StyleBoxTexture_ofc3y")
 
 [node name="Value" type="Label" parent="TopBar/CoinPill" unique_id=2094565874]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.827451, 0.3019608, 1)
+theme_override_colors/font_color = Color(1, 0.9529412, 0.76862746, 1)
+theme_override_colors/font_outline_color = Color(0.2901961, 0.16470589, 0, 1)
+theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 24
 text = "2.350  +"
 horizontal_alignment = 1
@@ -390,11 +312,13 @@ vertical_alignment = 1
 [node name="GemPill" type="PanelContainer" parent="TopBar" unique_id=791331894]
 custom_minimum_size = Vector2(130, 46)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_si58d")
+theme_override_styles/panel = SubResource("StyleBoxTexture_fau4l")
 
 [node name="Value" type="Label" parent="TopBar/GemPill" unique_id=1294790626]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.49411765, 0.8901961, 1, 1)
+theme_override_colors/font_outline_color = Color(0.019607844, 0.1254902, 0.22745098, 1)
+theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 24
 text = "180  +"
 horizontal_alignment = 1
@@ -404,38 +328,61 @@ vertical_alignment = 1
 custom_minimum_size = Vector2(46, 46)
 layout_mode = 2
 focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxTexture_42qp1")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_12yd3")
+theme_override_styles/hover = SubResource("StyleBoxTexture_26v5e")
+theme_override_styles/focus = SubResource("StyleBoxTexture_rp6ip")
 text = "Msg"
 
 [node name="FriendsButton" type="Button" parent="TopBar" unique_id=426187261]
 custom_minimum_size = Vector2(46, 46)
 layout_mode = 2
 focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxTexture_dckix")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_co4ci")
+theme_override_styles/hover = SubResource("StyleBoxTexture_d66xx")
+theme_override_styles/focus = SubResource("StyleBoxTexture_cmcyx")
 text = "Amg"
 
 [node name="SettingsButton" type="Button" parent="TopBar" unique_id=1852412496]
 custom_minimum_size = Vector2(46, 46)
 layout_mode = 2
 focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxTexture_7iyuo")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_406qy")
+theme_override_styles/hover = SubResource("StyleBoxTexture_83b5w")
+theme_override_styles/focus = SubResource("StyleBoxTexture_gy47a")
 text = "Cfg"
 
 [node name="ProfileCard" type="PanelContainer" parent="." unique_id=1891057453]
-custom_minimum_size = Vector2(228, 74)
+custom_minimum_size = Vector2(300, 92)
 layout_mode = 0
-offset_left = 945.0
-offset_top = 150.0
-offset_right = 945.0
-offset_bottom = 150.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_anexq")
+offset_left = 948.0
+offset_top = 146.0
+offset_right = 1248.0
+offset_bottom = 242.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_8gjrb")
 
 [node name="Content" type="HBoxContainer" parent="ProfileCard" unique_id=1067230905]
 layout_mode = 2
 theme_override_constants/separation = 10
 
 [node name="Avatar" type="Panel" parent="ProfileCard/Content" unique_id=426126967]
-custom_minimum_size = Vector2(54, 54)
+custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_styles/panel = SubResource("StyleBoxFlat_vxdmp")
+
+[node name="Ring" type="TextureRect" parent="ProfileCard/Content/Avatar" unique_id=300450459]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("14_neoyv")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Info" type="VBoxContainer" parent="ProfileCard/Content" unique_id=221468221]
 layout_mode = 2
@@ -460,21 +407,37 @@ layout_mode = 2
 value = 60.0
 show_percentage = false
 
-[node name="FriendsPanel" type="PanelContainer" parent="." unique_id=2126155821]
-custom_minimum_size = Vector2(342, 466)
+[node name="FriendsPanel" type="Control" parent="." unique_id=574836991]
+custom_minimum_size = Vector2(368, 490)
+anchors_preset = 0
+offset_left = 1290.0
+offset_top = 236.0
+offset_right = 1658.0
+offset_bottom = 726.0
+mouse_filter = 1
+
+[node name="Frame" type="NinePatchRect" parent="FriendsPanel" unique_id=610414997]
 layout_mode = 0
-offset_left = 1310.0
-offset_top = 245.0
-offset_right = 1310.0
-offset_bottom = 245.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_qvxhw")
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("15_wof4p")
+patch_margin_left = 70
+patch_margin_top = 150
+patch_margin_right = 70
+patch_margin_bottom = 70
 
 [node name="Margin" type="MarginContainer" parent="FriendsPanel" unique_id=658582218]
-layout_mode = 2
-theme_override_constants/margin_left = 14
-theme_override_constants/margin_top = 14
-theme_override_constants/margin_right = 14
-theme_override_constants/margin_bottom = 14
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 34
+theme_override_constants/margin_top = 92
+theme_override_constants/margin_right = 34
+theme_override_constants/margin_bottom = 24
 
 [node name="Content" type="VBoxContainer" parent="FriendsPanel/Margin" unique_id=993391476]
 layout_mode = 2
@@ -499,7 +462,7 @@ text = "5 online"
 
 [node name="FriendList" type="VBoxContainer" parent="FriendsPanel/Margin/Content" unique_id=331536337]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 4
 
 [node name="FriendLuna" parent="FriendsPanel/Margin/Content/FriendList" unique_id=370442676 instance=ExtResource("3_hj162")]
 layout_mode = 2
@@ -532,8 +495,12 @@ status_text = "No Lobby"
 badge_color = Color(0.5568628, 0.36078432, 0.8509804, 1)
 
 [node name="ViewAllButton" type="Button" parent="FriendsPanel/Margin/Content" unique_id=2110005369]
-custom_minimum_size = Vector2(0, 44)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 focus_mode = 0
 theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxTexture_lsxs6")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_unoev")
+theme_override_styles/hover = SubResource("StyleBoxTexture_7wy5f")
+theme_override_styles/focus = SubResource("StyleBoxTexture_o4h6x")
 text = "Ver todos os amigos"

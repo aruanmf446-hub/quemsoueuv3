@@ -1,0 +1,9 @@
+newmtl tripo_node_ac936e09_8c2b_4a41_8554_b1cf55e1a75c_material
+Kd 1.000000000 1.000000000 1.000000000
+d 1.000000000
+illum 2
+map_Kd Rodrigo_basecolor.jpg
+Pr 0.500000000
+Pm 0.000000000
+norm Rodrigo_normal.jpg
+

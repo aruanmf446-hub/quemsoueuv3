@@ -1,0 +1,8 @@
+# Personagem Halloween - pose estatica para rigging no Mixamo
+
+newmtl tripo_mat_dd1e133e-abf8-44e6-9912-f0f6043cb951
+Ka 1.0 1.0 1.0
+Kd 1.0 1.0 1.0
+Ks 0.0 0.0 0.0
+Ns 1.00000000
+map_Kd Halloween_textura.png

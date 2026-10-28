@@ -8,12 +8,16 @@ import sys
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[2]
-BASE = "d90dcb57e253a95e5ef13f05ea2b8c0f6024660f"
+BASE = "529ab72643ee3e5b92a466be9602299d0330b101"
 ALLOWED_CHANGES = {
     "project.godot", "data/characters.json", "scenes/menu/main_menu.tscn",
     "scripts/menu/main_menu.gd", "scenes/skins/skins_panel.tscn",
     "scripts/skins/skins_panel.gd", "scripts/progress/player_progress.gd",
     "scripts/lobby/lobby_area.gd", "scripts/lobby/lobby_stage.gd",
+    "scripts/skins/thumbnail_cache.gd",
+    "scripts/ui/navigation_manager.gd", "scripts/ui/player_screen.gd",
+    "scripts/ui/screens/settings_screen.gd", "scripts/ui/screens/public_profile_screen.gd",
+    "scripts/services/device_preferences.gd", "tools/player_ui/check.py",
 }
 ATTR = re.compile(r'(\w+)="([^"]*)"')
 

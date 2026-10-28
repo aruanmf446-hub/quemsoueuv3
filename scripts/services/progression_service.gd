@@ -9,7 +9,7 @@ func refresh() -> Dictionary:
 	var sequence := _request_sequence
 	state = "loading"
 	changed.emit()
-	var result := await client.rpc("qse_progression_snapshot")
+	var result := await client.call_rpc("qse_progression_snapshot")
 	if result.code == "session_changed" or sequence != _request_sequence:
 		return result
 	if result.ok and not PlayerContracts.valid_snapshot(result.data, str(session.user.get("id", ""))):
@@ -33,7 +33,7 @@ func equip(character_id: String) -> Dictionary:
 	var request := {"protocol_version": 2, "rules_version": data.rules_version,
 		"request_id": PlayerContracts.uuid(), "expected_revision": data.revision,
 		"operation": {"type": "equip_character", "character_id": character_id}}
-	var result := await client.rpc("qse_progression_command", {"p_request": request})
+	var result := await client.call_rpc("qse_progression_command", {"p_request": request})
 	if not result.ok:
 		return result
 	var response: Variant = result.data

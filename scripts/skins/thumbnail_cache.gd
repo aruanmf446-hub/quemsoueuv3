@@ -35,6 +35,9 @@ func ensure(host: Control, entries: Array) -> Dictionary:
 			result[entry["id"]] = path
 		else:
 			missing.append(entry)
+	# O renderizador headless não produz frame_post_draw para capturas.
+	if DisplayServer.get_name() == "headless":
+		return result
 	if missing.is_empty():
 		return result
 

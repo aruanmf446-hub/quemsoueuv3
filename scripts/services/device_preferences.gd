@@ -56,7 +56,7 @@ func apply() -> void:
 			AudioServer.add_bus()
 			index = AudioServer.bus_count - 1
 			AudioServer.set_bus_name(index, bus_name)
-		var key := {"Master": "master", "Music": "music", "SFX": "sfx"}[bus_name]
+		var key: String = {"Master": "master", "Music": "music", "SFX": "sfx"}[bus_name]
 		var gain := float(values[key])
 		AudioServer.set_bus_mute(index, gain <= 0.001)
 		AudioServer.set_bus_volume_db(index, linear_to_db(maxf(gain, 0.0001)))

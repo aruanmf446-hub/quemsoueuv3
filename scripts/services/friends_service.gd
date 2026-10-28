@@ -21,7 +21,7 @@ func search(term: String) -> Dictionary:
 	term = term.strip_edges()
 	if term.length() < 2 or term.length() > 64:
 		return ServiceResult.failure("invalid_search")
-	var result := await client.rpc("qse_find_players", {"p_term": term})
+	var result := await client.call_rpc("qse_find_players", {"p_term": term})
 	if result.ok and (not result.data is Dictionary or not PlayerContracts.valid_players(result.data.get("players"))):
 		return ServiceResult.failure("invalid_contract")
 	return result
@@ -30,7 +30,7 @@ func search(term: String) -> Dictionary:
 func act(action: String, target_id: String, request_id: String = "") -> Dictionary:
 	if action not in ["send", "accept", "decline", "cancel", "remove"]:
 		return ServiceResult.failure("invalid_action")
-	var result := await client.rpc("qse_friend_action", {"p_action": action, "p_target": target_id,
+	var result := await client.call_rpc("qse_friend_action", {"p_action": action, "p_target": target_id,
 		"p_request_id": PlayerContracts.uuid() if request_id.is_empty() else request_id})
 	if result.ok and (not result.data is Dictionary or result.data.get("status") not in ["applied", "noop"]):
 		return ServiceResult.failure("invalid_contract")

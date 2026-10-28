@@ -22,7 +22,7 @@ func load_rpc(name: String, params: Dictionary = {}) -> Dictionary:
 	var sequence := _request_sequence
 	state = "loading"
 	changed.emit()
-	var result := await client.rpc(name, params)
+	var result := await client.call_rpc(name, params)
 	if result.code == "session_changed" or sequence != _request_sequence:
 		return result
 	error = {} if result.ok else result

@@ -32,7 +32,7 @@ func load_more() -> Dictionary:
 		return ServiceResult.success({})
 	_history_loading = true
 	var epoch := _page_epoch
-	var result := await client.rpc("qse_wallet_history", {"p_before": str(next_cursor)})
+	var result := await client.call_rpc("qse_wallet_history", {"p_before": str(next_cursor)})
 	_history_loading = false
 	if epoch != _page_epoch:
 		return ServiceResult.failure("session_changed", "unauthorized")

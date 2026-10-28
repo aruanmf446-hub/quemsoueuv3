@@ -1,0 +1,110 @@
+{
+  "base_commit": "e89a1dd32d427d5fdb2d54741730eb9f6c1b4dc9",
+  "isolated_project": "ifomrkzmxgwwjapoeklo",
+  "production_project": "xgmlphejalzakucllsmw",
+  "production_migrations_applied": false,
+  "previous_no_session_preserved_not_rerun": {
+    "project": "ifomrkzmxgwwjapoeklo",
+    "phase": "anonymous",
+    "results": [
+      {
+        "test": "auth_email_enabled",
+        "passed": true
+      },
+      {
+        "test": "anon_denied_qse_profile_self",
+        "passed": true
+      },
+      {
+        "test": "anon_denied_qse_profile_update",
+        "passed": true
+      },
+      {
+        "test": "anon_denied_qse_account_preferences",
+        "passed": true
+      },
+      {
+        "test": "anon_denied_qse_profile_public",
+        "passed": true
+      },
+      {
+        "test": "anon_denied_qse_find_players",
+        "passed": true
+      },
+      {
+        "test": "anon_denied_qse_friends",
+        "passed": true
+      },
+      {
+        "test": "anon_denied_qse_friend_action",
+        "passed": true
+      },
+      {
+        "test": "anon_denied_qse_wallet_history",
+        "passed": true
+      },
+      {
+        "test": "anon_denied_qse_wallet",
+        "passed": true
+      },
+      {
+        "test": "anon_denied_qse_progression_snapshot",
+        "passed": true
+      },
+      {
+        "test": "anon_denied_qse_progression_command",
+        "passed": true
+      }
+    ],
+    "note": "Only executed cases are listed; authenticated cases require successful Auth login."
+  },
+  "additional_no_session": {
+    "project": "ifomrkzmxgwwjapoeklo",
+    "scope": "additional_no_session",
+    "results": [
+      {
+        "test": "malformed_jwt_rejected",
+        "http_status": 401,
+        "error_code": "PGRST301",
+        "passed": true
+      },
+      {
+        "test": "private_schema_not_exposed",
+        "http_status": 406,
+        "error_code": "PGRST106",
+        "passed": true
+      },
+      {
+        "test": "private_ledger_not_public_rpc",
+        "http_status": 404,
+        "error_code": "PGRST202",
+        "passed": true
+      }
+    ],
+    "signup_attempted": false,
+    "login_attempted": false,
+    "database_writes": false
+  },
+  "historical_auth_attempt": {
+    "project": "ifomrkzmxgwwjapoeklo",
+    "phase": "authenticated",
+    "results": [
+      {
+        "test": "real_auth_login_a",
+        "passed": false
+      }
+    ],
+    "note": "Only executed cases are listed; authenticated cases require successful Auth login."
+  },
+  "real_jwt_ab": {
+    "status": "PENDING",
+    "reason": "Signup returned 429 over_email_send_rate_limit; no accounts or real JWTs were available."
+  },
+  "closure_constraints": {
+    "no_new_signup_or_login_attempts": true,
+    "no_auth_table_inserts": true,
+    "no_browser_actions": true,
+    "no_security_setting_changes": true,
+    "isolated_project_preserved": true
+  }
+}

@@ -132,6 +132,8 @@ func _tune_materials() -> void:
 			tuned.metallic = minf(tuned.metallic, 0.3)
 			tuned.metallic_specular = 0.35
 			tuned.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+			# Mantém o material vivo até a liberação completa do nó, inclusive do RID.
+			mesh_instance.set_meta("qse_surface_material_%d" % surface, tuned)
 			mesh_instance.set_surface_override_material(surface, tuned)
 
 

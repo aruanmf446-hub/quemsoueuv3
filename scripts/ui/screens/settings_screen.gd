@@ -6,6 +6,8 @@ var _binding_button: Button
 
 func _ready() -> void:
 	super._ready()
+	visibility_changed.connect(func() -> void:
+		if not is_visible_in_tree(): _waiting_action = "")
 	services.session.changed.connect(func() -> void:
 		_waiting_action = ""
 		if is_visible_in_tree(): render())

@@ -1,0 +1,190 @@
+{
+  "id": "desert_phase_08",
+  "name": "Cavernas de Cristal",
+  "protagonist": "el_fuego",
+  "player_spawn": [
+    -8.0,
+    1.0,
+    0.0
+  ],
+  "reach": {
+    "note": "Um salto simples: pico 1.77 m, alcance ~4.6 m. Com pulo duplo (impulso 8.6): pico total ~3.3 m e alcance bem maior. Vãos de 3.5 m são cruzados saltando a partir de vários pontos antes da borda. O degrau de topo 2.7 m exige pulo duplo.",
+    "single_jump_max_step_top": 1.2,
+    "double_jump_max_step_top": 2.9,
+    "max_gap": 3.5
+  },
+  "platforms": [
+    {
+      "pos": [
+        -6.0,
+        -0.5,
+        0.0
+      ],
+      "size": [
+        16.0,
+        1.0,
+        4.0
+      ],
+      "kind": "ground"
+    },
+    {
+      "pos": [
+        12.0,
+        -0.5,
+        0.0
+      ],
+      "size": [
+        13.0,
+        1.0,
+        4.0
+      ],
+      "kind": "ground"
+    },
+    {
+      "pos": [
+        28.5,
+        -0.5,
+        0.0
+      ],
+      "size": [
+        14.0,
+        1.0,
+        4.0
+      ],
+      "kind": "ground"
+    },
+    {
+      "pos": [
+        46.0,
+        -0.5,
+        0.0
+      ],
+      "size": [
+        18.0,
+        1.0,
+        4.0
+      ],
+      "kind": "ground"
+    },
+    {
+      "pos": [
+        9.0,
+        1.1,
+        0.0
+      ],
+      "size": [
+        3.0,
+        0.6,
+        3.0
+      ],
+      "kind": "ledge"
+    },
+    {
+      "pos": [
+        25.0,
+        1.0,
+        0.0
+      ],
+      "size": [
+        3.0,
+        0.6,
+        3.0
+      ],
+      "kind": "ledge"
+    },
+    {
+      "pos": [
+        33.5,
+        1.0,
+        0.0
+      ],
+      "size": [
+        2.5,
+        0.6,
+        3.0
+      ],
+      "kind": "ledge"
+    },
+    {
+      "pos": [
+        41.0,
+        2.4,
+        0.0
+      ],
+      "size": [
+        3.0,
+        0.6,
+        3.0
+      ],
+      "kind": "ledge_high"
+    }
+  ],
+  "enemies": [
+    {
+      "type": "cactus",
+      "pos": [
+        14.0,
+        0.0,
+        0.0
+      ],
+      "patrol": [
+        9.0,
+        17.0
+      ]
+    },
+    {
+      "type": "cactus",
+      "pos": [
+        30.0,
+        0.0,
+        0.0
+      ],
+      "patrol": [
+        23.0,
+        34.0
+      ]
+    },
+    {
+      "type": "cactus",
+      "pos": [
+        44.0,
+        0.0,
+        0.0
+      ],
+      "patrol": [
+        38.0,
+        52.0
+      ]
+    }
+  ],
+  "goal": {
+    "pos": [
+      52.0,
+      1.5,
+      0.0
+    ]
+  },
+  "kill_plane_y": -8.0,
+  "boss_id": null,
+  "legacy_placeholder_visuals": false,
+  "implementation_status": "requires_godot_validation",
+  "next_scene": "res://scenes/desert/phase_09.tscn",
+  "checkpoints": [
+    {
+      "id": "desert_phase_08_checkpoint_01",
+      "pos": [
+        12.0,
+        0.1,
+        0.0
+      ]
+    },
+    {
+      "id": "desert_phase_08_checkpoint_02",
+      "pos": [
+        28.0,
+        0.1,
+        0.0
+      ]
+    }
+  ]
+}

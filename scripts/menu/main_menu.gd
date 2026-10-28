@@ -76,7 +76,7 @@ func _refresh_profile() -> void:
 
 
 func _refresh_wallet() -> void:
-	var locale := _services.preferences.values.locale
+	var locale: String = _services.preferences.values.locale
 	$TopBar/CoinPill/Content/Value.text = DevicePreferences.number(_services.wallet.balance("coins"), locale)
 	$TopBar/GemPill/Content/Value.text = DevicePreferences.number(_services.wallet.balance("gems"), locale)
 

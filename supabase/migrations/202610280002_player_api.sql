@@ -105,6 +105,9 @@ create function public.qse_wallet_history(p_before text default null) returns js
 declare owner uuid := qse_v3.require_user(); result jsonb; next_cursor text;
 begin
   if p_before is not null and p_before !~ '^[1-9][0-9]{0,18}$' then return jsonb_build_object('error','invalid_cursor'); end if;
+  if p_before is not null and p_before::numeric > 9223372036854775807::numeric then
+    return jsonb_build_object('error','invalid_cursor');
+  end if;
   select coalesce(jsonb_agg(jsonb_build_object('transaction_id',x.transaction_id,'sequence',x.sequence::text,
     'currency',x.currency,'amount',x.amount::text,'balance_after',x.balance_after::text,'reason',x.reason,'created_at',x.created_at) order by x.sequence desc),'[]'::jsonb),
     case when count(*)=20 then min(x.sequence)::text end into result,next_cursor from
@@ -235,7 +238,7 @@ begin
   for item in select p.oid::regprocedure as signature from pg_catalog.pg_proc p join pg_catalog.pg_namespace n on n.oid=p.pronamespace
     where n.nspname='public' and p.proname in ('qse_profile_self','qse_profile_update','qse_account_preferences','qse_profile_public',
       'qse_find_players','qse_friends','qse_friend_action','qse_wallet_history','qse_wallet','qse_progression_snapshot','qse_progression_command') loop
-    execute format('revoke all on function %s from public,anon',item.signature);
+    execute format('revoke all on function %s from public,anon,authenticated',item.signature);
     execute format('grant execute on function %s to authenticated',item.signature);
   end loop;
 end $permissions$;

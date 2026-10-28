@@ -43,8 +43,11 @@ func open(route: String, params: Dictionary = {}) -> void:
 			push_warning("Tela indisponível: %s" % route)
 			_error_dialog.popup_centered()
 			return
-		var screen := scene.instantiate() as PlayerScreen
+		var instance := scene.instantiate()
+		var screen := instance as PlayerScreen
 		if screen == null:
+			instance.free()
+			_error_dialog.popup_centered()
 			return
 		add_child(screen)
 		register_screen(route, screen)
@@ -89,5 +92,5 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_WM_GO_BACK_REQUEST and not _history.is_empty():
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST and is_visible_in_tree() and not _history.is_empty():
 		back()

@@ -69,6 +69,40 @@ func get_framing() -> Dictionary:
 	return _framing
 
 
+## Toca uma animação nomeada do catálogo. `loop = false` para ações como ataque e morte.
+func play_animation(anim_name: StringName, loop: bool = true) -> void:
+	if _anim_player == null or not _anim_player.has_animation(anim_name):
+		return
+	var clip := _anim_player.get_animation(anim_name)
+	clip.loop_mode = Animation.LOOP_LINEAR if loop else Animation.LOOP_NONE
+	is_static_pose = false
+	# Chamadas repetidas (a cada quadro) não devem reiniciar uma animação em andamento.
+	if _anim_player.current_animation == String(anim_name) and _anim_player.is_playing():
+		return
+	_anim_player.play(anim_name)
+
+
+## Congela uma animação em um instante, usada como pose estática.
+func set_pose(anim_name: StringName, time: float = 0.0) -> void:
+	if _anim_player == null or not _anim_player.has_animation(anim_name):
+		return
+	_anim_player.play(anim_name)
+	_anim_player.seek(time, true)
+	_anim_player.pause()
+	is_static_pose = true
+
+
+func has_animation(anim_name: StringName) -> bool:
+	return _anim_player != null and _anim_player.has_animation(anim_name)
+
+
+## Duração em segundos de uma animação nomeada, ou 0 se não existir.
+func animation_length(anim_name: StringName) -> float:
+	if not has_animation(anim_name):
+		return 0.0
+	return _anim_player.get_animation(anim_name).length
+
+
 ## Retorna um BoneAttachment3D fixado ao osso do socket, criado sob demanda.
 func get_socket(socket_name: StringName) -> BoneAttachment3D:
 	if _sockets.has(socket_name):

@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://c6mhdhh35nk0v"]
+
+[ext_resource type="Script" uid="uid://dqa2lhguckatf" path="res://scripts/desert/phase_01.gd" id="1_on0pp"]
+
+[node name="DesertPhase01" type="Node3D" unique_id=1372245827]
+script = ExtResource("1_on0pp")

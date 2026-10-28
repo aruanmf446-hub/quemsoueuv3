@@ -1,0 +1,32 @@
+{
+	"schema_version": 1,
+	"enemies": {
+		"cactus": {
+			"id": "cactus",
+			"name": "Cacto",
+			"model": "res://assets/characters/cactus/andar.fbx",
+			"height": 1.6,
+			"animations": {
+				"base": "res://assets/characters/cactus/andar.fbx",
+				"ataque": "res://assets/characters/cactus/ataque.fbx",
+				"correr": "res://assets/characters/cactus/correr.fbx",
+				"morte": "res://assets/characters/cactus/morte.fbx"
+			},
+			"idle": "",
+			"idle_verified": false,
+			"pose": "base",
+			"pose_time": 0.0,
+			"health": 2,
+			"damage": 1,
+			"speed": 2.0,
+			"chase_speed": 3.2,
+			"detect_range": 5.5,
+			"attack_range": 1.1,
+			"attack_cooldown": 1.3
+		}
+	},
+	"pending_assets": {
+		"malagueta": "Arquivos do boss Malagueta não encontrados em assets/. Necessários apenas para a fase 10.",
+		"desert_environment": "Arte de cenário, tiles e props do Reino do Deserto não encontrada. A Fase 01 usa geometria de caixa como placeholder."
+	}
+}

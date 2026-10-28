@@ -1,4 +1,4 @@
-# Tarefa 05 — implantação parcial, bloqueio de Auth
+# Tarefa 05 — relatório consolidado de encerramento
 
 ## Resultado efetivo
 
@@ -6,6 +6,7 @@
 
 - Projeto principal confirmado: `xgmlphejalzakucllsmw`.
 - Projeto isolado criado na mesma organização: `ifomrkzmxgwwjapoeklo`, nome `qse-v3-tarefa05-validation`, PostgreSQL 17.11.0.003, ACTIVE_HEALTHY.
+- Continuação e encerramento a partir de `work/backend-supabase-05`, commit `e89a1dd32d427d5fdb2d54741730eb9f6c1b4dc9`. Nenhuma migration ou teste aprovado foi refeito.
 - Base de código: `codex/telas-sistemas-jogador-03`, commit `e7ac72db03e753e5dc1f24c802f6cfc332f23802`.
 - Nenhuma cena, gameplay, câmera, modelo ou serviço Godot alterado.
 - Branches Supabase indisponíveis no plano atual; o projeto isolado separado foi a alternativa aceita.
@@ -97,12 +98,7 @@ O cadastro normal retornou `429 over_email_send_rate_limit` para ambos os e-mail
 
 Uma tentativa de criar fixtures diretamente em auth.users/auth.identities foi bloqueada pela revisão automática: contornaria o fluxo oficial de Auth por uma operação privilegiada não aprovada especificamente. **Essa inserção não foi executada**, e não foi contornada por outro caminho.
 
-O conector disponível não expõe alteração da configuração Auth/SMTP. As alternativas seguras são:
-
-1. No **projeto isolado**, desativar temporariamente **Confirm email** pelo painel, cadastrar as duas contas pela API normal, testar login/JWT e depois restaurar a configuração; ou
-2. Configurar entrega de e-mail funcional/SMTP e confirmar as contas normalmente.
-
-A primeira alternativa não deve ser aplicada ao projeto principal. O uso do painel pelo agente requer autorização de fallback para navegador; ainda não foi realizado.
+As tentativas de cadastro foram encerradas após o 429. Por instrução do usuário, não haverá novas tentativas nesta etapa, mudanças de segurança, acesso ao painel pelo navegador ou inserções nas tabelas internas de Auth. O projeto isolado e as migrations já aplicadas permanecem preservados.
 
 ## Funcionalidades e prontidão
 
@@ -141,8 +137,32 @@ Preservar números econômicos como strings; profile_public pode retornar {}; ow
 
 A presença mostrará indisponibilidade enquanto a autorização não estiver ativada. Não inventar estado online. A UI existente pode tentar abrir canais, mas não existem policies de presença autorizadoras no backend implantado.
 
-## Próxima ação exata
+## Verificações finais sem sessão
 
-Autorizar o uso do painel Supabase **somente no projeto isolado ifomrkzmxgwwjapoeklo** para desativar temporariamente Confirm email, executar o cadastro normal dos dois endereços indicados, testar os JWTs e restaurar a configuração. Alternativamente, o usuário pode fazer esse toggle no painel e avisar.
+Nesta continuação foram executados somente três testes adicionais HTTP no projeto isolado, sem cadastro, login ou escrita no banco:
 
-Com o gate A/B aprovado, implantar **somente 0001 e 0002** no projeto principal autorizado, verificar as ACLs/RLS e os contratos, e publicar nova evidência de execução. Não aplicar probe, bootstrap_local.sql ou 0003 em produção. Para recuperação de desastre, confirmar backup/restauração antes da ativação para usuários finais; até agora só rollback transacional foi testado.
+| Caso | Resposta observada | Resultado |
+|---|---|---|
+| JWT malformado em qse_wallet | HTTP 401, PGRST301 | Aprovado |
+| Tentativa de selecionar qse_v3 via Accept-Profile | HTTP 406, PGRST106 | Schema privado não exposto |
+| Tentativa de chamar post_wallet_entry como RPC pública | HTTP 404, PGRST202 | Ledger privado não exposto |
+
+Total consolidado: **15 verificações HTTP sem sessão aprovadas** — 12 anteriores preservadas, sem repetição, e 3 adicionais. Essas verificações não substituem login, isolamento A/B com dados ou execução com JWT real. A compilação Python do novo teste passou. Nenhum teste autenticado foi reexecutado.
+
+Evidências sanitizadas: `docs/player/evidence/T05_TEST_RESULTS.json`. A/B com JWT está explicitamente PENDENTE; o teste anterior de login interrompido continua registrado sem ser transformado em aprovação.
+
+## Procedimento de retomada — API oficial, após a quota permitir
+
+1. Retomar somente mediante nova solicitação; confirmar o fim do limite de envio sem loops automáticos. Se houver Retry-After, respeitá-lo. Não alterar confirmação de e-mail nem políticas para contornar o 429.
+2. Usar o projeto isolado `ifomrkzmxgwwjapoeklo` e sua chave publicável, nunca credenciais administrativas. Reutilizar a implementação e as migrations existentes; não reaplicá-las.
+3. Consultar o estado das contas de teste antes de cadastrar, para evitar duplicação. Os dois e-mails já foram fornecidos pelo usuário; credenciais temporárias ficam apenas no arquivo local ignorado `.runtime/stage.json`.
+4. Para contas ainda inexistentes, usar `POST /auth/v1/signup` com e-mail/senha. Encerrar imediatamente em novo 429 e registrar a resposta sem tokens ou senhas. Confirmar o e-mail pelo fluxo oficial quando exigido.
+5. Fazer login via `POST /auth/v1/token?grant_type=password`. Somente um JWT emitido pelo Auth com role authenticated habilita o teste A/B. Não forjar JWT nem inserir usuários por SQL.
+6. Com as duas contas confirmadas, executar `python3 tests/test_backend_http.py --phase authenticated` na branch de backend. O arquivo `.runtime/stage.json` deve conter `url`, `key` publicável e `users.a/users.b` com e-mail/senha das contas de teste. O runner exige a URL isolada e não pode usar o principal. Não publicar o arquivo de credenciais.
+7. O runner valida identidade, perfil/nickname, carteira zero, privacidade do schema, RLS por probe SECURITY INVOKER, amizades, equipamento, conclusão sem prova, refresh/logout. Registrar somente os casos efetivamente executados; não transformar casos bloqueados em aprovados.
+8. Preservar os 12 resultados HTTP sem login já aprovados; não repetí-los sem nova mudança/falha que o justifique.
+9. Produção permanece bloqueada até os testes com usuários reais e a verificação de recuperação necessária. Não aplicar o probe, bootstrap_local.sql ou migration 0003 no principal. Presença e verificador de fases permanecem pendências separadas.
+
+## Encerramento da Tarefa 05
+
+Entrega encerrada com implantação **somente no projeto isolado** e testes autenticados pendentes. Não há backend de produção liberado. Nenhuma nova pergunta ou ação de cadastro faz parte deste encerramento. O projeto principal `xgmlphejalzakucllsmw` não recebeu migrations desta tarefa.

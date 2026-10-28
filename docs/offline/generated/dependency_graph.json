@@ -1,0 +1,2367 @@
+{
+  "method": "Referências literais e nomes de classes; não é um parser GDScript nem resolve caminhos de nós em execução.",
+  "classes": {
+    "CactusEnemy": "scripts/desert/cactus_enemy.gd",
+    "SidePlayer": "scripts/desert/side_player.gd",
+    "TouchControls": "scripts/desert/touch_controls.gd",
+    "GraphicsProfile": "scripts/graphics/graphics_profile.gd",
+    "CharacterCatalog": "scripts/lobby/character_catalog.gd",
+    "CharacterSlot": "scripts/lobby/character_slot.gd",
+    "LobbyStage": "scripts/lobby/lobby_stage.gd",
+    "FriendRow": "scripts/menu/friend_row.gd",
+    "MenuCardButton": "scripts/menu/menu_button.gd",
+    "PlayerProgress": "scripts/progress/player_progress.gd",
+    "CharacterViewer": "scripts/skins/character_viewer.gd",
+    "ThumbnailCache": "scripts/skins/thumbnail_cache.gd"
+  },
+  "edges": [
+    {
+      "source": "addons/godot_mcp/core/editor_scenes.gd",
+      "line": 11,
+      "target": "levels/main_alt.tscn",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/editor_scenes.gd",
+      "line": 12,
+      "target": "scenes/main.tscn",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/project_validate.gd",
+      "line": 182,
+      "target": "main.tscn\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/res_paths.gd",
+      "line": 5,
+      "target": "main.tscn",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/res_paths.gd",
+      "line": 12,
+      "target": "...",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/res_paths.gd",
+      "line": 16,
+      "target": "main.tscn\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/res_paths.gd",
+      "line": 34,
+      "target": "../x.tscn",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/res_paths.gd",
+      "line": 35,
+      "target": "a/../../x.tscn",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/res_paths.gd",
+      "line": 35,
+      "target": "../x.tscn",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/res_paths.gd",
+      "line": 38,
+      "target": "..",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/res_save.gd",
+      "line": 63,
+      "target": "x.gd",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/resource_util.gd",
+      "line": 40,
+      "target": "...",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/resource_util.gd",
+      "line": 125,
+      "target": "path",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/runtime_override.gd",
+      "line": 14,
+      "target": "addons/godot_mcp/runtime/mcp_runtime.gd",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "addons/godot_mcp/core/runtime_override.gd",
+      "line": 15,
+      "target": "override.cfg",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/sprite_frames_ops.gd",
+      "line": 197,
+      "target": "hero.png\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/sprite_frames_ops.gd",
+      "line": 534,
+      "target": "a.png",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/sprite_frames_ops.gd",
+      "line": 535,
+      "target": "a.png",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/sprite_frames_ops.gd",
+      "line": 535,
+      "target": "b.png",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/sprite_frames_ops.gd",
+      "line": 649,
+      "target": "art/hero.png\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/variant_codec.gd",
+      "line": 63,
+      "target": "path/to/resource.tres\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/variant_codec.gd",
+      "line": 873,
+      "target": "...",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/variant_codec.gd",
+      "line": 932,
+      "target": "path/to/resource.tres\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/world_tileset.gd",
+      "line": 292,
+      "target": "tiles.png\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/world_tileset.gd",
+      "line": 348,
+      "target": "tiles.png\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/editor/editor_backend.gd",
+      "line": 354,
+      "target": "main.tscn\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/headless/headless_backend.gd",
+      "line": 121,
+      "target": "main.tscn\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/anim_ops.gd",
+      "line": 900,
+      "target": "sfx/step.wav\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/audio_ops.gd",
+      "line": 9,
+      "target": "default_bus_layout.tres",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/audio_ops.gd",
+      "line": 43,
+      "target": "default_bus_layout.tres",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/export_ops.gd",
+      "line": 34,
+      "target": "export_presets.cfg",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/project_ops.gd",
+      "line": 39,
+      "target": "addons/godot_mcp/plugin.cfg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "addons/godot_mcp/ops/project_ops.gd",
+      "line": 459,
+      "target": "game.gd\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/project_ops.gd",
+      "line": 542,
+      "target": "base.gd",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/project_ops.gd",
+      "line": 621,
+      "target": "addons",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "addons/godot_mcp/ops/project_ops.gd",
+      "line": 654,
+      "target": "addons/x",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/project_ops.gd",
+      "line": 654,
+      "target": "addons/x/plugin.cfg",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/resource_ops.gd",
+      "line": 28,
+      "target": "...",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/scene_extra_ops.gd",
+      "line": 158,
+      "target": "a.tscn",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/scene_extra_ops.gd",
+      "line": 158,
+      "target": "b.tscn",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/scene_extra_ops.gd",
+      "line": 158,
+      "target": "main.tscn",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/scene_extra_ops.gd",
+      "line": 166,
+      "target": "x.tscn",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/world_ops.gd",
+      "line": 200,
+      "target": "....tres\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/world_ops.gd",
+      "line": 245,
+      "target": "....tres\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/world_ops.gd",
+      "line": 511,
+      "target": "tileset.tres\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/world_ops.gd",
+      "line": 535,
+      "target": "library.tres\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/world_ops.gd",
+      "line": 670,
+      "target": "tiles.png\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/runtime/ops/rt_live.gd",
+      "line": 755,
+      "target": "enemy.tscn\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/runtime/ops/rt_live.gd",
+      "line": 815,
+      "target": "...\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/runtime/ops/rt_live.gd",
+      "line": 833,
+      "target": "main.tscn\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/runtime/ops/rt_live.gd",
+      "line": 855,
+      "target": "enemy.tscn",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "assets/backgrounds/Imagem do ChatGPT 28 de out. de 2026, 00_55_14.png.import",
+      "line": 13,
+      "target": "assets/backgrounds/Imagem do ChatGPT 28 de out. de 2026, 00_55_14.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Cowboy/1.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Cowboy/1.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Cowboy/1_0.png.import",
+      "line": 17,
+      "target": "assets/characters/Cowboy/1_0.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Cowboy/2.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Cowboy/2.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Cowboy/3.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Cowboy/3.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Cowboy/4.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Cowboy/4.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Cowboy/Cowboy.obj.import",
+      "line": 13,
+      "target": "assets/characters/Cowboy/Cowboy.obj",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Cowboy/Cowboy_basecolor.jpg.import",
+      "line": 14,
+      "target": "assets/characters/Cowboy/Cowboy_basecolor.jpg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/El fuego/Correr.fbx.import",
+      "line": 11,
+      "target": "assets/characters/El fuego/Correr.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/El fuego/Correr_0.png.import",
+      "line": 17,
+      "target": "assets/characters/El fuego/Correr_0.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/El fuego/El_fuego.obj.import",
+      "line": 13,
+      "target": "assets/characters/El fuego/El_fuego.obj",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/El fuego/El_fuego_basecolor.jpg.import",
+      "line": 14,
+      "target": "assets/characters/El fuego/El_fuego_basecolor.jpg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/El fuego/agachado.fbx.import",
+      "line": 11,
+      "target": "assets/characters/El fuego/agachado.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/El fuego/ataque.fbx.import",
+      "line": 11,
+      "target": "assets/characters/El fuego/ataque.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/El fuego/defesa.fbx.import",
+      "line": 11,
+      "target": "assets/characters/El fuego/defesa.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/El fuego/morte.fbx.import",
+      "line": 11,
+      "target": "assets/characters/El fuego/morte.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/El fuego/pulo duplo.fbx.import",
+      "line": 11,
+      "target": "assets/characters/El fuego/pulo duplo.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/El fuego/pulo.fbx.import",
+      "line": 11,
+      "target": "assets/characters/El fuego/pulo.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/El fuego/retorno.fbx.import",
+      "line": 11,
+      "target": "assets/characters/El fuego/retorno.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Gus/1.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Gus/1.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Gus/1_0.png.import",
+      "line": 17,
+      "target": "assets/characters/Gus/1_0.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Gus/2.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Gus/2.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Gus/3.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Gus/3.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Gus/4.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Gus/4.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Gus/Gus.obj.import",
+      "line": 13,
+      "target": "assets/characters/Gus/Gus.obj",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Gus/Gus_basecolor.jpg.import",
+      "line": 14,
+      "target": "assets/characters/Gus/Gus_basecolor.jpg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Hallowen/1.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Hallowen/1.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Hallowen/1_0.png.import",
+      "line": 17,
+      "target": "assets/characters/Hallowen/1_0.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Hallowen/2.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Hallowen/2.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Hallowen/3.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Hallowen/3.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Hallowen/4.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Hallowen/4.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Hallowen/Halloween_Mixamo_corrigido.obj.import",
+      "line": 13,
+      "target": "assets/characters/Hallowen/Halloween_Mixamo_corrigido.obj",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Hallowen/Halloween_textura.png.import",
+      "line": 14,
+      "target": "assets/characters/Hallowen/Halloween_textura.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Lana/1.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Lana/1.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Lana/1_0.png.import",
+      "line": 17,
+      "target": "assets/characters/Lana/1_0.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Lana/2.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Lana/2.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Lana/3.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Lana/3.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Lana/4.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Lana/4.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Lana/Lana.obj.import",
+      "line": 13,
+      "target": "assets/characters/Lana/Lana.obj",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Lana/Lana_basecolor.jpg.import",
+      "line": 14,
+      "target": "assets/characters/Lana/Lana_basecolor.jpg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Lorena/1.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Lorena/1.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Lorena/1_0.png.import",
+      "line": 17,
+      "target": "assets/characters/Lorena/1_0.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Lorena/2.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Lorena/2.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Lorena/3.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Lorena/3.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Lorena/4.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Lorena/4.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Lorena/Lorena.obj.import",
+      "line": 13,
+      "target": "assets/characters/Lorena/Lorena.obj",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Lorena/Lorena_basecolor.jpg.import",
+      "line": 14,
+      "target": "assets/characters/Lorena/Lorena_basecolor.jpg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Lorena/espada.glb.import",
+      "line": 11,
+      "target": "assets/characters/Lorena/espada.glb",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Lorena/espada_espada_basecolor.jpg.import",
+      "line": 17,
+      "target": "assets/characters/Lorena/espada_espada_basecolor.jpg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Michelly/1.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Michelly/1.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Michelly/1_0.png.import",
+      "line": 17,
+      "target": "assets/characters/Michelly/1_0.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Michelly/2.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Michelly/2.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Michelly/3.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Michelly/3.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Michelly/4.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Michelly/4.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Michelly/Michelly.obj.import",
+      "line": 13,
+      "target": "assets/characters/Michelly/Michelly.obj",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Michelly/Michelly_basecolor.jpg.import",
+      "line": 14,
+      "target": "assets/characters/Michelly/Michelly_basecolor.jpg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Michelly/arco.glb.import",
+      "line": 11,
+      "target": "assets/characters/Michelly/arco.glb",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Michelly/arco_fantasy_bow_3d_model_basecolor.jpg.import",
+      "line": 17,
+      "target": "assets/characters/Michelly/arco_fantasy_bow_3d_model_basecolor.jpg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Rodrigo/1.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Rodrigo/1.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Rodrigo/1_0.png.import",
+      "line": 17,
+      "target": "assets/characters/Rodrigo/1_0.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Rodrigo/2.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Rodrigo/2.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Rodrigo/3.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Rodrigo/3.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Rodrigo/4.fbx.import",
+      "line": 11,
+      "target": "assets/characters/Rodrigo/4.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Rodrigo/Rodrigo.obj.import",
+      "line": 13,
+      "target": "assets/characters/Rodrigo/Rodrigo.obj",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Rodrigo/Rodrigo_basecolor.jpg.import",
+      "line": 14,
+      "target": "assets/characters/Rodrigo/Rodrigo_basecolor.jpg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/Rodrigo/Rodrigo_normal.jpg.import",
+      "line": 13,
+      "target": "assets/characters/Rodrigo/Rodrigo_normal.jpg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/cactus/andar.fbx.import",
+      "line": 11,
+      "target": "assets/characters/cactus/andar.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/cactus/andar_0.png.import",
+      "line": 17,
+      "target": "assets/characters/cactus/andar_0.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/cactus/ataque.fbx.import",
+      "line": 11,
+      "target": "assets/characters/cactus/ataque.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/cactus/cactus.obj.import",
+      "line": 13,
+      "target": "assets/characters/cactus/cactus.obj",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/cactus/cactus_basecolor.jpg.import",
+      "line": 14,
+      "target": "assets/characters/cactus/cactus_basecolor.jpg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/cactus/correr.fbx.import",
+      "line": 11,
+      "target": "assets/characters/cactus/correr.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/cactus/morte.fbx.import",
+      "line": 11,
+      "target": "assets/characters/cactus/morte.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/malagueta/ataque de baixo pra cima.fbx.import",
+      "line": 11,
+      "target": "assets/characters/malagueta/ataque de baixo pra cima.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/malagueta/ataque de baixo pra cima_0.png.import",
+      "line": 17,
+      "target": "assets/characters/malagueta/ataque de baixo pra cima_0.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/malagueta/camehamera.fbx.import",
+      "line": 11,
+      "target": "assets/characters/malagueta/camehamera.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/malagueta/caminhar.fbx.import",
+      "line": 11,
+      "target": "assets/characters/malagueta/caminhar.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/malagueta/dark_fantasy_character_3d_model.obj.import",
+      "line": 13,
+      "target": "assets/characters/malagueta/dark_fantasy_character_3d_model.obj",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/malagueta/dark_fantasy_character_3d_model_basecolor.jpg.import",
+      "line": 14,
+      "target": "assets/characters/malagueta/dark_fantasy_character_3d_model_basecolor.jpg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/malagueta/lançamento.fbx.import",
+      "line": 11,
+      "target": "assets/characters/malagueta/lançamento.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/characters/malagueta/morte.fbx.import",
+      "line": 11,
+      "target": "assets/characters/malagueta/morte.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/icons/Imagem do ChatGPT 28 de out. de 2026, 00_56_26.png.import",
+      "line": 13,
+      "target": "assets/icons/Imagem do ChatGPT 28 de out. de 2026, 00_56_26.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/icons/Imagem do ChatGPT 28 de out. de 2026, 00_56_32.png.import",
+      "line": 13,
+      "target": "assets/icons/Imagem do ChatGPT 28 de out. de 2026, 00_56_32.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/icons/Imagem do ChatGPT 28 de out. de 2026, 00_56_35.png.import",
+      "line": 13,
+      "target": "assets/icons/Imagem do ChatGPT 28 de out. de 2026, 00_56_35.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/icons/Imagem do ChatGPT 28 de out. de 2026, 00_56_39.png.import",
+      "line": 13,
+      "target": "assets/icons/Imagem do ChatGPT 28 de out. de 2026, 00_56_39.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/icons/Imagem do ChatGPT 28 de out. de 2026, 00_56_43.png.import",
+      "line": 13,
+      "target": "assets/icons/Imagem do ChatGPT 28 de out. de 2026, 00_56_43.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/icons/vector/icon_coin.svg.import",
+      "line": 13,
+      "target": "assets/icons/vector/icon_coin.svg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/icons/vector/icon_friends.svg.import",
+      "line": 13,
+      "target": "assets/icons/vector/icon_friends.svg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/icons/vector/icon_gem.svg.import",
+      "line": 13,
+      "target": "assets/icons/vector/icon_gem.svg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/icons/vector/icon_mail.svg.import",
+      "line": 13,
+      "target": "assets/icons/vector/icon_mail.svg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/icons/vector/icon_settings.svg.import",
+      "line": 13,
+      "target": "assets/icons/vector/icon_settings.svg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/logos/Imagem do ChatGPT 28 de out. de 2026, 00_55_54.png.import",
+      "line": 13,
+      "target": "assets/logos/Imagem do ChatGPT 28 de out. de 2026, 00_55_54.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/processed/backgrounds/bg_lobby_fantasia.png.import",
+      "line": 13,
+      "target": "assets/processed/backgrounds/bg_lobby_fantasia.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/processed/buttons/btn_amizades.png.import",
+      "line": 13,
+      "target": "assets/processed/buttons/btn_amizades.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/processed/buttons/btn_configuracoes.png.import",
+      "line": 13,
+      "target": "assets/processed/buttons/btn_configuracoes.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/processed/buttons/btn_modo_duelo.png.import",
+      "line": 13,
+      "target": "assets/processed/buttons/btn_modo_duelo.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/processed/buttons/btn_modo_historia.png.import",
+      "line": 13,
+      "target": "assets/processed/buttons/btn_modo_historia.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/processed/buttons/btn_skins.png.import",
+      "line": 13,
+      "target": "assets/processed/buttons/btn_skins.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/processed/frames/frame_avatar_anel.png.import",
+      "line": 13,
+      "target": "assets/processed/frames/frame_avatar_anel.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/processed/frames/frame_botao_cabecalho.png.import",
+      "line": 13,
+      "target": "assets/processed/frames/frame_botao_cabecalho.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/processed/frames/frame_card_perfil.png.import",
+      "line": 13,
+      "target": "assets/processed/frames/frame_card_perfil.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/processed/frames/frame_painel_amizades.png.import",
+      "line": 13,
+      "target": "assets/processed/frames/frame_painel_amizades.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/processed/frames/frame_painel_brasao.png.import",
+      "line": 13,
+      "target": "assets/processed/frames/frame_painel_brasao.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/processed/logos/logo_menu_principal.png.import",
+      "line": 13,
+      "target": "assets/processed/logos/logo_menu_principal.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/processed/textures/textura_azul.png.import",
+      "line": 13,
+      "target": "assets/processed/textures/textura_azul.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/processed/textures/textura_dourada.png.import",
+      "line": 13,
+      "target": "assets/processed/textures/textura_dourada.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/processed/textures/textura_roxa.png.import",
+      "line": 13,
+      "target": "assets/processed/textures/textura_roxa.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/processed/textures/textura_verde.png.import",
+      "line": 13,
+      "target": "assets/processed/textures/textura_verde.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/processed/textures/textura_vermelha.png.import",
+      "line": 13,
+      "target": "assets/processed/textures/textura_vermelha.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/references/Imagem do ChatGPT 28 de out. de 2026, 00_58_08.png.import",
+      "line": 13,
+      "target": "assets/references/Imagem do ChatGPT 28 de out. de 2026, 00_58_08.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_02-1.png.import",
+      "line": 13,
+      "target": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_02-1.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_03-2.png.import",
+      "line": 13,
+      "target": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_03-2.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_04-3.png.import",
+      "line": 13,
+      "target": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_04-3.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_04-4.png.import",
+      "line": 13,
+      "target": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_04-4.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_05-5.png.import",
+      "line": 13,
+      "target": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_05-5.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_06-6.png.import",
+      "line": 13,
+      "target": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_06-6.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_06-7.png.import",
+      "line": 13,
+      "target": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_06-7.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_07-8.png.import",
+      "line": 13,
+      "target": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_07-8.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_08-10.png.import",
+      "line": 13,
+      "target": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_08-10.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_08-9.png.import",
+      "line": 13,
+      "target": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_08-9.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 7,
+      "target": "assets/characters/Cowboy/1.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 10,
+      "target": "assets/characters/Cowboy/1.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 11,
+      "target": "assets/characters/Cowboy/2.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 12,
+      "target": "assets/characters/Cowboy/3.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 13,
+      "target": "assets/characters/Cowboy/4.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 24,
+      "target": "assets/characters/Michelly/1.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 27,
+      "target": "assets/characters/Michelly/1.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 28,
+      "target": "assets/characters/Michelly/2.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 29,
+      "target": "assets/characters/Michelly/3.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 30,
+      "target": "assets/characters/Michelly/4.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 41,
+      "target": "assets/characters/Rodrigo/1.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 44,
+      "target": "assets/characters/Rodrigo/1.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 45,
+      "target": "assets/characters/Rodrigo/2.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 46,
+      "target": "assets/characters/Rodrigo/3.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 47,
+      "target": "assets/characters/Rodrigo/4.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 58,
+      "target": "assets/characters/Lorena/1.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 61,
+      "target": "assets/characters/Lorena/1.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 62,
+      "target": "assets/characters/Lorena/2.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 63,
+      "target": "assets/characters/Lorena/3.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 64,
+      "target": "assets/characters/Lorena/4.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 75,
+      "target": "assets/characters/Gus/1.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 78,
+      "target": "assets/characters/Gus/1.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 79,
+      "target": "assets/characters/Gus/2.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 80,
+      "target": "assets/characters/Gus/3.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 81,
+      "target": "assets/characters/Gus/4.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 92,
+      "target": "assets/characters/Lana/1.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 95,
+      "target": "assets/characters/Lana/1.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 96,
+      "target": "assets/characters/Lana/2.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 97,
+      "target": "assets/characters/Lana/3.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 98,
+      "target": "assets/characters/Lana/4.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 109,
+      "target": "assets/characters/Hallowen/1.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 112,
+      "target": "assets/characters/Hallowen/1.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 113,
+      "target": "assets/characters/Hallowen/2.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 114,
+      "target": "assets/characters/Hallowen/3.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 115,
+      "target": "assets/characters/Hallowen/4.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 129,
+      "target": "assets/characters/El fuego/Correr.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 132,
+      "target": "assets/characters/El fuego/Correr.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 133,
+      "target": "assets/characters/El fuego/agachado.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 134,
+      "target": "assets/characters/El fuego/ataque.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 135,
+      "target": "assets/characters/El fuego/defesa.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 136,
+      "target": "assets/characters/El fuego/morte.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 137,
+      "target": "assets/characters/El fuego/pulo duplo.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 138,
+      "target": "assets/characters/El fuego/pulo.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/characters.json",
+      "line": 139,
+      "target": "assets/characters/El fuego/retorno.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/desert_enemies.json",
+      "line": 7,
+      "target": "assets/characters/cactus/andar.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/desert_enemies.json",
+      "line": 10,
+      "target": "assets/characters/cactus/andar.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/desert_enemies.json",
+      "line": 11,
+      "target": "assets/characters/cactus/ataque.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/desert_enemies.json",
+      "line": 12,
+      "target": "assets/characters/cactus/correr.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "data/desert_enemies.json",
+      "line": 13,
+      "target": "assets/characters/cactus/morte.fbx",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "icon.svg.import",
+      "line": 13,
+      "target": "icon.svg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "project.godot",
+      "line": 14,
+      "target": "scenes/menu/main_menu.tscn",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "project.godot",
+      "line": 16,
+      "target": "icon.svg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "project.godot",
+      "line": 28,
+      "target": "addons/godot_mcp/plugin.cfg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/desert/phase_01.tscn",
+      "line": 3,
+      "target": "scripts/desert/phase_01.gd",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/lobby/character_slot.tscn",
+      "line": 3,
+      "target": "scripts/lobby/character_slot.gd",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/lobby/lobby_area.tscn",
+      "line": 3,
+      "target": "scripts/lobby/lobby_area.gd",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/lobby/lobby_area.tscn",
+      "line": 4,
+      "target": "scenes/lobby/lobby_stage.tscn",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/lobby/lobby_area.tscn",
+      "line": 5,
+      "target": "assets/processed/frames/frame_botao_cabecalho.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/lobby/lobby_stage.tscn",
+      "line": 3,
+      "target": "scripts/lobby/lobby_stage.gd",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/lobby/lobby_stage.tscn",
+      "line": 4,
+      "target": "scenes/lobby/character_slot.tscn",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/components/friend_row.tscn",
+      "line": 3,
+      "target": "scripts/menu/friend_row.gd",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/components/menu_card_button.tscn",
+      "line": 3,
+      "target": "scripts/menu/menu_button.gd",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/main_menu.tscn",
+      "line": 3,
+      "target": "scripts/menu/main_menu.gd",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/main_menu.tscn",
+      "line": 4,
+      "target": "scenes/menu/components/menu_card_button.tscn",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/main_menu.tscn",
+      "line": 5,
+      "target": "assets/processed/backgrounds/bg_lobby_fantasia.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/main_menu.tscn",
+      "line": 6,
+      "target": "assets/processed/logos/logo_menu_principal.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/main_menu.tscn",
+      "line": 7,
+      "target": "scenes/menu/components/friend_row.tscn",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/main_menu.tscn",
+      "line": 8,
+      "target": "scenes/lobby/lobby_area.tscn",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/main_menu.tscn",
+      "line": 9,
+      "target": "assets/processed/buttons/btn_modo_historia.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/main_menu.tscn",
+      "line": 10,
+      "target": "assets/processed/buttons/btn_modo_duelo.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/main_menu.tscn",
+      "line": 11,
+      "target": "assets/processed/buttons/btn_skins.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/main_menu.tscn",
+      "line": 12,
+      "target": "assets/processed/buttons/btn_amizades.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/main_menu.tscn",
+      "line": 13,
+      "target": "assets/processed/buttons/btn_configuracoes.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/main_menu.tscn",
+      "line": 14,
+      "target": "assets/processed/textures/textura_dourada.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/main_menu.tscn",
+      "line": 15,
+      "target": "assets/processed/textures/textura_azul.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/main_menu.tscn",
+      "line": 16,
+      "target": "assets/processed/frames/frame_botao_cabecalho.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/main_menu.tscn",
+      "line": 17,
+      "target": "assets/processed/frames/frame_card_perfil.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/main_menu.tscn",
+      "line": 18,
+      "target": "assets/processed/frames/frame_avatar_anel.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/main_menu.tscn",
+      "line": 19,
+      "target": "assets/icons/vector/icon_mail.svg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/main_menu.tscn",
+      "line": 20,
+      "target": "assets/icons/vector/icon_friends.svg",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/main_menu.tscn",
+      "line": 21,
+      "target": "assets/processed/frames/frame_painel_amizades.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/main_menu.tscn",
+      "line": 22,
+      "target": "assets/processed/textures/textura_verde.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/menu/main_menu.tscn",
+      "line": 23,
+      "target": "scenes/skins/skins_panel.tscn",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/skins/skins_panel.tscn",
+      "line": 3,
+      "target": "scripts/skins/skins_panel.gd",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/skins/skins_panel.tscn",
+      "line": 4,
+      "target": "assets/processed/frames/frame_painel_brasao.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scenes/skins/skins_panel.tscn",
+      "line": 5,
+      "target": "assets/processed/textures/textura_roxa.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scripts/desert/phase_01.gd",
+      "line": 8,
+      "target": "data/desert/phase_01.json",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scripts/desert/phase_01.gd",
+      "line": 9,
+      "target": "data/desert_enemies.json",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scripts/lobby/character_catalog.gd",
+      "line": 11,
+      "target": "data/characters.json",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scripts/skins/character_viewer.gd",
+      "line": 11,
+      "target": "scenes/lobby/lobby_stage.tscn",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scripts/skins/character_viewer.gd",
+      "line": 12,
+      "target": "assets/processed/frames/frame_painel_brasao.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scripts/skins/skins_panel.gd",
+      "line": 11,
+      "target": "assets/processed/textures/textura_azul.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scripts/skins/skins_panel.gd",
+      "line": 12,
+      "target": "assets/processed/textures/textura_roxa.png",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scripts/skins/skins_panel.gd",
+      "line": 13,
+      "target": "scenes/lobby/lobby_stage.tscn",
+      "kind": "resource",
+      "exists": true
+    },
+    {
+      "source": "scripts/desert/cactus_enemy.gd",
+      "target": "scripts/desert/side_player.gd",
+      "kind": "class_reference",
+      "exists": true
+    },
+    {
+      "source": "scripts/desert/cactus_enemy.gd",
+      "target": "scripts/lobby/character_slot.gd",
+      "kind": "class_reference",
+      "exists": true
+    },
+    {
+      "source": "scripts/desert/phase_01.gd",
+      "target": "scripts/desert/cactus_enemy.gd",
+      "kind": "class_reference",
+      "exists": true
+    },
+    {
+      "source": "scripts/desert/phase_01.gd",
+      "target": "scripts/desert/side_player.gd",
+      "kind": "class_reference",
+      "exists": true
+    },
+    {
+      "source": "scripts/desert/phase_01.gd",
+      "target": "scripts/desert/touch_controls.gd",
+      "kind": "class_reference",
+      "exists": true
+    },
+    {
+      "source": "scripts/desert/phase_01.gd",
+      "target": "scripts/lobby/character_catalog.gd",
+      "kind": "class_reference",
+      "exists": true
+    },
+    {
+      "source": "scripts/desert/phase_01.gd",
+      "target": "scripts/lobby/character_slot.gd",
+      "kind": "class_reference",
+      "exists": true
+    },
+    {
+      "source": "scripts/desert/side_player.gd",
+      "target": "scripts/lobby/character_slot.gd",
+      "kind": "class_reference",
+      "exists": true
+    },
+    {
+      "source": "scripts/lobby/lobby_area.gd",
+      "target": "scripts/lobby/character_catalog.gd",
+      "kind": "class_reference",
+      "exists": true
+    },
+    {
+      "source": "scripts/lobby/lobby_area.gd",
+      "target": "scripts/lobby/lobby_stage.gd",
+      "kind": "class_reference",
+      "exists": true
+    },
+    {
+      "source": "scripts/lobby/lobby_area.gd",
+      "target": "scripts/progress/player_progress.gd",
+      "kind": "class_reference",
+      "exists": true
+    },
+    {
+      "source": "scripts/lobby/lobby_stage.gd",
+      "target": "scripts/graphics/graphics_profile.gd",
+      "kind": "class_reference",
+      "exists": true
+    },
+    {
+      "source": "scripts/lobby/lobby_stage.gd",
+      "target": "scripts/lobby/character_slot.gd",
+      "kind": "class_reference",
+      "exists": true
+    },
+    {
+      "source": "scripts/menu/main_menu.gd",
+      "target": "scripts/menu/menu_button.gd",
+      "kind": "class_reference",
+      "exists": true
+    },
+    {
+      "source": "scripts/skins/character_viewer.gd",
+      "target": "scripts/lobby/lobby_stage.gd",
+      "kind": "class_reference",
+      "exists": true
+    },
+    {
+      "source": "scripts/skins/character_viewer.gd",
+      "target": "scripts/progress/player_progress.gd",
+      "kind": "class_reference",
+      "exists": true
+    },
+    {
+      "source": "scripts/skins/skins_panel.gd",
+      "target": "scripts/lobby/character_catalog.gd",
+      "kind": "class_reference",
+      "exists": true
+    },
+    {
+      "source": "scripts/skins/skins_panel.gd",
+      "target": "scripts/progress/player_progress.gd",
+      "kind": "class_reference",
+      "exists": true
+    },
+    {
+      "source": "scripts/skins/skins_panel.gd",
+      "target": "scripts/skins/character_viewer.gd",
+      "kind": "class_reference",
+      "exists": true
+    },
+    {
+      "source": "scripts/skins/skins_panel.gd",
+      "target": "scripts/skins/thumbnail_cache.gd",
+      "kind": "class_reference",
+      "exists": true
+    },
+    {
+      "source": "scripts/skins/thumbnail_cache.gd",
+      "target": "scripts/lobby/lobby_stage.gd",
+      "kind": "class_reference",
+      "exists": true
+    }
+  ],
+  "dynamic_references": [
+    {
+      "source": "addons/godot_mcp/core/log_buffer.gd",
+      "line": 144,
+      "expression": "res://addons/godot_mcp/"
+    },
+    {
+      "source": "addons/godot_mcp/core/project_validate.gd",
+      "line": 31,
+      "expression": "res://addons/"
+    },
+    {
+      "source": "addons/godot_mcp/core/res_paths.gd",
+      "line": 38,
+      "expression": "res://../"
+    },
+    {
+      "source": "addons/godot_mcp/ops/project_ops.gd",
+      "line": 663,
+      "expression": "res://addons/%s/plugin.cfg"
+    },
+    {
+      "source": "addons/godot_mcp/ops/project_ops.gd",
+      "line": 673,
+      "expression": "res://addons/"
+    }
+  ],
+  "missing_resources": [],
+  "addon_unresolved_literals": [
+    {
+      "source": "addons/godot_mcp/core/editor_scenes.gd",
+      "line": 11,
+      "target": "levels/main_alt.tscn",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/editor_scenes.gd",
+      "line": 12,
+      "target": "scenes/main.tscn",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/project_validate.gd",
+      "line": 182,
+      "target": "main.tscn\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/res_paths.gd",
+      "line": 5,
+      "target": "main.tscn",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/res_paths.gd",
+      "line": 12,
+      "target": "...",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/res_paths.gd",
+      "line": 16,
+      "target": "main.tscn\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/res_paths.gd",
+      "line": 34,
+      "target": "../x.tscn",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/res_paths.gd",
+      "line": 35,
+      "target": "a/../../x.tscn",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/res_paths.gd",
+      "line": 35,
+      "target": "../x.tscn",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/res_paths.gd",
+      "line": 38,
+      "target": "..",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/res_save.gd",
+      "line": 63,
+      "target": "x.gd",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/resource_util.gd",
+      "line": 40,
+      "target": "...",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/resource_util.gd",
+      "line": 125,
+      "target": "path",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/runtime_override.gd",
+      "line": 15,
+      "target": "override.cfg",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/sprite_frames_ops.gd",
+      "line": 197,
+      "target": "hero.png\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/sprite_frames_ops.gd",
+      "line": 534,
+      "target": "a.png",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/sprite_frames_ops.gd",
+      "line": 535,
+      "target": "a.png",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/sprite_frames_ops.gd",
+      "line": 535,
+      "target": "b.png",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/sprite_frames_ops.gd",
+      "line": 649,
+      "target": "art/hero.png\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/variant_codec.gd",
+      "line": 63,
+      "target": "path/to/resource.tres\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/variant_codec.gd",
+      "line": 873,
+      "target": "...",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/variant_codec.gd",
+      "line": 932,
+      "target": "path/to/resource.tres\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/world_tileset.gd",
+      "line": 292,
+      "target": "tiles.png\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/core/world_tileset.gd",
+      "line": 348,
+      "target": "tiles.png\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/editor/editor_backend.gd",
+      "line": 354,
+      "target": "main.tscn\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/headless/headless_backend.gd",
+      "line": 121,
+      "target": "main.tscn\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/anim_ops.gd",
+      "line": 900,
+      "target": "sfx/step.wav\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/audio_ops.gd",
+      "line": 9,
+      "target": "default_bus_layout.tres",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/audio_ops.gd",
+      "line": 43,
+      "target": "default_bus_layout.tres",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/export_ops.gd",
+      "line": 34,
+      "target": "export_presets.cfg",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/project_ops.gd",
+      "line": 459,
+      "target": "game.gd\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/project_ops.gd",
+      "line": 542,
+      "target": "base.gd",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/project_ops.gd",
+      "line": 654,
+      "target": "addons/x",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/project_ops.gd",
+      "line": 654,
+      "target": "addons/x/plugin.cfg",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/resource_ops.gd",
+      "line": 28,
+      "target": "...",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/scene_extra_ops.gd",
+      "line": 158,
+      "target": "a.tscn",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/scene_extra_ops.gd",
+      "line": 158,
+      "target": "b.tscn",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/scene_extra_ops.gd",
+      "line": 158,
+      "target": "main.tscn",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/scene_extra_ops.gd",
+      "line": 166,
+      "target": "x.tscn",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/world_ops.gd",
+      "line": 200,
+      "target": "....tres\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/world_ops.gd",
+      "line": 245,
+      "target": "....tres\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/world_ops.gd",
+      "line": 511,
+      "target": "tileset.tres\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/world_ops.gd",
+      "line": 535,
+      "target": "library.tres\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/ops/world_ops.gd",
+      "line": 670,
+      "target": "tiles.png\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/runtime/ops/rt_live.gd",
+      "line": 755,
+      "target": "enemy.tscn\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/runtime/ops/rt_live.gd",
+      "line": 815,
+      "target": "...\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/runtime/ops/rt_live.gd",
+      "line": 833,
+      "target": "main.tscn\\",
+      "kind": "resource",
+      "exists": false
+    },
+    {
+      "source": "addons/godot_mcp/runtime/ops/rt_live.gd",
+      "line": 855,
+      "target": "enemy.tscn",
+      "kind": "resource",
+      "exists": false
+    }
+  ],
+  "addon_literal_limit": "O plugin contém exemplos, caminhos opcionais e mensagens de validação; seus literais não são declarados dependências obrigatórias do jogo."
+}

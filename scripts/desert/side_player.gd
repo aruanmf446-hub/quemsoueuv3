@@ -52,6 +52,11 @@ func setup(entry: Dictionary) -> void:
 	_model.load_entry(entry)
 	_model.set_pose("base", 0.0)
 	jumps_used = 0
+	_attack_timer = 0.0
+	_attack_cooldown = 0.0
+	_invulnerable = 0.0
+	_air_time = 0.0
+	_was_on_floor = false
 	_landing_timer = 0.0
 
 
@@ -154,7 +159,7 @@ func take_damage(amount: int, from_x: float) -> void:
 
 func _start_attack() -> void:
 	_attack_timer = ATTACK_DURATION
-	_attack_cooldown = ATTACK_COOLDOWN
+	_attack_cooldown = maxf(ATTACK_COOLDOWN, ATTACK_DURATION)
 	_model.play_animation("ataque", false)
 	for enemy in get_tree().get_nodes_in_group("enemies"):
 		if enemy.has_method("take_damage") and _can_hit(enemy):

@@ -5,7 +5,10 @@ extends Node3D
 ## o bloqueio do lobby só afeta equipar no catálogo, não a campanha.
 ## Geometria de cenário é placeholder de caixa, até a arte do Reino do Deserto existir.
 
-const PHASE_PATH := "res://data/desert/phase_01.json"
+@export_file("*.json") var phase_path := "res://data/desert/phase_01.json"
+var _checkpoint := Vector3.ZERO
+var _respawning := false
+var _boss_defeated := false
 const ENEMIES_PATH := "res://data/desert_enemies.json"
 const PROTAGONIST_TYPE := "el_fuego"
 const CAMERA_LEAD := 1.5
@@ -27,25 +30,27 @@ var _touch: TouchControls
 
 func _ready() -> void:
 	_ensure_input_actions()
-	_phase = _read_json(PHASE_PATH)
+	_phase = _read_json(phase_path)
 	_enemy_catalog = _read_json(ENEMIES_PATH).get("enemies", {})
 	_build_environment()
 	_build_platforms()
+	_checkpoint = _vec3(_phase["player_spawn"])
 	_build_goal()
+	_build_checkpoints()
 	_build_player()
 	_build_enemies()
 	_build_camera()
 	_build_hud()
 
 
-func _physics_process(_delta: float) -> void:
-	if _player == null:
+func _physics_process(delta: float) -> void:
+	if _player == null or _respawning or completed:
 		return
 	if _player.global_position.y < float(_phase.get("kill_plane_y", -8.0)):
-		_respawn_player()
+		_player.take_damage(SidePlayer.MAX_HEALTH, _player.global_position.x)
 	_camera.global_position = _camera.global_position.lerp(
 		Vector3(_player.global_position.x + CAMERA_LEAD, CAMERA_HEIGHT, CAMERA_DISTANCE),
-		0.12
+		1.0 - exp(-8.0 * delta)
 	)
 	_camera.look_at(Vector3(_camera.global_position.x - CAMERA_LEAD, 1.2, 0.0), Vector3.UP)
 
@@ -84,7 +89,10 @@ func _build_platforms() -> void:
 		box_mesh.size = size
 		mesh.mesh = box_mesh
 		mesh.material_override = _placeholder_material(platform.get("kind", "ground"))
-		body.add_child(mesh)
+		if _phase.get("legacy_placeholder_visuals", true):
+			body.add_child(mesh)
+		else:
+			mesh.free()
 		add_child(body)
 
 
@@ -148,6 +156,8 @@ func _build_enemies() -> void:
 		enemy.add_child(model)
 		add_child(enemy)
 		enemy.setup(entry, spawn)
+		if spawn["type"] == "malagueta":
+			enemy.defeated.connect(func() -> void: _boss_defeated = true)
 
 
 func _build_camera() -> void:
@@ -200,6 +210,9 @@ func _on_player_health_changed(current: int, maximum: int) -> void:
 
 
 func _on_player_died() -> void:
+	if _respawning or completed:
+		return
+	_respawning = true
 	_show_message("Derrotado — reiniciando...")
 	get_tree().create_timer(1.8).timeout.connect(_respawn_player)
 
@@ -207,7 +220,8 @@ func _on_player_died() -> void:
 func _respawn_player() -> void:
 	_player.is_dead = false
 	_player.health = SidePlayer.MAX_HEALTH
-	_player.position = _vec3(_phase["player_spawn"])
+	_player.position = _checkpoint
+	_respawning = false
 	_player.velocity = Vector3.ZERO
 	_message_label.visible = false
 	_on_player_health_changed(_player.health, SidePlayer.MAX_HEALTH)
@@ -215,10 +229,22 @@ func _respawn_player() -> void:
 
 
 func _on_goal_entered(body: Node3D) -> void:
-	if body != _player or completed:
+	if body != _player or completed or _player.is_dead or _respawning:
+		return
+	if _phase.get("boss_id") == "malagueta" and not _boss_defeated:
+		_show_message("Derrote Malagueta antes de sair")
 		return
 	completed = true
-	_show_message("Fase 01 concluída")
+	_player.is_dead = true
+	_show_message("Fase concluída localmente — sem concessão online")
+	var next_path := str(_phase.get("next_scene", ""))
+	if not next_path.is_empty():
+		var next_button := Button.new()
+		next_button.text = "Próxima fase"
+		next_button.position = Vector2(360, 80)
+		next_button.custom_minimum_size = Vector2(220, 56)
+		next_button.pressed.connect(_advance.bind(next_path))
+		_message_label.get_parent().add_child(next_button)
 
 
 func _show_message(text: String) -> void:
@@ -262,7 +288,8 @@ func _ensure_input_actions() -> void:
 		for keycode: Key in bindings[action]:
 			var event := InputEventKey.new()
 			event.physical_keycode = keycode
-			InputMap.action_add_event(action, event)
+			if not InputMap.action_has_event(action, event):
+				InputMap.action_add_event(action, event)
 
 
 func _read_json(path: String) -> Dictionary:
@@ -276,3 +303,29 @@ func _read_json(path: String) -> Dictionary:
 
 func _vec3(values: Array) -> Vector3:
 	return Vector3(float(values[0]), float(values[1]), float(values[2]))
+
+
+func _build_checkpoints() -> void:
+	for checkpoint: Dictionary in _phase.get("checkpoints", []):
+		var area := Area3D.new()
+		area.position = _vec3(checkpoint.pos)
+		var shape := CollisionShape3D.new()
+		var box := BoxShape3D.new()
+		box.size = Vector3(1.5, 3.0, 2.0)
+		shape.shape = box
+		area.add_child(shape)
+		area.body_entered.connect(func(body: Node3D) -> void:
+			if body == _player and not _player.is_dead and not completed:
+				_checkpoint = _vec3(checkpoint.pos))
+		add_child(area)
+
+
+func _advance(path: String) -> void:
+	# Mantém o wrapper de retorno ao menu e sua sessão; sem escrever progresso online.
+	var scene := load(path) as PackedScene
+	if scene == null:
+		_show_message("Não foi possível carregar a próxima fase")
+		return
+	var parent := get_parent()
+	parent.add_child(scene.instantiate())
+	queue_free()

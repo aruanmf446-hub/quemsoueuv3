@@ -1,0 +1,39 @@
+{
+  "base_commit": "943c890519111c83aab3c5bdf85bcb120dc02f72",
+  "branch": "codex/progressao-offline-02",
+  "new_unit_tests": {
+    "count": 88,
+    "failures": 0,
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tools/progression/tests -v"
+  },
+  "previous_unit_tests": {
+    "count": 37,
+    "failures": 0,
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3 tools/offline/test_validation.py"
+  },
+  "reference_check": {
+    "status": "ok",
+    "rules_version": "desert_progression_2.0.0",
+    "preserved_files": 457,
+    "preserved_previous_delivery_files": 49,
+    "phases": 10,
+    "characters": 10,
+    "validated_save_examples": 3,
+    "godot_executed": false,
+    "remote_services_accessed": false,
+    "runtime_migration_applied": false
+  },
+  "previous_static_validation": {
+    "errors": 0,
+    "warnings": [
+      "runtime_unlock_contradiction",
+      "runtime_not_executed"
+    ]
+  },
+  "godot_executed": false,
+  "blender_executed": false,
+  "gameplay_tests_executed": false,
+  "remote_services_accessed": false,
+  "runtime_changed": false,
+  "previous_delivery_files_modified": 0
+}

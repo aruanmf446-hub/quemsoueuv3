@@ -184,6 +184,16 @@ Texturas: `ataque de baixo pra cima_0.png`, `dark_fantasy_character_3d_model_bas
 
 Compatibilidade: nomes/parentesco consistentes entre os FBXs inspecionados; pose de repouso e trilhas importadas continuam pendentes.
 
+## Ausências e escopo
+
+O inventário cobre 130 arquivos-fonte sob `assets/`, sem incluir os sidecars `.import`. O ícone `icon.svg` da raiz está protegido no snapshot do projeto e no grafo de referências.
+
+Referências externas: 20 encontradas pelo relativo, 20 com candidato local pelo nome e 0 sem arquivo/candidato. Candidato e textura embutida ainda precisam ser confirmados pelo importador.
+
+Não há idle semanticamente verificado no catálogo equipável. Faltam as cenas 2–10, os recursos de cenário/checkpoints/áudio e a integração do chefe; isso não significa que os arquivos originais de Malagueta estejam ausentes.
+
+Malagueta: `ataque de baixo pra cima.fbx` é o candidato de base com malha e skin; `caminhar.fbx`, `camehamera.fbx`, `lançamento.fbx` e `morte.fbx` só fornecem animação/esqueleto. Não usar um desses quatro como modelo visível isolado.
+
 ## Limites e preparação
 
 - OBJ não leva ossos/pesos/animações. GLB/FBX só podem ser declarados animáveis após inspeção das skins e validação de reprodução.

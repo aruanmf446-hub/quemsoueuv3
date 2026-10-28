@@ -4,6 +4,7 @@ from collections import Counter
 import json
 from pathlib import Path
 import re
+import subprocess
 
 from common import ROOT, BASE_COMMIT, load_json, resource_path, sha256, tracked_files, write_json
 from inspect_assets import inspect_model, external_reference
@@ -101,6 +102,8 @@ def audit(root, out):
     absent = [name for name in files if not (root / name).is_file()]
     if absent:
         raise ValueError(f"Checkout incompleto: {len(absent)} arquivos da base ausentes; primeiro: {absent[0]}")
+    if subprocess.run(["git", "diff", "--quiet", BASE_COMMIT, "--", *files], cwd=root).returncode:
+        raise ValueError("Há alterações em arquivos originais; não regenerar o snapshot como se fossem a base preservada.")
     graph = scan_references(root, files)
     inventory = build_inventory(root, files)
     source = load_json(root / "data/characters.json")
@@ -162,7 +165,13 @@ def audit(root, out):
             rows.append(f"| `{Path(r['path']).name}` | {detail} |")
         rows += ["", "Texturas: " + (", ".join(f"`{Path(p).name}`" for p in c["textures"]) or "nenhuma textura separada encontrada"), "",
                  "Compatibilidade: " + ("há mais de uma hierarquia; separar esqueleto-base e animações antes de vincular." if len(c["bone_hierarchy_signatures"]) > 1 else "nomes/parentesco consistentes entre os FBXs inspecionados; pose de repouso e trilhas importadas continuam pendentes.")]
-    rows += ["", "## Limites e preparação", "", "- OBJ não leva ossos/pesos/animações. GLB/FBX só podem ser declarados animáveis após inspeção das skins e validação de reprodução.",
+    references = [ref for record in inventory["files"] for ref in record.get("external_references", [])]
+    rows += ["", "## Ausências e escopo", "",
+             f"O inventário cobre {len(inventory['files'])} arquivos-fonte sob `assets/`, sem incluir os sidecars `.import`. O ícone `icon.svg` da raiz está protegido no snapshot do projeto e no grafo de referências.", "",
+             f"Referências externas: {sum(r['status'] == 'relative_found' for r in references)} encontradas pelo relativo, {sum(r['status'] == 'basename_candidate' for r in references)} com candidato local pelo nome e {sum(r['status'] == 'missing' for r in references)} sem arquivo/candidato. Candidato e textura embutida ainda precisam ser confirmados pelo importador.", "",
+             "Não há idle semanticamente verificado no catálogo equipável. Faltam as cenas 2–10, os recursos de cenário/checkpoints/áudio e a integração do chefe; isso não significa que os arquivos originais de Malagueta estejam ausentes.", "",
+             "Malagueta: `ataque de baixo pra cima.fbx` é o candidato de base com malha e skin; `caminhar.fbx`, `camehamera.fbx`, `lançamento.fbx` e `morte.fbx` só fornecem animação/esqueleto. Não usar um desses quatro como modelo visível isolado.",
+             "", "## Limites e preparação", "", "- OBJ não leva ossos/pesos/animações. GLB/FBX só podem ser declarados animáveis após inspeção das skins e validação de reprodução.",
              "- Caminhos de autoria ausentes podem ter textura embutida ou candidato pelo nome local: essas situações estão separadas no JSON; candidato não prova resolução pelo importador.",
              "- Manter originais. Conversão, LOD, compressão, materiais, sockets e root motion exigem uma etapa futura de importação e teste no Godot.",
              "- Não há orçamento de polígonos ou memória aprovado para os dispositivos-alvo; este relatório mede os arquivos, sem inventar limites de desempenho.",

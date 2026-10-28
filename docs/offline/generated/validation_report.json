@@ -1,0 +1,17 @@
+{
+  "scope": "offline_proposals_and_baseline",
+  "errors": [],
+  "warnings": [
+    {
+      "code": "runtime_unlock_contradiction",
+      "message": "Runtime preservado usa desert_stage_completed; a migração para desert_campaign_completed/fase 10 NÃO está aplicada."
+    },
+    {
+      "code": "runtime_not_executed",
+      "message": "Godot/Blender não executados: importação, sintaxe GDScript, gameplay, retarget e desempenho permanecem sem validação de execução."
+    }
+  ],
+  "godot_executed": false,
+  "blender_executed": false,
+  "remote_services_modified": false
+}

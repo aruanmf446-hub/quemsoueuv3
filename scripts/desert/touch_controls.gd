@@ -50,3 +50,8 @@ func _relayout() -> void:
 	var buttons := get_children()
 	for i in buttons.size():
 		_place(buttons[i], BUTTONS[i])
+
+
+func _exit_tree() -> void:
+	for spec: Dictionary in BUTTONS:
+		Input.action_release(spec["action"])

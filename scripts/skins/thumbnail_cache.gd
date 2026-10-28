@@ -35,6 +35,9 @@ func ensure(host: Control, entries: Array) -> Dictionary:
 			result[entry["id"]] = path
 		else:
 			missing.append(entry)
+	# O renderizador headless não produz frame_post_draw para capturas.
+	if DisplayServer.get_name() == "headless":
+		return result
 	if missing.is_empty():
 		return result
 
@@ -42,12 +45,20 @@ func ensure(host: Control, entries: Array) -> Dictionary:
 	stage.position = Vector2(-6000, 0)
 	host.add_child(stage)
 	for entry: Dictionary in missing:
+		if not is_instance_valid(host) or not host.is_visible_in_tree():
+			break
 		stage.show_character(entry)
 		stage.set_zoom(THUMB_ZOOM)
 		await RenderingServer.frame_post_draw
 		await RenderingServer.frame_post_draw
+		if not is_instance_valid(stage) or not is_instance_valid(host):
+			return result
+		if not host.is_visible_in_tree():
+			break
 		var viewport := stage.get_node("Viewport") as SubViewport
 		var image: Image = viewport.get_texture().get_image()
+		if image == null or image.is_empty():
+			continue
 		image.resize(THUMB_SIZE.x, THUMB_SIZE.y, Image.INTERPOLATE_LANCZOS)
 		var path := path_for(entry["id"])
 		var err: Error = image.save_png(path)
@@ -55,5 +66,6 @@ func ensure(host: Control, entries: Array) -> Dictionary:
 			result[entry["id"]] = path
 		else:
 			push_warning("Miniatura não salva para %s (erro %d)." % [entry["id"], err])
-	stage.queue_free()
+	if is_instance_valid(stage):
+		stage.queue_free()
 	return result

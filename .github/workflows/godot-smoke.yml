@@ -1,0 +1,30 @@
+name: Godot real headless smoke
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, codex/testes-godot-08, work/integracao-tarefas-04-08]
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download exact official engine (no fallback)
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/godot"
+          curl --fail --location --retry 2 https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip -o "$RUNNER_TEMP/godot/engine.zip"
+          unzip "$RUNNER_TEMP/godot/engine.zip" -d "$RUNNER_TEMP/godot"
+          chmod +x "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+          "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --version | grep -E '^4[.]7[.]2[.]stable[.]official'
+      - name: Import and open actual scenes
+        run: python3 tools/godot/run_smoke.py --godot "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --output "$RUNNER_TEMP/results"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: godot-headless-results
+          path: ${{ runner.temp }}/results

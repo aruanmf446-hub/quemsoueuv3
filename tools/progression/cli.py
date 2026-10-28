@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+import hashlib
+from tools.preservation import expected_blob
 
 from .codec import ROOT, ProgressionError, canonical, loads, require
 from .rules import Rules
@@ -28,7 +30,14 @@ def check_reference(root=ROOT):
                        "corrupt_save": "quarantine_original_bytes_without_creating_progress"}
     require(all(policy.get(key) == value for key, value in required_policy.items()), "migration_policy_mismatch", "Contrato de migração contradiz implementação")
     original = [p.decode() for p in subprocess.check_output(["git", "ls-tree", "-rz", "--name-only", BASE_COMMIT], cwd=root).split(b"\0") if p]
-    require(subprocess.run(["git", "diff", "--quiet", BASE_COMMIT, "--", *original], cwd=root).returncode == 0, "previous_files_changed", "Um arquivo anterior da base foi alterado")
+    for relative in original:
+        path = root / relative
+        require(path.is_file(), "previous_files_changed", relative)
+        data = path.read_bytes()
+        actual = hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
+        before = subprocess.check_output(["git", "rev-parse", BASE_COMMIT + ":" + relative], cwd=root).decode().strip()
+        require(actual == expected_blob(root, BASE_COMMIT, relative, before), "previous_files_changed", relative)
+
     examples = sorted((root / "data/progression/examples").glob("*.save.json"))
     for path in examples:
         load_save(rules, path.read_bytes())

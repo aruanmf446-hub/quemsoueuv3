@@ -59,7 +59,7 @@ func render() -> void:
 		_images[entry.id] = thumbnail
 		card.add_child(PlayerUI.label(entry.name, 24, PlayerUI.GOLD))
 		var unlocked := services.inventory.is_unlocked(entry.id)
-		var equipped := services.inventory.equipped_id() == entry.id
+		var equipped: bool = services.inventory.equipped_id() == entry.id
 		card.add_child(PlayerUI.label("Equipado" if equipped else ("Desbloqueado" if unlocked else "Bloqueado"), 18))
 		card.add_child(PlayerUI.button("Visualizar", _select.bind(entry.id)))
 	_select(_selected)

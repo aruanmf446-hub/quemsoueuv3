@@ -35,11 +35,15 @@ func set_preference(key: String, value: Variant) -> bool:
 		var other := "back_key" if key == "accept_key" else "accept_key"
 		if value == values[other]:
 			return false
+	var previous: Variant = values[key]
 	values[key] = value
 	var config := ConfigFile.new()
 	for item: String in values:
 		config.set_value("device", item, values[item])
 	last_error = config.save(SAVE_PATH)
+	if last_error != OK:
+		values[key] = previous
+		return false
 	apply()
 	changed.emit()
 	return last_error == OK
@@ -52,7 +56,7 @@ func apply() -> void:
 			AudioServer.add_bus()
 			index = AudioServer.bus_count - 1
 			AudioServer.set_bus_name(index, bus_name)
-		var key := {"Master": "master", "Music": "music", "SFX": "sfx"}[bus_name]
+		var key: String = {"Master": "master", "Music": "music", "SFX": "sfx"}[bus_name]
 		var gain := float(values[key])
 		AudioServer.set_bus_mute(index, gain <= 0.001)
 		AudioServer.set_bus_volume_db(index, linear_to_db(maxf(gain, 0.0001)))

@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/desert/phase_01.gd" id="1"]
+[node name="DesertPhase06" type="Node3D"]
+script = ExtResource("1")
+phase_path = "res://data/desert/phase_06.json"

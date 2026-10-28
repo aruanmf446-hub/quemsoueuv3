@@ -34,7 +34,7 @@ func set_session(token: String) -> void:
 	generation += 1
 
 
-func rpc(name: String, params: Dictionary = {}) -> Dictionary:
+func call_rpc(name: String, params: Dictionary = {}) -> Dictionary:
 	return await request("/rest/v1/rpc/" + name, HTTPClient.METHOD_POST, params)
 
 

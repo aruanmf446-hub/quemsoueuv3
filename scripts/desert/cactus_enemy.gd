@@ -4,6 +4,8 @@ extends CharacterBody3D
 ## Cacto do Reino do Deserto. Patrulha entre dois limites, persegue o jogador ao detectá-lo,
 ## ataca com cooldown e morre com a animação "morte". Parâmetros vêm de data/desert_enemies.json.
 
+signal defeated
+
 enum State { PATROL, CHASE, ATTACK, DEAD }
 
 const GRAVITY := 24.0
@@ -61,7 +63,7 @@ func _physics_process(delta: float) -> void:
 	if _player and not _player.is_dead:
 		to_player = _player.global_position - global_position
 
-	var distance_x := absf(to_player.x)
+	var distance_x := absf(to_player.x) if is_instance_valid(_player) and not _player.is_dead else INF
 	if distance_x <= attack_range and absf(to_player.y) < 1.4:
 		_set_state(State.ATTACK)
 	elif distance_x <= detect_range and absf(to_player.y) < 2.0:
@@ -122,6 +124,7 @@ func _set_state(next: State) -> void:
 
 func _die() -> void:
 	_state = State.DEAD
+	defeated.emit()
 	remove_from_group("enemies")
 	velocity = Vector3.ZERO
 	collision_layer = 0

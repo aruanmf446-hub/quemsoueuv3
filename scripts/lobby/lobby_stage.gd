@@ -18,6 +18,9 @@ const ZOOM_MIN := 0.55
 const ZOOM_MAX := 1.35
 const ZOOM_WHEEL_STEP := 0.9
 
+@export_range(0.5, 0.9) var fill_ratio: float = FILL_RATIO
+@export var pedestal_lift: float = PEDESTAL_LIFT
+
 @export var interactive: bool = false
 @export var profile_name: String = ""
 
@@ -70,8 +73,8 @@ func frame_character() -> void:
 		return
 	var height: float = framing["height"]
 	var center_y: float = framing["center_y"]
-	_target_y = center_y + PEDESTAL_LIFT
-	_base_distance = (height / FILL_RATIO) / (2.0 * tan(deg_to_rad(CAMERA_FOV * 0.5)))
+	_target_y = center_y + pedestal_lift
+	_base_distance = (height / fill_ratio) / (2.0 * tan(deg_to_rad(CAMERA_FOV * 0.5)))
 	_update_camera()
 
 

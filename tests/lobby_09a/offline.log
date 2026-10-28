@@ -1,0 +1,45 @@
+test_duplicate_json_keys_and_nonfinite_numbers (__main__.FileIntegrity.test_duplicate_json_keys_and_nonfinite_numbers) ... ok
+test_manifest_corruption_and_duplicate_key (__main__.FileIntegrity.test_manifest_corruption_and_duplicate_key) ... ok
+test_missing_reference (__main__.FileIntegrity.test_missing_reference) ... ok
+test_path_escape (__main__.FileIntegrity.test_path_escape) ... ok
+test_protected_source_tampering (__main__.FileIntegrity.test_protected_source_tampering) ... ok
+test_actual_base_and_animation_only_fbx (__main__.ModelInspection.test_actual_base_and_animation_only_fbx) ... ok
+test_corrupt_binary_fbx (__main__.ModelInspection.test_corrupt_binary_fbx) ... ok
+test_corrupt_glb (__main__.ModelInspection.test_corrupt_glb) ... ok
+test_obj_is_static_and_counts_polygons (__main__.ModelInspection.test_obj_is_static_and_counts_polygons) ... /workspace/scratch/294736040045/quemsoueuv3-integration/tools/offline/inspect_assets.py:165: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmp97lzkwsj/quad.obj' mode='r' encoding='utf-8'>
+  for line in Path(path).open(encoding="utf-8", errors="replace"):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_boss_cannot_be_skin (__main__.PlanningRules.test_boss_cannot_be_skin) ... ok
+test_changed_existing_identifier (__main__.PlanningRules.test_changed_existing_identifier) ... ok
+test_consistent_proposal (__main__.PlanningRules.test_consistent_proposal) ... ok
+test_duplicate_character (__main__.PlanningRules.test_duplicate_character) ... ok
+test_duplicate_checkpoint (__main__.PlanningRules.test_duplicate_checkpoint) ... ok
+test_duplicate_phase (__main__.PlanningRules.test_duplicate_phase) ... ok
+test_duplicate_runtime_identifier (__main__.PlanningRules.test_duplicate_runtime_identifier) ... ok
+test_enemy_cannot_be_skin (__main__.PlanningRules.test_enemy_cannot_be_skin) ... ok
+test_every_phase_uses_fuego (__main__.PlanningRules.test_every_phase_uses_fuego) ... ok
+test_final_boss_is_required (__main__.PlanningRules.test_final_boss_is_required) ... ok
+test_future_scene_not_claimed_implemented (__main__.PlanningRules.test_future_scene_not_claimed_implemented) ... ok
+test_incomplete_and_invalid_data (__main__.PlanningRules.test_incomplete_and_invalid_data) ... ok
+test_missing_dependency_registry (__main__.PlanningRules.test_missing_dependency_registry) ... ok
+test_missing_resource_registry (__main__.PlanningRules.test_missing_resource_registry) ... ok
+test_no_automatic_legacy_grant (__main__.PlanningRules.test_no_automatic_legacy_grant) ... ok
+test_no_early_campaign_reward (__main__.PlanningRules.test_no_early_campaign_reward) ... ok
+test_no_initial_fuego_unlock (__main__.PlanningRules.test_no_initial_fuego_unlock) ... ok
+test_no_skipping_prerequisites (__main__.PlanningRules.test_no_skipping_prerequisites) ... ok
+test_story_does_not_require_lobby_unlock (__main__.PlanningRules.test_story_does_not_require_lobby_unlock) ... ok
+test_client_cannot_choose_user_id (__main__.ProgressRules.test_client_cannot_choose_user_id) ... ok
+test_duplicate_completion_rejected (__main__.ProgressRules.test_duplicate_completion_rejected) ... ok
+test_enemy_unlock_rejected (__main__.ProgressRules.test_enemy_unlock_rejected) ... ok
+test_invalid_uuid_and_unverified_completion_rejected (__main__.ProgressRules.test_invalid_uuid_and_unverified_completion_rejected) ... ok
+test_locked_equipment_rejected (__main__.ProgressRules.test_locked_equipment_rejected) ... ok
+test_missing_initial_character_rejected (__main__.ProgressRules.test_missing_initial_character_rejected) ... ok
+test_phase_one_does_not_award_campaign (__main__.ProgressRules.test_phase_one_does_not_award_campaign) ... ok
+test_phase_ten_alone_does_not_award_campaign (__main__.ProgressRules.test_phase_ten_alone_does_not_award_campaign) ... ok
+test_valid_initial_and_completed (__main__.ProgressRules.test_valid_initial_and_completed) ... ok
+
+----------------------------------------------------------------------
+Ran 37 tests in 0.136s
+
+OK

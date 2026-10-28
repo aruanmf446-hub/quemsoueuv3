@@ -33,6 +33,7 @@ var facing: float = 1.0
 ## Saltos já usados na sequência atual. Zera ao tocar o chão.
 var jumps_used: int = 0
 
+var _knockback_timer: float = 0.0
 var _attack_timer: float = 0.0
 var _attack_cooldown: float = 0.0
 var _invulnerable: float = 0.0
@@ -52,6 +53,7 @@ func setup(entry: Dictionary) -> void:
 	_model.load_entry(entry)
 	_model.set_pose("base", 0.0)
 	jumps_used = 0
+	_knockback_timer = 0.0
 	_attack_timer = 0.0
 	_attack_cooldown = 0.0
 	_invulnerable = 0.0
@@ -64,6 +66,7 @@ func _physics_process(delta: float) -> void:
 	if is_dead:
 		return
 
+	_knockback_timer = maxf(_knockback_timer - delta, 0.0)
 	_attack_timer = maxf(_attack_timer - delta, 0.0)
 	_attack_cooldown = maxf(_attack_cooldown - delta, 0.0)
 	_invulnerable = maxf(_invulnerable - delta, 0.0)
@@ -83,7 +86,8 @@ func _physics_process(delta: float) -> void:
 		_start_attack()
 
 	var attacking := _attack_timer > 0.0
-	velocity.x = 0.0 if attacking else direction * SPEED
+	if _knockback_timer <= 0.0:
+		velocity.x = 0.0 if attacking else direction * SPEED
 	velocity.z = 0.0
 	move_and_slide()
 	global_position.z = 0.0
@@ -149,6 +153,7 @@ func take_damage(amount: int, from_x: float) -> void:
 		return
 	health = maxi(health - amount, 0)
 	_invulnerable = HIT_INVULNERABLE
+	_knockback_timer = 0.18
 	var push := signf(global_position.x - from_x)
 	velocity.x = HIT_KNOCKBACK.x * (push if push != 0.0 else 1.0)
 	velocity.y = HIT_KNOCKBACK.y

@@ -144,6 +144,7 @@ func _build_enemies() -> void:
 			continue
 		var enemy := CactusEnemy.new()
 		enemy.position = _vec3(spawn["pos"])
+		enemy.set_meta("spawn_position", enemy.position)
 		var shape := CollisionShape3D.new()
 		var capsule := CapsuleShape3D.new()
 		capsule.radius = 0.4
@@ -226,6 +227,13 @@ func _respawn_player() -> void:
 	_message_label.visible = false
 	_on_player_health_changed(_player.health, SidePlayer.MAX_HEALTH)
 	_player.setup(_find_protagonist())
+	_player.set("_invulnerable", SidePlayer.HIT_INVULNERABLE)
+	# Evita reaparecer dentro de um inimigo que perseguiu o checkpoint.
+	for enemy: Node3D in get_tree().get_nodes_in_group("enemies"):
+		if enemy.global_position.distance_to(_checkpoint) < 2.0 and enemy.has_meta("spawn_position"):
+			enemy.position = enemy.get_meta("spawn_position")
+			if enemy is CharacterBody3D:
+				enemy.velocity = Vector3.ZERO
 
 
 func _on_goal_entered(body: Node3D) -> void:

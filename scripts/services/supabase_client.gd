@@ -38,7 +38,7 @@ func rpc(name: String, params: Dictionary = {}) -> Dictionary:
 	return await request("/rest/v1/rpc/" + name, HTTPClient.METHOD_POST, params)
 
 
-func request(path: String, method: HTTPClient.Method, body: Dictionary = {}, authenticated: bool = true) -> Dictionary:
+func request(path: String, method: HTTPClient.Method, body: Dictionary = {}, authenticated: bool = true, token_override: String = "") -> Dictionary:
 	if not configured():
 		return ServiceResult.failure("not_configured", "offline")
 	if authenticated and access_token.is_empty():
@@ -51,6 +51,8 @@ func request(path: String, method: HTTPClient.Method, body: Dictionary = {}, aut
 	var headers := PackedStringArray(["Content-Type: application/json", "apikey: " + publishable_key])
 	if authenticated:
 		headers.append("Authorization: Bearer " + access_token)
+	elif not token_override.is_empty():
+		headers.append("Authorization: Bearer " + token_override)
 	var error := http.request(endpoint + path, headers, method, JSON.stringify(body) if method != HTTPClient.METHOD_GET else "")
 	if error != OK:
 		http.queue_free()

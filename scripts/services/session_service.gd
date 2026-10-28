@@ -28,11 +28,12 @@ func sign_up(email: String, password: String) -> Dictionary:
 
 
 func sign_out() -> Dictionary:
-	var result := ServiceResult.success(null)
-	if authenticated():
-		result = await client.request("/auth/v1/logout", HTTPClient.METHOD_POST)
+	var token := client.access_token
+	# Limpa imediatamente a conta local, inclusive offline; revogação não bloqueia a UI.
 	_clear()
-	return result
+	if token.is_empty():
+		return ServiceResult.success(null)
+	return await client.request("/auth/v1/logout?scope=local", HTTPClient.METHOD_POST, {}, false, token)
 
 
 func _accept(data: Variant) -> Dictionary:

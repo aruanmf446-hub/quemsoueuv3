@@ -1,3 +1,7 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Capturas temporárias de teste (não versionar)
+/tests/*.png
+/tests/*.png.import

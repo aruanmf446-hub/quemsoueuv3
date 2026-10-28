@@ -20,8 +20,8 @@
       "parameters": [
         "p_discoverable"
       ],
-      "response_schema": null,
-      "response_definition": null
+      "response_schema": "services.schema.json",
+      "response_definition": "account_preferences"
     },
     "qse_profile_public": {
       "parameters": [
@@ -48,8 +48,8 @@
         "p_target",
         "p_request_id"
       ],
-      "response_schema": null,
-      "response_definition": null
+      "response_schema": "services.schema.json",
+      "response_definition": "friend_action"
     },
     "qse_wallet_history": {
       "parameters": [

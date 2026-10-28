@@ -32,6 +32,8 @@ func act(action: String, target_id: String, request_id: String = "") -> Dictiona
 		return ServiceResult.failure("invalid_action")
 	var result := await client.rpc("qse_friend_action", {"p_action": action, "p_target": target_id,
 		"p_request_id": PlayerContracts.uuid() if request_id.is_empty() else request_id})
+	if result.ok and (not result.data is Dictionary or result.data.get("status") not in ["applied", "noop"]):
+		return ServiceResult.failure("invalid_contract")
 	if result.ok:
 		await refresh()
 	return result

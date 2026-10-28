@@ -31,6 +31,8 @@ func valid_data(value: Variant) -> bool:
 
 func set_discoverable(value: bool) -> Dictionary:
 	var result := await client.rpc("qse_account_preferences", {"p_discoverable": value})
+	if result.ok and (not result.data is Dictionary or result.data.get("discoverable") != value):
+		return ServiceResult.failure("invalid_contract")
 	if result.ok:
 		await refresh()
 	return result

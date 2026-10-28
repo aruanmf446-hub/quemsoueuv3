@@ -266,6 +266,33 @@
           }
         }
       }
+    },
+    "account_preferences": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "discoverable"
+      ],
+      "properties": {
+        "discoverable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "friend_action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "applied",
+            "noop"
+          ]
+        }
+      }
     }
   }
 }

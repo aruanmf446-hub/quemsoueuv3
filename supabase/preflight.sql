@@ -4,6 +4,10 @@ select nspname from pg_catalog.pg_namespace where nspname in ('qse_v3','auth','r
 select table_schema,table_name,column_name,data_type from information_schema.columns
  where (table_schema='auth' and table_name='users') or (table_schema='realtime' and table_name='messages')
  order by table_schema,table_name,ordinal_position;
+select table_schema,table_name,column_name,data_type from information_schema.columns
+ where table_schema in ('public','qse_v3') and table_name ilike any
+   (array['%profile%','%prefer%','%friend%','%wallet%','%transaction%','%achievement%','%progress%','%unlock%','%loadout%'])
+ order by table_schema,table_name,ordinal_position;
 select n.nspname,p.proname,pg_catalog.pg_get_function_identity_arguments(p.oid)
  from pg_catalog.pg_proc p join pg_catalog.pg_namespace n on n.oid=p.pronamespace
  where (n.nspname='public' and p.proname like 'qse_%') or n.nspname='qse_v3';

@@ -80,6 +80,13 @@ static func number(value: Variant, locale: String = "pt_BR") -> String:
 	if value == null:
 		return "—"
 	var text := str(value)
+	var fraction := ""
+	if value is float:
+		if not is_finite(value):
+			return "—"
+		var parts := String.num(value, 2).split(".")
+		text = parts[0]
+		fraction = parts[1] if parts.size() > 1 else ""
 	var sign_text := ""
 	if text.begins_with("-"):
 		sign_text = "−"
@@ -92,4 +99,5 @@ static func number(value: Variant, locale: String = "pt_BR") -> String:
 		groups.push_front(text.right(3))
 		text = text.left(text.length() - 3)
 	groups.push_front(text)
-	return sign_text + separator.join(groups)
+	var decimal_separator := "," if locale.begins_with("pt") else "."
+	return sign_text + separator.join(PackedStringArray(groups)) + (decimal_separator + fraction if not fraction.is_empty() else "")

@@ -1,0 +1,230 @@
+{
+  "schema_version": 2,
+  "rules_version": "desert_progression_2.0.0",
+  "base_commit": "943c890519111c83aab3c5bdf85bcb120dc02f72",
+  "campaign_id": "desert_campaign",
+  "protagonist_id": "el_fuego",
+  "achievement_id": "desert_campaign_completed",
+  "unlock_character_id": "el_fuego",
+  "classifications": {
+    "playable_heroes": [
+      "cowboy",
+      "michelly",
+      "rodrigo",
+      "lorena",
+      "gus",
+      "lana",
+      "halloween"
+    ],
+    "unlockable_heroes": [
+      "el_fuego"
+    ],
+    "common_enemies": [
+      "cactus"
+    ],
+    "minibosses": [],
+    "final_bosses": [
+      "malagueta"
+    ],
+    "campaign_only_characters": []
+  },
+  "characters": [
+    {
+      "id": "cowboy",
+      "name": "Cowboy",
+      "classification": "playable_hero",
+      "scope": "lobby_and_optional_campaign",
+      "lobby_initially_unlocked": true,
+      "required_achievement_id": null
+    },
+    {
+      "id": "michelly",
+      "name": "Michelly",
+      "classification": "playable_hero",
+      "scope": "lobby_and_optional_campaign",
+      "lobby_initially_unlocked": true,
+      "required_achievement_id": null
+    },
+    {
+      "id": "rodrigo",
+      "name": "Rodrigo",
+      "classification": "playable_hero",
+      "scope": "lobby_and_optional_campaign",
+      "lobby_initially_unlocked": true,
+      "required_achievement_id": null
+    },
+    {
+      "id": "lorena",
+      "name": "Lorena",
+      "classification": "playable_hero",
+      "scope": "lobby_and_optional_campaign",
+      "lobby_initially_unlocked": true,
+      "required_achievement_id": null
+    },
+    {
+      "id": "gus",
+      "name": "Gus",
+      "classification": "playable_hero",
+      "scope": "lobby_and_optional_campaign",
+      "lobby_initially_unlocked": true,
+      "required_achievement_id": null
+    },
+    {
+      "id": "lana",
+      "name": "Lana",
+      "classification": "playable_hero",
+      "scope": "lobby_and_optional_campaign",
+      "lobby_initially_unlocked": true,
+      "required_achievement_id": null
+    },
+    {
+      "id": "halloween",
+      "name": "Halloween",
+      "classification": "playable_hero",
+      "scope": "lobby_and_optional_campaign",
+      "lobby_initially_unlocked": true,
+      "required_achievement_id": null
+    },
+    {
+      "id": "el_fuego",
+      "name": "El Fuego",
+      "classification": "unlockable_hero",
+      "scope": "lobby_and_optional_campaign",
+      "lobby_initially_unlocked": false,
+      "required_achievement_id": "desert_campaign_completed"
+    },
+    {
+      "id": "cactus",
+      "name": "Cactus",
+      "classification": "common_enemy",
+      "scope": "campaign_only",
+      "lobby_initially_unlocked": false,
+      "required_achievement_id": null
+    },
+    {
+      "id": "malagueta",
+      "name": "Malagueta",
+      "classification": "final_boss",
+      "scope": "campaign_only",
+      "lobby_initially_unlocked": false,
+      "required_achievement_id": null
+    }
+  ],
+  "phases": [
+    {
+      "id": "desert_phase_01",
+      "name": "Entrada do Deserto",
+      "order": 1,
+      "checkpoint_ids": [
+        "desert_phase_01_checkpoint_01",
+        "desert_phase_01_checkpoint_02"
+      ],
+      "boss_id": null
+    },
+    {
+      "id": "desert_phase_02",
+      "name": "Dunas Perdidas",
+      "order": 2,
+      "checkpoint_ids": [
+        "desert_phase_02_checkpoint_01",
+        "desert_phase_02_checkpoint_02"
+      ],
+      "boss_id": null
+    },
+    {
+      "id": "desert_phase_03",
+      "name": "Oásis da Meia-Noite",
+      "order": 3,
+      "checkpoint_ids": [
+        "desert_phase_03_checkpoint_01",
+        "desert_phase_03_checkpoint_02"
+      ],
+      "boss_id": null
+    },
+    {
+      "id": "desert_phase_04",
+      "name": "Ruínas Esquecidas",
+      "order": 4,
+      "checkpoint_ids": [
+        "desert_phase_04_checkpoint_01",
+        "desert_phase_04_checkpoint_02"
+      ],
+      "boss_id": null
+    },
+    {
+      "id": "desert_phase_05",
+      "name": "Pontes do Abismo",
+      "order": 5,
+      "checkpoint_ids": [
+        "desert_phase_05_checkpoint_01",
+        "desert_phase_05_checkpoint_02"
+      ],
+      "boss_id": null
+    },
+    {
+      "id": "desert_phase_06",
+      "name": "Tempestade de Areia",
+      "order": 6,
+      "checkpoint_ids": [
+        "desert_phase_06_checkpoint_01",
+        "desert_phase_06_checkpoint_02"
+      ],
+      "boss_id": null
+    },
+    {
+      "id": "desert_phase_07",
+      "name": "Fortaleza dos Cactus",
+      "order": 7,
+      "checkpoint_ids": [
+        "desert_phase_07_checkpoint_01",
+        "desert_phase_07_checkpoint_02"
+      ],
+      "boss_id": null
+    },
+    {
+      "id": "desert_phase_08",
+      "name": "Cavernas de Cristal",
+      "order": 8,
+      "checkpoint_ids": [
+        "desert_phase_08_checkpoint_01",
+        "desert_phase_08_checkpoint_02"
+      ],
+      "boss_id": null
+    },
+    {
+      "id": "desert_phase_09",
+      "name": "Laboratório Proibido",
+      "order": 9,
+      "checkpoint_ids": [
+        "desert_phase_09_checkpoint_01",
+        "desert_phase_09_checkpoint_02"
+      ],
+      "boss_id": null
+    },
+    {
+      "id": "desert_phase_10",
+      "name": "Confronto com Malagueta",
+      "order": 10,
+      "checkpoint_ids": [
+        "desert_phase_10_checkpoint_01"
+      ],
+      "boss_id": "malagueta"
+    }
+  ],
+  "content_sources_sha256": {
+    "data/planning/character_registry.json": "6a4267afbff99ebb2809d8452190da55713ce9265dcd1a27b1ea8dc74d2ca13a",
+    "data/planning/desert_campaign.json": "ec0300dcbae6a70ff122b5eb858086277c1b76f9ec2ee0d2edf0088d79b67d9d",
+    "data/contracts/player_state.schema.json": "1eb035517bc7e8cd87bd1f7f93b777de48d58165cd485ed3cad44f1b85018915",
+    "data/planning/desert/phase_01.json": "0520abfe1efd9203e8d714cdd48966ccae1633ad5518457d21efd7f332d06296",
+    "data/planning/desert/phase_02.json": "d5bf7fa4a8709608b47dfd862844d51deb7274207a25b79146b6e8f321fe51a6",
+    "data/planning/desert/phase_03.json": "0dc366876f3f88032e39d432bf6858c6d262fa0d910ea243bddb316d6bb7287a",
+    "data/planning/desert/phase_04.json": "88691752f02861bf25d203f5b9690aaed8b13827b3ccaa42d1d312fab575c847",
+    "data/planning/desert/phase_05.json": "f2d903a6cb14b45c63faf1159631dea66e046e85c938973e9d87b8d9ecb55c41",
+    "data/planning/desert/phase_06.json": "9132af8e3a21e518afc39f0cd3bdd3591b7f2e3f82cb47726aae3706e6a0432f",
+    "data/planning/desert/phase_07.json": "dbdf7f8ccc20bea362e513b6586900a67bb3d46e9b6fb5987614da1815d7843f",
+    "data/planning/desert/phase_08.json": "d87987592f0747242f8f8e67de99cdf43b573c06ca10bb17333bf7eeebb2411b",
+    "data/planning/desert/phase_09.json": "202ef9c1d540daaacc2fdd3f6b196737264558d39abea9f6752eb250ad7444b4",
+    "data/planning/desert/phase_10.json": "61bf1f0bcb36af2723a41f1b7bc36ed4393e0e8857cfd65bdb7f2fb84592aff2"
+  },
+  "scope": "isolated_reference_not_connected_to_godot"
+}

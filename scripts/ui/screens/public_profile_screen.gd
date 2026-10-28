@@ -5,6 +5,8 @@ var _epoch := 0
 
 func _ready() -> void:
 	super._ready()
+	visibility_changed.connect(func() -> void:
+		if not is_visible_in_tree(): _epoch += 1)
 	services.session.changed.connect(func() -> void:
 		_epoch += 1
 		PlayerUI.clear(body)
@@ -18,7 +20,7 @@ func render() -> void:
 	heading.text = tr("Perfil público")
 	banner.show_state("loading")
 	var result := await services.profile.public_profile(str(parameters.get("public_id", "")))
-	if epoch != _epoch or not is_inside_tree():
+	if epoch != _epoch or not is_visible_in_tree():
 		return
 	status(result)
 	if not result.ok:

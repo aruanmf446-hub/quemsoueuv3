@@ -16,7 +16,7 @@ func _ready() -> void:
 
 
 func show_screen(params: Dictionary = {}) -> void:
-	parameters = params
+	parameters = params.duplicate(true)
 	show()
 	render()
 	$Margin/Column/Header/Back.grab_focus()

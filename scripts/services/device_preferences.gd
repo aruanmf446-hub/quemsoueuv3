@@ -35,11 +35,15 @@ func set_preference(key: String, value: Variant) -> bool:
 		var other := "back_key" if key == "accept_key" else "accept_key"
 		if value == values[other]:
 			return false
+	var previous: Variant = values[key]
 	values[key] = value
 	var config := ConfigFile.new()
 	for item: String in values:
 		config.set_value("device", item, values[item])
 	last_error = config.save(SAVE_PATH)
+	if last_error != OK:
+		values[key] = previous
+		return false
 	apply()
 	changed.emit()
 	return last_error == OK

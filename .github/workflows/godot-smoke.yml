@@ -1,6 +1,8 @@
 name: Godot real headless smoke
 on:
   workflow_dispatch:
+  push:
+    branches: [codex/testes-godot-08]
 permissions:
   contents: read
 jobs:

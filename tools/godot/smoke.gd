@@ -59,6 +59,10 @@ func _run() -> void:
 			navigation.call("back")
 			for frame in range(3):
 				await physics_frame
+			if not navigation.get("_history").is_empty() or navigation.get("_active") != null:
+				push_error("SMOKE_ROUTE_CLOSE_FAILED " + route)
+				quit(1)
+				return
 	print("SMOKE_OPEN_OK " + path)
 	# SceneTree encerra e libera a cena atual na ordem normal do motor.
 	quit(0)

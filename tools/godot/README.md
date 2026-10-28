@@ -1,8 +1,9 @@
 # Testes reais
 
-Executar `python3 tools/godot/run_smoke.py --godot godot --output /tmp/qse-smoke`.
-O runner importa recursos, abre dez fases por 30 quadros físicos, executa nove transições e abre/fecha as oito telas pelo menu. Cada caso roda um processo real; qualquer ERROR do motor reprova, inclusive com exit code zero.
+Executar `python3 tools/godot/run_smoke.py --godot /caminho/Godot_v4.7.2-stable_linux.x86_64 --output /tmp/qse-smoke`.
 
-Executado localmente no Godot oficial 4.6.3: 21/21 casos aprovados, incluindo importação, dez fases, nove transições e menu com oito rotas. Evidências em `tests/godot_evidence_t08`. Não são testes visuais, de campanha completa, combate ou balanceamento.
+Validado no Godot oficial 4.7.2.stable.official.ed1daf0bf: 22 casos finais aprovados (importação, dez fases, nove transições, teste funcional com 12 verificações e menu com oito rotas abertas/fechadas). Evidências em `tests/godot_evidence_472`; preservados os resultados anteriores 4.6.3. O teste funcional foi repetido após corrigir sua preparação de dano fatal; primeira tentativa preservada separadamente.
 
-O workflow manual usa a distribuição oficial exata 4.7.2, sem fallback, e publica os logs como artefato. Essa versão não está instalada aqui; sua consulta/download ficou bloqueada por HTTP 403 do proxy. A execução 4.7.2 permanece pendente; não foi iniciada execução paga ou remota de Actions.
+Corrigidos recuo de dano anulado pela movimentação e reinício sobre inimigos, com proteção temporária ao reaparecer. Sem alteração de assets, iluminação, Supabase, autenticação ou economia. Aparência, animações vistas em tela e balanceamento completo ainda exigem editor.
+
+Workflow oficial 4.7.2 acionado por push nesta branch e manualmente, sem fallback de versão. A chamada direta e consulta pela API de Actions retornam Forbidden neste ambiente; aprovação local não deve ser confundida com resultado remoto.

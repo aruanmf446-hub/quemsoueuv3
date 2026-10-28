@@ -12,12 +12,13 @@ func _ready() -> void:
 		if child is MenuCardButton:
 			child.activated.connect(_on_menu_button_activated)
 	_skins_panel.character_selected.connect(_on_skin_selected)
+	_skins_panel.progress_changed.connect(_lobby_area.revalidate)
 
 
 func _on_menu_button_activated(button_id: StringName) -> void:
 	option_selected.emit(button_id)
 	if button_id == &"skins":
-		_skins_panel.open()
+		_skins_panel.open(String(_lobby_area.current_character_id()))
 
 
 func _on_skin_selected(character_id: StringName) -> void:

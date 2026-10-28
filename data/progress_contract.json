@@ -1,0 +1,29 @@
+{
+	"schema_version": 1,
+	"description": "Contrato de progresso para desbloqueio de personagens. Hoje é usado apenas localmente (user://progress_dev.cfg) em desenvolvimento. Em produção, o servidor deve ser a única fonte de verdade: o cliente só exibe o estado devolvido pelo servidor e nunca autoriza sozinho o equipamento.",
+	"player_progress": {
+		"user_id": "uuid, fornecido pelo servidor após autenticação (ainda não implementado)",
+		"flags": {
+			"desert_stage_completed": {
+				"type": "bool",
+				"source": "servidor, ao concluir a fase do Reino do Deserto",
+				"unlocks": ["el_fuego"]
+			}
+		},
+		"equipped_character_id": "string, validada no servidor contra os personagens desbloqueados"
+	},
+	"catalog_unlock_rule": {
+		"type": "flag",
+		"flag": "required key in player_progress.flags, boolean true = desbloqueado"
+	},
+	"validation_rules": [
+		"equipped_character_id deve pertencer ao grupo playable ou unlockable",
+		"equipped_character_id com unlock.flag != true deve ser rejeitado",
+		"story_villains nunca podem ser equipados",
+		"alterações de flags somente pelo servidor"
+	],
+	"local_dev_only": {
+		"store": "user://progress_dev.cfg",
+		"note": "Botões DEV no painel Skins alteram este arquivo. Não é autenticação nem prova de progresso."
+	}
+}

@@ -43,6 +43,7 @@ func load_entry(entry: Dictionary) -> void:
 	_anim_player = _find_node_of_type(_model_root, AnimationPlayer) as AnimationPlayer
 	_skeleton = _find_node_of_type(_model_root, Skeleton3D) as Skeleton3D
 
+	_tune_materials()
 	_normalize_height(float(entry.get("height", DEFAULT_HEIGHT)))
 	if _anim_player:
 		_merge_animations(entry)
@@ -80,6 +81,24 @@ func get_socket(socket_name: StringName) -> BoneAttachment3D:
 	_skeleton.add_child(attachment)
 	_sockets[socket_name] = attachment
 	return attachment
+
+
+## Ajusta apenas o comportamento de luz dos materiais: reduz brilho especular
+## exagerado e usa filtragem anisotrópica. Cores e texturas originais são preservadas.
+func _tune_materials() -> void:
+	for mesh_instance: MeshInstance3D in _find_all_of_type(_model_root, MeshInstance3D):
+		if mesh_instance.mesh == null:
+			continue
+		for surface in mesh_instance.mesh.get_surface_count():
+			var source := mesh_instance.get_active_material(surface) as BaseMaterial3D
+			if source == null:
+				continue
+			var tuned := source.duplicate() as BaseMaterial3D
+			tuned.roughness = clampf(tuned.roughness, 0.5, 1.0)
+			tuned.metallic = minf(tuned.metallic, 0.3)
+			tuned.metallic_specular = 0.35
+			tuned.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+			mesh_instance.set_surface_override_material(surface, tuned)
 
 
 func _normalize_height(target_height: float) -> void:

@@ -1,0 +1,59 @@
+class_name ThumbnailCache
+extends RefCounted
+
+## Gera miniaturas estáticas dos personagens com o mesmo palco do lobby (mesma câmera,
+## iluminação e perfil gráfico). Em vez de renderizar oito modelos em tempo real no painel,
+## cada miniatura é capturada uma vez e reutilizada. Para atualizar as miniaturas após
+## mudar iluminação ou modelos, incremente VERSION: os arquivos antigos deixam de ser usados.
+
+const CACHE_DIR := "user://thumbnails"
+const VERSION := 2
+const THUMB_SIZE := Vector2i(200, 240)
+## Zoom de captura: deixa o personagem maior dentro da miniatura (menor = mais perto).
+const THUMB_ZOOM := 0.8
+
+var _stage_scene: PackedScene
+
+
+func _init(stage_scene: PackedScene) -> void:
+	_stage_scene = stage_scene
+
+
+static func path_for(character_id: String) -> String:
+	return "%s/%s_v%d.png" % [CACHE_DIR, character_id, VERSION]
+
+
+## Gera as miniaturas que ainda não existem e retorna {character_id: caminho_png}.
+## `host` precisa estar na árvore e visível, porque o palco é renderizado dentro dele.
+func ensure(host: Control, entries: Array) -> Dictionary:
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(CACHE_DIR))
+	var result := {}
+	var missing: Array = []
+	for entry: Dictionary in entries:
+		var path := path_for(entry["id"])
+		if FileAccess.file_exists(path):
+			result[entry["id"]] = path
+		else:
+			missing.append(entry)
+	if missing.is_empty():
+		return result
+
+	var stage := _stage_scene.instantiate() as LobbyStage
+	stage.position = Vector2(-6000, 0)
+	host.add_child(stage)
+	for entry: Dictionary in missing:
+		stage.show_character(entry)
+		stage.set_zoom(THUMB_ZOOM)
+		await RenderingServer.frame_post_draw
+		await RenderingServer.frame_post_draw
+		var viewport := stage.get_node("Viewport") as SubViewport
+		var image: Image = viewport.get_texture().get_image()
+		image.resize(THUMB_SIZE.x, THUMB_SIZE.y, Image.INTERPOLATE_LANCZOS)
+		var path := path_for(entry["id"])
+		var err: Error = image.save_png(path)
+		if err == OK:
+			result[entry["id"]] = path
+		else:
+			push_warning("Miniatura não salva para %s (erro %d)." % [entry["id"], err])
+	stage.queue_free()
+	return result

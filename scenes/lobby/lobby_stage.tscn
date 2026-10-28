@@ -6,11 +6,8 @@
 [sub_resource type="Environment" id="Environment_3lb3l"]
 background_mode = 1
 ambient_light_source = 2
-ambient_light_color = Color(0.62, 0.58, 0.55, 1)
-ambient_light_energy = 0.8
-tonemap_mode = 2
-glow_enabled = true
-glow_intensity = 0.6
+ambient_light_color = Color(0.62, 0.62, 0.64, 1)
+ambient_light_energy = 0.42
 
 [node name="LobbyStage" type="SubViewportContainer" unique_id=439807160]
 custom_minimum_size = Vector2(640, 760)
@@ -37,14 +34,19 @@ fov = 38.0
 
 [node name="KeyLight" type="DirectionalLight3D" parent="Viewport/World" unique_id=391603603]
 transform = Transform3D(0.8660254, 0.3213938, -0.38302222, 0, 0.76604444, 0.6427876, 0.5, -0.55667037, 0.66341394, 0, 0, 0)
-light_color = Color(1, 0.95, 0.85, 1)
-light_energy = 1.6
 shadow_enabled = true
+shadow_blur = 2.0
 
 [node name="RimLight" type="OmniLight3D" parent="Viewport/World" unique_id=1515496112]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 2.2, -1.6)
-light_color = Color(0.45, 0.7, 1, 1)
-light_energy = 2.5
+light_color = Color(0.55, 0.75, 1, 1)
+light_energy = 0.9
 omni_range = 6.0
 
 [node name="Character" parent="Viewport/World" unique_id=808239936 instance=ExtResource("1_gnweo")]
+
+[node name="FillLight" type="OmniLight3D" parent="Viewport/World" unique_id=1989691315]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.4, 1.5, 2.6)
+light_color = Color(1, 0.98, 0.96, 1)
+light_energy = 0.45
+omni_range = 8.0

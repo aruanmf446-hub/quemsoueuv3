@@ -1,0 +1,112 @@
+{
+  "engine": "4.6.3.stable.official.7d41c59c4",
+  "headless": true,
+  "visual_tests": false,
+  "tests": [
+    {
+      "test": "import",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "phase_01",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "transition_01",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "phase_02",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "transition_02",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "phase_03",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "transition_03",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "phase_04",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "transition_04",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "phase_05",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "transition_05",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "phase_06",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "transition_06",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "phase_07",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "transition_07",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "phase_08",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "transition_08",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "phase_09",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "transition_09",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "phase_10",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "main_menu",
+      "exit_code": 0,
+      "passed": true
+    }
+  ]
+}

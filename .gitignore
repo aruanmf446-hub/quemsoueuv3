@@ -5,3 +5,7 @@
 # Capturas temporárias de teste (não versionar)
 /tests/*.png
 /tests/*.png.import
+
+# Backend validation credentials and local test outputs
+.runtime/
+/tests/results_*.json

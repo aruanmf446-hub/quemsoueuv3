@@ -1,7 +1,18 @@
 -- Aplicar somente após preflight.sql e revisão do projeto remoto. Nenhuma tabela existente é substituída.
 begin;
+-- Harden the existing DDL helper without removing its event trigger.
+do $helper_acl$
+begin
+  if to_regprocedure('public.rls_auto_enable()') is not null then
+    revoke execute on function public.rls_auto_enable() from public,anon,authenticated;
+  end if;
+end $helper_acl$;
 create schema qse_v3;
-revoke all on schema qse_v3 from public;
+revoke all on schema qse_v3 from public,anon,authenticated;
+-- API exposure remains public RPCs only; no direct client writes.
+alter default privileges in schema qse_v3 revoke all on tables from public,anon,authenticated;
+alter default privileges in schema qse_v3 revoke all on sequences from public,anon,authenticated;
+alter default privileges in schema qse_v3 revoke execute on functions from public,anon,authenticated;
 grant usage on schema qse_v3 to authenticated, service_role;
 
 create table qse_v3.character_catalog (
@@ -143,6 +154,9 @@ create table qse_v3.wallet_transactions (
   unique (user_id,idempotency_key)
 );
 create index wallet_history_owner on qse_v3.wallet_transactions(user_id,sequence desc);
+
+revoke all on all tables in schema qse_v3 from public,anon,authenticated;
+revoke all on all sequences in schema qse_v3 from public,anon,authenticated;
 
 -- RLS: leitura privada ao dono; escrita de economia/progresso/carga/amizades só por funções.
 do $rls$

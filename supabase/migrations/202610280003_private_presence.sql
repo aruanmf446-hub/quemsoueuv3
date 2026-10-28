@@ -1,3 +1,4 @@
+-- NOT DEPLOYED: private-channel configuration and revocation acceptance are mandatory.
 -- Requer Supabase Realtime com autorização de canais privados habilitada.
 -- Não remove nem altera políticas preexistentes. Interrompe se os pré-requisitos faltarem.
 begin;
@@ -17,7 +18,7 @@ begin
   return owner=target or exists(select 1 from qse_v3.friendships where user_low=least(owner,target) and user_high=greatest(owner,target));
 end $$;
 revoke all on function qse_v3.presence_allowed(text,boolean) from public,anon;
-grant execute on function qse_v3.presence_allowed(text,boolean) to authenticated,anon;
+grant execute on function qse_v3.presence_allowed(text,boolean) to authenticated;
 -- Guardas restritivas impedem que políticas permissivas preexistentes abram este namespace.
 -- Outros tópicos Realtime continuam regidos pelas políticas já existentes.
 create policy qse_v3_presence_read_guard on realtime.messages as restrictive for select to public

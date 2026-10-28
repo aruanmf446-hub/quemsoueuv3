@@ -1,25 +1,122 @@
 extends Control
 
 signal option_selected(option_id: StringName)
-
 @onready var _menu_buttons: VBoxContainer = $MenuButtons
-@onready var _lobby_area: Control = $LobbyArea
-@onready var _skins_panel: Control = $SkinsPanel
+@onready var _navigation: NavigationManager = $Navigation
+@onready var _services: PlayerServices = $Services
+var _mode_label: Label
 
 
 func _ready() -> void:
 	for child in _menu_buttons.get_children():
 		if child is MenuCardButton:
 			child.activated.connect(_on_menu_button_activated)
-	_skins_panel.character_selected.connect(_on_skin_selected)
-	_skins_panel.progress_changed.connect(_lobby_area.revalidate)
+	_navigation.register_screen("skins", $SkinsPanel)
+	$TopBar/FriendsButton.pressed.connect(_navigation.open.bind("friends", {}))
+	$TopBar/MailButton.pressed.connect(_navigation.open.bind("friends", {"tab": "incoming"}))
+	$TopBar/SettingsButton.pressed.connect(_navigation.open.bind("settings", {}))
+	$FriendsPanel/Margin/Content/ViewAllButton.pressed.connect(_navigation.open.bind("friends", {}))
+	for target: Button in [$TopBar/FriendsButton, $TopBar/MailButton, $TopBar/SettingsButton, $FriendsPanel/Margin/Content/ViewAllButton]:
+		target.focus_mode = Control.FOCUS_ALL
+	_hotspot($ProfileCard, "profile")
+	_hotspot($TopBar/CoinPill, "wallet")
+	_hotspot($TopBar/GemPill, "wallet")
+	_mode_label = PlayerUI.label("", 18, PlayerUI.GOLD)
+	_mode_label.position = Vector2(42, 198)
+	_mode_label.size = Vector2(620, 44)
+	_mode_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_mode_label)
+	move_child(_mode_label, 2)
+	_services.profile.changed.connect(_refresh_profile)
+	_services.inventory.changed.connect(_refresh_profile)
+	_services.wallet.changed.connect(_refresh_wallet)
+	_services.friends.changed.connect(_refresh_friends)
+	_services.session.changed.connect(_refresh_profile)
+	_services.preferences.changed.connect(_refresh_wallet)
+	_navigation.route_changed.connect(_route_changed)
+	_refresh_profile()
+	_refresh_wallet()
+	_refresh_friends()
+	$MenuButtons/BtnDuel.disabled = true
+	$MenuButtons/BtnDuel.tooltip_text = "Modo Duelo em desenvolvimento"
+	get_tree().auto_accept_quit = false
 
 
 func _on_menu_button_activated(button_id: StringName) -> void:
 	option_selected.emit(button_id)
-	if button_id == &"skins":
-		_skins_panel.open(String(_lobby_area.current_character_id()))
+	_navigation.open(String(button_id))
 
 
-func _on_skin_selected(character_id: StringName) -> void:
-	_lobby_area.select_character(String(character_id))
+func _hotspot(target: Control, route: String) -> void:
+	var button := Button.new()
+	button.tooltip_text = {"profile": "Meu perfil", "wallet": "Minha carteira"}.get(route, route)
+	button.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	for state: String in ["normal", "hover", "pressed"]:
+		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	button.pressed.connect(_navigation.open.bind(route, {}))
+	target.add_child(button)
+
+
+func _refresh_profile() -> void:
+	var profile := _services.profile.data
+	$ProfileCard/Content/Info/Name.text = str(profile.get("nickname", "Minha conta") if profile.get("nickname") != null else "Minha conta")
+	$ProfileCard/Content/Info/Level.text = "Nível " + DevicePreferences.number(profile.get("level")) if profile.get("level") != null else "Perfil · sem nível registrado"
+	$ProfileCard/Content/Info/Xp.hide()
+	_mode_label.text = "Conta conectada" if _services.session.authenticated() else "Demonstração local • entre para sincronizar"
+	var avatar: Panel = $ProfileCard/Content/Avatar
+	var previous := avatar.get_node_or_null("EquippedPortrait")
+	if previous != null:
+		avatar.remove_child(previous)
+		previous.queue_free()
+	var portrait := PlayerUI.portrait(_services.inventory.equipped_id(), 50)
+	portrait.name = "EquippedPortrait"
+	portrait.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	avatar.add_child(portrait)
+	avatar.move_child(portrait, 0)
+
+
+func _refresh_wallet() -> void:
+	var locale := _services.preferences.values.locale
+	$TopBar/CoinPill/Content/Value.text = DevicePreferences.number(_services.wallet.balance("coins"), locale)
+	$TopBar/GemPill/Content/Value.text = DevicePreferences.number(_services.wallet.balance("gems"), locale)
+
+
+func _refresh_friends() -> void:
+	var list: VBoxContainer = $FriendsPanel/Margin/Content/FriendList
+	PlayerUI.clear(list)
+	var data: Array = _services.friends.data.get("friends", [])
+	var online := 0
+	for friend: Dictionary in data:
+		if _services.friends.online_ids.has(str(friend.user_id)):
+			online += 1
+	$FriendsPanel/Margin/Content/Header/Online.text = "%d online" % online if _services.friends.presence_connected else "—"
+	for index in mini(data.size(), 4):
+		var friend: Dictionary = data[index]
+		var row := preload("res://scenes/menu/components/friend_row.tscn").instantiate() as FriendRow
+		row.friend_name = str(friend.nickname)
+		row.status_text = _services.friends.presence_label(str(friend.user_id))
+		row.status_color = Color("#3ddc5c") if _services.friends.online_ids.has(str(friend.user_id)) else Color("#b3bfd0")
+		row.tooltip_text = str(_services.inventory.entry(str(friend.equipped_character_id)).get("name", "Skin indisponível"))
+		list.add_child(row)
+		var avatar: Panel = row.get_node("Avatar")
+		var portrait := PlayerUI.portrait(str(friend.equipped_character_id), 40)
+		avatar.add_child(portrait)
+		portrait.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		var friend_label := row.get_node("Info/Name") as Label
+		friend_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		friend_label.clip_text = true
+		var button := row.get_node("AddButton") as Button
+		button.text = "›"
+		button.focus_mode = Control.FOCUS_ALL
+		button.pressed.connect(_navigation.open.bind("public_profile", {"public_id": friend.public_id}))
+	if data.is_empty():
+		list.add_child(PlayerUI.label("Nenhum amigo ainda." if _services.friends.state == "success" else "Entre para ver suas amizades.", 18))
+
+
+func _route_changed(route: String) -> void:
+	$LobbyArea/Stage/Viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS if route.is_empty() else SubViewport.UPDATE_DISABLED
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		get_tree().quit()

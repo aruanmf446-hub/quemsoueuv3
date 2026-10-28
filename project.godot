@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 window/size/viewport_width=1672
 window/size/viewport_height=941
+window/handheld/orientation=0
 window/size/mode=3
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"

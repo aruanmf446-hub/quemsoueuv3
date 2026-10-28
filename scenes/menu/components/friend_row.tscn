@@ -1,0 +1,76 @@
+[gd_scene format=3 uid="uid://q7fgofghdik7"]
+
+[ext_resource type="Script" uid="uid://dfr6xb37ixvkq" path="res://scripts/menu/friend_row.gd" id="1_dpqlp"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dpqlp"]
+bg_color = Color(0.16470589, 0.2901961, 0.43137255, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.49803922, 0.7058824, 0.9019608, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+
+[node name="FriendRow" type="HBoxContainer" unique_id=370442676]
+custom_minimum_size = Vector2(316, 64)
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+script = ExtResource("1_dpqlp")
+
+[node name="Avatar" type="Panel" parent="." unique_id=491150163]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_dpqlp")
+
+[node name="Info" type="VBoxContainer" parent="." unique_id=39124946]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="Name" type="Label" parent="Info" unique_id=808602878]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 22
+text = "Amigo"
+
+[node name="StatusRow" type="HBoxContainer" parent="Info" unique_id=295120810]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="Dot" type="ColorRect" parent="Info/StatusRow" unique_id=916775151]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+color = Color(0.23921569, 0.8627451, 0.36078432, 1)
+
+[node name="Status" type="Label" parent="Info/StatusRow" unique_id=236409499]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.23921569, 0.8627451, 0.36078432, 1)
+theme_override_font_sizes/font_size = 15
+text = "Online"
+
+[node name="Badge" type="Panel" parent="." unique_id=1354214874]
+custom_minimum_size = Vector2(40, 44)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="AddButton" type="Button" parent="." unique_id=314443491]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_font_sizes/font_size = 26
+text = "+"

@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "godot": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@shin2344234/godot-mcp@0.1.2",
+        "--project",
+        "C:\\Users\\aruan\\Documents\\GitHub\\quemsoueuv3"
+      ]
+    }
+  }
+}

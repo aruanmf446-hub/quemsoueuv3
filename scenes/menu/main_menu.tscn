@@ -1,0 +1,539 @@
+[gd_scene format=3 uid="uid://bqalstx2y0s1g"]
+
+[ext_resource type="Script" uid="uid://cckmelvnkfepu" path="res://scripts/menu/main_menu.gd" id="1_247la"]
+[ext_resource type="PackedScene" uid="uid://bsrusk2vn40uu" path="res://scenes/menu/components/menu_card_button.tscn" id="2_kiqgm"]
+[ext_resource type="PackedScene" uid="uid://q7fgofghdik7" path="res://scenes/menu/components/friend_row.tscn" id="3_hj162"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_247la"]
+bg_color = Color(0.105882354, 0.22745098, 0.54901963, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.827451, 0.3019608, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kiqgm"]
+bg_color = Color(0.38117647, 0.2717647, 0.049411763, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.84705883, 0.6039216, 0.10980392, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hj162"]
+bg_color = Color(0.25411767, 0.18117648, 0.032941177, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.84705883, 0.6039216, 0.10980392, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xn6kt"]
+bg_color = Color(0.55058825, 0.392549, 0.071372546, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.84705883, 0.6039216, 0.10980392, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_isoef"]
+bg_color = Color(0.33882353, 0.10058823, 0.07588235, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.7529412, 0.22352941, 0.16862746, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qgo02"]
+bg_color = Color(0.22588237, 0.067058824, 0.05058824, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.7529412, 0.22352941, 0.16862746, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vovv2"]
+bg_color = Color(0.48941174, 0.14529411, 0.109607846, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.7529412, 0.22352941, 0.16862746, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1k4da"]
+bg_color = Color(0.22058824, 0.105882354, 0.35470587, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.49019608, 0.23529412, 0.7882353, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bbqo6"]
+bg_color = Color(0.14705883, 0.07058824, 0.2364706, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.49019608, 0.23529412, 0.7882353, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d4hu8"]
+bg_color = Color(0.31862745, 0.15294117, 0.51235294, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.49019608, 0.23529412, 0.7882353, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p1nwe"]
+bg_color = Color(0.08117647, 0.27882352, 0.13058823, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.18039216, 0.61960787, 0.2901961, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_prbor"]
+bg_color = Color(0.05411765, 0.18588236, 0.08705883, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.18039216, 0.61960787, 0.2901961, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_27h4x"]
+bg_color = Color(0.1172549, 0.4027451, 0.18862745, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.18039216, 0.61960787, 0.2901961, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gdhp0"]
+bg_color = Color(0.082941175, 0.19588235, 0.3670588, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.18431373, 0.43529412, 0.8156863, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pstia"]
+bg_color = Color(0.055294123, 0.13058825, 0.2447059, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.18431373, 0.43529412, 0.8156863, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_41tvm"]
+bg_color = Color(0.11980392, 0.28294116, 0.5301961, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.18431373, 0.43529412, 0.8156863, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uaj4g"]
+bg_color = Color(0.047058824, 0.101960786, 0.18039216, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.84705883, 0.6039216, 0.10980392, 1)
+corner_radius_top_left = 23
+corner_radius_top_right = 23
+corner_radius_bottom_right = 23
+corner_radius_bottom_left = 23
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_si58d"]
+bg_color = Color(0.047058824, 0.101960786, 0.18039216, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2901961, 0.78431374, 1, 1)
+corner_radius_top_left = 23
+corner_radius_top_right = 23
+corner_radius_bottom_right = 23
+corner_radius_bottom_left = 23
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_anexq"]
+bg_color = Color(0.047058824, 0.101960786, 0.18039216, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.23137255, 0.43529412, 0.65882355, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vxdmp"]
+bg_color = Color(0.16470589, 0.2901961, 0.43137255, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.49803922, 0.7058824, 0.9019608, 1)
+corner_radius_top_left = 27
+corner_radius_top_right = 27
+corner_radius_bottom_right = 27
+corner_radius_bottom_left = 27
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qvxhw"]
+bg_color = Color(0.047058824, 0.101960786, 0.18039216, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.23137255, 0.43529412, 0.65882355, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[node name="MainMenu" type="Control" unique_id=1956077792]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_247la")
+
+[node name="Background" type="ColorRect" parent="." unique_id=235729961]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.16470589, 0.43529412, 0.61960787, 1)
+
+[node name="LogoBanner" type="Panel" parent="." unique_id=1427860668]
+custom_minimum_size = Vector2(452, 150)
+layout_mode = 0
+offset_left = 24.0
+offset_top = 22.0
+offset_right = 24.0
+offset_bottom = 22.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_247la")
+
+[node name="Logo" type="Label" parent="." unique_id=973639710]
+layout_mode = 0
+offset_left = 46.0
+offset_top = 68.0
+offset_right = 581.0
+offset_bottom = 156.0
+theme_override_colors/font_color = Color(1, 0.827451, 0.3019608, 1)
+theme_override_colors/font_outline_color = Color(0.101960786, 0.0627451, 0.1882353, 1)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 46
+text = "MENU PRINCIPAL"
+
+[node name="MenuButtons" type="VBoxContainer" parent="." unique_id=212160107]
+layout_mode = 0
+offset_left = 36.0
+offset_top = 248.0
+offset_right = 36.0
+offset_bottom = 248.0
+theme_override_constants/separation = 12
+
+[node name="BtnStory" parent="MenuButtons" unique_id=1921252774 instance=ExtResource("2_kiqgm")]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_kiqgm")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_hj162")
+theme_override_styles/hover = SubResource("StyleBoxFlat_xn6kt")
+theme_override_styles/focus = SubResource("StyleBoxFlat_kiqgm")
+button_id = &"story"
+title = "Modo História"
+subtitle = "Viva uma grande aventura
+nos quatro reinos."
+accent_color = Color(0.84705883, 0.6039216, 0.10980392, 1)
+
+[node name="BtnDuel" parent="MenuButtons" unique_id=86780443 instance=ExtResource("2_kiqgm")]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_isoef")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_qgo02")
+theme_override_styles/hover = SubResource("StyleBoxFlat_vovv2")
+theme_override_styles/focus = SubResource("StyleBoxFlat_isoef")
+button_id = &"duel"
+title = "Modo Duelo"
+subtitle = "Desafie outros jogadores
+e prove suas habilidades."
+accent_color = Color(0.7529412, 0.22352941, 0.16862746, 1)
+
+[node name="BtnSkins" parent="MenuButtons" unique_id=982841425 instance=ExtResource("2_kiqgm")]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_1k4da")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_d4hu8")
+theme_override_styles/focus = SubResource("StyleBoxFlat_1k4da")
+button_id = &"skins"
+title = "Skins"
+subtitle = "Personalize seu herói
+com visuais únicos."
+accent_color = Color(0.49019608, 0.23529412, 0.7882353, 1)
+
+[node name="BtnFriends" parent="MenuButtons" unique_id=1298851961 instance=ExtResource("2_kiqgm")]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_p1nwe")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_prbor")
+theme_override_styles/hover = SubResource("StyleBoxFlat_27h4x")
+theme_override_styles/focus = SubResource("StyleBoxFlat_p1nwe")
+button_id = &"friends"
+title = "Amizades"
+subtitle = "Jogue com seus amigos
+e forme sua equipe."
+accent_color = Color(0.18039216, 0.61960787, 0.2901961, 1)
+
+[node name="BtnSettings" parent="MenuButtons" unique_id=407469799 instance=ExtResource("2_kiqgm")]
+custom_minimum_size = Vector2(490, 104)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_gdhp0")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_pstia")
+theme_override_styles/hover = SubResource("StyleBoxFlat_41tvm")
+theme_override_styles/focus = SubResource("StyleBoxFlat_gdhp0")
+button_id = &"settings"
+title = "Configurações"
+subtitle = "Ajuste o jogo do seu jeito."
+accent_color = Color(0.18431373, 0.43529412, 0.8156863, 1)
+
+[node name="TopBar" type="HBoxContainer" parent="." unique_id=759648291]
+layout_mode = 0
+offset_left = 1140.0
+offset_top = 14.0
+offset_right = 1140.0
+offset_bottom = 14.0
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="CoinPill" type="PanelContainer" parent="TopBar" unique_id=143717158]
+custom_minimum_size = Vector2(150, 46)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_uaj4g")
+
+[node name="Value" type="Label" parent="TopBar/CoinPill" unique_id=2094565874]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.827451, 0.3019608, 1)
+theme_override_font_sizes/font_size = 24
+text = "2.350  +"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GemPill" type="PanelContainer" parent="TopBar" unique_id=791331894]
+custom_minimum_size = Vector2(130, 46)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_si58d")
+
+[node name="Value" type="Label" parent="TopBar/GemPill" unique_id=1294790626]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.49411765, 0.8901961, 1, 1)
+theme_override_font_sizes/font_size = 24
+text = "180  +"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MailButton" type="Button" parent="TopBar" unique_id=763511601]
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+focus_mode = 0
+text = "Msg"
+
+[node name="FriendsButton" type="Button" parent="TopBar" unique_id=426187261]
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+focus_mode = 0
+text = "Amg"
+
+[node name="SettingsButton" type="Button" parent="TopBar" unique_id=1852412496]
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+focus_mode = 0
+text = "Cfg"
+
+[node name="ProfileCard" type="PanelContainer" parent="." unique_id=1891057453]
+custom_minimum_size = Vector2(228, 74)
+layout_mode = 0
+offset_left = 945.0
+offset_top = 150.0
+offset_right = 945.0
+offset_bottom = 150.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_anexq")
+
+[node name="Content" type="HBoxContainer" parent="ProfileCard" unique_id=1067230905]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Avatar" type="Panel" parent="ProfileCard/Content" unique_id=426126967]
+custom_minimum_size = Vector2(54, 54)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_vxdmp")
+
+[node name="Info" type="VBoxContainer" parent="ProfileCard/Content" unique_id=221468221]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 2
+
+[node name="Name" type="Label" parent="ProfileCard/Content/Info" unique_id=1028192388]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "AventureiroBR"
+
+[node name="Level" type="Label" parent="ProfileCard/Content/Info" unique_id=575903798]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8117647, 0.9019608, 1, 1)
+theme_override_font_sizes/font_size = 15
+text = "Nível 28"
+
+[node name="Xp" type="ProgressBar" parent="ProfileCard/Content/Info" unique_id=266094133]
+custom_minimum_size = Vector2(130, 8)
+layout_mode = 2
+value = 60.0
+show_percentage = false
+
+[node name="FriendsPanel" type="PanelContainer" parent="." unique_id=2126155821]
+custom_minimum_size = Vector2(342, 466)
+layout_mode = 0
+offset_left = 1310.0
+offset_top = 245.0
+offset_right = 1310.0
+offset_bottom = 245.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_qvxhw")
+
+[node name="Margin" type="MarginContainer" parent="FriendsPanel" unique_id=658582218]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="Content" type="VBoxContainer" parent="FriendsPanel/Margin" unique_id=993391476]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Header" type="HBoxContainer" parent="FriendsPanel/Margin/Content" unique_id=1946666244]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="FriendsPanel/Margin/Content/Header" unique_id=626769983]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 26
+text = "Amizades"
+
+[node name="Online" type="Label" parent="FriendsPanel/Margin/Content/Header" unique_id=1855555013]
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_colors/font_color = Color(0.23921569, 0.8627451, 0.36078432, 1)
+theme_override_font_sizes/font_size = 16
+text = "5 online"
+
+[node name="FriendList" type="VBoxContainer" parent="FriendsPanel/Margin/Content" unique_id=331536337]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="FriendLuna" parent="FriendsPanel/Margin/Content/FriendList" unique_id=370442676 instance=ExtResource("3_hj162")]
+layout_mode = 2
+friend_name = "LunaSolis"
+status_text = "No Modo História"
+badge_color = Color(0.84705883, 0.6039216, 0.10980392, 1)
+
+[node name="FriendDragao" parent="FriendsPanel/Margin/Content/FriendList" unique_id=58025579 instance=ExtResource("3_hj162")]
+layout_mode = 2
+friend_name = "DragaoAzul"
+status_text = "No Lobby"
+
+[node name="FriendCaio" parent="FriendsPanel/Margin/Content/FriendList" unique_id=422807206 instance=ExtResource("3_hj162")]
+layout_mode = 2
+friend_name = "CaioRPG"
+status_text = "Em Duelo"
+status_color = Color(1, 0.3647059, 0.3647059, 1)
+badge_color = Color(0.7529412, 0.22352941, 0.16862746, 1)
+
+[node name="FriendMare" parent="FriendsPanel/Margin/Content/FriendList" unique_id=771007498 instance=ExtResource("3_hj162")]
+layout_mode = 2
+friend_name = "MaréViva"
+status_text = "Online"
+badge_color = Color(0.16470589, 0.6313726, 0.59607846, 1)
+
+[node name="FriendEstrela" parent="FriendsPanel/Margin/Content/FriendList" unique_id=1574101351 instance=ExtResource("3_hj162")]
+layout_mode = 2
+friend_name = "EstrelaGui"
+status_text = "No Lobby"
+badge_color = Color(0.5568628, 0.36078432, 0.8509804, 1)
+
+[node name="ViewAllButton" type="Button" parent="FriendsPanel/Margin/Content" unique_id=2110005369]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 18
+text = "Ver todos os amigos"

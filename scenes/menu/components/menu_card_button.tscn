@@ -1,0 +1,64 @@
+[gd_scene format=3 uid="uid://bsrusk2vn40uu"]
+
+[ext_resource type="Script" uid="uid://gtfpmm5oiwch" path="res://scripts/menu/menu_button.gd" id="1_mekhi"]
+
+[node name="MenuCardButton" type="Button" unique_id=1921252774]
+custom_minimum_size = Vector2(660, 118)
+size_flags_horizontal = 3
+script = ExtResource("1_mekhi")
+
+[node name="Padding" type="MarginContainer" parent="." unique_id=384183352]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_right = 24
+
+[node name="Content" type="HBoxContainer" parent="Padding" unique_id=1933767747]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 18
+
+[node name="Icon" type="TextureRect" parent="Padding/Content" unique_id=1066934578]
+visible = false
+custom_minimum_size = Vector2(84, 84)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="VBoxContainer" parent="Padding/Content" unique_id=863627172]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="Padding/Content/Text" unique_id=339273710]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 36
+text = "Título"
+
+[node name="Subtitle" type="Label" parent="Padding/Content/Text" unique_id=1315690570]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9098039, 0.9098039, 0.9098039, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 20
+text = "Subtítulo"
+
+[node name="Arrow" type="Label" parent="Padding/Content" unique_id=87925183]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 56
+text = "›"

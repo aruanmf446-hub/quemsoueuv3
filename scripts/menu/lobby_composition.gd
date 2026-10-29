@@ -127,8 +127,9 @@ func _layout() -> void:
 	var w := menu.size.x
 	var h := menu.size.y
 	var compact := DisplayServer.window_get_size().y < 500
-	var type_scale := 1.35 if compact else 1.0
-	var left_width := 350.0 if compact else 310.0
+	# Em 844x390 a viewport é desenhada com escala ~0,41; o texto precisa de mais unidades de projeto.
+	var type_scale := 1.8 if compact else 1.0
+	var left_width := 400.0 if compact else 310.0
 	_rect(brand, Vector2(32, 24), Vector2(350, 40))
 	_rect(eyebrow, Vector2(34, 68), Vector2(380, 35))
 	_rect(footer, Vector2(34, h - 44), Vector2(500, 32))
@@ -145,9 +146,10 @@ func _layout() -> void:
 	for currency: String in ["CoinPill", "GemPill"]:
 		menu.get_node("TopBar/" + currency + "/Content/Value").add_theme_font_size_override("font_size", 32 if compact else 22)
 	var mode: Label = menu.get("_mode_label")
-	_rect(mode, Vector2(34, h - 90), Vector2(650, 36))
+	# Compacto: uma linha só, para não invadir o rodapé. Largura limitada antes do nome do personagem.
+	_rect(mode, Vector2(34, h - 90), Vector2(760 if compact else 650, 36))
 	mode.add_theme_color_override("font_color", Color("e5e6dc"))
-	mode.add_theme_font_size_override("font_size", int(18 * type_scale))
+	mode.add_theme_font_size_override("font_size", int(18 * (1.3 if compact else 1.0)))
 	var buttons: VBoxContainer = menu.get_node("MenuButtons")
 	_rect(buttons, Vector2(32, h * (0.26 if compact else 0.30)), Vector2(left_width, 0))
 	buttons.add_theme_constant_override("separation", 10)

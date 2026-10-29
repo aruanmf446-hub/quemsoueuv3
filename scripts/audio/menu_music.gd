@@ -181,7 +181,7 @@ func _index(id: String) -> int:
 func _process(delta: float) -> void:
 	_retry_in = maxf(0.0, _retry_in - delta)
 	var scene := get_tree().current_scene
-	var in_menu := scene != null and scene.scene_file_path == MENU
+	var in_menu := scene is Control and scene.scene_file_path == MENU and (scene as Control).visible
 	if in_menu and _menu != scene:
 		_menu = scene
 		if not _menu.tree_exiting.is_connected(_leave_menu):

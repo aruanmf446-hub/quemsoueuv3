@@ -8,40 +8,86 @@ var _unit := 1.0
 var _font: FontFile
 var _next_card: Control
 
+const ART := [
+	preload("res://assets/desert/night_city/outskirts.png"),
+	preload("res://assets/desert/night_city/bazaar.png"),
+	preload("res://assets/desert/night_city/citadel.png"),
+]
+const GOLD := Color("#f2c76e")
+const PANEL := Color(0.035, 0.06, 0.11, 0.94)
+var _compact := false
+var _rail: ScrollContainer
+
+## Seleção de fases em cartões lado a lado (estilo seleção de fase de jogos de console),
+## sobre a panorâmica da cidade noturna. Sem a moldura ornamental, que cobria o texto.
 func _ready() -> void:
 	super._ready()
 	_font = preload("res://assets/desert/phase01/interface.ttf").duplicate() as FontFile
 	_font.multichannel_signed_distance_field = true
+	$CrestFrame.hide()
+	($Backdrop as TextureRect).texture = ART[2]
+	($Tint as ColorRect).color = Color(0.02, 0.03, 0.07, 0.55)
+	var shade := TextureRect.new()
+	shade.name = "Shade"
+	var gradient := Gradient.new()
+	gradient.colors = PackedColorArray([Color(0.01, 0.02, 0.05, 0.15), Color(0.01, 0.02, 0.05, 0.92)])
+	var texture := GradientTexture2D.new()
+	texture.gradient = gradient
+	texture.fill_from = Vector2(0, 0)
+	texture.fill_to = Vector2(0, 1)
+	shade.texture = texture
+	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	shade.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	add_child(shade)
+	move_child(shade, $Tint.get_index()+1)
 	services.progression.changed.connect(func() -> void:
 		if is_visible_in_tree(): render())
 
 func _process(_delta: float) -> void:
 	if is_visible_in_tree() and absf(_screen_unit()-_unit) > 0.02: render()
 
+## Tamanho em unidades do viewport: no desktop o valor direto; no celular, pontos da tela.
+func _px(desktop: float, phone_points: float) -> float:
+	return phone_points*_unit if _compact else desktop
+
 func render() -> void:
+	_compact = UIScale.is_compact()
 	_unit = _screen_unit()
 	PlayerUI.clear(body)
-	heading.text = tr("Modo História")
+	var margin: MarginContainer = $Margin
+	for side in ["left","right"]: margin.add_theme_constant_override("margin_"+side, roundi(_px(64,18)))
+	margin.add_theme_constant_override("margin_top", roundi(_px(40,10)))
+	margin.add_theme_constant_override("margin_bottom", roundi(_px(36,8)))
+	$Margin/Column.add_theme_constant_override("separation", roundi(_px(16,6)))
+	body.add_theme_constant_override("separation", roundi(_px(18,6)))
+	heading.text = tr("MODO HISTÓRIA")
 	heading.add_theme_font_override("font",_font)
-	heading.add_theme_font_size_override("font_size",roundi(29*_unit))
+	heading.add_theme_font_size_override("font_size",roundi(_px(40,20)))
+	heading.add_theme_color_override("font_color",Color.WHITE)
 	var back: Button = $Margin/Column/Header/Back
-	back.custom_minimum_size.y = 48*_unit
+	_style_slanted(back,false)
+	back.custom_minimum_size = Vector2(_px(150,76),_px(52,30))
 	back.add_theme_font_override("font",_font)
-	back.add_theme_font_size_override("font_size",roundi(18*_unit))
-	banner.show_state("success","Avanço salvo neste aparelho • recompensas online não incluídas.")
-	for label: Label in banner.find_children("*","Label",true,false):
-		label.add_theme_font_override("font",_font)
-		label.add_theme_font_size_override("font_size",roundi(15*_unit))
+	back.add_theme_font_size_override("font_size",roundi(_px(20,13)))
+	banner.hide()
 	var tabs := PlayerUI.row(body)
-	tabs.add_theme_constant_override("separation",roundi(10*_unit))
+	tabs.add_theme_constant_override("separation",roundi(_px(10,5)))
 	for realm: Array in [["Deserto","desert"],["Floresta","forest"],["Mar","sea"],["Lunar","lunar"]]:
-		var tab := _button(realm[0],_select_realm.bind(realm[1]),realm[1] == _realm)
-		tab.custom_minimum_size.x = 130*_unit
+		var tab := Button.new()
+		tab.text = realm[0] if realm[1] == "desert" else realm[0]+"  🔒"
+		tab.toggle_mode = true
+		tab.button_pressed = realm[1] == _realm
 		tab.disabled = realm[1] != "desert"
 		if tab.disabled: tab.tooltip_text = "Reino em desenvolvimento"
+		tab.custom_minimum_size = Vector2(_px(150,78),_px(42,24))
+		tab.add_theme_font_override("font",_font)
+		tab.add_theme_font_size_override("font_size",roundi(_px(17,11)))
+		_style_slanted(tab,realm[1] == _realm)
+		tab.pressed.connect(_select_realm.bind(realm[1]))
 		tabs.add_child(tab)
 	if _realm != "desert":
-		body.add_child(_label("Este reino faz parte de uma aventura futura. Ainda não há fases disponíveis.",22,PlayerUI.GOLD))
+		body.add_child(_label("Este reino faz parte de uma aventura futura. Ainda não há fases disponíveis.",22,GOLD))
 		return
 	var rules := PlayerContracts.read_json(PlayerContracts.RULES_PATH)
 	var confirmed: Array = services.progression.data.get("completed_phase_ids",[]) if services.progression.state == "success" else []
@@ -52,9 +98,32 @@ func render() -> void:
 	var local_completed := LocalCampaign.completed_orders()
 	var unlocked := maxi(LocalCampaign.highest_unlocked(),online_unlocked)
 	_next_card = null
-	body.add_child(_label("CIDADE NO DESERTO  /  CAMPANHA NOTURNA",16,PlayerUI.GOLD))
-	body.add_child(_label("El Fuego · %d/9 fases concluídas neste aparelho" % local_completed.size(),22))
-	body.add_child(_label("Percursos de pelo menos 3 minutos nas fases 01–09. Ataque e defesa têm reposições no mapa; morrer reinicia a fase.",16,Color("#bac9d8")))
+	# Resumo: reino, protagonista e progresso em nove segmentos.
+	var summary := PlayerUI.row(body)
+	summary.add_theme_constant_override("separation",roundi(_px(18,8)))
+	var info := PlayerUI.column(summary)
+	info.add_theme_constant_override("separation",0)
+	info.add_child(_label("REINO DO DESERTO  ·  CIDADE NOTURNA",_px(15,9)/_unit_or_one(),GOLD))
+	info.add_child(_label("El Fuego  —  %d de 9 fases concluídas" % local_completed.size(),_px(22,12)/_unit_or_one()))
+	var pips := Control.new()
+	pips.custom_minimum_size = Vector2(_px(300,150),_px(14,8))
+	pips.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	pips.draw.connect(func() -> void:
+		var w := pips.size.x/9.0
+		for index in range(9):
+			var rect := Rect2(index*w+1, 0, w-3, pips.size.y)
+			pips.draw_rect(rect, GOLD if index < local_completed.size() else (Color(1,1,1,0.35) if index < unlocked else Color(1,1,1,0.10))))
+	summary.add_child(pips)
+	_rail = ScrollContainer.new()
+	_rail.name = "PhaseRail"
+	_rail.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_rail.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER if _compact else ScrollContainer.SCROLL_MODE_AUTO
+	_rail.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_rail.custom_minimum_size.y = _px(640,262)
+	body.add_child(_rail)
+	var cards := HBoxContainer.new()
+	cards.add_theme_constant_override("separation",roundi(_px(20,10)))
+	_rail.add_child(cards)
 	for phase: Dictionary in rules.phases:
 		var order := int(phase.order)
 		var metadata: Dictionary = CampaignLayout.metadata(order) if order <= 9 else {"name":phase.name,"description":PlayerContracts.read_json("res://data/planning/desert/phase_10.json").get("narrative_description","")}
@@ -63,81 +132,141 @@ func render() -> void:
 		var available := order <= unlocked
 		var done := order in local_completed or str(phase.id) in confirmed
 		var current := available and not done and order == unlocked
-		var card := _card(current)
-		card.get_parent().name = "PhaseCard%02d" % order
-		if current: _next_card = card.get_parent()
-		var row := PlayerUI.row(card)
-		row.add_theme_constant_override("separation",roundi(16*_unit))
-		var info := PlayerUI.column(row)
-		info.add_theme_constant_override("separation",roundi(7*_unit))
-		info.add_child(_label("%02d · %s" % [order,metadata.get("name",phase.name)],23,PlayerUI.GOLD if available else Color("#a3afbc")))
-		info.add_child(_label(str(metadata.get("description","")),16,Color("#c1cfdd")))
-		var status_text := "Concluída neste aparelho" if order in local_completed else ("Conclusão online confirmada" if str(phase.id) in confirmed else ("Liberada para jogar" if available else "Conclua a fase %02d para liberar" % (order-1)))
-		if order == 10 and available: status_text = "Fase final liberada"
-		info.add_child(_label(status_text,15,Color("#85cfba") if done else (Color("#dfc58f") if available else Color("#8f9eaf"))))
-		var action := "Jogar novamente" if done else ("Continuar" if available and order > 1 else "Jogar")
-		if not available: action = "Bloqueada"
-		if not exists: action = "Indisponível"
-		var start := _button(action,_launch.bind(str(phase.id),path),current)
+		var card := _phase_card(cards,order,str(metadata.get("name",phase.name)),str(metadata.get("description","")),available,done,current)
+		card.name = "PhaseCard%02d" % order
+		if current: _next_card = card
+		var action := "JOGAR NOVAMENTE" if done else ("CONTINUAR" if available and order > 1 else "JOGAR")
+		if not available: action = "BLOQUEADA"
+		if not exists: action = "INDISPONÍVEL"
+		var start := Button.new()
 		start.name = "Launch%02d" % order
+		start.text = action
 		start.set_meta("phase_order",order)
-		start.custom_minimum_size.x = 172*_unit
 		start.disabled = not available or not exists
-		row.add_child(start)
+		start.custom_minimum_size.y = _px(50,28)
+		start.add_theme_font_override("font",_font)
+		start.add_theme_font_size_override("font_size",roundi(_px(18,11)))
+		_style_slanted(start,current or (available and not done))
+		start.pressed.connect(_launch.bind(str(phase.id),path))
+		card.get_meta("footer").add_child(start)
 	call_deferred("_reveal_next")
+
+func _unit_or_one() -> float:
+	return _unit if _compact else 1.0
+
+func _phase_card(parent: Control, order: int, title: String, description: String, available: bool, done: bool, current: bool) -> PanelContainer:
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(_px(380,190),_px(600,258))
+	var style := StyleBoxFlat.new()
+	style.bg_color = PANEL
+	style.border_color = GOLD if current else (Color("#5fbf9f") if done else Color(1,1,1,0.10))
+	style.set_border_width_all(roundi(_px(3,2)) if current else 1)
+	style.set_corner_radius_all(roundi(_px(12,6)))
+	style.shadow_color = Color(GOLD,0.35) if current else Color(0,0,0,0.45)
+	style.shadow_size = roundi(_px(18,8)) if current else roundi(_px(10,4))
+	panel.add_theme_stylebox_override("panel",style)
+	parent.add_child(panel)
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation",0)
+	panel.add_child(column)
+	# Arte da cidade com o número da fase por cima.
+	var art := TextureRect.new()
+	art.texture = ART[(order-1)%ART.size()]
+	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	art.custom_minimum_size.y = _px(290,100)
+	art.modulate = Color.WHITE if available else Color(0.32,0.34,0.4)
+	art.clip_contents = true
+	column.add_child(art)
+	var number := Label.new()
+	number.text = "%02d" % order
+	number.add_theme_font_override("font",_font)
+	number.add_theme_font_size_override("font_size",roundi(_px(64,32)))
+	number.add_theme_color_override("font_color",Color.WHITE if available else Color(1,1,1,0.5))
+	number.add_theme_color_override("font_outline_color",Color(0,0,0,0.85))
+	number.add_theme_constant_override("outline_size",roundi(_px(10,5)))
+	number.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	number.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	number.offset_left = _px(16,8)
+	number.offset_bottom = _px(-2,-1)
+	art.add_child(number)
+	var chip := Label.new()
+	chip.text = "✓ CONCLUÍDA" if done else ("▶ PRÓXIMA" if current else ("LIBERADA" if available else "🔒 BLOQUEADA"))
+	chip.add_theme_font_override("font",_font)
+	chip.add_theme_font_size_override("font_size",roundi(_px(14,8)))
+	chip.add_theme_color_override("font_color",Color("#0e1a12") if done else (Color("#151006") if current else Color.WHITE))
+	var chip_style := StyleBoxFlat.new()
+	chip_style.bg_color = Color("#6fd3ad") if done else (GOLD if current else Color(0,0,0,0.65))
+	chip_style.set_corner_radius_all(roundi(_px(4,2)))
+	chip_style.content_margin_left = _px(10,5)
+	chip_style.content_margin_right = _px(10,5)
+	chip_style.content_margin_top = _px(3,1)
+	chip_style.content_margin_bottom = _px(3,1)
+	chip.add_theme_stylebox_override("normal",chip_style)
+	chip.position = Vector2(_px(12,6),_px(12,6))
+	art.add_child(chip)
+	var content := VBoxContainer.new()
+	content.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	content.add_theme_constant_override("separation",roundi(_px(8,3)))
+	var pad := MarginContainer.new()
+	pad.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	for side in ["left","right"]: pad.add_theme_constant_override("margin_"+side,roundi(_px(18,9)))
+	pad.add_theme_constant_override("margin_top",roundi(_px(14,6)))
+	pad.add_theme_constant_override("margin_bottom",roundi(_px(16,7)))
+	column.add_child(pad)
+	pad.add_child(content)
+	var name_label := _plain(title,_px(26,12),GOLD if available else Color("#9aa6b3"))
+	content.add_child(name_label)
+	var text := _plain(description if available else "Conclua a fase %02d para liberar." % (order-1),_px(17,8.5),Color("#c3cfdc") if available else Color("#7f8b98"))
+	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	text.max_lines_visible = 4 if not _compact else 3
+	text.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	content.add_child(text)
+	var footer := VBoxContainer.new()
+	content.add_child(footer)
+	panel.set_meta("footer",footer)
+	return panel
+
+func _plain(text: String, size: float, color: Color) -> Label:
+	var label := Label.new()
+	label.text = text
+	label.add_theme_font_override("font",_font)
+	label.add_theme_font_size_override("font_size",roundi(size))
+	label.add_theme_color_override("font_color",color)
+	label.custom_minimum_size.x = 10
+	return label
+
+## Botões e abas inclinados como os menus de jogos esportivos.
+func _style_slanted(button: Button, primary: bool) -> void:
+	for state in ["normal","hover","pressed","focus","disabled"]:
+		var style := StyleBoxFlat.new()
+		style.skew = Vector2(0.22,0)
+		style.bg_color = GOLD if primary else Color(0.06,0.10,0.17,0.92)
+		if state in ["hover","focus"]: style.bg_color = style.bg_color.lightened(0.12)
+		if state == "pressed": style.bg_color = style.bg_color.darkened(0.15)
+		if state == "disabled": style.bg_color = Color(0.05,0.07,0.11,0.85)
+		style.border_color = GOLD if (state == "focus" or not primary) else GOLD.lightened(0.3)
+		style.set_border_width_all(0 if state == "disabled" else 1)
+		style.content_margin_left = _px(18,9)
+		style.content_margin_right = _px(18,9)
+		style.anti_aliasing = true
+		button.add_theme_stylebox_override(state,style)
+	for state in ["font_color","font_hover_color","font_pressed_color","font_focus_color","font_hover_pressed_color"]:
+		button.add_theme_color_override(state,Color("#141006") if primary else Color.WHITE)
+	button.add_theme_color_override("font_disabled_color",Color(1,1,1,0.38))
 
 func _reveal_next() -> void:
 	await get_tree().process_frame
-	if is_instance_valid(_next_card) and is_visible_in_tree():
-		($Margin/Column/Scroll as ScrollContainer).ensure_control_visible(_next_card)
+	if is_instance_valid(_next_card) and is_instance_valid(_rail) and is_visible_in_tree():
+		_rail.ensure_control_visible(_next_card)
 
 func _screen_unit() -> float:
 	return UIScale.unit_for(get_viewport()) if UIScale.is_compact() else 1.0
 
-func _label(text: String, pixels: int, color := PlayerUI.TEXT) -> Label:
+func _label(text: String, pixels: float, color := PlayerUI.TEXT) -> Label:
 	var label := PlayerUI.label(text,roundi(pixels*_unit),color)
 	label.add_theme_font_override("font",_font)
 	return label
-
-func _button(text: String, action: Callable, primary := false) -> Button:
-	var button := Button.new()
-	button.text = text
-	button.custom_minimum_size = Vector2(150,48)*_unit
-	button.add_theme_font_override("font",_font)
-	button.add_theme_font_size_override("font_size",roundi(17*_unit))
-	for state in ["normal","hover","pressed","focus","disabled"]:
-		var style := StyleBoxFlat.new()
-		style.bg_color = Color("#dbc084") if primary else Color("#203a50")
-		if state in ["hover","focus"]: style.bg_color = style.bg_color.lightened(0.10)
-		if state == "pressed": style.bg_color = style.bg_color.darkened(0.10)
-		if state == "disabled": style.bg_color = Color("#1a2837")
-		style.border_color = Color("#d4b77b") if primary or state == "focus" else Color("#40546a")
-		style.set_border_width_all(1)
-		style.set_corner_radius_all(roundi(5*_unit))
-		style.content_margin_left = 14*_unit
-		style.content_margin_right = 14*_unit
-		button.add_theme_stylebox_override(state,style)
-	for state in ["font_color","font_hover_color","font_pressed_color","font_focus_color"]:
-		button.add_theme_color_override(state,Color("#122436") if primary else Color("#f0e8d8"))
-	button.add_theme_color_override("font_disabled_color",Color("#7f8c9d"))
-	button.pressed.connect(action)
-	return button
-
-func _card(current: bool) -> VBoxContainer:
-	var panel := PanelContainer.new()
-	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color("#132b40") if current else Color("#142436")
-	style.border_color = Color("#bb9a5d") if current else Color("#33485e")
-	style.set_border_width_all(1)
-	style.set_corner_radius_all(roundi(8*_unit))
-	style.content_margin_left = 16*_unit
-	style.content_margin_right = 16*_unit
-	style.content_margin_top = 14*_unit
-	style.content_margin_bottom = 14*_unit
-	panel.add_theme_stylebox_override("panel",style)
-	body.add_child(panel)
-	return PlayerUI.column(panel)
 
 func _confirmed_unlocked(completed: Array) -> int:
 	var result := 1

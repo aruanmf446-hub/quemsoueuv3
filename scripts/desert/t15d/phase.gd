@@ -471,7 +471,6 @@ func _build_hud() -> void:
 	_session.restart_requested.connect(_restart_level)
 	_session.checkpoint_requested.connect(_respawn_at_checkpoint)
 	_session.next_requested.connect(func() -> void:
-		_resume()
 		_advance(str(_phase.next_scene)))
 	_session.return_requested.connect(_return_to_story)
 	_sync_resources()
@@ -653,10 +652,13 @@ func _restart_level() -> void:
 	_hud.set_completed(false)
 	_sync_resources()
 func _advance(path: String) -> void:
-	var packed := load(path) as PackedScene
-	if packed == null:
-		_hud.notify("Não foi possível abrir a próxima fase",true)
-		return
+	var loading := CampaignLoading.new()
+	loading.name = "CampaignLoading"
+	get_tree().root.add_child(loading)
+	loading.begin(path, _finish_advance)
+
+func _finish_advance(packed: PackedScene) -> void:
+	_resume()
 	var next := packed.instantiate()
 	if next.has_signal("return_requested"):
 		_handoff = true

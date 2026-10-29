@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "opening": [
+    {"image": "res://assets/processed/backgrounds/bg_lobby_fantasia.png", "eyebrow": "QUEM SOU EU V3", "title": "Quatro reinos. Uma história.", "message": "Sua próxima aventura começa aqui."},
+    {"image": "res://assets/desert/night_city/outskirts.png", "eyebrow": "MODO HISTÓRIA", "title": "A cidade desperta à noite", "message": "Atravesse as ruas do deserto com El Fuego."},
+    {"image": "res://assets/desert/night_city/citadel.png", "eyebrow": "NOVIDADES DO REINO", "title": "Nove distritos para explorar", "message": "Veja as notícias completas no lobby."}
+  ],
+  "transition": [
+    {"image": "res://assets/desert/night_city/outskirts.png", "eyebrow": "CAMPANHA NOTURNA", "title": "Pelos portões da cidade", "message": "Observe a rua. Cada passagem conta uma parte da jornada."},
+    {"image": "res://assets/desert/night_city/bazaar.png", "eyebrow": "REINO DO DESERTO", "title": "Atravessando distritos", "message": "Há atalhos, perigos e recursos pelas ruas."},
+    {"image": "res://assets/desert/night_city/citadel.png", "eyebrow": "EL FUEGO", "title": "O próximo capítulo aguarda", "message": "A noite ainda guarda caminhos para descobrir."}
+  ],
+  "news": [
+    {"image": "res://assets/desert/night_city/outskirts.png", "eyebrow": "NOVIDADES · CAMPANHA", "title": "A cidade do deserto está aberta", "message": "As fases 01–09 já formam a primeira jornada noturna de El Fuego."},
+    {"image": "res://assets/desert/night_city/bazaar.png", "eyebrow": "NOVIDADES · JOGABILIDADE", "title": "Explore cada distrito", "message": "Salte os vãos, enfrente os Cactus e encontre reposições no caminho."},
+    {"image": "res://assets/desert/night_city/citadel.png", "eyebrow": "EM DESENVOLVIMENTO", "title": "Mais reinos virão", "message": "Floresta, Mar e Lunar fazem parte dos próximos capítulos."}
+  ]
+}

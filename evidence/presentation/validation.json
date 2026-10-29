@@ -1,0 +1,114 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "rendering": "Compatibility on Xorg/Mesa llvmpipe",
+  "screenshots": [
+    {
+      "file": "desktop_abertura.png",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "desktop_entrando_fase.png",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "desktop_lobby.png",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "desktop_noticias.png",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "medium_abertura.png",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "medium_entrando_fase.png",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "medium_lobby.png",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "medium_noticias.png",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "mobile_abertura.png",
+      "width": 844,
+      "height": 390
+    },
+    {
+      "file": "mobile_entrando_fase.png",
+      "width": 844,
+      "height": 390
+    },
+    {
+      "file": "mobile_lobby.png",
+      "width": 844,
+      "height": 390
+    },
+    {
+      "file": "mobile_noticias.png",
+      "width": 844,
+      "height": 390
+    }
+  ],
+  "visual_flow": [
+    {
+      "resolution": "1920x1080",
+      "checks": 14,
+      "failures": 0
+    },
+    {
+      "resolution": "1280x720",
+      "checks": 14,
+      "failures": 0
+    },
+    {
+      "resolution": "844x390",
+      "checks": 15,
+      "failures": 0
+    }
+  ],
+  "navigation": [
+    {
+      "test": "navigation-desktop",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 36.68,
+      "graphical": true,
+      "fixed_physics_step": false
+    },
+    {
+      "test": "navigation-mobile",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 30.58,
+      "graphical": true,
+      "fixed_physics_step": false
+    }
+  ],
+  "smoke": {
+    "passed": true,
+    "stages": 22
+  },
+  "failure_and_skip": {
+    "checks": 4,
+    "failures": 0,
+    "missing_resource_errors_expected": true
+  },
+  "headless_flow": {
+    "checks": 11,
+    "failures": 0
+  }
+}

@@ -304,14 +304,14 @@ func _launch(phase_id: String, path: String) -> void:
 	var menu := get_tree().current_scene as Control
 	if menu == null: return
 	_launching = true
-	var veil := await LoadingVeil.begin(get_tree(), "Entrando na cidade…")
-	var packed := load(path) as PackedScene
-	if packed == null:
-		veil.finish()
-		_launching = false
-		banner.show()
-		banner.show_state("error","Não foi possível abrir a fase. Tente novamente.")
-		return
+	var loading := CampaignLoading.new()
+	loading.name = "CampaignLoading"
+	get_tree().root.add_child(loading)
+	loading.cancelled.connect(func() -> void: _launching = false)
+	loading.begin(path, _open_loaded_phase.bind(menu))
+
+func _open_loaded_phase(packed: PackedScene, menu: Control) -> void:
+	if not is_instance_valid(menu): return
 	var host := Node.new()
 	host.name = "StoryPrototypeSession"
 	get_tree().root.add_child(host)
@@ -334,4 +334,3 @@ func _launch(phase_id: String, path: String) -> void:
 				layer.show()
 				layer.process_mode = Node.PROCESS_MODE_INHERIT)
 	menu.hide()
-	veil.finish()

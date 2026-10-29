@@ -5,6 +5,7 @@ signal option_selected(option_id: StringName)
 @onready var _navigation: NavigationManager = $Navigation
 @onready var _services: PlayerServices = $Services
 var _mode_label: Label
+var _news_button: Button
 
 
 func _ready() -> void:
@@ -45,6 +46,30 @@ func _ready() -> void:
 	add_child(composition)
 	# Mini player das músicas do menu: no celular é o único controle (sem F6–F9).
 	add_child(preload("res://scripts/audio/now_playing.gd").new())
+	_news_button = Button.new()
+	_news_button.name = "NewsButton"
+	_news_button.text = "NOVIDADES"
+	_news_button.tooltip_text = "Notícias e próximos capítulos"
+	_news_button.focus_mode = Control.FOCUS_ALL
+	_news_button.pressed.connect(_open_news)
+	PlayerUI.style_button(_news_button, false)
+	add_child(_news_button)
+	resized.connect(_layout_news_button)
+	_layout_news_button.call_deferred()
+
+func _layout_news_button() -> void:
+	if not is_instance_valid(_news_button): return
+	var compact := UIScale.is_compact()
+	var unit := UIScale.unit_for(get_viewport()) if compact else 1.0
+	_news_button.size = Vector2(180, 48) * unit if compact else Vector2(174, 48)
+	_news_button.position = Vector2(32, size.y - _news_button.size.y - 16 * unit) if compact else Vector2(size.x - _news_button.size.x - 24, size.y - _news_button.size.y - 20)
+	_news_button.add_theme_font_size_override("font_size", roundi((17 if compact else 18) * unit))
+
+func _open_news() -> void:
+	if get_node_or_null("NewsOverlay") != null: return
+	var overlay := NewsOverlay.new()
+	overlay.name = "NewsOverlay"
+	add_child(overlay)
 
 
 func _on_menu_button_activated(button_id: StringName) -> void:
@@ -126,6 +151,7 @@ func _refresh_friends() -> void:
 
 func _route_changed(route: String) -> void:
 	$LobbyArea/Stage/Viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS if route.is_empty() else SubViewport.UPDATE_DISABLED
+	if is_instance_valid(_news_button): _news_button.visible = route.is_empty()
 	# O mini player é do lobby: nas telas internas ele cobria títulos e conteúdo.
 	var now_playing := get_node_or_null("NowPlaying")
 	if now_playing != null: now_playing.set_suppressed(not route.is_empty())

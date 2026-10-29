@@ -182,7 +182,7 @@ class Ferry extends AnimatableBody3D:
 		sync_to_physics = true
 		var shape := CollisionShape3D.new()
 		var box := BoxShape3D.new()
-		box.size = Vector3(2.6, 0.5, 3.0)
+		box.size = Vector3(3.6, 0.5, 3.0)
 		shape.shape = box
 		shape.position.y = -0.25
 		add_child(shape)
@@ -192,7 +192,7 @@ class Ferry extends AnimatableBody3D:
 		stone.uv1_triplanar = true
 		var deck := MeshInstance3D.new()
 		var mesh := BoxMesh.new()
-		mesh.size = Vector3(2.6, 0.5, 3.0)
+		mesh.size = Vector3(3.6, 0.5, 3.0)
 		deck.mesh = mesh
 		deck.material_override = stone
 		deck.position.y = -0.25
@@ -208,7 +208,7 @@ class Ferry extends AnimatableBody3D:
 			glow.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 			glow.albedo_color = Color("#ffc46b")
 			lamp.material_override = glow
-			lamp.position = Vector3(side * 1.15, 0.12, -1.2)
+			lamp.position = Vector3(side * 1.65, 0.12, -1.2)
 			add_child(lamp)
 		var light := OmniLight3D.new()
 		light.light_color = Color("#ffc46b")

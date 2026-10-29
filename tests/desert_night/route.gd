@@ -63,8 +63,15 @@ func run() -> void:
 	await snap("01_spawn")
 	var start_tick := Engine.get_physics_frames()
 	_previous_x = player.position.x
+	var last_tick := Time.get_ticks_usec()
+	var step_times: Array[float] = []
 	for step in range(60*420):
 		_frame_count = step
+		var tick := Time.get_ticks_usec()
+		# O passo da vitória (salvar e abrir a tela final) fica fora: o jogo já parou.
+		if step > 30 and not phase.completed:
+			step_times.append((tick-last_tick)/1000.0)
+		last_tick = tick
 		if phase.completed or deaths > 0: break
 		if step == _jump_release_at: Input.action_release("jump")
 		if step == _attack_release_at: Input.action_release("attack")
@@ -129,7 +136,10 @@ func run() -> void:
 	check(phase._loaded_chunks.size() <= 7,"streaming mantém quantidade limitada de distritos carregados")
 	check(phase._checkpoint_index == 6,"percurso ativa os sete checkpoints")
 	if phase.completed: await snap("04_vitoria")
-	var result := {"order":order,"completed":phase.completed,"deaths":deaths,"checks":checks,"failures":failures,"physics_seconds":physics_seconds,"phase_seconds":phase._elapsed,"health":player.health,"swings":swings,"defeated":phase._defeated_ids.size(),"collected":phase._collected_ids.size(),"captured":capture_frames,"position":[player.position.x,player.position.y,player.position.z]}
+	step_times.sort()
+	var cost := {"p95_ms": step_times[int(step_times.size()*0.95)] if not step_times.is_empty() else 0.0, "max_ms": step_times[-1] if not step_times.is_empty() else 0.0}
+	if not capture_frames: check(cost.max_ms < 33.0,"nenhum passo de jogo passa de 33ms de processamento (máx %.1fms)" % cost.max_ms)
+	var result := {"cpu_step":cost,"order":order,"completed":phase.completed,"deaths":deaths,"checks":checks,"failures":failures,"physics_seconds":physics_seconds,"phase_seconds":phase._elapsed,"health":player.health,"swings":swings,"defeated":phase._defeated_ids.size(),"collected":phase._collected_ids.size(),"captured":capture_frames,"position":[player.position.x,player.position.y,player.position.z]}
 	FileAccess.open(output+".json",FileAccess.WRITE).store_string(JSON.stringify(result,"  "))
 	print("NIGHT_ROUTE_RESULT ",JSON.stringify(result))
 	quit(1 if failures else 0)

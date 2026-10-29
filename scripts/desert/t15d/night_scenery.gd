@@ -23,6 +23,9 @@ var travel := 0.0
 var parallax_offset := 0.0
 var district := 0
 var place_index := -1
+## Texturas dos quatro lugares da fase, carregadas na entrada: carregar no meio da corrida
+## travava ~50ms a cada troca de lugar.
+var _textures := {}
 
 func configure(order: int, length: float = 1200.0, start: float = -8.0) -> void:
 	_order = clampi(order, 1, 9)
@@ -42,6 +45,9 @@ func _ready() -> void:
 		layer.render_priority = index
 		add_child(layer)
 		_layers.append(layer)
+	for stage in range(STAGES):
+		var index := _place_for((stage + 0.5) / STAGES)
+		if not _textures.has(index): _textures[index] = load(PLACES[index].texture)
 	_set_place(_place_for(0.0), true)
 
 ## Lugar de cada trecho: sequência diferente por fase, para as nove não repetirem igual.
@@ -54,19 +60,23 @@ func _set_place(index: int, instant := false) -> void:
 	place_index = index
 	var place: Dictionary = PLACES[index]
 	if instant:
-		_layers[_front].texture = load(place.texture)
+		_layers[_front].texture = _texture(index)
 		_layers[_front].modulate = place.tint
 		_layers[1 - _front].modulate.a = 0.0
 		_fade = 1.0
 	else:
 		# Novo lugar entra por cima e aparece aos poucos; depois vira a camada de trás.
 		_front = 1 - _front
-		_layers[_front].texture = load(place.texture)
+		_layers[_front].texture = _texture(index)
 		_layers[_front].modulate = Color(place.tint, 0.0)
 		_layers[_front].render_priority = 1
 		_layers[1 - _front].render_priority = 0
 		_fade = 0.0
 	location_changed.emit(place)
+
+func _texture(index: int) -> Texture2D:
+	if not _textures.has(index): _textures[index] = load(PLACES[index].texture)
+	return _textures[index]
 
 func current_place() -> Dictionary:
 	return PLACES[maxi(place_index, 0)]

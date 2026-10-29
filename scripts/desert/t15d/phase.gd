@@ -307,8 +307,8 @@ func _build_chunk_details(chunk: Node3D, index: int) -> void:
 		var middle := (float(hole.start)+float(hole.end))*0.5
 		if hole.get("ferry",false) and _in_chunk(middle,index):
 			var ferry := preload("res://scripts/desert/t15d/parkour.gd").Ferry.new()
-			ferry.from_x = float(hole.start)+1.4
-			ferry.to_x = float(hole.end)-1.4
+			ferry.from_x = float(hole.start)+1.9
+			ferry.to_x = float(hole.end)-1.9
 			chunk.add_child(ferry)
 	for geyser: Dictionary in _phase.get("geysers",[]):
 		if _in_chunk(float(geyser.pos[0]),index):

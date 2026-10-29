@@ -72,7 +72,7 @@ func run() -> void:
 				for island: Array in islands:
 					if island[0] > grounds[index][1] and island[1] < grounds[index+1][0]:
 						parts = [float(island[0])-float(grounds[index][1]), float(grounds[index+1][0])-float(island[1])]
-				# Vão com balsa: a balsa (2,6m) para a 0,1m de cada borda; o vão ao subir é curto.
+				# Vão com balsa: a balsa (3,6m) para a 0,1m de cada borda; o vão ao subir é curto.
 				for hole: Dictionary in stage.holes:
 					if hole.get("ferry",false) and absf(float(hole.start)-float(grounds[index][1])) < 0.05:
 						parts = [0.1, 0.1]

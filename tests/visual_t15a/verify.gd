@@ -20,6 +20,6 @@ func _run() -> void:
 	assert(skins.get('_stage').interactive)
 	assert(skins.get('_stage').character.character_id == &'el_fuego')
 	assert(PlayerServices.current.inventory.equipped_id() == 'cowboy')
-	assert(ThumbnailCache.VERSION == 5 and ThumbnailCache.THUMB_SIZE == Vector2i(1024,1280))
+	assert(ThumbnailCache.VERSION == 6 and ThumbnailCache.THUMB_SIZE == Vector2i(2048,2560))
 	print('PASS tabs removed, locked Fuego, search, favorites, equipped skin, interactive real 3D and native cache')
 	quit()

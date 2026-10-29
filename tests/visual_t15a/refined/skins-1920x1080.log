@@ -1,0 +1,10 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.2 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 20.1.2, 256 bits)
+
+Margin rect=[P: (0.0, 0.0), S: (1672.0, 941.0)] min=(961.0, 276.0)
+Margin/Column rect=[P: (26.0, 26.0), S: (1620.0, 889.0)] min=(909.0, 224.0)
+Margin/Column/SkinsShowcase rect=[P: (26.0, 89.0), S: (1620.0, 826.0)] min=(909.0, 161.0)
+STAGE [P: (1073.0, 190.0), S: (565.0, 665.0)] min=(0.0, 0.0)
+SKINS_CAPTURE inicio (1920, 1080) file=tests/visual_t15a/refined/skins-1920x1080.png

@@ -1,5 +1,5 @@
 class_name LobbyStage
-extends SubViewportContainer
+extends Control
 
 ## Palco 3D transparente do lobby e do visualizador de Skins. Mesmo sistema de
 ## renderização e iluminação nos dois lugares. Quando `interactive` é verdadeiro,
@@ -30,6 +30,10 @@ const ZOOM_WHEEL_STEP := 0.9
 @onready var _key_light: DirectionalLight3D = $Viewport/World/KeyLight
 @onready var _rim_light: OmniLight3D = $Viewport/World/RimLight
 
+var _surface: TextureRect
+var _resolution_divisor := 1
+var stretch_shrink: int:
+	get: return _resolution_divisor
 var _base_distance: float = 3.0
 var _target_y: float = 0.9
 var _yaw: float = 0.0
@@ -38,6 +42,17 @@ var _zoom: float = 1.0
 
 
 func _ready() -> void:
+	_surface = TextureRect.new()
+	_surface.name = "RenderedCharacter"
+	_surface.texture = _viewport.get_texture()
+	_surface.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_surface.stretch_mode = TextureRect.STRETCH_SCALE
+	_surface.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	_surface.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_surface)
+	_surface.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	resized.connect(_resize_render)
+	get_viewport().size_changed.connect(_resize_render)
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	add_to_group("player_preview_stages")
 	var environment: Environment = $Viewport/World/Environment.environment.duplicate()
@@ -61,7 +76,8 @@ func _ready() -> void:
 func apply_profile(name: String) -> void:
 	var settings := GraphicsProfile.settings(name)
 	_viewport.msaa_3d = settings["msaa_3d"]
-	stretch_shrink = settings["stretch_shrink"]
+	_resolution_divisor = settings["stretch_shrink"]
+	_resize_render()
 	_key_light.shadow_enabled = settings["shadows"]
 
 
@@ -134,3 +150,15 @@ func _update_camera() -> void:
 	) * distance
 	_camera.position = target + offset
 	_camera.look_at(target, Vector3.UP)
+
+
+func _resize_render() -> void:
+	if not is_instance_valid(_viewport): return
+	if is_instance_valid(_surface):
+		_surface.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	# Render above the physical output resolution, then resolve down to the UI.
+	# This also covers UI scaling and high-DPI windows; no low-res container upscale.
+	var output_scale := Vector2(get_window().size) / get_viewport().get_visible_rect().size
+	var pixels := get_global_transform_with_canvas().get_scale().abs() * size * output_scale
+	var supersample := 2.0 / float(_resolution_divisor)
+	_viewport.size = Vector2i(clampi(ceili(pixels.x * supersample), 64, 2560), clampi(ceili(pixels.y * supersample), 64, 2560))

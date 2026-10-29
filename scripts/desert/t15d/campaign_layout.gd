@@ -68,13 +68,14 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 		var width := 3.0+float((index+order)%3)*0.25
 		# Vão largo com pedra no meio que desmorona: dois saltos rápidos em vez de um.
 		var stepping := index > 0 and (index*3+order)%5 == 1
-		if stepping: width = 6.6
+		# Pulo normal saindo da borda pousa na pedra (2,4m larga, 2,5m de cada borda).
+		if stepping: width = 7.4
 		var pit_left := center-width*0.5
 		var pit_right := center+width*0.5
 		spans.append({"left":left,"right":pit_left})
 		pits.append({"id":"%s.pit.%02d" % [prefix,index],"start":pit_left,"end":pit_right,"width":width,"stepping":stepping})
 		if stepping:
-			platforms.append({"id":"%s.crumble.%02d" % [prefix,index],"kind":"crumble","pos":[center,-0.3,0.0],"size":[1.6,0.6,3.0],"span_start":center-0.8,"span_end":center+0.8,"chunk":floori(center/CHUNK_LENGTH)})
+			platforms.append({"id":"%s.crumble.%02d" % [prefix,index],"kind":"crumble","pos":[center,-0.3,0.0],"size":[2.4,0.6,3.0],"span_start":center-1.2,"span_end":center+1.2,"chunk":floori(center/CHUNK_LENGTH)})
 		signs.append({"id":"%s.pit.%02d.left" % [prefix,index],"kind":"pit_warning","pos":[pit_left-5.0,0.0,-1.5],"direction":1})
 		signs.append({"id":"%s.pit.%02d.right" % [prefix,index],"kind":"pit_warning","pos":[pit_right+5.0,0.0,-1.5],"direction":-1})
 		left = pit_right

@@ -99,7 +99,7 @@ class CrumbleStone extends StaticBody3D:
 	signal crumbled
 	const DELAY := 0.55
 	const RETURN := 2.5
-	var stone_size := Vector3(1.6, 0.6, 3.0)
+	var stone_size := Vector3(2.4, 0.6, 3.0)
 	var _shape: CollisionShape3D
 	var _mesh: MeshInstance3D
 	var _timer := -1.0

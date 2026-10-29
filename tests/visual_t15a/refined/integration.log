@@ -1,0 +1,27 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS Godot 4.7.2 runtime
+PASS Portuguese fallback preserved
+PASS landscape orientation preserved
+PASS central autoload available
+PASS no unlicensed or fictional tracks bundled
+PASS autoload recognizes approved lobby
+PASS music uses lobby preference instance
+PASS Claude reserved audio node preserved and silent
+PASS both channels use configured Music bus
+PASS settings route keeps menu music context
+PASS existing settings controls intact
+PASS existing music slider persists volume
+PASS existing slider controls transport bus
+PASS transport mute integrates existing settings
+PASS transport unmute restores prior volume
+PASS F7 pause routed without new UI
+PASS F7 resume routed without new UI
+PASS empty catalog skip controls stay silent
+PASS menu exit immediately stops central transport
+PASS non-menu context cannot play menu audio
+PASS return binds new approved lobby instance
+PASS manual pause preserved across scene changes
+PASS return rebinds live preferences
+PASS return resumes safely with empty catalog
+T12_INTEGRATION_FAILURES 0

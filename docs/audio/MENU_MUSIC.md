@@ -1,8 +1,6 @@
-# T11 — Música exclusiva do menu
+# Música exclusiva do menu — integração T15B
 
-Autoload `MenuMusic` (`MenuMusicPlayer`), Godot 4.7.2. A entrega inclui código funcional,
-mas não inclui faixas: o catálogo inicial vazio fica silencioso.
-Nenhuma tela, cena, serviço online, economia ou lógica de gameplay foi alterada.
+Autoload `MenuMusic` (`MenuMusicPlayer`), Godot 4.7.2. A integração T15B reaproveita a T14A e conecta a tela Músicas às Configurações T14B da main `e3de674`. O catálogo contém 14 metadados pendentes; nenhum MP3 é versionado. Serviços online, Personagens, economia e gameplay foram preservados.
 
 ## Catálogo e licenciamento
 
@@ -13,7 +11,8 @@ Campos obrigatórios por entrada (descrição de formato, não uma faixa fictíc
 | Campo | Valor |
 | --- | --- |
 | id | Identificador único e estável, string não vazia |
-| title / artist | Título e artista reais, strings não vazias |
+| title | Título real, string não vazia |
+| artist | String; vazia enquanto os metadados estão pendentes, sem artista inventado |
 | audio | Caminho `res://assets/music/` para AudioStream importado: OGG, MP3 ou WAV |
 | cover | Caminho `res://assets/music/` para Texture2D importada |
 | enabled | Booleano `true` para disponibilizar |
@@ -79,3 +78,28 @@ As fixtures são removidas automaticamente. Não depende de contas ou Supabase.
 Também foram executados import completo e inicialização headless do menu real no
 Godot `4.7.2.stable.official.ed1daf0bf`. A validação automatizada não substitui escuta
 manual e conferência do material/licença quando as parcerias entregarem os arquivos.
+
+
+## Seleção e acesso (T14A integrada na T15B)
+
+No menu principal: **Configurações → Áudio → Gerenciar músicas**. A navegação registra a rota `music` e volta ao painel Áudio ao pressionar Voltar. O arquivo atual de Configurações recebeu apenas o botão de acesso; os quatro grupos, escalonamento, estilos, mudo e preferências da T14B foram mantidos.
+
+Categorias: Alternative (3), Funk (1), K-pop (3), Pop (3), Trap (4). O catálogo da T14A foi preservado byte a byte: 14 faixas, todas `enabled=false`, `license.status=pending`, sem artista/capa inventados. Sem autorização de distribuição registrada, a playlist normal fica silenciosa.
+
+“Tocar no menu”, “Ocultar” e “Reexibir” trabalham num rascunho. “Salvar” persiste `user://menu_music_selection.cfg`; “Descartar” e reabrir a tela restauram o último estado salvo. A API de transporte, atalhos e barramentos de volume existentes continuam em uso. Nenhuma música toca fora da cena do menu principal.
+
+## Teste local autorizado, separado de distribuição
+
+Para usar arquivos locais que você tem autorização para testar, importe-os nos caminhos de `audio` registrados no catálogo e inicie o executável **do editor** com:
+
+```sh
+Godot_v4.7.2-stable_linux.x86_64 --path /workspace/quemsoueuv3 -- --local-music-test
+```
+
+Abra Gerenciar músicas e marque **“Tenho autorização para teste local nesta sessão”**. A opção aparece apenas nesse modo explícito do editor; builds exportadas não podem habilitá-la. Desmarcar interrompe a reprodução de teste. Nada é salvo como autorização: nem `license.*` nem `enabled` são alterados. As faixas continuam identificadas como pendentes para distribuição. A capa não é exigida para teste local, mas permanece exigida no caminho normal de licenciamento. A escolha de faixas/ocultação continua valendo nesse modo.
+
+MP3s locais são ignorados pelo Git. Isso não fornece licença nem permissão para incluí-los em um pacote exportado. Não há MP3 nesta entrega. Os testes de reprodução usam somente PCM inteiramente zerado gerado temporariamente, sem faixas reais nem autorizações comerciais fictícias.
+
+## Evidências T15B
+
+Ver `tests/music_t15b/README.md`. O teste de captura usa o botão real de Configurações no menu e um clique de mouse em Gerenciar músicas; não instancia a tela Músicas diretamente. As verificações cobrem seleção, persistência, descarte, categorias, autorização local, transporte, volume, saída/retorno ao menu e regressão das Configurações T14B.

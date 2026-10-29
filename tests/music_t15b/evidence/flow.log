@@ -1,0 +1,32 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS 14 faixas pendentes não reproduzem
+PASS sem licença simulada: alternative-disappear-for-a-little-while
+PASS sem licença simulada: alternative-people-on-the-moon
+PASS sem licença simulada: alternative-somewhere-in-september
+PASS sem licença simulada: funk-vai-no-automatico
+PASS sem licença simulada: k-pop-bad-desire
+PASS sem licença simulada: k-pop-neon-love
+PASS sem licença simulada: k-pop-venom-kiss
+PASS sem licença simulada: pop-almost-in-love
+PASS sem licença simulada: pop-bad-at-being-good
+PASS sem licença simulada: pop-too-good-to-miss
+PASS sem licença simulada: trap-after-2-am
+PASS sem licença simulada: trap-dont-touch-my-furniture
+PASS sem licença simulada: trap-necromode
+PASS sem licença simulada: trap-smile-for-the-camera
+PASS Configurações T14B preservadas
+PASS Áudio contém Gerenciar músicas
+PASS Configurações → Áudio → Gerenciar músicas abre a tela
+PASS cinco categorias preservadas
+PASS rascunho não altera playlist
+PASS descarte restaura salvo
+PASS salvar aplica ocultação e escolha
+PASS seleção persistida em disco
+PASS descartar não desfaz estado salvo
+PASS reexibir remove ocultação
+PASS Voltar retorna ao Áudio recente
+PASS sair descarta rascunho
+PASS autorização local exige modo explícito do editor
+PASS catálogo real restaurado e pendente
+T15B_RESULT checks=29 failures=0

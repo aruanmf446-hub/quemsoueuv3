@@ -1,0 +1,81 @@
+name: Publish Web preview
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/gameplay-t15d]
+    paths:
+      - '.github/workflows/deploy-web.yml'
+      - 'assets/**'
+      - 'data/**'
+      - 'export_presets.cfg'
+      - 'project.godot'
+      - 'scenes/**'
+      - 'scripts/**'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install official Godot 4.7.2 and Web templates
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot" "$RUNNER_TEMP/xdg-data/godot/export_templates/4.7.2.stable"
+          curl --fail --location --retry 3 \
+            https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip \
+            -o "$RUNNER_TEMP/godot/engine.zip"
+          curl --fail --location --retry 3 \
+            https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz \
+            -o "$RUNNER_TEMP/godot/templates.tpz"
+          unzip -q "$RUNNER_TEMP/godot/engine.zip" -d "$RUNNER_TEMP/godot"
+          chmod +x "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+          for name in version.txt web_nothreads_debug.zip web_nothreads_release.zip; do
+            unzip -p "$RUNNER_TEMP/godot/templates.tpz" "templates/$name" \
+              > "$RUNNER_TEMP/xdg-data/godot/export_templates/4.7.2.stable/$name"
+          done
+          "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --version | grep -E '^4[.]7[.]2[.]stable[.]official'
+      - name: Import and export Web
+        shell: bash
+        env:
+          XDG_DATA_HOME: ${{ runner.temp }}/xdg-data
+          XDG_CONFIG_HOME: ${{ runner.temp }}/xdg-config
+          XDG_CACHE_HOME: ${{ runner.temp }}/xdg-cache
+        run: |
+          set -euo pipefail
+          engine="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+          mkdir -p "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" build/web
+          "$engine" --headless --editor --import --quit > "$RUNNER_TEMP/import.log" 2>&1
+          "$engine" --headless --export-release Web build/web/index.html > "$RUNNER_TEMP/export.log" 2>&1
+          if grep -E 'SCRIPT ERROR:|ERROR:|Parse Error:' "$RUNNER_TEMP/import.log" "$RUNNER_TEMP/export.log"; then
+            exit 1
+          fi
+          test -s build/web/index.html
+          test -s build/web/index.pck
+          test -s build/web/index.wasm
+          du -sh build/web
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: build/web
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

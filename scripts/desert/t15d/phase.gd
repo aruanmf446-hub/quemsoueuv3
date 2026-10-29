@@ -108,7 +108,16 @@ func _build_environment() -> void:
 	_scenery = preload("res://scripts/desert/t15d/night_scenery.gd").new()
 	_scenery.configure(_order,float(_phase.length),float(_phase.player_spawn[0]))
 	add_child(_scenery)
-	get_viewport().msaa_3d = Viewport.MSAA_2X
+	# Luz de contorno fria vinda de trás: recorta personagens e Cactus do fundo iluminado.
+	var rim := DirectionalLight3D.new()
+	rim.name = "RimLight"
+	rim.rotation_degrees = Vector3(-18,165,0)
+	rim.light_color = Color("#8fb4ff")
+	rim.light_energy = 0.9
+	rim.light_specular = 0.6
+	add_child(rim)
+	# Antisserrilhado: 4× no computador, 2× em celulares e no navegador.
+	get_viewport().msaa_3d = Viewport.MSAA_2X if UIScale.is_compact() or OS.has_feature("web") else Viewport.MSAA_4X
 func _build_player() -> void:
 	_player = Player.new()
 	_player.name = "ElFuego"
@@ -122,11 +131,13 @@ func _build_player() -> void:
 	_player.strike_landed.connect(_impact)
 	_player.inventory_changed.connect(_sync_resources)
 	_player.swung.connect(func() -> void: _sfx.play("swing"))
+	_player.jumped_up.connect(func() -> void: _sfx.play("jump",1.0 if _player.jumps_used < 2 else 1.25,-9.0))
+	_player.landed.connect(func() -> void: _sfx.play("land",1.0,-8.0))
 	_player.strike_window.connect(_slash)
 	_player.hurt.connect(func() -> void: _sfx.play("hurt"))
 	_player.strike_landed.connect(func(_point: Vector3) -> void: _sfx.play("hit"))
 	_player.blocked.connect(func() -> void: _sfx.play("block"))
-	_player.action_empty.connect(func(_kind: String) -> void: _sfx.play("empty"))
+	_player.action_empty.connect(func(_kind: String) -> void: _sfx.play("empty",1.0,-5.0))
 	_player.action_empty.connect(func(kind: String) -> void:
 		if is_instance_valid(_hud): _hud.notify("Sem ataque • procure a lâmina dourada" if kind == "attack" else "Sem defesa • procure o escudo azul",true))
 	_player.blocked.connect(func() -> void: _impact(_player.position+Vector3(_player.facing*0.45,0.9,0),Color("#9cdeff")))
@@ -304,7 +315,7 @@ func _spawn_enemy(chunk: Node3D, spawn: Dictionary) -> void:
 	enemy.add_child(model)
 	chunk.add_child(enemy)
 	enemy.setup(_enemy_catalog.cactus,spawn)
-	enemy.winding_up.connect(func() -> void: _sfx.play("windup",0.9))
+	enemy.winding_up.connect(func() -> void: _sfx.play("windup",0.9,-4.0))
 	enemy.defeated.connect(func() -> void:
 		_defeated_ids[str(spawn.id)] = true
 		_defeated = _defeated_ids.size())
@@ -610,7 +621,7 @@ func _check_checkpoints() -> void:
 	_checkpoint_index = next
 	_checkpoint = _vec3(points[next].pos)
 	_snapshot = {"defeated":_defeated_ids.duplicate(),"collected":_collected_ids.duplicate(),"attack":_player.attack_charges,"defense":_player.defense_charges}
-	_sfx.play("pickup",0.75)
+	_sfx.play("checkpoint")
 	_hud.notify("Checkpoint %d de %d salvo" % [next+1,points.size()])
 	get_tree().call_group("campaign_checkpoints","refresh_lit",_checkpoint_index)
 func _respawn_at_checkpoint() -> void:

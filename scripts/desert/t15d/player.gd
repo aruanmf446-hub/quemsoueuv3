@@ -3,6 +3,8 @@ signal strike_landed(point: Vector3)
 signal inventory_changed
 signal action_empty(kind: String)
 signal swung
+signal jumped_up
+signal landed
 signal strike_window
 signal hurt
 const ActorSlot = preload("res://scripts/desert/t15d/actor_slot.gd")
@@ -82,6 +84,7 @@ func _physics_process(delta: float) -> void:
 	var jumped := false
 	if _jump_buffer > 0.0 and not is_defending and _attack_timer <= 0.15:
 		jumped = _try_jump()
+		if jumped: jumped_up.emit()
 		if jumped:
 			_jump_buffer = 0.0
 			_set_crouched(false)
@@ -189,6 +192,7 @@ func _update_model_facing() -> void:
 		_blink = 0.0
 		_model.visible = true
 func _land() -> void:
+	landed.emit()
 	if _hurt_timer > 0.0: return
 	_actor.play_animation("aterrissagem", false, 0.05)
 	_landing_timer = LANDING_LOCK

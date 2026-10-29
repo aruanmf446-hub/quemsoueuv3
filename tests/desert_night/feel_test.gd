@@ -40,7 +40,7 @@ func run() -> void:
 	await frames(40)
 	player = phase._player
 	for actor in get_nodes_in_group("enemies"): actor.set_physics_process(false)
-	check(phase.get_node_or_null("CombatSfx") != null and phase._sfx._streams.size() == 8,"oito sons de combate sintetizados")
+	check(phase.get_node_or_null("CombatSfx") != null and phase._sfx._streams.size() == 11,"onze sons sintetizados (combate, coleta, checkpoint, pulo e aterrissagem)")
 	# Corrida: cadência proporcional à velocidade no arranque, plena em velocidade máxima.
 	key(KEY_D,true)
 	await frames(3)

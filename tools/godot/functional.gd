@@ -55,9 +55,18 @@ func _run() -> void:
 	enemy.position = player.position + Vector3(1, 0, 0)
 	enemy.set_physics_process(false)
 	player.facing = 1
+	var enemy_health := enemy.health
 	Input.action_press("attack")
 	await frames(2)
 	Input.action_release("attack")
+	check(enemy.health == enemy_health, "attack_has_windup")
+	await frames(16)
+	check(enemy.health == enemy_health - SidePlayer.ATTACK_DAMAGE, "attack_first_contact")
+	await frames(32)
+	Input.action_press("attack")
+	await frames(2)
+	Input.action_release("attack")
+	await frames(16)
 	check(enemy.get("_state") == CactusEnemy.State.DEAD, "attack_defeats_cactus")
 	await create_timer(1.8).timeout
 	phase.queue_free()

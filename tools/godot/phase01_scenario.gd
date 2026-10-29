@@ -201,15 +201,21 @@ func _attack(target: Node3D, timeout: float) -> void:
 	var elapsed := 0.0
 	while elapsed < timeout and target != null and target.is_in_group("enemies") and not _player.is_dead:
 		var dx := target.global_position.x - _player.global_position.x
-		if absf(dx) > 0.9:
+		if absf(dx) > COMBAT_RANGE:
 			Input.action_press("move_right" if dx > 0.0 else "move_left")
 			await _auto_jump()
 			await _frames(1)
 		else:
+			# T15D impede atravessar o corpo do Cactus. Vire pelo input real e
+			# ataque no alcance de combate, em vez de tentar entrar no alvo.
+			Input.action_release("move_right")
+			Input.action_release("move_left")
+			Input.action_press("move_right" if dx > 0 else "move_left")
+			await _frames(2)
 			Input.action_release("move_right")
 			Input.action_release("move_left")
 			await _press("attack")
-			await _seconds(0.5)
+			await _seconds(0.65)
 		elapsed += 1.0 / PHYSICS_FPS
 	Input.action_release("move_right")
 	Input.action_release("move_left")

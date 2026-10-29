@@ -1,0 +1,37 @@
+[
+  {
+    "test": "import",
+    "passed": true,
+    "exit_code": 0
+  },
+  {
+    "test": "extra",
+    "passed": true,
+    "exit_code": 0
+  },
+  {
+    "test": "scenario",
+    "passed": true,
+    "exit_code": 0
+  },
+  {
+    "test": "desktop",
+    "passed": true,
+    "exit_code": 0
+  },
+  {
+    "test": "mobile",
+    "passed": true,
+    "exit_code": 0
+  },
+  {
+    "test": "smoke",
+    "passed": true,
+    "exit_code": 0
+  },
+  {
+    "test": "mobile-scenario",
+    "passed": true,
+    "exit_code": 0
+  }
+]

@@ -3,7 +3,7 @@ name: Publish Web preview
 on:
   workflow_dispatch:
   push:
-    branches: [codex/gameplay-t15d]
+    branches: [main, codex/gameplay-t15d]
     paths:
       - '.github/workflows/deploy-web.yml'
       - 'assets/**'

@@ -9,7 +9,7 @@ func _process(_delta: float) -> void: queue_redraw()
 func _draw() -> void:
 	if not is_instance_valid(phase) or phase.completed or phase._respawning: return
 	var camera: Camera3D = phase._camera
-	var unit := get_viewport_rect().size.y/maxf(get_window().size.y,1)
+	var unit := UIScale.unit_for(get_viewport())
 	for enemy in get_tree().get_nodes_in_group("enemies"):
 		if not phase.is_ancestor_of(enemy) or absf(enemy.position.x-phase._player.position.x) > 5.0: continue
 		var head: Vector3 = enemy.global_position+Vector3.UP*1.65

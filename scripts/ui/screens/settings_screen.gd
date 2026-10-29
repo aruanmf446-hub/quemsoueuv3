@@ -68,10 +68,8 @@ func render() -> void:
 
 func _adapt() -> void:
 	if not is_instance_valid(_rail): return
-	var pixels := DisplayServer.window_get_size()
-	var compact := OS.has_feature("android") or pixels.y < 600
-	var logical_height := minf(pixels.y, 480.0) if OS.has_feature("android") else float(pixels.y)
-	var factor := maxf(1.0, size.y / maxf(1.0, logical_height)) if compact else 1.0
+	var compact := UIScale.is_compact()
+	var factor := maxf(1.0, UIScale.unit_for(get_viewport())) if compact else 1.0
 	var margin: MarginContainer = $Margin
 	margin.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	margin.scale = Vector2.ONE * factor

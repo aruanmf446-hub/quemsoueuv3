@@ -92,7 +92,7 @@ func _reveal_next() -> void:
 		($Margin/Column/Scroll as ScrollContainer).ensure_control_visible(_next_card)
 
 func _screen_unit() -> float:
-	return get_viewport().get_visible_rect().size.y/maxf(get_window().size.y,1) if get_window().size.y < 600 else 1.0
+	return UIScale.unit_for(get_viewport()) if UIScale.is_compact() else 1.0
 
 func _label(text: String, pixels: int, color := PlayerUI.TEXT) -> Label:
 	var label := PlayerUI.label(text,roundi(pixels*_unit),color)

@@ -17,6 +17,7 @@ var _time := 0.0
 var _compact := false
 var _font: FontFile
 var _shown_id := ""
+var _suppressed := false
 
 func _ready() -> void:
 	name = "NowPlaying"
@@ -76,9 +77,13 @@ func _pressed(index: int) -> void:
 			else: _music.pause()
 		2: _music.next_track()
 
+func set_suppressed(value: bool) -> void:
+	_suppressed = value
+	_refresh()
+
 func _refresh() -> void:
 	var available: bool = is_instance_valid(_music) and not _music.available_tracks().is_empty()
-	visible = available
+	visible = available and not _suppressed
 	if not available: return
 	var track: Dictionary = _music.current_track()
 	_title.text = str(track.get("title", "Carregando música..."))
@@ -158,7 +163,7 @@ func _draw_icon(button: Button, index: int) -> void:
 func _layout() -> void:
 	var menu := get_parent() as Control
 	if menu == null: return
-	_compact = DisplayServer.window_get_size().y < 500
+	_compact = UIScale.is_compact(500.0)
 	var w := 740.0 if _compact else 500.0
 	var h := 150.0 if _compact else 100.0
 	set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)

@@ -439,13 +439,13 @@ func _build_camera() -> void:
 	_follow_camera(1.0)
 func _follow_camera(delta: float) -> void:
 	# Telas baixas (844×390) aproximam mais: o personagem não pode virar um ícone.
-	_camera.size = 6.0 if get_window().size.y < 600 else 7.0
+	_camera.size = 6.0 if UIScale.is_compact() else 7.0
 	# Antecipação maior na direção da corrida: o próximo vão entra no quadro mais cedo.
 	_lead = move_toward(_lead,clampf(_player.velocity.x/6.0,-1.0,1.0)*2.4,delta*4.0)
 	var lead := _lead
 	# Em telas baixas o chão sobe no quadro (~60%): os botões de toque ficam sobre a
 	# parede do terreno, não sobre a borda dos buracos à frente.
-	var floor_y := 0.75 if get_window().size.y < 600 else 1.65
+	var floor_y := 0.75 if UIScale.is_compact() else 1.65
 	var target := Vector3(clampf(_player.position.x+lead,float(_phase.player_spawn[0]),float(_phase.goal.pos[0])),maxf(floor_y,_player.position.y+1.4-_camera.size*0.5+0.55),0)
 	var destination := target+Vector3(0,1,14)
 	_camera.position = _camera.position.lerp(destination,1.0-exp(-8*delta))

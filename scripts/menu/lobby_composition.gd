@@ -164,7 +164,7 @@ func _rect(control: Control, position: Vector2, dimensions: Vector2) -> void:
 func _layout() -> void:
 	var w := menu.size.x
 	var h := menu.size.y
-	var compact := DisplayServer.window_get_size().y < 500
+	var compact := UIScale.is_compact(500.0)
 	# Em 844x390 a viewport é desenhada com escala ~0,41; o texto precisa de mais unidades de projeto.
 	var type_scale := 1.8 if compact else 1.0
 	var left_width := 530.0 if compact else 400.0

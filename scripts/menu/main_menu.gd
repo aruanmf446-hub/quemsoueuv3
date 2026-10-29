@@ -126,6 +126,9 @@ func _refresh_friends() -> void:
 
 func _route_changed(route: String) -> void:
 	$LobbyArea/Stage/Viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS if route.is_empty() else SubViewport.UPDATE_DISABLED
+	# O mini player é do lobby: nas telas internas ele cobria títulos e conteúdo.
+	var now_playing := get_node_or_null("NowPlaying")
+	if now_playing != null: now_playing.set_suppressed(not route.is_empty())
 
 
 func _notification(what: int) -> void:

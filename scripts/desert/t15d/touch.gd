@@ -11,12 +11,12 @@ func _ready() -> void:
 	_font = preload("res://assets/desert/phase01/interface.ttf").duplicate() as FontFile
 	_font.multichannel_signed_distance_field = true
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	visible = DisplayServer.is_touchscreen_available() or OS.has_feature("android") or get_window().size.y < 600 or "--touch-controls" in OS.get_cmdline_user_args()
+	visible = DisplayServer.is_touchscreen_available() or OS.has_feature("android") or UIScale.is_compact() or "--touch-controls" in OS.get_cmdline_user_args()
 func _draw() -> void:
 	if not visible: return
 	_areas.clear()
 	var screen := get_viewport_rect().size
-	var unit := screen.y / maxf(get_window().size.y,1)
+	var unit := UIScale.unit_for(get_viewport())
 	var radius := 26.0*unit
 	var space := 62.0*unit
 	var bottom := screen.y - 42*unit
@@ -38,7 +38,7 @@ func _process(_delta: float) -> void:
 	var pixels := get_window().size
 	if pixels != _last_pixels:
 		_last_pixels = pixels
-		visible = DisplayServer.is_touchscreen_available() or OS.has_feature("android") or OS.has_feature("web") or pixels.y < 600 or "--touch-controls" in OS.get_cmdline_user_args()
+		visible = DisplayServer.is_touchscreen_available() or OS.has_feature("android") or OS.has_feature("web") or UIScale.is_compact() or "--touch-controls" in OS.get_cmdline_user_args()
 		if not visible:
 			for index in _held.keys(): _release(index)
 	queue_redraw()

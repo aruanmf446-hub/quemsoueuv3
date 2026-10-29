@@ -157,7 +157,7 @@ func _split_layout() -> void:
 
 
 func _responsive_layout() -> void:
-	var compact := DisplayServer.window_get_size().y < 600
+	var compact := UIScale.is_compact()
 	if compact != _was_compact and _stage != null and is_instance_valid(_stage):
 		_was_compact = compact
 		_select(_selected)
@@ -224,7 +224,7 @@ func _rebuild_gallery() -> void:
 	_images.clear()
 	_cards.clear()
 	_grid = GridContainer.new()
-	_grid.columns = 2 if DisplayServer.window_get_size().y < 600 else (2 if size.x >= 1400 else 2)
+	_grid.columns = 2 if UIScale.is_compact() else (2 if size.x >= 1400 else 2)
 	_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_grid.add_theme_constant_override("h_separation", 10)
 	_grid.add_theme_constant_override("v_separation", 10)
@@ -249,7 +249,7 @@ func _rebuild_gallery() -> void:
 	if count == 0:
 		body.add_child(PlayerUI.label("Nenhum personagem encontrado.", 19))
 	if _fav_button != null:
-		_fav_button.text = "FAV" if DisplayServer.window_get_size().y < 600 else "Favoritos"
+		_fav_button.text = "FAV" if UIScale.is_compact() else "Favoritos"
 		_fav_button.add_theme_color_override("font_color", ACCENT if _favorite_only else PlayerUI.TEXT)
 	if _collection_count != null:
 		var obtained := 0
@@ -321,7 +321,7 @@ func _gallery_card(entry: Dictionary) -> PanelContainer:
 	card.gui_input.connect(func(event: InputEvent) -> void:
 		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 			_select(character_id))
-	_style_card_height(card, DisplayServer.window_get_size().y < 600)
+	_style_card_height(card, UIScale.is_compact())
 	return card
 
 
@@ -383,7 +383,7 @@ func _select(character_id: String) -> void:
 	if entry.is_empty():
 		_preview.add_child(PlayerUI.label("Selecione uma skin."))
 		return
-	var compact := DisplayServer.window_get_size().y < 600
+	var compact := UIScale.is_compact()
 	var heading_row := HBoxContainer.new()
 	heading_row.add_theme_constant_override("separation", 12)
 	_preview.add_child(heading_row)

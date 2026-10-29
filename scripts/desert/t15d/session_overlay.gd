@@ -130,7 +130,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _layout() -> void:
 	if not is_instance_valid(_panel): return
 	var viewport_size := get_viewport().get_visible_rect().size
-	var unit := viewport_size.y/maxf(get_window().size.y,1) if get_window().size.y < 600 else 1.0
+	var unit := UIScale.unit_for(get_viewport()) if UIScale.is_compact() else 1.0
 	_panel.scale = Vector2.ONE*unit
 	_panel.size = _panel.get_combined_minimum_size()
 	_panel.position = (viewport_size-_panel.size*unit)*0.5

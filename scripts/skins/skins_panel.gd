@@ -63,6 +63,20 @@ func _split_layout() -> void:
 	_scroll = $Margin/Column/Scroll
 	_header = $Margin/Column/Header
 	_back_button = $Margin/Column/Header/Back
+	var tabs := HBoxContainer.new()
+	tabs.name = "CatalogTabs"
+	tabs.add_theme_constant_override("separation", 8)
+	_header.add_child(tabs)
+	for name in ["◆ Personagens", "♧ Skins", "⚔ Armas", "◉ Emotes", "✦ Personalização"]:
+		var tab := _button(name, func() -> void: pass)
+		tab.custom_minimum_size = Vector2(0, 42)
+		tab.add_theme_font_size_override("font_size", 15)
+		if name != "◆ Personagens":
+			tab.disabled = true
+			tab.tooltip_text = "Em desenvolvimento"
+		else:
+			tab.disabled = true
+		tabs.add_child(tab)
 	_split = HBoxContainer.new()
 	_split.name = "SkinsShowcase"
 	_split.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -141,6 +155,8 @@ func _responsive_layout() -> void:
 	for edge in ["left", "right", "top", "bottom"]:
 		margin.add_theme_constant_override("margin_" + edge, inset)
 	_header.add_theme_constant_override("separation", 12 if compact else 22)
+	var tabs: HBoxContainer = _header.get_node("CatalogTabs")
+	tabs.visible = not compact
 	_back_button.custom_minimum_size = Vector2(86 if compact else 130, 38 if compact else 50)
 	_back_button.add_theme_font_size_override("font_size", 16 if compact else 21)
 	heading.add_theme_font_size_override("font_size", 23 if compact else 37)

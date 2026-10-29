@@ -46,6 +46,10 @@ func _capture() -> void:
 		for frame in range(120):
 			await process_frame
 	await RenderingServer.frame_post_draw
+	for path: String in ["Margin", "Margin/Column", "Margin/Column/SkinsShowcase"]:
+		var control: Control = skins.get_node(path)
+		print(path, " rect=", control.get_global_rect(), " min=", control.get_combined_minimum_size())
+	print("STAGE ", skins.get("_stage").get_global_rect(), " min=", skins.get("_stage").get_combined_minimum_size())
 	var picture := root.get_texture().get_image()
 	var error := picture.save_png(output)
 	print("SKINS_CAPTURE ", mode, " ", DisplayServer.window_get_size(), " file=", output)

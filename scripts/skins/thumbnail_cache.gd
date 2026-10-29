@@ -7,8 +7,8 @@ extends RefCounted
 ## mudar iluminação ou modelos, incremente VERSION: os arquivos antigos deixam de ser usados.
 
 const CACHE_DIR := "user://thumbnails"
-const VERSION := 4
-const THUMB_SIZE := Vector2i(300, 360)
+const VERSION := 5
+const THUMB_SIZE := Vector2i(1024, 1280)
 ## Zoom de captura: deixa o personagem maior dentro da miniatura (menor = mais perto).
 const THUMB_ZOOM := 0.8
 ## Ajuste de câmera por personagem (multiplica o zoom; maior = mais longe).
@@ -51,7 +51,10 @@ func ensure(host: Control, entries: Array) -> Dictionary:
 
 	var stage := _stage_scene.instantiate() as LobbyStage
 	stage.position = Vector2(-6000, 0)
+	stage.custom_minimum_size = Vector2(THUMB_SIZE)
+	stage.size = Vector2(THUMB_SIZE)
 	host.add_child(stage)
+	stage.apply_profile("alto")
 	for entry: Dictionary in missing:
 		if not is_instance_valid(host) or not host.is_visible_in_tree():
 			break
@@ -67,7 +70,9 @@ func ensure(host: Control, entries: Array) -> Dictionary:
 		var image: Image = viewport.get_texture().get_image()
 		if image == null or image.is_empty():
 			continue
-		image.resize(THUMB_SIZE.x, THUMB_SIZE.y, Image.INTERPOLATE_LANCZOS)
+		# Capture at native resolution; never enlarge a low-resolution render.
+		if image.get_size() != THUMB_SIZE:
+			push_warning("Unexpected thumbnail render size: %s" % image.get_size())
 		var path := path_for(entry["id"])
 		var err: Error = image.save_png(path)
 		if err == OK:

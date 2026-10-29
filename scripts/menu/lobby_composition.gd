@@ -30,13 +30,13 @@ func _ready() -> void:
 	for button: MenuCardButton in menu.get_node("MenuButtons").get_children():
 		button.art_texture = null
 		button.get_node("Padding").hide()
-		button.text = {"story": "História  ›", "duel": "Duelo", "skins": "Skins", "friends": "Amizades", "settings": "Configurações"}[String(button.button_id)]
+		button.text = {"story": "História  ›", "duel": "Duelo", "skins": "Personagens", "friends": "Amizades", "settings": "Configurações"}[String(button.button_id)]
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		_style_button(button, button.button_id == &"story")
 		button.add_theme_constant_override("outline_size", 0)
 		button.focus_mode = Control.FOCUS_ALL
-	menu.get_node("MenuButtons/BtnDuel").text = "Duelo · em breve"
+	menu.get_node("MenuButtons/BtnDuel").hide()
 	for path: String in ["TopBar/CoinPill", "TopBar/GemPill", "ProfileCard"]:
 		menu.get_node(path).add_theme_stylebox_override("panel", _box(Color(0.06, 0.09, 0.11, 0.86)))
 	for path: String in ["TopBar/MailButton", "TopBar/FriendsButton", "TopBar/SettingsButton"]:
@@ -48,7 +48,14 @@ func _ready() -> void:
 		value.add_theme_constant_override("outline_size", 0)
 		value.add_theme_color_override("font_color", PAPER)
 		var icon: Panel = menu.get_node("TopBar/" + currency + "/Content/Icon")
-		icon.add_theme_stylebox_override("panel", _box(ACCENT if currency == "CoinPill" else Color("8fcbbf"), 10))
+		icon.add_theme_stylebox_override("panel", _box(Color.TRANSPARENT, 10))
+		var symbol := TextureRect.new()
+		symbol.texture = load("res://assets/icons/vector/icon_coin.svg" if currency == "CoinPill" else "res://assets/icons/vector/icon_gem.svg")
+		symbol.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		symbol.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		symbol.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		icon.add_child(symbol)
+		symbol.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		menu.get_node("TopBar/" + currency).tooltip_text = "Moedas" if currency == "CoinPill" else "Gemas"
 	menu.get_node("FriendsPanel/Frame").hide()
 	social_bg = Panel.new()
@@ -67,8 +74,8 @@ func _ready() -> void:
 	stage.frame_character()
 	var rim: OmniLight3D = stage.get_node("Viewport/World/RimLight")
 	rim.light_color = Color("fff1db")
-	rim.light_energy = 0.55
-	stage.get_node("Viewport/World/KeyLight").light_energy = 0.95
+	rim.light_energy = 1.1
+	stage.get_node("Viewport/World/KeyLight").light_energy = 1.0
 	for path: String in ["PrevButton", "NextButton"]:
 		var button: Button = menu.get_node("LobbyArea/Overlay/" + path)
 		_style_button(button, false)
@@ -124,7 +131,12 @@ func _box(color: Color, radius: int = 8) -> StyleBoxFlat:
 	return box
 
 func _style_button(button: Button, primary: bool) -> void:
-	button.add_theme_stylebox_override("normal", _box(ACCENT if primary else Color(0.06, 0.09, 0.11, 0.9)))
+	var normal := _box(ACCENT if primary else Color(0.04, 0.09, 0.14, 0.80))
+	normal.border_color = ACCENT if primary else Color(0.52, 0.66, 0.73, 0.40)
+	normal.border_width_left = 4 if primary else 2
+	normal.corner_radius_top_left = 2
+	normal.corner_radius_bottom_left = 2
+	button.add_theme_stylebox_override("normal", normal)
 	button.add_theme_stylebox_override("hover", _box(Color("f4ce98") if primary else Color("36434b")))
 	button.add_theme_stylebox_override("pressed", _box(Color("c99a59") if primary else Color("10191e")))
 	button.add_theme_stylebox_override("disabled", _box(Color(0.06, 0.09, 0.11, 0.76)))
@@ -148,7 +160,7 @@ func _layout() -> void:
 	var compact := DisplayServer.window_get_size().y < 500
 	# Em 844x390 a viewport é desenhada com escala ~0,41; o texto precisa de mais unidades de projeto.
 	var type_scale := 1.8 if compact else 1.0
-	var left_width := 400.0 if compact else 310.0
+	var left_width := 370.0 if compact else 290.0
 	_rect(brand, Vector2(32, 24), Vector2(350, 40))
 	_rect(brand_logo, Vector2(24, 12), Vector2(400, 133))
 	_rect(eyebrow, Vector2(34, 68), Vector2(380, 35))
@@ -187,7 +199,7 @@ func _layout() -> void:
 	_rect(area.get_node("Overlay/PrevButton"), Vector2(area.size.x * 0.25 - 58, area.size.y - 64), Vector2(54, 54))
 	_rect(area.get_node("Overlay/NextButton"), Vector2(area.size.x * 0.75 + 4, area.size.y - 64), Vector2(54, 54))
 	var friends: Control = menu.get_node("FriendsPanel")
-	_rect(friends, Vector2(w - 350, h * 0.63), Vector2(318, 0))
+	_rect(friends, Vector2(w - 350, h * 0.66), Vector2(318, 0))
 	menu.get_node("FriendsPanel/Margin/Content/ViewAllButton").add_theme_font_size_override("font_size", 28 if compact else 18)
 	for child in menu.get_node("FriendsPanel/Margin/Content/FriendList").get_children():
 		if child is Label:

@@ -38,7 +38,18 @@ var _zoom: float = 1.0
 
 
 func _ready() -> void:
+	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	add_to_group("player_preview_stages")
+	var environment: Environment = $Viewport/World/Environment.environment.duplicate()
+	$Viewport/World/Environment.environment = environment
+	environment.ambient_light_color = Color("#c5d7ed")
+	environment.ambient_light_energy = 0.46
+	_key_light.light_color = Color("#fff0da")
+	_key_light.light_energy = 1.0
+	_key_light.shadow_bias = 0.035
+	_key_light.directional_shadow_max_distance = 12.0
+	$Viewport/World/FillLight.light_energy = 0.50
+	_rim_light.light_energy = 0.9
 	# No lobby o palco não captura cliques; no visualizador ele precisa receber arraste e roda.
 	mouse_filter = Control.MOUSE_FILTER_STOP if interactive else Control.MOUSE_FILTER_IGNORE
 	var preferred := GraphicsProfile.default_for_platform()

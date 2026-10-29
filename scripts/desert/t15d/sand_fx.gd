@@ -7,125 +7,155 @@ const SAND_DARK := Color("#8a5a2b")
 const SAND_LIGHT := Color("#f3cf8e")
 const SPARK := Color("#7fd4ff")
 
-## Soco de areia: do punho sai um cone curto de areia compactada, com anel de pressão e
-## raios estalando em volta da mão. É só visual: o dano é corpo a corpo (player.gd).
+## Soco de areia: a areia envolve o punho durante o golpe (redemoinho que deixa rastro
+## seguindo o braço) com faíscas pequenas em volta da mão; no quadro do soco, uma
+## explosão curta de areia sai da ponta do punho. Nada voa para longe.
 class SandPunch extends Node3D:
 	var direction := 1.0
+	var skeleton: Skeleton3D
+	var bone := -1
+	var _swirl: CPUParticles3D
+	var _grains: CPUParticles3D
 	var _bolt_mesh: ImmediateMesh
 	var _light: OmniLight3D
 	var _rng := RandomNumberGenerator.new()
 	var _life := 0.0
 	var _rebuild := 0.0
+	var _struck := false
 
 	func _ready() -> void:
+		top_level = true
 		_rng.randomize()
-		# Cone de areia: grãos em riscos disparados para a frente, rápidos e curtos.
-		var blast := CPUParticles3D.new()
-		blast.one_shot = true
-		blast.explosiveness = 0.85
-		blast.amount = 110
-		blast.lifetime = 0.32
-		blast.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
-		blast.emission_sphere_radius = 0.08
-		blast.direction = Vector3(direction, 0.04, 0)
-		blast.spread = 16
-		blast.initial_velocity_min = 5.0
-		blast.initial_velocity_max = 10.0
-		blast.damping_min = 10.0
-		blast.damping_max = 16.0
-		blast.gravity = Vector3(0, -3, 0)
-		blast.particle_flag_align_y = true
-		blast.mesh = Res.streak(0.045, 0.26)
-		blast.color_ramp = Res.ramp([Color(SAND_LIGHT, 1.0), Color(SAND, 0.9), Color(SAND_DARK, 0.0)])
-		add_child(blast)
-		# Nuvem do soco: puffs de areia que se abrem à frente do punho.
-		var puff := CPUParticles3D.new()
-		puff.one_shot = true
-		puff.explosiveness = 0.9
-		puff.amount = 34
-		puff.lifetime = 0.45
-		puff.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
-		puff.emission_sphere_radius = 0.1
-		puff.direction = Vector3(direction, 0, 0)
-		puff.spread = 28
-		puff.initial_velocity_min = 2.0
-		puff.initial_velocity_max = 5.0
-		puff.damping_min = 6.0
-		puff.damping_max = 9.0
-		puff.gravity = Vector3(0, 0.4, 0)
-		puff.scale_amount_curve = Res.grow()
-		puff.mesh = Res.sprite(0.5)
-		puff.color_ramp = Res.ramp([Color(SAND, 1.0), Color("#b97d3e", 0.75), Color(SAND_DARK, 0.0)])
-		add_child(puff)
-		for particles in [blast, puff]: particles.emitting = true
-		# Anel de pressão saindo do punho, achatado na direção do soco.
-		var ring := MeshInstance3D.new()
-		ring.mesh = Res.ring_quad()
-		ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		var ring_mat: StandardMaterial3D = ring.mesh.surface_get_material(0).duplicate()
-		ring_mat.albedo_color = Color(1.0, 0.85, 0.55, 0.9)
-		ring.material_override = ring_mat
-		ring.position = Vector3(direction * 0.05, 0, 0.1)
-		ring.scale = Vector3(0.25, 0.5, 1)
-		add_child(ring)
-		var wave := create_tween().set_parallel(true)
-		wave.tween_property(ring, "position:x", direction * 0.7, 0.2).set_ease(Tween.EASE_OUT)
-		wave.tween_property(ring, "scale", Vector3(0.6, 1.6, 1), 0.2).set_ease(Tween.EASE_OUT)
-		wave.tween_property(ring_mat, "albedo_color:a", 0.0, 0.2)
+		_follow()
+		# Redemoinho em volta do punho; em coordenadas do mundo, então deixa rastro.
+		_swirl = CPUParticles3D.new()
+		_swirl.amount = 46
+		_swirl.lifetime = 0.28
+		_swirl.local_coords = false
+		_swirl.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE_SURFACE
+		_swirl.emission_sphere_radius = 0.09
+		_swirl.spread = 180
+		_swirl.initial_velocity_min = 0.05
+		_swirl.initial_velocity_max = 0.25
+		_swirl.tangential_accel_min = 2.0
+		_swirl.tangential_accel_max = 4.0
+		_swirl.gravity = Vector3(0, -0.6, 0)
+		_swirl.scale_amount_min = 0.7
+		_swirl.scale_amount_max = 1.2
+		_swirl.mesh = Res.sprite(0.11)
+		_swirl.color_ramp = Res.ramp([Color(SAND_LIGHT, 0.95), Color(SAND, 0.7), Color(SAND_DARK, 0.0)])
+		add_child(_swirl)
+		# Grãos finos que escorrem do punho.
+		_grains = CPUParticles3D.new()
+		_grains.amount = 36
+		_grains.lifetime = 0.35
+		_grains.local_coords = false
+		_grains.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+		_grains.emission_sphere_radius = 0.07
+		_grains.spread = 180
+		_grains.initial_velocity_min = 0.1
+		_grains.initial_velocity_max = 0.5
+		_grains.gravity = Vector3(0, -4, 0)
+		_grains.particle_flag_align_y = true
+		_grains.mesh = Res.streak(0.012, 0.05)
+		_grains.color_ramp = Res.ramp([Color(SAND_LIGHT, 1.0), Color(SAND_DARK, 0.0)])
+		add_child(_grains)
 		_bolt_mesh = ImmediateMesh.new()
 		var bolts := MeshInstance3D.new()
 		bolts.mesh = _bolt_mesh
 		bolts.material_override = Res.lightning_material()
 		bolts.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		bolts.position.z = 0.12
 		add_child(bolts)
 		_light = OmniLight3D.new()
-		_light.light_color = SPARK
-		_light.light_energy = 2.0
-		_light.omni_range = 2.2
+		_light.light_color = Color("#ffd49a")
+		_light.light_energy = 0.6
+		_light.omni_range = 1.2
 		add_child(_light)
+
+	func _follow() -> void:
+		if is_instance_valid(skeleton) and bone >= 0:
+			global_position = skeleton.global_transform * skeleton.get_bone_global_pose(bone).origin + Vector3(0, 0, 0.12)
+
+	## Quadro do soco: explosão compacta na ponta do punho.
+	func strike() -> void:
+		_struck = true
+		var puff := CPUParticles3D.new()
+		puff.one_shot = true
+		puff.explosiveness = 0.95
+		puff.amount = 14
+		puff.lifetime = 0.35
+		puff.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+		puff.emission_sphere_radius = 0.06
+		puff.direction = Vector3(direction, 0.1, 0)
+		puff.spread = 40
+		puff.initial_velocity_min = 1.0
+		puff.initial_velocity_max = 2.4
+		puff.damping_min = 6.0
+		puff.damping_max = 9.0
+		puff.gravity = Vector3.ZERO
+		puff.scale_amount_curve = Res.grow()
+		puff.mesh = Res.sprite(0.26)
+		puff.color_ramp = Res.ramp([Color(SAND_LIGHT, 0.9), Color(SAND, 0.55), Color(SAND_DARK, 0.0)])
+		add_child(puff)
+		var spray := CPUParticles3D.new()
+		spray.one_shot = true
+		spray.explosiveness = 1.0
+		spray.amount = 30
+		spray.lifetime = 0.3
+		spray.direction = Vector3(direction, 0.15, 0)
+		spray.spread = 30
+		spray.initial_velocity_min = 2.0
+		spray.initial_velocity_max = 4.5
+		spray.damping_min = 5.0
+		spray.damping_max = 8.0
+		spray.gravity = Vector3(0, -5, 0)
+		spray.particle_flag_align_y = true
+		spray.mesh = Res.streak(0.014, 0.08)
+		spray.color_ramp = Res.ramp([Color(SAND_LIGHT, 1.0), Color(SAND_DARK, 0.0)])
+		add_child(spray)
+		for particles in [puff, spray]:
+			particles.local_coords = false
+			particles.emitting = true
+		_light.light_energy = 1.6
+		_light.light_color = Color("#bfe6ff")
 		create_tween().tween_property(_light, "light_energy", 0.0, 0.25)
-		get_tree().create_timer(0.7, false).timeout.connect(queue_free)
 
 	func _process(delta: float) -> void:
 		_life += delta
+		if _life < 0.32: _follow()
+		if _life > 0.3:
+			_swirl.emitting = false
+			_grains.emitting = false
+		if _life > 0.9:
+			queue_free()
+			return
 		_rebuild -= delta
 		if _rebuild > 0.0: return
 		_rebuild = 0.04
 		_bolt_mesh.clear_surfaces()
-		if _life > 0.2: return
-		# Raios curtos estalando do punho para a frente, dentro do cone de areia.
+		if _life > (0.36 if _struck else 0.3): return
+		# Faíscas curtas em volta da mão (dois ou três estalos finos).
 		var paths: Array = []
-		for bolt in range(3):
-			var points := PackedVector3Array([Vector3.ZERO])
-			var reach := _rng.randf_range(0.5, 1.1)
-			for index in range(1, 6):
-				var t := float(index) / 5.0
-				points.append(Vector3(direction * reach * t, _rng.randf_range(-0.14, 0.14) * t, 0))
+		for bolt in range(2 if not _struck else 3):
+			var angle := _rng.randf() * TAU
+			var start := Vector3(cos(angle), sin(angle), 0) * 0.06
+			var points := PackedVector3Array([start])
+			var reach := 0.12 if not _struck else 0.22
+			for index in range(1, 4):
+				points.append(start + Vector3(cos(angle), sin(angle), 0) * reach * index / 3.0 + Vector3(_rng.randf_range(-0.04, 0.04), _rng.randf_range(-0.04, 0.04), 0))
 			paths.append(points)
-		Res.draw_lightning(_bolt_mesh, paths)
+		Res.draw_lightning(_bolt_mesh, paths, 0.45)
 
-	## Impacto no Cactus: anel de choque, areia, grãos e faíscas.
+	## Impacto no Cactus: poeira, grãos e faíscas no ponto do golpe.
 	static func impact(parent: Node, point: Vector3) -> void:
 		var node := Node3D.new()
 		parent.add_child(node)
 		node.global_position = point
-		var ring := MeshInstance3D.new()
-		ring.mesh = Res.ring_quad()
-		ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		ring.scale = Vector3.ONE * 0.3
-		ring.position.z = 0.15
-		var ring_mat: StandardMaterial3D = ring.mesh.surface_get_material(0).duplicate()
-		ring.material_override = ring_mat
-		node.add_child(ring)
-		var grow := node.create_tween().set_parallel(true)
-		grow.tween_property(ring, "scale", Vector3.ONE * 2.0, 0.26).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-		grow.tween_property(ring_mat, "albedo_color:a", 0.0, 0.26)
 		var dust := CPUParticles3D.new()
 		dust.one_shot = true
 		dust.explosiveness = 0.95
-		dust.amount = 22
-		dust.lifetime = 0.6
+		dust.amount = 14
+		dust.lifetime = 0.5
 		dust.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
 		dust.emission_sphere_radius = 0.18
 		dust.spread = 180
@@ -135,8 +165,8 @@ class SandPunch extends Node3D:
 		dust.damping_max = 4.0
 		dust.gravity = Vector3(0, -1.5, 0)
 		dust.scale_amount_curve = Res.grow()
-		dust.mesh = Res.sprite(0.45)
-		dust.color_ramp = Res.ramp([Color(SAND, 0.9), Color("#b97d3e", 0.55), Color(SAND_DARK, 0.0)])
+		dust.mesh = Res.sprite(0.32)
+		dust.color_ramp = Res.ramp([Color(SAND, 0.85), Color("#b97d3e", 0.5), Color(SAND_DARK, 0.0)])
 		node.add_child(dust)
 		var sparks := CPUParticles3D.new()
 		sparks.one_shot = true
@@ -180,7 +210,7 @@ class SandShield extends Node3D:
 		# Lajes de pedra lado a lado no sentido da tela (câmera lateral), alturas diferentes
 		# e levemente inclinadas: de lado lê como uma parede de terra com topo recortado.
 		# [deslocamento x, altura, espessura, inclinação]
-		var slabs := [[-0.22, 1.25, 0.26, 0.10], [0.0, 1.85, 0.3, 0.04], [0.24, 1.55, 0.28, -0.05], [0.44, 0.95, 0.24, -0.14]]
+		var slabs := [[-0.1, 1.15, 0.15, 0.1], [0.0, 1.75, 0.16, 0.04], [0.1, 1.5, 0.15, -0.03], [0.2, 1.05, 0.14, -0.1]]
 		for slab: Array in slabs:
 			var piece := MeshInstance3D.new()
 			var box := BoxMesh.new()
@@ -193,8 +223,8 @@ class SandShield extends Node3D:
 			# Pedra solta no topo de cada laje.
 			var cap := MeshInstance3D.new()
 			var rock := SphereMesh.new()
-			rock.radius = 0.17
-			rock.height = 0.22
+			rock.radius = 0.08
+			rock.height = 0.12
 			rock.radial_segments = 6
 			rock.rings = 3
 			cap.mesh = rock
@@ -202,7 +232,7 @@ class SandShield extends Node3D:
 			cap.position = Vector3(0, float(slab[1]) * 0.5, 0)
 			piece.add_child(cap)
 		_trickle = CPUParticles3D.new()
-		_trickle.amount = 24
+		_trickle.amount = 40
 		_trickle.lifetime = 0.8
 		_trickle.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
 		_trickle.emission_box_extents = Vector3(0.35, 0.05, 0.5)
@@ -213,7 +243,7 @@ class SandShield extends Node3D:
 		_trickle.initial_velocity_max = 0.6
 		_trickle.gravity = Vector3(0, -6, 0)
 		_trickle.particle_flag_align_y = true
-		_trickle.mesh = Res.streak(0.02, 0.09)
+		_trickle.mesh = Res.streak(0.012, 0.06)
 		_trickle.color_ramp = Res.ramp([Color(SAND, 1.0), Color(SAND_DARK, 0.0)])
 		_trickle.emitting = false
 		_wall.add_child(_trickle)
@@ -396,10 +426,10 @@ class Res:
 		return mat
 
 	## Desenha cada caminho como duas faixas: halo azul largo e núcleo branco fino.
-	static func draw_lightning(mesh: ImmediateMesh, paths: Array) -> void:
+	static func draw_lightning(mesh: ImmediateMesh, paths: Array, scale := 1.0) -> void:
 		mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
 		for pass_index in range(2):
-			var width := 0.11 if pass_index == 0 else 0.026
+			var width := (0.11 if pass_index == 0 else 0.026) * scale
 			var color := Color(0.35, 0.7, 1.0, 0.85) if pass_index == 0 else Color(0.85, 0.95, 1.0, 1.0)
 			for path: PackedVector3Array in paths:
 				var shrink := 1.0 if path.size() > 2 else 0.6

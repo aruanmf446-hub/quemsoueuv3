@@ -155,7 +155,7 @@ func run() -> void:
 		await physics_frame
 		for child in phase.get_children():
 			if child.get_class() == "Node3D" and child.has_method("impact"): arc_seen = true
-	check(arc_seen,"soco solta a explosão de areia com choque")
+	check(arc_seen,"areia envolve o punho no soco")
 	await frames(16)
 	check(hit_frame[0] >= 8 and hit_frame[0] <= 13,"soco acerta com o braço estendido (quadro %d)" % hit_frame[0])
 	check(player.attack_charges == 0,"golpe consome a carga")

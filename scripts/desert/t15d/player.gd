@@ -24,6 +24,7 @@ const HURT_TIME := 0.32
 var _yaw := PI*0.5
 var _hurt_timer := 0.0
 var _blink := 0.0
+var _fist: Node3D
 var _actor: ActorSlot:
 	get: return _model as ActorSlot
 func _ready() -> void:
@@ -138,16 +139,21 @@ func _start_attack() -> void:
 	_attack_cooldown = 0.62
 	_hit_delivered = false
 	_actor.play_animation("golpe", false, 0.05)
+	# Mão esquerda do modelo é a que soca (fica à frente nas duas direções).
+	var skeleton: Skeleton3D = _actor._skeleton
+	if skeleton != null:
+		_fist = SandFx.SandPunch.new()
+		_fist.direction = facing
+		_fist.skeleton = skeleton
+		_fist.bone = skeleton.find_bone("mixamorig_LeftHand")
+		get_parent().add_child(_fist)
 	swung.emit()
-## Golpe: soco corpo a corpo no quadro do braço estendido. Do punho sai uma explosão de
-## areia com choque (só visual); o dano vale para Cactus à frente, até 1,7m, sem parede.
+## Golpe: soco corpo a corpo no quadro do braço estendido; o dano vale para Cactus à
+## frente, até 1,7m, sem parede. A areia envolve o punho desde o começo do golpe.
 func _deliver_hit() -> void:
 	_hit_delivered = true
 	strike_window.emit()
-	var punch := SandFx.SandPunch.new()
-	punch.direction = facing
-	get_parent().add_child(punch)
-	punch.global_position = global_position + Vector3(facing * 0.35, 0.95, 0.2)
+	if is_instance_valid(_fist): _fist.strike()
 	for enemy: Node3D in get_tree().get_nodes_in_group("enemies"):
 		if not enemy.has_method("take_damage") or not _can_hit(enemy): continue
 		var query := PhysicsRayQueryParameters3D.create(global_position + Vector3.UP * 0.7, enemy.global_position + Vector3.UP * 0.7, 1)

@@ -30,15 +30,24 @@ func _run() -> void:
 		if not next_path.is_empty() and "--transition" in args:
 			scene.call("_advance", next_path)
 			var replacement: Node = null
+			var story_skipped := false
 			var deadline := Time.get_ticks_msec() + 12000
 			while Time.get_ticks_msec() < deadline:
+				var story := root.get_node_or_null("PhaseStory") as PhaseStory
+				if story != null and not story_skipped:
+					if not story._carousel.manual_story or story._carousel.cards.size() < 2:
+						push_error("SMOKE_STORY_FAILED " + next_path)
+						quit(1)
+						return
+					story_skipped = true
+					story._carousel.skip_requested.emit()
 				for child in root.get_children():
 					if child is Node3D and child.scene_file_path == next_path:
 						replacement = child
 						break
 				if replacement != null: break
 				await process_frame
-			if replacement == null or replacement.scene_file_path != next_path:
+			if not story_skipped or replacement == null or replacement.scene_file_path != next_path:
 				push_error("SMOKE_TRANSITION_FAILED " + next_path)
 				quit(1)
 				return

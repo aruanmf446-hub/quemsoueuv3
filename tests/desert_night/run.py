@@ -34,6 +34,7 @@ targets=[
  ('rules-desktop',engine+window+['--script','res://tests/desert_night/rules.gd','--',str(out/'rules-desktop'),'1920x1080']),
  ('rules-mobile',engine+window+['--script','res://tests/desert_night/rules.gd','--',str(out/'rules-mobile'),'844x390']),
  ('navigation-desktop',engine+window+['--script','res://tests/desert_night/navigation.gd','--',str(out/'navigation-desktop'),'1920x1080']),
+ ('variety',engine+headless+['--script','res://tests/desert_night/variety_test.gd']),
  ('parkour',engine+headless+['--script','res://tests/desert_night/parkour_test.gd']),
  ('checkpoints',engine+headless+['--script','res://tests/desert_night/checkpoint_test.gd']),
  ('touch-scroll',engine+window+['--script','res://tests/ui/touch_scroll_test.gd']),

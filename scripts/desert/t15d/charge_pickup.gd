@@ -24,7 +24,7 @@ func _ready() -> void:
 	_visual = Node3D.new()
 	_visual.position.y = 0.85
 	add_child(_visual)
-	var color := Color("#e4bd71") if kind == "attack" else Color("#79cceb")
+	var color: Color = {"attack": Color("#e4bd71"), "defense": Color("#79cceb"), "health": Color("#ff5d5d")}.get(kind, Color.WHITE)
 	var mat := StandardMaterial3D.new()
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat.albedo_color = color
@@ -45,6 +45,11 @@ func _ready() -> void:
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var polygon: PackedVector2Array
 	if kind == "attack": polygon = PackedVector2Array([Vector2(-0.06,-0.2),Vector2(-0.06,0.11),Vector2(0,0.24),Vector2(0.06,0.11),Vector2(0.06,-0.2)])
+	elif kind == "health":
+		polygon = PackedVector2Array()
+		for step in range(28):
+			var t := TAU*step/28.0
+			polygon.append(Vector2(16*pow(sin(t),3),13*cos(t)-5*cos(2*t)-2*cos(3*t)-cos(4*t))*0.0125)
 	else: polygon = PackedVector2Array([Vector2(-0.16,0.16),Vector2(0.16,0.16),Vector2(0.13,-0.07),Vector2(0,-0.22),Vector2(-0.13,-0.07)])
 	var indices := Geometry2D.triangulate_polygon(polygon)
 	for index in indices:

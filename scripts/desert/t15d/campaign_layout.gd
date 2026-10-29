@@ -105,6 +105,9 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 		pickups.append({"id":"%s.attack.%02d" % [prefix,index],"kind":"attack","pos":[enemy_x+6.0,0.55,0.0]})
 		if index in extra_attack_slots:
 			pickups.append({"id":"%s.attack.extra.%02d" % [prefix,index],"kind":"attack","pos":[enemy_x-5.0,0.55,0.0]})
+		# Recarga de vida: um coração a cada três trechos, entre o Cactus e os degraus.
+		if index % 3 == 1:
+			pickups.append({"id":"%s.health.%02d" % [prefix,index],"kind":"health","pos":[span_left+span_width*0.58,0.55,0.0]})
 		if defense_slots.has(index):
 			pickups.append({"id":"%s.defense.%02d" % [prefix,index],"kind":"defense","pos":[enemy_x-9.0,0.55,0.0]})
 		# Os degraus ficam fora do espaço de duelo/reposição e a pelo menos 8m do vão.

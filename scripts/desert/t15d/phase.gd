@@ -37,6 +37,8 @@ var _build_queue: Array[Callable] = []
 var _checkpoint_index := -1
 var _snapshot := {}
 var _sfx: Node
+var _environment: Environment
+var _announced_place := false
 var _key_light: OmniLight3D
 func _ready() -> void:
 	_previous_go_back = bool(get_meta("previous_go_back",get_tree().quit_on_go_back))
@@ -92,6 +94,7 @@ func _build_environment() -> void:
 	environment.ambient_light_energy = 0.62
 	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	add_child(world_environment)
+	_environment = environment
 	var moon := DirectionalLight3D.new()
 	moon.name = "Moonlight"
 	moon.rotation_degrees = Vector3(-40,-30,0)
@@ -109,6 +112,7 @@ func _build_environment() -> void:
 	_scenery = preload("res://scripts/desert/t15d/night_scenery.gd").new()
 	_scenery.configure(_order,float(_phase.length),float(_phase.player_spawn[0]))
 	add_child(_scenery)
+	_scenery.location_changed.connect(_on_location_changed)
 	# Luz de contorno fria vinda de trás: recorta personagens e Cactus do fundo iluminado.
 	var rim := DirectionalLight3D.new()
 	rim.name = "RimLight"
@@ -119,6 +123,12 @@ func _build_environment() -> void:
 	add_child(rim)
 	# Antisserrilhado: 4× no computador, 2× em celulares e no navegador.
 	get_viewport().msaa_3d = Viewport.MSAA_2X if UIScale.is_compact() or OS.has_feature("web") else Viewport.MSAA_4X
+## Mudou de lugar: a luz ambiente acompanha a cor do novo cenário e o nome aparece.
+func _on_location_changed(place: Dictionary) -> void:
+	if is_instance_valid(_environment):
+		create_tween().tween_property(_environment,"ambient_light_color",place.ambient,1.2)
+	if _announced_place and is_instance_valid(_hud): _hud.announce_place(str(place.name))
+	_announced_place = true
 func _build_player() -> void:
 	_player = Player.new()
 	_player.name = "ElFuego"
@@ -271,7 +281,7 @@ func _build_chunk_details(chunk: Node3D, index: int) -> void:
 			item.position = _vec3(spawn.pos)
 			item.collected.connect(_on_pickup_collected)
 			item.full_touched.connect(func(kind: String) -> void:
-				if is_instance_valid(_hud): _hud.notify("Ataque cheio • reposição preservada" if kind == "attack" else "Defesa cheia • reposição preservada"))
+				if is_instance_valid(_hud): _hud.notify({"attack":"Ataque cheio","defense":"Defesa cheia","health":"Vida cheia"}.get(kind,"Cheio")+" • item preservado"))
 			chunk.add_child(item)
 	for sign: Dictionary in _phase.signs:
 		if _in_chunk(float(sign.pos[0]),index): _build_pit_sign(chunk,sign)
@@ -402,7 +412,7 @@ func _pit_material(key: String) -> StandardMaterial3D:
 func _on_pickup_collected(id: String, kind: String) -> void:
 	_collected_ids[id] = true
 	_sfx.play("pickup",1.0 if kind == "attack" else 1.25)
-	_hud.notify("Ataque +1" if kind == "attack" else "Defesa +1")
+	_hud.notify({"attack":"Ataque +1","defense":"Defesa +1","health":"Vida +1"}.get(kind,"+1"))
 func _build_goal() -> void:
 	_goal = Area3D.new()
 	_goal.name = "ExitGate"

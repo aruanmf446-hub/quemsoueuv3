@@ -16,6 +16,7 @@ var _toast: Label
 var _hint: Label
 var _font: FontFile
 var _kicker: Label
+var _place: Label
 var _toast_left := 0.0
 var _flash: ColorRect
 var _icons: Control
@@ -208,6 +209,27 @@ func update_progress(share: float, seconds: float, district: String) -> void:
 	_bar.value = share*100.0
 	_district.text = district.to_upper()
 	_progress.text = "%d%%   ·   %02d:%02d" % [roundi(share*100),int(seconds)/60,int(seconds)%60]
+## Nome do novo lugar em destaque no alto da tela, some sozinho.
+func announce_place(text: String) -> void:
+	if not is_instance_valid(_place):
+		_place = Label.new()
+		_place.add_theme_font_override("font",_font)
+		_place.add_theme_color_override("font_color",Color("#f6e3bd"))
+		_place.add_theme_color_override("font_outline_color",Color(0.02,0.03,0.06,0.9))
+		_place.add_theme_constant_override("outline_size",8)
+		_place.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_place.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_root.add_child(_place)
+	var screen := _root.size
+	_place.add_theme_font_size_override("font_size",30)
+	_place.text = text.to_upper()
+	_place.position = Vector2(0,screen.y*0.22)
+	_place.size = Vector2(screen.x,44)
+	_place.modulate.a = 0.0
+	var show := _place.create_tween()
+	show.tween_property(_place,"modulate:a",1.0,0.4)
+	show.tween_interval(1.8)
+	show.tween_property(_place,"modulate:a",0.0,0.6)
 func notify(text: String, warning := false) -> void:
 	_toast.text = text
 	_toast.add_theme_color_override("font_color",Color("#f0b6a5") if warning else Color("#f1dfb4"))

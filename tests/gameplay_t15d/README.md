@@ -73,12 +73,11 @@ Supabase, gameplay compartilhado ou as outras fases.
 O runner agora também executa `session_checks.gd` e `journey.gd` nas duas resoluções.
 O primeiro isola pausa durante morte, cancelamento de respawn, perda de foco,
 notificação Voltar, ataque através de parede, recuperação e remoção de cadáver.
-O segundo clica/toca o menu e os botões reais: entrar pelo Modo História, pausar,
-retomar, checkpoint, reinício, retorno, relançamento, travessia, vitória, replay e
-avanço/retorno. A travessia registrada até a primeira vitória usa somente ações de
-entrada desde o spawn, sem reposicionamento. Depois do replay há uma chamada
-isolada do gatilho de vitória para testar o botão de avanço sem repetir o percurso;
-isso está explícito no código e não é usado como evidência de travessia.
+O segundo usa a tela atual do Modo História: seleciona a fase 01, avança os
+cartões ilustrados, inicia a partida, verifica vida/cargas e movimento, testa
+queda e recomeço, então apresenta a história da fase 02 antes de pulá-la. A
+conclusão da fase 01 é acionada como fixture para testar essa navegação; os
+percursos completos das fases 01–09 são verificados em `tests/desert_night/route.gd`.
 
 `route_movie.gd` grava exclusivamente o percurso completo até a primeira vitória,
 sem menu, teleporte, callback de vitória antecipado ou respawn forçado. O vídeo é

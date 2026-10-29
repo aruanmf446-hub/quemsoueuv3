@@ -8,6 +8,7 @@
     "wallet": "res://scenes/player/wallet.tscn",
     "skins": "res://scenes/skins/skins_panel.tscn",
     "story": "res://scenes/player/story.tscn",
-    "account": "res://scenes/player/account.tscn"
+    "account": "res://scenes/player/account.tscn",
+    "music": "res://scenes/player/music.tscn"
   }
 }

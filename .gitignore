@@ -9,3 +9,7 @@
 # Backend validation credentials and local test outputs
 .runtime/
 /tests/results_*.json
+
+# Áudio local de desenvolvimento: não distribuir nem versionar MP3.
+/assets/music/**/*.mp3
+/assets/music/_local_test/

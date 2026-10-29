@@ -126,6 +126,9 @@ func _audio() -> void:
 		if not _save("muted", value): mute.set_pressed_no_signal(not value))
 	_content.add_child(mute)
 	_content.add_child(PlayerUI.label("A música toca exclusivamente no menu. Seus volumes são mantidos ao silenciar.", 18, MUTED))
+	var manage := _button("Gerenciar músicas", func() -> void: navigate_requested.emit("music", {}))
+	manage.name = "ManageMusic"
+	_content.add_child(manage)
 
 func _slider(text: String, key: String) -> void:
 	var line := PlayerUI.row(_content)

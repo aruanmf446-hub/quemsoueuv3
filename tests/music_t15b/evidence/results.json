@@ -1,0 +1,32 @@
+[
+  {
+    "test": "import",
+    "exit_code": 0,
+    "passed": true
+  },
+  {
+    "test": "flow",
+    "exit_code": 0,
+    "passed": true
+  },
+  {
+    "test": "playback",
+    "exit_code": 0,
+    "passed": true
+  },
+  {
+    "test": "settings",
+    "exit_code": 0,
+    "passed": true
+  },
+  {
+    "test": "audio",
+    "exit_code": 0,
+    "passed": true
+  },
+  {
+    "test": "capture",
+    "exit_code": 0,
+    "passed": true
+  }
+]

@@ -97,6 +97,9 @@ func run() -> void:
 			check(false,"não fica preso no percurso por oito segundos")
 			break
 		var enemy := enemy_ahead(2.5)
+		if await ride_ferry(step):
+			_stalled = 0
+			continue
 		if player._attack_timer > 0.0:
 			Input.action_release("move_right")
 		elif enemy != null and player.attack_charges > 0 and player.is_on_floor():
@@ -130,6 +133,37 @@ func run() -> void:
 	FileAccess.open(output+".json",FileAccess.WRITE).store_string(JSON.stringify(result,"  "))
 	print("NIGHT_ROUTE_RESULT ",JSON.stringify(result))
 	quit(1 if failures else 0)
+## Balsa: espera na borda até ela encostar, sobe, fica parado e salta na outra borda.
+## Retorna true quando controlou este quadro.
+func ride_ferry(step: int) -> bool:
+	var hole: Dictionary = {}
+	for candidate: Dictionary in phase._phase.holes:
+		if candidate.get("ferry",false) and player.position.x > float(candidate.start)-1.2 and player.position.x < float(candidate.end)+0.3:
+			hole = candidate
+	if hole.is_empty() or not player.is_on_floor(): return false
+	var ferry: Node3D
+	for node in get_nodes_in_group("ferries"):
+		if node.from_x > float(hole.start) and node.to_x < float(hole.end): ferry = node
+	if ferry == null: return false
+	var start := float(hole.start)
+	var finish := float(hole.end)
+	if player.position.x > finish: return false
+	if player.position.x < start:
+		# Na borda: espera a balsa chegar perto e sobe com um passo/pulinho.
+		Input.action_release("move_right")
+		if player.position.x < start-0.6:
+			Input.action_press("move_right")
+		elif absf(ferry.position.x-ferry.from_x) < 0.15:
+			# A balsa encosta na borda (0,1m): basta andar para subir.
+			Input.action_press("move_right")
+		await physics_frame
+		return true
+	# Em cima da balsa: centraliza, espera chegar ao outro lado e desce andando.
+	Input.action_release("move_right")
+	if absf(ferry.position.x-ferry.to_x) < 0.15 or player.position.x < ferry.position.x-0.6:
+		Input.action_press("move_right")
+	await physics_frame
+	return true
 func jump(step: int) -> void:
 	if Input.is_action_pressed("jump"): return
 	Input.action_press("jump")

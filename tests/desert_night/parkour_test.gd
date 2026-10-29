@@ -78,6 +78,55 @@ func run() -> void:
 	check(await hop_to_stone(1.0, float(hole.start), center) and await hop_off(1.0, float(hole.end)),"vão largo atravessado indo")
 	await frames(170)
 	check(await hop_to_stone(-1.0, float(hole.end), center) and await hop_off(-1.0, float(hole.start)),"vão largo atravessado voltando")
+	# Balsa: subir andando, ser levado ao outro lado e descer; e voltar.
+	var ferry_hole: Dictionary
+	for candidate: Dictionary in phase._phase.holes:
+		if candidate.get("ferry",false): ferry_hole = candidate; break
+	await place(float(ferry_hole.start)-1.5)
+	var ferry: Node3D
+	for node in get_nodes_in_group("ferries"):
+		if node.from_x > float(ferry_hole.start) and node.to_x < float(ferry_hole.end): ferry = node
+	check(ferry != null,"balsa existe no vão largo")
+	while absf(ferry.position.x-ferry.from_x) > 0.15: await physics_frame
+	Input.action_press("move_right")
+	while player.position.x < ferry.position.x-0.2: await physics_frame
+	Input.action_release("move_right")
+	var carried := false
+	for step in range(360):
+		await physics_frame
+		if player.position.x > float(ferry_hole.end)-2.0 and player.is_on_floor(): carried = true
+		if absf(ferry.position.x-ferry.to_x) < 0.15: break
+	check(carried and not player.is_dead,"balsa carrega o jogador sobre o vão")
+	Input.action_press("move_right")
+	await frames(30)
+	Input.action_release("move_right")
+	check(player.position.x > float(ferry_hole.end) and not player.is_dead,"desce da balsa do outro lado")
+	while absf(ferry.position.x-ferry.to_x) > 0.15: await physics_frame
+	Input.action_press("move_left")
+	while player.position.x > ferry.position.x+0.2: await physics_frame
+	Input.action_release("move_left")
+	for step in range(360):
+		await physics_frame
+		if absf(ferry.position.x-ferry.from_x) < 0.15: break
+	Input.action_press("move_left")
+	await frames(30)
+	Input.action_release("move_left")
+	check(player.position.x < float(ferry_hole.start) and not player.is_dead,"balsa também leva de volta")
+	# Tempestade: vento freia quem anda para a direita, não empurra quem está parado.
+	var storm: Dictionary = phase._phase.storms[0]
+	await place(float(storm.start)+10.0)
+	await frames(5)
+	check(phase._in_storm and player.wind < 0.0 and phase._hud._storm_veil.color.a >= 0.0,"tempestade ativa com vento e véu")
+	var x0 := player.position.x
+	await frames(60)
+	check(absf(player.position.x-x0) < 0.05,"parado na tempestade o personagem não escorrega")
+	Input.action_press("move_right")
+	await frames(60)
+	Input.action_release("move_right")
+	check(player.velocity.x < 5.5 or player.position.x-x0 < 6.0,"vento reduz a velocidade para a direita")
+	await place(float(storm.end)+5.0)
+	await frames(5)
+	check(not phase._in_storm and player.wind == 0.0,"tempestade termina ao sair do trecho")
 	print("PARKOUR_RESULT checks=%d failures=%d" % [checks,failures])
 	quit(1 if failures else 0)
 

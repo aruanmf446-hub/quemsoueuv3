@@ -77,6 +77,7 @@ func _physics_process(delta: float) -> void:
 		_stream_world(_player.position.x)
 		_update_progress()
 		_check_checkpoints()
+		_update_storm()
 		if not _tutorial_pit and _player.position.x > float(_phase.holes[0].start)-12.0:
 			_tutorial_pit = true
 			_hud.notify("Buraco à frente • pule para atravessar")
@@ -125,6 +126,17 @@ func _build_environment() -> void:
 	add_child(rim)
 	# Antisserrilhado: 4× no computador, 2× em celulares e no navegador.
 	get_viewport().msaa_3d = Viewport.MSAA_2X if UIScale.is_compact() or OS.has_feature("web") else Viewport.MSAA_4X
+## Tempestade de areia: tela tingida, grãos voando e vento contra quem vai para a direita.
+var _in_storm := false
+func _update_storm() -> void:
+	var inside := false
+	for storm: Dictionary in _phase.get("storms",[]):
+		if _player.position.x >= float(storm.start) and _player.position.x <= float(storm.end): inside = true
+	if inside == _in_storm: return
+	_in_storm = inside
+	_player.wind = -0.8 if inside else 0.0
+	_hud.set_storm(inside)
+	_hud.notify("Tempestade de areia • vento contra" if inside else "A tempestade passou",inside)
 ## Mudou de lugar: a luz ambiente acompanha a cor do novo cenário e o nome aparece.
 func _on_location_changed(place: Dictionary) -> void:
 	if is_instance_valid(_environment):
@@ -291,6 +303,13 @@ func _build_chunk_details(chunk: Node3D, index: int) -> void:
 			chunk.add_child(item)
 	for sign: Dictionary in _phase.signs:
 		if _in_chunk(float(sign.pos[0]),index): _build_pit_sign(chunk,sign)
+	for hole: Dictionary in _phase.holes:
+		var middle := (float(hole.start)+float(hole.end))*0.5
+		if hole.get("ferry",false) and _in_chunk(middle,index):
+			var ferry := preload("res://scripts/desert/t15d/parkour.gd").Ferry.new()
+			ferry.from_x = float(hole.start)+1.4
+			ferry.to_x = float(hole.end)-1.4
+			chunk.add_child(ferry)
 	for geyser: Dictionary in _phase.get("geysers",[]):
 		if _in_chunk(float(geyser.pos[0]),index):
 			var pad := preload("res://scripts/desert/t15d/parkour.gd").Geyser.new()
@@ -676,6 +695,9 @@ func _restart_level() -> void:
 	_tutorial_pit = false
 	_checkpoint_index = -1
 	_snapshot = {}
+	_in_storm = false
+	_player.wind = 0.0
+	_hud.set_storm(false)
 	_checkpoint = _vec3(_phase.player_spawn)
 	_build_queue.clear()
 	for chunk: Node in _loaded_chunks.values():

@@ -167,3 +167,60 @@ class CrumbleStone extends StaticBody3D:
 		_mesh.scale = Vector3.ONE * 0.2
 		_shape.set_deferred("disabled", false)
 		create_tween().tween_property(_mesh, "scale", Vector3.ONE, 0.25)
+
+## Balsa de pedra: vai e volta sobre o vão largo (4s por volta, pausa curta em cada borda).
+## AnimatableBody3D carrega o jogador junto; o topo fica no nível do chão.
+class Ferry extends AnimatableBody3D:
+	const PERIOD := 4.0
+	var from_x := 0.0
+	var to_x := 0.0
+	var _time := 0.0
+
+	func _ready() -> void:
+		add_to_group("ferries")
+		collision_layer = 1
+		sync_to_physics = true
+		var shape := CollisionShape3D.new()
+		var box := BoxShape3D.new()
+		box.size = Vector3(2.6, 0.5, 3.0)
+		shape.shape = box
+		shape.position.y = -0.25
+		add_child(shape)
+		var stone := StandardMaterial3D.new()
+		stone.albedo_texture = preload("res://assets/desert/phase01/sandstone.png")
+		stone.albedo_color = Color(0.82, 0.66, 0.5)
+		stone.uv1_triplanar = true
+		var deck := MeshInstance3D.new()
+		var mesh := BoxMesh.new()
+		mesh.size = Vector3(2.6, 0.5, 3.0)
+		deck.mesh = mesh
+		deck.material_override = stone
+		deck.position.y = -0.25
+		add_child(deck)
+		# Lanternas nas pontas: a balsa fica visível sobre o poço escuro.
+		for side in [-1.0, 1.0]:
+			var lamp := MeshInstance3D.new()
+			var orb := SphereMesh.new()
+			orb.radius = 0.09
+			orb.height = 0.18
+			lamp.mesh = orb
+			var glow := StandardMaterial3D.new()
+			glow.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			glow.albedo_color = Color("#ffc46b")
+			lamp.material_override = glow
+			lamp.position = Vector3(side * 1.15, 0.12, -1.2)
+			add_child(lamp)
+		var light := OmniLight3D.new()
+		light.light_color = Color("#ffc46b")
+		light.light_energy = 0.7
+		light.omni_range = 3.0
+		light.position = Vector3(0, 0.6, -1.0)
+		add_child(light)
+		position.x = from_x
+
+	func _physics_process(delta: float) -> void:
+		_time += delta
+		var phase := fmod(_time, PERIOD) / PERIOD
+		# 0→1→0 com pausa nas bordas: tempo para subir e descer.
+		var t := clampf((1.0 - cos(phase * TAU)) * 0.5 * 1.2 - 0.1, 0.0, 1.0)
+		position.x = lerpf(from_x, to_x, t)

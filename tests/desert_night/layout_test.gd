@@ -61,6 +61,7 @@ func run() -> void:
 			else: connected.append(interval.duplicate())
 		grounds = connected
 		var holes := 0
+		var ferries := 0
 		var gaps_ok := true
 		for index in range(grounds.size()-1):
 			var gap: float = grounds[index+1][0]-grounds[index][1]
@@ -71,10 +72,18 @@ func run() -> void:
 				for island: Array in islands:
 					if island[0] > grounds[index][1] and island[1] < grounds[index+1][0]:
 						parts = [float(island[0])-float(grounds[index][1]), float(grounds[index+1][0])-float(island[1])]
+				# Vão com balsa: a balsa (2,6m) para a 0,1m de cada borda; o vão ao subir é curto.
+				for hole: Dictionary in stage.holes:
+					if hole.get("ferry",false) and absf(float(hole.start)-float(grounds[index][1])) < 0.05:
+						parts = [0.1, 0.1]
+						ferries += 1
 				for part in parts:
-					if part > 3.5+0.01 or (parts.size() == 1 and part < 2.5) or part < 1.5: gaps_ok = false
+					if part > 3.5+0.01 or (parts.size() == 1 and part < 2.5) or (part < 1.5 and part > 0.2): gaps_ok = false
 		check(holes >= 12,prefix+"buracos reais distribuídos pelo percurso")
 		check(islands.size() >= 2,prefix+"vãos largos com pedra que desmorona")
+		check(ferries >= 1,prefix+"vão com balsa de pedra (%d)" % ferries)
+		var storms: Array = stage.get("storms",[])
+		check(storms.size() == 1 and float(storms[0].end)-float(storms[0].start) >= 50.0,prefix+"trecho de tempestade de areia")
 		var geysers_ok := walls.size() >= 2
 		for x in walls:
 			var sides := 0

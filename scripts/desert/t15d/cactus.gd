@@ -11,7 +11,7 @@ func _ready() -> void:
 	floor_snap_length = 0.18
 func setup(entry: Dictionary, spawn: Dictionary) -> void:
 	super.setup(entry, spawn)
-	health = 3
+	health = 1
 	attack_range = 1.25
 func _physics_process(delta: float) -> void:
 	if _state == State.DEAD: return

@@ -69,7 +69,7 @@ func play_animation(anim_name: StringName, loop: bool = true) -> void:
 	if character_id == &"el_fuego":
 		match String(anim_name):
 			"base": speed = 1.65
-			"ataque": speed = 0.95 / 0.52
+			"ataque": speed = 0.95 / 0.42
 			"pulo": speed = 2.3
 			"pulo_duplo": speed = 1.4
 			"retorno": speed = 3.0

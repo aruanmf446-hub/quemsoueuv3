@@ -11,12 +11,12 @@ func _draw() -> void:
 	var camera: Camera3D = phase._camera
 	var unit := get_viewport_rect().size.y/maxf(get_window().size.y,1)
 	for enemy in get_tree().get_nodes_in_group("enemies"):
-		if enemy.get_parent() != phase or absf(enemy.position.x-phase._player.position.x) > 5.0: continue
+		if not phase.is_ancestor_of(enemy) or absf(enemy.position.x-phase._player.position.x) > 5.0: continue
 		var head: Vector3 = enemy.global_position+Vector3.UP*1.65
 		if camera.is_position_behind(head): continue
 		var point := camera.unproject_position(head)
-		for pip in range(3):
-			var rect := Rect2(point+Vector2((pip-1)*9-3,-3)*unit,Vector2(6,4)*unit)
+		for pip in range(1):
+			var rect := Rect2(point+Vector2(pip*9-3,-3)*unit,Vector2(6,4)*unit)
 			draw_style_box(_pip_style(Color("#e1b56c") if pip < enemy.health else Color(0.05,0.09,0.13,0.8)),rect)
 		if enemy._windup > 0:
 			var center := point+Vector2(0,-20)*unit

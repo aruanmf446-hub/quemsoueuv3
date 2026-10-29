@@ -1,14 +1,15 @@
 extends Node3D
 ## Geometria própria da Fase 01: superfícies coincidem com os colisores; vãos continuam abertos.
 var _rng := RandomNumberGenerator.new()
+var order := 1
 func build(platforms: Array) -> void:
-	_rng.seed = 150104
+	_rng.seed = 150104+order*7919+(int(float(platforms[0].pos[0]))*13 if not platforms.is_empty() else 0)
 	for platform: Dictionary in platforms:
 		var p: Array = platform.pos
 		var s: Array = platform.size
 		var top := float(p[1]) + float(s[1]) * 0.5
 		var bottom := -5.5 if platform.kind == "ground" else 0.0
-		_shelf(float(p[0]), float(s[0]), top, bottom, float(s[2]))
+		_shelf(float(p[0]), float(s[0]), top, bottom, float(s[2]),bool(platform.get("cap_left",true)),bool(platform.get("cap_right",true)))
 		if platform.kind == "ground":
 			for i in range(int(float(s[0]) / 1.8)):
 				var rock := MeshInstance3D.new()
@@ -24,12 +25,8 @@ func build(platforms: Array) -> void:
 				add_child(rock)
 			for i in range(int(float(s[0])/2.5)):
 				_dry_grass(Vector3(float(p[0])+_rng.randf_range(-float(s[0])*0.45,float(s[0])*0.45),top,-1.65))
-	for x in [-11.0, 11.0, 30.0, 48.0]:
-		arch(Vector3(x, 0, -4.5), 1.7)
-		# Ruínas diferentes por trecho; sem obstruir a faixa de movimentação.
-		_cairn(Vector3(x+2.1,0,-3.2))
 
-func _shelf(x: float, width: float, top: float, bottom: float, depth: float) -> void:
+func _shelf(x: float, width: float, top: float, bottom: float, depth: float, cap_left := true, cap_right := true) -> void:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var surface := SurfaceTool.new()
@@ -47,8 +44,8 @@ func _shelf(x: float, width: float, top: float, bottom: float, depth: float) -> 
 			var color := Color("#a57852").lightened(sin(layer*1.9)*0.035+sin((x0+x1)*0.2)*0.018)
 			_quad(st, Vector3(x0,y0,_cliff_z(x0,layer,depth)), Vector3(x0,y1,_cliff_z(x0,layer+1,depth)), Vector3(x1,y1,_cliff_z(x1,layer+1,depth)), Vector3(x1,y0,_cliff_z(x1,layer,depth)), color)
 			_quad(st, Vector3(x1,y0,back), Vector3(x1,y1,back), Vector3(x0,y1,back), Vector3(x0,y0,back), color)
-	_quad(st, Vector3(x-width*.5,top,-depth*.5), Vector3(x-width*.5,bottom,-depth*.5), Vector3(x-width*.5,bottom,depth*.5), Vector3(x-width*.5,top,depth*.5), Color("#9e694b"))
-	_quad(st, Vector3(x+width*.5,top,depth*.5), Vector3(x+width*.5,bottom,depth*.5), Vector3(x+width*.5,bottom,-depth*.5), Vector3(x+width*.5,top,-depth*.5), Color("#a37650"))
+	if cap_left: _quad(st, Vector3(x-width*.5,top,-depth*.5), Vector3(x-width*.5,bottom,-depth*.5), Vector3(x-width*.5,bottom,depth*.5), Vector3(x-width*.5,top,depth*.5), Color("#9e694b"))
+	if cap_right: _quad(st, Vector3(x+width*.5,top,depth*.5), Vector3(x+width*.5,bottom,depth*.5), Vector3(x+width*.5,bottom,-depth*.5), Vector3(x+width*.5,top,-depth*.5), Color("#a37650"))
 	st.generate_normals()
 	var visual := MeshInstance3D.new()
 	visual.mesh = st.commit()
@@ -60,7 +57,7 @@ func _shelf(x: float, width: float, top: float, bottom: float, depth: float) -> 
 	var sand := MeshInstance3D.new()
 	sand.mesh = surface.commit()
 	var sand_mat := StandardMaterial3D.new()
-	sand_mat.albedo_color = Color("#a69e8d").srgb_to_linear()
+	sand_mat.albedo_color = Color("#a69e8d").srgb_to_linear()*Color(0.7,0.76,0.85,1)
 	sand_mat.roughness = 1.0
 	var texture := NoiseTexture2D.new()
 	texture.width = 128

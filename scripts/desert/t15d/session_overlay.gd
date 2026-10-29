@@ -1,7 +1,6 @@
 extends CanvasLayer
 ## Navegação local da Fase 01; a pausa não altera dados de campanha.
 signal resume_requested
-signal checkpoint_requested
 signal restart_requested
 signal next_requested
 signal return_requested
@@ -11,6 +10,9 @@ var _column: VBoxContainer
 var _font: FontFile
 var opened := false
 var _completion := false
+var order := 1
+var phase_name := "Entrada do Deserto"
+var total_enemies := 0
 func _ready() -> void:
 	layer = 20
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -49,7 +51,7 @@ func _title(text: String, size: int, color: Color) -> void:
 func _button(text: String, action: Callable, primary := false) -> void:
 	var button := Button.new()
 	button.text = text
-	button.custom_minimum_size = Vector2(320,40)
+	button.custom_minimum_size = Vector2(320,44)
 	button.add_theme_font_size_override("font_size",17)
 	button.add_theme_color_override("font_color",Color("#172436") if primary else Color("#f4e5ca"))
 	for state in ["font_hover_color","font_pressed_color","font_focus_color"]:
@@ -72,19 +74,19 @@ func _clear() -> void:
 func show_pause() -> void:
 	_completion = false
 	_clear()
-	_title("ENTRADA DO DESERTO",12,Color("#d9b778"))
+	_title(phase_name.to_upper(),12,Color("#d9b778"))
 	_title("Pausa",28,Color.WHITE)
 	_button("Continuar",resume_requested.emit,true)
-	_button("Retomar do checkpoint",checkpoint_requested.emit)
 	_button("Recomeçar fase",restart_requested.emit)
 	_button("Voltar aos reinos",return_requested.emit)
 	_open()
-func show_completion(defeated: int, seconds: float) -> void:
+func show_completion(defeated: int, seconds: float, saved := true) -> void:
 	_completion = true
 	_clear()
-	_title("FASE 01  /  CONCLUÍDA",12,Color("#d9b778"))
+	_title("FASE %02d  /  CONCLUÍDA" % order,12,Color("#d9b778"))
 	_title("Travessia concluída",27,Color.WHITE)
-	_title("Cactus derrotados  %d / 3    •    %02d:%02d" % [defeated,int(seconds)/60,int(seconds)%60],14,Color("#dccdb3"))
+	_title("Cactus  %d / %d    •    %02d:%02d" % [defeated,total_enemies,int(seconds)/60,int(seconds)%60],14,Color("#dccdb3"))
+	_title("Próxima fase liberada neste aparelho" if saved else "Não foi possível salvar o progresso",14,Color("#9dc9dc"))
 	_button("Próxima fase",next_requested.emit,true)
 	_button("Jogar novamente",restart_requested.emit)
 	_button("Voltar aos reinos",return_requested.emit)

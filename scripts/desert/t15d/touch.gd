@@ -4,6 +4,7 @@ const ACTIONS := ["move_left", "move_right", "crouch", "defend", "attack", "jump
 const LABELS := ["‹", "›", "↓", "DEF", "ATQ", "↑"]
 var _areas: Array[Rect2] = []
 var _held := {}
+var actor: Node
 var _font: FontFile
 var _last_pixels := Vector2i.ZERO
 func _ready() -> void:
@@ -24,13 +25,15 @@ func _draw() -> void:
 		var point: Vector2 = points[index]
 		_areas.append(Rect2(point-Vector2.ONE*radius,Vector2.ONE*radius*2))
 		var down := _held.values().has(ACTIONS[index])
+		var empty: bool = is_instance_valid(actor) and ((index == 4 and actor.attack_charges == 0) or (index == 3 and actor.defense_charges == 0))
 		draw_circle(point,radius,Color(0.04,0.09,0.15,0.74) if not down else Color(0.48,0.32,0.11,0.8))
 		draw_arc(point,radius,0,TAU,40,Color(0.95,0.80,0.48,0.7),1.5*unit,true)
 		var font := _font
 		var font_size := int((14 if index in [3,4] else 27)*unit)
 		var label: String = LABELS[index]
+		if empty: label += " 0"
 		var width := font.get_string_size(label,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size).x
-		draw_string(font,point+Vector2(-width*.5,font_size*.35),label,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,Color("#f5e4bd"))
+		draw_string(font,point+Vector2(-width*.5,font_size*.35),label,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,Color("#a4a8ad") if empty else Color("#f5e4bd"))
 func _process(_delta: float) -> void:
 	var pixels := get_window().size
 	if pixels != _last_pixels:

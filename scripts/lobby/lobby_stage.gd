@@ -161,4 +161,11 @@ func _resize_render() -> void:
 	var output_scale := Vector2(get_window().size) / get_viewport().get_visible_rect().size
 	var pixels := get_global_transform_with_canvas().get_scale().abs() * size * output_scale
 	var supersample := 2.0 / float(_resolution_divisor)
-	_viewport.size = Vector2i(clampi(ceili(pixels.x * supersample), 64, 2560), clampi(ceili(pixels.y * supersample), 64, 2560))
+	var target := pixels * supersample
+	# Celular e navegador: sem supersampling e com teto de ~1,2 megapixel. Em telas de alta
+	# densidade o palco chegava a 2560×2560 com MSAA, estourava a memória do WebGL no
+	# iPhone e o navegador recarregava a página ao girar o personagem.
+	var budget := 1_200_000.0 if OS.has_feature("web") or OS.has_feature("mobile") or UIScale.is_compact() else 6_000_000.0
+	if OS.has_feature("web") or OS.has_feature("mobile"): target = pixels
+	if target.x * target.y > budget: target *= sqrt(budget / (target.x * target.y))
+	_viewport.size = Vector2i(clampi(ceili(target.x), 64, 2560), clampi(ceili(target.y), 64, 2560))

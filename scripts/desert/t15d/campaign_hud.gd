@@ -119,9 +119,9 @@ func box() -> StyleBoxFlat:
 	return style
 func _layout() -> void:
 	var viewport_size := get_viewport().get_visible_rect().size
-	var compact := get_window().size.y < 600
+	var compact := UIScale.is_compact()
 	# Em telas baixas os painéis encolhem e perdem a linha secundária: a ação ocupa o quadro.
-	var factor := viewport_size.y/maxf(get_window().size.y,1)*0.8 if compact else 1.0
+	var factor := UIScale.unit_for(get_viewport())*0.8 if compact else 1.0
 	_root.scale = Vector2.ONE*factor
 	_kicker.visible = not compact
 	var screen := viewport_size/factor
@@ -169,7 +169,7 @@ func clear_pulse() -> void:
 	_flash.color.a = 0.0
 func set_completed(value: bool) -> void:
 	_pause.visible = not value
-	_hint.visible = not value and get_window().size.y >= 600
+	_hint.visible = not value and not UIScale.is_compact()
 	_toast.hide()
 func _process(delta: float) -> void:
 	if _flash_time > 0.0:

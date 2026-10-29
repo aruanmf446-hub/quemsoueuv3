@@ -8,6 +8,7 @@ const Layout = preload("res://scripts/desert/t15d/campaign_layout.gd")
 const Progress = preload("res://scripts/desert/t15d/campaign_progress.gd")
 const Pickup = preload("res://scripts/desert/t15d/charge_pickup.gd")
 const CHUNK_SIZE := 64.0
+const AHEAD := 2
 signal return_requested
 var _order := 1
 var _scenery: Node3D
@@ -31,6 +32,10 @@ var _saved := false
 var _handoff := false
 var _actor_resources: Array[PackedScene] = []
 var _lead := 0.0
+var _build_queue: Array[Callable] = []
+## Checkpoint ativo (-1 = início da fase) e o estado salvo ao passar por ele.
+var _checkpoint_index := -1
+var _snapshot := {}
 var _sfx: Node
 var _key_light: OmniLight3D
 func _ready() -> void:
@@ -67,6 +72,7 @@ func _physics_process(delta: float) -> void:
 		if _player.position.y < float(_phase.kill_plane_y): _player.fall_out()
 		_stream_world(_player.position.x)
 		_update_progress()
+		_check_checkpoints()
 		if not _tutorial_pit and _player.position.x > float(_phase.holes[0].start)-12.0:
 			_tutorial_pit = true
 			_hud.notify("Buraco à frente • pule para atravessar")
@@ -153,21 +159,51 @@ func _stream_world(x: float, force := false) -> void:
 	_stream_center = center
 	var minimum := floori(float(_phase.bounds.min_x)/CHUNK_SIZE)
 	var maximum := floori(float(_phase.bounds.max_x)/CHUNK_SIZE)
+	# Dois trechos à frente e atrás: o próximo trecho fica pronto bem antes de aparecer.
 	var wanted := {}
-	for index in range(maxi(minimum,center-1),mini(maximum,center+1)+1): wanted[index] = true
+	for index in range(maxi(minimum,center-AHEAD),mini(maximum,center+AHEAD)+1): wanted[index] = true
 	for index in _loaded_chunks.keys():
 		if not wanted.has(index):
 			var old: Node3D = _loaded_chunks[index]
 			_world.remove_child(old)
 			old.queue_free()
 			_loaded_chunks.erase(index)
-	for index in wanted:
-		if not _loaded_chunks.has(index): _load_chunk(index)
-func _load_chunk(index: int) -> void:
+	# O trecho atual e os vizinhos imediatos são montados na hora (spawn, reinício,
+	# checkpoint); os mais distantes entram na fila e são montados aos poucos.
+	var order: Array = wanted.keys()
+	order.sort_custom(func(a: int, b: int) -> bool: return absi(a-center) < absi(b-center))
+	for index in order:
+		if not _loaded_chunks.has(index): _load_chunk(index,force or absi(index-center) <= 1)
+## Monta o trecho em etapas. Antes tudo era feito num único quadro (20–55ms no desktop,
+## bem mais no celular), o que travava a corrida a cada 64m.
+func _load_chunk(index: int, immediate := true) -> void:
 	var chunk := Node3D.new()
 	chunk.name = "DistrictChunk_%d" % index
 	_world.add_child(chunk)
 	_loaded_chunks[index] = chunk
+	var tasks: Array[Callable] = []
+	var platforms := _chunk_platforms(index)
+	# Colisão primeiro: é barata e precisa existir antes de qualquer visual.
+	_build_collision(chunk,platforms)
+	if not platforms.is_empty():
+		for platform: Dictionary in platforms:
+			tasks.append(_build_terrain_piece.bind(chunk,platform))
+		tasks.append(_build_props.bind(chunk,platforms))
+	for spawn: Dictionary in _phase.enemies:
+		if _in_chunk(float(spawn.pos[0]),index) and not _defeated_ids.has(str(spawn.id)):
+			tasks.append(_spawn_enemy.bind(chunk,spawn))
+	tasks.append(_build_chunk_details.bind(chunk,index))
+	for task in tasks:
+		if immediate: task.call()
+		else: _build_queue.append(task)
+func _process(_delta: float) -> void:
+	# Uma etapa por quadro (mais etapas só enquanto o quadro gastou menos de 1ms).
+	var started := Time.get_ticks_usec()
+	while not _build_queue.is_empty() and Time.get_ticks_usec()-started < 1000:
+		var task: Callable = _build_queue.pop_front()
+		var chunk: Object = task.get_bound_arguments()[0] if not task.get_bound_arguments().is_empty() else null
+		if chunk == null or is_instance_valid(chunk) and (chunk as Node).is_inside_tree(): task.call()
+func _chunk_platforms(index: int) -> Array:
 	var left := index*CHUNK_SIZE
 	var right := left+CHUNK_SIZE
 	var platforms: Array = []
@@ -189,6 +225,9 @@ func _load_chunk(index: int) -> void:
 		part.pit_left = source.kind == "ground" and _is_pit_edge(x0,true)
 		part.pit_right = source.kind == "ground" and _is_pit_edge(x1,false)
 		platforms.append(part)
+	return platforms
+func _build_collision(chunk: Node3D, platforms: Array) -> void:
+	for part: Dictionary in platforms:
 		var body := StaticBody3D.new()
 		body.collision_layer = 1
 		body.position = _vec3(part.pos)
@@ -202,17 +241,18 @@ func _load_chunk(index: int) -> void:
 		shape.shape = box
 		body.add_child(shape)
 		chunk.add_child(body)
-	if not platforms.is_empty():
-		var terrain := Terrain.new()
-		terrain.order = _order
-		chunk.add_child(terrain)
-		terrain.build(platforms)
-		var props := preload("res://scripts/desert/t15d/city_props.gd").new()
-		chunk.add_child(props)
-		props.build(platforms,_order)
-	for spawn: Dictionary in _phase.enemies:
-		if _in_chunk(float(spawn.pos[0]),index) and not _defeated_ids.has(str(spawn.id)):
-			_spawn_enemy(chunk,spawn)
+func _build_terrain_piece(chunk: Node3D, platform: Dictionary) -> void:
+	var terrain := Terrain.new()
+	terrain.order = _order
+	chunk.add_child(terrain)
+	terrain.build([platform])
+func _build_props(chunk: Node3D, platforms: Array) -> void:
+	var props := preload("res://scripts/desert/t15d/city_props.gd").new()
+	chunk.add_child(props)
+	props.build(platforms,_order)
+func _build_chunk_details(chunk: Node3D, index: int) -> void:
+	var left := index*CHUNK_SIZE
+	var right := left+CHUNK_SIZE
 	for spawn: Dictionary in _phase.pickups:
 		if _in_chunk(float(spawn.pos[0]),index) and not _collected_ids.has(str(spawn.id)):
 			var item := Pickup.new()
@@ -225,6 +265,14 @@ func _load_chunk(index: int) -> void:
 			chunk.add_child(item)
 	for sign: Dictionary in _phase.signs:
 		if _in_chunk(float(sign.pos[0]),index): _build_pit_sign(chunk,sign)
+	var points: Array = _phase.get("checkpoints",[])
+	for point_index in range(points.size()):
+		if _in_chunk(float(points[point_index].pos[0]),index):
+			var banner := preload("res://scripts/desert/t15d/checkpoint_banner.gd").new()
+			banner.index = point_index
+			banner.position = _vec3(points[point_index].pos)+Vector3(-0.9,0,-1.6)
+			chunk.add_child(banner)
+			banner.refresh_lit(_checkpoint_index)
 	for hole: Dictionary in _phase.holes:
 		var x0 := maxf(float(hole.start),left)
 		var x1 := minf(float(hole.end),right)
@@ -391,13 +439,13 @@ func _build_camera() -> void:
 	_follow_camera(1.0)
 func _follow_camera(delta: float) -> void:
 	# Telas baixas (844×390) aproximam mais: o personagem não pode virar um ícone.
-	_camera.size = 6.0 if get_window().size.y < 600 else 7.0
+	_camera.size = 6.0 if UIScale.is_compact() else 7.0
 	# Antecipação maior na direção da corrida: o próximo vão entra no quadro mais cedo.
 	_lead = move_toward(_lead,clampf(_player.velocity.x/6.0,-1.0,1.0)*2.4,delta*4.0)
 	var lead := _lead
 	# Em telas baixas o chão sobe no quadro (~60%): os botões de toque ficam sobre a
 	# parede do terreno, não sobre a borda dos buracos à frente.
-	var floor_y := 0.75 if get_window().size.y < 600 else 1.65
+	var floor_y := 0.75 if UIScale.is_compact() else 1.65
 	var target := Vector3(clampf(_player.position.x+lead,float(_phase.player_spawn[0]),float(_phase.goal.pos[0])),maxf(floor_y,_player.position.y+1.4-_camera.size*0.5+0.55),0)
 	var destination := target+Vector3(0,1,14)
 	_camera.position = _camera.position.lerp(destination,1.0-exp(-8*delta))
@@ -421,6 +469,7 @@ func _build_hud() -> void:
 	add_child(_session)
 	_session.resume_requested.connect(_resume)
 	_session.restart_requested.connect(_restart_level)
+	_session.checkpoint_requested.connect(_respawn_at_checkpoint)
 	_session.next_requested.connect(func() -> void:
 		_resume()
 		_advance(str(_phase.next_scene)))
@@ -509,7 +558,7 @@ func _release_input() -> void:
 	if is_instance_valid(_touch_pad): _touch_pad.release_all()
 	for action in ["move_left","move_right","jump","attack","defend","crouch"]: Input.action_release(action)
 func _pause() -> void:
-	if completed or _paused: return
+	if completed or _paused or _respawning: return
 	_release_input()
 	_touch_pad.hide()
 	_paused = true
@@ -529,7 +578,10 @@ func _unhandled_input(event: InputEvent) -> void:
 func _notification(what: int) -> void:
 	if not is_instance_valid(_session) or completed: return
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
-		if _paused: _resume()
+		# Na tela de derrota, Voltar equivale a escolher o checkpoint.
+		if _respawning:
+			if _paused: _respawn_at_checkpoint()
+		elif _paused: _resume()
 		else: _pause()
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT: _pause()
 func _on_player_died() -> void:
@@ -540,10 +592,60 @@ func _on_player_died() -> void:
 	var token := _life_token
 	var fell := _player.position.y < -1.0
 	_sfx.play("fall" if fell else "hurt",1.0 if fell else 0.7)
-	_hud.notify("Você caiu • recomeçando a fase" if fell else "Derrotado • recomeçando a fase",true)
-	_hud.pulse(Color(0.02,0.015,0.03),0.8,1.4,true)
-	get_tree().create_timer(1.4,false).timeout.connect(func() -> void:
-		if token == _life_token: _restart_level())
+	_hud.pulse(Color(0.02,0.015,0.03),0.8,1.0,true)
+	# Depois da queda/animação de morte, a fase pausa e o jogador escolhe para onde voltar.
+	get_tree().create_timer(1.0,false).timeout.connect(func() -> void:
+		if token != _life_token or completed: return
+		_touch_pad.hide()
+		_session.show_death(fell,"checkpoint %d" % (_checkpoint_index+1) if _checkpoint_index >= 0 else "")
+		_paused = true
+		get_tree().paused = true)
+## Checkpoints: ao passar pela bandeira de um distrito, guarda posição, cargas, Cactus
+## derrotados e itens coletados. Voltar a ele restaura esse estado com a vida cheia.
+func _check_checkpoints() -> void:
+	var points: Array = _phase.get("checkpoints",[])
+	var next := _checkpoint_index+1
+	if next >= points.size() or _player.is_dead: return
+	if _player.position.x < float(points[next].pos[0]) or not _player.is_on_floor(): return
+	_checkpoint_index = next
+	_checkpoint = _vec3(points[next].pos)
+	_snapshot = {"defeated":_defeated_ids.duplicate(),"collected":_collected_ids.duplicate(),"attack":_player.attack_charges,"defense":_player.defense_charges}
+	_sfx.play("pickup",0.75)
+	_hud.notify("Checkpoint %d de %d salvo" % [next+1,points.size()])
+	get_tree().call_group("campaign_checkpoints","refresh_lit",_checkpoint_index)
+func _respawn_at_checkpoint() -> void:
+	if _checkpoint_index < 0:
+		_restart_level()
+		return
+	_life_token += 1
+	_resume()
+	_respawning = false
+	_build_queue.clear()
+	_defeated_ids = (_snapshot.defeated as Dictionary).duplicate()
+	_collected_ids = (_snapshot.collected as Dictionary).duplicate()
+	_defeated = _defeated_ids.size()
+	for chunk: Node in _loaded_chunks.values():
+		_world.remove_child(chunk)
+		chunk.queue_free()
+	_loaded_chunks.clear()
+	_player.is_dead = false
+	_player.position = _checkpoint+Vector3.UP*0.05
+	_player.velocity = Vector3.ZERO
+	_player.facing = 1
+	_player.setup(_find_protagonist())
+	_player.attack_charges = int(_snapshot.attack)
+	_player.defense_charges = int(_snapshot.defense)
+	_player.inventory_changed.emit()
+	_player._invulnerable = 1.5
+	_player.set_physics_process(true)
+	_touch_pad.set_process(true)
+	_lead = 0.0
+	_hud.clear_pulse()
+	_hud._last_health = 3
+	_stream_world(_player.position.x,true)
+	_follow_camera(1.0)
+	_sync_resources()
+	_hud.notify("De volta ao checkpoint %d" % (_checkpoint_index+1))
 func _respawn_player() -> void:
 	_restart_level()
 func _restart_level() -> void:
@@ -557,6 +659,10 @@ func _restart_level() -> void:
 	_defeated_ids.clear()
 	_collected_ids.clear()
 	_tutorial_pit = false
+	_checkpoint_index = -1
+	_snapshot = {}
+	_checkpoint = _vec3(_phase.player_spawn)
+	_build_queue.clear()
 	for chunk: Node in _loaded_chunks.values():
 		_world.remove_child(chunk)
 		chunk.queue_free()

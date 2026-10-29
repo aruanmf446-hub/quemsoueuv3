@@ -36,7 +36,7 @@ func show_screen(params: Dictionary = {}) -> void:
 
 func render() -> void:
 	PlayerUI.clear(body)
-	var compact := get_window().size.x < SMALL_WINDOW
+	var compact := UIScale.is_compact()
 	var k := COMPACT_SCALE if compact else 1.0
 	heading.text = tr("Músicas do menu")
 	heading.add_theme_font_size_override("font_size", int(38 * k))

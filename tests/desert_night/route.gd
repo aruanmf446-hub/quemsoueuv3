@@ -56,7 +56,7 @@ func run() -> void:
 	await frames(30)
 	check(phase._phase.get("order",0) == order,"cena carrega o mapa correto %02d" % order)
 	check(player.health == 3 and player.attack_charges == 1 and player.defense_charges == 1,"vida e recursos iniciais 3/3, 1/1 e 1/1")
-	check(phase._phase.get("checkpoints",[]).is_empty(),"nenhum checkpoint intermediário")
+	check(phase._phase.get("checkpoints",[]).size() == 7,"sete checkpoints de distrito")
 	var origin := player.position.x
 	var goal := float(phase._phase.goal.pos[0])
 	check((goal-origin-1.0)/6.0 >= 180.0,"distância obrigatória garante três minutos mesmo sem combate")
@@ -124,6 +124,7 @@ func run() -> void:
 	check(float(phase._elapsed) >= 180.0,"tempo físico da fase >=180s (%.2f)" % phase._elapsed)
 	check(physics_seconds >= 180.0,"relógio independente confirma >=180s (%.2f)" % physics_seconds)
 	check(phase._loaded_chunks.size() <= 7,"streaming mantém quantidade limitada de distritos carregados")
+	check(phase._checkpoint_index == 6,"percurso ativa os sete checkpoints")
 	if phase.completed: await snap("04_vitoria")
 	var result := {"order":order,"completed":phase.completed,"deaths":deaths,"checks":checks,"failures":failures,"physics_seconds":physics_seconds,"phase_seconds":phase._elapsed,"health":player.health,"swings":swings,"defeated":phase._defeated_ids.size(),"collected":phase._collected_ids.size(),"captured":capture_frames,"position":[player.position.x,player.position.y,player.position.z]}
 	FileAccess.open(output+".json",FileAccess.WRITE).store_string(JSON.stringify(result,"  "))

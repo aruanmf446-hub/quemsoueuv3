@@ -4,12 +4,14 @@ signal resume_requested
 signal restart_requested
 signal next_requested
 signal return_requested
+signal checkpoint_requested
 var _veil: ColorRect
 var _panel: PanelContainer
 var _column: VBoxContainer
 var _font: FontFile
 var opened := false
 var _completion := false
+var _death := false
 var order := 1
 var phase_name := "Entrada do Deserto"
 var total_enemies := 0
@@ -73,6 +75,7 @@ func _clear() -> void:
 		child.queue_free()
 func show_pause() -> void:
 	_completion = false
+	_death = false
 	_clear()
 	_title(phase_name.to_upper(),12,Color("#d9b778"))
 	_title("Pausa",28,Color.WHITE)
@@ -80,8 +83,22 @@ func show_pause() -> void:
 	_button("Recomeçar fase",restart_requested.emit)
 	_button("Voltar aos reinos",return_requested.emit)
 	_open()
+## Tela de derrota: a fase fica pausada até o jogador escolher para onde voltar.
+func show_death(fell: bool, checkpoint_label: String) -> void:
+	_completion = false
+	_death = true
+	_clear()
+	_title(phase_name.to_upper(),12,Color("#d9b778"))
+	_title("Você caiu" if fell else "Você foi derrotado",28,Color("#f3b4a2"))
+	var has_checkpoint := not checkpoint_label.is_empty()
+	_title("Continue do %s com a vida cheia." % checkpoint_label if has_checkpoint else "Recomece a fase com a vida cheia.",14,Color("#dccdb3"))
+	_button("Voltar ao checkpoint" if has_checkpoint else "Recomeçar do início",checkpoint_requested.emit,true)
+	if has_checkpoint: _button("Recomeçar fase",restart_requested.emit)
+	_button("Voltar ao menu",return_requested.emit)
+	_open()
 func show_completion(defeated: int, seconds: float, saved := true) -> void:
 	_completion = true
+	_death = false
 	_clear()
 	_title("FASE %02d  /  CONCLUÍDA" % order,12,Color("#d9b778"))
 	_title("Travessia concluída",27,Color.WHITE)
@@ -107,12 +124,13 @@ func close() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if opened and event.is_action_pressed("ui_cancel"):
 		if _completion: return_requested.emit()
+		elif _death: checkpoint_requested.emit()
 		else: resume_requested.emit()
 		get_viewport().set_input_as_handled()
 func _layout() -> void:
 	if not is_instance_valid(_panel): return
 	var viewport_size := get_viewport().get_visible_rect().size
-	var unit := viewport_size.y/maxf(get_window().size.y,1) if get_window().size.y < 600 else 1.0
+	var unit := UIScale.unit_for(get_viewport()) if UIScale.is_compact() else 1.0
 	_panel.scale = Vector2.ONE*unit
 	_panel.size = _panel.get_combined_minimum_size()
 	_panel.position = (viewport_size-_panel.size*unit)*0.5

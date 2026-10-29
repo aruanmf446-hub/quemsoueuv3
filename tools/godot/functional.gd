@@ -44,13 +44,18 @@ func _run() -> void:
 	player.set("_invulnerable", 0.0)
 	player.position = Vector3(12, 0.1, 0)
 	await frames(3)
-	# A campanha 01–09 não tem checkpoint intermediário: o ponto de retorno é sempre o spawn.
+	# x=12 fica antes do primeiro checkpoint de distrito: o ponto de retorno ainda é o spawn.
 	var spawn_x := float(phase.get("_phase").player_spawn[0])
 	check(absf(phase.get("_checkpoint").x - spawn_x) < 0.01, "checkpoint_area")
 	# Garante um golpe fatal no teste, independente do contato ao entrar na área.
 	player.set("_invulnerable", 0.0)
 	player.take_damage(SidePlayer.MAX_HEALTH, 0)
-	await create_timer(2.0).timeout
+	# A derrota pausa a fase e abre o painel; o botão principal volta ao último checkpoint.
+	await create_timer(1.5, true).timeout
+	var session: Node = phase.get("_session")
+	if session != null and session.get("opened"):
+		session.emit_signal("checkpoint_requested")
+	await create_timer(0.5, true).timeout
 	print("RESPAWN_STATE ", player.is_dead, " health=", player.health, " x=", player.position.x)
 	# Morrer reinicia a fase inteira no spawn, com a vida cheia da campanha (3).
 	check(not player.is_dead and player.health == int(player.get("RUN_MAX_HEALTH")) and absf(player.position.x-spawn_x) < 0.1, "checkpoint_respawn")

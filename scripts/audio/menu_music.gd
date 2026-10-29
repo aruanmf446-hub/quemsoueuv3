@@ -323,6 +323,15 @@ func _play(track: Dictionary, position: float = 0.0) -> void:
 	track_changed.emit(current_track())
 	state_changed.emit()
 
+## Posição e duração da faixa atual, para a barra de progresso do mini player.
+func playback_position() -> float:
+	var player := _players[_active]
+	return player.get_playback_position() if player.playing or player.stream_paused else 0.0
+
+func track_length() -> float:
+	var stream := _players[_active].stream
+	return stream.get_length() if stream != null else 0.0
+
 func pause() -> void:
 	paused = true
 	for player in _players: player.stream_paused = true

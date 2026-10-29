@@ -157,10 +157,19 @@ func run() -> void:
 		if player.is_dead: break
 		await physics_frame
 	check(player.is_dead and deaths == prior_deaths+1,"cair no buraco aciona morte")
-	await frames(130)
+	# A derrota pausa a fase e mostra o painel; sem checkpoint ativo, o primário recomeça.
+	for frame in range(150):
+		if phase._session.opened and phase._session._death: break
+		await physics_frame
+	check(phase._session.opened and paused,"morte abre o painel de derrota com a fase pausada")
+	for child in phase._session._column.get_children():
+		if child is Button:
+			child.pressed.emit()
+			break
+	await frames(10)
 	player = phase._player
 	var spawn_x := float(phase._phase.player_spawn[0])
-	check(not player.is_dead and absf(player.position.x-spawn_x) < 0.5,"morte retorna ao início inteiro da fase")
+	check(not player.is_dead and absf(player.position.x-spawn_x) < 0.5,"sem checkpoint, a derrota volta ao início inteiro da fase")
 	check(player.health == 3 and player.attack_charges == 1 and player.defense_charges == 1,"nova tentativa restaura vida e os dois recursos")
 	check(phase._defeated_ids.is_empty() and phase._collected_ids.is_empty(),"nova tentativa restaura inimigos e reposições")
 	# GUI: eventos reais de dois dedos e mouse, alvos físicos e pausa.

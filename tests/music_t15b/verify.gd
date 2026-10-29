@@ -28,9 +28,11 @@ func run() -> void:
 	current_scene = menu
 	await settle(12)
 	nav = menu.get_node("Navigation")
-	check(music.tracks.size() == 14 and music.available_tracks().is_empty(), "14 faixas pendentes não reproduzem")
+	# As 14 faixas foram liberadas pelo proprietário (docs/audio/MENU_MUSIC.md): todas
+	# precisam passar pela validação completa de licença, áudio e capa.
+	check(music.tracks.size() == 14 and music.available_tracks().size() == 14, "14 faixas liberadas reproduzem")
 	for track: Dictionary in music.tracks:
-		check(track.license.status == "pending" and not track.enabled, "sem licença simulada: " + track.id)
+		check(track.license.status == "approved" and track.enabled and music.licensed(track), "licença válida: " + track.id)
 	# Caminho real, iniciado pelo botão de Configurações no menu.
 	menu.get_node("TopBar/SettingsButton").pressed.emit()
 	await settle()
@@ -90,7 +92,7 @@ func run() -> void:
 	music.save_selection([], [])
 	check(not music.set_local_test_authorized(true) if not music.local_test_mode() else music.set_local_test_authorized(true), "autorização local exige modo explícito do editor")
 	if music.local_test_mode(): await playback()
-	check(music.reload_catalog() and music.tracks.size() == 14 and music.available_tracks().is_empty(), "catálogo real restaurado e pendente")
+	check(music.reload_catalog() and music.tracks.size() == 14 and music.available_tracks().size() == 14, "catálogo real restaurado com as 14 faixas")
 	menu.queue_free()
 	await settle()
 	print("T15B_RESULT checks=", checks, " failures=", failures)

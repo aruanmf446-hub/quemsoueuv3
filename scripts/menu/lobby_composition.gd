@@ -39,7 +39,11 @@ func _ready() -> void:
 		button.focus_mode = Control.FOCUS_ALL
 	menu.get_node("MenuButtons/BtnDuel").hide()
 	for path: String in ["TopBar/CoinPill", "TopBar/GemPill", "ProfileCard"]:
-		menu.get_node(path).add_theme_stylebox_override("panel", _box(Color(0.06, 0.09, 0.11, 0.86)))
+		var pill := _box(Color(0.035, 0.06, 0.11, 0.88), 3)
+		pill.skew = Vector2(0.16, 0)
+		pill.border_color = Color(ACCENT, 0.45)
+		pill.border_width_bottom = 2
+		menu.get_node(path).add_theme_stylebox_override("panel", pill)
 	for path: String in ["TopBar/MailButton", "TopBar/FriendsButton", "TopBar/SettingsButton"]:
 		menu.get_node(path).hide()
 	menu.get_node("ProfileCard/Content/Avatar/Ring").hide()
@@ -62,7 +66,7 @@ func _ready() -> void:
 	social_bg = Panel.new()
 	social_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	social_bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	var social_style := _box(Color(0.025, 0.065, 0.12, 0.95))
+	var social_style := _box(Color(0.035, 0.06, 0.11, 0.90), 12)
 	social_style.border_width_top = 2
 	social_style.border_color = ACCENT
 	social_bg.add_theme_stylebox_override("panel", social_style)
@@ -137,17 +141,25 @@ func _box(color: Color, radius: int = 8) -> StyleBoxFlat:
 	box.content_margin_bottom = 10
 	return box
 
+## Mesmo visual das outras telas: cartões inclinados, o principal dourado e os demais
+## em vidro escuro com filete dourado à esquerda.
 func _style_button(button: Button, primary: bool) -> void:
-	var normal := _box(ACCENT if primary else Color(0.025, 0.065, 0.12, 0.95))
-	normal.border_color = ACCENT if primary else Color(0.52, 0.66, 0.73, 0.40)
-	normal.border_width_left = 4 if primary else 2
-	normal.corner_radius_top_left = 2
-	normal.corner_radius_bottom_left = 2
-	button.add_theme_stylebox_override("normal", normal)
-	button.add_theme_stylebox_override("hover", _box(Color("f4ce98") if primary else Color("36434b")))
-	button.add_theme_stylebox_override("pressed", _box(Color("c99a59") if primary else Color("10191e")))
-	button.add_theme_stylebox_override("disabled", _box(Color(0.06, 0.09, 0.11, 0.76)))
-	var focus := _box(Color.TRANSPARENT)
+	var states := {
+		"normal": ACCENT if primary else Color(0.035, 0.06, 0.11, 0.90),
+		"hover": Color("f6d08f") if primary else Color(0.08, 0.13, 0.21, 0.94),
+		"pressed": Color("c99a59") if primary else Color(0.02, 0.04, 0.07, 0.95),
+		"disabled": Color(0.05, 0.07, 0.10, 0.70),
+	}
+	for state: String in states:
+		var style := _box(states[state], 3)
+		style.skew = Vector2(0.16, 0)
+		style.anti_aliasing = true
+		style.border_color = ACCENT if not primary else Color(1, 1, 1, 0.35)
+		style.border_width_left = 0 if primary else 5
+		style.border_width_top = 1 if primary else 0
+		button.add_theme_stylebox_override(state, style)
+	var focus := _box(Color.TRANSPARENT, 3)
+	focus.skew = Vector2(0.16, 0)
 	focus.set_border_width_all(2)
 	focus.border_color = PAPER
 	button.add_theme_stylebox_override("focus", focus)
@@ -164,7 +176,7 @@ func _rect(control: Control, position: Vector2, dimensions: Vector2) -> void:
 func _layout() -> void:
 	var w := menu.size.x
 	var h := menu.size.y
-	var compact := DisplayServer.window_get_size().y < 500
+	var compact := UIScale.is_compact(500.0)
 	# Em 844x390 a viewport é desenhada com escala ~0,41; o texto precisa de mais unidades de projeto.
 	var type_scale := 1.8 if compact else 1.0
 	var left_width := 530.0 if compact else 400.0

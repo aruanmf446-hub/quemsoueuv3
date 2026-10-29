@@ -83,8 +83,18 @@ func run() -> void:
 		if player.is_dead: break
 	key(KEY_D,false)
 	check(fall_clip,"cair de uma borda troca a corrida pela pose de queda")
-	await frames(110)
-	check(not player.is_dead and player.health == 3,"queda reinicia a fase com vida cheia")
+	var panel := false
+	for step in range(150):
+		await physics_frame
+		if phase._session.opened and phase._session._death: panel = true; break
+	check(panel and get_root().get_tree().paused,"morte pausa e mostra o painel de derrota")
+	var labels: Array[String] = []
+	for child in phase._session._column.get_children():
+		if child is Button: labels.append(child.text)
+	check(labels == ["Recomeçar do início","Voltar ao menu"],"sem checkpoint: recomeçar ou voltar ao menu (%s)" % ", ".join(labels))
+	(phase._session._column.get_children().filter(func(c: Node) -> bool: return c is Button)[0] as Button).pressed.emit()
+	await frames(20)
+	check(not player.is_dead and player.health == 3 and not paused,"botão do painel volta ao jogo com vida cheia")
 	check(phase._hud._flash.color.a < 0.01,"véu de morte é removido no reinício")
 	check(not Input.is_action_pressed("move_right") and not Input.is_action_pressed("jump"),"nenhuma ação fica presa depois da morte")
 	for actor in get_nodes_in_group("enemies"): actor.set_physics_process(false)

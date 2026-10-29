@@ -25,8 +25,10 @@ const PROFILES := {
 
 
 static func default_for_platform() -> String:
+	# Navegador também usa "medio": no "baixo" o personagem do lobby saía serrilhado
+	# (sem MSAA) e em meia resolução, o que parecia pixelado em telas de celular.
 	if OS.has_feature("web"):
-		return "baixo"
+		return "medio"
 	if OS.has_feature("android"):
 		return "medio"
 	return "alto"

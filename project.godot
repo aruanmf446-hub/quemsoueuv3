@@ -39,7 +39,13 @@ locale/fallback="pt_BR"
 
 3d/physics_engine="Jolt Physics"
 
+[gui]
+
+theme/default_font_multichannel_signed_distance_field=true
+
 [rendering]
+
+textures/canvas_textures/default_texture_filter=3
 
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="gl_compatibility"

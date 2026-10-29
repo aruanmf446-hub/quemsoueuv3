@@ -13,7 +13,8 @@ Campos obrigatórios por entrada (descrição de formato, não uma faixa fictíc
 | Campo | Valor |
 | --- | --- |
 | id | Identificador único e estável, string não vazia |
-| title / artist | Título e artista reais, strings não vazias |
+| title | Título real, string não vazia |
+| artist | String; vazia enquanto os metadados estão pendentes (a tela mostra "metadados pendentes") |
 | audio | Caminho `res://assets/music/` para AudioStream importado: OGG, MP3 ou WAV |
 | cover | Caminho `res://assets/music/` para Texture2D importada |
 | enabled | Booleano `true` para disponibilizar |
@@ -84,7 +85,7 @@ manual e conferência do material/licença quando as parcerias entregarem os arq
 
 O catálogo lista as 14 faixas de `assets/music/` por categoria (Alternative 3, Funk 1,
 K-pop 3, Pop 3, Trap 4). Todas estão com `enabled: false` e `license.status: "pending"`,
-com artista "Artista não informado" e capas ainda inexistentes. Nenhuma toca até receber
+sem artista registrado (metadados pendentes) e capas ainda inexistentes. Nenhuma toca até receber
 autorização registrada. Os MP3 (73 MB) não são versionados nesta branch; importe-os no
 editor antes de testar.
 
@@ -92,7 +93,7 @@ A tela Músicas (`scenes/player/music.tscn`, rota `music`) separa as faixas por 
 Cada faixa tem "Tocar no menu" (desmarcar tira da playlist) e "Ocultar" (some da lista e da
 playlist; "Reexibir" desfaz). Salvar grava `user://menu_music_selection.cfg` e aplica na
 hora. Descartar volta ao último estado salvo; sair da tela também descarta o rascunho.
-A tela ainda não tem ponto de entrada visível no lobby ou em Configurações.
+Entrada prevista: Configurações → Áudio → Gerenciar músicas, chamando `navigation.open("music")`. Configurações não foi editada nesta branch.
 
 Validação: `tools/godot/music_flow.gd` (35 verificações: catálogo pendente, seleção
 persistida, próxima, anterior, pausa, volume, mudo, saída do menu e tela). As faixas de

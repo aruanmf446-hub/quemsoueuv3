@@ -75,9 +75,12 @@ func reload_catalog(path: String = CATALOG) -> bool:
 	return true
 
 func _valid_entry(t: Dictionary) -> bool:
-	for field: String in ["id", "title", "artist", "audio", "cover"]:
+	for field: String in ["id", "title", "audio", "cover"]:
 		if not t.get(field) is String or str(t[field]).is_empty():
 			return false
+	# Artista pode ficar vazio enquanto os metadados estão pendentes; a tela não o inventa.
+	if not t.get("artist") is String:
+		return false
 	if not str(t.audio).begins_with("res://assets/music/") or not str(t.cover).begins_with("res://assets/music/"):
 		return false
 	if ".." in str(t.audio) or ".." in str(t.cover):

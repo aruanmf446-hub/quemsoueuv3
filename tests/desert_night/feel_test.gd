@@ -154,10 +154,10 @@ func run() -> void:
 	for step in range(14):
 		await physics_frame
 		for child in phase.get_children():
-			if child.has_signal("hit") and child.has_method("_burst"): arc_seen = true
-	check(arc_seen,"golpe lança a bola de areia com choque")
+			if child.get_class() == "Node3D" and child.has_method("impact"): arc_seen = true
+	check(arc_seen,"soco solta a explosão de areia com choque")
 	await frames(16)
-	check(hit_frame[0] >= 9 and hit_frame[0] <= 20,"areia sai com o braço estendido e atinge logo depois (quadro %d)" % hit_frame[0])
+	check(hit_frame[0] >= 8 and hit_frame[0] <= 13,"soco acerta com o braço estendido (quadro %d)" % hit_frame[0])
 	check(player.attack_charges == 0,"golpe consome a carga")
 	# Dano: reação própria, sinal e véu vermelho; depois pisca na invulnerabilidade.
 	await frames(30)

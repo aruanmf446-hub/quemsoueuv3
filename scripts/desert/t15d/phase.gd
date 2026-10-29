@@ -79,6 +79,7 @@ func _physics_process(delta: float) -> void:
 	_follow_camera(delta)
 	_key_light.position = _player.position+Vector3(0.0,1.5,1.8)
 	_shield.active = _player.is_defending and not _player.is_dead
+	_shield.facing = _player.facing
 	_shield.position = _player.position
 func _build_environment() -> void:
 	var world_environment := WorldEnvironment.new()

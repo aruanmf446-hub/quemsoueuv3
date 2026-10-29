@@ -2,14 +2,27 @@ extends SidePlayer
 signal strike_landed(point: Vector3)
 signal inventory_changed
 signal action_empty(kind: String)
+signal swung
+signal strike_window
+signal hurt
+const ActorSlot = preload("res://scripts/desert/t15d/actor_slot.gd")
 const RUN_MAX_HEALTH := 3
 var attack_charges := 1
 var defense_charges := 1
 var _shield_timer := 0.0
 var _hit_delivered := false
 var _attack_buffer := 0.0
-const STRIKE_TIME := 0.13
+var _defend_buffer := 0.0
+const STRIKE_TIME := 0.16
 const SWING := 0.42
+## Tempo de virada do modelo (o colisor vira na hora; só o visual gira).
+const TURN_RATE := 22.0
+const HURT_TIME := 0.32
+var _yaw := PI*0.5
+var _hurt_timer := 0.0
+var _blink := 0.0
+var _actor: ActorSlot:
+	get: return _model as ActorSlot
 func _ready() -> void:
 	super._ready()
 	collision_layer = 2
@@ -21,13 +34,16 @@ func setup(entry: Dictionary) -> void:
 	super.setup(entry)
 	_hit_delivered = false
 	_attack_buffer = 0.0
+	_defend_buffer = 0.0
 	attack_charges = 1
 	defense_charges = 1
 	_shield_timer = 0.0
+	_hurt_timer = 0.0
+	_yaw = PI*0.5*facing
 	health = RUN_MAX_HEALTH
 	health_changed.emit(health,RUN_MAX_HEALTH)
 	inventory_changed.emit()
-	_model.play_animation("pronto", true)
+	_actor.play_animation("pronto", true)
 func _physics_process(delta: float) -> void:
 	if is_dead:
 		velocity.y = maxf(velocity.y - GRAVITY * delta, MAX_FALL_SPEED)
@@ -41,7 +57,9 @@ func _physics_process(delta: float) -> void:
 	_coyote_timer = maxf(_coyote_timer - delta, 0.0)
 	_jump_buffer = maxf(_jump_buffer - delta, 0.0)
 	_attack_buffer = maxf(_attack_buffer - delta, 0.0)
+	_defend_buffer = maxf(_defend_buffer - delta, 0.0)
 	_shield_timer = maxf(_shield_timer-delta,0.0)
+	_hurt_timer = maxf(_hurt_timer-delta,0.0)
 	var direction := Input.get_axis("move_left", "move_right")
 	if direction != 0.0 and _attack_timer <= 0.0:
 		facing = signf(direction)
@@ -50,12 +68,15 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("attack"):
 		if attack_charges > 0: _attack_buffer = 0.15
 		else: action_empty.emit("attack")
+	# Defesa com buffer curto: apertar pouco antes de pousar ou no fim do golpe não se perde.
 	if Input.is_action_just_pressed("defend"):
-		if defense_charges > 0 and is_on_floor() and _attack_timer <= 0.0:
-			defense_charges -= 1
-			_shield_timer = 1.2
-			inventory_changed.emit()
-		elif defense_charges == 0: action_empty.emit("defense")
+		if defense_charges > 0: _defend_buffer = 0.2
+		else: action_empty.emit("defense")
+	if _defend_buffer > 0.0 and defense_charges > 0 and is_on_floor() and _attack_timer <= 0.0:
+		_defend_buffer = 0.0
+		defense_charges -= 1
+		_shield_timer = 1.2
+		inventory_changed.emit()
 	is_defending = _shield_timer > 0.0 and is_on_floor() and _knockback_timer <= 0.0 and _attack_timer <= 0.0
 	_set_crouched(not is_defending and Input.is_action_pressed("crouch") and is_on_floor() and _attack_timer <= 0.0)
 	var jumped := false
@@ -80,14 +101,30 @@ func _physics_process(delta: float) -> void:
 	global_position.z = 0.0
 	_update_floor_state(jumped)
 	_update_model_facing()
-	if _attack_timer <= 0.0 and _landing_timer <= 0.0 and not jumped:
+	if _attack_timer > 0.0:
+		# A investida termina antes da janela do golpe; volta à guarda suavemente.
+		if _actor.current_clip() != "golpe" and _hurt_timer <= 0.0: _actor.play_animation("pronto", true, 0.18)
+	elif not jumped and not is_on_floor():
+		_update_air_animation()
+	elif _landing_timer <= 0.0 and _hurt_timer <= 0.0 and not jumped:
 		_update_stance_animation(direction)
+	# Cadência da corrida acompanha a velocidade real: sem pés deslizando na aceleração.
+	_actor.set_rate(clampf(absf(velocity.x)/SPEED,0.45,1.0) if _actor.current_clip() == "base" else 1.0)
+## No ar: mantém pulo/pulo duplo enquanto sobe e passa para a pose de queda ao descer
+## ou ao sair de uma borda andando (antes o clipe de corrida continuava no ar).
+func _update_air_animation() -> void:
+	if _hurt_timer > 0.0: return
+	var clip := _actor.current_clip()
+	var position := _actor.clip_position()
+	var still_jumping := (clip == "pulo" and position < 1.02) or (clip == "pulo_duplo" and position < 0.85)
+	if still_jumping and velocity.y > -6.0: return
+	if velocity.y < -1.0 or not still_jumping: _actor.play_animation("queda", true, 0.16)
 func _update_stance_animation(direction: float) -> void:
 	if not is_on_floor(): return
-	if is_defending: _model.play_animation("defesa", true)
-	elif is_crouching: _model.play_animation("agachado", true)
-	elif absf(direction) > 0.01: _model.play_animation("base", true)
-	else: _model.play_animation("pronto", true)
+	if is_defending: _actor.play_animation("defesa", true)
+	elif is_crouching: _actor.play_animation("agachado", true)
+	elif absf(direction) > 0.01: _actor.play_animation("base", true)
+	else: _actor.play_animation("pronto", true)
 func _start_attack() -> void:
 	if attack_charges <= 0: return
 	attack_charges -= 1
@@ -96,9 +133,11 @@ func _start_attack() -> void:
 	_attack_timer = SWING
 	_attack_cooldown = 0.62
 	_hit_delivered = false
-	_model.play_animation("ataque", false)
+	_actor.play_animation("golpe", false, 0.05)
+	swung.emit()
 func _deliver_hit() -> void:
 	_hit_delivered = true
+	strike_window.emit()
 	for enemy: Node3D in get_tree().get_nodes_in_group("enemies"):
 		if not enemy.has_method("take_damage") or not _can_hit(enemy): continue
 		var query := PhysicsRayQueryParameters3D.create(global_position + Vector3.UP * 0.7, enemy.global_position + Vector3.UP * 0.7, 1)
@@ -132,8 +171,27 @@ func take_damage(amount: int, from_x: float) -> void:
 	var direction := signf(global_position.x-from_x)
 	velocity = Vector3(4.0*(direction if direction != 0 else 1.0),4.5,0)
 	health_changed.emit(health,RUN_MAX_HEALTH)
-	_model.flash(Color("#fff1d7"))
+	_model.flash(Color("#ff8a6a"))
+	_hurt_timer = HURT_TIME
+	_actor.play_animation("dano", false, 0.04)
+	hurt.emit()
 	if health <= 0: _die()
+## Visual: virada curta e piscar durante a invulnerabilidade depois do recuo.
+func _update_model_facing() -> void:
+	var delta := get_physics_process_delta_time()
+	# Interpolação linear entre ±90°: a virada passa pela frente do modelo, nunca pelas costas.
+	_yaw = lerpf(_yaw, PI*0.5*facing, 1.0-exp(-TURN_RATE*delta))
+	_model.basis = Basis(Vector3.UP, _yaw)
+	if _invulnerable > 0.0 and not is_dead and not is_defending and _hurt_timer <= 0.0:
+		_blink += delta
+		_model.visible = fmod(_blink, 0.14) < 0.09
+	else:
+		_blink = 0.0
+		_model.visible = true
+func _land() -> void:
+	if _hurt_timer > 0.0: return
+	_actor.play_animation("aterrissagem", false, 0.05)
+	_landing_timer = LANDING_LOCK
 func fall_out() -> void:
 	if is_dead: return
 	health = 0

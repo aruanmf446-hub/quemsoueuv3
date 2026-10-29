@@ -30,6 +30,9 @@ var _shield: MeshInstance3D
 var _saved := false
 var _handoff := false
 var _actor_resources: Array[PackedScene] = []
+var _lead := 0.0
+var _sfx: Node
+var _key_light: OmniLight3D
 func _ready() -> void:
 	_previous_go_back = bool(get_meta("previous_go_back",get_tree().quit_on_go_back))
 	get_tree().quit_on_go_back = false
@@ -44,6 +47,9 @@ func _ready() -> void:
 		for source in entry.animations.values(): sources[str(source)] = true
 	for source in sources: _actor_resources.append(load(source) as PackedScene)
 	_checkpoint = _vec3(_phase.player_spawn)
+	_sfx = preload("res://scripts/desert/t15d/combat_sfx.gd").new()
+	_sfx.name = "CombatSfx"
+	add_child(_sfx)
 	_build_environment()
 	_world = Node3D.new()
 	_world.name = "StreamedCity"
@@ -65,6 +71,7 @@ func _physics_process(delta: float) -> void:
 			_tutorial_pit = true
 			_hud.notify("Buraco à frente • pule para atravessar")
 	_follow_camera(delta)
+	_key_light.position = _player.position+Vector3(0.0,1.5,1.8)
 	_shield.visible = _player.is_defending and not _player.is_dead
 	_shield.position = _player.position+Vector3(0,0.8,0)
 func _build_environment() -> void:
@@ -108,10 +115,24 @@ func _build_player() -> void:
 	_player.died.connect(_on_player_died)
 	_player.strike_landed.connect(_impact)
 	_player.inventory_changed.connect(_sync_resources)
+	_player.swung.connect(func() -> void: _sfx.play("swing"))
+	_player.strike_window.connect(_slash)
+	_player.hurt.connect(func() -> void: _sfx.play("hurt"))
+	_player.strike_landed.connect(func(_point: Vector3) -> void: _sfx.play("hit"))
+	_player.blocked.connect(func() -> void: _sfx.play("block"))
+	_player.action_empty.connect(func(_kind: String) -> void: _sfx.play("empty"))
 	_player.action_empty.connect(func(kind: String) -> void:
 		if is_instance_valid(_hud): _hud.notify("Sem ataque • procure a lâmina dourada" if kind == "attack" else "Sem defesa • procure o escudo azul",true))
 	_player.blocked.connect(func() -> void: _impact(_player.position+Vector3(_player.facing*0.45,0.9,0),Color("#9cdeff")))
 	_player.setup(_find_protagonist())
+	# Luz de recorte que acompanha o protagonista: o traje escuro não some na muralha.
+	_key_light = OmniLight3D.new()
+	_key_light.name = "PlayerKeyLight"
+	_key_light.light_color = Color("#ffd9b0")
+	_key_light.light_energy = 0.75
+	_key_light.omni_range = 3.6
+	_key_light.shadow_enabled = false
+	add_child(_key_light)
 	_shield = MeshInstance3D.new()
 	var ring := TorusMesh.new()
 	ring.inner_radius = 0.74
@@ -204,6 +225,12 @@ func _load_chunk(index: int) -> void:
 			chunk.add_child(item)
 	for sign: Dictionary in _phase.signs:
 		if _in_chunk(float(sign.pos[0]),index): _build_pit_sign(chunk,sign)
+	for hole: Dictionary in _phase.holes:
+		var x0 := maxf(float(hole.start),left)
+		var x1 := minf(float(hole.end),right)
+		if x1 > x0: _build_pit_void(chunk,x0,x1)
+		for edge in [float(hole.start),float(hole.end)]:
+			if _in_chunk(edge,index): _build_pit_lip(chunk,edge,edge == float(hole.start))
 func _in_chunk(x: float, index: int) -> bool:
 	return floori(x/CHUNK_SIZE) == index
 func _is_pit_edge(x: float, left: bool) -> bool:
@@ -229,6 +256,7 @@ func _spawn_enemy(chunk: Node3D, spawn: Dictionary) -> void:
 	enemy.add_child(model)
 	chunk.add_child(enemy)
 	enemy.setup(_enemy_catalog.cactus,spawn)
+	enemy.winding_up.connect(func() -> void: _sfx.play("windup",0.9))
 	enemy.defeated.connect(func() -> void:
 		_defeated_ids[str(spawn.id)] = true
 		_defeated = _defeated_ids.size())
@@ -244,8 +272,72 @@ func _build_pit_sign(chunk: Node3D, entry: Dictionary) -> void:
 	label.outline_size = 8
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	chunk.add_child(label)
+## Fundo do vão: antes o panorama aparecia pelo buraco e o vão parecia uma janela.
+## Um poço escuro com gradiente deixa claro que ali não há chão.
+func _build_pit_void(chunk: Node3D, x0: float, x1: float) -> void:
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var bands := [[0.0,Color("#2b1d16")],[-0.7,Color("#140d0c")],[-2.4,Color("#050609")],[-12.0,Color("#020205")]]
+	for band in range(bands.size()-1):
+		var top: float = bands[band][0]
+		var bottom: float = bands[band+1][0]
+		var a: Color = bands[band][1]
+		var b: Color = bands[band+1][1]
+		for vertex in [[x0,top,a],[x1,top,a],[x1,bottom,b],[x0,top,a],[x1,bottom,b],[x0,bottom,b]]:
+			st.set_color(vertex[2])
+			st.add_vertex(Vector3(vertex[0],vertex[1],-2.1))
+	# Fundo da fenda atrás do corredor: sem ele o panorama aparecia numa faixa acima do poço.
+	for vertex in [[x0,-6.5],[x1,-6.5],[x1,-2.1],[x0,-6.5],[x1,-2.1],[x0,-2.1]]:
+		st.set_color(Color("#21160f"))
+		st.add_vertex(Vector3(vertex[0],-0.01,vertex[1]))
+	var mesh := MeshInstance3D.new()
+	mesh.name = "PitVoid"
+	mesh.set_meta("pit_void",Vector2(x0,x1))
+	mesh.mesh = st.commit()
+	var material := StandardMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.vertex_color_use_as_albedo = true
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mesh.material_override = material
+	mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	chunk.add_child(mesh)
+## Borda de perigo: friso âmbar no lábio do piso e faixa marcada antes do vão.
+func _build_pit_lip(chunk: Node3D, x: float, left_edge: bool) -> void:
+	var inward := -1.0 if left_edge else 1.0
+	var lip := MeshInstance3D.new()
+	lip.name = "PitLip"
+	var strip := BoxMesh.new()
+	strip.size = Vector3(0.07,0.06,4.1)
+	lip.mesh = strip
+	lip.position = Vector3(x+inward*0.035,0.0,0.0)
+	lip.set_meta("pit_edge",x)
+	lip.material_override = _pit_material("lip")
+	lip.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	chunk.add_child(lip)
+	var band := MeshInstance3D.new()
+	band.name = "PitBand"
+	var plane := PlaneMesh.new()
+	plane.size = Vector2(0.9,3.9)
+	band.mesh = plane
+	band.position = Vector3(x+inward*0.57,0.012,0.0)
+	band.material_override = _pit_material("band")
+	band.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	chunk.add_child(band)
+var _pit_materials := {}
+func _pit_material(key: String) -> StandardMaterial3D:
+	if _pit_materials.has(key): return _pit_materials[key]
+	var material := StandardMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	if key == "lip":
+		material.albedo_color = Color("#e09a45")
+	else:
+		material.albedo_color = Color(0.85,0.42,0.12,0.22)
+		material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_pit_materials[key] = material
+	return material
 func _on_pickup_collected(id: String, kind: String) -> void:
 	_collected_ids[id] = true
+	_sfx.play("pickup",1.0 if kind == "attack" else 1.25)
 	_hud.notify("Ataque +1" if kind == "attack" else "Defesa +1")
 func _build_goal() -> void:
 	_goal = Area3D.new()
@@ -269,7 +361,11 @@ func _build_goal() -> void:
 	label.font_size = 48
 	label.pixel_size = 0.007
 	label.modulate = Color("#e5c58b")
-	label.position = Vector3(float(_phase.goal.pos[0]),3.5,-1.4)
+	label.outline_modulate = Color("#081523")
+	label.outline_size = 10
+	# Acima do arco e sem teste de profundidade: antes as colunas cortavam o texto.
+	label.no_depth_test = true
+	label.position = Vector3(float(_phase.goal.pos[0]),4.15,-1.0)
 	add_child(label)
 	var boundary := StaticBody3D.new()
 	boundary.position = Vector3(float(_phase.bounds.min_x)-0.25,2.5,0)
@@ -294,9 +390,15 @@ func _build_camera() -> void:
 	add_child(_camera)
 	_follow_camera(1.0)
 func _follow_camera(delta: float) -> void:
-	_camera.size = 6.9 if get_window().size.y < 600 else 7.6
-	var lead := clampf(_player.velocity.x/6.0,-1.0,1.0)*1.4
-	var target := Vector3(clampf(_player.position.x+lead,float(_phase.player_spawn[0]),float(_phase.goal.pos[0])),maxf(1.65,_player.position.y+1.4-_camera.size*0.5+0.55),0)
+	# Telas baixas (844×390) aproximam mais: o personagem não pode virar um ícone.
+	_camera.size = 6.0 if get_window().size.y < 600 else 7.0
+	# Antecipação maior na direção da corrida: o próximo vão entra no quadro mais cedo.
+	_lead = move_toward(_lead,clampf(_player.velocity.x/6.0,-1.0,1.0)*2.4,delta*4.0)
+	var lead := _lead
+	# Em telas baixas o chão sobe no quadro (~60%): os botões de toque ficam sobre a
+	# parede do terreno, não sobre a borda dos buracos à frente.
+	var floor_y := 0.75 if get_window().size.y < 600 else 1.65
+	var target := Vector3(clampf(_player.position.x+lead,float(_phase.player_spawn[0]),float(_phase.goal.pos[0])),maxf(floor_y,_player.position.y+1.4-_camera.size*0.5+0.55),0)
 	var destination := target+Vector3(0,1,14)
 	_camera.position = _camera.position.lerp(destination,1.0-exp(-8*delta))
 	_camera.look_at(Vector3(_camera.position.x,_camera.position.y-1,0),Vector3.UP)
@@ -332,6 +434,36 @@ func _update_progress() -> void:
 	var share := clampf((_player.position.x-float(_phase.player_spawn[0]))/float(_phase.length),0,1)
 	var district := mini(int(share*8),7)
 	_hud.update_progress(share,_elapsed,str(_phase.districts[district].name))
+## Rastro curto do golpe: mostra o alcance real (1,7m) que o braço sozinho não cobre.
+func _slash() -> void:
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var steps := 10
+	for index in range(steps):
+		var a0 := lerpf(-1.0,0.9,float(index)/steps)
+		var a1 := lerpf(-1.0,0.9,float(index+1)/steps)
+		var inner := 0.95
+		var outer0 := 1.05+0.18*sin(float(index)/steps*PI)
+		var outer1 := 1.05+0.18*sin(float(index+1)/steps*PI)
+		var points := [Vector3(cos(a0)*inner,sin(a0)*inner,0),Vector3(cos(a0)*outer0,sin(a0)*outer0,0),Vector3(cos(a1)*outer1,sin(a1)*outer1,0),Vector3(cos(a1)*inner,sin(a1)*inner,0)]
+		for corner in [0,1,2,0,2,3]: st.add_vertex(points[corner])
+	var arc := MeshInstance3D.new()
+	arc.name = "SlashArc"
+	arc.mesh = st.commit()
+	var material := StandardMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	material.albedo_color = Color(1.0,0.86,0.55,0.85)
+	arc.material_override = material
+	arc.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	arc.position = _player.position+Vector3(_player.facing*0.15,0.85,0.4)
+	arc.scale = Vector3(_player.facing*0.9,0.9,1)
+	add_child(arc)
+	var tween := arc.create_tween().set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
+	tween.tween_property(material,"albedo_color:a",0.0,0.16)
+	tween.parallel().tween_property(arc,"scale",Vector3(_player.facing*1.1,1.05,1),0.16)
+	tween.tween_callback(arc.queue_free)
 func _impact(point: Vector3, color := Color("#ffd58a")) -> void:
 	var particles := CPUParticles3D.new()
 	particles.position = point
@@ -406,7 +538,10 @@ func _on_player_died() -> void:
 	_release_input()
 	_life_token += 1
 	var token := _life_token
-	_hud.notify("Você caiu • recomeçando a fase" if _player.position.y < -3 else "Derrotado • recomeçando a fase",true)
+	var fell := _player.position.y < -1.0
+	_sfx.play("fall" if fell else "hurt",1.0 if fell else 0.7)
+	_hud.notify("Você caiu • recomeçando a fase" if fell else "Derrotado • recomeçando a fase",true)
+	_hud.pulse(Color(0.02,0.015,0.03),0.8,1.4,true)
 	get_tree().create_timer(1.4,false).timeout.connect(func() -> void:
 		if token == _life_token: _restart_level())
 func _respawn_player() -> void:
@@ -434,6 +569,9 @@ func _restart_level() -> void:
 	_player._invulnerable = 0.6
 	_player.set_physics_process(true)
 	_touch_pad.set_process(true)
+	_lead = 0.0
+	_hud.clear_pulse()
+	_hud._last_health = 3
 	_stream_world(_player.position.x,true)
 	_follow_camera(1.0)
 	_hud.set_completed(false)

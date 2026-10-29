@@ -15,13 +15,25 @@ var _pause: Button
 var _toast: Label
 var _hint: Label
 var _font: FontFile
+var _kicker: Label
 var _toast_left := 0.0
+var _flash: ColorRect
+var _flash_time := 0.0
+var _flash_length := 1.0
+var _flash_peak := 0.0
+var _last_health := 3
 var _stage: Dictionary
 func configure(stage: Dictionary) -> void:
 	_stage = stage
 func _ready() -> void:
 	_font = preload("res://assets/desert/phase01/interface.ttf").duplicate() as FontFile
 	_font.multichannel_signed_distance_field = true
+	# Véu de tela inteira para dano/morte, abaixo dos painéis e sem capturar toque.
+	_flash = ColorRect.new()
+	_flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_flash.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_flash.color = Color(0,0,0,0)
+	add_child(_flash)
 	_root = Control.new()
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_root.theme = Theme.new()
@@ -33,7 +45,8 @@ func _ready() -> void:
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation",5)
 	_identity.add_child(column)
-	column.add_child(label("CIDADE DO DESERTO  /  %02d" % int(_stage.order),11,Color("#c7b48f")))
+	_kicker = label("CIDADE DO DESERTO  /  %02d" % int(_stage.order),11,Color("#c7b48f"))
+	column.add_child(_kicker)
 	_title = label(str(_stage.name),20,Color("#f5eee0"))
 	column.add_child(_title)
 	var resources := HBoxContainer.new()
@@ -107,24 +120,30 @@ func box() -> StyleBoxFlat:
 func _layout() -> void:
 	var viewport_size := get_viewport().get_visible_rect().size
 	var compact := get_window().size.y < 600
-	var factor := viewport_size.y/maxf(get_window().size.y,1) if compact else 1.0
+	# Em telas baixas os painéis encolhem e perdem a linha secundária: a ação ocupa o quadro.
+	var factor := viewport_size.y/maxf(get_window().size.y,1)*0.8 if compact else 1.0
 	_root.scale = Vector2.ONE*factor
+	_kicker.visible = not compact
 	var screen := viewport_size/factor
 	_root.size = screen
 	_identity.position = Vector2(14,14)
 	_identity.size = _identity.get_combined_minimum_size()
+	_identity.call_deferred("reset_size")
 	_status.position = Vector2(screen.x-242,14)
 	_status.custom_minimum_size = Vector2(174,76)
 	_status.size = _status.get_combined_minimum_size()
 	_pause.position = Vector2(screen.x-58,14)
 	_pause.size = Vector2(44,48)
-	_toast.position = Vector2(maxf(14,(screen.x-430)*0.5),112 if compact else 128)
+	_toast.position = Vector2(maxf(14,(screen.x-430)*0.5),92 if compact else 128)
 	_toast.size = Vector2(minf(screen.x-28,430),32)
 	_hint.visible = not compact
 	_hint.position = Vector2(14,screen.y-30)
 	_hint.size = Vector2(screen.x-28,24)
 func update_resources(player: Node) -> void:
+	if player.health < _last_health and player.health > 0: pulse(Color("#b8302a"),0.26,0.35)
+	_last_health = player.health
 	_health.text = "VIDA  %d/3" % player.health
+	_health.modulate = Color(1.0,0.55,0.5) if player.health == 1 else Color.WHITE
 	_attack.text = "ATAQUE  %d/1" % player.attack_charges
 	_defense.text = "DEFESA  %d/1" % player.defense_charges
 	_attack.modulate = Color.WHITE if player.attack_charges > 0 else Color(0.58,0.58,0.58)
@@ -138,11 +157,25 @@ func notify(text: String, warning := false) -> void:
 	_toast.add_theme_color_override("font_color",Color("#f0b6a5") if warning else Color("#f1dfb4"))
 	_toast_left = 2.0
 	_toast.show()
+## Tinge a tela e desvanece: vermelho curto no dano, escurecimento longo na morte.
+func pulse(color: Color, peak: float, length: float, fade_in := false) -> void:
+	_flash.color = Color(color,0.0 if fade_in else peak)
+	_flash_peak = peak
+	_flash_length = length
+	_flash_time = length
+	_flash.set_meta("fade_in",fade_in)
+func clear_pulse() -> void:
+	_flash_time = 0.0
+	_flash.color.a = 0.0
 func set_completed(value: bool) -> void:
 	_pause.visible = not value
 	_hint.visible = not value and get_window().size.y >= 600
 	_toast.hide()
 func _process(delta: float) -> void:
+	if _flash_time > 0.0:
+		_flash_time = maxf(_flash_time-delta,0.0)
+		var progress := 1.0-_flash_time/_flash_length
+		_flash.color.a = _flash_peak*(minf(progress*2.5,1.0) if _flash.get_meta("fade_in",false) else 1.0-progress)
 	if _toast_left > 0:
 		_toast_left -= delta
 		_toast.modulate.a = minf(_toast_left*4.0,1.0)

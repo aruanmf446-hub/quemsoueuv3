@@ -1,9 +1,11 @@
 extends CactusEnemy
+signal winding_up
 var _windup := 0.0
 var _stagger := 0.0
 var _attack_direction := 1.0
 var _recovery := 0.0
 var attacks_delivered := 0
+var _yaw_target := PI*0.5
 func _ready() -> void:
 	super._ready()
 	collision_layer = 4
@@ -13,6 +15,7 @@ func setup(entry: Dictionary, spawn: Dictionary) -> void:
 	super.setup(entry, spawn)
 	health = 1
 	attack_range = 1.25
+	_model.rotation.y = _yaw_target
 func _physics_process(delta: float) -> void:
 	if _state == State.DEAD: return
 	if global_position.y < KILL_PLANE_Y:
@@ -49,6 +52,7 @@ func _physics_process(delta: float) -> void:
 			_attack_direction = signf(offset.x)
 			_model.play_animation("ataque", false)
 			_model.flash(Color("#ffbf62"))
+			winding_up.emit()
 		else:
 			_model.play_animation("pronto",true)
 	else:
@@ -69,6 +73,10 @@ func _physics_process(delta: float) -> void:
 			_move_toward(direction, chase_speed if chasing else speed, "correr" if chasing else "base")
 	move_and_slide()
 	global_position.z = 0.0
+	_model.rotation.y = lerp_angle(_model.rotation.y,_yaw_target,1.0-exp(-16.0*delta))
+## Virada visual curta, como a do protagonista; a direção lógica muda na hora.
+func _face(direction: float) -> void:
+	if direction != 0.0: _yaw_target = PI*0.5*direction
 func take_damage(amount: int) -> void:
 	if _state == State.DEAD: return
 	_model.flash(Color("#fff4c6"))

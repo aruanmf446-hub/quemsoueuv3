@@ -34,6 +34,9 @@ targets=[
  ('rules-desktop',engine+window+['--script','res://tests/desert_night/rules.gd','--',str(out/'rules-desktop'),'1920x1080']),
  ('rules-mobile',engine+window+['--script','res://tests/desert_night/rules.gd','--',str(out/'rules-mobile'),'844x390']),
  ('navigation-desktop',engine+window+['--script','res://tests/desert_night/navigation.gd','--',str(out/'navigation-desktop'),'1920x1080']),
+ ('feel-01',engine+headless+['--script','res://tests/desert_night/feel_test.gd','--','1']),
+ ('feel-05',engine+headless+['--script','res://tests/desert_night/feel_test.gd','--','5']),
+ ('feel-09',engine+headless+['--script','res://tests/desert_night/feel_test.gd','--','9']),
  ('navigation-mobile',engine+window+['--script','res://tests/desert_night/navigation.gd','--',str(out/'navigation-mobile'),'844x390']),
 ]
 for order in a.orders:

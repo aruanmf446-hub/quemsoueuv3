@@ -33,7 +33,12 @@ func run() -> void:
 	check(ProjectSettings.get_setting("display/window/handheld/orientation") == 0, "landscape orientation preserved")
 	music = root.get_node("MenuMusic")
 	check(music is MenuMusicPlayer, "central autoload available")
-	check(music.tracks.is_empty() and silent(), "no unlicensed or fictional tracks bundled")
+	# O catálogo traz as faixas liberadas pelo proprietário: toda entrada carregada precisa
+	# passar pela validação completa (aprovada, vigente, com áudio e capa importados).
+	var all_licensed := true
+	for track: Dictionary in music.tracks:
+		if not music.licensed(track): all_licensed = false
+	check(all_licensed and music.available_tracks().size() == music.tracks.size(), "every bundled track is licensed with audio and cover")
 	var scene: Control = load("res://scenes/menu/main_menu.tscn").instantiate()
 	root.add_child(scene)
 	current_scene = scene
@@ -68,7 +73,7 @@ func run() -> void:
 	check(not music.paused, "F7 resume routed without new UI")
 	await key(KEY_F6)
 	await key(KEY_F8)
-	check(music.current_id.is_empty() and silent(), "empty catalog skip controls stay silent")
+	check(not music.current_id.is_empty() and not silent(), "skip controls keep a licensed track playing")
 	music.pause()
 	prefs.set_preference("music", old_volume)
 	root.remove_child(scene)
@@ -91,7 +96,8 @@ func run() -> void:
 	check(music.paused, "manual pause preserved across scene changes")
 	check(music._preferences == returned.get_node("Services").preferences, "return rebinds live preferences")
 	music.resume()
-	check(not music.paused and silent(), "return resumes safely with empty catalog")
+	await frames(10)
+	check(not music.paused and not music.current_id.is_empty(), "return resumes the licensed playlist")
 	returned.queue_free()
 	current_scene = null
 	await frames()

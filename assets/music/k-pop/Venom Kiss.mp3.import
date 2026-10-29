@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://cr7vln7byjuxt"
+path="res://.godot/imported/Venom Kiss.mp3-b0c6db7907a155945481a0b378c9d36c.mp3str"
+
+[deps]
+
+source_file="res://assets/music/k-pop/Venom Kiss.mp3"
+dest_files=["res://.godot/imported/Venom Kiss.mp3-b0c6db7907a155945481a0b378c9d36c.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

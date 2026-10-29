@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://cy05u17jqa24u"
+path="res://.godot/imported/Smile for the Camera.mp3-30d635dfada3bf476381da95c3f2a09a.mp3str"
+
+[deps]
+
+source_file="res://assets/music/Trap/Smile for the Camera.mp3"
+dest_files=["res://.godot/imported/Smile for the Camera.mp3-30d635dfada3bf476381da95c3f2a09a.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

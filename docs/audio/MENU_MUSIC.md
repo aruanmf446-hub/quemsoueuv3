@@ -103,3 +103,20 @@ MP3s locais são ignorados pelo Git. Isso não fornece licença nem permissão p
 ## Evidências T15B
 
 Ver `tests/music_t15b/README.md`. O teste de captura usa o botão real de Configurações no menu e um clique de mouse em Gerenciar músicas; não instancia a tela Músicas diretamente. As verificações cobrem seleção, persistência, descarte, categorias, autorização local, transporte, volume, saída/retorno ao menu e regressão das Configurações T14B.
+
+## Liberação das 14 faixas (2026-10-29)
+
+As 14 faixas do catálogo foram liberadas a pedido do proprietário do projeto
+(`aruanmf446-hub`), que enviou os MP3 ao repositório. Cada entrada está com
+`enabled: true`, `status: approved` e a referência
+`liberado-pelo-proprietario-aruanmf446-hub-2026-10-29`, válida de 2026-10-29 a
+2036-10-29. Essa referência registra a decisão do proprietário. Ela não é um
+documento de licença: se alguma faixa não puder ser distribuída publicamente,
+mude o `status` dela e publique de novo.
+
+As capas em `assets/music/covers/` são artes simples geradas para cada faixa
+(gradiente da categoria e título), sem imagem de terceiros.
+
+O lobby ganhou um mini player (`scripts/audio/now_playing.gd`) com capa, título,
+faixa anterior, pausar/tocar e próxima. Ele usa a mesma API dos atalhos F6–F8 e é
+o único controle no celular. Fica oculto quando nenhuma faixa está liberada.

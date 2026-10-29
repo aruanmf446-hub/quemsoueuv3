@@ -123,7 +123,9 @@ func _test_skins(inventory: Node) -> void:
 		var preview: Node = skins.get("_preview")
 		var equip: Button = null
 		for candidate in find_all(preview, "Button"):
-			if candidate.text in ["Equipar", "Equipado"]:
+			# Rótulos em caixa alta no visual aprovado; a comparação ignora a caixa.
+			# Skin bloqueada mostra BLOQUEADO no lugar do botão de equipar.
+			if candidate.text.to_lower() in ["equipar", "equipado", "bloqueado"]:
 				equip = candidate
 		if equip == null:
 			check(false, "skins_equip_button_present_" + str(entry.id))

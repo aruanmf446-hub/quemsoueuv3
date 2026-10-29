@@ -6,9 +6,13 @@ signal state_changed
 signal catalog_error(message: String)
 
 const CATALOG := "res://data/music/catalog.json"
+const SELECTION_PATH := "user://menu_music_selection.cfg"
 const MENU := "res://scenes/menu/main_menu.tscn"
 const SILENCE := -60.0
 var tracks: Array[Dictionary] = []
+## Escolhas do jogador (salvas): ocultas somem da lista; desmarcadas ficam fora da playlist.
+var _hidden := {}
+var _deselected := {}
 var current_id := ""
 var paused := false
 var fade_seconds := 0.8
@@ -30,6 +34,7 @@ func _ready() -> void:
 		add_child(player)
 		player.finished.connect(_finished.bind(i))
 		_players.append(player)
+	_load_selection()
 	reload_catalog()
 
 func reload_catalog(path: String = CATALOG) -> bool:
@@ -87,6 +92,10 @@ func _valid_entry(t: Dictionary) -> bool:
 	return true
 
 func _available(t: Dictionary) -> bool:
+	return licensed(t) and not is_excluded(str(t.get("id", "")))
+
+## Verdadeiro quando a licença e os recursos estão válidos, sem considerar a escolha do jogador.
+func licensed(t: Dictionary) -> bool:
 	if t.is_empty():
 		return false
 	var rights: Dictionary = t.license
@@ -96,6 +105,38 @@ func _available(t: Dictionary) -> bool:
 		and not str(rights.get("reference", "")).is_empty() and now >= float(rights.starts_at) \
 		and now < float(rights.ends_at) and ResourceLoader.exists(t.audio, "AudioStream") \
 		and ResourceLoader.exists(t.cover, "Texture2D")
+
+func is_excluded(id: String) -> bool:
+	return _hidden.has(id) or _deselected.has(id)
+
+## Estado salvo: {"hidden": [ids], "deselected": [ids]}.
+func selection() -> Dictionary:
+	return {"hidden": _hidden.keys(), "deselected": _deselected.keys()}
+
+## Grava a escolha no disco e aplica imediatamente à playlist. Retorna false se não gravar.
+func save_selection(hidden: Array, deselected: Array) -> bool:
+	var cfg := ConfigFile.new()
+	cfg.set_value("menu_music", "hidden", hidden)
+	cfg.set_value("menu_music", "deselected", deselected)
+	if cfg.save(SELECTION_PATH) != OK:
+		return false
+	_hidden = _as_set(hidden)
+	_deselected = _as_set(deselected)
+	state_changed.emit()
+	return true
+
+func _load_selection() -> void:
+	var cfg := ConfigFile.new()
+	if cfg.load(SELECTION_PATH) != OK:
+		return
+	_hidden = _as_set(cfg.get_value("menu_music", "hidden", []))
+	_deselected = _as_set(cfg.get_value("menu_music", "deselected", []))
+
+func _as_set(values: Array) -> Dictionary:
+	var result := {}
+	for value: Variant in values:
+		result[str(value)] = true
+	return result
 
 func current_track() -> Dictionary:
 	var index := _index(current_id)

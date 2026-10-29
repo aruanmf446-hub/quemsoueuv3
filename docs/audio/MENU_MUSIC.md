@@ -79,3 +79,22 @@ As fixtures são removidas automaticamente. Não depende de contas ou Supabase.
 Também foram executados import completo e inicialização headless do menu real no
 Godot `4.7.2.stable.official.ed1daf0bf`. A validação automatizada não substitui escuta
 manual e conferência do material/licença quando as parcerias entregarem os arquivos.
+
+## Organização e seleção das faixas (T14A)
+
+O catálogo lista as 14 faixas de `assets/music/` por categoria (Alternative 3, Funk 1,
+K-pop 3, Pop 3, Trap 4). Todas estão com `enabled: false` e `license.status: "pending"`,
+com artista "Artista não informado" e capas ainda inexistentes. Nenhuma toca até receber
+autorização registrada. Os MP3 (73 MB) não são versionados nesta branch; importe-os no
+editor antes de testar.
+
+A tela Músicas (`scenes/player/music.tscn`, rota `music`) separa as faixas por categoria.
+Cada faixa tem "Tocar no menu" (desmarcar tira da playlist) e "Ocultar" (some da lista e da
+playlist; "Reexibir" desfaz). Salvar grava `user://menu_music_selection.cfg` e aplica na
+hora. Descartar volta ao último estado salvo; sair da tela também descarta o rascunho.
+A tela ainda não tem ponto de entrada visível no lobby ou em Configurações.
+
+Validação: `tools/godot/music_flow.gd` (35 verificações: catálogo pendente, seleção
+persistida, próxima, anterior, pausa, volume, mudo, saída do menu e tela). As faixas de
+teste usam áudio real importado com licença fictícia só em memória; nada disso vai ao
+catálogo. Capturas: `tools/godot/capture_music.gd`.

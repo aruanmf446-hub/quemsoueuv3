@@ -71,15 +71,13 @@ func _split_layout() -> void:
 	tabs.name = "CatalogTabs"
 	tabs.add_theme_constant_override("separation", 8)
 	_header.add_child(tabs)
-	for name in ["◆ Personagens", "♧ Skins", "⚔ Armas", "◉ Emotes", "✦ Personalização"]:
-		var tab := _button(name, func() -> void: pass)
+	# Só a aba Personagens tem função nesta versão; as demais aparecem marcadas como "em breve".
+	for label: String in ["◆ Personagens", "♧ Skins", "⚔ Armas", "✦ Personalização"]:
+		var active := label == "◆ Personagens"
+		var tab := _button(label if active else label + " · em breve", func() -> void: pass, active)
 		tab.custom_minimum_size = Vector2(0, 42)
 		tab.add_theme_font_size_override("font_size", 15)
-		if name != "◆ Personagens":
-			tab.disabled = true
-			tab.tooltip_text = "Em desenvolvimento"
-		else:
-			tab.disabled = true
+		tab.disabled = not active
 		tabs.add_child(tab)
 	_split = HBoxContainer.new()
 	_split.name = "SkinsShowcase"

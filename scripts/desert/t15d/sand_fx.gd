@@ -25,56 +25,40 @@ class SandBolt extends Node3D:
 		_rng.randomize()
 		_core = Node3D.new()
 		add_child(_core)
-		var ball := MeshInstance3D.new()
-		var sphere := SphereMesh.new()
-		sphere.radius = 0.17
-		sphere.height = 0.3
-		sphere.radial_segments = 16
-		sphere.rings = 8
-		ball.mesh = sphere
-		var mat := StandardMaterial3D.new()
-		mat.albedo_color = SAND
-		mat.emission_enabled = true
-		mat.emission = SAND * 0.35
-		mat.emission_energy_multiplier = 0.6
-		mat.roughness = 1.0
-		mat.albedo_texture = Res.grain_texture()
-		ball.material_override = mat
-		ball.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		_core.add_child(ball)
-		# Nuvem de areia girando em volta do núcleo: é ela que dá a cara de areia.
+		# Sem núcleo sólido: a frente do disparo é uma rajada de areia solta, mais densa no
+		# centro e alongada na direção do voo (antes parecia uma pedra).
 		var cloud := CPUParticles3D.new()
-		cloud.amount = 40
-		cloud.lifetime = 0.25
+		cloud.amount = 200
+		cloud.lifetime = 0.18
 		cloud.local_coords = true
-		cloud.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
-		cloud.emission_sphere_radius = 0.24
+		cloud.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+		cloud.emission_box_extents = Vector3(0.32, 0.14, 0.12)
 		cloud.spread = 180
 		cloud.initial_velocity_min = 0.2
 		cloud.initial_velocity_max = 0.8
 		cloud.tangential_accel_min = 8.0
 		cloud.tangential_accel_max = 14.0
 		cloud.gravity = Vector3.ZERO
-		cloud.scale_amount_min = 0.7
-		cloud.scale_amount_max = 1.6
-		cloud.mesh = Res.grain_mesh(0.045)
+		cloud.scale_amount_min = 0.5
+		cloud.scale_amount_max = 1.0
+		cloud.mesh = Res.grain_mesh(0.03)
 		cloud.scale_amount_curve = Res.shrink()
 		cloud.color = Color.WHITE
 		_core.add_child(cloud)
 		var trail := CPUParticles3D.new()
-		trail.amount = 90
-		trail.lifetime = 0.45
+		trail.amount = 320
+		trail.lifetime = 0.5
 		trail.local_coords = false
 		trail.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
-		trail.emission_sphere_radius = 0.16
-		trail.direction = Vector3(-direction, 0.2, 0)
-		trail.spread = 25
+		trail.emission_sphere_radius = 0.2
+		trail.direction = Vector3(-direction, 0.15, 0)
+		trail.spread = 18
 		trail.initial_velocity_min = 0.5
 		trail.initial_velocity_max = 2.0
 		trail.gravity = Vector3(0, -3, 0)
-		trail.scale_amount_min = 0.5
-		trail.scale_amount_max = 1.2
-		trail.mesh = Res.grain_mesh(0.05)
+		trail.scale_amount_min = 0.4
+		trail.scale_amount_max = 0.9
+		trail.mesh = Res.grain_mesh(0.03)
 		trail.scale_amount_curve = Res.shrink()
 		trail.color = Color.WHITE
 		add_child(trail)
@@ -120,12 +104,14 @@ class SandBolt extends Node3D:
 		_arc_mesh.clear_surfaces()
 		if _done: return
 		_arc_mesh.surface_begin(Mesh.PRIMITIVE_LINES)
-		for arc in range(5):
-			var angle := _rng.randf() * TAU
-			var start := Vector3(cos(angle), sin(angle), 0) * 0.15
-			var point := start
-			for segment in range(4):
-				var next := point + Vector3(_rng.randf_range(-0.09, 0.09) - direction * 0.07, _rng.randf_range(-0.09, 0.09) + start.y * 0.3, _rng.randf_range(-0.04, 0.04))
+		# Choque: raios em zigue-zague correndo ao longo do jato, de trás para a frente.
+		for arc in range(4):
+			var length := minf(_travelled + 0.4, 1.4)
+			var point := Vector3(-direction * length, _rng.randf_range(-0.12, 0.12), _rng.randf_range(-0.05, 0.05))
+			var steps := 7
+			for segment in range(steps):
+				var t := float(segment + 1) / steps
+				var next := Vector3(lerpf(-direction * length, direction * 0.3, t), _rng.randf_range(-0.18, 0.18), _rng.randf_range(-0.06, 0.06))
 				_arc_mesh.surface_set_color(SPARK)
 				_arc_mesh.surface_add_vertex(point)
 				_arc_mesh.surface_set_color(Color.WHITE)
@@ -278,7 +264,7 @@ class Res:
 	static var _grain_cache := {}
 	static var _texture_cache: Texture2D
 
-	static func grain_mesh(size: float, glow := false, color := Color("#e3b56f")) -> Mesh:
+	static func grain_mesh(size: float, glow := false, color := Color("#c98d4c")) -> Mesh:
 		var key := "%s_%s_%s" % [size, glow, color.to_html()]
 		if _grain_cache.has(key): return _grain_cache[key]
 		var mesh := BoxMesh.new()

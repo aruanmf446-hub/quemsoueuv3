@@ -4,7 +4,15 @@ const ActorSlot = preload("res://scripts/desert/t15d/actor_slot.gd")
 const Player = preload("res://scripts/desert/t15d/player.gd")
 const Cactus = preload("res://scripts/desert/t15d/cactus.gd")
 const Terrain = preload("res://scripts/desert/t15d/terrain.gd")
-var _backdrop: Sprite3D
+signal return_requested
+var _scenery: Node3D
+var _session: CanvasLayer
+var _pause_button: Button
+var _elapsed := 0.0
+var _defeated := 0
+var _life_token := 0
+var _paused := false
+var _previous_go_back := true
 var _hud_root: Control
 var _hud_box: PanelContainer
 var _progress_box: PanelContainer
@@ -14,7 +22,12 @@ var _touch_pad: Control
 var _markers: Array[MeshInstance3D] = []
 var _last_checkpoint := Vector3.ZERO
 var _font: FontFile
+func _ready() -> void:
+	_previous_go_back = get_tree().quit_on_go_back
+	get_tree().quit_on_go_back = false
+	super._ready()
 func _physics_process(delta: float) -> void:
+	if not completed and not _respawning: _elapsed += delta
 	if is_instance_valid(_player):
 		if not completed and not _respawning:
 			if _player.position.y < float(_phase.get("kill_plane_y",-8)): _player.fall_out()
@@ -47,12 +60,8 @@ func _build_environment() -> void:
 	fill.light_color = Color("#d3e4ff")
 	fill.light_energy = 0.45
 	add_child(fill)
-	_backdrop = Sprite3D.new()
-	_backdrop.texture = preload("res://assets/desert/phase01/desert_kingdom.png")
-	_backdrop.pixel_size = 0.01
-	_backdrop.shaded = false
-	_backdrop.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(_backdrop)
+	_scenery = preload("res://scripts/desert/t15d/scenery.gd").new()
+	add_child(_scenery)
 	get_viewport().msaa_3d = Viewport.MSAA_2X
 func _build_platforms() -> void:
 	for platform: Dictionary in _phase.platforms:
@@ -84,6 +93,7 @@ func _build_player() -> void:
 	_player.health_changed.connect(_on_player_health_changed)
 	_player.died.connect(_on_player_died)
 	_player.strike_landed.connect(_impact)
+	_player.blocked.connect(func() -> void: _impact(_player.position+Vector3(_player.facing*0.45,0.9,0),Color("#9cdeff")))
 	_player.setup(_find_protagonist())
 func _build_enemies() -> void:
 	for spawn: Dictionary in _phase.enemies:
@@ -104,6 +114,7 @@ func _build_enemies() -> void:
 		enemy.add_child(model)
 		add_child(enemy)
 		enemy.setup(entry,spawn)
+		enemy.defeated.connect(func() -> void: _defeated += 1)
 func _build_camera() -> void:
 	_camera = Camera3D.new()
 	_camera.projection = Camera3D.PROJECTION_ORTHOGONAL
@@ -120,11 +131,7 @@ func _follow_camera(delta: float) -> void:
 	var destination := target+Vector3(0,1.0,14)
 	_camera.position = _camera.position.lerp(destination,1.0-exp(-8.0*delta))
 	_camera.look_at(Vector3(_camera.position.x,_camera.position.y-1.0,0),Vector3.UP)
-	_backdrop.basis = _camera.basis
-	_backdrop.position = _camera.position-_camera.basis.z*48+_camera.basis.x*(sin(_player.position.x*0.028)*0.6)
-	var aspect := get_viewport().get_visible_rect().size.aspect()
-	var height := maxf(_camera.size*1.18,_camera.size*aspect/1.778*1.18)
-	_backdrop.scale = Vector3.ONE*height/(_backdrop.texture.get_height()*0.01)
+	_scenery.follow(_camera,_player.position.x)
 func _build_hud() -> void:
 	_font = preload("res://assets/desert/phase01/interface.ttf").duplicate() as FontFile
 	_font.multichannel_signed_distance_field = true
@@ -177,6 +184,26 @@ func _build_hud() -> void:
 	_hud_root.add_child(_hint)
 	_touch_pad = preload("res://scripts/desert/t15d/touch.gd").new()
 	layer.add_child(_touch_pad)
+	var combat := preload("res://scripts/desert/t15d/combat_readout.gd").new()
+	combat.phase = self
+	layer.add_child(combat)
+	_pause_button = Button.new()
+	_pause_button.text = "Ⅱ"
+	_pause_button.tooltip_text = "Pausar (Esc)"
+	_pause_button.add_theme_font_size_override("font_size",22)
+	_pause_button.add_theme_stylebox_override("normal",_ui_box())
+	_pause_button.add_theme_stylebox_override("hover",_ui_box())
+	_pause_button.pressed.connect(_pause)
+	_hud_root.add_child(_pause_button)
+	_session = preload("res://scripts/desert/t15d/session_overlay.gd").new()
+	add_child(_session)
+	_session.resume_requested.connect(_resume)
+	_session.checkpoint_requested.connect(_restart_checkpoint)
+	_session.restart_requested.connect(_restart_level)
+	_session.next_requested.connect(func() -> void:
+		_resume()
+		_advance(str(_phase.next_scene)))
+	_session.return_requested.connect(_return_to_story)
 	get_viewport().size_changed.connect(_layout_hud)
 	_layout_hud()
 	_on_player_health_changed(_player.health,SidePlayer.MAX_HEALTH)
@@ -205,9 +232,11 @@ func _layout_hud() -> void:
 	_hud_box.position = Vector2(14,14)
 	_hud_box.custom_minimum_size = Vector2(240,84)
 	_hud_box.size = _hud_box.custom_minimum_size
-	_progress_box.position = Vector2(screen.x-196,14)
+	_progress_box.position = Vector2(screen.x-252,14)
 	_progress_box.custom_minimum_size = Vector2(182,48)
 	_progress_box.size = _progress_box.custom_minimum_size
+	_pause_button.position = Vector2(screen.x-58,14)
+	_pause_button.size = Vector2(44,48)
 	_message_label.position = Vector2(14,screen.y*0.20)
 	_message_label.size = Vector2(screen.x-28,80)
 	_hint.visible = get_window().size.y >= 600
@@ -231,6 +260,16 @@ func _build_checkpoints() -> void:
 		marker.material_override = _marker_material(false)
 		add_child(marker)
 		_markers.append(marker)
+		# Suporte físico de leitura: o anel já não parece flutuar sem contexto.
+		var post := MeshInstance3D.new()
+		var column := CylinderMesh.new()
+		column.height = 0.7
+		column.top_radius = 0.055
+		column.bottom_radius = 0.12
+		post.mesh = column
+		post.position = _vec3(checkpoint.pos)+Vector3(0,0.35,-0.7)
+		post.material_override = Terrain.stone_material(Color("#8f8166"))
+		add_child(post)
 func _marker_material(active: bool) -> StandardMaterial3D:
 	var mat := StandardMaterial3D.new()
 	mat.albedo_color = Color("#eac47e") if active else Color("#77c8db")
@@ -240,14 +279,18 @@ func _marker_material(active: bool) -> StandardMaterial3D:
 func _build_goal() -> void:
 	super._build_goal()
 	for area in get_children():
-		if area is Area3D: area.collision_mask = 2
+		if area is Area3D:
+			area.collision_mask = 2
+			# Remove o poste amarelo de placeholder; o portal 3D identifica a saída.
+			for child in area.get_children():
+				if child is MeshInstance3D: child.queue_free()
 	var arch := Terrain.new()
 	add_child(arch)
 	arch.arch(Vector3(52,0,-0.6),1.6)
 func _respawn_player() -> void:
 	super._respawn_player()
 	_follow_camera(1.0)
-func _impact(point: Vector3) -> void:
+func _impact(point: Vector3, color := Color("#ffd58a")) -> void:
 	var particles := CPUParticles3D.new()
 	particles.position = point
 	particles.amount = 12
@@ -269,27 +312,101 @@ func _impact(point: Vector3) -> void:
 	var material := StandardMaterial3D.new()
 	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	material.vertex_color_use_as_albedo = true
-	material.albedo_color = Color("#ffd58a")
+	material.albedo_color = color
 	mesh.material = material
 	particles.mesh = mesh
-	particles.color = Color("#ffd58a")
+	particles.color = color
 	add_child(particles)
-	get_tree().create_timer(0.8).timeout.connect(particles.queue_free)
+	get_tree().create_timer(0.8,false).timeout.connect(particles.queue_free)
 
 func _on_goal_entered(body: Node3D) -> void:
-	super._on_goal_entered(body)
-	if not completed: return
+	if body != _player or completed or _player.is_dead or _respawning: return
+	completed = true
+	_player.is_dead = true
 	_player.velocity = Vector3.ZERO
+	_player.set_physics_process(false)
 	_bar.value = 100
 	_progress_label.text = "Progresso 100%"
 	_hint.hide()
-	for index in _touch_pad._held.keys(): _touch_pad._release(index)
+	_message_label.hide()
+	_pause_button.hide()
+	_release_input()
 	_touch_pad.hide()
 	_touch_pad.set_process(false)
 	for enemy: Node in get_tree().get_nodes_in_group("enemies"):
 		if enemy.get_parent() == self: enemy.set_physics_process(false)
 	_player._model.play_animation("pronto",true)
-	_show_message("Fase concluída")
-	for child in _hud_root.get_children():
-		if child is Button and child.text == "Próxima fase":
-			child.position = _hud_root.size*0.5+Vector2(-110,30)
+	_session.show_completion(_defeated,_elapsed)
+
+func _release_input() -> void:
+	_touch_pad.release_all()
+	for action in ["move_left","move_right","jump","attack","defend","crouch"]:
+		Input.action_release(action)
+func _pause() -> void:
+	if completed or _paused: return
+	_release_input()
+	_touch_pad.hide()
+	_paused = true
+	_session.show_pause()
+	get_tree().paused = true
+func _resume() -> void:
+	get_tree().paused = false
+	_paused = false
+	_release_input()
+	_session.close()
+	_touch_pad._last_pixels = Vector2i.ZERO
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel") and not completed:
+		_pause()
+		get_viewport().set_input_as_handled()
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST and is_instance_valid(_session) and not completed:
+		if _paused: _resume()
+		else: _pause()
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and is_instance_valid(_session) and not completed:
+		_pause()
+func _on_player_died() -> void:
+	if _respawning or completed: return
+	_respawning = true
+	_life_token += 1
+	var token := _life_token
+	_show_message("Retornando ao checkpoint…")
+	get_tree().create_timer(1.4,false).timeout.connect(func() -> void:
+		if token == _life_token: _respawn_player())
+func _restart_checkpoint() -> void:
+	_life_token += 1
+	_resume()
+	_respawn_player()
+func _restart_level() -> void:
+	_life_token += 1
+	_resume()
+	completed = false
+	_elapsed = 0.0
+	_defeated = 0
+	_checkpoint = _vec3(_phase.player_spawn)
+	for child in get_children():
+		if child is Cactus:
+			remove_child(child)
+			child.queue_free()
+	_build_enemies()
+	_player.set_physics_process(true)
+	_touch_pad.set_process(true)
+	_pause_button.show()
+	_hint.visible = get_window().size.y >= 600
+	_respawn_player()
+func _return_to_story() -> void:
+	_resume()
+	if return_requested.get_connections().is_empty():
+		get_tree().change_scene_to_file("res://scenes/menu/main_menu.tscn")
+	else:
+		return_requested.emit()
+func _flash_message(text: String) -> void:
+	_show_message(text)
+	var token := _message_token
+	get_tree().create_timer(CHECKPOINT_FLASH,false).timeout.connect(func() -> void:
+		if token == _message_token and not completed and not _respawning:
+			_message_label.hide())
+func _exit_tree() -> void:
+	# Retornar/avançar jamais deixa a árvore pausada.
+	if _paused: get_tree().paused = false
+	get_tree().quit_on_go_back = _previous_go_back

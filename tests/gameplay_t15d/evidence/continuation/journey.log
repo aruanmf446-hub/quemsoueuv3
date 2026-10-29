@@ -1,0 +1,30 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS card Modo História acessível no menu
+PASS Modo História aberto por clique real
+PASS menu inicia uma sessão de gameplay
+PASS entrada pelo menu pousa em chão seguro
+PASS retorno antigo recolhido sem sobrepor HUD
+PASS Esc abre pausa e congela a partida
+PASS jogador imóvel durante pausa
+PASS Continuar retoma por mouse/toque
+PASS percurso real ativa primeiro checkpoint
+PASS retomar checkpoint restaura vida e controle
+PASS reinício restaura mapa e três Cactus
+PASS reinício entrega personagem vivo no início
+PASS retorno limpa sessão e mostra os reinos
+PASS relançar não duplica jogador nem sessão
+PASS jornada do menu até a saída sem teleporte
+PASS vitória fecha progresso e apresenta ações
+PASS vitória encerra controle sem queda ou toque preso
+PASS panorâmica e paralaxe acompanham o percurso
+PASS Jogar novamente reabre uma partida funcional
+PASS replay restaura inimigos e estatísticas
+PASS Próxima fase abre cena existente sem alterar seus dados
+PASS wrapper de retorno restaurado para a fase legada
+PASS retorno após avançar preserva menu
+PASS sair da Fase 01 restaura a política Voltar do aplicativo
+JOURNEY_RESULT checks=24 failures=0 deaths=0 mobile=false
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)

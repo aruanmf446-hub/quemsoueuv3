@@ -31,7 +31,7 @@ func load_entry(entry: Dictionary) -> void:
 	if entry.id == "el_fuego" and lib.has_animation(&"ataque"):
 		lib.get_animation(&"ataque").length = 0.95
 	# Repouso em guarda derivado dos próprios ossos/clipe, sem congelar uma pose de corrida.
-	if lib.has_animation(&"defesa"):
+	if lib.has_animation(&"ataque"):
 		var source := lib.get_animation(&"ataque")
 		var idle := Animation.new()
 		idle.length = 2.4

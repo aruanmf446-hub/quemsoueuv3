@@ -68,5 +68,8 @@ func _release(index: int) -> void:
 	_held.erase(index)
 	if not _held.values().has(action): Input.action_release(action)
 func _exit_tree() -> void:
-	for action in _held.values(): Input.action_release(action)
-	_held.clear()
+	release_all()
+func release_all() -> void:
+	for index in _held.keys(): _release(index)
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT: release_all()

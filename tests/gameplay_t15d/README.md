@@ -42,3 +42,68 @@ Em `evidence/`: logs/resultados da rodada final, capturas antes/depois e estados
 A validação gráfica foi feita em Linux por software, não em GPU/aparelho Android ou navegador Web. Movie Maker produz quadros com passo fixo; o vídeo não é medição de FPS em tempo real. Não há afirmação de desempenho em hardware final. O visual está implementado para revisão, sem presumir aprovação artística definitiva. A conversa externa “Criar imagem” não estava acessível; foi usada a ferramenta de geração disponível nesta sessão. Nenhum merge na main foi realizado.
 
 Rodada aprovada: 36 checks adicionais; 19 checks de percurso em 1920×1080 e os mesmos 19 em 844×390; 22 etapas do smoke. Capturas de revisão identificaram e levaram a correções de cor/normais do terreno, painéis esticados, pés abaixo do piso, borrão no HUD, câmera subindo demais no salto e interpenetração de atores.
+
+## Continuação — percurso fechado e cenário
+
+A continuação em `codex/gameplay-t15d` mantém a Fase 01 isolada e acrescenta:
+
+- Panorâmica original do cânion com paralaxe horizontal e vertical limitada. A primeira
+  tentativa dissolvia duas arquiteturas e foi rejeitada na revisão das capturas por
+  produzir torres transparentes. A versão final usa um único horizonte coerente.
+- Material original de arenito, mipmaps, areia separada no piso, arcos em blocos,
+  pedras/vegetação seca e suportes dos checkpoints. Não muda a superfície dos
+  colisores, os vãos, os dados de mapa ou os spawns.
+- Preparação e três indicadores de vida dos Cactus próximos, retorno à guarda entre
+  golpes, recuperação após impacto e bloqueio de golpes por paredes nos dois sentidos.
+  A animação de repouso dos Cactus também deriva de seu próprio clipe de ataque.
+- Pausa por botão, Esc ou notificação Voltar, com continuar, retomar checkpoint,
+  recomeçar e retornar aos reinos. Perda de foco libera o multitoque e pausa.
+  Timers de respawn, checkpoint, efeitos e remoção do Cactus respeitam a pausa.
+  Reiniciar cancela callbacks de morte antigos.
+- Conclusão com tempo/derrotas reais da sessão, replay completo e avanço para a
+  próxima cena existente. A política Voltar do aplicativo é restaurada ao sair.
+  Nenhuma recompensa ou conclusão online é gravada.
+
+O único ajuste de código de produção fora de `scripts/desert/t15d/` é a integração de navegação em
+`story_screen.gd`: conecta o retorno oferecido pela fase e recolhe o wrapper antigo
+que sobrepunha seu HUD. Ao avançar para uma fase legada, esse wrapper reaparece.
+Não muda a composição do lobby, Personagens, Configurações, Músicas, serviços,
+Supabase, gameplay compartilhado ou as outras fases.
+
+O runner agora também executa `session_checks.gd` e `journey.gd` nas duas resoluções.
+O primeiro isola pausa durante morte, cancelamento de respawn, perda de foco,
+notificação Voltar, ataque através de parede, recuperação e remoção de cadáver.
+O segundo clica/toca o menu e os botões reais: entrar pelo Modo História, pausar,
+retomar, checkpoint, reinício, retorno, relançamento, travessia, vitória, replay e
+avanço/retorno. A travessia registrada até a primeira vitória usa somente ações de
+entrada desde o spawn, sem reposicionamento. Depois do replay há uma chamada
+isolada do gatilho de vitória para testar o botão de avanço sem repetir o percurso;
+isso está explícito no código e não é usado como evidência de travessia.
+
+`route_movie.gd` grava exclusivamente o percurso completo até a primeira vitória,
+sem menu, teleporte, callback de vitória antecipado ou respawn forçado. O vídeo é
+produzido pelo Movie Maker do Godot e codificado em H.264, sem interpolação.
+As imagens em `evidence/continuation/` são framebuffers nativos, incluindo entrada
+pelo menu, trecho intermediário, combate, pausa e conclusão. Os logs e JSON da
+rodada correspondente acompanham as capturas. A evidência anterior permanece
+preservada em `evidence/` para comparação.
+
+O escopo desta continuação é a **Fase 01** do início à conclusão, conforme a T15D.
+O botão Próxima fase abre a Fase 02 original; não significa que as nove fases
+seguintes receberam este acabamento. A validação continua em Linux/llvmpipe,
+sem medição de desempenho em Android físico ou Web.
+
+Rodada final da continuação: **36** verificações adicionais de controles/animação,
+**14** de sessão/combate, **24** de fluxo completo em cada resolução (mouse em
+1920×1080 e toque em 844×390), os **19** checks anteriores de percurso em ambas e
+**22** etapas de smoke. Todos passaram no Godot 4.7.2. As duas jornadas pelo menu
+chegaram à saída com **zero mortes**, sem reposicionamento após o spawn.
+
+
+A gravação final `evidence/continuation/travessia-completa.mp4` contém **487 quadros**,
+**16,23 s a 30 fps**: spawn, saltos, combate, degrau alto e saída, com **zero mortes**,
+**vida 4/5** e **dois Cactus derrotados**. Fonte nativa Movie Maker 1672×941;
+o MP4 tem 1672×942 apenas para acomodar YUV420p, com uma linha inferior adicionada.
+Sem áudio, cortes, aceleração ou interpolação. O log original `continuous-route.log`
+inclui o resultado e o tempo de renderização por software; não é um benchmark de FPS.
+As capturas PNG exigidas continuam em suas resoluções nativas 1920×1080 e 844×390.

@@ -13,6 +13,9 @@ window=['--rendering-method','gl_compatibility','--audio-driver','Dummy']
 targets=[
  ('import',engine+['--headless','--editor','--import','--quit']),
  ('extra',engine+window+['--script','res://tests/gameplay_t15d/verify.gd','--',str(out/'extra'),'1920x1080']),
+ ('session',engine+window+['--script','res://tests/gameplay_t15d/session_checks.gd']),
+ ('journey',engine+window+['--script','res://tests/gameplay_t15d/journey.gd','--',str(out/'journey'),'1920x1080']),
+ ('mobile-journey',engine+window+['--script','res://tests/gameplay_t15d/journey.gd','--',str(out/'mobile-journey'),'844x390']),
  ('scenario',engine+window+['--script','res://tools/godot/phase01_scenario.gd','--',str(out/'route'),'1920x1080']),
  ('mobile-scenario',engine+window+['--script','res://tools/godot/phase01_scenario.gd','--',str(out/'mobile-route'),'844x390']),
  ('desktop',engine+window+['--script','res://tests/gameplay_t15d/capture.gd','--',str(out/'desktop'),'1920x1080']),

@@ -9,3 +9,22 @@ O link à conversa “Criar imagem” não pôde ser lido: não existe ferrament
 A arte usa um plano atrás do mundo 3D, com pan suave e escala ajustada ao aspecto da janela. Não substitui nem simula os modelos de El Fuego/Cactus. Nenhum Blender, serviço pago adicional ou pacote de cenário externo foi utilizado.
 
 `interface.ttf` é DejaVu Sans original do pacote de sistema `fonts-dejavu-core`, redistribuído sem alterações. Licença em `FONT_LICENSE.txt`. O modo MSDF é configurado em instâncias privadas do HUD e controles desta fase.
+
+## Continuação T15D — cânion
+
+`desert_canyon.png`: nova arte original gerada pela ferramenta de imagem da sessão,
+para a segunda metade da Fase 01, em 2026-10-29. Origem preservada em
+`/workspace/generated_images/exec-422ae31c-dc7f-4928-85a6-75a282c4f48f.png`.
+Prompt: deserto de arenito em vista lateral, dunas, montanhas com perspectiva
+atmosférica e portal antigo à direita, sem personagens, HUD ou plataformas.
+A paisagem substitui o fundo inicial da Fase 01 e recebe paralaxe por `scenery.gd`;
+a arte anterior permanece preservada no repositório. Não há dissolve entre
+construções sobrepostas;
+chão, vãos, ruínas próximas, colisores e personagens continuam em 3D.
+
+`sandstone.png`: textura original de arenito gerada na mesma sessão,
+origem `/workspace/generated_images/exec-fd8ffa34-8370-4405-8c10-8aed172c9165.png`.
+Prompt: albedo ortográfico de arenito com estratos e erosão discretos, sem luz
+ou sombra direcional, destinado à repetição nas superfícies 3D. Sem mapas de
+normal ou shaders customizados. É um material aplicado à geometria real,
+não uma pintura de plataformas substituindo os colisores.

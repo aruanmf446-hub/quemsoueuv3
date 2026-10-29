@@ -1,0 +1,42 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS spawn estável
+PASS repouso não congela corrida
+PASS captura real inicio
+PASS teclado move com aceleração responsiva
+PASS visual acompanha cápsula, sem root motion (0.029m)
+PASS soltar direção freia sem escorregar
+PASS primeiro pulo via tecla
+PASS segundo impulso no ar
+PASS terceiro salto rejeitado
+PASS aterrissagem recupera os dois saltos
+PASS buffer de salto na aterrissagem
+PASS agachar reconhecido antes de inserir teto
+PASS não levanta cápsula através de teto baixo
+PASS levanta quando há espaço livre
+PASS jogador não sobe no corpo dos Cactus
+PASS checkpoint/saída detectam camada do jogador
+PASS checkpoint/saída detectam camada do jogador
+PASS checkpoint/saída detectam camada do jogador
+PASS ataque não causa dano instantâneo antes do gesto
+PASS hit coincide com contato do golpe (vida=1 antes=3 timer=0.303 delivered=true frente=1.0)
+PASS um golpe não acerta duas vezes
+PASS captura real combate
+PASS segundo golpe derrota o Cactus
+PASS Cactus anuncia ataque antes de aplicar dano
+PASS defesa pode reagir à preparação
+PASS corpos não se interpenetram no combate
+PASS captura real defesa
+PASS patrulha detecta borda e recua
+PASS dois dedos: direção e salto simultâneos
+PASS multitoque mantém direção no segundo salto
+PASS soltar dedos não deixa ações presas
+PASS captura real mobile-salto
+PASS captura real mobile
+PASS mouse também aciona controle virtual
+PASS soltar mouse libera controle virtual
+PASS HUD compacto sem faixas verticais
+T15D_RESULT checks=36 failures=0 root_offset_max=0.02924633026123
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)

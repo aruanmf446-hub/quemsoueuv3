@@ -1,0 +1,17 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS floor_collision
+PASS lateral_movement
+PASS jump
+PASS double_jump
+PASS third_jump_denied
+PASS damage_knockback
+PASS checkpoint_area
+RESPAWN_STATE false health=5 x=12.0
+PASS checkpoint_respawn
+PASS attack_has_windup
+PASS attack_first_contact
+PASS attack_defeats_cactus
+PASS boss_exit_locked
+PASS actual_malagueta_model
+PASS boss_exit_after_defeat

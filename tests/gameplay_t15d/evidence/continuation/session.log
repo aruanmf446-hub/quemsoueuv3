@@ -1,0 +1,20 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS pausa também suspende o relógio do respawn
+PASS retomar conclui respawn uma única vez
+PASS reiniciar cancela o respawn antigo sem teleporte tardio
+PASS perda de foco pausa e libera dedos/direção
+PASS voltar do foco não deixa overlay ou pausa presos
+PASS fase assume o botão Voltar sem encerrar o aplicativo
+PASS botão Voltar abre pausa
+PASS botão Voltar também retoma a partida
+PASS parede bloqueia o impacto do Cactus
+PASS o mesmo golpe acerta quando a parede é removida
+PASS Cactus volta à guarda durante intervalo do ataque
+PASS pausa suspende também a remoção do Cactus derrotado
+PASS retomar libera a remoção do Cactus derrotado
+PASS reinício também remove cadáveres e zera a pausa
+SESSION_RESULT checks=14 failures=0
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)

@@ -65,11 +65,21 @@ func _launch(phase_id: String, path: String) -> void:
 	var host := Node.new()
 	host.name = "StoryPrototypeSession"
 	get_tree().root.add_child(host)
-	host.add_child(packed.instantiate())
+	var phase := packed.instantiate()
+	host.add_child(phase)
 	var layer := PrototypeReturnOverlay.new()
 	layer.return_action = func() -> void:
 		host.queue_free()
 		menu.show()
 		_launching = false
 	host.add_child(layer)
+	# A Fase 01 oferece pausa/retorno próprios; mantém o wrapper das fases legadas.
+	if phase.has_signal("return_requested"):
+		phase.connect("return_requested", layer.return_action)
+		layer.hide()
+		layer.process_mode = Node.PROCESS_MODE_DISABLED
+		phase.tree_exiting.connect(func() -> void:
+			if is_instance_valid(layer):
+				layer.show()
+				layer.process_mode = Node.PROCESS_MODE_INHERIT)
 	menu.hide()

@@ -164,7 +164,10 @@ func _deliver_hit() -> void:
 		strike_landed.emit(point)
 func restore_charge(kind: String) -> bool:
 	if is_dead: return false
-	if kind == "attack" and attack_charges < 1:
+	if kind == "health" and health < RUN_MAX_HEALTH:
+		health += 1
+		health_changed.emit(health,RUN_MAX_HEALTH)
+	elif kind == "attack" and attack_charges < 1:
 		attack_charges = 1
 	elif kind == "defense" and defense_charges < 1:
 		defense_charges = 1

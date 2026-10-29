@@ -65,6 +65,11 @@ jobs:
           test -s build/web/index.pck
           test -s build/web/index.wasm
           du -sh build/web
+      - uses: actions/upload-artifact@v4
+        with:
+          name: quem-sou-eu-v3-web-preview
+          path: build/web
+          retention-days: 90
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:

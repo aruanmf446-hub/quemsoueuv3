@@ -79,6 +79,14 @@ func _ready() -> void:
 	music.bus = "Music"
 	# Reserved for the approved soundtrack; deliberately no stream or autoplay.
 	menu.add_child(music)
+	# Limpeza final: textos e cartão de conta saem da composição. Os nós continuam existindo
+	# para preservar sinais, serviços e rotas; a seleção de personagem fica nas Skins.
+	eyebrow.hide()
+	footer.hide()
+	menu.get("_mode_label").hide()
+	menu.get_node("ProfileCard").hide()
+	for path: String in ["NameLabel", "PrevButton", "NextButton"]:
+		menu.get_node("LobbyArea/Overlay/" + path).hide()
 	_language()
 	menu.get_node("Services").preferences.changed.connect(_language)
 	menu.resized.connect(_layout)

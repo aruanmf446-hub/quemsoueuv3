@@ -92,7 +92,9 @@ func _run() -> void:
 	check(current_route() == "", "friends_view_all_closes")
 
 	# 3) Hotspots de perfil e carteira (criados no _hotspot)
-	for hotspot: Control in [menu.get_node("ProfileCard"), menu.get_node("TopBar/CoinPill"), menu.get_node("TopBar/GemPill")]:
+	# Cartão "Minha conta" foi removido da composição final; perfil segue pelas telas internas.
+	check(not menu.get_node("ProfileCard").is_visible_in_tree(), "profile_card_hidden_by_cleanup")
+	for hotspot: Control in [menu.get_node("TopBar/CoinPill"), menu.get_node("TopBar/GemPill")]:
 		await click(hotspot)
 		await settle()
 		var route := current_route()

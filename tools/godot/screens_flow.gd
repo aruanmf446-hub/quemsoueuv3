@@ -80,29 +80,28 @@ func _run() -> void:
 
 
 func _test_lobby_swap(inventory: Node) -> void:
-	var next_button := menu.get_node("LobbyArea/Overlay/NextButton") as Button
-	var prev_button := menu.get_node("LobbyArea/Overlay/PrevButton") as Button
-	var name_label := menu.get_node("LobbyArea/Overlay/NameLabel") as Label
-	var unlocked_count := 0
+	# Limpeza final: setas e nome saem do lobby; a troca passa só pela tela Skins.
+	check(not menu.get_node("LobbyArea/Overlay/NextButton").is_visible_in_tree(), "lobby_arrows_hidden")
+	check(not menu.get_node("LobbyArea/Overlay/NameLabel").is_visible_in_tree(), "lobby_name_hidden")
+	var lobby: Node = menu.get_node("LobbyArea")
+	var start: String = inventory.equipped_id()
+	var unlocked: Array = []
 	for entry: Dictionary in inventory.entries:
 		if inventory.is_unlocked(entry.id):
-			unlocked_count += 1
-	check(unlocked_count >= 2, "lobby_has_two_or_more_unlocked (%d)" % unlocked_count)
-	var start: String = inventory.equipped_id()
-	await click(next_button)
+			unlocked.append(entry.id)
+	check(unlocked.size() >= 2, "skins_has_two_or_more_unlocked (%d)" % unlocked.size())
+	nav.call("open", "skins", {})
 	await frames(30)
-	var after_next: String = inventory.equipped_id()
-	check(after_next != start, "lobby_next_changes_character")
-	check(inventory.is_unlocked(after_next), "lobby_next_lands_on_unlocked")
-	check(name_label.text == inventory.entry(after_next).get("name", "?"), "lobby_label_matches_character")
-	await click(prev_button)
+	var skins: Control = menu.get_node("SkinsPanel")
+	for character_id: String in unlocked:
+		await skins.call("_equip", character_id)
+		await frames(30)
+		check(lobby.call("current_character_id") == StringName(character_id), "skins_equip_updates_stage_" + character_id)
+	await skins.call("_equip", start)
 	await frames(30)
-	check(inventory.equipped_id() == start, "lobby_prev_returns_to_start")
-	# Percorre o ciclo inteiro: deve voltar ao início sem travar.
-	for i in range(unlocked_count):
-		await click(next_button)
-		await frames(20)
-	check(inventory.equipped_id() == start, "lobby_full_cycle_returns")
+	nav.call("back")
+	await frames(20)
+	check(inventory.equipped_id() == start, "skins_restore_start_character")
 
 
 func _test_skins(inventory: Node) -> void:

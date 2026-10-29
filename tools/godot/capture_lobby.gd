@@ -20,7 +20,7 @@ func _capture() -> void:
 	if actual != Vector2i(int(requested[0]), int(requested[1])):
 		print("LAYOUT_WARN resolution_not_applied ", actual)
 	var bounds := Rect2(Vector2.ZERO, scene.size)
-	for path: String in ["MenuButtons", "ProfileCard", "TopBar", "FriendsPanel", "LobbyArea/Overlay/NameLabel"]:
+	for path: String in ["MenuButtons", "TopBar", "FriendsPanel"]:
 		var control: Control = scene.get_node(path)
 		if not bounds.encloses(control.get_global_rect()):
 			push_error("LOBBY_OUT_OF_BOUNDS " + path + " " + str(control.get_global_rect()))

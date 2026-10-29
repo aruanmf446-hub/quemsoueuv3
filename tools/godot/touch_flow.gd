@@ -76,13 +76,25 @@ func _run() -> void:
 	nav.call("back")
 	await settle()
 
+	# Limpeza final: setas ocultas no lobby; a troca por toque passa pela tela Skins.
+	check(not menu.get_node("LobbyArea/Overlay/NextButton").is_visible_in_tree(), "touch_lobby_arrows_hidden")
 	var start: String = inventory.equipped_id()
-	await tap(menu.get_node("LobbyArea/Overlay/NextButton"))
+	nav.call("open", "skins", {})
 	await frames(30)
-	check(inventory.equipped_id() != start and inventory.is_unlocked(inventory.equipped_id()), "touch_lobby_next_changes_character")
-	await tap(menu.get_node("LobbyArea/Overlay/PrevButton"))
+	var skins: Control = menu.get_node("SkinsPanel")
+	var other := ""
+	for entry: Dictionary in inventory.entries:
+		if entry.id != start and inventory.is_unlocked(entry.id):
+			other = entry.id
+			break
+	await skins.call("_equip", other)
 	await frames(30)
-	check(inventory.equipped_id() == start, "touch_lobby_prev_restores")
+	check(inventory.equipped_id() == other, "touch_skins_equip_changes_character")
+	await skins.call("_equip", start)
+	await frames(30)
+	nav.call("back")
+	await settle()
+	check(inventory.equipped_id() == start, "touch_skins_restore_start")
 
 	print("TOUCH_FLOW_FAILURES ", failures)
 	quit(1 if failures else 0)

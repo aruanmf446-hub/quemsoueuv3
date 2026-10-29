@@ -1,11 +1,16 @@
 """Isolated Godot tests. Generates only zero-valued PCM, never music or shipped tracks."""
-import argparse, json, pathlib, shutil, subprocess, tempfile, wave
+import argparse, json, os, pathlib, shutil, subprocess, tempfile, wave
 p = argparse.ArgumentParser()
 p.add_argument('--godot', required=True)
 a = p.parse_args()
 root = pathlib.Path(__file__).resolve().parents[2]
 with tempfile.TemporaryDirectory(prefix='qse-t11-') as folder:
     d = pathlib.Path(folder)
+    env = os.environ.copy()
+    for key, leaf in [('XDG_DATA_HOME','data'),('XDG_CONFIG_HOME','config'),('XDG_CACHE_HOME','cache')]:
+        path = d / leaf
+        path.mkdir()
+        env[key] = str(path)
     for name in ['scripts/audio/menu_music.gd', 'data/music/catalog.json', 'tests/audio/test_menu_music.gd']:
         target = d / name
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -30,7 +35,7 @@ with tempfile.TemporaryDirectory(prefix='qse-t11-') as folder:
     (d / 'tests/audio/catalog.json').write_text(json.dumps(dict(version=1, fade_seconds=0.05, tracks=tracks)))
     (d / 'tests/audio/invalid.json').write_text('{broken')
     for args in [['--editor', '--import', '--quit'], ['--script', 'res://tests/audio/test_menu_music.gd']]:
-        r = subprocess.run([a.godot, '--headless', '--path', str(d), *args], text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=90)
+        r = subprocess.run([a.godot, '--headless', '--path', str(d), *args], env=env, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=90)
         print(r.stdout)
         if r.returncode or 'SCRIPT ERROR' in r.stdout or 'FAIL ' in r.stdout:
             raise SystemExit(1)

@@ -84,8 +84,7 @@ func run() -> void:
 	check(first != null and not first.disabled and second != null and second.disabled,"novo perfil libera só a primeira fase")
 	await snap("01_historia")
 	await click(first)
-	await frames(40)
-	var host := root.get_node_or_null("StoryPrototypeSession")
+	var host := await wait_for_host()
 	check(host != null and not menu.visible,"Jogar inicia a sessão e recolhe o menu")
 	if host == null: quit(1); return
 	var phase: Node3D
@@ -108,10 +107,8 @@ func run() -> void:
 	check(Progress.is_completed(1) and Progress.is_unlocked(2),"vitória salva desbloqueio local da próxima fase")
 	check(not Progress.is_unlocked(3),"vitória de01 não libera fase03")
 	await click(find_button(phase._session,"Próxima fase"))
-	await frames(45)
-	phase = null
-	for child in host.get_children():
-		if child is Node3D: phase = child
+	phase = await wait_for_phase(host,2)
+	await frames(3)
 	check(phase != null and phase._order == 2,"Próxima fase carrega02 com controlador novo")
 	check(not quit_on_go_back,"troca01→02 preserva controle do botão Voltar")
 	legacy = null
@@ -127,8 +124,7 @@ func run() -> void:
 	check(second != null and not second.disabled,"lista atualiza fase02 liberada sem reabrir o jogo")
 	await snap("03_fase02_liberada")
 	await click(second)
-	await frames(35)
-	host = root.get_node_or_null("StoryPrototypeSession")
+	host = await wait_for_host()
 	check(host != null,"fase02 liberada pode ser aberta pelo botão real")
 	if host != null:
 		for child in host.get_children():
@@ -139,3 +135,23 @@ func run() -> void:
 		await frames(15)
 	print("NIGHT_NAVIGATION_RESULT checks=",checks," failures=",failures," mobile=",mobile)
 	quit(1 if failures else 0)
+
+func wait_for_host() -> Node:
+	var deadline := Time.get_ticks_msec()+12000
+	while Time.get_ticks_msec() < deadline:
+		var story := root.get_node_or_null("PhaseStory") as PhaseStory
+		if story != null: story._carousel.skip_requested.emit()
+		var host := root.get_node_or_null("StoryPrototypeSession")
+		if host != null: return host
+		await process_frame
+	return null
+
+func wait_for_phase(host: Node, order: int) -> Node3D:
+	var deadline := Time.get_ticks_msec()+12000
+	while Time.get_ticks_msec() < deadline:
+		var story := root.get_node_or_null("PhaseStory") as PhaseStory
+		if story != null: story._carousel.skip_requested.emit()
+		for child in host.get_children():
+			if child is Node3D and child.get("_order") == order: return child
+		await process_frame
+	return null

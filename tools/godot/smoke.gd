@@ -29,12 +29,15 @@ func _run() -> void:
 			return
 		if not next_path.is_empty() and "--transition" in args:
 			scene.call("_advance", next_path)
-			for frame in range(3):
-				await physics_frame
 			var replacement: Node = null
-			for child in root.get_children():
-				if child is Node3D:
-					replacement = child
+			var deadline := Time.get_ticks_msec() + 12000
+			while Time.get_ticks_msec() < deadline:
+				for child in root.get_children():
+					if child is Node3D and child.scene_file_path == next_path:
+						replacement = child
+						break
+				if replacement != null: break
+				await process_frame
 			if replacement == null or replacement.scene_file_path != next_path:
 				push_error("SMOKE_TRANSITION_FAILED " + next_path)
 				quit(1)

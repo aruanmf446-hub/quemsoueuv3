@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "phases": {
+    "01": [
+      {"image": "res://assets/desert/night_city/outskirts.png", "eyebrow": "CAPÍTULO 01 · ENTRADA DO DESERTO", "title": "Os portões estão abertos", "message": "El Fuego chega à cidade no meio do deserto, sob a luz da lua."},
+      {"image": "res://assets/desert/night_city/bazaar.png", "eyebrow": "CAPÍTULO 01 · A PRIMEIRA ROTA", "title": "Patrulhas na noite", "message": "Cactus bloqueiam as ruas que levam ao interior. É hora de encontrar uma passagem."}
+    ],
+    "02": [
+      {"image": "res://assets/desert/night_city/outskirts.png", "eyebrow": "CAPÍTULO 02 · DUNAS PERDIDAS", "title": "A areia cobre as trilhas", "message": "As ruas desaparecem entre dunas e muros antigos."},
+      {"image": "res://assets/desert/night_city/citadel.png", "eyebrow": "CAPÍTULO 02 · MARCOS ANTIGOS", "title": "Siga os sinais", "message": "El Fuego procura os marcos que podem levá-lo de volta à rota."}
+    ],
+    "03": [
+      {"image": "res://assets/desert/night_city/bazaar.png", "eyebrow": "CAPÍTULO 03 · OÁSIS DA MEIA-NOITE", "title": "Luzes além do oásis", "message": "A travessia chega a um bairro que ainda brilha no meio da noite."},
+      {"image": "res://assets/desert/night_city/citadel.png", "eyebrow": "CAPÍTULO 03 · UM INDÍCIO", "title": "Ordens da fortaleza", "message": "El Fuego encontra pistas sobre quem comanda as patrulhas Cactus."}
+    ],
+    "04": [
+      {"image": "res://assets/desert/night_city/outskirts.png", "eyebrow": "CAPÍTULO 04 · RUÍNAS ESQUECIDAS", "title": "Pedra e silêncio", "message": "Pátios e arcos antigos escondem a passagem para o próximo distrito."},
+      {"image": "res://assets/desert/night_city/bazaar.png", "eyebrow": "CAPÍTULO 04 · INSCRIÇÕES", "title": "Uma rota de abastecimento", "message": "As ruínas revelam um caminho usado para abastecer os Cactus."}
+    ],
+    "05": [
+      {"image": "res://assets/desert/night_city/citadel.png", "eyebrow": "CAPÍTULO 05 · PONTES DO ABISMO", "title": "A cidade se divide", "message": "Um desfiladeiro separa as ruínas dos acessos à fortaleza."},
+      {"image": "res://assets/desert/night_city/outskirts.png", "eyebrow": "CAPÍTULO 05 · TRAVESSIA", "title": "Um passo de cada vez", "message": "El Fuego precisa cruzar pontes e vãos para seguir adiante."}
+    ],
+    "06": [
+      {"image": "res://assets/desert/night_city/outskirts.png", "eyebrow": "CAPÍTULO 06 · TEMPESTADE DE AREIA", "title": "O horizonte desaparece", "message": "A areia encobre a aproximação da fortaleza."},
+      {"image": "res://assets/desert/night_city/bazaar.png", "eyebrow": "CAPÍTULO 06 · ORIENTAÇÃO", "title": "Entre abrigos e marcos", "message": "Só os sinais nas ruas podem guiar El Fuego pela tempestade."}
+    ],
+    "07": [
+      {"image": "res://assets/desert/night_city/citadel.png", "eyebrow": "CAPÍTULO 07 · FORTALEZA DOS CACTUS", "title": "Os portões da fortaleza", "message": "El Fuego entra no território protegido pelas patrulhas Cactus."},
+      {"image": "res://assets/desert/night_city/bazaar.png", "eyebrow": "CAPÍTULO 07 · REVELAÇÃO", "title": "O laboratório de Malagueta", "message": "Além das galerias subterrâneas, Malagueta mantém um laboratório."}
+    ],
+    "08": [
+      {"image": "res://assets/desert/night_city/bazaar.png", "eyebrow": "CAPÍTULO 08 · CAVERNAS DE CRISTAL", "title": "A rota sob a fortaleza", "message": "Uma passagem de cristais conduz El Fuego para baixo da cidade."},
+      {"image": "res://assets/desert/night_city/citadel.png", "eyebrow": "CAPÍTULO 08 · ENERGIA", "title": "A origem do laboratório", "message": "Os cristais apontam para a energia usada no laboratório de Malagueta."}
+    ],
+    "09": [
+      {"image": "res://assets/desert/night_city/citadel.png", "eyebrow": "CAPÍTULO 09 · LABORATÓRIO PROIBIDO", "title": "O coração da cidade", "message": "El Fuego chega ao distrito proibido e à entrada do laboratório."},
+      {"image": "res://assets/desert/night_city/outskirts.png", "eyebrow": "CAPÍTULO 09 · ÚLTIMA PASSAGEM", "title": "A rota está interrompida", "message": "Com o abastecimento dos Cactus cortado, o refúgio de Malagueta fica ao alcance."}
+    ],
+    "10": [
+      {"image": "res://assets/desert/night_city/citadel.png", "eyebrow": "CAPÍTULO 10 · CONFRONTO FINAL", "title": "Malagueta espera", "message": "A jornada pelo Reino do Deserto chega ao seu confronto final."},
+      {"image": "res://assets/desert/night_city/bazaar.png", "eyebrow": "CAPÍTULO 10 · EL FUEGO", "title": "Encerre a campanha", "message": "Derrote Malagueta para concluir a história do deserto."}
+    ]
+  }
+}

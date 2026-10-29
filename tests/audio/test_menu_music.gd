@@ -74,7 +74,7 @@ func run() -> void:
 	check(music.current_id.is_empty() and not music._players[music._active].playing, "no valid licenses stops playback")
 	# Exercise automatic scene ownership without loading unrelated game systems.
 	music.reload_catalog("res://tests/audio/catalog.json")
-	var menu := Node.new()
+	var menu := Control.new()
 	menu.scene_file_path = music.MENU
 	var services := Services.new()
 	services.name = "Services"
@@ -91,6 +91,12 @@ func run() -> void:
 	music._players[1 - music._active].stop()
 	music._process(0.01)
 	check(music.current_id == "a", "active expired license is stopped and skipped")
+	menu.hide()
+	music._process(0.01)
+	check(not music._inside and not music._players[music._active].playing, "hidden lobby stops licensed menu music during gameplay")
+	menu.show()
+	music._process(0.01)
+	check(music._inside, "returning to lobby restores menu music context")
 	menu.free()
 	check(not music._inside and not music._players[music._active].playing, "scene tree exit stops playback before gameplay")
 	var gameplay := Node.new()

@@ -13,6 +13,10 @@ var parameters: Dictionary = {}
 func _ready() -> void:
 	services = PlayerServices.current
 	$Margin/Column/Header/Back.pressed.connect(func() -> void: back_requested.emit())
+	# A moldura dourada cortava títulos e conteúdo; o padrão das telas agora é sem moldura.
+	var crest := get_node_or_null("CrestFrame")
+	if crest != null:
+		crest.hide()
 
 
 func show_screen(params: Dictionary = {}) -> void:

@@ -22,7 +22,7 @@ func render() -> void:
 	preview(visual, services.inventory.equipped_id())
 	visual.add_child(PlayerUI.button("Trocar skin", func() -> void: navigate_requested.emit("skins", {})))
 	var info := PlayerUI.card(row)
-	info.add_child(PlayerUI.portrait(services.inventory.equipped_id()))
+	info.add_child(PlayerUI.portrait(services.inventory.equipped_id(), 200))
 	var data := services.profile.data
 	info.add_child(PlayerUI.label(str(data.get("nickname", "") if data.get("nickname") != null else "Sem nickname"), 32, PlayerUI.GOLD))
 	info.add_child(PlayerUI.label("ID público: " + str(data.get("public_id", "—"))))

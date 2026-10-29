@@ -8,6 +8,7 @@ signal landed
 signal strike_window
 signal hurt
 const ActorSlot = preload("res://scripts/desert/t15d/actor_slot.gd")
+const SandFx = preload("res://scripts/desert/t15d/sand_fx.gd")
 const RUN_MAX_HEALTH := 3
 var attack_charges := 1
 var defense_charges := 1
@@ -138,15 +139,16 @@ func _start_attack() -> void:
 	_hit_delivered = false
 	_actor.play_animation("golpe", false, 0.05)
 	swung.emit()
+## Golpe: lança uma bola de areia carregada de choque, que voa até 3,6m na direção do
+## olhar, para em paredes e atinge o primeiro Cactus no caminho.
 func _deliver_hit() -> void:
 	_hit_delivered = true
 	strike_window.emit()
-	for enemy: Node3D in get_tree().get_nodes_in_group("enemies"):
-		if not enemy.has_method("take_damage") or not _can_hit(enemy): continue
-		var query := PhysicsRayQueryParameters3D.create(global_position + Vector3.UP * 0.7, enemy.global_position + Vector3.UP * 0.7, 1)
-		if not get_world_3d().direct_space_state.intersect_ray(query).is_empty(): continue
-		enemy.take_damage(ATTACK_DAMAGE)
-		strike_landed.emit(enemy.global_position + Vector3.UP * 0.8)
+	var bolt := SandFx.SandBolt.new()
+	bolt.direction = facing
+	get_parent().add_child(bolt)
+	bolt.global_position = global_position + Vector3(facing * 0.45, 0.85, 0.15)
+	bolt.hit.connect(func(point: Vector3) -> void: strike_landed.emit(point))
 func restore_charge(kind: String) -> bool:
 	if is_dead: return false
 	if kind == "attack" and attack_charges < 1:

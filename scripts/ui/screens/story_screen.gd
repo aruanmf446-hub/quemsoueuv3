@@ -120,9 +120,15 @@ func render() -> void:
 	_rail.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_rail.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER if _compact else ScrollContainer.SCROLL_MODE_AUTO
 	_rail.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_rail.custom_minimum_size.y = _px(640,262)
+	# Os cartões ocupam a altura que sobrar: tudo cabe numa tela, sem rolar para baixo
+	# (no iPhone a barra do navegador deixa só ~320 pontos de altura).
+	_rail.custom_minimum_size.y = _px(360,150)
+	var page: ScrollContainer = $Margin/Column/Scroll
+	page.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_child(_rail)
 	var cards := HBoxContainer.new()
+	cards.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	cards.add_theme_constant_override("separation",roundi(_px(20,10)))
 	_rail.add_child(cards)
 	for phase: Dictionary in rules.phases:
@@ -157,7 +163,7 @@ func _unit_or_one() -> float:
 
 func _phase_card(parent: Control, order: int, title: String, description: String, available: bool, done: bool, current: bool) -> PanelContainer:
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(_px(380,190),_px(600,258))
+	panel.custom_minimum_size = Vector2(_px(380,190),0)
 	var style := StyleBoxFlat.new()
 	style.bg_color = PANEL
 	style.border_color = GOLD if current else (Color("#5fbf9f") if done else Color(1,1,1,0.10))
@@ -175,7 +181,9 @@ func _phase_card(parent: Control, order: int, title: String, description: String
 	art.texture = ART[(order-1)%ART.size()]
 	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	art.custom_minimum_size.y = _px(290,100)
+	art.custom_minimum_size.y = _px(150,46)
+	art.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	art.size_flags_stretch_ratio = 1.1
 	art.modulate = Color.WHITE if available else Color(0.32,0.34,0.4)
 	art.clip_contents = true
 	column.add_child(art)
@@ -190,6 +198,7 @@ func _phase_card(parent: Control, order: int, title: String, description: String
 	number.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	number.offset_left = _px(16,8)
 	number.offset_bottom = _px(-2,-1)
+	number.offset_top = number.offset_bottom
 	art.add_child(number)
 	var chip := Label.new()
 	chip.text = "✓ CONCLUÍDA" if done else ("▶ PRÓXIMA" if current else ("LIBERADA" if available else "🔒 BLOQUEADA"))
@@ -211,6 +220,7 @@ func _phase_card(parent: Control, order: int, title: String, description: String
 	content.add_theme_constant_override("separation",roundi(_px(8,3)))
 	var pad := MarginContainer.new()
 	pad.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	pad.size_flags_stretch_ratio = 1.0
 	for side in ["left","right"]: pad.add_theme_constant_override("margin_"+side,roundi(_px(18,9)))
 	pad.add_theme_constant_override("margin_top",roundi(_px(14,6)))
 	pad.add_theme_constant_override("margin_bottom",roundi(_px(16,7)))
@@ -220,7 +230,8 @@ func _phase_card(parent: Control, order: int, title: String, description: String
 	content.add_child(name_label)
 	var text := _plain(description if available else "Conclua a fase %02d para liberar." % (order-1),_px(17,8.5),Color("#c3cfdc") if available else Color("#7f8b98"))
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	text.max_lines_visible = 4 if not _compact else 3
+	text.max_lines_visible = 4 if not _compact else 2
+	text.clip_text = true
 	text.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	content.add_child(text)
 	var footer := VBoxContainer.new()
@@ -292,11 +303,15 @@ func _launch(phase_id: String, path: String) -> void:
 	if not LocalCampaign.is_unlocked(order) and order > _confirmed_unlocked(confirmed): return
 	var menu := get_tree().current_scene as Control
 	if menu == null: return
+	_launching = true
+	var veil := await LoadingVeil.begin(get_tree(), "Entrando na cidade…")
 	var packed := load(path) as PackedScene
 	if packed == null:
+		veil.finish()
+		_launching = false
+		banner.show()
 		banner.show_state("error","Não foi possível abrir a fase. Tente novamente.")
 		return
-	_launching = true
 	var host := Node.new()
 	host.name = "StoryPrototypeSession"
 	get_tree().root.add_child(host)
@@ -319,3 +334,4 @@ func _launch(phase_id: String, path: String) -> void:
 				layer.show()
 				layer.process_mode = Node.PROCESS_MODE_INHERIT)
 	menu.hide()
+	veil.finish()

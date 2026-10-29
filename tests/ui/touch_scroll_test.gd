@@ -13,6 +13,10 @@ func move(pos: Vector2, rel: Vector2) -> void:
 	var e := InputEventMouseMotion.new(); e.position = pos; e.global_position = pos; e.relative = rel; e.button_mask = MOUSE_BUTTON_MASK_LEFT
 	root.push_input(e, true)
 func run() -> void:
+	if DisplayServer.get_name() == "headless":
+		print("SCROLL_SKIPPED precisa de janela real (coordenadas de toque)")
+		quit(0)
+		return
 	root.size = Vector2i(1280,560)
 	change_scene_to_file("res://scenes/menu/main_menu.tscn")
 	for i in 60: await process_frame

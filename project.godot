@@ -23,7 +23,6 @@ MenuMusic="*res://scripts/audio/menu_music.gd"
 
 window/size/viewport_width=1672
 window/size/viewport_height=941
-window/handheld/orientation=0
 window/size/mode=3
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
@@ -31,6 +30,10 @@ window/stretch/aspect="expand"
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg")
+
+[internationalization]
+
+locale/fallback="pt_BR"
 
 [physics]
 
@@ -41,7 +44,3 @@ enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg")
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
-
-[internationalization]
-
-locale/fallback="pt_BR"

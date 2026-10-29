@@ -4,12 +4,22 @@ var _flash_left := 0.0
 var _flash_material: StandardMaterial3D
 var _meshes: Array[MeshInstance3D] = []
 var _ground_offsets := {}
+static var _processed := {}
 func load_entry(entry: Dictionary) -> void:
 	super.load_entry(entry)
 	_meshes.clear()
 	for mesh: MeshInstance3D in _model_root.find_children("*", "MeshInstance3D", true, false):
 		_meshes.append(mesh)
 	if _anim_player == null or _skeleton == null: return
+	# Biblioteca processada é compartilhada por personagem: criar cada Cactus refazia
+	# cópia, recortes e medição dos pés, o que pesava ao montar trechos da cidade.
+	var cache_key := str(entry.get("id",""))
+	if _processed.has(cache_key):
+		_anim_player.remove_animation_library(&"")
+		_anim_player.add_animation_library(&"", _processed[cache_key].library)
+		_ground_offsets = _processed[cache_key].offsets
+		_model_root.position.y = float(_processed[cache_key].base_y)
+		return
 	var lib := _anim_player.get_animation_library(&"").duplicate(true) as AnimationLibrary
 	_anim_player.remove_animation_library(&"")
 	_anim_player.add_animation_library(&"", lib)
@@ -71,6 +81,7 @@ func load_entry(entry: Dictionary) -> void:
 				feet = minf(feet,point.y)
 		_ground_offsets[String(name)] = base_y+0.035-feet if is_finite(feet) else base_y
 	_model_root.position.y = base_y
+	_processed[cache_key] = {"library": lib, "offsets": _ground_offsets, "base_y": base_y}
 
 
 ## Trecho [from, to] de um clipe, reamostrado a 30 quadros/s e começando em zero.

@@ -8,6 +8,7 @@ const Layout = preload("res://scripts/desert/t15d/campaign_layout.gd")
 const Progress = preload("res://scripts/desert/t15d/campaign_progress.gd")
 const Pickup = preload("res://scripts/desert/t15d/charge_pickup.gd")
 const CHUNK_SIZE := 64.0
+const AHEAD := 2
 signal return_requested
 var _order := 1
 var _scenery: Node3D
@@ -31,6 +32,7 @@ var _saved := false
 var _handoff := false
 var _actor_resources: Array[PackedScene] = []
 var _lead := 0.0
+var _build_queue: Array[Callable] = []
 var _sfx: Node
 var _key_light: OmniLight3D
 func _ready() -> void:
@@ -153,21 +155,51 @@ func _stream_world(x: float, force := false) -> void:
 	_stream_center = center
 	var minimum := floori(float(_phase.bounds.min_x)/CHUNK_SIZE)
 	var maximum := floori(float(_phase.bounds.max_x)/CHUNK_SIZE)
+	# Dois trechos à frente e atrás: o próximo trecho fica pronto bem antes de aparecer.
 	var wanted := {}
-	for index in range(maxi(minimum,center-1),mini(maximum,center+1)+1): wanted[index] = true
+	for index in range(maxi(minimum,center-AHEAD),mini(maximum,center+AHEAD)+1): wanted[index] = true
 	for index in _loaded_chunks.keys():
 		if not wanted.has(index):
 			var old: Node3D = _loaded_chunks[index]
 			_world.remove_child(old)
 			old.queue_free()
 			_loaded_chunks.erase(index)
-	for index in wanted:
-		if not _loaded_chunks.has(index): _load_chunk(index)
-func _load_chunk(index: int) -> void:
+	# O trecho atual e os vizinhos imediatos são montados na hora (spawn, reinício,
+	# checkpoint); os mais distantes entram na fila e são montados aos poucos.
+	var order: Array = wanted.keys()
+	order.sort_custom(func(a: int, b: int) -> bool: return absi(a-center) < absi(b-center))
+	for index in order:
+		if not _loaded_chunks.has(index): _load_chunk(index,force or absi(index-center) <= 1)
+## Monta o trecho em etapas. Antes tudo era feito num único quadro (20–55ms no desktop,
+## bem mais no celular), o que travava a corrida a cada 64m.
+func _load_chunk(index: int, immediate := true) -> void:
 	var chunk := Node3D.new()
 	chunk.name = "DistrictChunk_%d" % index
 	_world.add_child(chunk)
 	_loaded_chunks[index] = chunk
+	var tasks: Array[Callable] = []
+	var platforms := _chunk_platforms(index)
+	# Colisão primeiro: é barata e precisa existir antes de qualquer visual.
+	_build_collision(chunk,platforms)
+	if not platforms.is_empty():
+		for platform: Dictionary in platforms:
+			tasks.append(_build_terrain_piece.bind(chunk,platform))
+		tasks.append(_build_props.bind(chunk,platforms))
+	for spawn: Dictionary in _phase.enemies:
+		if _in_chunk(float(spawn.pos[0]),index) and not _defeated_ids.has(str(spawn.id)):
+			tasks.append(_spawn_enemy.bind(chunk,spawn))
+	tasks.append(_build_chunk_details.bind(chunk,index))
+	for task in tasks:
+		if immediate: task.call()
+		else: _build_queue.append(task)
+func _process(_delta: float) -> void:
+	# Uma etapa por quadro (mais etapas só enquanto o quadro gastou menos de 1ms).
+	var started := Time.get_ticks_usec()
+	while not _build_queue.is_empty() and Time.get_ticks_usec()-started < 1000:
+		var task: Callable = _build_queue.pop_front()
+		var chunk: Object = task.get_bound_arguments()[0] if not task.get_bound_arguments().is_empty() else null
+		if chunk == null or is_instance_valid(chunk) and (chunk as Node).is_inside_tree(): task.call()
+func _chunk_platforms(index: int) -> Array:
 	var left := index*CHUNK_SIZE
 	var right := left+CHUNK_SIZE
 	var platforms: Array = []
@@ -189,6 +221,9 @@ func _load_chunk(index: int) -> void:
 		part.pit_left = source.kind == "ground" and _is_pit_edge(x0,true)
 		part.pit_right = source.kind == "ground" and _is_pit_edge(x1,false)
 		platforms.append(part)
+	return platforms
+func _build_collision(chunk: Node3D, platforms: Array) -> void:
+	for part: Dictionary in platforms:
 		var body := StaticBody3D.new()
 		body.collision_layer = 1
 		body.position = _vec3(part.pos)
@@ -202,17 +237,18 @@ func _load_chunk(index: int) -> void:
 		shape.shape = box
 		body.add_child(shape)
 		chunk.add_child(body)
-	if not platforms.is_empty():
-		var terrain := Terrain.new()
-		terrain.order = _order
-		chunk.add_child(terrain)
-		terrain.build(platforms)
-		var props := preload("res://scripts/desert/t15d/city_props.gd").new()
-		chunk.add_child(props)
-		props.build(platforms,_order)
-	for spawn: Dictionary in _phase.enemies:
-		if _in_chunk(float(spawn.pos[0]),index) and not _defeated_ids.has(str(spawn.id)):
-			_spawn_enemy(chunk,spawn)
+func _build_terrain_piece(chunk: Node3D, platform: Dictionary) -> void:
+	var terrain := Terrain.new()
+	terrain.order = _order
+	chunk.add_child(terrain)
+	terrain.build([platform])
+func _build_props(chunk: Node3D, platforms: Array) -> void:
+	var props := preload("res://scripts/desert/t15d/city_props.gd").new()
+	chunk.add_child(props)
+	props.build(platforms,_order)
+func _build_chunk_details(chunk: Node3D, index: int) -> void:
+	var left := index*CHUNK_SIZE
+	var right := left+CHUNK_SIZE
 	for spawn: Dictionary in _phase.pickups:
 		if _in_chunk(float(spawn.pos[0]),index) and not _collected_ids.has(str(spawn.id)):
 			var item := Pickup.new()
@@ -557,6 +593,7 @@ func _restart_level() -> void:
 	_defeated_ids.clear()
 	_collected_ids.clear()
 	_tutorial_pit = false
+	_build_queue.clear()
 	for chunk: Node in _loaded_chunks.values():
 		_world.remove_child(chunk)
 		chunk.queue_free()

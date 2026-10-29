@@ -11,6 +11,20 @@ const CARD_BORDER := Color("#455269")
 const BUTTON_BG := Color("#27364e")
 const ACCENT := Color("#f2b66e")
 const SMALL_SCREEN := 1100.0
+const FAVORITES_PATH := "user://skins_favorites.cfg"
+var _favorites: Dictionary = {}
+var _favorite_only := false
+var _search := ""
+var _status_filter := 0
+var _reverse_sort := false
+var _toolbar: HBoxContainer
+var _collection_sidebar: VBoxContainer
+var _gallery_section: VBoxContainer
+var _gallery_scroll: ScrollContainer
+var _search_field: LineEdit
+var _filter_button: OptionButton
+var _sort_button: OptionButton
+var _fav_button: Button
 var _thumbnails: ThumbnailCache
 var _paths: Dictionary = {}
 var _selected := ""
@@ -30,10 +44,12 @@ var _cards: Dictionary = {}
 
 func _ready() -> void:
 	super._ready()
-	heading.text = tr("Skins")
+	heading.text = tr("Personagens")
+	$Tint.color = Color(0.025, 0.04, 0.09, 0.54)
 	_thumbnails = ThumbnailCache.new(preload("res://scenes/lobby/lobby_stage.tscn"))
 	# Moldura azul/dourada gigante removida desta tela; o fundo do lobby permanece.
 	$CrestFrame.hide()
+	_load_favorites()
 	_split_layout()
 	get_viewport().size_changed.connect(_responsive_layout)
 	_responsive_layout()
@@ -55,12 +71,61 @@ func _split_layout() -> void:
 	column.move_child(_split, _scroll.get_index())
 	_scroll.reparent(_split)
 	_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_scroll.size_flags_stretch_ratio = 0.8
+	_scroll.size_flags_stretch_ratio = 1.5
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_gallery_section = VBoxContainer.new()
+	_gallery_section.name = "Catalog"
+	_gallery_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_gallery_section.size_flags_stretch_ratio = 1.65
+	_gallery_section.add_theme_constant_override("separation", 12)
+	_split.add_child(_gallery_section)
+	_scroll.reparent(_gallery_section)
+	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_toolbar = HBoxContainer.new()
+	_toolbar.add_theme_constant_override("separation", 8)
+	_gallery_section.add_child(_toolbar)
+	_gallery_section.move_child(_toolbar, 0)
+	_search_field = LineEdit.new()
+	_search_field.placeholder_text = "Pesquisar personagem..."
+	_search_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_search_field.text_changed.connect(func(value: String) -> void:
+		_search = value
+		_rebuild_gallery())
+	_toolbar.add_child(_search_field)
+	_fav_button = _button("♡ Favoritos", _toggle_favorite_only)
+	_fav_button.custom_minimum_size = Vector2(112, 42)
+	_toolbar.add_child(_fav_button)
+	_filter_button = OptionButton.new()
+	for value in ["Todos", "Disponíveis", "Bloqueados"]:
+		_filter_button.add_item(value)
+	_filter_button.item_selected.connect(func(index: int) -> void:
+		_status_filter = index
+		_rebuild_gallery())
+	_toolbar.add_child(_filter_button)
+	_sort_button = OptionButton.new()
+	_sort_button.add_item("A-Z")
+	_sort_button.add_item("Z-A")
+	_sort_button.item_selected.connect(func(index: int) -> void:
+		_reverse_sort = index == 1
+		_rebuild_gallery())
+	_toolbar.add_child(_sort_button)
+	_collection_sidebar = VBoxContainer.new()
+	_collection_sidebar.name = "Collections"
+	_collection_sidebar.custom_minimum_size.x = 170
+	_collection_sidebar.add_theme_constant_override("separation", 14)
+	_split.add_child(_collection_sidebar)
+	_split.move_child(_collection_sidebar, 0)
+	_collection_sidebar.add_child(PlayerUI.label("COLEÇÕES", 23, ACCENT))
+	var collection := _button("✦ COMEÇO", func() -> void: _rebuild_gallery())
+	collection.custom_minimum_size.y = 52
+	_collection_sidebar.add_child(collection)
+	var collection_note := PlayerUI.label("Personagens originais", 13, Color("#a8b9d0"))
+	_collection_sidebar.add_child(collection_note)
+	_scroll.get_parent().move_child(_scroll, 1)
 	_side = PanelContainer.new()
 	_side.name = "HeroPreview"
 	_side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_side.size_flags_stretch_ratio = 1.2
+	_side.size_flags_stretch_ratio = 1.0
 	_side.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_side.add_theme_stylebox_override("panel", _panel_style(false))
 	_split.add_child(_side)
@@ -81,10 +146,16 @@ func _responsive_layout() -> void:
 	heading.add_theme_font_size_override("font_size", 23 if compact else 37)
 	$Margin/Column.add_theme_constant_override("separation", 6 if compact else 12)
 	_split.add_theme_constant_override("separation", 8 if compact else 18)
-	_scroll.size_flags_stretch_ratio = 0.75 if compact else 0.85
-	_side.size_flags_stretch_ratio = 1.4 if compact else 1.15
+	_scroll.size_flags_stretch_ratio = 1.0
+	_gallery_section.size_flags_stretch_ratio = 1.45 if compact else 1.65
+	_side.size_flags_stretch_ratio = 1.15 if compact else 1.0
+	_collection_sidebar.visible = not compact
+	_toolbar.add_theme_constant_override("separation", 4 if compact else 8)
+	_fav_button.text = "♥" if compact else ("♥ Favoritos" if _favorite_only else "♡ Favoritos")
+	_fav_button.custom_minimum_size.x = 34 if compact else 112
+	_search_field.placeholder_text = "Pesquisar..." if compact else "Pesquisar personagem..."
 	if _grid != null:
-		_grid.columns = 1 if compact else 2
+		_grid.columns = 2 if compact else 4
 		for item in _grid.get_children():
 			_style_card_height(item, compact)
 	if _stage != null and is_instance_valid(_stage):
@@ -105,70 +176,141 @@ func close() -> void:
 func render() -> void:
 	if _selected.is_empty():
 		_selected = services.inventory.equipped_id()
-	PlayerUI.clear(body)
-	_images.clear()
-	_cards.clear()
+	_rebuild_gallery()
 	# Sem texto de demonstração: o banner só aparece para erros e estados de carregamento.
 	banner.show_state("success")
-	_grid = GridContainer.new()
-	_grid.columns = 1 if size.x < SMALL_SCREEN else 2
-	_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_grid.add_theme_constant_override("h_separation", 10)
-	_grid.add_theme_constant_override("v_separation", 10)
-	body.add_child(_grid)
-	for entry: Dictionary in services.inventory.entries:
-		_grid.add_child(_gallery_card(entry))
+	# A galeria é reconstruída de forma independente dos serviços de inventário.
+
 	_select(_selected)
 	_responsive_layout()
 	if not _generating:
 		_generate_thumbnails()
 
 
+func _rebuild_gallery() -> void:
+	PlayerUI.clear(body)
+	_images.clear()
+	_cards.clear()
+	_grid = GridContainer.new()
+	_grid.columns = 2 if size.x < SMALL_SCREEN else 4
+	_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_grid.add_theme_constant_override("h_separation", 10)
+	_grid.add_theme_constant_override("v_separation", 10)
+	body.add_child(_grid)
+	var entries: Array = services.inventory.entries.duplicate()
+	entries.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return str(a.get("name", "")).nocasecmp_to(str(b.get("name", ""))) > 0 if _reverse_sort else str(a.get("name", "")).nocasecmp_to(str(b.get("name", ""))) < 0)
+	var count := 0
+	for entry: Dictionary in entries:
+		var id: String = str(entry.id)
+		var unlocked: bool = services.inventory.is_unlocked(id)
+		if not _search.is_empty() and not str(entry.name).to_lower().contains(_search.to_lower()):
+			continue
+		if _favorite_only and not _favorites.has(id):
+			continue
+		if _status_filter == 1 and not unlocked:
+			continue
+		if _status_filter == 2 and unlocked:
+			continue
+		_grid.add_child(_gallery_card(entry))
+		count += 1
+	if count == 0:
+		body.add_child(PlayerUI.label("Nenhum personagem encontrado.", 19))
+	if _fav_button != null:
+		_fav_button.text = "♥ Favoritos" if _favorite_only else "♡ Favoritos"
+
+
 func _gallery_card(entry: Dictionary) -> PanelContainer:
 	var character_id: String = entry.id
 	var card := PanelContainer.new()
+	card.mouse_filter = Control.MOUSE_FILTER_STOP
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	card.add_theme_stylebox_override("panel", _panel_style(character_id == _selected))
 	_cards[character_id] = card
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 10)
-	card.add_child(row)
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 3)
+	card.add_child(column)
+	var top := HBoxContainer.new()
+	column.add_child(top)
+	var favorite := _button("♥" if _favorites.has(character_id) else "♡", _toggle_favorite.bind(character_id))
+	favorite.custom_minimum_size = Vector2(30, 28)
+	favorite.add_theme_font_size_override("font_size", 17)
+	top.add_spacer(false)
+	top.add_child(favorite)
 	var thumbnail := TextureRect.new()
 	thumbnail.name = "Portrait"
-	thumbnail.custom_minimum_size = Vector2(110, 130)
+	thumbnail.custom_minimum_size = Vector2(0, 175)
 	thumbnail.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	thumbnail.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	thumbnail.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	thumbnail.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var path := str(_paths.get(character_id, ThumbnailCache.path_for(character_id)))
 	if FileAccess.file_exists(path):
 		thumbnail.texture = ImageTexture.create_from_image(Image.load_from_file(path))
-	row.add_child(thumbnail)
+	column.add_child(thumbnail)
 	_images[character_id] = thumbnail
-	var info := VBoxContainer.new()
-	info.name = "Info"
-	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	info.add_theme_constant_override("separation", 4)
-	row.add_child(info)
-	var name_label := PlayerUI.label(entry.name, 19, Color("#faf2df"))
+	var name_label := PlayerUI.label(entry.name, 17, Color("#faf2df"))
 	name_label.clip_text = true
-	info.add_child(name_label)
-	var unlocked := services.inventory.is_unlocked(character_id)
+	column.add_child(name_label)
 	var equipped: bool = services.inventory.equipped_id() == character_id
-	var state := PlayerUI.label("EQUIPADO" if equipped else ("DISPONÍVEL" if unlocked else "BLOQUEADO"), 12, ACCENT if unlocked else Color("#a8b3c4"))
-	info.add_child(state)
-	var view := _button("VISUALIZAR", _select.bind(character_id))
-	view.custom_minimum_size.y = 34
-	view.add_theme_font_size_override("font_size", 14)
-	info.add_child(view)
+	var unlocked: bool = services.inventory.is_unlocked(character_id)
+	var state := _button("EQUIPADO" if equipped else ("DISPONÍVEL" if unlocked else "BLOQUEADO"), _select.bind(character_id), equipped)
+	state.custom_minimum_size.y = 30
+	state.add_theme_font_size_override("font_size", 12)
+	column.add_child(state)
+	card.gui_input.connect(func(event: InputEvent) -> void:
+		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			_select(character_id))
 	_style_card_height(card, size.x < SMALL_SCREEN)
 	return card
 
 
 func _style_card_height(card: Control, compact: bool) -> void:
-	card.custom_minimum_size.y = 100 if compact else 168
-	var portrait: TextureRect = card.get_node_or_null("HBoxContainer/Portrait")
+	card.custom_minimum_size.y = 0
+	var portrait: TextureRect = card.get_node_or_null("VBoxContainer/Portrait")
 	if portrait != null:
-		portrait.custom_minimum_size = Vector2(65, 76) if compact else Vector2(110, 130)
+		portrait.custom_minimum_size.y = 70 if compact else 175
+
+
+func _toggle_favorite(character_id: String) -> void:
+	if _favorites.has(character_id):
+		_favorites.erase(character_id)
+	else:
+		_favorites[character_id] = true
+	_save_favorites()
+	_rebuild_gallery()
+
+
+func _toggle_favorite_only() -> void:
+	_favorite_only = not _favorite_only
+	_rebuild_gallery()
+
+
+func _load_favorites() -> void:
+	var cfg := ConfigFile.new()
+	if cfg.load(FAVORITES_PATH) == OK:
+		for id in cfg.get_value("catalog", "favorite_ids", []):
+			_favorites[str(id)] = true
+
+
+func _save_favorites() -> void:
+	var cfg := ConfigFile.new()
+	cfg.set_value("catalog", "favorite_ids", _favorites.keys())
+	cfg.save(FAVORITES_PATH)
+
+
+func _select_neighbor(direction: int) -> void:
+	var ids: Array[String] = []
+	for child in _grid.get_children():
+		for id: String in _cards:
+			if _cards[id] == child:
+				ids.append(id)
+	if ids.is_empty():
+		return
+	var index := ids.find(_selected)
+	if index < 0:
+		index = 0
+	_select(ids[posmod(index + direction, ids.size())])
 
 
 func _select(character_id: String) -> void:
@@ -190,6 +332,20 @@ func _select(character_id: String) -> void:
 	var equipped := services.inventory.equipped_id() == character_id
 	var unlocked := services.inventory.is_unlocked(character_id)
 	heading_row.add_child(PlayerUI.label("EQUIPADO" if equipped else ("DISPONÍVEL" if unlocked else "BLOQUEADO"), 12 if compact else 16, ACCENT))
+	var favorite := _button("♥" if _favorites.has(character_id) else "♡", _toggle_favorite.bind(character_id))
+	favorite.custom_minimum_size = Vector2(36, 34)
+	heading_row.add_child(favorite)
+	var arrows := HBoxContainer.new()
+	_preview.add_child(arrows)
+	var left_arrow := _button("‹", _select_neighbor.bind(-1))
+	left_arrow.custom_minimum_size = Vector2(44, 36)
+	arrows.add_child(left_arrow)
+	var hint := PlayerUI.label("Arraste para girar • Coleção Começo", 13, Color("#a8b9d0"))
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	arrows.add_child(hint)
+	var right_arrow := _button("›", _select_neighbor.bind(1))
+	right_arrow.custom_minimum_size = Vector2(44, 36)
+	arrows.add_child(right_arrow)
 	_stage = preview(_preview, character_id)
 	if _stage != null:
 		_stage.custom_minimum_size = Vector2.ZERO
@@ -238,14 +394,14 @@ func _generate_thumbnails() -> void:
 
 func _panel_style(selected: bool) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = CARD_BG_SELECTED if selected else CARD_BG
+	style.bg_color = Color(0.10, 0.17, 0.29, 0.88) if selected else Color(0.06, 0.11, 0.20, 0.80)
 	style.border_color = ACCENT if selected else CARD_BORDER
 	style.set_border_width_all(2 if selected else 1)
 	style.set_corner_radius_all(14)
-	style.content_margin_left = 10
-	style.content_margin_top = 8
-	style.content_margin_right = 10
-	style.content_margin_bottom = 8
+	style.content_margin_left = 8
+	style.content_margin_top = 6
+	style.content_margin_right = 8
+	style.content_margin_bottom = 6
 	return style
 
 

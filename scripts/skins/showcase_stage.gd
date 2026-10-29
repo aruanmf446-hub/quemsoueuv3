@@ -47,40 +47,81 @@ func prepare_showcase() -> void:
 	# Inclinação leve revela a plataforma e mantém o corpo inteiro no quadro.
 	_pitch = 0.08
 	resized.connect(frame_character)
+	_capture_pose_bounds.call_deferred()
+
+
+var _display_bounds := AABB()
+var _pose_measured := false
+var _fit_boxes: Array[AABB] = []
+
+
+func _capture_pose_bounds() -> void:
+	if not is_inside_tree() or not is_instance_valid(character):
+		return
+	# Capture a caixa real da pose, incluindo pele, roupas, cabelo e chapéu.
+	# O bake é apenas uma medição CPU por seleção, nunca substitui a malha real.
+	for skeleton: Skeleton3D in character.find_children("*", "Skeleton3D", true, false):
+		skeleton.force_update_all_bone_transforms()
+	var first := true
+	_fit_boxes.clear()
+	for instance: MeshInstance3D in character.find_children("*", "MeshInstance3D", true, false):
+		if instance.mesh == null or not instance.is_visible_in_tree():
+			continue
+		var mesh := instance.mesh
+		# O renderizador dummy não registra skins; o smoke headless usa
+		# a caixa importada. A medição da pose é validada no teste visual.
+		if instance.skin != null and DisplayServer.get_name() != "headless":
+			var posed := instance.bake_mesh_from_current_skeleton_pose()
+			if posed != null:
+				mesh = posed
+		var box: AABB = character.global_transform.affine_inverse() * instance.global_transform * mesh.get_aabb()
+		_fit_boxes.append(box)
+		_display_bounds = box if first else _display_bounds.merge(box)
+		first = false
+	if first:
+		return
+	var ground := _display_bounds.position.y
+	var pedestal := get_node("Viewport/World/ShowcasePedestal") as Node3D
+	var ring := get_node("Viewport/World/ShowcaseRing") as Node3D
+	pedestal.position.y = ground - 0.07
+	ring.position.y = ground + 0.005
+	var pedestal_bounds := AABB(Vector3(-0.76, ground - 0.13, -0.76), Vector3(1.52, 0.15, 1.52))
+	_fit_boxes.append(pedestal_bounds)
+	_display_bounds = _display_bounds.merge(pedestal_bounds)
+	_pose_measured = true
+	frame_character()
 
 
 func frame_character() -> void:
 	if not is_inside_tree() or not is_instance_valid(character) or not character.is_inside_tree():
 		return
-	super.frame_character()
-	# A pose importada pode exceder a caixa estática da malha (El Fuego).
-	# Meça os ossos na pose atual, já transformados pela escala do slot.
-	var skeleton := character.find_child("*", true, false) as Skeleton3D
-	for child in character.find_children("*", "Skeleton3D", true, false):
-		skeleton = child as Skeleton3D
-		break
-	if skeleton == null:
+	if not _pose_measured:
+		super.frame_character()
 		return
-	skeleton.force_update_all_bone_transforms()
-	var low := Vector3(INF, INF, INF)
-	var high := Vector3(-INF, -INF, -INF)
-	for bone in range(skeleton.get_bone_count()):
-		var point := character.to_local(skeleton.to_global(skeleton.get_bone_global_pose(bone).origin))
-		low = low.min(point)
-		high = high.max(point)
-	if not is_finite(low.y):
-		return
-	var height := maxf(high.y - low.y, float(character.get_framing().get("height", 1.8)))
-	var ground := minf(0.0, low.y - height * 0.04)
-	var pedestal := get_node_or_null("Viewport/World/ShowcasePedestal") as Node3D
-	var ring := get_node_or_null("Viewport/World/ShowcaseRing") as Node3D
-	if pedestal != null:
-		pedestal.position.y = ground - 0.07
-		ring.position.y = ground + 0.005
-	# Margem para cabelo/chapéu além do esqueleto e para a plataforma.
-	_target_y = (high.y + low.y) * 0.5
-	var aspect := maxf(size.x / maxf(size.y, 1.0), 0.3)
-	var vertical := height * 1.16 / fill_ratio
-	var horizontal := maxf(high.x - low.x, 1.6) * 1.12 / aspect
-	_base_distance = maxf(vertical, horizontal) / (2.0 * tan(deg_to_rad(CAMERA_FOV * 0.5)))
 	_update_camera()
+
+
+func _update_camera() -> void:
+	if not _pose_measured:
+		super._update_camera()
+		return
+	if not is_inside_tree() or not is_instance_valid(_camera):
+		return
+	var target := _display_bounds.get_center()
+	var direction := Vector3(sin(_yaw) * cos(_pitch), sin(_pitch), cos(_yaw) * cos(_pitch))
+	_camera.position = target + direction
+	_camera.look_at(target, Vector3.UP)
+	# Resolva a distância de cada canto em espaço de câmera. Inclui profundidade
+	# e pedestal, e recalcula ao girar ou redimensionar sem recarregar o modelo.
+	var view_rotation := _camera.basis.inverse()
+	var tangent := tan(deg_to_rad(CAMERA_FOV * 0.5))
+	var aspect := maxf(size.x / maxf(size.y, 1.0), 0.3)
+	var distance := 0.1
+	for box in _fit_boxes:
+		for index in range(8):
+			var corner := view_rotation * (box.get_endpoint(index) - target)
+			distance = maxf(distance, corner.z + absf(corner.y) / (tangent * 0.91))
+			distance = maxf(distance, corner.z + absf(corner.x) / (tangent * aspect * 0.82))
+	_base_distance = distance
+	_camera.position = target + direction * distance * _zoom
+	_camera.look_at(target, Vector3.UP)

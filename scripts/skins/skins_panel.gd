@@ -68,21 +68,6 @@ func _split_layout() -> void:
 	_scroll = $Margin/Column/Scroll
 	_header = $Margin/Column/Header
 	_back_button = $Margin/Column/Header/Back
-	var tabs := HBoxContainer.new()
-	tabs.name = "CatalogTabs"
-	tabs.add_theme_constant_override("separation", 14)
-	_header.add_child(tabs)
-	for name in ["◆ Personagens", "♧ Skins", "⚔ Armas", "◉ Emotes", "✦ Personalização"]:
-		var tab := _button(name, func() -> void: pass)
-		tab.custom_minimum_size = Vector2(0, 42)
-		tab.add_theme_font_size_override("font_size", 17)
-		if name != "◆ Personagens":
-			tab.disabled = true
-			tab.tooltip_text = "Em desenvolvimento"
-		else:
-			tab.disabled = true
-			tab.add_theme_color_override("font_disabled_color", ACCENT)
-		tabs.add_child(tab)
 	_split = HBoxContainer.new()
 	_split.name = "SkinsShowcase"
 	_split.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -181,8 +166,6 @@ func _responsive_layout() -> void:
 	for edge in ["left", "right", "top", "bottom"]:
 		margin.add_theme_constant_override("margin_" + edge, inset)
 	_header.add_theme_constant_override("separation", 12 if compact else 22)
-	var tabs: HBoxContainer = _header.get_node("CatalogTabs")
-	tabs.visible = not compact
 	_back_button.custom_minimum_size = Vector2(86 if compact else 130, 38 if compact else 50)
 	_back_button.add_theme_font_size_override("font_size", 16 if compact else 21)
 	heading.add_theme_font_size_override("font_size", 23 if compact else 37)
@@ -267,7 +250,7 @@ func _rebuild_gallery() -> void:
 		for item: Dictionary in services.inventory.entries:
 			if services.inventory.is_unlocked(str(item.id)):
 				obtained += 1
-		_collection_count.text = "%d / %d adquiridos" % [obtained, services.inventory.entries.size()]
+		_collection_count.text = "%d/%d desbloqueados" % [obtained, services.inventory.entries.size()]
 
 
 func _gallery_card(entry: Dictionary) -> PanelContainer:
@@ -402,23 +385,10 @@ func _select(character_id: String) -> void:
 	heading_row.add_child(name_label)
 	var equipped := services.inventory.equipped_id() == character_id
 	var unlocked := services.inventory.is_unlocked(character_id)
-	heading_row.add_child(PlayerUI.label("EQUIPADO" if equipped else ("DISPONÍVEL" if unlocked else "BLOQUEADO"), 12 if compact else 16, ACCENT))
 	var favorite := _favorite_button(character_id)
 	favorite.custom_minimum_size = Vector2(36, 34)
 	heading_row.add_child(favorite)
-	var arrows := HBoxContainer.new()
-	_preview.add_child(arrows)
-	var left_arrow := _button("‹", _select_neighbor.bind(-1))
-	left_arrow.custom_minimum_size = Vector2(44, 36)
-	arrows.add_child(left_arrow)
-	var hint := PlayerUI.label("Arraste para girar • Coleção Começo", 13, Color("#a8b9d0"))
-	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	arrows.add_child(hint)
-	var right_arrow := _button("›", _select_neighbor.bind(1))
-	right_arrow.custom_minimum_size = Vector2(44, 36)
-	arrows.add_child(right_arrow)
-	var details := PlayerUI.label(_collection_title + "  •  " + ("Equipado" if equipped else ("Disponível" if unlocked else "Bloqueado")), 15, ACCENT)
+	var details := PlayerUI.label("Coleção " + _collection_title + "  •  Arraste para girar", 13 if compact else 15, ACCENT)
 	_preview.add_child(details)
 	_stage = _showcase(_preview, character_id)
 	if _stage != null:
@@ -426,8 +396,21 @@ func _select(character_id: String) -> void:
 		_stage.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		_stage.fill_ratio = PREVIEW_FILL_RATIO
 		_stage.frame_character()
-		_stage.set_zoom(ThumbnailCache.framing_zoom(character_id))
+		_stage.set_zoom(1.0)
 		_stage.frame_character.call_deferred()
+		for direction in [-1, 1]:
+			var arrow := _button("‹" if direction < 0 else "›", _select_neighbor.bind(direction))
+			arrow.tooltip_text = "Personagem anterior" if direction < 0 else "Próximo personagem"
+			arrow.custom_minimum_size = Vector2(44, 44)
+			_stage.add_child(arrow)
+			arrow.anchor_left = 0.0 if direction < 0 else 1.0
+			arrow.anchor_right = arrow.anchor_left
+			arrow.anchor_top = 0.5
+			arrow.anchor_bottom = 0.5
+			arrow.offset_left = 4 if direction < 0 else -48
+			arrow.offset_right = 48 if direction < 0 else -4
+			arrow.offset_top = -22
+			arrow.offset_bottom = 22
 	_description = PlayerUI.label(str(entry.get("description", "")), 16)
 	_description.custom_minimum_size.y = 0
 	_description.visible = not compact and not _description.text.is_empty()
@@ -443,9 +426,6 @@ func _select(character_id: String) -> void:
 	equip.custom_minimum_size.y = 36 if compact else 48
 	equip.disabled = not unlocked or equipped
 	actions.add_child(equip)
-	var back := _button("VOLTAR", close)
-	back.custom_minimum_size.y = 36 if compact else 48
-	actions.add_child(back)
 
 
 func _equip(character_id: String) -> void:

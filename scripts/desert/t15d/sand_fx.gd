@@ -5,7 +5,7 @@ extends RefCounted
 const SAND := Color("#d9a35e")
 const SAND_DARK := Color("#8a5a2b")
 const SAND_LIGHT := Color("#f3cf8e")
-const SPARK := Color("#7fd4ff")
+const SPARK := Color("#ff8a1f")
 
 ## Soco de areia: a areia envolve o punho durante o golpe (redemoinho que deixa rastro
 ## seguindo o braço) com faíscas pequenas em volta da mão; no quadro do soco, uma
@@ -117,7 +117,7 @@ class SandPunch extends Node3D:
 			particles.local_coords = false
 			particles.emitting = true
 		_light.light_energy = 1.6
-		_light.light_color = Color("#bfe6ff")
+		_light.light_color = Color("#ffb066")
 		create_tween().tween_property(_light, "light_energy", 0.0, 0.25)
 
 	func _process(delta: float) -> void:
@@ -179,7 +179,7 @@ class SandPunch extends Node3D:
 		sparks.gravity = Vector3.ZERO
 		sparks.particle_flag_align_y = true
 		sparks.mesh = Res.streak(0.018, 0.2, true)
-		sparks.color_ramp = Res.ramp([Color(0.9, 0.98, 1.0, 1.0), Color(SPARK, 0.0)])
+		sparks.color_ramp = Res.ramp([Color(1.0, 0.9, 0.6, 1.0), Color(SPARK, 0.0)])
 		node.add_child(sparks)
 		for particles in [dust, sparks]: particles.emitting = true
 		node.get_tree().create_timer(0.8, false).timeout.connect(node.queue_free)
@@ -398,7 +398,7 @@ class Res:
 		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
 		mat.albedo_texture = texture
-		mat.albedo_color = Color(0.75, 0.92, 1.0, 1.0)
+		mat.albedo_color = Color(1.0, 0.7, 0.35, 1.0)
 		mat.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
 		quad.material = mat
 		_cache.ring = quad
@@ -430,7 +430,7 @@ class Res:
 		mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
 		for pass_index in range(2):
 			var width := (0.11 if pass_index == 0 else 0.026) * scale
-			var color := Color(0.35, 0.7, 1.0, 0.85) if pass_index == 0 else Color(0.85, 0.95, 1.0, 1.0)
+			var color := Color(1.0, 0.45, 0.08, 0.85) if pass_index == 0 else Color(1.0, 0.88, 0.6, 1.0)
 			for path: PackedVector3Array in paths:
 				var shrink := 1.0 if path.size() > 2 else 0.6
 				for index in range(path.size() - 1):

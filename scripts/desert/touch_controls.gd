@@ -2,17 +2,19 @@ class_name TouchControls
 extends Control
 
 ## Controles de toque para Android e Web. Cada botão aciona a mesma ação de entrada do
-## teclado (move_left, move_right, jump, attack), então a lógica de jogo não muda.
-## Visível somente quando há toque disponível ou em Android/Web.
+## teclado (move_left, move_right, jump, attack, crouch, defend), então a lógica de jogo não muda.
+## Visível somente quando há toque disponível ou em Android/Web. A linha 1 fica acima da linha 0.
 
 const BUTTON_SIZE := Vector2(96, 96)
 const MARGIN := 24.0
 
 const BUTTONS := [
-	{"action": "move_left", "label": "<", "anchor": "left", "column": 0},
-	{"action": "move_right", "label": ">", "anchor": "left", "column": 1},
-	{"action": "attack", "label": "J", "anchor": "right", "column": 1},
-	{"action": "jump", "label": "^", "anchor": "right", "column": 0},
+	{"action": "move_left", "label": "<", "anchor": "left", "column": 0, "row": 0},
+	{"action": "move_right", "label": ">", "anchor": "left", "column": 1, "row": 0},
+	{"action": "attack", "label": "J", "anchor": "right", "column": 1, "row": 0},
+	{"action": "jump", "label": "^", "anchor": "right", "column": 0, "row": 0},
+	{"action": "defend", "label": "D", "anchor": "right", "column": 1, "row": 1},
+	{"action": "crouch", "label": "v", "anchor": "right", "column": 0, "row": 1},
 ]
 
 
@@ -40,10 +42,12 @@ func _should_show() -> bool:
 
 func _place(button: Button, spec: Dictionary) -> void:
 	var size := get_viewport_rect().size
+	var row: int = spec.get("row", 0)
 	var x: float = MARGIN + spec["column"] * (BUTTON_SIZE.x + MARGIN)
 	if spec["anchor"] == "right":
 		x = size.x - MARGIN - BUTTON_SIZE.x - spec["column"] * (BUTTON_SIZE.x + MARGIN)
-	button.position = Vector2(x, size.y - BUTTON_SIZE.y - MARGIN)
+	var y := size.y - BUTTON_SIZE.y - MARGIN - row * (BUTTON_SIZE.y + MARGIN)
+	button.position = Vector2(x, y)
 
 
 func _relayout() -> void:

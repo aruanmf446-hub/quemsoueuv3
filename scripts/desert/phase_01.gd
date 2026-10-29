@@ -11,11 +11,13 @@ var _respawning := false
 var _boss_defeated := false
 const ENEMIES_PATH := "res://data/desert_enemies.json"
 const PROTAGONIST_TYPE := "el_fuego"
-const CAMERA_LEAD := 1.5
-const CAMERA_HEIGHT := 2.6
-const CAMERA_DISTANCE := 11.0
-const PLAYER_HEIGHT := 1.4
-const PLAYER_RADIUS := 0.35
+## Câmera de perfil: perto o bastante para El Fuego ocupar uma fatia legível da tela.
+const CAMERA_LEAD := 1.2
+const CAMERA_HEIGHT := 2.2
+const CAMERA_DISTANCE := 8.0
+const CAMERA_FOV := 48.0
+const CAMERA_LOOK_HEIGHT := 1.0
+const CHECKPOINT_FLASH := 1.4
 
 var completed: bool = false
 
@@ -24,7 +26,9 @@ var _enemy_catalog: Dictionary
 var _player: SidePlayer
 var _camera: Camera3D
 var _health_label: Label
+var _progress_label: Label
 var _message_label: Label
+var _message_token := 0
 var _touch: TouchControls
 
 
@@ -47,31 +51,44 @@ func _physics_process(delta: float) -> void:
 	if _player == null or _respawning or completed:
 		return
 	if _player.global_position.y < float(_phase.get("kill_plane_y", -8.0)):
-		_player.take_damage(SidePlayer.MAX_HEALTH, _player.global_position.x)
+		_player.fall_out()
+		return
+	_update_progress()
 	_camera.global_position = _camera.global_position.lerp(
 		Vector3(_player.global_position.x + CAMERA_LEAD, CAMERA_HEIGHT, CAMERA_DISTANCE),
 		1.0 - exp(-8.0 * delta)
 	)
-	_camera.look_at(Vector3(_camera.global_position.x - CAMERA_LEAD, 1.2, 0.0), Vector3.UP)
+	_camera.look_at(Vector3(_camera.global_position.x - CAMERA_LEAD, CAMERA_LOOK_HEIGHT, 0.0), Vector3.UP)
 
 
+## Iluminação de dia no deserto, com o mesmo ambiente quente do lobby. O cenário ainda é
+## placeholder de caixa; a luz é ajustada para que o protagonista não fique escuro.
 func _build_environment() -> void:
+	var settings := GraphicsProfile.settings(GraphicsProfile.default_for_platform())
+	get_viewport().msaa_3d = settings["msaa_3d"]
 	var env := WorldEnvironment.new()
 	env.environment = Environment.new()
 	env.environment.background_mode = Environment.BG_COLOR
-	env.environment.background_color = Color("#0d1733")
+	env.environment.background_color = Color("#8fc1e6")
 	env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.environment.ambient_light_color = Color("#3a4a7a")
-	env.environment.ambient_light_energy = 0.6
+	env.environment.ambient_light_color = Color("#ffe9c8")
+	env.environment.ambient_light_energy = 0.55
 	env.environment.tonemap_mode = Environment.TONE_MAPPER_LINEAR
 	add_child(env)
 
-	var moon := DirectionalLight3D.new()
-	moon.rotation_degrees = Vector3(-55.0, -20.0, 0.0)
-	moon.light_color = Color("#bcd4ff")
-	moon.light_energy = 0.9
-	moon.shadow_enabled = true
-	add_child(moon)
+	var sun := DirectionalLight3D.new()
+	sun.rotation_degrees = Vector3(-50.0, -30.0, 0.0)
+	sun.light_color = Color("#fff1d6")
+	sun.light_energy = 1.2
+	sun.shadow_enabled = settings["shadows"]
+	add_child(sun)
+
+	# Luz de preenchimento sem sombra, vinda do lado oposto, para tirar o preto das costas.
+	var fill := DirectionalLight3D.new()
+	fill.rotation_degrees = Vector3(-25.0, 150.0, 0.0)
+	fill.light_color = Color("#c7dcff")
+	fill.light_energy = 0.35
+	add_child(fill)
 
 
 func _build_platforms() -> void:
@@ -119,13 +136,6 @@ func _build_goal() -> void:
 func _build_player() -> void:
 	_player = SidePlayer.new()
 	_player.position = _vec3(_phase["player_spawn"])
-	var shape := CollisionShape3D.new()
-	var capsule := CapsuleShape3D.new()
-	capsule.radius = PLAYER_RADIUS
-	capsule.height = PLAYER_HEIGHT
-	shape.shape = capsule
-	shape.position = Vector3(0.0, PLAYER_HEIGHT * 0.5, 0.0)
-	_player.add_child(shape)
 	var model := CharacterSlot.new()
 	model.name = "Model"
 	_player.add_child(model)
@@ -190,6 +200,14 @@ func _build_hud() -> void:
 	_health_label.add_theme_constant_override("outline_size", 5)
 	layer.add_child(_health_label)
 
+	_progress_label = Label.new()
+	_progress_label.position = Vector2(24, 92)
+	_progress_label.add_theme_font_size_override("font_size", 18)
+	_progress_label.add_theme_color_override("font_color", Color("#dbe7ff"))
+	_progress_label.add_theme_color_override("font_outline_color", Color("#0a1630"))
+	_progress_label.add_theme_constant_override("outline_size", 4)
+	layer.add_child(_progress_label)
+
 	_message_label = Label.new()
 	_message_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	_message_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -249,15 +267,35 @@ func _on_goal_entered(body: Node3D) -> void:
 	if not next_path.is_empty():
 		var next_button := Button.new()
 		next_button.text = "Próxima fase"
-		next_button.position = Vector2(360, 80)
+		next_button.position = get_viewport().get_visible_rect().size * 0.5 + Vector2(-110, 70)
 		next_button.custom_minimum_size = Vector2(220, 56)
 		next_button.pressed.connect(_advance.bind(next_path))
 		_message_label.get_parent().add_child(next_button)
 
 
 func _show_message(text: String) -> void:
+	_message_token += 1
 	_message_label.text = text
 	_message_label.visible = true
+
+
+## Aviso temporário (ex.: checkpoint). Não apaga uma mensagem permanente que chegou depois.
+func _flash_message(text: String) -> void:
+	_show_message(text)
+	var token := _message_token
+	get_tree().create_timer(CHECKPOINT_FLASH).timeout.connect(func() -> void:
+		if token == _message_token and not completed and not _respawning:
+			_message_label.visible = false)
+
+
+## Progresso até a saída, em porcentagem da distância entre o início e a meta.
+func _update_progress() -> void:
+	if _progress_label == null or _player == null:
+		return
+	var start := float(_phase["player_spawn"][0])
+	var goal := float(_phase["goal"]["pos"][0])
+	var share := clampf((_player.global_position.x - start) / maxf(goal - start, 0.01), 0.0, 1.0)
+	_progress_label.text = "Progresso %d%%" % roundi(share * 100.0)
 
 
 ## El Fuego é localizado no catálogo de personagens pelo id estável. A campanha não usa
@@ -273,9 +311,10 @@ func _find_protagonist() -> Dictionary:
 
 func _placeholder_material(kind: String) -> StandardMaterial3D:
 	var material := StandardMaterial3D.new()
+	# Cores de areia e pedra para os blocos de placeholder; sem arte de cenário ainda.
 	var colors := {
-		"ground": Color("#8a6a45"),
-		"ledge": Color("#a88a5a"),
+		"ground": Color("#d9b27c"),
+		"ledge": Color("#c49a63"),
 		"goal": Color("#ffd34d"),
 	}
 	material.albedo_color = colors.get(kind, Color("#777777"))
@@ -288,7 +327,9 @@ func _ensure_input_actions() -> void:
 		"move_left": [KEY_A, KEY_LEFT],
 		"move_right": [KEY_D, KEY_RIGHT],
 		"jump": [KEY_SPACE, KEY_W, KEY_UP],
+		"crouch": [KEY_S, KEY_DOWN],
 		"attack": [KEY_J, KEY_K],
+		"defend": [KEY_L, KEY_SHIFT],
 	}
 	for action: String in bindings:
 		if not InputMap.has_action(action):
@@ -323,8 +364,9 @@ func _build_checkpoints() -> void:
 		shape.shape = box
 		area.add_child(shape)
 		area.body_entered.connect(func(body: Node3D) -> void:
-			if body == _player and not _player.is_dead and not completed:
-				_checkpoint = _vec3(checkpoint.pos))
+			if body == _player and not _player.is_dead and not completed and _vec3(checkpoint.pos).x > _checkpoint.x:
+				_checkpoint = _vec3(checkpoint.pos)
+				_flash_message("Checkpoint salvo"))
 		add_child(area)
 
 

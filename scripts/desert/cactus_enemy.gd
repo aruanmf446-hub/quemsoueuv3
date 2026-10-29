@@ -9,6 +9,8 @@ signal defeated
 enum State { PATROL, CHASE, ATTACK, DEAD }
 
 const GRAVITY := 24.0
+## Mesmo valor de kill_plane_y em data/desert/phase_01.json: cacto que cai do mapa é removido.
+const KILL_PLANE_Y := -8.0
 
 var health: int = 2
 var damage: int = 1
@@ -49,6 +51,10 @@ func setup(entry: Dictionary, spawn: Dictionary) -> void:
 
 func _physics_process(delta: float) -> void:
 	if _state == State.DEAD:
+		return
+	if global_position.y < KILL_PLANE_Y:
+		remove_from_group("enemies")
+		queue_free()
 		return
 	_cooldown = maxf(_cooldown - delta, 0.0)
 	if _player == null or not is_instance_valid(_player):

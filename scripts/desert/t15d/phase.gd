@@ -184,11 +184,14 @@ func _load_chunk(index: int, immediate := true) -> void:
 	var tasks: Array[Callable] = []
 	var platforms := _chunk_platforms(index)
 	# Colisão primeiro: é barata e precisa existir antes de qualquer visual.
-	_build_collision(chunk,platforms)
-	if not platforms.is_empty():
-		for platform: Dictionary in platforms:
+	var solid := platforms.filter(func(p: Dictionary) -> bool: return p.kind != "crumble")
+	_build_collision(chunk,solid)
+	for platform: Dictionary in platforms:
+		if platform.kind == "crumble": _build_crumble(chunk,platform)
+	if not solid.is_empty():
+		for platform: Dictionary in solid:
 			tasks.append(_build_terrain_piece.bind(chunk,platform))
-		tasks.append(_build_props.bind(chunk,platforms))
+		tasks.append(_build_props.bind(chunk,solid))
 	for spawn: Dictionary in _phase.enemies:
 		if _in_chunk(float(spawn.pos[0]),index) and not _defeated_ids.has(str(spawn.id)):
 			tasks.append(_spawn_enemy.bind(chunk,spawn))
@@ -241,6 +244,12 @@ func _build_collision(chunk: Node3D, platforms: Array) -> void:
 		shape.shape = box
 		body.add_child(shape)
 		chunk.add_child(body)
+func _build_crumble(chunk: Node3D, platform: Dictionary) -> void:
+	var stone := preload("res://scripts/desert/t15d/parkour.gd").CrumbleStone.new()
+	stone.position = _vec3(platform.pos)
+	stone.stone_size = _vec3(platform.size)
+	stone.crumbled.connect(func() -> void: _sfx.play("land",0.6,-2.0))
+	chunk.add_child(stone)
 func _build_terrain_piece(chunk: Node3D, platform: Dictionary) -> void:
 	var terrain := Terrain.new()
 	terrain.order = _order
@@ -265,6 +274,12 @@ func _build_chunk_details(chunk: Node3D, index: int) -> void:
 			chunk.add_child(item)
 	for sign: Dictionary in _phase.signs:
 		if _in_chunk(float(sign.pos[0]),index): _build_pit_sign(chunk,sign)
+	for geyser: Dictionary in _phase.get("geysers",[]):
+		if _in_chunk(float(geyser.pos[0]),index):
+			var pad := preload("res://scripts/desert/t15d/parkour.gd").Geyser.new()
+			pad.position = _vec3(geyser.pos)
+			pad.launched.connect(func() -> void: _sfx.play("jump",0.7,-2.0))
+			chunk.add_child(pad)
 	var points: Array = _phase.get("checkpoints",[])
 	for point_index in range(points.size()):
 		if _in_chunk(float(points[point_index].pos[0]),index):

@@ -27,6 +27,8 @@ func run() -> void:
 		var spawn_safe := false
 		var goal_safe := false
 		var max_step := 0.0
+		var islands: Array = []
+		var walls: Array[float] = []
 		var bad_ids: Array[String] = []
 		var unsafe_pickups: Array[String] = []
 		var unsafe_enemies: Array[String] = []
@@ -36,6 +38,13 @@ func run() -> void:
 			var left := float(platform.pos[0])-float(platform.size[0])*0.5
 			var right := float(platform.pos[0])+float(platform.size[0])*0.5
 			var top := float(platform.pos[1])+float(platform.size[1])*0.5
+			if platform.kind == "crumble":
+				# Pedra do vão largo: ponto de apoio no meio, não chão seguro.
+				islands.append([left,right])
+				continue
+			if platform.kind == "geyser_wall":
+				walls.append(float(platform.pos[0]))
+				continue
 			if platform.kind == "ground":
 				grounds.append([left,right])
 				if start > left+1 and start < right-1: spawn_safe = true
@@ -57,8 +66,22 @@ func run() -> void:
 			var gap: float = grounds[index+1][0]-grounds[index][1]
 			if gap > 0.1:
 				holes += 1
-				if gap > 3.5+0.01 or gap < 2.5: gaps_ok = false
+				# Vão largo: cada metade (borda→pedra→borda) precisa estar no alcance.
+				var parts: Array[float] = [gap]
+				for island: Array in islands:
+					if island[0] > grounds[index][1] and island[1] < grounds[index+1][0]:
+						parts = [float(island[0])-float(grounds[index][1]), float(grounds[index+1][0])-float(island[1])]
+				for part in parts:
+					if part > 3.5+0.01 or (parts.size() == 1 and part < 2.5) or part < 1.5: gaps_ok = false
 		check(holes >= 12,prefix+"buracos reais distribuídos pelo percurso")
+		check(islands.size() >= 2,prefix+"vãos largos com pedra que desmorona")
+		var geysers_ok := walls.size() >= 2
+		for x in walls:
+			var sides := 0
+			for geyser: Dictionary in stage.geysers:
+				if absf(absf(float(geyser.pos[0])-x)-4.2) < 0.01: sides += 1
+			if sides != 2: geysers_ok = false
+		check(geysers_ok,prefix+"muralhas altas com gêiser dos dois lados")
 		check(gaps_ok,prefix+"vãos reversíveis dentro do alcance de salto")
 		var attack := 0
 		var defense := 0

@@ -3,10 +3,9 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://1rmsouyohuau"
-path.s3tc="res://.godot/imported/1_0.png-2712e88e86ae2ed9f89a59224dd9d643.s3tc.ctex"
+path="res://.godot/imported/1_0.png-2712e88e86ae2ed9f89a59224dd9d643.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
 "md5": "a35105bd0d3d190badc13d3e55aaf8e5"
@@ -15,13 +14,13 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/characters/Cowboy/1_0.png"
-dest_files=["res://.godot/imported/1_0.png-2712e88e86ae2ed9f89a59224dd9d643.s3tc.ctex"]
+dest_files=["res://.godot/imported/1_0.png-2712e88e86ae2ed9f89a59224dd9d643.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.85
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
@@ -40,5 +39,5 @@ process/premult_alpha=false
 process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
-process/size_limit=0
+process/size_limit=1024
 detect_3d/compress_to=0

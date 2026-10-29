@@ -64,7 +64,11 @@ jobs:
           test -s build/web/index.html
           test -s build/web/index.pck
           test -s build/web/index.wasm
-          du -sh build/web
+          # Músicas do menu fora do pacote: o jogo baixa cada faixa sob demanda (menu_music.gd).
+          mkdir -p build/web/music
+          (cd assets/music && find . -name '*.mp3' -exec cp --parents {} ../../build/web/music/ \;)
+          ls -la build/web/index.pck
+          du -sh build/web build/web/music
       - uses: actions/upload-artifact@v4
         with:
           name: quem-sou-eu-v3-web-preview

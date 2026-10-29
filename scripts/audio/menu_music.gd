@@ -6,9 +6,13 @@ signal state_changed
 signal catalog_error(message: String)
 
 const CATALOG := "res://data/music/catalog.json"
+const SELECTION_PATH := "user://menu_music_selection.cfg"
 const MENU := "res://scenes/menu/main_menu.tscn"
 const SILENCE := -60.0
 var tracks: Array[Dictionary] = []
+## Escolhas do jogador (salvas): ocultas somem da lista; desmarcadas ficam fora da playlist.
+var _hidden := {}
+var _deselected := {}
 var current_id := ""
 var paused := false
 var fade_seconds := 0.8
@@ -21,6 +25,8 @@ var _inside := false
 var _preferences: Node
 var _last_volume := 1.0
 var _retry_in := 0.0
+## Autorização de teste dura só esta sessão do editor; nunca é uma licença de distribuição.
+var _local_test_authorized := false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -30,6 +36,7 @@ func _ready() -> void:
 		add_child(player)
 		player.finished.connect(_finished.bind(i))
 		_players.append(player)
+	_load_selection()
 	reload_catalog()
 
 func reload_catalog(path: String = CATALOG) -> bool:
@@ -70,9 +77,12 @@ func reload_catalog(path: String = CATALOG) -> bool:
 	return true
 
 func _valid_entry(t: Dictionary) -> bool:
-	for field: String in ["id", "title", "artist", "audio", "cover"]:
+	for field: String in ["id", "title", "audio", "cover"]:
 		if not t.get(field) is String or str(t[field]).is_empty():
 			return false
+	# Artista pode ficar vazio enquanto os metadados estão pendentes; a tela não o inventa.
+	if not t.get("artist") is String:
+		return false
 	if not str(t.audio).begins_with("res://assets/music/") or not str(t.cover).begins_with("res://assets/music/"):
 		return false
 	if ".." in str(t.audio) or ".." in str(t.cover):
@@ -87,6 +97,26 @@ func _valid_entry(t: Dictionary) -> bool:
 	return true
 
 func _available(t: Dictionary) -> bool:
+	return (licensed(t) or local_test_available(t)) and not is_excluded(str(t.get("id", "")))
+
+func local_test_mode() -> bool:
+	return OS.has_feature("editor") and "--local-music-test" in OS.get_cmdline_user_args()
+
+func set_local_test_authorized(value: bool) -> bool:
+	if value and not local_test_mode():
+		return false
+	_local_test_authorized = value
+	state_changed.emit()
+	return true
+
+func local_test_available(track: Dictionary) -> bool:
+	# Capas pendentes não impedem a audição local. O caminho comercial mantém
+	# todas as verificações de licença/capa originais em licensed().
+	return local_test_mode() and _local_test_authorized and _valid_entry(track) \
+		and ResourceLoader.exists(str(track.audio), "AudioStream")
+
+## Verdadeiro quando a licença e os recursos estão válidos, sem considerar a escolha do jogador.
+func licensed(t: Dictionary) -> bool:
 	if t.is_empty():
 		return false
 	var rights: Dictionary = t.license
@@ -96,6 +126,38 @@ func _available(t: Dictionary) -> bool:
 		and not str(rights.get("reference", "")).is_empty() and now >= float(rights.starts_at) \
 		and now < float(rights.ends_at) and ResourceLoader.exists(t.audio, "AudioStream") \
 		and ResourceLoader.exists(t.cover, "Texture2D")
+
+func is_excluded(id: String) -> bool:
+	return _hidden.has(id) or _deselected.has(id)
+
+## Estado salvo: {"hidden": [ids], "deselected": [ids]}.
+func selection() -> Dictionary:
+	return {"hidden": _hidden.keys(), "deselected": _deselected.keys()}
+
+## Grava a escolha no disco e aplica imediatamente à playlist. Retorna false se não gravar.
+func save_selection(hidden: Array, deselected: Array) -> bool:
+	var cfg := ConfigFile.new()
+	cfg.set_value("menu_music", "hidden", hidden)
+	cfg.set_value("menu_music", "deselected", deselected)
+	if cfg.save(SELECTION_PATH) != OK:
+		return false
+	_hidden = _as_set(hidden)
+	_deselected = _as_set(deselected)
+	state_changed.emit()
+	return true
+
+func _load_selection() -> void:
+	var cfg := ConfigFile.new()
+	if cfg.load(SELECTION_PATH) != OK:
+		return
+	_hidden = _as_set(cfg.get_value("menu_music", "hidden", []))
+	_deselected = _as_set(cfg.get_value("menu_music", "deselected", []))
+
+func _as_set(values: Array) -> Dictionary:
+	var result := {}
+	for value: Variant in values:
+		result[str(value)] = true
+	return result
 
 func current_track() -> Dictionary:
 	var index := _index(current_id)
@@ -118,7 +180,8 @@ func _process(delta: float) -> void:
 	var in_menu := scene != null and scene.scene_file_path == MENU
 	if in_menu and _menu != scene:
 		_menu = scene
-		_menu.tree_exiting.connect(_leave_menu, CONNECT_ONE_SHOT)
+		if not _menu.tree_exiting.is_connected(_leave_menu):
+			_menu.tree_exiting.connect(_leave_menu, CONNECT_ONE_SHOT)
 		var services := scene.get_node_or_null("Services")
 		_preferences = services.get("preferences") if services != null else null
 		_inside = true

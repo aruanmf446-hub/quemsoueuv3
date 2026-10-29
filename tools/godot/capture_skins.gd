@@ -17,15 +17,17 @@ func _capture() -> void:
 	var menu := load("res://scenes/menu/main_menu.tscn").instantiate() as Control
 	root.add_child(menu)
 	current_scene = menu
-	for frame in range(30):
+	for frame in range(10):
 		await process_frame
 	var nav: Node = menu.get_node("Navigation")
 	nav.call("open", "skins", {})
-	for frame in range(120):
+	for frame in range(40):
 		await process_frame
 	await RenderingServer.frame_post_draw
 	var skins: Control = menu.get_node("SkinsPanel")
 	var inventory: Node = menu.get_node("Services").inventory
+	while skins.get("_generating"):
+		await process_frame
 	if mode == "rolado":
 		var scroll := _find_scroll(skins)
 		if scroll != null:
@@ -43,9 +45,13 @@ func _capture() -> void:
 				target = entry.id
 				break
 		await skins.call("_equip", target)
-		for frame in range(120):
+		for frame in range(40):
 			await process_frame
 	await RenderingServer.frame_post_draw
+	for path: String in ["Margin", "Margin/Column", "Margin/Column/SkinsShowcase"]:
+		var control: Control = skins.get_node(path)
+		print(path, " rect=", control.get_global_rect(), " min=", control.get_combined_minimum_size())
+	print("STAGE ", skins.get("_stage").get_global_rect(), " min=", skins.get("_stage").get_combined_minimum_size())
 	var picture := root.get_texture().get_image()
 	var error := picture.save_png(output)
 	print("SKINS_CAPTURE ", mode, " ", DisplayServer.window_get_size(), " file=", output)

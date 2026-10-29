@@ -1,0 +1,25 @@
+extends SceneTree
+func _initialize() -> void: call_deferred('_run')
+func _run() -> void:
+	var menu := load('res://scenes/menu/main_menu.tscn').instantiate() as Control
+	root.add_child(menu)
+	current_scene = menu
+	var skins: Control = menu.get_node('SkinsPanel')
+	skins.show_screen()
+	assert(skins.find_child('CatalogTabs', true, false) == null)
+	assert(not PlayerServices.current.inventory.is_unlocked('el_fuego'))
+	skins.set('_search', 'Cowboy')
+	skins.call('_rebuild_gallery')
+	assert(skins.get('_cards').size() == 1)
+	skins.call('_toggle_favorite', 'cowboy')
+	skins.set('_favorite_only', true)
+	skins.call('_rebuild_gallery')
+	assert(skins.get('_cards').has('cowboy'))
+	skins.call('_select', 'el_fuego')
+	assert(skins.get('_stage') is LobbyStage)
+	assert(skins.get('_stage').interactive)
+	assert(skins.get('_stage').character.character_id == &'el_fuego')
+	assert(PlayerServices.current.inventory.equipped_id() == 'cowboy')
+	assert(ThumbnailCache.VERSION == 6 and ThumbnailCache.THUMB_SIZE == Vector2i(2048,2560))
+	print('PASS tabs removed, locked Fuego, search, favorites, equipped skin, interactive real 3D and native cache')
+	quit()

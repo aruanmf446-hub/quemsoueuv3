@@ -28,7 +28,8 @@ func run() -> void:
 	music = load("res://scripts/audio/menu_music.gd").new()
 	root.add_child(music)
 	music.set_process(false)
-	check(music.tracks.is_empty(), "empty licensed catalog stays silent")
+	check(music.tracks.size() == 14 and music.available_tracks().is_empty() \
+		and music._players.all(func(player: AudioStreamPlayer) -> bool: return not player.playing), "14 pending catalog entries stay silent")
 	var pref := Preferences.new()
 	root.add_child(pref)
 	AudioServer.add_bus()

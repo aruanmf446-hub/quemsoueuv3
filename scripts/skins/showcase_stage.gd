@@ -8,9 +8,10 @@ func prepare_showcase() -> void:
 	_key_light = get_node("Viewport/World/KeyLight")
 	_rim_light = get_node("Viewport/World/RimLight")
 	pedestal_lift = -0.02
-	_key_light.light_energy = 1.25
+	apply_profile("alto")
+	_key_light.light_energy = 1.0
 	_key_light.light_color = Color("#fff1d5")
-	_rim_light.light_energy = 2.2
+	_rim_light.light_energy = 1.25
 	_rim_light.light_color = Color("#84bcff")
 	var world := get_node("Viewport/World")
 	var floor_mesh := CylinderMesh.new()

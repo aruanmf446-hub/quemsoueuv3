@@ -68,21 +68,6 @@ func _split_layout() -> void:
 	_scroll = $Margin/Column/Scroll
 	_header = $Margin/Column/Header
 	_back_button = $Margin/Column/Header/Back
-	var tabs := HBoxContainer.new()
-	tabs.name = "CatalogTabs"
-	tabs.add_theme_constant_override("separation", 14)
-	_header.add_child(tabs)
-	for name in ["◆ Personagens", "♧ Skins", "⚔ Armas", "◉ Emotes", "✦ Personalização"]:
-		var tab := _button(name, func() -> void: pass)
-		tab.custom_minimum_size = Vector2(0, 42)
-		tab.add_theme_font_size_override("font_size", 17)
-		if name != "◆ Personagens":
-			tab.disabled = true
-			tab.tooltip_text = "Em desenvolvimento"
-		else:
-			tab.disabled = true
-			tab.add_theme_color_override("font_disabled_color", ACCENT)
-		tabs.add_child(tab)
 	_split = HBoxContainer.new()
 	_split.name = "SkinsShowcase"
 	_split.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -172,17 +157,21 @@ func _split_layout() -> void:
 
 
 func _responsive_layout() -> void:
-	var compact := size.x < SMALL_SCREEN
+	var compact := DisplayServer.window_get_size().y < 600
 	if compact != _was_compact and _stage != null and is_instance_valid(_stage):
 		_was_compact = compact
 		_select(_selected)
 	var margin: MarginContainer = $Margin
+	var factor := 2.0 if compact else 1.0
+	margin.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	margin.scale = Vector2.ONE * factor
+	margin.position = Vector2.ZERO
+	margin.size = get_viewport().get_visible_rect().size / factor
+	margin.set_deferred("size", get_viewport().get_visible_rect().size / factor)
 	var inset := 12 if compact else 26
 	for edge in ["left", "right", "top", "bottom"]:
 		margin.add_theme_constant_override("margin_" + edge, inset)
 	_header.add_theme_constant_override("separation", 12 if compact else 22)
-	var tabs: HBoxContainer = _header.get_node("CatalogTabs")
-	tabs.visible = not compact
 	_back_button.custom_minimum_size = Vector2(86 if compact else 130, 38 if compact else 50)
 	_back_button.add_theme_font_size_override("font_size", 16 if compact else 21)
 	heading.add_theme_font_size_override("font_size", 23 if compact else 37)
@@ -198,13 +187,13 @@ func _responsive_layout() -> void:
 	_fav_button.custom_minimum_size.x = 34 if compact else 112
 	_search_field.placeholder_text = "Pesquisar..." if compact else "Pesquisar personagem..."
 	if _grid != null:
-		_grid.columns = 2 if compact else (4 if size.x >= 1400 else 3)
+		_grid.columns = 2 if compact else (2 if size.x >= 1400 else 2)
 		for item in _grid.get_children():
 			_style_card_height(item, compact)
 	if _stage != null and is_instance_valid(_stage):
 		_stage.custom_minimum_size = Vector2.ZERO
 	if _description != null and is_instance_valid(_description):
-		_description.visible = not compact and not _description.text.is_empty()
+		_description.hide()
 
 
 func open(equipped_id: String = "") -> void:
@@ -235,7 +224,7 @@ func _rebuild_gallery() -> void:
 	_images.clear()
 	_cards.clear()
 	_grid = GridContainer.new()
-	_grid.columns = 2 if size.x < SMALL_SCREEN else (4 if size.x >= 1400 else 3)
+	_grid.columns = 2 if DisplayServer.window_get_size().y < 600 else (2 if size.x >= 1400 else 2)
 	_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_grid.add_theme_constant_override("h_separation", 10)
 	_grid.add_theme_constant_override("v_separation", 10)
@@ -260,14 +249,14 @@ func _rebuild_gallery() -> void:
 	if count == 0:
 		body.add_child(PlayerUI.label("Nenhum personagem encontrado.", 19))
 	if _fav_button != null:
-		_fav_button.text = "FAV" if size.x < SMALL_SCREEN else "Favoritos"
+		_fav_button.text = "FAV" if DisplayServer.window_get_size().y < 600 else "Favoritos"
 		_fav_button.add_theme_color_override("font_color", ACCENT if _favorite_only else PlayerUI.TEXT)
 	if _collection_count != null:
 		var obtained := 0
 		for item: Dictionary in services.inventory.entries:
 			if services.inventory.is_unlocked(str(item.id)):
 				obtained += 1
-		_collection_count.text = "%d / %d adquiridos" % [obtained, services.inventory.entries.size()]
+		_collection_count.text = "%d / %d desbloqueados" % [obtained, services.inventory.entries.size()]
 
 
 func _gallery_card(entry: Dictionary) -> PanelContainer:
@@ -306,6 +295,7 @@ func _gallery_card(entry: Dictionary) -> PanelContainer:
 	thumbnail.custom_minimum_size = Vector2(0, 225)
 	thumbnail.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	thumbnail.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	thumbnail.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	thumbnail.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	thumbnail.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var path := str(_paths.get(character_id, ThumbnailCache.path_for(character_id)))
@@ -331,7 +321,7 @@ func _gallery_card(entry: Dictionary) -> PanelContainer:
 	card.gui_input.connect(func(event: InputEvent) -> void:
 		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 			_select(character_id))
-	_style_card_height(card, size.x < SMALL_SCREEN)
+	_style_card_height(card, DisplayServer.window_get_size().y < 600)
 	return card
 
 
@@ -339,7 +329,7 @@ func _style_card_height(card: Control, compact: bool) -> void:
 	card.custom_minimum_size.y = 0
 	var portrait: TextureRect = card.get_node_or_null("Content/Portrait")
 	if portrait != null:
-		portrait.custom_minimum_size.y = 105 if compact else clampf((size.y - 260) / 2.0 - 110, 170, 270)
+		portrait.custom_minimum_size.y = 180 if compact else clampf((size.y - 260) / 2.0 - 110, 170, 270)
 
 
 func _toggle_favorite(character_id: String) -> void:
@@ -393,7 +383,7 @@ func _select(character_id: String) -> void:
 	if entry.is_empty():
 		_preview.add_child(PlayerUI.label("Selecione uma skin."))
 		return
-	var compact := size.x < SMALL_SCREEN
+	var compact := DisplayServer.window_get_size().y < 600
 	var heading_row := HBoxContainer.new()
 	heading_row.add_theme_constant_override("separation", 12)
 	_preview.add_child(heading_row)
@@ -419,6 +409,7 @@ func _select(character_id: String) -> void:
 	right_arrow.custom_minimum_size = Vector2(44, 36)
 	arrows.add_child(right_arrow)
 	var details := PlayerUI.label(_collection_title + "  •  " + ("Equipado" if equipped else ("Disponível" if unlocked else "Bloqueado")), 15, ACCENT)
+	details.hide()
 	_preview.add_child(details)
 	_stage = _showcase(_preview, character_id)
 	if _stage != null:
@@ -430,7 +421,7 @@ func _select(character_id: String) -> void:
 		_stage.frame_character.call_deferred()
 	_description = PlayerUI.label(str(entry.get("description", "")), 16)
 	_description.custom_minimum_size.y = 0
-	_description.visible = not compact and not _description.text.is_empty()
+	_description.hide()
 	_preview.add_child(_description)
 	if not unlocked:
 		var lock_label := PlayerUI.label(PlayerProgress.lock_label(entry), 14 if compact else 17, Color("#ffcf8a"))
@@ -518,11 +509,11 @@ func _portrait_texture(path: String) -> Texture2D:
 	var bounds := image.get_used_rect()
 	if bounds.size.x == 0 or bounds.size.y == 0:
 		return ImageTexture.create_from_image(image)
-	var crop_height := mini(image.get_height() - bounds.position.y, int(bounds.size.y * 0.64))
-	var crop_width := mini(image.get_width(), int(crop_height * 0.83))
+	var crop_height := mini(image.get_height() - bounds.position.y, int(bounds.size.y * 0.48))
+	var crop_width := mini(image.get_width(), int(crop_height * 1.05))
 	var crop_x := clampi(int(bounds.get_center().x - crop_width * 0.5), 0, image.get_width() - crop_width)
 	var cropped := image.get_region(Rect2i(crop_x, bounds.position.y, crop_width, crop_height))
-	cropped.resize(384, 450, Image.INTERPOLATE_LANCZOS)
+	cropped.generate_mipmaps()
 	return ImageTexture.create_from_image(cropped)
 
 

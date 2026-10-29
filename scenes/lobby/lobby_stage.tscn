@@ -1,7 +1,8 @@
 [gd_scene format=3 uid="uid://c0m77lrhy6l25"]
 
-[ext_resource type="Script" uid="uid://mp2mru6hw0cv" path="res://scripts/lobby/lobby_stage.gd" id="1_3lb3l"]
-[ext_resource type="PackedScene" uid="uid://csl767uv84o3m" path="res://scenes/lobby/character_slot.tscn" id="1_gnweo"]
+[ext_resource type="Script" path="res://scripts/lobby/lobby_stage.gd" id="1_3lb3l"]
+[ext_resource type="PackedScene" path="res://scenes/lobby/character_slot.tscn" id="1_gnweo"]
+[ext_resource type="Script" path="res://scripts/lobby/character_slot.gd" id="3_6axya"]
 
 [sub_resource type="Environment" id="Environment_3lb3l"]
 background_mode = 1
@@ -9,10 +10,10 @@ ambient_light_source = 2
 ambient_light_color = Color(0.62, 0.62, 0.64, 1)
 ambient_light_energy = 0.42
 
-[node name="LobbyStage" type="SubViewportContainer" unique_id=439807160]
-custom_minimum_size = Vector2(640, 760)
+[node name="LobbyStage" type="Control" unique_id=1397380140]
+layout_mode = 3
+anchors_preset = 0
 mouse_filter = 2
-stretch = true
 script = ExtResource("1_3lb3l")
 
 [node name="Viewport" type="SubViewport" parent="." unique_id=45234840]
@@ -43,7 +44,8 @@ light_color = Color(0.55, 0.75, 1, 1)
 light_energy = 0.9
 omni_range = 6.0
 
-[node name="Character" parent="Viewport/World" unique_id=808239936 instance=ExtResource("1_gnweo")]
+[node name="Character" type="Node3D" parent="Viewport/World" unique_id=808239936 instance=ExtResource("1_gnweo")]
+script = ExtResource("3_6axya")
 
 [node name="FillLight" type="OmniLight3D" parent="Viewport/World" unique_id=1989691315]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.4, 1.5, 2.6)

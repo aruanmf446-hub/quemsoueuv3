@@ -30,13 +30,14 @@ func _ready() -> void:
 	for button: MenuCardButton in menu.get_node("MenuButtons").get_children():
 		button.art_texture = null
 		button.get_node("Padding").hide()
-		button.text = {"story": "História  ›", "duel": "Duelo", "skins": "Skins", "friends": "Amizades", "settings": "Configurações"}[String(button.button_id)]
+		button.text = {"story": "História  ›", "duel": "Duelo", "skins": "Personagens", "friends": "Amizades", "settings": "Configurações"}[String(button.button_id)]
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		_action_content(button)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		_style_button(button, button.button_id == &"story")
 		button.add_theme_constant_override("outline_size", 0)
 		button.focus_mode = Control.FOCUS_ALL
-	menu.get_node("MenuButtons/BtnDuel").text = "Duelo · em breve"
+	menu.get_node("MenuButtons/BtnDuel").hide()
 	for path: String in ["TopBar/CoinPill", "TopBar/GemPill", "ProfileCard"]:
 		menu.get_node(path).add_theme_stylebox_override("panel", _box(Color(0.06, 0.09, 0.11, 0.86)))
 	for path: String in ["TopBar/MailButton", "TopBar/FriendsButton", "TopBar/SettingsButton"]:
@@ -48,13 +49,24 @@ func _ready() -> void:
 		value.add_theme_constant_override("outline_size", 0)
 		value.add_theme_color_override("font_color", PAPER)
 		var icon: Panel = menu.get_node("TopBar/" + currency + "/Content/Icon")
-		icon.add_theme_stylebox_override("panel", _box(ACCENT if currency == "CoinPill" else Color("8fcbbf"), 10))
+		icon.add_theme_stylebox_override("panel", _box(Color.TRANSPARENT, 10))
+		var symbol := TextureRect.new()
+		symbol.texture = load("res://assets/icons/vector/icon_coin.svg" if currency == "CoinPill" else "res://assets/icons/vector/icon_gem.svg")
+		symbol.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		symbol.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		symbol.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		icon.add_child(symbol)
+		symbol.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		menu.get_node("TopBar/" + currency).tooltip_text = "Moedas" if currency == "CoinPill" else "Gemas"
 	menu.get_node("FriendsPanel/Frame").hide()
 	social_bg = Panel.new()
 	social_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	social_bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	social_bg.add_theme_stylebox_override("panel", _box(Color(0.06, 0.09, 0.11, 0.78)))
+	var social_style := _box(Color(0.025, 0.065, 0.12, 0.95))
+	social_style.border_width_top = 2
+	social_style.border_color = ACCENT
+	social_bg.add_theme_stylebox_override("panel", social_style)
+	menu.get_node("FriendsPanel/Margin/Content/Header/Title").text = "SOCIAL"
 	menu.get_node("FriendsPanel").add_child(social_bg)
 	menu.get_node("FriendsPanel").move_child(social_bg, 0)
 	var margin: MarginContainer = menu.get_node("FriendsPanel/Margin")
@@ -67,8 +79,8 @@ func _ready() -> void:
 	stage.frame_character()
 	var rim: OmniLight3D = stage.get_node("Viewport/World/RimLight")
 	rim.light_color = Color("fff1db")
-	rim.light_energy = 0.55
-	stage.get_node("Viewport/World/KeyLight").light_energy = 0.95
+	rim.light_energy = 1.1
+	stage.get_node("Viewport/World/KeyLight").light_energy = 1.0
 	for path: String in ["PrevButton", "NextButton"]:
 		var button: Button = menu.get_node("LobbyArea/Overlay/" + path)
 		_style_button(button, false)
@@ -115,6 +127,8 @@ func _label(text: String, font_size: int, color: Color) -> Label:
 
 func _box(color: Color, radius: int = 8) -> StyleBoxFlat:
 	var box := StyleBoxFlat.new()
+	box.shadow_color = Color(0,0,0,0.28)
+	box.shadow_size = 10
 	box.bg_color = color
 	box.set_corner_radius_all(radius)
 	box.content_margin_left = 18
@@ -124,7 +138,12 @@ func _box(color: Color, radius: int = 8) -> StyleBoxFlat:
 	return box
 
 func _style_button(button: Button, primary: bool) -> void:
-	button.add_theme_stylebox_override("normal", _box(ACCENT if primary else Color(0.06, 0.09, 0.11, 0.9)))
+	var normal := _box(ACCENT if primary else Color(0.025, 0.065, 0.12, 0.95))
+	normal.border_color = ACCENT if primary else Color(0.52, 0.66, 0.73, 0.40)
+	normal.border_width_left = 4 if primary else 2
+	normal.corner_radius_top_left = 2
+	normal.corner_radius_bottom_left = 2
+	button.add_theme_stylebox_override("normal", normal)
 	button.add_theme_stylebox_override("hover", _box(Color("f4ce98") if primary else Color("36434b")))
 	button.add_theme_stylebox_override("pressed", _box(Color("c99a59") if primary else Color("10191e")))
 	button.add_theme_stylebox_override("disabled", _box(Color(0.06, 0.09, 0.11, 0.76)))
@@ -148,7 +167,7 @@ func _layout() -> void:
 	var compact := DisplayServer.window_get_size().y < 500
 	# Em 844x390 a viewport é desenhada com escala ~0,41; o texto precisa de mais unidades de projeto.
 	var type_scale := 1.8 if compact else 1.0
-	var left_width := 400.0 if compact else 310.0
+	var left_width := 530.0 if compact else 400.0
 	_rect(brand, Vector2(32, 24), Vector2(350, 40))
 	_rect(brand_logo, Vector2(24, 12), Vector2(400, 133))
 	_rect(eyebrow, Vector2(34, 68), Vector2(380, 35))
@@ -171,15 +190,25 @@ func _layout() -> void:
 	mode.add_theme_color_override("font_color", Color("e5e6dc"))
 	mode.add_theme_font_size_override("font_size", int(18 * (1.3 if compact else 1.0)))
 	var buttons: VBoxContainer = menu.get_node("MenuButtons")
-	_rect(buttons, Vector2(32, h * (0.26 if compact else 0.30)), Vector2(left_width, 0))
+	_rect(buttons, Vector2(32, h * (0.25 if compact else 0.29)), Vector2(left_width, 0))
 	buttons.add_theme_constant_override("separation", 10)
 	for button: Button in buttons.get_children():
-		button.custom_minimum_size = Vector2(left_width, 104 if compact else 68)
+		button.custom_minimum_size = Vector2(left_width, 130 if compact else 88)
 		button.add_theme_font_size_override("font_size", int(26 * type_scale))
+		var content: HBoxContainer = button.get_node_or_null("ActionBody")
+		if content != null:
+			content.offset_left = 22
+			content.offset_right = -18
+			content.offset_top = 12
+			content.offset_bottom = -12
+			content.get_node("Icon").custom_minimum_size.x = 60 if compact else 46
+			content.get_node("Text/Title").add_theme_font_size_override("font_size", 38 if compact else 26)
+			content.get_node("Text/Subtitle").add_theme_font_size_override("font_size", 23 if compact else 15)
 	buttons.size.x = left_width
 	var area: Control = menu.get_node("LobbyArea")
 	_rect(area, Vector2(w * 0.53 - h * 0.43, h * 0.035), Vector2(h * 0.86, h * 0.93))
 	area.get_node("Stage").custom_minimum_size = Vector2.ZERO
+	area.get_node("Stage").set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var name_label: Label = area.get_node("Overlay/NameLabel")
 	_rect(name_label, Vector2(area.size.x * 0.25, area.size.y - 62), Vector2(area.size.x * 0.5, 50))
 	name_label.add_theme_constant_override("outline_size", 2)
@@ -187,7 +216,7 @@ func _layout() -> void:
 	_rect(area.get_node("Overlay/PrevButton"), Vector2(area.size.x * 0.25 - 58, area.size.y - 64), Vector2(54, 54))
 	_rect(area.get_node("Overlay/NextButton"), Vector2(area.size.x * 0.75 + 4, area.size.y - 64), Vector2(54, 54))
 	var friends: Control = menu.get_node("FriendsPanel")
-	_rect(friends, Vector2(w - 350, h * 0.63), Vector2(318, 0))
+	_rect(friends, Vector2(w - 350, h * 0.66), Vector2(318, 0))
 	menu.get_node("FriendsPanel/Margin/Content/ViewAllButton").add_theme_font_size_override("font_size", 28 if compact else 18)
 	for child in menu.get_node("FriendsPanel/Margin/Content/FriendList").get_children():
 		if child is Label:
@@ -209,3 +238,41 @@ func _language() -> void:
 	var mode := Node.AUTO_TRANSLATE_MODE_INHERIT if TranslationServer.get_locale().begins_with("en") else Node.AUTO_TRANSLATE_MODE_DISABLED
 	for path: String in ["MenuButtons", "ProfileCard", "FriendsPanel", "TopBar", "LobbyArea"]:
 		menu.get_node(path).auto_translate_mode = mode
+
+
+func _action_content(button: MenuCardButton) -> void:
+	if button.button_id == &"duel": return
+	button.text = ""
+	var titles := {"story": ["JOGAR", "Modo História · Reino do Deserto"], "skins": ["PERSONAGENS", "Coleção Começo"], "friends": ["AMIZADES", "Sua equipe de aventura"], "settings": ["AJUSTES", "Sua experiência"]}
+	var paths := {"story": '<path d="M12 3 21 8v8l-9 5-9-5V8zM12 3v18M3 8l9 5 9-5"/>', "skins": '<circle cx="12" cy="7" r="4"/><path d="M4 22v-4a8 8 0 0 1 16 0v4M4 18h16"/>', "friends": '<circle cx="8" cy="8" r="3"/><circle cx="18" cy="9" r="3"/><path d="M1 22v-4a7 7 0 0 1 14 0v4M16 15a6 6 0 0 1 7 6"/>', "settings": '<path d="M3 6h18M3 12h18M3 18h18"/><circle cx="8" cy="6" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="9" cy="18" r="2"/>'}
+	var row := HBoxContainer.new()
+	row.name = "ActionBody"
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_theme_constant_override("separation", 18)
+	button.add_child(row)
+	row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var icon := TextureRect.new()
+	icon.name = "Icon"
+	var ink := "#152437" if button.button_id == &"story" else "#e9c995"
+	var svg: String = '<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 24 24"><g fill="none" stroke="' + ink + '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' + paths[String(button.button_id)] + '</g></svg>'
+	var image := Image.new()
+	image.load_svg_from_string(svg)
+	icon.texture = ImageTexture.create_from_image(image)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(icon)
+	var text := VBoxContainer.new()
+	text.name = "Text"
+	text.alignment = BoxContainer.ALIGNMENT_CENTER
+	text.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(text)
+	var values: Array = titles[String(button.button_id)]
+	for index in range(2):
+		var label := Label.new()
+		label.name = "Title" if index == 0 else "Subtitle"
+		label.text = values[index]
+		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		label.add_theme_color_override("font_color", INK if button.button_id == &"story" else (PAPER if index == 0 else Color("#a8bdd1")))
+		text.add_child(label)

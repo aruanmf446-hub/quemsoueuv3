@@ -13,7 +13,7 @@ func _capture() -> void:
 	var scene := load("res://scenes/menu/main_menu.tscn").instantiate() as Control
 	root.add_child(scene)
 	current_scene = scene
-	for frame in range(40):
+	for frame in range(12):
 		await process_frame
 	await RenderingServer.frame_post_draw
 	var actual := DisplayServer.window_get_size()
@@ -36,6 +36,7 @@ func _capture() -> void:
 		print("LAYOUT_WARN side_menu_wide ", buttons.size.x)
 	var stage: LobbyStage = scene.get_node("LobbyArea/Stage")
 	var camera: Camera3D = stage.get_node("Viewport/World/Camera")
+	print("RENDER_BOUNDS ", stage.get_global_rect(), " output=", stage.get_node("RenderedCharacter").get_global_rect(), " viewport=", stage.get_node("Viewport").size)
 	var framing := stage.character.get_framing()
 	var top := camera.unproject_position(Vector3(0, float(framing.height), 0))
 	var feet := camera.unproject_position(Vector3.ZERO)

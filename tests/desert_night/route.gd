@@ -63,8 +63,15 @@ func run() -> void:
 	await snap("01_spawn")
 	var start_tick := Engine.get_physics_frames()
 	_previous_x = player.position.x
+	var last_tick := Time.get_ticks_usec()
+	var step_times: Array[float] = []
 	for step in range(60*420):
 		_frame_count = step
+		var tick := Time.get_ticks_usec()
+		# O passo da vitória (salvar e abrir a tela final) fica fora: o jogo já parou.
+		if step > 30 and not phase.completed:
+			step_times.append((tick-last_tick)/1000.0)
+		last_tick = tick
 		if phase.completed or deaths > 0: break
 		if step == _jump_release_at: Input.action_release("jump")
 		if step == _attack_release_at: Input.action_release("attack")
@@ -97,6 +104,9 @@ func run() -> void:
 			check(false,"não fica preso no percurso por oito segundos")
 			break
 		var enemy := enemy_ahead(2.5)
+		if await ride_ferry(step):
+			_stalled = 0
+			continue
 		if player._attack_timer > 0.0:
 			Input.action_release("move_right")
 		elif enemy != null and player.attack_charges > 0 and player.is_on_floor():
@@ -126,10 +136,44 @@ func run() -> void:
 	check(phase._loaded_chunks.size() <= 7,"streaming mantém quantidade limitada de distritos carregados")
 	check(phase._checkpoint_index == 6,"percurso ativa os sete checkpoints")
 	if phase.completed: await snap("04_vitoria")
-	var result := {"order":order,"completed":phase.completed,"deaths":deaths,"checks":checks,"failures":failures,"physics_seconds":physics_seconds,"phase_seconds":phase._elapsed,"health":player.health,"swings":swings,"defeated":phase._defeated_ids.size(),"collected":phase._collected_ids.size(),"captured":capture_frames,"position":[player.position.x,player.position.y,player.position.z]}
+	step_times.sort()
+	var cost := {"p95_ms": step_times[int(step_times.size()*0.95)] if not step_times.is_empty() else 0.0, "max_ms": step_times[-1] if not step_times.is_empty() else 0.0}
+	if not capture_frames: check(cost.max_ms < 33.0,"nenhum passo de jogo passa de 33ms de processamento (máx %.1fms)" % cost.max_ms)
+	var result := {"cpu_step":cost,"order":order,"completed":phase.completed,"deaths":deaths,"checks":checks,"failures":failures,"physics_seconds":physics_seconds,"phase_seconds":phase._elapsed,"health":player.health,"swings":swings,"defeated":phase._defeated_ids.size(),"collected":phase._collected_ids.size(),"captured":capture_frames,"position":[player.position.x,player.position.y,player.position.z]}
 	FileAccess.open(output+".json",FileAccess.WRITE).store_string(JSON.stringify(result,"  "))
 	print("NIGHT_ROUTE_RESULT ",JSON.stringify(result))
 	quit(1 if failures else 0)
+## Balsa: espera na borda até ela encostar, sobe, fica parado e salta na outra borda.
+## Retorna true quando controlou este quadro.
+func ride_ferry(step: int) -> bool:
+	var hole: Dictionary = {}
+	for candidate: Dictionary in phase._phase.holes:
+		if candidate.get("ferry",false) and player.position.x > float(candidate.start)-1.2 and player.position.x < float(candidate.end)+0.3:
+			hole = candidate
+	if hole.is_empty() or not player.is_on_floor(): return false
+	var ferry: Node3D
+	for node in get_nodes_in_group("ferries"):
+		if node.from_x > float(hole.start) and node.to_x < float(hole.end): ferry = node
+	if ferry == null: return false
+	var start := float(hole.start)
+	var finish := float(hole.end)
+	if player.position.x > finish: return false
+	if player.position.x < start:
+		# Na borda: espera a balsa chegar perto e sobe com um passo/pulinho.
+		Input.action_release("move_right")
+		if player.position.x < start-0.6:
+			Input.action_press("move_right")
+		elif absf(ferry.position.x-ferry.from_x) < 0.15:
+			# A balsa encosta na borda (0,1m): basta andar para subir.
+			Input.action_press("move_right")
+		await physics_frame
+		return true
+	# Em cima da balsa: centraliza, espera chegar ao outro lado e desce andando.
+	Input.action_release("move_right")
+	if absf(ferry.position.x-ferry.to_x) < 0.15 or player.position.x < ferry.position.x-0.6:
+		Input.action_press("move_right")
+	await physics_frame
+	return true
 func jump(step: int) -> void:
 	if Input.is_action_pressed("jump"): return
 	Input.action_press("jump")

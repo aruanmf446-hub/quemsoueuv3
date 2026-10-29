@@ -24,8 +24,11 @@ func run() -> void:
 	var changes := [0]
 	phase._scenery.location_changed.connect(func(_p: Dictionary) -> void: changes[0] += 1)
 	var start := float(phase._phase.player_spawn[0])
-	for share in [0.05,0.3,0.55,0.8,0.97]:
-		player.position = Vector3(start+float(phase._phase.length)*share,0.05,0)
+	# Pontos em chão firme (início e bandeiras de checkpoint): nunca cai num vão largo.
+	var spots: Array[float] = [start+2.0]
+	for index in [1,3,5,6]: spots.append(float(phase._phase.checkpoints[index].pos[0]))
+	for x in spots:
+		player.position = Vector3(x,0.05,0)
 		phase._stream_world(player.position.x,true)
 		for actor in get_nodes_in_group("enemies"): actor.queue_free()
 		await frames(5)
@@ -39,6 +42,8 @@ func run() -> void:
 	var heart: Dictionary
 	for pickup: Dictionary in phase._phase.pickups:
 		if pickup.kind == "health": heart = pickup; break
+	phase._restart_level()
+	await frames(5)
 	player.position = Vector3(float(heart.pos[0])-3.0,0.05,0)
 	phase._stream_world(player.position.x,true)
 	for actor in get_nodes_in_group("enemies"): actor.queue_free()

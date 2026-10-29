@@ -8,6 +8,7 @@ var brand: Label
 var eyebrow: Label
 var footer: Label
 var social_bg: Panel
+var brand_logo: TextureRect
 
 func _ready() -> void:
 	menu = get_parent()
@@ -83,6 +84,16 @@ func _ready() -> void:
 	# para preservar sinais, serviços e rotas; a seleção de personagem fica nas Skins.
 	eyebrow.hide()
 	footer.hide()
+	# Logo oficial (retangular) substitui o título textual, na mesma posição.
+	brand.hide()
+	brand_logo = TextureRect.new()
+	brand_logo.name = "BrandLogo"
+	brand_logo.texture = preload("res://assets/processed/logos/logo_quem_sou_eu_retangular.png")
+	brand_logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	brand_logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	brand_logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	menu.add_child(brand_logo)
+	menu.move_child(brand_logo, menu.get_node("SkinsPanel").get_index())
 	menu.get("_mode_label").hide()
 	menu.get_node("ProfileCard").hide()
 	for path: String in ["NameLabel", "PrevButton", "NextButton"]:
@@ -139,6 +150,7 @@ func _layout() -> void:
 	var type_scale := 1.8 if compact else 1.0
 	var left_width := 400.0 if compact else 310.0
 	_rect(brand, Vector2(32, 24), Vector2(350, 40))
+	_rect(brand_logo, Vector2(24, 12), Vector2(400, 133))
 	_rect(eyebrow, Vector2(34, 68), Vector2(380, 35))
 	_rect(footer, Vector2(34, h - 44), Vector2(500, 32))
 	_rect(menu.get_node("ProfileCard"), Vector2(w * 0.36, 24), Vector2(370, 80))

@@ -1,7 +1,12 @@
 extends PlayerScreen
 
-const ACCENT := Color("#f2cf7d")
+const ACCENT := Color("#f2c76e")
 const MUTED := Color("#a8bad3")
+const GLASS := Color(0.035, 0.06, 0.11, 0.92)
+const INK := Color("#141006")
+var _grabber: ImageTexture
+var _toggle_on: ImageTexture
+var _toggle_off: ImageTexture
 var _category := 0
 var _waiting_action := ""
 var _binding_button: Button
@@ -15,7 +20,8 @@ var _rail: VBoxContainer
 func _ready() -> void:
 	super._ready()
 	$CrestFrame.hide()
-	$Tint.color = Color(0.025, 0.045, 0.09, 0.94)
+	$Tint.color = Color(0.02, 0.035, 0.07, 0.86)
+	_make_icons()
 	visibility_changed.connect(func() -> void:
 		if not is_visible_in_tree(): _waiting_action = "")
 	resized.connect(_adapt)
@@ -37,7 +43,7 @@ func render() -> void:
 	_layout.add_theme_constant_override("separation", 28)
 	_rail = PlayerUI.column(_layout)
 	_rail.size_flags_horizontal = Control.SIZE_FILL
-	_rail.add_child(PlayerUI.label("QUEM SOU EU", 16, ACCENT))
+	_rail.add_child(PlayerUI.label("AJUSTES", 16, ACCENT))
 	_rail.add_child(PlayerUI.label("Sua experiência", 26))
 	_tabs.clear()
 	var names := ["Áudio", "Gráficos", "Controles", "Idioma"]
@@ -45,13 +51,14 @@ func render() -> void:
 		var tab := _button("0%d   %s" % [i + 1, tr(names[i])], _select.bind(i))
 		tab.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		tab.toggle_mode = true
+		_style_tab(tab)
 		tab.button_pressed = i == _category
 		_rail.add_child(tab)
 		_tabs.append(tab)
 	var panel := PanelContainer.new()
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	panel.add_theme_stylebox_override("panel", _box(Color("#14243c"), 24))
+	panel.add_theme_stylebox_override("panel", _glass(24))
 	_layout.add_child(panel)
 	var scroll := ScrollContainer.new()
 	_scroll = scroll
@@ -83,7 +90,7 @@ func _adapt() -> void:
 	$Margin/Column.add_theme_constant_override("separation", 12 if compact else 18)
 	_feedback.add_theme_font_size_override("font_size", 16 if compact else 18)
 	var panel: PanelContainer = _layout.get_child(1)
-	panel.add_theme_stylebox_override("panel", _box(Color("#14243c"), 16 if compact else 24))
+	panel.add_theme_stylebox_override("panel", _glass(16 if compact else 24))
 	_rail.get_child(0).visible = not compact
 	_rail.get_child(1).visible = not compact
 	for tab in _tabs:
@@ -108,7 +115,13 @@ func _show_category() -> void:
 		3: _language()
 
 func _title(title: String, subtitle: String) -> void:
-	_content.add_child(PlayerUI.label(title, 30))
+	var head := PlayerUI.label(title.to_upper(), 30, Color.WHITE)
+	_content.add_child(head)
+	var line := ColorRect.new()
+	line.color = ACCENT
+	line.custom_minimum_size = Vector2(56, 3)
+	line.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	_content.add_child(line)
 	_content.add_child(PlayerUI.label(subtitle, 19, MUTED))
 
 func _audio() -> void:
@@ -120,6 +133,7 @@ func _audio() -> void:
 	mute.text = tr("Silenciar todo o áudio")
 	mute.button_pressed = services.preferences.values.muted
 	mute.custom_minimum_size.y = 52
+	_style_toggle(mute)
 	mute.toggled.connect(func(value: bool) -> void:
 		if not _save("muted", value): mute.set_pressed_no_signal(not value))
 	_content.add_child(mute)
@@ -129,7 +143,12 @@ func _audio() -> void:
 	_content.add_child(manage)
 
 func _slider(text: String, key: String) -> void:
-	var line := PlayerUI.row(_content)
+	var card := PanelContainer.new()
+	card.add_theme_stylebox_override("panel", _row_box())
+	_content.add_child(card)
+	var stack := PlayerUI.column(card)
+	stack.add_theme_constant_override("separation", 4)
+	var line := PlayerUI.row(stack)
 	line.add_child(PlayerUI.label(text, 22))
 	var percent := PlayerUI.label("%d%%" % roundi(float(services.preferences.values[key]) * 100), 22, ACCENT)
 	percent.size_flags_horizontal = Control.SIZE_FILL
@@ -141,11 +160,13 @@ func _slider(text: String, key: String) -> void:
 	slider.value = services.preferences.values[key]
 	slider.custom_minimum_size = Vector2(180, 44)
 	slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var track := _box(Color("#293e5c"), 0)
-	track.set_corner_radius_all(4)
-	track.content_margin_top = 4
-	track.content_margin_bottom = 4
+	var track := _box(Color(1, 1, 1, 0.12), 0)
+	track.set_corner_radius_all(6)
+	track.content_margin_top = 6
+	track.content_margin_bottom = 6
 	slider.add_theme_stylebox_override("slider", track)
+	for state in ["grabber", "grabber_highlight", "grabber_disabled"]:
+		slider.add_theme_icon_override(state, _grabber)
 	var fill := track.duplicate() as StyleBoxFlat
 	fill.bg_color = ACCENT
 	slider.add_theme_stylebox_override("grabber_area", fill)
@@ -153,7 +174,7 @@ func _slider(text: String, key: String) -> void:
 	slider.value_changed.connect(func(value: float) -> void:
 		if _save(key, value): percent.text = "%d%%" % roundi(value * 100)
 		else: slider.set_value_no_signal(float(services.preferences.values[key])))
-	_content.add_child(slider)
+	stack.add_child(slider)
 
 func _graphics() -> void:
 	_title("Gráficos", "Qualidade da prévia 3D dos personagens.")
@@ -199,6 +220,7 @@ func _language() -> void:
 		discoverable.button_pressed = services.profile.data.get("discoverable", false)
 		discoverable.disabled = services.profile.state != "success"
 		discoverable.custom_minimum_size.y = 52
+		_style_toggle(discoverable)
 		discoverable.toggled.connect(func(value: bool) -> void: status(await services.profile.set_discoverable(value)))
 		account.add_child(discoverable)
 	account.add_child(_button("Entrar na conta", func() -> void: navigate_requested.emit("account", {})))
@@ -240,15 +262,100 @@ func _button(text: String, action: Callable) -> Button:
 	node.pressed.connect(action)
 	return node
 
+## Botões inclinados no estilo dos menus de jogos esportivos: vidro escuro com borda
+## dourada; pressionado/selecionado fica dourado com texto escuro.
 func _style_button(node: Button) -> void:
 	node.add_theme_font_size_override("font_size", 21)
-	for state: String in ["normal", "hover", "pressed", "focus"]:
-		var style := _box(Color("#213852") if state != "pressed" else Color("#4b4432"), 14)
-		if state in ["pressed", "focus"]:
+	for state: String in ["normal", "hover", "pressed", "focus", "hover_pressed"]:
+		var style := _box(Color(0.07, 0.11, 0.18, 0.95), 14)
+		style.skew = Vector2(0.18, 0)
+		style.set_corner_radius_all(3)
+		style.border_color = Color(ACCENT, 0.45)
+		style.set_border_width_all(1)
+		if state == "hover": style.bg_color = Color(0.11, 0.17, 0.26, 0.95)
+		if state in ["pressed", "hover_pressed"]:
+			style.bg_color = ACCENT
+		if state == "focus":
+			style.draw_center = false
 			style.border_color = ACCENT
 			style.set_border_width_all(2)
-		if state == "hover": style.bg_color = Color("#304c6a")
 		node.add_theme_stylebox_override(state, style)
+	for color in ["font_color", "font_hover_color", "font_focus_color"]:
+		node.add_theme_color_override(color, Color.WHITE)
+	for color in ["font_pressed_color", "font_hover_pressed_color"]:
+		node.add_theme_color_override(color, INK)
+
+func _style_tab(node: Button) -> void:
+	_style_button(node)
+	var normal := node.get_theme_stylebox("normal") as StyleBoxFlat
+	normal.border_color = Color(1, 1, 1, 0.08)
+
+func _style_toggle(node: CheckButton) -> void:
+	node.add_theme_icon_override("checked", _toggle_on)
+	node.add_theme_icon_override("unchecked", _toggle_off)
+	node.add_theme_icon_override("checked_disabled", _toggle_on)
+	node.add_theme_icon_override("unchecked_disabled", _toggle_off)
+	node.add_theme_font_size_override("font_size", 21)
+	var card := _row_box()
+	for state in ["normal", "hover", "pressed", "hover_pressed"]:
+		node.add_theme_stylebox_override(state, card)
+	var focus := _row_box()
+	focus.draw_center = false
+	focus.border_color = ACCENT
+	focus.set_border_width_all(2)
+	node.add_theme_stylebox_override("focus", focus)
+
+func _glass(padding: int) -> StyleBoxFlat:
+	var box := _box(GLASS, padding)
+	box.set_corner_radius_all(14)
+	box.border_color = Color(ACCENT, 0.25)
+	box.border_width_top = 2
+	box.shadow_color = Color(0, 0, 0, 0.45)
+	box.shadow_size = 18
+	return box
+
+func _row_box() -> StyleBoxFlat:
+	var box := _box(Color(1, 1, 1, 0.04), 16)
+	box.set_corner_radius_all(10)
+	box.content_margin_top = 12
+	box.content_margin_bottom = 12
+	return box
+
+## Ícones desenhados em código, em alta resolução, para o deslizador e o interruptor.
+func _make_icons() -> void:
+	if _grabber != null: return
+	var size := 64
+	var dot := Image.create(size, size, false, Image.FORMAT_RGBA8)
+	for y in range(size):
+		for x in range(size):
+			var d := Vector2(x + 0.5 - size * 0.5, y + 0.5 - size * 0.5).length()
+			var a := clampf(size * 0.5 - 1.0 - d, 0.0, 1.0)
+			var ring := clampf(size * 0.5 - 7.0 - d, 0.0, 1.0)
+			dot.set_pixel(x, y, Color(ACCENT.lerp(Color.WHITE, 0.0), a) if ring <= 0.0 else Color(1, 1, 1, a))
+	dot.resize(30, 30, Image.INTERPOLATE_LANCZOS)
+	_grabber = ImageTexture.create_from_image(dot)
+	_toggle_on = ImageTexture.create_from_image(_pill(true))
+	_toggle_off = ImageTexture.create_from_image(_pill(false))
+
+func _pill(on: bool) -> Image:
+	var w := 128
+	var h := 68
+	var image := Image.create(w, h, false, Image.FORMAT_RGBA8)
+	var r := h * 0.5
+	var knob := Vector2(w - r, r) if on else Vector2(r, r)
+	for y in range(h):
+		for x in range(w):
+			var p := Vector2(x + 0.5, y + 0.5)
+			var cx := clampf(p.x, r, w - r)
+			var dist := p.distance_to(Vector2(cx, r))
+			var a := clampf(r - 1.0 - dist, 0.0, 1.0)
+			var color := ACCENT if on else Color(1, 1, 1, 0.18)
+			color.a *= a
+			var kd := p.distance_to(knob)
+			var ka := clampf(r - 7.0 - kd, 0.0, 1.0)
+			image.set_pixel(x, y, color.lerp(Color(INK if on else Color.WHITE, 1.0), ka) if ka > 0.0 else color)
+	image.resize(56, 30, Image.INTERPOLATE_LANCZOS)
+	return image
 
 func _box(color: Color, padding: int) -> StyleBoxFlat:
 	var box := StyleBoxFlat.new()

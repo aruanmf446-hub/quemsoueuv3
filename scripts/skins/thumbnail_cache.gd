@@ -7,10 +7,13 @@ extends RefCounted
 ## mudar iluminação ou modelos, incremente VERSION: os arquivos antigos deixam de ser usados.
 
 const CACHE_DIR := "user://thumbnails"
-const VERSION := 2
-const THUMB_SIZE := Vector2i(200, 240)
+const VERSION := 4
+const THUMB_SIZE := Vector2i(300, 360)
 ## Zoom de captura: deixa o personagem maior dentro da miniatura (menor = mais perto).
 const THUMB_ZOOM := 0.8
+## Ajuste de câmera por personagem (multiplica o zoom; maior = mais longe).
+## El Fuego tem pose de corrida mais larga que a altura declarada, então precisa de mais distância.
+const FRAME_ZOOM := {"el_fuego": 1.25}
 
 var _stage_scene: PackedScene
 
@@ -21,6 +24,11 @@ func _init(stage_scene: PackedScene) -> void:
 
 static func path_for(character_id: String) -> String:
 	return "%s/%s_v%d.png" % [CACHE_DIR, character_id, VERSION]
+
+
+## Multiplicador de zoom para a skin (1.0 quando não há ajuste). Usado também na prévia.
+static func framing_zoom(character_id: String) -> float:
+	return FRAME_ZOOM.get(character_id, 1.0)
 
 
 ## Gera as miniaturas que ainda não existem e retorna {character_id: caminho_png}.
@@ -48,7 +56,7 @@ func ensure(host: Control, entries: Array) -> Dictionary:
 		if not is_instance_valid(host) or not host.is_visible_in_tree():
 			break
 		stage.show_character(entry)
-		stage.set_zoom(THUMB_ZOOM)
+		stage.set_zoom(THUMB_ZOOM * framing_zoom(entry["id"]))
 		await RenderingServer.frame_post_draw
 		await RenderingServer.frame_post_draw
 		if not is_instance_valid(stage) or not is_instance_valid(host):

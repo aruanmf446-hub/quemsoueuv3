@@ -4,8 +4,11 @@ extends PlayerScreen
 func _ready() -> void:
 	super._ready()
 	heading.text = tr("Meu perfil")
+	ModernUI.style_header(self)
+	body.add_theme_constant_override("separation", ModernUI.fs(18))
 	services.profile.changed.connect(_refresh_visible)
 	services.inventory.changed.connect(_refresh_visible)
+	ModernUI.follow_resize(self)
 
 
 func _refresh_visible() -> void:
@@ -15,45 +18,63 @@ func _refresh_visible() -> void:
 
 func render() -> void:
 	PlayerUI.clear(body)
+	ModernUI.update_scale(self)
 	banner.show_state(services.profile.state)
-	var row := PlayerUI.row(body)
-	var visual := PlayerUI.card(row)
-	visual.add_child(PlayerUI.label("Herói equipado", 25, PlayerUI.GOLD))
-	preview(visual, services.inventory.equipped_id())
-	visual.add_child(PlayerUI.button("Trocar skin", func() -> void: navigate_requested.emit("skins", {})))
-	var info := PlayerUI.card(row)
-	info.add_child(PlayerUI.portrait(services.inventory.equipped_id(), 200))
+	var locale: String = services.preferences.values.locale
+	var top := _layout()
+	# Herói: a única imagem do personagem nesta tela, com a troca de skin ao lado.
+	var hero := ModernUI.panel(top, 18)
+	hero.add_child(ModernUI.eyebrow("Herói equipado"))
+	var stage := preview(hero, services.inventory.equipped_id())
+	if stage != null:
+		stage.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		stage.fill_ratio = 0.86
+		stage.frame_character()
+	hero.add_child(ModernUI.button("Trocar skin", func() -> void: navigate_requested.emit("skins", {})))
+	var identity := ModernUI.panel(top, 22)
 	var data := services.profile.data
-	info.add_child(PlayerUI.label(str(data.get("nickname", "") if data.get("nickname") != null else "Sem nickname"), 32, PlayerUI.GOLD))
-	info.add_child(PlayerUI.label("ID público: " + str(data.get("public_id", "—"))))
-	info.add_child(PlayerUI.label("Nível: " + DevicePreferences.number(data.get("level"), services.preferences.values.locale)))
-	info.add_child(PlayerUI.label("Experiência: " + DevicePreferences.number(data.get("experience"), services.preferences.values.locale)))
+	identity.add_child(ModernUI.eyebrow("Perfil"))
+	identity.add_child(ModernUI.title(str(data.get("nickname", "") if data.get("nickname") != null else "Sem nickname"), 36))
+	var tiles := PlayerUI.row(identity)
+	tiles.add_theme_constant_override("separation", ModernUI.fs(10))
+	ModernUI.stat(tiles, "ID público", str(data.get("public_id", "—")), 24)
+	ModernUI.stat(tiles, "Nível", DevicePreferences.number(data.get("level"), locale), 24)
+	ModernUI.stat(tiles, "Experiência", DevicePreferences.number(data.get("experience"), locale), 24)
 	if not services.session.authenticated():
-		info.add_child(PlayerUI.label("Demonstração local • perfil e estatísticas online indisponíveis."))
-		account_button(info)
+		identity.add_child(ModernUI.muted("Demonstração local • perfil e estatísticas online indisponíveis."))
+		identity.add_child(ModernUI.button("Entrar na conta", func() -> void: navigate_requested.emit("account", {}), true))
 		return
-	var nickname := LineEdit.new()
-	nickname.placeholder_text = tr("Novo nickname")
+	var editor := PlayerUI.row(identity)
+	editor.add_theme_constant_override("separation", ModernUI.fs(10))
+	var nickname := ModernUI.field("Novo nickname")
 	nickname.max_length = 24
-	nickname.custom_minimum_size.y = 52
-	info.add_child(nickname)
-	info.add_child(PlayerUI.button("Salvar nickname", func() -> void: _save_nickname(nickname.text)))
-	info.add_child(PlayerUI.button("Atualizar", func() -> void: services.profile.refresh()))
+	nickname.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	editor.add_child(nickname)
+	editor.add_child(ModernUI.button("Salvar nickname", func() -> void: _save_nickname(nickname.text), true))
+	identity.add_child(ModernUI.button("Atualizar", func() -> void: services.profile.refresh()))
 	var stats: Dictionary = data.get("statistics", {})
-	info.add_child(PlayerUI.label("Estatísticas", 25, PlayerUI.GOLD))
+	identity.add_child(ModernUI.eyebrow("Estatísticas"))
 	if stats.is_empty():
-		info.add_child(PlayerUI.label("Ainda não há estatísticas registradas."))
+		identity.add_child(ModernUI.muted("Ainda não há estatísticas registradas."))
 	for key: String in stats:
-		info.add_child(PlayerUI.label("%s: %s" % [key, DevicePreferences.number(stats[key], services.preferences.values.locale)]))
-	var progress := PlayerUI.card(body)
-	progress.add_child(PlayerUI.label("Conquistas e reinos", 25, PlayerUI.GOLD))
+		identity.add_child(ModernUI.muted("%s: %s" % [key, DevicePreferences.number(stats[key], locale)], 18))
+	var progress := ModernUI.panel(body, 22)
+	progress.add_child(ModernUI.eyebrow("Conquistas e reinos"))
 	if services.progression.state != "success":
-		progress.add_child(PlayerUI.label("Progresso confirmado indisponível."))
+		progress.add_child(ModernUI.muted("Progresso confirmado indisponível."))
 	else:
 		var snapshot := services.progression.data
-		progress.add_child(PlayerUI.label("Deserto · %d de 10 fases concluídas" % snapshot.completed_phase_ids.size()))
-		progress.add_child(PlayerUI.label("Reino do Deserto concluído" if PlayerContracts.ACHIEVEMENT in snapshot.achievement_ids else "Nenhuma conquista registrada."))
-	progress.add_child(PlayerUI.label("Floresta · Mar · Lunar: campanhas futuras"))
+		progress.add_child(ModernUI.title("Deserto · %d de 10 fases concluídas" % snapshot.completed_phase_ids.size(), 24))
+		progress.add_child(ModernUI.muted("Reino do Deserto concluído" if PlayerContracts.ACHIEVEMENT in snapshot.achievement_ids else "Nenhuma conquista registrada."))
+	progress.add_child(ModernUI.muted("Floresta · Mar · Lunar: campanhas futuras", 16))
+
+
+## Dois blocos lado a lado em telas largas e empilhados em telas estreitas.
+func _layout() -> BoxContainer:
+	var layout: BoxContainer = VBoxContainer.new() if ModernUI.compact() else HBoxContainer.new()
+	layout.add_theme_constant_override("separation", ModernUI.fs(18))
+	body.add_child(layout)
+	return layout
 
 
 func _save_nickname(value: String) -> void:

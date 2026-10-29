@@ -18,6 +18,10 @@ var _font: FontFile
 var _kicker: Label
 var _toast_left := 0.0
 var _flash: ColorRect
+var _icons: Control
+var _hp := 3
+var _atk := 1
+var _def := 1
 var _flash_time := 0.0
 var _flash_length := 1.0
 var _flash_peak := 0.0
@@ -55,7 +59,15 @@ func _ready() -> void:
 	_health = label("VIDA  3/3",14,Color("#f1c5b7"))
 	_attack = label("ATAQUE  1/1",14,Color("#e9c478"))
 	_defense = label("DEFESA  1/1",14,Color("#91cee9"))
-	for item in [_health,_attack,_defense]: resources.add_child(item)
+	# Os rótulos ficam para leitores de tela/testes; o jogador vê os ícones desenhados.
+	for item in [_health,_attack,_defense]:
+		item.hide()
+		resources.add_child(item)
+	_icons = Control.new()
+	_icons.custom_minimum_size = Vector2(250,30)
+	_icons.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_icons.draw.connect(_draw_resources)
+	resources.add_child(_icons)
 	_status = PanelContainer.new()
 	_status.add_theme_stylebox_override("panel",box())
 	_root.add_child(_status)
@@ -68,7 +80,7 @@ func _ready() -> void:
 	progress_column.add_child(_progress)
 	_bar = ProgressBar.new()
 	_bar.show_percentage = false
-	_bar.custom_minimum_size = Vector2(150,4)
+	_bar.custom_minimum_size = Vector2(150,6)
 	var fill := StyleBoxFlat.new()
 	fill.bg_color = Color("#c5a96a")
 	_bar.add_theme_stylebox_override("fill",fill)
@@ -81,8 +93,13 @@ func _ready() -> void:
 	_pause.tooltip_text = "Pausar (Esc)"
 	_pause.focus_mode = Control.FOCUS_NONE
 	_pause.add_theme_font_size_override("font_size",22)
-	_pause.add_theme_stylebox_override("normal",box())
-	var hover := box()
+	var round := box()
+	round.skew = Vector2.ZERO
+	round.border_width_left = 0
+	round.set_border_width_all(1)
+	round.set_corner_radius_all(24)
+	_pause.add_theme_stylebox_override("normal",round)
+	var hover := round.duplicate() as StyleBoxFlat
 	hover.bg_color = Color("#294459")
 	_pause.add_theme_stylebox_override("hover",hover)
 	_pause.pressed.connect(pause_requested.emit)
@@ -108,10 +125,12 @@ func label(text: String, size: int, color: Color) -> Label:
 	return node
 func box() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.025,0.065,0.11,0.91)
-	style.border_color = Color(0.65,0.57,0.39,0.65)
-	style.set_corner_radius_all(8)
-	style.set_border_width_all(1)
+	style.bg_color = Color(0.035,0.06,0.11,0.88)
+	style.border_color = Color("#f2c76e")
+	style.set_corner_radius_all(3)
+	style.border_width_left = 4
+	style.skew = Vector2(0.12,0)
+	style.anti_aliasing = true
 	style.content_margin_left = 12
 	style.content_margin_right = 12
 	style.content_margin_top = 9
@@ -139,7 +158,44 @@ func _layout() -> void:
 	_hint.visible = not compact
 	_hint.position = Vector2(14,screen.y-30)
 	_hint.size = Vector2(screen.x-28,24)
+## Corações para a vida, lâmina dourada para o ataque e escudo azul para a defesa,
+## nas mesmas cores das reposições do mapa. Vazios ficam só com o contorno.
+func _draw_resources() -> void:
+	var h := _icons.size.y
+	var x := 0.0
+	for index in range(3):
+		_heart(Vector2(x+h*0.5,h*0.52),h*0.42,index < _hp)
+		x += h*1.05
+	x += h*0.5
+	_blade(Vector2(x+h*0.5,h*0.5),h*0.46,_atk > 0)
+	x += h*1.4
+	_shield_icon(Vector2(x+h*0.5,h*0.5),h*0.42,_def > 0)
+func _heart(c: Vector2, r: float, full: bool) -> void:
+	var points := PackedVector2Array()
+	for step in range(32):
+		var t := TAU*step/32.0
+		points.append(c+Vector2(16*pow(sin(t),3),-(13*cos(t)-5*cos(2*t)-2*cos(3*t)-cos(4*t)))*r/17.0)
+	if full: _icons.draw_colored_polygon(points,Color("#ff5d5d"))
+	points.append(points[0])
+	_icons.draw_polyline(points,Color("#ffd0c4") if full else Color(1,1,1,0.35),1.6,true)
+func _blade(c: Vector2, r: float, full: bool) -> void:
+	var blade := PackedVector2Array([c+Vector2(0,-r),c+Vector2(r*0.22,-r*0.55),c+Vector2(r*0.22,r*0.35),c+Vector2(-r*0.22,r*0.35),c+Vector2(-r*0.22,-r*0.55)])
+	var color := Color("#f2c76e") if full else Color(1,1,1,0.0)
+	if full: _icons.draw_colored_polygon(blade,color)
+	blade.append(blade[0])
+	_icons.draw_polyline(blade,Color("#fff0c4") if full else Color(1,1,1,0.35),1.6,true)
+	_icons.draw_line(c+Vector2(-r*0.55,r*0.42),c+Vector2(r*0.55,r*0.42),Color("#f2c76e") if full else Color(1,1,1,0.35),2.4,true)
+	_icons.draw_line(c+Vector2(0,r*0.45),c+Vector2(0,r*0.95),Color("#b88a3c") if full else Color(1,1,1,0.35),2.8,true)
+func _shield_icon(c: Vector2, r: float, full: bool) -> void:
+	var points := PackedVector2Array([c+Vector2(-r*0.85,-r*0.8),c+Vector2(r*0.85,-r*0.8),c+Vector2(r*0.8,r*0.1),c+Vector2(0,r),c+Vector2(-r*0.8,r*0.1)])
+	if full: _icons.draw_colored_polygon(points,Color("#79cceb"))
+	points.append(points[0])
+	_icons.draw_polyline(points,Color("#d6f3ff") if full else Color(1,1,1,0.35),1.6,true)
 func update_resources(player: Node) -> void:
+	_hp = player.health
+	_atk = player.attack_charges
+	_def = player.defense_charges
+	if is_instance_valid(_icons): _icons.queue_redraw()
 	if player.health < _last_health and player.health > 0: pulse(Color("#b8302a"),0.26,0.35)
 	_last_health = player.health
 	_health.text = "VIDA  %d/3" % player.health

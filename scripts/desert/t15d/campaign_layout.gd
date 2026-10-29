@@ -56,6 +56,7 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 	var districts: Array = []
 	var landmarks: Array = []
 	var checkpoints: Array = []
+	var geysers: Array = []
 	var prefix := "p%02d" % order
 	var left := spawn_x-8.0
 	# As distâncias normais são 57–84m entre vãos, com variação de posição/largura.
@@ -65,10 +66,16 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 		var jitter: float = [2.0,-3.0,4.0,-1.0,0.0,3.0,-2.0][(index+order)%7]
 		var center := lerpf(spawn_x+62.0,goal_x-48.0,normalized)+jitter
 		var width := 3.0+float((index+order)%3)*0.25
+		# Vão largo com pedra no meio que desmorona: dois saltos rápidos em vez de um.
+		var stepping := index > 0 and (index*3+order)%5 == 1
+		# Pulo normal saindo da borda pousa na pedra (2,4m larga, 2,5m de cada borda).
+		if stepping: width = 7.4
 		var pit_left := center-width*0.5
 		var pit_right := center+width*0.5
 		spans.append({"left":left,"right":pit_left})
-		pits.append({"id":"%s.pit.%02d" % [prefix,index],"start":pit_left,"end":pit_right,"width":width})
+		pits.append({"id":"%s.pit.%02d" % [prefix,index],"start":pit_left,"end":pit_right,"width":width,"stepping":stepping})
+		if stepping:
+			platforms.append({"id":"%s.crumble.%02d" % [prefix,index],"kind":"crumble","pos":[center,-0.3,0.0],"size":[2.4,0.6,3.0],"span_start":center-1.2,"span_end":center+1.2,"chunk":floori(center/CHUNK_LENGTH)})
 		signs.append({"id":"%s.pit.%02d.left" % [prefix,index],"kind":"pit_warning","pos":[pit_left-5.0,0.0,-1.5],"direction":1})
 		signs.append({"id":"%s.pit.%02d.right" % [prefix,index],"kind":"pit_warning","pos":[pit_right+5.0,0.0,-1.5],"direction":-1})
 		left = pit_right
@@ -103,7 +110,18 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 		# Os degraus ficam fora do espaço de duelo/reposição e a pelo menos 8m do vão.
 		# Módulos alternam pátio aberto, degrau baixo, degrau largo e salto duplo.
 		var pattern := (index+order*3)%7
-		if span_width >= 48.0 and pattern != 4:
+		# Peças de parkour que se revezam com os degraus: telhados em escada e muralha com gêiser.
+		var piece := (index*5+order*2)%6
+		if span_width >= 50.0 and index > 0 and piece == 0:
+			var center_x := span_left+span_width*0.74
+			for step in range(3):
+				_ledge(platforms,prefix,index,step,center_x+(step-1)*3.8,2.6,[1.0,1.9,2.6][step])
+		elif span_width >= 50.0 and index > 0 and piece == 3:
+			var wall_x := span_left+span_width*0.74
+			platforms.append({"id":"%s.wall.%02d" % [prefix,index],"kind":"geyser_wall","pos":[wall_x,2.1,0.0],"size":[2.4,4.2,3.0],"span_start":wall_x-1.2,"span_end":wall_x+1.2,"chunk":floori(wall_x/CHUNK_LENGTH)})
+			for side in [-1.0,1.0]:
+				geysers.append({"id":"%s.geyser.%02d.%s" % [prefix,index,"l" if side < 0 else "r"],"pos":[wall_x+side*4.2,0.0,0.0]})
+		elif span_width >= 48.0 and pattern != 4:
 			var ledge_x := span_left+span_width*0.74
 			var height: float = [1.2,2.7,1.3,1.3,0.0,2.5,1.0][pattern]
 			var width: float = [3.4,3.2,3.6,5.0,0.0,3.4,3.8][pattern]
@@ -131,7 +149,7 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 		"maximum_horizontal_speed":MAX_HORIZONTAL_SPEED,
 		"platforms":platforms,"enemies":enemies,"pickups":pickups,"holes":pits,
 		"signs":signs,"districts":districts,"landmarks":landmarks,
-		"checkpoints":checkpoints,"goal":{"pos":[goal_x,1.5,0.0]},
+		"checkpoints":checkpoints,"geysers":geysers,"goal":{"pos":[goal_x,1.5,0.0]},
 		"kill_plane_y":-8.0,"boss_id":null,"legacy_placeholder_visuals":false,
 		"bounds":{"min_x":spawn_x-8.0,"max_x":goal_x+10.0},
 		"next_scene":"res://scenes/desert/phase_%02d.tscn" % (order+1),
@@ -165,7 +183,8 @@ static func _checkpoint_x(value: float, holes: Array, platforms: Array, enemies:
 		for hole: Dictionary in holes:
 			if x >= float(hole.start)-3.0 and x <= float(hole.end)+3.0: blocked = true
 		for platform: Dictionary in platforms:
-			if platform.kind != "ground" and absf(x-float(platform.pos[0])) <= float(platform.size[0])*0.5+1.5: blocked = true
+			var margin := 6.0 if platform.kind == "geyser_wall" else 1.5
+			if platform.kind != "ground" and absf(x-float(platform.pos[0])) <= float(platform.size[0])*0.5+margin: blocked = true
 		for enemy: Dictionary in enemies:
 			if x >= float(enemy.patrol[0])-7.0 and x <= float(enemy.patrol[1])+7.0: blocked = true
 		if not blocked: return x

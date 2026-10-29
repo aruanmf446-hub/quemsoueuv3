@@ -37,22 +37,30 @@ func open(route: String, params: Dictionary = {}) -> void:
 		return
 	if _history.is_empty():
 		_previous_focus = weakref(get_viewport().gui_get_focus_owner())
+	var veil: LoadingVeil
 	if not _screens.has(route):
+		# Primeira abertura carrega a cena: mostra o véu antes, para o toque ter resposta.
+		_busy = true
+		veil = await LoadingVeil.begin(get_tree())
+		_busy = false
 		var scene := load(_routes[route]) as PackedScene
 		if scene == null:
 			push_warning("Tela indisponível: %s" % route)
+			veil.finish()
 			_error_dialog.popup_centered()
 			return
 		var instance := scene.instantiate()
 		var screen := instance as PlayerScreen
 		if screen == null:
 			instance.free()
+			veil.finish()
 			_error_dialog.popup_centered()
 			return
 		add_child(screen)
 		register_screen(route, screen)
 	_history.append({"route": route, "params": params.duplicate(true)})
 	_display(route, params)
+	if veil != null: veil.finish()
 
 
 func back() -> void:

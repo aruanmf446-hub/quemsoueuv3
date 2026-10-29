@@ -27,7 +27,7 @@ var _paused := false
 var _previous_go_back := true
 var _goal: Area3D
 var _tutorial_pit := false
-var _shield: MeshInstance3D
+var _shield: Node3D
 var _saved := false
 var _handoff := false
 var _actor_resources: Array[PackedScene] = []
@@ -78,8 +78,9 @@ func _physics_process(delta: float) -> void:
 			_hud.notify("Buraco à frente • pule para atravessar")
 	_follow_camera(delta)
 	_key_light.position = _player.position+Vector3(0.0,1.5,1.8)
-	_shield.visible = _player.is_defending and not _player.is_dead
-	_shield.position = _player.position+Vector3(0,0.8,0)
+	_shield.active = _player.is_defending and not _player.is_dead
+	_shield.facing = _player.facing
+	_shield.position = _player.position
 func _build_environment() -> void:
 	var world_environment := WorldEnvironment.new()
 	world_environment.environment = Environment.new()
@@ -133,7 +134,6 @@ func _build_player() -> void:
 	_player.swung.connect(func() -> void: _sfx.play("swing"))
 	_player.jumped_up.connect(func() -> void: _sfx.play("jump",1.0 if _player.jumps_used < 2 else 1.25,-9.0))
 	_player.landed.connect(func() -> void: _sfx.play("land",1.0,-8.0))
-	_player.strike_window.connect(_slash)
 	_player.hurt.connect(func() -> void: _sfx.play("hurt"))
 	_player.strike_landed.connect(func(_point: Vector3) -> void: _sfx.play("hit"))
 	_player.blocked.connect(func() -> void: _sfx.play("block"))
@@ -150,20 +150,10 @@ func _build_player() -> void:
 	_key_light.omni_range = 3.6
 	_key_light.shadow_enabled = false
 	add_child(_key_light)
-	_shield = MeshInstance3D.new()
-	var ring := TorusMesh.new()
-	ring.inner_radius = 0.74
-	ring.outer_radius = 0.78
-	ring.rings = 24
-	ring.ring_segments = 6
-	_shield.mesh = ring
-	_shield.rotation_degrees.x = 90
-	var material := StandardMaterial3D.new()
-	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	material.albedo_color = Color("#8edfff")
-	_shield.material_override = material
-	_shield.hide()
+	_shield = preload("res://scripts/desert/t15d/sand_fx.gd").SandShield.new()
+	_shield.name = "SandShield"
 	add_child(_shield)
+	_player.blocked.connect(func() -> void: _shield.absorb(-_player.facing))
 func _stream_world(x: float, force := false) -> void:
 	var center := floori(x/CHUNK_SIZE)
 	if center == _stream_center and not force: return
@@ -195,11 +185,14 @@ func _load_chunk(index: int, immediate := true) -> void:
 	var tasks: Array[Callable] = []
 	var platforms := _chunk_platforms(index)
 	# Colisão primeiro: é barata e precisa existir antes de qualquer visual.
-	_build_collision(chunk,platforms)
-	if not platforms.is_empty():
-		for platform: Dictionary in platforms:
+	var solid := platforms.filter(func(p: Dictionary) -> bool: return p.kind != "crumble")
+	_build_collision(chunk,solid)
+	for platform: Dictionary in platforms:
+		if platform.kind == "crumble": _build_crumble(chunk,platform)
+	if not solid.is_empty():
+		for platform: Dictionary in solid:
 			tasks.append(_build_terrain_piece.bind(chunk,platform))
-		tasks.append(_build_props.bind(chunk,platforms))
+		tasks.append(_build_props.bind(chunk,solid))
 	for spawn: Dictionary in _phase.enemies:
 		if _in_chunk(float(spawn.pos[0]),index) and not _defeated_ids.has(str(spawn.id)):
 			tasks.append(_spawn_enemy.bind(chunk,spawn))
@@ -252,6 +245,12 @@ func _build_collision(chunk: Node3D, platforms: Array) -> void:
 		shape.shape = box
 		body.add_child(shape)
 		chunk.add_child(body)
+func _build_crumble(chunk: Node3D, platform: Dictionary) -> void:
+	var stone := preload("res://scripts/desert/t15d/parkour.gd").CrumbleStone.new()
+	stone.position = _vec3(platform.pos)
+	stone.stone_size = _vec3(platform.size)
+	stone.crumbled.connect(func() -> void: _sfx.play("land",0.6,-2.0))
+	chunk.add_child(stone)
 func _build_terrain_piece(chunk: Node3D, platform: Dictionary) -> void:
 	var terrain := Terrain.new()
 	terrain.order = _order
@@ -276,6 +275,12 @@ func _build_chunk_details(chunk: Node3D, index: int) -> void:
 			chunk.add_child(item)
 	for sign: Dictionary in _phase.signs:
 		if _in_chunk(float(sign.pos[0]),index): _build_pit_sign(chunk,sign)
+	for geyser: Dictionary in _phase.get("geysers",[]):
+		if _in_chunk(float(geyser.pos[0]),index):
+			var pad := preload("res://scripts/desert/t15d/parkour.gd").Geyser.new()
+			pad.position = _vec3(geyser.pos)
+			pad.launched.connect(func() -> void: _sfx.play("jump",0.7,-2.0))
+			chunk.add_child(pad)
 	var points: Array = _phase.get("checkpoints",[])
 	for point_index in range(points.size()):
 		if _in_chunk(float(points[point_index].pos[0]),index):
@@ -494,36 +499,6 @@ func _update_progress() -> void:
 	var share := clampf((_player.position.x-float(_phase.player_spawn[0]))/float(_phase.length),0,1)
 	var district := mini(int(share*8),7)
 	_hud.update_progress(share,_elapsed,str(_phase.districts[district].name))
-## Rastro curto do golpe: mostra o alcance real (1,7m) que o braço sozinho não cobre.
-func _slash() -> void:
-	var st := SurfaceTool.new()
-	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var steps := 10
-	for index in range(steps):
-		var a0 := lerpf(-1.0,0.9,float(index)/steps)
-		var a1 := lerpf(-1.0,0.9,float(index+1)/steps)
-		var inner := 0.95
-		var outer0 := 1.05+0.18*sin(float(index)/steps*PI)
-		var outer1 := 1.05+0.18*sin(float(index+1)/steps*PI)
-		var points := [Vector3(cos(a0)*inner,sin(a0)*inner,0),Vector3(cos(a0)*outer0,sin(a0)*outer0,0),Vector3(cos(a1)*outer1,sin(a1)*outer1,0),Vector3(cos(a1)*inner,sin(a1)*inner,0)]
-		for corner in [0,1,2,0,2,3]: st.add_vertex(points[corner])
-	var arc := MeshInstance3D.new()
-	arc.name = "SlashArc"
-	arc.mesh = st.commit()
-	var material := StandardMaterial3D.new()
-	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	material.cull_mode = BaseMaterial3D.CULL_DISABLED
-	material.albedo_color = Color(1.0,0.86,0.55,0.85)
-	arc.material_override = material
-	arc.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	arc.position = _player.position+Vector3(_player.facing*0.15,0.85,0.4)
-	arc.scale = Vector3(_player.facing*0.9,0.9,1)
-	add_child(arc)
-	var tween := arc.create_tween().set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
-	tween.tween_property(material,"albedo_color:a",0.0,0.16)
-	tween.parallel().tween_property(arc,"scale",Vector3(_player.facing*1.1,1.05,1),0.16)
-	tween.tween_callback(arc.queue_free)
 func _impact(point: Vector3, color := Color("#ffd58a")) -> void:
 	var particles := CPUParticles3D.new()
 	particles.position = point

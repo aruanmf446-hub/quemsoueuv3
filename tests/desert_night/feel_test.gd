@@ -153,10 +153,11 @@ func run() -> void:
 	var arc_seen := false
 	for step in range(14):
 		await physics_frame
-		if phase.get_node_or_null("SlashArc") != null: arc_seen = true
-	check(arc_seen,"rastro do golpe aparece na janela de impacto")
+		for child in phase.get_children():
+			if child.get_class() == "Node3D" and child.has_method("impact"): arc_seen = true
+	check(arc_seen,"areia envolve o punho no soco")
 	await frames(16)
-	check(hit_frame[0] >= 8 and hit_frame[0] <= 13,"impacto chega com o braço estendido (quadro %d)" % hit_frame[0])
+	check(hit_frame[0] >= 8 and hit_frame[0] <= 13,"soco acerta com o braço estendido (quadro %d)" % hit_frame[0])
 	check(player.attack_charges == 0,"golpe consome a carga")
 	# Dano: reação própria, sinal e véu vermelho; depois pisca na invulnerabilidade.
 	await frames(30)

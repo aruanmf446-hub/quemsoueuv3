@@ -8,6 +8,7 @@ signal landed
 signal strike_window
 signal hurt
 const ActorSlot = preload("res://scripts/desert/t15d/actor_slot.gd")
+const SandFx = preload("res://scripts/desert/t15d/sand_fx.gd")
 const RUN_MAX_HEALTH := 3
 var attack_charges := 1
 var defense_charges := 1
@@ -23,6 +24,7 @@ const HURT_TIME := 0.32
 var _yaw := PI*0.5
 var _hurt_timer := 0.0
 var _blink := 0.0
+var _fist: Node3D
 var _actor: ActorSlot:
 	get: return _model as ActorSlot
 func _ready() -> void:
@@ -137,16 +139,29 @@ func _start_attack() -> void:
 	_attack_cooldown = 0.62
 	_hit_delivered = false
 	_actor.play_animation("golpe", false, 0.05)
+	# Mão esquerda do modelo é a que soca (fica à frente nas duas direções).
+	var skeleton: Skeleton3D = _actor._skeleton
+	if skeleton != null:
+		_fist = SandFx.SandPunch.new()
+		_fist.direction = facing
+		_fist.skeleton = skeleton
+		_fist.bone = skeleton.find_bone("mixamorig_LeftHand")
+		get_parent().add_child(_fist)
 	swung.emit()
+## Golpe: soco corpo a corpo no quadro do braço estendido; o dano vale para Cactus à
+## frente, até 1,7m, sem parede. A areia envolve o punho desde o começo do golpe.
 func _deliver_hit() -> void:
 	_hit_delivered = true
 	strike_window.emit()
+	if is_instance_valid(_fist): _fist.strike()
 	for enemy: Node3D in get_tree().get_nodes_in_group("enemies"):
 		if not enemy.has_method("take_damage") or not _can_hit(enemy): continue
 		var query := PhysicsRayQueryParameters3D.create(global_position + Vector3.UP * 0.7, enemy.global_position + Vector3.UP * 0.7, 1)
 		if not get_world_3d().direct_space_state.intersect_ray(query).is_empty(): continue
 		enemy.take_damage(ATTACK_DAMAGE)
-		strike_landed.emit(enemy.global_position + Vector3.UP * 0.8)
+		var point := enemy.global_position + Vector3.UP * 0.8
+		SandFx.SandPunch.impact(get_parent(), point)
+		strike_landed.emit(point)
 func restore_charge(kind: String) -> bool:
 	if is_dead: return false
 	if kind == "attack" and attack_charges < 1:

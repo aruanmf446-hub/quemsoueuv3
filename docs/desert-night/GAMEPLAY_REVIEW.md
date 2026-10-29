@@ -78,7 +78,13 @@ clipe (`tests/desert_night/anim_sheet.gd`) e de cada ação em jogo
   (mover, pular, atacar), sem teleporte depois do spawn, com passo físico fixo.
 - `window-route`, `mobile-route`: o mesmo percurso da fase 01 em janela gráfica.
 
-Capturas e resultados desta rodada: `evidence/desert-night-gameplay/`.
+Resultado da rodada final (código do commit desta revisão): **23 de 23 etapas
+aprovadas**. Foram 42 verificações de regras em cada resolução, 23 de sensação
+em cada uma das fases 01, 05 e 09, e as nove fases concluídas por entradas sem
+morte, em 210,5–214,5 s de física cada, com todos os Cactus derrotados (14–20 por
+fase). O percurso gráfico da fase 01 chegou à saída em 1920×1080 e em 844×390.
+
+Capturas e resultados: `evidence/desert-night-gameplay/` (ver o README da pasta).
 
 ## Limites
 

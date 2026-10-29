@@ -58,3 +58,9 @@ separadas e quentes, para manter El Fuego legível diante da cidade iluminada.
 O teste de percurso longo foi rodado com passo físico fixo em modo headless;
 capturas e testes de interface vieram de janelas gráficas. Ainda falta ensaio
 de desempenho e toque em Android físico e navegador Web.
+
+## Revisão de jogabilidade
+
+A revisão de animações, cargas, combate, buracos, morte, câmera e HUD das fases
+01–09 está em `GAMEPLAY_REVIEW.md`, com evidências em
+`evidence/desert-night-gameplay/`.

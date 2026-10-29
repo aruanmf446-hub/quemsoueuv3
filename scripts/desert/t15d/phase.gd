@@ -37,6 +37,8 @@ var _build_queue: Array[Callable] = []
 var _checkpoint_index := -1
 var _snapshot := {}
 var _sfx: Node
+var _shake := 0.0
+var _hit_stopping := false
 var _environment: Environment
 var _announced_place := false
 var _key_light: OmniLight3D
@@ -145,7 +147,11 @@ func _build_player() -> void:
 	_player.jumped_up.connect(func() -> void: _sfx.play("jump",1.0 if _player.jumps_used < 2 else 1.25,-9.0))
 	_player.landed.connect(func() -> void: _sfx.play("land",1.0,-8.0))
 	_player.hurt.connect(func() -> void: _sfx.play("hurt"))
-	_player.strike_landed.connect(func(_point: Vector3) -> void: _sfx.play("hit"))
+	_player.strike_landed.connect(func(_point: Vector3) -> void:
+		_sfx.play("hit")
+		_hit_stop(0.05)
+		_shake = 0.1)
+	_player.hurt.connect(func() -> void: _shake = 0.14)
 	_player.blocked.connect(func() -> void: _sfx.play("block"))
 	_player.action_empty.connect(func(_kind: String) -> void: _sfx.play("empty",1.0,-5.0))
 	_player.action_empty.connect(func(kind: String) -> void:
@@ -475,6 +481,11 @@ func _follow_camera(delta: float) -> void:
 	var target := Vector3(clampf(_player.position.x+lead,float(_phase.player_spawn[0]),float(_phase.goal.pos[0])),maxf(floor_y,_player.position.y+1.4-_camera.size*0.5+0.55),0)
 	var destination := target+Vector3(0,1,14)
 	_camera.position = _camera.position.lerp(destination,1.0-exp(-8*delta))
+	# Tremida curta no golpe e no dano; some em ~0,1s.
+	if _shake > 0.0:
+		_shake = maxf(_shake-delta,0.0)
+		var amount := _shake*0.6
+		_camera.position += Vector3(randf_range(-amount,amount),randf_range(-amount,amount),0)
 	_camera.look_at(Vector3(_camera.position.x,_camera.position.y-1,0),Vector3.UP)
 	_scenery.follow(_camera,_player.position.x)
 func _build_hud() -> void:
@@ -508,6 +519,15 @@ func _update_progress() -> void:
 	var share := clampf((_player.position.x-float(_phase.player_spawn[0]))/float(_phase.length),0,1)
 	var district := mini(int(share*8),7)
 	_hud.update_progress(share,_elapsed,str(_phase.districts[district].name))
+## Pausa de impacto: o mundo congela ~3 quadros quando o soco acerta (dá peso ao golpe).
+## Usa time_scale e um temporizador que ignora a escala, então nunca fica preso.
+func _hit_stop(seconds: float) -> void:
+	if _hit_stopping or get_tree().paused: return
+	_hit_stopping = true
+	Engine.time_scale = 0.05
+	await get_tree().create_timer(seconds,true,false,true).timeout
+	Engine.time_scale = 1.0
+	_hit_stopping = false
 func _impact(point: Vector3, color := Color("#ffd58a")) -> void:
 	var particles := CPUParticles3D.new()
 	particles.position = point
@@ -712,6 +732,7 @@ func _return_to_story() -> void:
 	if return_requested.get_connections().is_empty(): get_tree().change_scene_to_file("res://scenes/menu/main_menu.tscn")
 	else: return_requested.emit()
 func _exit_tree() -> void:
+	if _hit_stopping: Engine.time_scale = 1.0
 	if _paused: get_tree().paused = false
 	if not _handoff: get_tree().quit_on_go_back = _previous_go_back
 	if is_instance_valid(get_parent()):

@@ -4,7 +4,10 @@ extends PlayerScreen
 ## Layout: galeria rolável à esquerda (duas colunas) e prévia 3D fixa à direita, fora da rolagem.
 signal character_selected(character_id: StringName)
 signal progress_changed
-const PREVIEW_FILL_RATIO := 0.76
+const PREVIEW_FILL_RATIO := 0.70
+const COLLECTION_FILE := "res://data/collections/comeco.json"
+var _collection_title := "Começo"
+var _collection_count: Label
 const CARD_BG := Color("#111d30")
 const CARD_BG_SELECTED := Color("#25344e")
 const CARD_BORDER := Color("#455269")
@@ -45,7 +48,8 @@ var _cards: Dictionary = {}
 func _ready() -> void:
 	super._ready()
 	heading.text = tr("Personagens")
-	$Tint.color = Color(0.025, 0.04, 0.09, 0.54)
+	$Tint.color = Color(0.025, 0.04, 0.09, 0.76)
+	_load_collection()
 	_thumbnails = ThumbnailCache.new(preload("res://scenes/lobby/lobby_stage.tscn"))
 	# Moldura azul/dourada gigante removida desta tela; o fundo do lobby permanece.
 	$CrestFrame.hide()
@@ -125,23 +129,32 @@ func _split_layout() -> void:
 	_toolbar.add_child(_sort_button)
 	_collection_sidebar = VBoxContainer.new()
 	_collection_sidebar.name = "Collections"
-	_collection_sidebar.custom_minimum_size.x = 170
+	_collection_sidebar.custom_minimum_size.x = 216
 	_collection_sidebar.add_theme_constant_override("separation", 14)
 	_split.add_child(_collection_sidebar)
 	_split.move_child(_collection_sidebar, 0)
-	_collection_sidebar.add_child(PlayerUI.label("COLEÇÕES", 23, ACCENT))
-	var collection := _button("✦ COMEÇO", func() -> void: _rebuild_gallery())
+	var collection_panel := PanelContainer.new()
+	collection_panel.add_theme_stylebox_override("panel", _panel_style(false))
+	_collection_sidebar.add_child(collection_panel)
+	var categories := VBoxContainer.new()
+	categories.add_theme_constant_override("separation", 10)
+	collection_panel.add_child(categories)
+	categories.add_child(PlayerUI.label("◈  COLEÇÕES", 20, ACCENT))
+	var collection := _button("✦  " + _collection_title.to_upper(), func() -> void: _rebuild_gallery(), true)
 	collection.custom_minimum_size.y = 52
-	_collection_sidebar.add_child(collection)
-	var collection_note := PlayerUI.label("Personagens originais", 13, Color("#a8b9d0"))
-	_collection_sidebar.add_child(collection_note)
+	categories.add_child(collection)
+	_collection_count = PlayerUI.label("", 15, Color("#a8b9d0"))
+	categories.add_child(_collection_count)
 	_scroll.get_parent().move_child(_scroll, 1)
 	_side = PanelContainer.new()
 	_side.name = "HeroPreview"
 	_side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_side.size_flags_stretch_ratio = 1.0
 	_side.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_side.add_theme_stylebox_override("panel", _panel_style(false))
+	var showcase_style := _panel_style(false)
+	showcase_style.bg_color = Color(0.025, 0.07, 0.14, 0.89)
+	showcase_style.border_color = Color(0.31, 0.40, 0.53, 0.8)
+	_side.add_theme_stylebox_override("panel", showcase_style)
 	_split.add_child(_side)
 	_preview = VBoxContainer.new()
 	_preview.add_theme_constant_override("separation", 6)
@@ -234,6 +247,12 @@ func _rebuild_gallery() -> void:
 		body.add_child(PlayerUI.label("Nenhum personagem encontrado.", 19))
 	if _fav_button != null:
 		_fav_button.text = "♥ Favoritos" if _favorite_only else "♡ Favoritos"
+	if _collection_count != null:
+		var obtained := 0
+		for item: Dictionary in services.inventory.entries:
+			if services.inventory.is_unlocked(str(item.id)):
+				obtained += 1
+		_collection_count.text = "%d / %d personagens obtidos" % [obtained, services.inventory.entries.size()]
 
 
 func _gallery_card(entry: Dictionary) -> PanelContainer:
@@ -255,17 +274,17 @@ func _gallery_card(entry: Dictionary) -> PanelContainer:
 	top.add_child(favorite)
 	var thumbnail := TextureRect.new()
 	thumbnail.name = "Portrait"
-	thumbnail.custom_minimum_size = Vector2(0, 175)
+	thumbnail.custom_minimum_size = Vector2(0, 195)
 	thumbnail.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	thumbnail.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	thumbnail.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	thumbnail.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var path := str(_paths.get(character_id, ThumbnailCache.path_for(character_id)))
 	if FileAccess.file_exists(path):
-		thumbnail.texture = ImageTexture.create_from_image(Image.load_from_file(path))
+		thumbnail.texture = _portrait_texture(path)
 	column.add_child(thumbnail)
 	_images[character_id] = thumbnail
-	var name_label := PlayerUI.label(entry.name, 17, Color("#faf2df"))
+	var name_label := PlayerUI.label(entry.name, 21, Color("#faf2df"))
 	name_label.clip_text = true
 	column.add_child(name_label)
 	var equipped: bool = services.inventory.equipped_id() == character_id
@@ -285,7 +304,7 @@ func _style_card_height(card: Control, compact: bool) -> void:
 	card.custom_minimum_size.y = 0
 	var portrait: TextureRect = card.get_node_or_null("VBoxContainer/Portrait")
 	if portrait != null:
-		portrait.custom_minimum_size.y = 70 if compact else 175
+		portrait.custom_minimum_size.y = 70 if compact else 195
 
 
 func _toggle_favorite(character_id: String) -> void:
@@ -362,6 +381,8 @@ func _select(character_id: String) -> void:
 	var right_arrow := _button("›", _select_neighbor.bind(1))
 	right_arrow.custom_minimum_size = Vector2(44, 36)
 	arrows.add_child(right_arrow)
+	var details := PlayerUI.label(_collection_title + "  •  " + ("Equipado" if equipped else ("Disponível" if unlocked else "Bloqueado")), 15, ACCENT)
+	_preview.add_child(details)
 	_stage = preview(_preview, character_id)
 	if _stage != null:
 		_stage.custom_minimum_size = Vector2.ZERO
@@ -370,6 +391,7 @@ func _select(character_id: String) -> void:
 		_stage.frame_character()
 		_stage.set_zoom(ThumbnailCache.framing_zoom(character_id))
 	_description = PlayerUI.label(str(entry.get("description", "")), 16)
+	_description.custom_minimum_size.y = 36
 	_description.visible = not compact
 	_preview.add_child(_description)
 	if not unlocked:
@@ -405,7 +427,7 @@ func _generate_thumbnails() -> void:
 	# Captura sequencial; as listas de amigos só leem PNGs existentes.
 	for character_id: String in _paths:
 		if _images.has(character_id) and is_instance_valid(_images[character_id]):
-			_images[character_id].texture = ImageTexture.create_from_image(Image.load_from_file(_paths[character_id]))
+			_images[character_id].texture = _portrait_texture(_paths[character_id])
 
 
 func _panel_style(selected: bool) -> StyleBoxFlat:
@@ -441,3 +463,31 @@ func _button(text: String, action: Callable, primary := false) -> Button:
 	button.add_theme_color_override("font_disabled_color", Color("#7d8796"))
 	button.pressed.connect(action)
 	return button
+
+
+## Renderiza retratos do cache existente sem alterar os GLB ou a prévia 3D.
+## A região superior da captura contém rosto/tronco, e o corte permanece dentro do canvas.
+func _portrait_texture(path: String) -> Texture2D:
+	var image := Image.load_from_file(path)
+	if image == null or image.is_empty():
+		return null
+	var source_width := image.get_width()
+	var source_height := image.get_height()
+	var crop_height := int(source_height * 0.56)
+	var crop_width := int(min(source_width, crop_height * 0.90))
+	var crop_x := maxi(0, (source_width - crop_width) / 2)
+	var crop_y := int(source_height * 0.04)
+	var cropped := image.get_region(Rect2i(crop_x, crop_y, crop_width, crop_height))
+	cropped.resize(384, 450, Image.INTERPOLATE_LANCZOS)
+	return ImageTexture.create_from_image(cropped)
+
+
+func _load_collection() -> void:
+	if not FileAccess.file_exists(COLLECTION_FILE):
+		return
+	var file := FileAccess.open(COLLECTION_FILE, FileAccess.READ)
+	if file == null:
+		return
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	if parsed is Dictionary:
+		_collection_title = str(parsed.get("name", "Começo"))

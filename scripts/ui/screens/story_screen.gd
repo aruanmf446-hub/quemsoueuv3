@@ -21,6 +21,7 @@ var _rail: ScrollContainer
 ## Seleção de fases em cartões lado a lado (estilo seleção de fase de jogos de console),
 ## sobre a panorâmica da cidade noturna. Sem a moldura ornamental, que cobria o texto.
 func _ready() -> void:
+	manages_own_scale = true
 	super._ready()
 	_font = preload("res://assets/desert/phase01/interface.ttf").duplicate() as FontFile
 	_font.multichannel_signed_distance_field = true

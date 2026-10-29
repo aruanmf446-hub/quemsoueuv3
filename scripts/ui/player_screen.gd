@@ -10,9 +10,35 @@ var services: PlayerServices
 var parameters: Dictionary = {}
 
 
+## Telas que cuidam do próprio layout compacto (escala e tamanhos) ficam fora do
+## ajuste automático abaixo.
+var manages_own_scale := false
+
 func _ready() -> void:
 	services = PlayerServices.current
 	$Margin/Column/Header/Back.pressed.connect(func() -> void: back_requested.emit())
+	# Visual comum: sem a moldura ornamental (cobria o conteúdo), fundo escurecido e
+	# botão Voltar inclinado no estilo do resto do menu.
+	$CrestFrame.hide()
+	$Tint.color = Color(0.02, 0.035, 0.07, 0.86)
+	PlayerUI.style_button($Margin/Column/Header/Back, false)
+	heading.add_theme_color_override("font_color", Color.WHITE)
+	resized.connect(_adapt_scale)
+	_adapt_scale.call_deferred()
+
+## No celular a tela inteira é desenhada maior (em pontos da tela), como nas
+## Configurações; antes o layout de computador ficava minúsculo no aparelho.
+func _adapt_scale() -> void:
+	if manages_own_scale or not is_inside_tree(): return
+	var margin: MarginContainer = $Margin
+	var factor := maxf(1.0, UIScale.unit_for(get_viewport()) * 0.75) if UIScale.is_compact() else 1.0
+	margin.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	margin.scale = Vector2.ONE * factor
+	margin.position = Vector2.ZERO
+	margin.size = size / factor
+	for side in ["left", "right"]: margin.add_theme_constant_override("margin_" + side, 24 if factor > 1.0 else 76)
+	margin.add_theme_constant_override("margin_top", 16 if factor > 1.0 else 70)
+	margin.add_theme_constant_override("margin_bottom", 12 if factor > 1.0 else 62)
 
 
 func show_screen(params: Dictionary = {}) -> void:

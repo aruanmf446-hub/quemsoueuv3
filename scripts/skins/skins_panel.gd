@@ -47,6 +47,7 @@ var _was_compact := false
 
 
 func _ready() -> void:
+	manages_own_scale = true
 	super._ready()
 	heading.text = tr("Personagens")
 	$Tint.color = Color(0.025, 0.04, 0.09, 0.90)

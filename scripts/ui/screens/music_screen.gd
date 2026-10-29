@@ -17,6 +17,7 @@ var _show_hidden := false
 
 
 func _ready() -> void:
+	manages_own_scale = true
 	super._ready()
 	# A moldura decorativa cobria o texto desta tela; o fundo do lobby permanece.
 	$CrestFrame.hide()

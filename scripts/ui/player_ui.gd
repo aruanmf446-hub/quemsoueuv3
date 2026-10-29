@@ -24,23 +24,39 @@ static func button(text: String, action: Callable) -> Button:
 	node.text = TranslationServer.translate(text)
 	node.custom_minimum_size = Vector2(130, 52)
 	node.focus_mode = Control.FOCUS_ALL
-	node.add_theme_color_override("font_color", TEXT)
-	node.add_theme_color_override("font_outline_color", INK)
-	node.add_theme_constant_override("outline_size", 2)
 	node.add_theme_font_size_override("font_size", 21)
-	for state: String in ["normal", "hover", "pressed", "disabled", "focus"]:
-		var style := StyleBoxTexture.new()
-		style.texture = PURPLE if state == "disabled" else BLUE
-		style.texture_margin_left = 16
-		style.texture_margin_top = 12
-		style.texture_margin_right = 16
-		style.texture_margin_bottom = 12
-		style.content_margin_left = 18
-		style.content_margin_right = 18
-		style.modulate_color = Color(1.2, 1.2, 1.2) if state == "focus" else Color.WHITE
-		node.add_theme_stylebox_override(state, style)
+	style_button(node, false)
 	node.pressed.connect(action)
 	return node
+
+
+## Botão inclinado do menu: vidro escuro com borda dourada; o principal é dourado.
+static func style_button(node: Button, primary: bool) -> void:
+	for state: String in ["normal", "hover", "pressed", "disabled", "focus", "hover_pressed"]:
+		var style := StyleBoxFlat.new()
+		style.skew = Vector2(0.16, 0)
+		style.anti_aliasing = true
+		style.set_corner_radius_all(3)
+		style.content_margin_left = 20
+		style.content_margin_right = 20
+		style.content_margin_top = 8
+		style.content_margin_bottom = 8
+		style.bg_color = GOLD if primary else Color(0.06, 0.10, 0.17, 0.94)
+		style.border_color = Color(GOLD, 0.0 if primary else 0.5)
+		style.set_border_width_all(1)
+		if state == "hover": style.bg_color = style.bg_color.lightened(0.1)
+		if state in ["pressed", "hover_pressed"]: style.bg_color = GOLD.darkened(0.1)
+		if state == "disabled": style.bg_color = Color(0.05, 0.07, 0.11, 0.75)
+		if state == "focus":
+			style.draw_center = false
+			style.border_color = Color.WHITE
+			style.set_border_width_all(2)
+		node.add_theme_stylebox_override(state, style)
+	for color: String in ["font_color", "font_hover_color", "font_focus_color"]:
+		node.add_theme_color_override(color, INK if primary else TEXT)
+	for color: String in ["font_pressed_color", "font_hover_pressed_color"]:
+		node.add_theme_color_override(color, INK)
+	node.add_theme_color_override("font_disabled_color", Color(1, 1, 1, 0.38))
 
 
 static func column(parent: Node) -> VBoxContainer:
@@ -63,10 +79,12 @@ static func card(parent: Node) -> VBoxContainer:
 	var panel := PanelContainer.new()
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color("#172b49")
-	style.border_color = GOLD.darkened(0.35)
-	style.set_border_width_all(2)
-	style.set_corner_radius_all(18)
+	style.bg_color = Color(0.035, 0.06, 0.11, 0.92)
+	style.border_color = Color(GOLD, 0.6)
+	style.border_width_top = 2
+	style.set_corner_radius_all(12)
+	style.shadow_color = Color(0, 0, 0, 0.4)
+	style.shadow_size = 12
 	style.content_margin_left = 22
 	style.content_margin_top = 18
 	style.content_margin_right = 22

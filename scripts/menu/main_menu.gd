@@ -40,6 +40,9 @@ func _ready() -> void:
 	$MenuButtons/BtnDuel.disabled = true
 	$MenuButtons/BtnDuel.tooltip_text = "Modo Duelo em desenvolvimento"
 	get_tree().auto_accept_quit = false
+	var composition := preload("res://scripts/menu/lobby_composition.gd").new()
+	composition.name = "LobbyComposition"
+	add_child(composition)
 
 
 func _on_menu_button_activated(button_id: StringName) -> void:
@@ -110,7 +113,13 @@ func _refresh_friends() -> void:
 		button.focus_mode = Control.FOCUS_ALL
 		button.pressed.connect(_navigation.open.bind("public_profile", {"public_id": friend.public_id}))
 	if data.is_empty():
-		list.add_child(PlayerUI.label("Nenhum amigo ainda." if _services.friends.state == "success" else "Entre para ver suas amizades.", 18))
+		var empty_text := "Nenhum amigo ainda." if _services.friends.state == "success" else "Entre para ver suas amizades."
+		var empty_label := PlayerUI.label(empty_text, 18)
+		if _services.preferences.values.locale.begins_with("pt"):
+			empty_label.text = empty_text
+		list.add_child(empty_label)
+	if has_node("LobbyComposition"):
+		get_node("LobbyComposition").call_deferred("_layout")
 
 
 func _route_changed(route: String) -> void:

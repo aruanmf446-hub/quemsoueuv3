@@ -13,8 +13,8 @@ const ENEMIES_PATH := "res://data/desert_enemies.json"
 const PROTAGONIST_TYPE := "el_fuego"
 ## Câmera de perfil: perto o bastante para El Fuego ocupar uma fatia legível da tela.
 const CAMERA_LEAD := 1.2
-const CAMERA_HEIGHT := 2.2
-const CAMERA_DISTANCE := 8.0
+const CAMERA_HEIGHT := 1.8
+const CAMERA_DISTANCE := 6.5
 const CAMERA_FOV := 48.0
 const CAMERA_LOOK_HEIGHT := 1.0
 const CHECKPOINT_FLASH := 1.4
@@ -72,14 +72,14 @@ func _build_environment() -> void:
 	env.environment.background_color = Color("#8fc1e6")
 	env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.environment.ambient_light_color = Color("#ffe9c8")
-	env.environment.ambient_light_energy = 0.55
+	env.environment.ambient_light_energy = 0.4
 	env.environment.tonemap_mode = Environment.TONE_MAPPER_LINEAR
 	add_child(env)
 
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-50.0, -30.0, 0.0)
 	sun.light_color = Color("#fff1d6")
-	sun.light_energy = 1.2
+	sun.light_energy = 0.85
 	sun.shadow_enabled = settings["shadows"]
 	add_child(sun)
 
@@ -87,7 +87,7 @@ func _build_environment() -> void:
 	var fill := DirectionalLight3D.new()
 	fill.rotation_degrees = Vector3(-25.0, 150.0, 0.0)
 	fill.light_color = Color("#c7dcff")
-	fill.light_energy = 0.35
+	fill.light_energy = 0.25
 	add_child(fill)
 
 

@@ -56,23 +56,51 @@ func _shelf(x: float, width: float, top: float, bottom: float, depth: float, cap
 	surface.generate_normals()
 	var sand := MeshInstance3D.new()
 	sand.mesh = surface.commit()
-	var sand_mat := StandardMaterial3D.new()
-	sand_mat.albedo_color = Color("#a69e8d").srgb_to_linear()*Color(0.7,0.76,0.85,1)
-	sand_mat.roughness = 1.0
-	var texture := NoiseTexture2D.new()
-	texture.width = 128
-	texture.height = 128
-	texture.seamless = true
-	var noise := FastNoiseLite.new()
-	noise.seed = 15
-	noise.frequency = 0.13
-	texture.noise = noise
-	var gradient := Gradient.new()
-	gradient.colors = PackedColorArray([Color("#e4ddd0"),Color.WHITE])
-	texture.color_ramp = gradient
-	sand_mat.albedo_texture = texture
-	sand.material_override = sand_mat
+	sand.material_override = sand_material()
 	add_child(sand)
+
+## Piso de areia/pedra quente com a mesma textura do arenito (antes era um plano
+## cinza-azulado liso, que parecia inacabado ao lado do cenário).
+static var _sand_cache: StandardMaterial3D
+static func sand_material() -> StandardMaterial3D:
+	if _sand_cache != null: return _sand_cache
+	var mat := StandardMaterial3D.new()
+	# Pedras de calçamento cobertas de areia: ruído celular para as pedras e um
+	# segundo ruído suave para manchas de areia; relevo vem de um mapa normal.
+	var cells := FastNoiseLite.new()
+	cells.noise_type = FastNoiseLite.TYPE_CELLULAR
+	cells.cellular_return_type = FastNoiseLite.RETURN_DISTANCE2_SUB
+	cells.frequency = 0.014
+	cells.seed = 31
+	var color := NoiseTexture2D.new()
+	color.width = 512
+	color.height = 512
+	color.seamless = true
+	color.noise = cells
+	var ramp := Gradient.new()
+	ramp.offsets = PackedFloat32Array([0.0, 0.35, 1.0])
+	ramp.colors = PackedColorArray([Color("#5e4632"), Color("#9c7955"), Color("#c49d72")])
+	color.color_ramp = ramp
+	color.generate_mipmaps = true
+	var bumps := NoiseTexture2D.new()
+	bumps.width = 512
+	bumps.height = 512
+	bumps.seamless = true
+	bumps.noise = cells
+	bumps.as_normal_map = true
+	bumps.bump_strength = 6.0
+	bumps.generate_mipmaps = true
+	mat.albedo_texture = color
+	# A luz da lua é azulada; o fator quente compensa para o piso não ficar lilás.
+	mat.albedo_color = Color(0.62, 0.50, 0.42)
+	mat.normal_enabled = true
+	mat.normal_texture = bumps
+	mat.normal_scale = 0.8
+	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+	mat.uv1_scale = Vector3(1.4,1.4,1)
+	mat.roughness = 0.9
+	_sand_cache = mat
+	return mat
 
 func _cliff_z(x: float, layer: int, depth: float) -> float:
 	return depth*0.5 + sin(x*2.0+layer*0.74)*0.12+cos(x*0.7+layer*1.2)*0.1

@@ -18,6 +18,7 @@ var _scroll: ScrollContainer
 var _rail: VBoxContainer
 
 func _ready() -> void:
+	manages_own_scale = true
 	super._ready()
 	$CrestFrame.hide()
 	$Tint.color = Color(0.02, 0.035, 0.07, 0.86)

@@ -28,14 +28,16 @@ func _ready() -> void:
 	_panel.theme = Theme.new()
 	_panel.theme.default_font = _font
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color("#102436")
-	style.border_color = Color("#c9a66a")
-	style.set_border_width_all(1)
-	style.set_corner_radius_all(12)
-	style.content_margin_left = 24
-	style.content_margin_right = 24
-	style.content_margin_top = 16
-	style.content_margin_bottom = 16
+	style.bg_color = Color(0.035,0.06,0.11,0.96)
+	style.border_color = Color("#f2c76e")
+	style.border_width_top = 3
+	style.set_corner_radius_all(10)
+	style.shadow_color = Color(0,0,0,0.55)
+	style.shadow_size = 24
+	style.content_margin_left = 34
+	style.content_margin_right = 34
+	style.content_margin_top = 22
+	style.content_margin_bottom = 24
 	_panel.add_theme_stylebox_override("panel",style)
 	add_child(_panel)
 	_column = VBoxContainer.new()
@@ -53,19 +55,21 @@ func _title(text: String, size: int, color: Color) -> void:
 func _button(text: String, action: Callable, primary := false) -> void:
 	var button := Button.new()
 	button.text = text
-	button.custom_minimum_size = Vector2(320,44)
+	button.custom_minimum_size = Vector2(340,50)
 	button.add_theme_font_size_override("font_size",17)
-	button.add_theme_color_override("font_color",Color("#172436") if primary else Color("#f4e5ca"))
+	button.add_theme_color_override("font_color",Color("#141006") if primary else Color("#f4e5ca"))
 	for state in ["font_hover_color","font_pressed_color","font_focus_color"]:
-		button.add_theme_color_override(state,Color("#172436") if primary else Color("#ffffff"))
+		button.add_theme_color_override(state,Color("#141006") if primary else Color("#ffffff"))
 	for state in ["normal","hover","pressed","focus"]:
 		var box := StyleBoxFlat.new()
-		box.bg_color = Color("#dbba79") if primary else Color("#1b3549")
+		box.skew = Vector2(0.16,0)
+		box.anti_aliasing = true
+		box.bg_color = Color("#f2c76e") if primary else Color(0.07,0.11,0.18,0.95)
 		if state in ["hover","focus"]: box.bg_color = box.bg_color.lightened(0.12)
-		if state == "pressed": box.bg_color = box.bg_color.darkened(0.12)
-		box.set_corner_radius_all(5)
-		box.set_border_width_all(1)
-		box.border_color = Color("#d1b278") if state == "focus" else Color(0.7,0.7,0.7,0.12)
+		if state == "pressed": box.bg_color = box.bg_color.darkened(0.15)
+		box.set_corner_radius_all(3)
+		box.border_color = Color("#fff3d0") if state == "focus" else Color("#f2c76e",0.0 if primary else 0.45)
+		box.set_border_width_all(2 if state == "focus" else 1)
 		button.add_theme_stylebox_override(state,box)
 	button.pressed.connect(action)
 	_column.add_child(button)

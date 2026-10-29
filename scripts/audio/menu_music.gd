@@ -27,6 +27,10 @@ var _last_volume := 1.0
 var _retry_in := 0.0
 ## Autorização de teste dura só esta sessão do editor; nunca é uma licença de distribuição.
 var _local_test_authorized := false
+var _web_request: HTTPRequest
+var _web_cache := {}
+var _web_loading := ""
+var _web_wanted := {}
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -113,7 +117,7 @@ func local_test_available(track: Dictionary) -> bool:
 	# Capas pendentes não impedem a audição local. O caminho comercial mantém
 	# todas as verificações de licença/capa originais em licensed().
 	return local_test_mode() and _local_test_authorized and _valid_entry(track) \
-		and ResourceLoader.exists(str(track.audio), "AudioStream")
+		and _audio_exists(str(track.audio))
 
 ## Verdadeiro quando a licença e os recursos estão válidos, sem considerar a escolha do jogador.
 func licensed(t: Dictionary) -> bool:
@@ -124,7 +128,7 @@ func licensed(t: Dictionary) -> bool:
 	return t.get("enabled", false) == true and rights.get("status") == "approved" \
 		and rights.get("scope") == "main_menu" and rights.get("reference", "") is String \
 		and not str(rights.get("reference", "")).is_empty() and now >= float(rights.starts_at) \
-		and now < float(rights.ends_at) and ResourceLoader.exists(t.audio, "AudioStream") \
+		and now < float(rights.ends_at) and _audio_exists(str(t.audio)) \
 		and ResourceLoader.exists(t.cover, "Texture2D")
 
 func is_excluded(id: String) -> bool:
@@ -241,9 +245,57 @@ func _select(direction: int) -> void:
 	current_id = ""
 	state_changed.emit()
 
+## No navegador os MP3 ficam fora do pacote do jogo (publicados em music/ ao lado da
+## página) e são baixados sob demanda: carregar as 14 faixas junto travava o celular.
+func _web() -> bool:
+	return OS.has_feature("web")
+
+func _audio_exists(path: String) -> bool:
+	return path.begins_with("res://assets/music/") if _web() else ResourceLoader.exists(path, "AudioStream")
+
+func _web_url(path: String) -> String:
+	var parts := PackedStringArray()
+	for part in path.trim_prefix("res://assets/music/").split("/"): parts.append(part.uri_encode())
+	var base := str(JavaScriptBridge.eval("new URL('.', window.location.href).href", true))
+	return base + "music/" + "/".join(parts)
+
+func _fetch_web(track: Dictionary, position: float) -> void:
+	_web_wanted = {"track": track.duplicate(true), "position": position}
+	if _web_request == null:
+		_web_request = HTTPRequest.new()
+		add_child(_web_request)
+		_web_request.request_completed.connect(_web_loaded)
+	if _web_request.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED: return
+	_web_loading = str(track.id)
+	if _web_request.request(_web_url(str(track.audio))) != OK: _web_loading = ""
+
+func _web_loaded(result: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+	var loaded := _web_loading
+	_web_loading = ""
+	if result == HTTPRequest.RESULT_SUCCESS and code == 200 and not body.is_empty():
+		var stream := AudioStreamMP3.new()
+		stream.data = body
+		# Guarda só as duas últimas faixas: o celular tem pouca memória para áudio.
+		_web_cache[loaded] = stream
+		while _web_cache.size() > 2: _web_cache.erase(_web_cache.keys()[0])
+	var wanted: Dictionary = _web_wanted
+	if wanted.is_empty(): return
+	if str(wanted.track.id) != loaded:
+		_fetch_web(wanted.track, float(wanted.position))
+	elif _web_cache.has(loaded):
+		_web_wanted = {}
+		_play(wanted.track, float(wanted.position))
+
 func _play(track: Dictionary, position: float = 0.0) -> void:
 	if not _inside or not _available(track): return
-	var stream := load(track.audio) as AudioStream
+	var stream: AudioStream
+	if _web():
+		if not _web_cache.has(str(track.id)):
+			_fetch_web(track, position)
+			return
+		stream = _web_cache[str(track.id)]
+	else:
+		stream = load(track.audio) as AudioStream
 	if stream == null: return
 	# Imported loop flags must not prevent playlist advancement.
 	stream = stream.duplicate() as AudioStream

@@ -3,22 +3,21 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://qrrsnpqp00ju"
-path.s3tc="res://.godot/imported/El_fuego_basecolor.jpg-138dcd0f2f4dea842b426b99a15fc8aa.s3tc.ctex"
+path="res://.godot/imported/El_fuego_basecolor.jpg-138dcd0f2f4dea842b426b99a15fc8aa.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/characters/El fuego/El_fuego_basecolor.jpg"
-dest_files=["res://.godot/imported/El_fuego_basecolor.jpg-138dcd0f2f4dea842b426b99a15fc8aa.s3tc.ctex"]
+dest_files=["res://.godot/imported/El_fuego_basecolor.jpg-138dcd0f2f4dea842b426b99a15fc8aa.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.85
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
@@ -37,5 +36,5 @@ process/premult_alpha=false
 process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
-process/size_limit=0
+process/size_limit=1024
 detect_3d/compress_to=0

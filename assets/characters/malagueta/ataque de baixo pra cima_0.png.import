@@ -3,10 +3,9 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bre74onglu616"
-path.s3tc="res://.godot/imported/ataque de baixo pra cima_0.png-3a1ebdd3b69cee1f408fde3577c5e625.s3tc.ctex"
+path="res://.godot/imported/ataque de baixo pra cima_0.png-3a1ebdd3b69cee1f408fde3577c5e625.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
 "md5": "e7a7cb8a6f10efa94297a2035cfa305e"
@@ -15,13 +14,13 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/characters/malagueta/ataque de baixo pra cima_0.png"
-dest_files=["res://.godot/imported/ataque de baixo pra cima_0.png-3a1ebdd3b69cee1f408fde3577c5e625.s3tc.ctex"]
+dest_files=["res://.godot/imported/ataque de baixo pra cima_0.png-3a1ebdd3b69cee1f408fde3577c5e625.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.85
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
@@ -40,5 +39,5 @@ process/premult_alpha=false
 process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
-process/size_limit=0
+process/size_limit=1024
 detect_3d/compress_to=0

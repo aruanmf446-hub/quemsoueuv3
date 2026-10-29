@@ -3,10 +3,9 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://brvy021nlaulf"
-path.s3tc="res://.godot/imported/Correr_0.png-9df8fb19d506bb889dd6b3fc608ba354.s3tc.ctex"
+path="res://.godot/imported/Correr_0.png-9df8fb19d506bb889dd6b3fc608ba354.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
 "md5": "c4e1524c9c49aae65fd8a4e29c0fab4f"
@@ -15,13 +14,13 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/characters/El fuego/Correr_0.png"
-dest_files=["res://.godot/imported/Correr_0.png-9df8fb19d506bb889dd6b3fc608ba354.s3tc.ctex"]
+dest_files=["res://.godot/imported/Correr_0.png-9df8fb19d506bb889dd6b3fc608ba354.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.85
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
@@ -40,5 +39,5 @@ process/premult_alpha=false
 process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
-process/size_limit=0
+process/size_limit=1024
 detect_3d/compress_to=0

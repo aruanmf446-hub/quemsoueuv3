@@ -3,7 +3,7 @@ extends Node
 
 signal changed
 const SAVE_PATH := "user://device_preferences_v1.cfg"
-const DEFAULTS := {"master": 1.0, "music": 1.0, "sfx": 1.0, "quality": "medio", "locale": "pt_BR", "accept_key": KEY_ENTER, "back_key": KEY_ESCAPE}
+const DEFAULTS := {"muted": false, "master": 1.0, "music": 1.0, "sfx": 1.0, "quality": "medio", "locale": "pt_BR", "accept_key": KEY_ENTER, "back_key": KEY_ESCAPE}
 var values: Dictionary = DEFAULTS.duplicate()
 var last_error := OK
 
@@ -58,7 +58,7 @@ func apply() -> void:
 			AudioServer.set_bus_name(index, bus_name)
 		var key: String = {"Master": "master", "Music": "music", "SFX": "sfx"}[bus_name]
 		var gain := float(values[key])
-		AudioServer.set_bus_mute(index, gain <= 0.001)
+		AudioServer.set_bus_mute(index, gain <= 0.001 or (bus_name == "Master" and bool(values.muted)))
 		AudioServer.set_bus_volume_db(index, linear_to_db(maxf(gain, 0.0001)))
 	TranslationServer.set_locale(values.locale)
 	for binding: Array in [["ui_accept", "accept_key"], ["ui_cancel", "back_key"]]:
@@ -73,6 +73,7 @@ func apply() -> void:
 
 static func _valid(key: String, value: Variant) -> bool:
 	match key:
+		"muted": return value is bool
 		"master", "music", "sfx": return (value is float or value is int) and is_finite(value) and value >= 0 and value <= 1
 		"accept_key", "back_key": return value is int and value > 0 and value <= 0x7fffffff
 		"quality": return value in ["baixo", "medio", "alto"]

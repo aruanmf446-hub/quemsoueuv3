@@ -1,62 +1,196 @@
 extends PlayerScreen
 
+const ACCENT := Color("#f2cf7d")
+const MUTED := Color("#a8bad3")
+var _category := 0
 var _waiting_action := ""
 var _binding_button: Button
-
+var _content: VBoxContainer
+var _feedback: Label
+var _tabs: Array[Button] = []
+var _layout: HBoxContainer
+var _scroll: ScrollContainer
+var _rail: VBoxContainer
 
 func _ready() -> void:
 	super._ready()
+	$CrestFrame.hide()
+	$Tint.color = Color(0.025, 0.045, 0.09, 0.94)
 	visibility_changed.connect(func() -> void:
 		if not is_visible_in_tree(): _waiting_action = "")
+	resized.connect(_adapt)
 	services.session.changed.connect(func() -> void:
 		_waiting_action = ""
 		if is_visible_in_tree(): render())
-
 
 func render() -> void:
 	_waiting_action = ""
 	PlayerUI.clear(body)
 	heading.text = tr("Configurações")
-	banner.show_state("success")
-	var row := PlayerUI.row(body)
-	var sound := PlayerUI.card(row)
-	sound.add_child(PlayerUI.label("Áudio e imagem", 28, PlayerUI.GOLD))
-	_slider(sound, "Volume geral", "master", 0, 1)
-	_slider(sound, "Música", "music", 0, 1)
-	_slider(sound, "Efeitos sonoros", "sfx", 0, 1)
+	heading.add_theme_color_override("font_color", Color.WHITE)
+	banner.hide()
+	$Margin/Column/Header/Back.text = tr("‹ Voltar")
+	_style_button($Margin/Column/Header/Back)
+	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_layout = PlayerUI.row(body)
+	_layout.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_layout.add_theme_constant_override("separation", 28)
+	_rail = PlayerUI.column(_layout)
+	_rail.size_flags_horizontal = Control.SIZE_FILL
+	_rail.add_child(PlayerUI.label("QUEM SOU EU", 16, ACCENT))
+	_rail.add_child(PlayerUI.label("Sua experiência", 26))
+	_tabs.clear()
+	var names := ["Áudio", "Gráficos", "Controles", "Idioma"]
+	for i in range(names.size()):
+		var tab := _button("0%d   %s" % [i + 1, tr(names[i])], _select.bind(i))
+		tab.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		tab.toggle_mode = true
+		tab.button_pressed = i == _category
+		_rail.add_child(tab)
+		_tabs.append(tab)
+	var panel := PanelContainer.new()
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	panel.add_theme_stylebox_override("panel", _box(Color("#14243c"), 24))
+	_layout.add_child(panel)
+	var scroll := ScrollContainer.new()
+	_scroll = scroll
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	panel.add_child(scroll)
+	_content = PlayerUI.column(scroll)
+	_content.add_theme_constant_override("separation", 20)
+	_feedback = PlayerUI.label("Preferências salvas neste dispositivo.", 18, MUTED)
+	body.add_child(_feedback)
+	_show_category()
+	_adapt()
+
+func _adapt() -> void:
+	if not is_instance_valid(_rail): return
+	var pixels := DisplayServer.window_get_size()
+	var compact := OS.has_feature("android") or pixels.y < 600
+	var logical_height := minf(pixels.y, 480.0) if OS.has_feature("android") else float(pixels.y)
+	var factor := maxf(1.0, size.y / maxf(1.0, logical_height)) if compact else 1.0
+	var margin: MarginContainer = $Margin
+	margin.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	margin.scale = Vector2.ONE * factor
+	margin.position = Vector2.ZERO
+	margin.size = size / factor
+	for side in ["left", "right", "top", "bottom"]:
+		margin.add_theme_constant_override("margin_" + side, 16 if compact else 48)
+	_rail.custom_minimum_size.x = 170 if compact else 280
+	_rail.add_theme_constant_override("separation", 8 if compact else 14)
+	_layout.add_theme_constant_override("separation", 20 if compact else 28)
+	$Margin/Column.add_theme_constant_override("separation", 12 if compact else 18)
+	_feedback.add_theme_font_size_override("font_size", 16 if compact else 18)
+	var panel: PanelContainer = _layout.get_child(1)
+	panel.add_theme_stylebox_override("panel", _box(Color("#14243c"), 16 if compact else 24))
+	_rail.get_child(0).visible = not compact
+	_rail.get_child(1).visible = not compact
+	for tab in _tabs:
+		tab.custom_minimum_size = Vector2(150, 48 if compact else 56)
+		tab.add_theme_font_size_override("font_size", 19 if compact else 21)
+	$Margin/Column/Header/Back.custom_minimum_size = Vector2(110 if compact else 170, 48 if compact else 56)
+	heading.add_theme_font_size_override("font_size", 28 if compact else 38)
+
+func _select(index: int) -> void:
+	_waiting_action = ""
+	_category = index
+	for i in range(_tabs.size()): _tabs[i].button_pressed = i == index
+	_show_category()
+
+func _show_category() -> void:
+	_scroll.scroll_vertical = 0
+	PlayerUI.clear(_content)
+	match _category:
+		0: _audio()
+		1: _graphics()
+		2: _controls()
+		3: _language()
+
+func _title(title: String, subtitle: String) -> void:
+	_content.add_child(PlayerUI.label(title, 30))
+	_content.add_child(PlayerUI.label(subtitle, 19, MUTED))
+
+func _audio() -> void:
+	_title("Áudio", "Ajuste o som da sua aventura.")
+	_slider("Volume geral", "master")
+	_slider("Música", "music")
+	_slider("Efeitos sonoros", "sfx")
+	var mute := CheckButton.new()
+	mute.text = tr("Silenciar todo o áudio")
+	mute.button_pressed = services.preferences.values.muted
+	mute.custom_minimum_size.y = 52
+	mute.toggled.connect(func(value: bool) -> void:
+		if not _save("muted", value): mute.set_pressed_no_signal(not value))
+	_content.add_child(mute)
+	_content.add_child(PlayerUI.label("A música toca exclusivamente no menu. Seus volumes são mantidos ao silenciar.", 18, MUTED))
+
+func _slider(text: String, key: String) -> void:
+	var line := PlayerUI.row(_content)
+	line.add_child(PlayerUI.label(text, 22))
+	var percent := PlayerUI.label("%d%%" % roundi(float(services.preferences.values[key]) * 100), 22, ACCENT)
+	percent.size_flags_horizontal = Control.SIZE_FILL
+	percent.custom_minimum_size.x = 64
+	line.add_child(percent)
+	var slider := HSlider.new()
+	slider.max_value = 1.0
+	slider.step = 0.01
+	slider.value = services.preferences.values[key]
+	slider.custom_minimum_size = Vector2(180, 44)
+	slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var track := _box(Color("#293e5c"), 0)
+	track.set_corner_radius_all(4)
+	track.content_margin_top = 4
+	track.content_margin_bottom = 4
+	slider.add_theme_stylebox_override("slider", track)
+	var fill := track.duplicate() as StyleBoxFlat
+	fill.bg_color = ACCENT
+	slider.add_theme_stylebox_override("grabber_area", fill)
+	slider.add_theme_stylebox_override("grabber_area_highlight", fill)
+	slider.value_changed.connect(func(value: float) -> void:
+		if _save(key, value): percent.text = "%d%%" % roundi(value * 100)
+		else: slider.set_value_no_signal(float(services.preferences.values[key])))
+	_content.add_child(slider)
+
+func _graphics() -> void:
+	_title("Gráficos", "Qualidade da prévia 3D dos personagens.")
 	var quality := OptionButton.new()
-	quality.custom_minimum_size.y = 52
-	var qualities := ["baixo", "medio", "alto"]
-	for text: String in ["Baixa", "Média", "Alta"]:
-		quality.add_item(tr(text))
-	quality.select(qualities.find(services.preferences.values.quality))
-	quality.item_selected.connect(func(index: int) -> void: _save("quality", qualities[index]))
-	sound.add_child(PlayerUI.label("Qualidade gráfica"))
-	sound.add_child(quality)
-	if OS.has_feature("web"):
-		sound.add_child(PlayerUI.button("Alternar tela cheia", func() -> void:
-			var mode := DisplayServer.WINDOW_MODE_WINDOWED if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN else DisplayServer.WINDOW_MODE_FULLSCREEN
-			DisplayServer.window_set_mode(mode)))
-	var controls := PlayerUI.card(row)
-	controls.add_child(PlayerUI.label("Controles dos menus", 28, PlayerUI.GOLD))
-	controls.add_child(PlayerUI.label("Mouse, toque ou teclado. Use Tab e as setas para navegar."))
+	quality.custom_minimum_size.y = 56
+	_style_button(quality)
+	var keys := ["baixo", "medio", "alto"]
+	for text: String in ["Baixa", "Média", "Alta"]: quality.add_item(tr(text))
+	quality.select(keys.find(services.preferences.values.quality))
+	quality.item_selected.connect(func(index: int) -> void:
+		if not _save("quality", keys[index]): quality.select(keys.find(services.preferences.values.quality)))
+	_content.add_child(quality)
+	for text: String in ["Baixa: meia resolução, sem sombras e sem antisserrilhamento.", "Média: resolução integral, sombras e MSAA 2×.", "Alta: resolução integral, sombras e MSAA 4×."]:
+		_content.add_child(PlayerUI.label(text, 20, MUTED))
+	_content.add_child(PlayerUI.label("Aplicado à prévia 3D. As configurações de combate são preservadas.", 18, ACCENT))
+
+func _controls() -> void:
+	_title("Controles", "Personalize as teclas de navegação dos menus.")
 	for item: Array in [["Confirmar", "accept_key"], ["Voltar", "back_key"]]:
-		var line := PlayerUI.row(controls)
+		var line := PlayerUI.row(_content)
 		line.add_child(PlayerUI.label(item[0]))
-		var key_button := PlayerUI.button(OS.get_keycode_string(int(services.preferences.values[item[1]])), func() -> void: pass)
+		var key_button := _button(OS.get_keycode_string(int(services.preferences.values[item[1]])), func() -> void: pass)
 		key_button.pressed.connect(_wait_for_key.bind(item[1], key_button))
 		line.add_child(key_button)
-	controls.add_child(PlayerUI.label("Os comandos do protótipo de combate são preservados: A/D ou setas, Espaço e J/K."))
-	var account := PlayerUI.card(body)
-	account.add_child(PlayerUI.label("Idioma e conta", 28, PlayerUI.GOLD))
-	var locale := OptionButton.new()
-	locale.add_item("Português (Brasil)")
-	locale.add_item("English (partial)")
-	locale.select(0 if services.preferences.values.locale == "pt_BR" else 1)
-	locale.item_selected.connect(func(index: int) -> void:
-		_save("locale", "pt_BR" if index == 0 else "en")
-		render())
-	account.add_child(locale)
+	for text: String in ["Teclado: Tab e setas para navegar; teclas acima para confirmar e voltar.", "Mouse: clique para selecionar; arraste os controles de volume.", "Toque: toque para selecionar; deslize para rolar e ajustar o volume.", "Combate: A/D ou setas, Espaço e J/K. Comandos do gameplay preservados."]:
+		_content.add_child(PlayerUI.label(text, 19, MUTED))
+
+func _language() -> void:
+	_title("Idioma", "Escolha o idioma da interface.")
+	for item: Array in [["Português (Brasil)", "pt_BR"], ["English", "en"]]:
+		var locale_button := _button(item[0], func() -> void:
+			if _save("locale", item[1]): render())
+		locale_button.toggle_mode = true
+		locale_button.button_pressed = services.preferences.values.locale == item[1]
+		_content.add_child(locale_button)
+	_content.add_child(PlayerUI.label("O inglês está disponível parcialmente. Textos sem tradução permanecem em português.", 18, MUTED))
+	var account := PlayerUI.column(_content)
+	account.add_child(PlayerUI.label("Conta", 24, ACCENT))
 	account.add_child(PlayerUI.label(str(services.session.user.get("email", "Demonstração local • sem conta conectada"))))
 	if services.session.authenticated():
 		var discoverable := CheckButton.new()
@@ -66,44 +200,61 @@ func render() -> void:
 		discoverable.custom_minimum_size.y = 52
 		discoverable.toggled.connect(func(value: bool) -> void: status(await services.profile.set_discoverable(value)))
 		account.add_child(discoverable)
-	account_button(account)
+	account.add_child(_button("Entrar na conta", func() -> void: navigate_requested.emit("account", {})))
 	if services.session.authenticated():
-		account.add_child(PlayerUI.button("Sair da conta", func() -> void:
+		account.add_child(_button("Sair da conta", func() -> void:
 			await services.session.sign_out()
 			render()))
 
-
-func _slider(parent: Node, text: String, key: String, minimum: float, maximum: float) -> void:
-	parent.add_child(PlayerUI.label(text))
-	var slider := HSlider.new()
-	slider.min_value = minimum
-	slider.max_value = maximum
-	slider.step = 0.01
-	slider.value = services.preferences.values[key]
-	slider.custom_minimum_size = Vector2(280, 48)
-	slider.value_changed.connect(func(value: float) -> void: _save(key, value))
-	parent.add_child(slider)
-
-
-func _save(key: String, value: Variant) -> void:
-	if not services.preferences.set_preference(key, value):
-		banner.show_state("error", "Não foi possível salvar a preferência neste dispositivo.")
-
+func _save(key: String, value: Variant) -> bool:
+	var saved := services.preferences.set_preference(key, value)
+	_feedback.text = tr("Preferências salvas neste dispositivo." if saved else "Não foi possível salvar a preferência neste dispositivo.")
+	_feedback.add_theme_color_override("font_color", MUTED if saved else Color("#ff9797"))
+	return saved
 
 func _wait_for_key(action: String, button: Button) -> void:
+	if is_instance_valid(_binding_button) and not _waiting_action.is_empty():
+		_binding_button.text = OS.get_keycode_string(int(services.preferences.values[_waiting_action]))
 	_waiting_action = action
 	_binding_button = button
 	button.text = tr("Pressione uma tecla…")
 
-
 func _input(event: InputEvent) -> void:
-	if not is_visible_in_tree() or _waiting_action.is_empty() or not event is InputEventKey or not event.pressed or event.echo:
-		return
-	var other := "back_key" if _waiting_action == "accept_key" else "accept_key"
-	if event.physical_keycode == int(services.preferences.values[other]):
-		banner.show_state("error", "Escolha uma tecla diferente para confirmar e voltar.")
-		return
-	_save(_waiting_action, int(event.physical_keycode))
-	_binding_button.text = OS.get_keycode_string(event.physical_keycode)
-	_waiting_action = ""
+	if not is_visible_in_tree() or _waiting_action.is_empty() or not event is InputEventKey or not event.pressed or event.echo: return
 	get_viewport().set_input_as_handled()
+	var code: int = event.physical_keycode if event.physical_keycode != 0 else event.keycode
+	var other := "back_key" if _waiting_action == "accept_key" else "accept_key"
+	if code == int(services.preferences.values[other]):
+		_feedback.text = tr("Escolha uma tecla diferente para confirmar e voltar.")
+		return
+	if _save(_waiting_action, code):
+		_binding_button.text = OS.get_keycode_string(code)
+		_waiting_action = ""
+
+func _button(text: String, action: Callable) -> Button:
+	var node := Button.new()
+	node.text = tr(text)
+	node.custom_minimum_size = Vector2(150, 56)
+	_style_button(node)
+	node.pressed.connect(action)
+	return node
+
+func _style_button(node: Button) -> void:
+	node.add_theme_font_size_override("font_size", 21)
+	for state: String in ["normal", "hover", "pressed", "focus"]:
+		var style := _box(Color("#213852") if state != "pressed" else Color("#4b4432"), 14)
+		if state in ["pressed", "focus"]:
+			style.border_color = ACCENT
+			style.set_border_width_all(2)
+		if state == "hover": style.bg_color = Color("#304c6a")
+		node.add_theme_stylebox_override(state, style)
+
+func _box(color: Color, padding: int) -> StyleBoxFlat:
+	var box := StyleBoxFlat.new()
+	box.bg_color = color
+	box.set_corner_radius_all(12)
+	box.content_margin_left = padding
+	box.content_margin_right = padding
+	box.content_margin_top = padding
+	box.content_margin_bottom = padding
+	return box

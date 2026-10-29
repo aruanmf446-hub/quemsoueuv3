@@ -43,6 +43,8 @@ func _ready() -> void:
 	var composition := preload("res://scripts/menu/lobby_composition.gd").new()
 	composition.name = "LobbyComposition"
 	add_child(composition)
+	# Mini player das músicas do menu: no celular é o único controle (sem F6–F9).
+	add_child(preload("res://scripts/audio/now_playing.gd").new())
 
 
 func _on_menu_button_activated(button_id: StringName) -> void:

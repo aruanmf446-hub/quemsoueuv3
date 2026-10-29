@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://bviikyioumlvw"
+path="res://.godot/imported/Don't Touch My Furniture.mp3-8455bd980c90d27e3c040f5a6d951540.mp3str"
+
+[deps]
+
+source_file="res://assets/music/Trap/Don't Touch My Furniture.mp3"
+dest_files=["res://.godot/imported/Don't Touch My Furniture.mp3-8455bd980c90d27e3c040f5a6d951540.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

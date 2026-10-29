@@ -44,13 +44,16 @@ func _run() -> void:
 	player.set("_invulnerable", 0.0)
 	player.position = Vector3(12, 0.1, 0)
 	await frames(3)
-	check(absf(phase.get("_checkpoint").x - 12.0) < 0.01, "checkpoint_area")
+	# A campanha 01–09 não tem checkpoint intermediário: o ponto de retorno é sempre o spawn.
+	var spawn_x := float(phase.get("_phase").player_spawn[0])
+	check(absf(phase.get("_checkpoint").x - spawn_x) < 0.01, "checkpoint_area")
 	# Garante um golpe fatal no teste, independente do contato ao entrar na área.
 	player.set("_invulnerable", 0.0)
 	player.take_damage(SidePlayer.MAX_HEALTH, 0)
 	await create_timer(2.0).timeout
 	print("RESPAWN_STATE ", player.is_dead, " health=", player.health, " x=", player.position.x)
-	check(not player.is_dead and player.health == SidePlayer.MAX_HEALTH and absf(player.position.x-12) < 0.1, "checkpoint_respawn")
+	# Morrer reinicia a fase inteira no spawn, com a vida cheia da campanha (3).
+	check(not player.is_dead and player.health == int(player.get("RUN_MAX_HEALTH")) and absf(player.position.x-spawn_x) < 0.1, "checkpoint_respawn")
 	var enemy := get_first_node_in_group("enemies") as CactusEnemy
 	enemy.position = player.position + Vector3(1, 0, 0)
 	enemy.set_physics_process(false)

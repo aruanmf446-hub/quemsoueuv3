@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://b82qjo2ryunw"
+path="res://.godot/imported/Vai no Automático.mp3-f877a363a69ad71295df51525403f5c3.mp3str"
+
+[deps]
+
+source_file="res://assets/music/Funk/Vai no Automático.mp3"
+dest_files=["res://.godot/imported/Vai no Automático.mp3-f877a363a69ad71295df51525403f5c3.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://vfw6tqobjkw1"
+path="res://.godot/imported/After 2 AM.mp3-d44c6c55691122428d6abacf37dc71aa.mp3str"
+
+[deps]
+
+source_file="res://assets/music/Trap/After 2 AM.mp3"
+dest_files=["res://.godot/imported/After 2 AM.mp3-d44c6c55691122428d6abacf37dc71aa.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

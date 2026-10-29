@@ -1,0 +1,12 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+CAPTURE start player=(-8.0, 0.000364, 0.0) camera=(-7.999994, 2.649998, 13.99999) health=5
+CAPTURE run player=(-3.22667, 0.000884, 0.0) camera=(-2.828804, 2.649999, 14.0) health=5
+CAPTURE jump player=(-1.526625, 1.700955, 0.0) camera=(-1.127847, 2.649999, 14.0) health=5
+CAPTURE double player=(0.873375, 3.300955, 0.0) camera=(1.27226, 2.889189, 14.0) health=5
+CAPTURE defend player=(12.88337, 0.000521, 0.0) camera=(12.88308, 2.650001, 14.0) health=5
+CAPTURE combat player=(12.88337, 0.000521, 0.0) camera=(12.88332, 2.650001, 14.0) health=5
+CAPTURE_COMPLETE
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)

@@ -1,0 +1,48 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 20.1.2, 256 bits)
+
+PASS estado inicial real: vida3, ataque1, defesa1
+PASS cargas cheias recusam reposição sem consumir item
+PASS spawn seguro no piso
+PASS tecla física anda para frente
+PASS tecla física permite voltar pelo mapa
+PASS primeiro salto responsivo
+PASS pulo duplo preservado
+PASS terceiro impulso rejeitado
+PASS aterrissar restaura saltos
+PASS agachar continua encolhendo a cápsula
+PASS encostar no Cactus causa dano imediato
+PASS contato não mata nem causa dano ao Cactus
+PASS invulnerabilidade impede drenagem de vida a cada frame
+PASS golpe consome a única carga de ataque
+PASS um ataque real é suficiente para derrotar o Cactus
+PASS derrota recebe id persistente no percurso
+PASS atacar vazio informa falta de carga sem gerar golpe
+PASS reposição restaura uma carga, até o limite1
+PASS segunda reposição não cria carga acima de1
+PASS defesa consome carga e abre a janela de proteção
+PASS uma defesa bloqueia um contato real
+PASS escudo se encerra após o único bloqueio
+PASS defesa vazia não concede nova proteção
+PASS item de ataque permanece quando o inventário está cheio
+PASS usar carga sobre o item permite coleta real da reposição
+PASS item coletado não reaparece ao ir para trás após streaming
+PASS streaming não acumula o mapa inteiro
+PASS cair no buraco aciona morte
+PASS morte retorna ao início inteiro da fase
+PASS nova tentativa restaura vida e os dois recursos
+PASS nova tentativa restaura inimigos e reposições
+PASS landscape mobile exibe todos os comandos
+PASS alvos de toque têm pelo menos48 pixels físicos
+PASS multitoque mantém direção e salta
+PASS segundo toque executa pulo duplo sem perder direção
+PASS soltar dedos libera ações
+PASS captura real de fixture mobile_hud
+PASS mouse abre a pausa pelo botão real
+PASS mundo permanece parado na pausa
+PASS captura real de fixture mobile_pause
+PASS Continuar retoma por GUI real
+PASS retomar não deixa toque preso
+NIGHT_RULES_RESULT checks=42 failures=0
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)

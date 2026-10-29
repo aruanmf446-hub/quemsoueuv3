@@ -1,0 +1,26 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS spawn sobre o chão
+PASS corre para a direita (-8.00 → -3.63)
+PASS animação de corrida ao andar (base)
+PASS pulo sobe com animação de pulo (y=0.93, pulo)
+PASS pulo duplo usa o segundo salto (pulo_duplo)
+PASS aterrissagem zera a contagem de saltos
+PASS salto simples alcança altura de plataforma
+PASS coyote time: salto logo após sair da borda
+PASS checkpoint 1 registrado em x=12
+PASS agachar encolhe a colisão e toca 'agachado' (agachado)
+PASS soltar agachar restaura a colisão
+PASS defesa ativa e toca 'defesa' (defesa)
+PASS defesa bloqueia ataque do cacto (3 bloqueios)
+PASS defesa mantém a vida (5 → 5)
+PASS ataque derrota o cacto
+PASS cair no vão causa morte
+PASS reinício com vida cheia
+PASS reinício no checkpoint (x=12.00)
+PASS fase concluída até a saída
+SCENARIO_STATS deaths=2 blocked=3 health=4
+PHASE01_SCENARIO_FAILURES 0
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)

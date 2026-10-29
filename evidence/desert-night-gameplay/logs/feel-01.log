@@ -1,0 +1,28 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS oito sons de combate sintetizados
+PASS cadência da corrida acompanha a aceleração (0.45→1.0)
+PASS modelo gira entre direções em vez de saltar 180°
+PASS virada termina alinhada à nova direção
+PASS salto usa o clipe de impulso
+PASS descida do salto mostra a pose de queda
+PASS aterrissagem usa o amortecimento do próprio salto, não o recuo de dano
+PASS cair de uma borda troca a corrida pela pose de queda
+PASS queda reinicia a fase com vida cheia
+PASS véu de morte é removido no reinício
+PASS nenhuma ação fica presa depois da morte
+PASS buraco tem fundo escuro em vez de mostrar o panorama
+PASS bordas dos dois lados do buraco são marcadas
+PASS pulo atravessa o buraco para a frente
+PASS pulo atravessa o mesmo buraco de volta
+PASS ataque toca a investida recortada, sem o mortal do combo
+PASS rastro do golpe aparece na janela de impacto
+PASS impacto chega com o braço estendido (quadro 11)
+PASS golpe consome a carga
+PASS dano mostra recuo, som e véu vermelho
+PASS recuo afasta o jogador da origem do dano
+PASS invulnerabilidade pisca o personagem
+PASS personagem volta a ficar visível ao fim da invulnerabilidade
+FEEL_RESULT checks=23 failures=0
+WARNING: 8 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)

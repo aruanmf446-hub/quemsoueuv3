@@ -1,0 +1,177 @@
+{
+  "engine": "Godot 4.7.2.stable.official.ed1daf0bf",
+  "rendering_method": "Compatibility",
+  "routes": [
+    {
+      "captured": false,
+      "checks": 9,
+      "collected": 14,
+      "completed": true,
+      "deaths": 0,
+      "defeated": 14,
+      "failures": 0,
+      "health": 3,
+      "order": 1,
+      "phase_seconds": 210.516666666726,
+      "physics_seconds": 210.033333333333,
+      "position": [
+        1191.17761230469,
+        0.00088374107144773,
+        0.0
+      ],
+      "swings": 14
+    },
+    {
+      "captured": false,
+      "checks": 9,
+      "collected": 15,
+      "completed": true,
+      "deaths": 0,
+      "defeated": 15,
+      "failures": 0,
+      "health": 3,
+      "order": 2,
+      "phase_seconds": 211.15000000006,
+      "physics_seconds": 210.666666666667,
+      "position": [
+        1191.15673828125,
+        0.000883826403878629,
+        0.0
+      ],
+      "swings": 15
+    },
+    {
+      "captured": false,
+      "checks": 9,
+      "collected": 16,
+      "completed": true,
+      "deaths": 0,
+      "defeated": 16,
+      "failures": 0,
+      "health": 3,
+      "order": 3,
+      "phase_seconds": 212.000000000061,
+      "physics_seconds": 211.516666666667,
+      "position": [
+        1191.22375488281,
+        0.000883765402249992,
+        0.0
+      ],
+      "swings": 16
+    },
+    {
+      "captured": false,
+      "checks": 9,
+      "collected": 17,
+      "completed": true,
+      "deaths": 0,
+      "defeated": 17,
+      "failures": 0,
+      "health": 3,
+      "order": 4,
+      "phase_seconds": 212.416666666728,
+      "physics_seconds": 211.933333333333,
+      "position": [
+        1191.24621582031,
+        0.000883754517417401,
+        0.0
+      ],
+      "swings": 17
+    },
+    {
+      "captured": false,
+      "checks": 9,
+      "collected": 18,
+      "completed": true,
+      "deaths": 0,
+      "defeated": 18,
+      "failures": 0,
+      "health": 3,
+      "order": 5,
+      "phase_seconds": 212.983333333395,
+      "physics_seconds": 212.5,
+      "position": [
+        1191.1923828125,
+        0.000883751083165407,
+        0.0
+      ],
+      "swings": 18
+    },
+    {
+      "captured": false,
+      "checks": 9,
+      "collected": 19,
+      "completed": true,
+      "deaths": 0,
+      "defeated": 19,
+      "failures": 0,
+      "health": 3,
+      "order": 6,
+      "phase_seconds": 213.783333333396,
+      "physics_seconds": 213.3,
+      "position": [
+        1191.23376464844,
+        0.000883831176906824,
+        0.0
+      ],
+      "swings": 19
+    },
+    {
+      "captured": false,
+      "checks": 9,
+      "collected": 20,
+      "completed": true,
+      "deaths": 0,
+      "defeated": 20,
+      "failures": 0,
+      "health": 3,
+      "order": 7,
+      "phase_seconds": 214.450000000063,
+      "physics_seconds": 213.966666666667,
+      "position": [
+        1191.18884277344,
+        0.000883796717971563,
+        0.0
+      ],
+      "swings": 20
+    },
+    {
+      "captured": false,
+      "checks": 9,
+      "collected": 20,
+      "completed": true,
+      "deaths": 0,
+      "defeated": 20,
+      "failures": 0,
+      "health": 3,
+      "order": 8,
+      "phase_seconds": 214.416666666729,
+      "physics_seconds": 213.933333333333,
+      "position": [
+        1191.1611328125,
+        0.000883763772435486,
+        0.0
+      ],
+      "swings": 20
+    },
+    {
+      "captured": false,
+      "checks": 9,
+      "collected": 20,
+      "completed": true,
+      "deaths": 0,
+      "defeated": 20,
+      "failures": 0,
+      "health": 3,
+      "order": 9,
+      "phase_seconds": 214.250000000063,
+      "physics_seconds": 213.766666666667,
+      "position": [
+        1191.23913574219,
+        0.000883764761965722,
+        0.0
+      ],
+      "swings": 20
+    }
+  ]
+}

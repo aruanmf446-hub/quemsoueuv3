@@ -1,0 +1,178 @@
+[
+  {
+    "test": "import",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 8.71,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "layout",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 0.32,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "legacy10",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 0.7,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "progress",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 0.3,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "rules-desktop",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 52.59,
+    "graphical": true,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "rules-mobile",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 35.27,
+    "graphical": true,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "navigation-desktop",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 30.56,
+    "graphical": true,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "feel-01",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 2.13,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "feel-05",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 2.24,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "feel-09",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 2.08,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "navigation-mobile",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 20.01,
+    "graphical": true,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "route-01",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 9.74,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-02",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 9.73,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-03",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 10.4,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-04",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 9.93,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-05",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 9.73,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-06",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 9.98,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-07",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 9.89,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-08",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 10.31,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-09",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 10.88,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "window-route",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 502.78,
+    "graphical": true,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "mobile-route",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 241.26,
+    "graphical": true,
+    "fixed_physics_step": false
+  }
+]

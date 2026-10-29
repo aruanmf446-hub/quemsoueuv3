@@ -3,7 +3,7 @@ extends Node3D
 ## Coordenadas mundiais como as plataformas clipadas do chunk; nunca cria colisores.
 ## Bordas artificiais de chunk NÃO recebem lanternas: para isso o chamador marca
 ## pit_left/pit_right somente nas extremidades que realmente tocam um buraco.
-const BUILDING_SPACING := 24.0
+const BUILDING_SPACING := 19.0
 var _builders := {}
 var _materials := {}
 var _order := 1
@@ -20,13 +20,14 @@ func build(platforms: Array, order: int) -> void:
 		var left := float(p[0])-float(dimensions[0])*0.5
 		var right := float(p[0])+float(dimensions[0])*0.5
 		var top := float(p[1])+float(dimensions[1])*0.5
-		var first := ceili((left-12.0)/BUILDING_SPACING)
-		var last := floori((right-12.0)/BUILDING_SPACING)
+		var first := ceili((left-4.0)/BUILDING_SPACING)
+		var last := floori((right-4.0)/BUILDING_SPACING)
 		for slot in range(first,last+1):
-			var x := 12.0+float(slot)*BUILDING_SPACING
+			var x := 4.0+float(slot)*BUILDING_SPACING
 			var rng := RandomNumberGenerator.new()
 			rng.seed = absi(_order*1000003+slot*9176+3059)
-			var width := rng.randf_range(4.5,7.2)
+			# Deixa janelas para a cidade panorâmica entre as fachadas próximas.
+			var width := rng.randf_range(3.8,5.1)
 			if x-width*0.5 < left+0.15 or x+width*0.5 > right-0.15: continue
 			_building(Vector3(x,top,rng.randf_range(-6.2,-5.3)),width,rng)
 			building_count += 1
@@ -39,7 +40,7 @@ func build(platforms: Array, order: int) -> void:
 func _building(origin: Vector3, width: float, rng: RandomNumberGenerator) -> void:
 	var district := int((_order-1)/3.0)
 	var variant := rng.randi_range(0,3)
-	var height := rng.randf_range(2.5,3.8)+float(district)*0.35
+	var height := rng.randf_range(2.45,3.1)+float(district)*0.23
 	var depth := rng.randf_range(1.1,1.6)
 	var front := origin.z+depth*0.5
 	_box(origin+Vector3(0,height*0.5,0),Vector3(width,height,depth),"stone")
@@ -67,9 +68,10 @@ func _building(origin: Vector3, width: float, rng: RandomNumberGenerator) -> voi
 			_arch_patch(Vector3(x,origin.y+0.71,front+0.065),0.46,0.76,"recess")
 			_arch_patch(Vector3(x,origin.y+0.75,front+0.075),0.34,0.64,"window")
 	if variant == 0 or (district == 2 and variant == 3):
-		var dome_radius := minf(width*0.32,1.65)
-		_dome(origin+Vector3(0,height-0.04,0),dome_radius,0.85+dome_radius*0.35,"dome")
-		_box(origin+Vector3(0,height+0.93+dome_radius*0.35,0),Vector3(0.07,0.30,0.07),"metal")
+		var dome_radius := minf(width*0.22,1.10)
+		var dome_height := 0.45+dome_radius*0.25
+		_dome(origin+Vector3(0,height-0.04,0),dome_radius,dome_height,"dome")
+		_box(origin+Vector3(0,height+dome_height+0.03,0),Vector3(0.07,0.24,0.07),"metal")
 	elif variant == 1:
 		# Torre lateral assimétrica; não se repete em cada casa.
 		var side := -1.0 if rng.randf() < 0.5 else 1.0
@@ -218,7 +220,7 @@ func _flush() -> void:
 func _material(key: String) -> StandardMaterial3D:
 	if _materials.has(key): return _materials[key]
 	var mat := StandardMaterial3D.new()
-	var colors := {"stone":"#6e7e96","trim":"#8b96a8","recess":"#30475e","dome":"#435b7a","metal":"#283b51","cloth":"#3e7182","cloth_alt":"#685675","window":"#d5a667"}
+	var colors := {"stone":"#927e74","trim":"#ae9480","recess":"#354051","dome":"#586883","metal":"#344054","cloth":"#446e76","cloth_alt":"#745c68","window":"#d5a667"}
 	mat.albedo_color = Color(colors.get(key,"#72849a")).srgb_to_linear()
 	mat.roughness = 0.92
 	mat.cull_mode = BaseMaterial3D.CULL_DISABLED

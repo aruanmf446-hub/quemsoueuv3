@@ -1,0 +1,34 @@
+[
+  {
+    "test": "progress",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 0.47,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "rules-desktop",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 75.29,
+    "graphical": true,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "navigation-desktop",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 45.52,
+    "graphical": true,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "navigation-mobile",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 29.71,
+    "graphical": true,
+    "fixed_physics_step": false
+  }
+]

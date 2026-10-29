@@ -32,3 +32,29 @@ o harness está sendo corrigido e as nove não são declaradas validadas ainda.
 As imagens em `evidence/desert-night-wip/` são capturas reais da primeira
 integração no Godot4.7.2, não as capturas finais dos materiais refinados.
 Android físico e navegador Web ainda não foram validados.
+
+## Revisão concluída nesta continuação
+
+Godot oficial 4.7.2, Compatibility, foi executado em display Xorg virtual com
+Mesa/llvmpipe. As fases 01–09 foram percorridas integralmente por entradas de
+movimento, salto e ataque, sem teleporte depois do spawn. Todas chegaram à meta
+sem morte ou erro de script, em 210–214 segundos de física cada. O arquivo
+`evidence/desert-night-final/routes.json` registra os resultados individuais.
+Esse tempo é do percurso automatizado e não prevê a duração de cada jogador.
+
+As regras foram exercitadas também com janela em 1920×1080 e 844×390: vida 3/3,
+ataque e defesa 1/1, dano ao tocar Cactus, invulnerabilidade curta, reposições,
+queda em buraco, reinício integral, controle nos dois sentidos, multitoque,
+pausa e liberação da fase seguinte. O teste de retorno cruzou um limite de
+streaming e voltou ao início sem morte. A fase 10 original passou no teste de
+isolamento e não foi modificada.
+
+As capturas em `evidence/desert-night-final/` vêm do framebuffer do Godot e
+mostram o começo das fases 01, 05 e 09 em 1920×1080, 1280×720 e 844×390, além da fase 02
+liberada no menu. Essa captura do menu vem da fixture de navegação, que aciona
+o callback de vitória para isolar a transição; as nove travessias físicas são
+registradas separadamente em `routes.json`. A revisão das imagens levou a fachadas mais estreitas,
+separadas e quentes, para manter El Fuego legível diante da cidade iluminada.
+O teste de percurso longo foi rodado com passo físico fixo em modo headless;
+capturas e testes de interface vieram de janelas gráficas. Ainda falta ensaio
+de desempenho e toque em Android físico e navegador Web.

@@ -1,0 +1,8 @@
+{
+  "id": "comeco",
+  "name": "Começo",
+  "description": "Coleção inicial",
+  "source": "inventory",
+  "character_ids": [],
+  "note": "Lista dinâmica: todos os personagens atualmente cadastrados no inventário. Novas coleções terão IDs explícitos. Modelos 3D permanecem em seus caminhos originais."
+}

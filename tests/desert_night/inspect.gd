@@ -47,6 +47,11 @@ func strip(label: String, count: int, gap: int, action: Callable, full_at := -1,
 	check(sheet.save_png(output+"_strip_"+label+".png") == OK,"faixa "+label)
 func release() -> void:
 	for code in [KEY_D,KEY_A,KEY_SPACE,KEY_J,KEY_SHIFT,KEY_S]: key(code,false)
+## Fixture: mantém o jogador vivo nas sequências de combate para chegar às próximas cenas.
+func keep_alive() -> void:
+	if player.health < 2 and not player.is_dead:
+		player.health = 3
+		player.health_changed.emit(3,3)
 func place(x: float) -> void:
 	player.position = Vector3(x,0.05,0)
 	player.velocity = Vector3.ZERO
@@ -114,17 +119,20 @@ func run() -> void:
 		if i == 0: key(KEY_D,true)
 		if not is_instance_valid(foe) or foe.global_position.x-player.position.x < 1.6: key(KEY_D,false))
 	key(KEY_D,false)
+	keep_alive()
 	await strip("dano",8,4,func(i: int) -> void:
 		if i == 0:
 			player._invulnerable = 0.0
 			player.take_damage(1,foe.global_position.x if is_instance_valid(foe) else player.position.x+1.0))
+	keep_alive()
 	await snap("04_dano_hud")
 	await frames(60)
 	player._invulnerable = 0.0
 	await strip("defesa",8,4,func(i: int) -> void:
 		if i == 0: key(KEY_SHIFT,true)
 		if i == 1: key(KEY_SHIFT,false)
-		if i == 3: player.take_damage(1,player.position.x+1.0))
+		if i == 3: player.take_damage(1,player.position.x+1.0)
+		keep_alive())
 	# Buraco: aproximação, borda, queda e morte.
 	var hole: Dictionary = phase._phase.holes[2]
 	for actor in get_nodes_in_group("enemies"): actor.queue_free()
@@ -164,10 +172,18 @@ func run() -> void:
 	await frames(20)
 	await snap("07_morte_queda")
 	check(deaths[0] == 1,"queda mata")
-	await frames(90)
+	for step in range(150):
+		if phase._session.opened: break
+		await physics_frame
+	await snap("07b_painel_derrota")
+	for child in phase._session._column.get_children():
+		if child is Button:
+			child.pressed.emit()
+			break
+	await frames(30)
 	await snap("08_reinicio")
-	check(player.health == 3 and player.attack_charges == 1 and player.defense_charges == 1,"reinício restaura vida e cargas")
-	check(player.position.x < float(phase._phase.player_spawn[0])+1.0,"reinício volta ao começo da fase")
+	check(player.health == 3 and not player.is_dead,"retorno restaura a vida")
+	check(absf(player.position.x-phase._checkpoint.x) < 1.0,"retorno volta ao último checkpoint (ou ao início)")
 	release()
 	# Conclusão: aciona a saída para ver a tela final (fixture; não é percurso).
 	await place(float(phase._phase.goal.pos[0])-4.0)

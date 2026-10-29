@@ -17,7 +17,7 @@ func run() -> void:
 		var prefix := "fase %02d · " % order
 		check(stage.get("order",0) == order,prefix+"ordem estável")
 		check((goal-start-1.0)/6.0 >= 180.0,prefix+"limite inferior de duração >=180s")
-		check(stage.get("checkpoints",[]).is_empty(),prefix+"morte não deixa checkpoint intermediário")
+		check(stage.get("checkpoints",[]).size() == 7,prefix+"um checkpoint por distrito depois do primeiro")
 		check(stage.next_scene == "res://scenes/desert/phase_%02d.tscn" % (order+1),prefix+"saída aponta para a próxima cena existente")
 		check(ResourceLoader.exists(stage.next_scene),prefix+"próxima cena existe")
 		check(not identities.has(stage.name),prefix+"identidade de fase distinta")

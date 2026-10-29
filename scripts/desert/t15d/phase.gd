@@ -33,6 +33,9 @@ var _handoff := false
 var _actor_resources: Array[PackedScene] = []
 var _lead := 0.0
 var _build_queue: Array[Callable] = []
+## Checkpoint ativo (-1 = início da fase) e o estado salvo ao passar por ele.
+var _checkpoint_index := -1
+var _snapshot := {}
 var _sfx: Node
 var _key_light: OmniLight3D
 func _ready() -> void:
@@ -69,6 +72,7 @@ func _physics_process(delta: float) -> void:
 		if _player.position.y < float(_phase.kill_plane_y): _player.fall_out()
 		_stream_world(_player.position.x)
 		_update_progress()
+		_check_checkpoints()
 		if not _tutorial_pit and _player.position.x > float(_phase.holes[0].start)-12.0:
 			_tutorial_pit = true
 			_hud.notify("Buraco à frente • pule para atravessar")
@@ -261,6 +265,14 @@ func _build_chunk_details(chunk: Node3D, index: int) -> void:
 			chunk.add_child(item)
 	for sign: Dictionary in _phase.signs:
 		if _in_chunk(float(sign.pos[0]),index): _build_pit_sign(chunk,sign)
+	var points: Array = _phase.get("checkpoints",[])
+	for point_index in range(points.size()):
+		if _in_chunk(float(points[point_index].pos[0]),index):
+			var banner := preload("res://scripts/desert/t15d/checkpoint_banner.gd").new()
+			banner.index = point_index
+			banner.position = _vec3(points[point_index].pos)+Vector3(-0.9,0,-1.6)
+			chunk.add_child(banner)
+			banner.refresh_lit(_checkpoint_index)
 	for hole: Dictionary in _phase.holes:
 		var x0 := maxf(float(hole.start),left)
 		var x1 := minf(float(hole.end),right)
@@ -457,6 +469,7 @@ func _build_hud() -> void:
 	add_child(_session)
 	_session.resume_requested.connect(_resume)
 	_session.restart_requested.connect(_restart_level)
+	_session.checkpoint_requested.connect(_respawn_at_checkpoint)
 	_session.next_requested.connect(func() -> void:
 		_resume()
 		_advance(str(_phase.next_scene)))
@@ -545,7 +558,7 @@ func _release_input() -> void:
 	if is_instance_valid(_touch_pad): _touch_pad.release_all()
 	for action in ["move_left","move_right","jump","attack","defend","crouch"]: Input.action_release(action)
 func _pause() -> void:
-	if completed or _paused: return
+	if completed or _paused or _respawning: return
 	_release_input()
 	_touch_pad.hide()
 	_paused = true
@@ -565,7 +578,10 @@ func _unhandled_input(event: InputEvent) -> void:
 func _notification(what: int) -> void:
 	if not is_instance_valid(_session) or completed: return
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
-		if _paused: _resume()
+		# Na tela de derrota, Voltar equivale a escolher o checkpoint.
+		if _respawning:
+			if _paused: _respawn_at_checkpoint()
+		elif _paused: _resume()
 		else: _pause()
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT: _pause()
 func _on_player_died() -> void:
@@ -576,10 +592,60 @@ func _on_player_died() -> void:
 	var token := _life_token
 	var fell := _player.position.y < -1.0
 	_sfx.play("fall" if fell else "hurt",1.0 if fell else 0.7)
-	_hud.notify("Você caiu • recomeçando a fase" if fell else "Derrotado • recomeçando a fase",true)
-	_hud.pulse(Color(0.02,0.015,0.03),0.8,1.4,true)
-	get_tree().create_timer(1.4,false).timeout.connect(func() -> void:
-		if token == _life_token: _restart_level())
+	_hud.pulse(Color(0.02,0.015,0.03),0.8,1.0,true)
+	# Depois da queda/animação de morte, a fase pausa e o jogador escolhe para onde voltar.
+	get_tree().create_timer(1.0,false).timeout.connect(func() -> void:
+		if token != _life_token or completed: return
+		_touch_pad.hide()
+		_session.show_death(fell,"checkpoint %d" % (_checkpoint_index+1) if _checkpoint_index >= 0 else "")
+		_paused = true
+		get_tree().paused = true)
+## Checkpoints: ao passar pela bandeira de um distrito, guarda posição, cargas, Cactus
+## derrotados e itens coletados. Voltar a ele restaura esse estado com a vida cheia.
+func _check_checkpoints() -> void:
+	var points: Array = _phase.get("checkpoints",[])
+	var next := _checkpoint_index+1
+	if next >= points.size() or _player.is_dead: return
+	if _player.position.x < float(points[next].pos[0]) or not _player.is_on_floor(): return
+	_checkpoint_index = next
+	_checkpoint = _vec3(points[next].pos)
+	_snapshot = {"defeated":_defeated_ids.duplicate(),"collected":_collected_ids.duplicate(),"attack":_player.attack_charges,"defense":_player.defense_charges}
+	_sfx.play("pickup",0.75)
+	_hud.notify("Checkpoint %d de %d salvo" % [next+1,points.size()])
+	get_tree().call_group("campaign_checkpoints","refresh_lit",_checkpoint_index)
+func _respawn_at_checkpoint() -> void:
+	if _checkpoint_index < 0:
+		_restart_level()
+		return
+	_life_token += 1
+	_resume()
+	_respawning = false
+	_build_queue.clear()
+	_defeated_ids = (_snapshot.defeated as Dictionary).duplicate()
+	_collected_ids = (_snapshot.collected as Dictionary).duplicate()
+	_defeated = _defeated_ids.size()
+	for chunk: Node in _loaded_chunks.values():
+		_world.remove_child(chunk)
+		chunk.queue_free()
+	_loaded_chunks.clear()
+	_player.is_dead = false
+	_player.position = _checkpoint+Vector3.UP*0.05
+	_player.velocity = Vector3.ZERO
+	_player.facing = 1
+	_player.setup(_find_protagonist())
+	_player.attack_charges = int(_snapshot.attack)
+	_player.defense_charges = int(_snapshot.defense)
+	_player.inventory_changed.emit()
+	_player._invulnerable = 1.5
+	_player.set_physics_process(true)
+	_touch_pad.set_process(true)
+	_lead = 0.0
+	_hud.clear_pulse()
+	_hud._last_health = 3
+	_stream_world(_player.position.x,true)
+	_follow_camera(1.0)
+	_sync_resources()
+	_hud.notify("De volta ao checkpoint %d" % (_checkpoint_index+1))
 func _respawn_player() -> void:
 	_restart_level()
 func _restart_level() -> void:
@@ -593,6 +659,9 @@ func _restart_level() -> void:
 	_defeated_ids.clear()
 	_collected_ids.clear()
 	_tutorial_pit = false
+	_checkpoint_index = -1
+	_snapshot = {}
+	_checkpoint = _vec3(_phase.player_spawn)
 	_build_queue.clear()
 	for chunk: Node in _loaded_chunks.values():
 		_world.remove_child(chunk)

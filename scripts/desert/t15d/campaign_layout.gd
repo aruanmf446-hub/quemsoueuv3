@@ -55,6 +55,7 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 	var signs: Array = []
 	var districts: Array = []
 	var landmarks: Array = []
+	var checkpoints: Array = []
 	var prefix := "p%02d" % order
 	var left := spawn_x-8.0
 	# As distâncias normais são 57–84m entre vãos, com variação de posição/largura.
@@ -119,6 +120,10 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 		districts.append({"id":"%s.district.%02d" % [prefix,index],"index":index,"name":DISTRICT_LABELS[index],"start":start,"end":end,"theme":district_theme})
 		var landmark_x := _safe_floor_x(start+12.0,pits)
 		landmarks.append({"id":"%s.landmark.%02d" % [prefix,index],"kind":"district_gate","pos":[landmark_x,0.0,-4.5],"theme":district_theme})
+		# Checkpoint no começo de cada distrito (menos o primeiro, que é o spawn), em chão
+		# firme: fora de vãos e degraus e longe da patrulha dos Cactus.
+		if index > 0:
+			checkpoints.append({"id":"%s.checkpoint.%02d" % [prefix,index],"district":index,"pos":[_checkpoint_x(start+4.0,pits,platforms,enemies),0.0,0.0]})
 	stage.merge({
 		"protagonist":"el_fuego","player_spawn":[spawn_x,1.0,0.0],
 		"length":distance,"total_length":distance,"minimum_seconds":requested_seconds,
@@ -126,7 +131,7 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 		"maximum_horizontal_speed":MAX_HORIZONTAL_SPEED,
 		"platforms":platforms,"enemies":enemies,"pickups":pickups,"holes":pits,
 		"signs":signs,"districts":districts,"landmarks":landmarks,
-		"checkpoints":[],"goal":{"pos":[goal_x,1.5,0.0]},
+		"checkpoints":checkpoints,"goal":{"pos":[goal_x,1.5,0.0]},
 		"kill_plane_y":-8.0,"boss_id":null,"legacy_placeholder_visuals":false,
 		"bounds":{"min_x":spawn_x-8.0,"max_x":goal_x+10.0},
 		"next_scene":"res://scenes/desert/phase_%02d.tscn" % (order+1),
@@ -152,6 +157,20 @@ static func _ledge(platforms: Array, prefix: String, span: int, index: int, x: f
 		"pos":[x,height*0.5,0.0],"size":[width,height,3.0],
 		"span_start":x-width*0.5,"span_end":x+width*0.5,"chunk":floori(x/CHUNK_LENGTH),
 	})
+
+static func _checkpoint_x(value: float, holes: Array, platforms: Array, enemies: Array) -> float:
+	var x := value
+	for attempt in range(40):
+		var blocked := false
+		for hole: Dictionary in holes:
+			if x >= float(hole.start)-3.0 and x <= float(hole.end)+3.0: blocked = true
+		for platform: Dictionary in platforms:
+			if platform.kind != "ground" and absf(x-float(platform.pos[0])) <= float(platform.size[0])*0.5+1.5: blocked = true
+		for enemy: Dictionary in enemies:
+			if x >= float(enemy.patrol[0])-7.0 and x <= float(enemy.patrol[1])+7.0: blocked = true
+		if not blocked: return x
+		x += 2.0
+	return x
 
 static func _safe_floor_x(value: float, holes: Array) -> float:
 	for hole: Dictionary in holes:

@@ -19,24 +19,26 @@ func run() -> void:
 	current_scene = phase
 	await frames(30)
 	player = phase._player
+	# Regras atuais: a derrota pausa a fase e abre o painel; nada acontece sozinho.
 	player.fall_out()
-	await frames(20)
-	phase._pause()
-	await frames(100)
-	check(phase._respawning and player.is_dead,"pausa também suspende o relógio do respawn")
-	phase._resume()
-	await frames(90)
-	check(not phase._respawning and not player.is_dead and player.health == 5,"retomar conclui respawn uma única vez")
+	for step in range(150):
+		if phase._session.opened and phase._session._death: break
+		await physics_frame
+	check(paused and phase._respawning and player.is_dead,"derrota pausa a fase e espera a escolha do jogador")
+	await frames(120)
+	check(player.is_dead and phase._session.opened,"sem escolha, o personagem não reaparece sozinho")
+	phase._respawn_at_checkpoint()
+	await frames(10)
+	check(not paused and not phase._respawning and not player.is_dead and player.health == 3,"voltar ao checkpoint conclui o retorno uma única vez com vida 3")
 	player.fall_out()
 	await frames(10)
-	phase._pause()
-	phase._restart_checkpoint()
+	phase._restart_level()
 	await frames(10)
 	Input.action_press("move_right")
 	await frames(30)
 	Input.action_release("move_right")
 	await frames(100)
-	check(player.position.x > -6 and not player.is_dead,"reiniciar cancela o respawn antigo sem teleporte tardio")
+	check(player.position.x > -6 and not player.is_dead and not phase._session.opened,"recomeçar cancela a derrota antiga sem painel tardio")
 	var pad = phase._touch_pad
 	await frames(3)
 	pad._press(4,pad._areas[1].get_center())
@@ -102,6 +104,7 @@ func run() -> void:
 	phase._pause()
 	phase._restart_level()
 	await frames(20)
-	check(get_nodes_in_group("enemies").size() == 3 and not paused,"reinício também remove cadáveres e zera a pausa")
+	var alive := get_nodes_in_group("enemies").filter(func(e: Node) -> bool: return e._state != e.State.DEAD)
+	check(alive.size() == get_nodes_in_group("enemies").size() and not alive.is_empty() and not paused,"reinício também remove cadáveres e zera a pausa")
 	print("SESSION_RESULT checks=",checks," failures=",failures)
 	quit(1 if failures else 0)

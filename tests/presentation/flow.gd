@@ -79,8 +79,21 @@ func run() -> void:
 	await snap("entrando_fase")
 	deadline = Time.get_ticks_msec() + 10000
 	while Time.get_ticks_msec() < deadline:
-		if root.get_node_or_null("StoryPrototypeSession") != null: break
+		if root.get_node_or_null("PhaseStory") != null: break
 		await process_frame
+	var phase_story := root.get_node_or_null("PhaseStory") as PhaseStory
+	check(phase_story != null, "história da fase aparece antes do gameplay")
+	if phase_story == null: quit(1); return
+	check(phase_story._carousel.manual_story and phase_story._carousel.cards.size() == 2, "fase 01 tem duas imagens sob controle do jogador")
+	await snap("historia_fase01_01")
+	phase_story._carousel.next()
+	deadline = Time.get_ticks_msec() + 3000
+	while phase_story._carousel.index != 1 and Time.get_ticks_msec() < deadline:
+		await process_frame
+	check(phase_story._carousel.index == 1, "Próximo apresenta segunda imagem")
+	await snap("historia_fase01_02")
+	phase_story._carousel.skip_requested.emit()
+	await frames(8)
 	check(root.get_node_or_null("StoryPrototypeSession") != null, "cena da fase abre após carregar recursos")
 	print("PRESENTATION_RESULT checks=", checks, " failures=", failures)
 	quit(1 if failures else 0)

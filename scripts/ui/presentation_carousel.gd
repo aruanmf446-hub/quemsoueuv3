@@ -5,11 +5,13 @@ extends Control
 signal advanced(count: int)
 signal skip_requested
 signal close_requested
+signal story_finished
 
 var cards: Array = []
 var dwell_seconds := 2.1
 var show_close := false
 var allow_skip := true
+var manual_story := false
 var index := 0
 var advances := 0
 var _front: Control
@@ -20,6 +22,7 @@ var _skip: Button
 var _close: Button
 var _back: Button
 var _forward: Button
+var _story_next: Button
 var _dots: Label
 
 func _ready() -> void:
@@ -36,6 +39,7 @@ func _ready() -> void:
 	_close = _button("Fechar", func() -> void: close_requested.emit())
 	_back = _button("‹", previous)
 	_forward = _button("›", next)
+	_story_next = _button("Próximo", next)
 	_dots = Label.new()
 	_dots.add_theme_font_override("font", _font)
 	_dots.add_theme_color_override("font_color", Color("#f7e6c1"))
@@ -52,7 +56,10 @@ func _ready() -> void:
 func set_cards(group: String) -> void:
 	var source := FileAccess.get_file_as_string("res://data/ui/presentation.json")
 	var parsed: Variant = JSON.parse_string(source)
-	cards = parsed.get(group, []) if parsed is Dictionary else []
+	set_cards_data(parsed.get(group, []) if parsed is Dictionary else [])
+
+func set_cards_data(entries: Array) -> void:
+	cards = entries
 	index = 0
 	advances = 0
 	if is_inside_tree():
@@ -65,6 +72,9 @@ func set_cards(group: String) -> void:
 		_layout()
 
 func next() -> void:
+	if manual_story and index >= cards.size() - 1:
+		story_finished.emit()
+		return
 	_slide(1)
 
 func previous() -> void:
@@ -75,6 +85,7 @@ func focus_close() -> void:
 
 func _slide(direction: int) -> void:
 	if _moving or cards.size() < 2: return
+	if manual_story and index + direction < 0: return
 	_moving = true
 	_timer.stop()
 	var upcoming := posmod(index + direction, cards.size())
@@ -97,7 +108,7 @@ func _slide(direction: int) -> void:
 	_start_timer()
 
 func _start_timer() -> void:
-	if _timer != null and cards.size() > 1:
+	if _timer != null and not manual_story and cards.size() > 1:
 		_timer.start(dwell_seconds)
 
 func _card(card_index: int) -> Control:
@@ -153,8 +164,10 @@ func _layout_card(frame: Control) -> void:
 	for row: Array in [["Eyebrow", 0.08, 16], ["Title", 0.30, 36], ["Message", 0.66, 19]]:
 		var label := panel.get_node(row[0]) as Label
 		label.position = Vector2(pad, panel.size.y * float(row[1]))
-		label.size = Vector2(panel.size.x - pad * 2, panel.size.y * (0.3 if row[0] == "Title" else 0.22))
-		label.add_theme_font_size_override("font_size", roundi(float(row[2]) * unit))
+		var controls_space := 155.0 * unit if manual_story and row[0] == "Message" else 0.0
+		label.size = Vector2(panel.size.x - pad * 2 - controls_space, panel.size.y * (0.3 if row[0] == "Title" else 0.22))
+		var font_size := 16 if compact and manual_story and row[0] == "Message" else int(row[2])
+		label.add_theme_font_size_override("font_size", roundi(float(font_size) * unit))
 
 func _layout() -> void:
 	if _front != null: _layout_card(_front)
@@ -162,15 +175,19 @@ func _layout() -> void:
 	var compact := UIScale.is_compact()
 	var unit := UIScale.unit_for(get_viewport()) if compact else clampf(size.y / 720.0, 0.80, 1.5)
 	_skip.visible = allow_skip and not show_close
+	_skip.text = "Pular história" if manual_story else "Pular abertura"
 	_close.visible = show_close
-	_back.visible = show_close
+	_back.visible = show_close or (manual_story and index > 0)
 	_forward.visible = show_close
-	for button: Button in [_skip, _close, _back, _forward]:
+	_story_next.visible = manual_story
+	_story_next.text = "Começar fase" if manual_story and index == cards.size() - 1 else "Próximo"
+	for button: Button in [_skip, _close, _back, _forward, _story_next]:
 		var navigation := button == _back or button == _forward
 		button.custom_minimum_size = Vector2(48 * unit, 48 * unit) if navigation else Vector2(124 * unit, 44 * unit)
 		button.size = button.custom_minimum_size
 		button.add_theme_font_size_override("font_size", roundi((27 if navigation else 17) * unit))
 	_skip.position = Vector2(size.x - _skip.size.x - 25 * unit, 22 * unit)
+	_story_next.position = Vector2(size.x - _story_next.size.x - 25 * unit, size.y - _story_next.size.y - 22 * unit)
 	_close.position = Vector2(size.x - _close.size.x - 25 * unit, 22 * unit)
 	_back.position = Vector2(24 * unit, size.y * 0.46)
 	_forward.position = Vector2(size.x - _forward.size.x - 24 * unit, size.y * 0.46)

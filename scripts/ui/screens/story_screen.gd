@@ -308,7 +308,19 @@ func _launch(phase_id: String, path: String) -> void:
 	loading.name = "CampaignLoading"
 	get_tree().root.add_child(loading)
 	loading.cancelled.connect(func() -> void: _launching = false)
-	loading.begin(path, _open_loaded_phase.bind(menu))
+	loading.begin(path, _present_phase_story.bind(menu, order))
+
+func _present_phase_story(packed: PackedScene, menu: Control, order: int) -> void:
+	if not is_instance_valid(menu): return
+	menu.hide()
+	var story := PhaseStory.new()
+	story.name = "PhaseStory"
+	get_tree().root.add_child(story)
+	story.finished.connect(_open_loaded_phase.bind(packed, menu))
+	story.cancelled.connect(func() -> void:
+		if is_instance_valid(menu): menu.show()
+		_launching = false)
+	story.begin(order)
 
 func _open_loaded_phase(packed: PackedScene, menu: Control) -> void:
 	if not is_instance_valid(menu): return

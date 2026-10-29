@@ -108,6 +108,7 @@ func run() -> void:
 	check(not Progress.is_unlocked(3),"vitória de01 não libera fase03")
 	await click(find_button(phase._session,"Próxima fase"))
 	phase = await wait_for_phase(host,2)
+	await frames(3)
 	check(phase != null and phase._order == 2,"Próxima fase carrega02 com controlador novo")
 	check(not quit_on_go_back,"troca01→02 preserva controle do botão Voltar")
 	legacy = null
@@ -138,6 +139,8 @@ func run() -> void:
 func wait_for_host() -> Node:
 	var deadline := Time.get_ticks_msec()+12000
 	while Time.get_ticks_msec() < deadline:
+		var story := root.get_node_or_null("PhaseStory") as PhaseStory
+		if story != null: story._carousel.skip_requested.emit()
 		var host := root.get_node_or_null("StoryPrototypeSession")
 		if host != null: return host
 		await process_frame
@@ -146,6 +149,8 @@ func wait_for_host() -> Node:
 func wait_for_phase(host: Node, order: int) -> Node3D:
 	var deadline := Time.get_ticks_msec()+12000
 	while Time.get_ticks_msec() < deadline:
+		var story := root.get_node_or_null("PhaseStory") as PhaseStory
+		if story != null: story._carousel.skip_requested.emit()
 		for child in host.get_children():
 			if child is Node3D and child.get("_order") == order: return child
 		await process_frame

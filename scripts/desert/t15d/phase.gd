@@ -655,7 +655,15 @@ func _advance(path: String) -> void:
 	var loading := CampaignLoading.new()
 	loading.name = "CampaignLoading"
 	get_tree().root.add_child(loading)
-	loading.begin(path, _finish_advance)
+	loading.begin(path, _present_next_phase.bind(path))
+
+func _present_next_phase(packed: PackedScene, path: String) -> void:
+	var order := int(path.get_file().get_basename().trim_prefix("phase_"))
+	var story := PhaseStory.new()
+	story.name = "PhaseStory"
+	get_tree().root.add_child(story)
+	story.finished.connect(_finish_advance.bind(packed))
+	story.begin(order)
 
 func _finish_advance(packed: PackedScene) -> void:
 	_resume()

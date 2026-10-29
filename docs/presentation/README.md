@@ -26,10 +26,18 @@ thread principal depois de dois quadros desenhados: neste projeto, o carregador
 em thread falha ao resolver `preload()` de cenas aninhadas no Godot 4.7.2.
 A sequência mantém o último cartão na tela durante qualquer pausa nessa leitura.
 
+Depois do carregamento, cada uma das dez fases mostra sua própria história em
+duas imagens. **Próximo** avança apenas quando o jogador toca/clica; no último
+cartão, **Começar fase** abre a partida. **Pular história** entra diretamente
+na fase a partir de qualquer cartão. Esc cancela e devolve à seleção (ou à
+tela de conclusão, ao avançar para a próxima fase). A apresentação não usa
+temporizador: o tempo de leitura fica com o jogador. Os textos e imagens estão
+em `data/ui/phase_stories.json` e usam as panorâmicas noturnas existentes.
+
 Validação: `tests/presentation/flow.gd` percorre abertura, notícias e entrada na
 fase no Godot 4.7.2. Capturas reais em `evidence/presentation/` foram geradas em
 1920×1080, 1280×720 e 844×390. O teste de navegação da campanha agora espera a
-transição visual antes de verificar a fase seguinte. `tests/presentation/failure.gd`
+história antes de verificar a fase seguinte. `tests/presentation/failure.gd`
 confere tentativa novamente, retorno e pulo da abertura; ele solicita uma cena
 inexistente de propósito, por isso seu log contém erros esperados de recurso.
 O smoke geral passou nas 22 etapas. É preciso ainda medir tempo

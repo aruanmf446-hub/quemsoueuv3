@@ -1,0 +1,18 @@
+name: Sondagem temporária dos três Supabase
+on:
+  push:
+    branches: [claude/sondar-supabase]
+permissions:
+  contents: write
+jobs:
+  sondar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 sondagem/probe.py | tee sondagem/resultado.txt
+      - if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sondagem/resultado.txt && git commit -m "Resultado da sondagem" && git push origin HEAD:claude/sondar-supabase || true

@@ -405,7 +405,7 @@ RAIL chat_open [P: (1368.981, 6.97037), S: (291.71, 927.0593)] minimum=(147.0, 3
 GEOMETRY chat_open grid=[P: (26.13889, 251.6304), S: (1311.127, 666.5416)] screen=(1672.0, 941.0)
 PASS capture_chat-fixture
 PASS room_access_denied_hides_and_stops
-FAIL room_access_denied_clears_bubbles
+PASS room_access_denied_clears_bubbles
 PASS logout_blocks_composer
 PASS finished_shows_real_result
 PASS finished_disables_selection
@@ -424,5 +424,5 @@ PASS spectator_cannot_pick_slender_man
 PASS hide_protects_hand_and_stops_polling
 PASS hide_removes_private_images_before_return
 PASS leaving_restores_lobby_layout
-BATTLE_REFERENCE checks=395 failures=1
-exit=1
+BATTLE_REFERENCE checks=395 failures=0
+exit=0

@@ -394,7 +394,7 @@ PASS chat_open_public_area_never_scrolls
 RAIL chat_open [P: (1556.269, 19.30256), S: (448.7846, 902.3949)] minimum=(147.0, 303.0)
 GEOMETRY chat_open grid=[P: (53.08205, 395.7026), S: (1454.931, 501.8667)] screen=(2036.0, 941.0)
 PASS room_access_denied_hides_and_stops
-FAIL room_access_denied_clears_bubbles
+PASS room_access_denied_clears_bubbles
 PASS logout_blocks_composer
 PASS finished_shows_real_result
 PASS finished_disables_selection
@@ -412,4 +412,4 @@ PASS spectator_cannot_pick_slender_man
 PASS hide_protects_hand_and_stops_polling
 PASS hide_removes_private_images_before_return
 PASS leaving_restores_lobby_layout
-BATTLE_REFERENCE checks=386 failures=2
+BATTLE_REFERENCE checks=386 failures=1

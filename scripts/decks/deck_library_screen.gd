@@ -7,6 +7,7 @@ var _stack: VBoxContainer
 var _query := ""
 var _deck: Dictionary = {}
 var _index := -1
+var _results: VBoxContainer
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -70,12 +71,11 @@ func _render_library() -> void:
 		_update_results()
 	)
 	_stack.add_child(entry)
-	var host := _content()
-	host.name = "Results"
+	_results = _content()
 	_update_results()
 
 func _update_results() -> void:
-	var host := _stack.get_node_or_null("Results") as VBoxContainer
+	var host := _results
 	if host == null:
 		return
 	for child in host.get_children():

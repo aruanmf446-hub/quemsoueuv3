@@ -37,7 +37,6 @@ jobs:
           timeout 300 "$GODOT" --headless --verbose --path . --rendering-method gl_compatibility --script res://tests/duel_local/flow_test.gd > "$OUT/verbose.log" 2>&1
           grep -n -i -A3 "in use\|leaked" "$OUT/verbose.log" | head -60
           grep -i -A12 "still in use" "$OUT/verbose.log" > "$OUT/leaks.txt"
-          exit 0
           for res in 1920x1080 844x390 640x360; do
             export XDG_DATA_HOME="$(mktemp -d)" XDG_CONFIG_HOME="$(mktemp -d)"
             timeout 420 xvfb-run -a -s "-screen 0 1920x1080x24" "$GODOT" --path . --rendering-method gl_compatibility --audio-driver Dummy \

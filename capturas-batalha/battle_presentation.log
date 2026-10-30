@@ -266,7 +266,7 @@ PASS roster_cell_5
 PASS roster_cell_5
 PASS roster_cell_5
 PASS roster_cell_5
-FAIL roster_cell_5
+PASS roster_cell_5
 PASS players_12_fixture_all_options
 PASS players_12_fixture_visible_bruxa_do_pantano
 PASS players_12_fixture_original_art_bruxa_do_pantano
@@ -413,4 +413,4 @@ PASS spectator_cannot_pick_slender_man
 PASS hide_protects_hand_and_stops_polling
 PASS hide_removes_private_images_before_return
 PASS leaving_restores_lobby_layout
-BATTLE_REFERENCE checks=387 failures=1
+BATTLE_REFERENCE checks=387 failures=0

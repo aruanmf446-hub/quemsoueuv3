@@ -133,6 +133,24 @@ Falhas devem ser tratadas sem exibir token, SQL, stack trace ou dados de outros 
 - Tabelas CHAT têm RLS ativo **sem policies diretas para anon/authenticated**; RPCs especiais aceitam somente `service_role` injetada no gateway, nunca no aplicativo.
 - Este contrato descreve o **código implantado**; cobertura de testes de rede e múltiplos usuários deve ser lida no relatório `docs/backend/T16A_TESTES.md` (não presumir aprovação sem evidência).
 
+
+### Uso técnico com o adaptador HTTP existente (sem alterar o Godot na 16A)
+
+O cliente `SupabaseClient` atual aceita `request(path, method, body, authenticated, token_override)`.
+Na implementação 16B, configurar `chat_client.connection = "chat"` e usar a chamada **sem sessão CHAT**:
+
+```gdscript
+var result = await chat_client.request(
+    "/functions/v1/qse-chat-gateway",
+    HTTPClient.METHOD_POST,
+    {"action": "list"},
+    false,
+    game_access_token
+)
+```
+
+O parâmetro `false` evita procurar sessão no CHAT; `token_override` envia o JWT válido **GAME** no cabeçalho Authorization. `apikey` é a chave **publicável CHAT** já configurada no adaptador. O trecho é **exemplo documental**, NÃO código integrado nem aprovado em Godot. `request_id` é obrigatório nas chamadas de envio.
+
 ## Orientação para Claude / Tarefa 16B
 
 Usar **somente** estas 4 ações e o formato acima. Utilizar o JWT de sessão GAME já obtido pelo jogo; não criar sessão CHAT, não enviar `sender` no request, não armazenar JWT no disco. O gateway CHAT substitui acesso direto a qualquer `qse_chat_*` da Data API. Manter o chat visualmente desligado até o usuário aprovar a 16B.

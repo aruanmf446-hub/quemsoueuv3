@@ -363,6 +363,9 @@ func _render_instruction(me: Dictionary) -> void:
 				_cancel.show()
 		"reveal":
 			_render_event()
+			# Identifica a própria jogada sem refazer o layout da batalha.
+			if bool(turn.get("is_you", false)):
+				_instruction.text = "Sua jogada"
 		"finished":
 			var winners: Array = (_data.result if _data.get("result") is Dictionary else {}).get("winners",[])
 			_instruction.text = "Vitória de %s!" % str(_player(_data,str(winners[0])).get("nickname","")) if winners.size() == 1 else "Empate!"

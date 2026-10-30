@@ -163,6 +163,8 @@ func _run() -> void:
 			await press("Eliminar")
 			check(str(duel.match().phase) == "reveal", "voto vira revelação")
 			if not picked_by_me:
+				var own_move_label := match_view().find_child("RoundInstruction", true, false) as Label
+				check(own_move_label != null and own_move_label.text == "Sua jogada", "aviso Sua jogada na própria revelação")
 				await shot("09_revelando")
 				await skip(2.6)
 				await shot("10_atingidos")
@@ -193,6 +195,9 @@ func _run() -> void:
 
 	# Sair da partida local volta ao modo online (preparado para o Supabase).
 	await duel.leave()
+	await settle()
+	check(duel.is_local() and not duel.in_room(), "modo local continua ativo após sair da sala")
+	check(button("Criar partida local") != null, "entrada local exibida sem sala")
 	await duel.use_online()
 	check(not duel.is_local(), "volta ao modo online")
 	var online := await duel.list_rooms("", true)

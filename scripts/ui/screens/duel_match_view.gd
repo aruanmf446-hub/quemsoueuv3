@@ -49,9 +49,8 @@ func _ready() -> void:
 	get_window().focus_exited.connect(_conceal_hand)
 	visibility_changed.connect(func() -> void:
 		if not is_visible_in_tree():
-			_private_shown = false
-			_pending_pick = ""
-			_private_signature = "")
+			_conceal_hand()
+			_pending_pick = "")
 	_layout.call_deferred()
 func _build() -> void:
 	if _built: return

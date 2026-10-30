@@ -1,4 +1,24 @@
-# PASSAGEM — IMPLEMENTAÇÃO INCOMPLETA
+# CONTINUIDADE DO PR #39
+
+## Atualização de 30/10/2026 — revisão técnica concluída, visual pendente
+
+A continuação está na mesma branch e no mesmo PR, sem alterar a main.
+Veja [capturas e resultados atuais](../../../evidence/battle-reference/revisao-2026-10-30/README.md).
+
+- Godot 4.7.2: smoke completo **30/30**; funcional sem o erro de fonte registrado abaixo.
+- Apresentação gráfica: **383 verificações** por janela em 844×390, 640×360,
+  1920×1080 e 2532×1170 com densidade 3; todas passaram.
+- Corrigidas a remoção imediata das imagens privadas ao ocultar a tela e a entrada
+  nativa de toque nas cartas, evitando clique sintético duplicado.
+- Acrescentadas verificações de teclado, privacidade, vitória e espectador.
+- Preservados os nove PNGs, a grade sem rolagem, os serviços, os retratos e a composição existente.
+- Build Web de 54,57 MiB: partida local percorrida no Chromium com toque emulado;
+  capturas e ressalvas de configuração/certificado/mídias estão no relatório.
+- Android físico, serviços remotos autenticados e comparação com a imagem original
+  da batalha permanecem sem validação. Não afirmar aprovação estética.
+- **Manter o PR em rascunho e aguardar avaliação do usuário; não fazer merge automático.**
+
+O restante deste documento registra a passagem original, anterior à revisão acima.
 
 **Branch:** `codex/battle-reference-layout` · **Base:** `main` em `6cff1f0` (PR #38 integrado).
 

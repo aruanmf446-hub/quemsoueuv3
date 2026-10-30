@@ -74,7 +74,10 @@ func _style(hover: bool) -> void:
 	add_theme_stylebox_override("panel",style)
 func _on_gui_input(event: InputEvent) -> void:
 	if not interactive: return
-	if (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or event.is_action_pressed("ui_accept"):
+	# Handle native touch as well as mouse/keyboard. Ignore the synthetic mouse
+	# companion so a tap cannot select and immediately deselect the same card.
+	if event is InputEventMouseButton and event.device == InputEvent.DEVICE_ID_EMULATION: return
+	if (event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or event.is_action_pressed("ui_accept"):
 		grab_focus()
 		activated.emit()
 		accept_event()

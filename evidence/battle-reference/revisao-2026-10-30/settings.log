@@ -1,0 +1,34 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS legacy preferences preserved without mute field
+PASS real preview profile baixo
+PASS real preview profile medio
+PASS real preview profile alto
+PASS master saves
+PASS music saves
+PASS effects save
+PASS mute saves
+PASS Master actually muted
+PASS mute preserves gain
+PASS reject invalid mute
+PASS reject invalid gain
+PASS remap confirm
+PASS reject duplicate key
+PASS InputMap applies remap
+PASS quality saves
+PASS locale saves
+PASS preferences survive reload
+PASS ornamental frame removed
+PASS English heading
+PASS four categories
+PASS category 0 selected
+PASS category 1 selected
+PASS category 2 selected
+PASS category 3 selected
+PASS duplicate remap stays waiting
+PASS screen remap functional
+PASS unmute restores audio
+SETTINGS_RESULT failures=0

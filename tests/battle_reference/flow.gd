@@ -28,6 +28,27 @@ func click(target: Control) -> void:
 		root.push_input(event)
 		await process_frame
 	await settle()
+func touch(target: Control) -> void:
+	# Deliver a native touchscreen event, independently of desktop mouse input.
+	Input.emulate_mouse_from_touch = true
+	var point := root.get_final_transform()*target.get_global_rect().get_center()
+	for pressed in [true,false]:
+		var event := InputEventScreenTouch.new()
+		event.index = 0
+		event.position = point
+		event.pressed = pressed
+		root.push_input(event)
+		await process_frame
+	await settle()
+func keyboard_accept(target: Control) -> void:
+	target.grab_focus()
+	for pressed in [true,false]:
+		var event := InputEventAction.new()
+		event.action = "ui_accept"
+		event.pressed = pressed
+		root.push_input(event)
+		await process_frame
+	await settle()
 func capture(label: String) -> void:
 	if output.is_empty(): return
 	await RenderingServer.frame_post_draw
@@ -89,10 +110,22 @@ func run() -> void:
 	await capture("selection")
 	var grid: GridContainer = battle.find_child("Cards",true,false)
 	var first_bounds: Rect2 = grid.get_child(0).get_global_rect()
-	await click(grid.get_child(0))
+	await touch(grid.get_child(0))
+	check(battle.get("_chosen").size()==1,"touch_selects_card")
 	grid = battle.find_child("Cards",true,false)
-	await click(grid.get_child(1))
-	check(battle.get("_chosen").size()==2,"real_pointer_selects_two")
+	var synthetic := InputEventMouseButton.new()
+	synthetic.device = InputEvent.DEVICE_ID_EMULATION
+	synthetic.button_index = MOUSE_BUTTON_LEFT
+	synthetic.pressed = true
+	synthetic.position = root.get_final_transform()*grid.get_child(0).get_global_rect().get_center()
+	root.push_input(synthetic)
+	synthetic = synthetic.duplicate()
+	synthetic.pressed = false
+	root.push_input(synthetic)
+	await settle()
+	check(battle.get("_chosen").size()==1,"synthetic_mouse_does_not_double_toggle_touch")
+	await keyboard_accept(grid.get_child(1))
+	check(battle.get("_chosen").size()==2,"keyboard_selects_second_card")
 	check(grid.get_child(0).get_global_rect().is_equal_approx(first_bounds),"selection_does_not_shift_cards")
 	await click(battle.find_child("ConfirmSelection",true,false))
 	check(services.duel.match().phase=="countdown","real_selection_committed")
@@ -109,6 +142,10 @@ func run() -> void:
 	check(hand.get_child_count()==2 and hand.get_child(0) is TextureRect,"private_hand_from_real_data")
 	geometry("hand_open",9)
 	await capture("private-hand")
+	root.focus_exited.emit()
+	await settle()
+	check(not battle.get("_private_shown") and hand.get_child(0).name=="HiddenHand","focus_loss_removes_private_images")
+	await click(battle.find_child("TogglePrivateCards",true,false))
 	await click(battle.find_child("TogglePrivateCards",true,false))
 	check(hand.get_child(0).name=="HiddenHand","private_hand_hides_again")
 	# Presentation-only fixture: force the real local player to the active UI state.
@@ -226,10 +263,32 @@ func run() -> void:
 	await settle()
 	check(chat.get("_rendered").is_empty(),"logout_clears_private_bubbles")
 	check(not input.editable,"logout_blocks_composer")
+	# Presentation fixtures cover finished/winner and spectator without changing rules.
+	services.duel.room = real_data.duplicate(true)
+	services.duel.room.match.phase = "finished"
+	services.duel.room.match.result = {"winners":[services.duel.room.you.member_id]}
+	battle.refresh()
+	await settle()
+	check(battle.find_child("RoundInstruction",true,false).text.begins_with("Vitória de"),"finished_shows_real_result")
+	check(not battle.find_child("ConfirmSelection",true,false).visible,"finished_disables_selection")
+	var winner_panel: Control = battle.find_child("Players",true,false).get_node("Player_"+str(services.duel.room.you.member_id))
+	check(winner_panel.active,"winner_highlight_in_top_panel")
+	await capture("victory-fixture")
+	services.duel.room = real_data.duplicate(true)
+	services.duel.room.match.phase = "turns"
+	for participant: Dictionary in services.duel.room.match.players: participant.is_you = false
+	battle.refresh()
+	await settle()
+	check(battle.find_child("RoundDetail",true,false).text.begins_with("Espectador"),"spectator_identified")
+	for card: Control in battle.find_child("Cards",true,false).get_children(): check(not card.interactive,"spectator_cannot_pick_"+card.name)
+	services.duel.room = real_data.duplicate(true)
+	battle.refresh()
+	await settle()
 	await click(battle.find_child("TogglePrivateCards",true,false))
 	screen.hide()
 	await settle()
 	check(not battle.get("_private_shown") and not services.chat.is_open(),"hide_protects_hand_and_stops_polling")
+	check(hand.get_child_count()==1 and hand.get_child(0).name=="HiddenHand","hide_removes_private_images_before_return")
 	screen.show()
 	services.duel.room=real_data
 	await services.duel.leave()

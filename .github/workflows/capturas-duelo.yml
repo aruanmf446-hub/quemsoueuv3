@@ -1,0 +1,54 @@
+name: Capturas temporárias do Duelo local
+# Temporário: roda o teste da partida local no Godot real e fotografa cada etapa.
+on:
+  push:
+    branches: [claude/capturas-duelo]
+permissions:
+  contents: write
+concurrency:
+  group: capturas-duelo
+  cancel-in-progress: true
+jobs:
+  capturas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Godot 4.7.2 oficial e display virtual
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb mesa-utils libgl1-mesa-dri > /dev/null
+          mkdir -p "$RUNNER_TEMP/godot"
+          curl --fail --location --retry 3 https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip -o "$RUNNER_TEMP/godot/engine.zip"
+          unzip -q "$RUNNER_TEMP/godot/engine.zip" -d "$RUNNER_TEMP/godot"
+          chmod +x "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+      - name: Teste e capturas
+        run: |
+          set +e -uo pipefail
+          GODOT="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+          OUT="$GITHUB_WORKSPACE/capturas-duelo"
+          rm -rf "$OUT"; mkdir -p "$OUT"
+          export XDG_DATA_HOME="$(mktemp -d)" XDG_CONFIG_HOME="$(mktemp -d)" XDG_CACHE_HOME="$(mktemp -d)"
+          "$GODOT" --headless --path . --editor --import --quit > "$OUT/import.log" 2>&1
+          timeout 300 "$GODOT" --headless --path . --rendering-method gl_compatibility --script res://tests/duel_local/flow_test.gd > "$OUT/headless.log" 2>&1
+          echo "exit=$?" >> "$OUT/headless.log"
+          grep -E "DUEL_LOCAL|ERROR|SCRIPT|exit=" "$OUT/headless.log" | head -40
+          for res in 1920x1080 844x390 640x360; do
+            export XDG_DATA_HOME="$(mktemp -d)" XDG_CONFIG_HOME="$(mktemp -d)"
+            timeout 420 xvfb-run -a -s "-screen 0 1920x1080x24" "$GODOT" --path . --rendering-method gl_compatibility --audio-driver Dummy \
+              --script res://tests/duel_local/flow_test.gd -- "$OUT" "$res" > "$OUT/captura-$res.log" 2>&1
+            echo "exit=$?" >> "$OUT/captura-$res.log"
+            echo "== $res"; grep -E "DUEL_LOCAL|ERROR|SCRIPT|exit=" "$OUT/captura-$res.log" | head -20
+          done
+          python3 tools/godot/run_smoke.py --godot "$GODOT" --output "$OUT/smoke" > "$OUT/smoke.txt" 2>&1
+          cat "$OUT/smoke.txt"
+          ls -la "$OUT"
+      - name: Gravar neste branch
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A capturas-duelo
+          git commit -m "Capturas reais da partida local do Duelo" || exit 0
+          git push origin HEAD:claude/capturas-duelo

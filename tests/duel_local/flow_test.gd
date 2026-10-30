@@ -196,7 +196,9 @@ func _run() -> void:
 	await duel.use_online()
 	check(not duel.is_local(), "volta ao modo online")
 	var online := await duel.list_rooms("", true)
-	check(not online.ok and str(online.code) == "not_configured", "online continua indo ao Supabase")
+	# Sem sessão o cliente GAME recusa antes da rede (ou sem chave: not_configured).
+	var expected := "not_authenticated" if services.client.configured() else "not_configured"
+	check(not online.ok and str(online.code) == expected, "online continua indo ao Supabase GAME")
 	screen.queue_free()
 	await settle()
 	services.queue_free()

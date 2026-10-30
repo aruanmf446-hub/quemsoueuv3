@@ -59,7 +59,10 @@ jobs:
           mkdir -p "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" build/web
           "$engine" --headless --editor --import --quit > "$RUNNER_TEMP/import.log" 2>&1
           "$engine" --headless --export-release Web build/web/index.html > "$RUNNER_TEMP/export.log" 2>&1
-          if grep -E 'SCRIPT ERROR:|ERROR:|Parse Error:' "$RUNNER_TEMP/import.log" "$RUNNER_TEMP/export.log"; then
+          # Ignore apenas avisos conhecidos de limpeza do Godot ao encerrar a exportação.
+          # Erros de script, importação e exportação continuam bloqueando o deploy.
+          if grep -E 'SCRIPT ERROR:|ERROR:|Parse Error:' "$RUNNER_TEMP/import.log" "$RUNNER_TEMP/export.log" \
+            | grep -Ev 'ERROR: ([0-9]+ resources still in use at exit|Pages in use exist at exit in PagedAllocator:|[0-9]+ RID allocations of type .* were leaked at exit)'; then
             exit 1
           fi
           test -s build/web/index.html

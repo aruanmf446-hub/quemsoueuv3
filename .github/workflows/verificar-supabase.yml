@@ -1,0 +1,33 @@
+name: Verificação temporária das conexões Supabase
+on:
+  push:
+    branches: [claude/verificar-supabase]
+permissions:
+  contents: write
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Godot 4.7.2
+        run: |
+          mkdir -p "$RUNNER_TEMP/godot"
+          curl --fail --location --retry 3 https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip -o "$RUNNER_TEMP/godot/engine.zip"
+          unzip -q "$RUNNER_TEMP/godot/engine.zip" -d "$RUNNER_TEMP/godot"
+          chmod +x "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+      - name: Smoke completo
+        run: |
+          set +e
+          OUT="$GITHUB_WORKSPACE/verificacao-supabase"; mkdir -p "$OUT"
+          "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --editor --import --quit > /dev/null 2>&1; "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --script res://tests/consumption/verify.gd > "$OUT/smoke.txt" 2>&1
+          cat "$OUT/smoke.txt"
+          rm -rf "$OUT/smoke/data" "$OUT/smoke/config" "$OUT/smoke/cache"
+      - name: Gravar
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A verificacao-supabase
+          git commit -m "Resultado da verificação" || exit 0
+          git push origin HEAD:claude/verificar-supabase

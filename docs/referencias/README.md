@@ -14,9 +14,6 @@ referências e **não** criar outro estilo "para combinar com o resto do jogo".
 Organização e navegação: menus de **Fortnite, Call of Duty e PES** (hierarquia clara,
 poucas cores, foco no conteúdo). São referência de organização, não de ornamento.
 
-`personagens/IMPLEMENTACAO_ATUAL.png` registra como a tela estava quando a referência
-foi aprovada; serve só para comparação.
-
 ## Como o modelo vira código
 
 Os valores da referência estão em [`scripts/ui/player_ui.gd`](../../scripts/ui/player_ui.gd)
@@ -26,12 +23,6 @@ Os valores da referência estão em [`scripts/ui/player_ui.gd`](../../scripts/ui
 EQUIPADO / DISPONÍVEL / BLOQUEADO), `plate` (cartões) e `frame_panel` (painéis).
 Telas novas usam esses componentes; não definem cores próprias.
 
-## Reprovado — não usar como referência
-
-- `assets/ui/Imagem do ChatGPT … .png` e tudo em `assets/ui/kit/`: molduras e placas azul/
-  douradas com brilho e cantos de cristal, texturas azul/dourada/roxa/verde/vermelha.
-- `assets/processed/frames/frame_painel_brasao.png` (moldura com brasão) nas telas do jogador.
-
-Essas imagens ficam no repositório só porque o HUD da campanha do Deserto ainda usa os anéis
-de recurso (`assets/ui/kit/ring*.png`). `python3 tools/player_ui/check_design.py` (CI) falha
-se elas voltarem às telas do jogador.
+Painéis, botões e cartões são desenhados com `StyleBoxFlat` (cor, filete e cantos). Telas do
+jogador não usam imagens como moldura (`NinePatchRect` / `StyleBoxTexture`);
+`python3 tools/player_ui/check_design.py` (CI) confere isso.

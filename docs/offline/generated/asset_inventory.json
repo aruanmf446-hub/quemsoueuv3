@@ -6977,13 +6977,6 @@
       "character_id": null
     },
     {
-      "path": "res://assets/processed/frames/frame_painel_brasao.png",
-      "size_bytes": 2112363,
-      "sha256": "eceead19f217252c8615b3604ab18982a8e85d4f5fa42a702d370ab4e178fcfb",
-      "format": "png",
-      "character_id": null
-    },
-    {
       "path": "res://assets/processed/logos/logo_menu_principal.png",
       "size_bytes": 1933734,
       "sha256": "ffc8b3a66b8e1d028a8724e3b16ba93aa906f52e9e7554cff6ef699729ccae92",
@@ -7026,79 +7019,9 @@
       "character_id": null
     },
     {
-      "path": "res://assets/references/Imagem do ChatGPT 28 de out. de 2026, 00_58_08.png",
+      "path": "res://docs/referencias/menu/REFERENCIA_MENU.png",
       "size_bytes": 3759470,
       "sha256": "0fe35c7d2a73d4f88c6a11c3a30426c48f404b2e9544270977057c5fa61115c6",
-      "format": "png",
-      "character_id": null
-    },
-    {
-      "path": "res://assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_02-1.png",
-      "size_bytes": 1704937,
-      "sha256": "2e519712c723404b761d045fd542814f24b167a7fd9c113e25a6f136a0739d9e",
-      "format": "png",
-      "character_id": null
-    },
-    {
-      "path": "res://assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_03-2.png",
-      "size_bytes": 1145971,
-      "sha256": "71402cc3eb09b5cd74b63504361345132574f911e61e497933bb42fd396879d9",
-      "format": "png",
-      "character_id": null
-    },
-    {
-      "path": "res://assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_04-3.png",
-      "size_bytes": 1019061,
-      "sha256": "6a4c6ef63287007668e8e62a959dff60cd802f51c685e076d7bed6b4161b58b5",
-      "format": "png",
-      "character_id": null
-    },
-    {
-      "path": "res://assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_04-4.png",
-      "size_bytes": 1068988,
-      "sha256": "f2bc307140bae7eeb30fe4d33f8c9ad06b748673e43d8a2d35f40baadbbef0c0",
-      "format": "png",
-      "character_id": null
-    },
-    {
-      "path": "res://assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_05-5.png",
-      "size_bytes": 1707528,
-      "sha256": "db6f89c500abf38c424f162a68f5d304b37b753cff931249a62b6a52d137676e",
-      "format": "png",
-      "character_id": null
-    },
-    {
-      "path": "res://assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_06-6.png",
-      "size_bytes": 2428307,
-      "sha256": "19f86c856000057c5b1de067f31f1b275216ec7b2db1f8d1f3d2e60d93a76066",
-      "format": "png",
-      "character_id": null
-    },
-    {
-      "path": "res://assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_06-7.png",
-      "size_bytes": 2565676,
-      "sha256": "5bf37186bef413579b57859edfe43cd2e4a37f41bac3341ee51b98f2acf8c9e3",
-      "format": "png",
-      "character_id": null
-    },
-    {
-      "path": "res://assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_07-8.png",
-      "size_bytes": 1948052,
-      "sha256": "39628a295365880894a9964fd780d83cc5e1d57d439c3f8ad7558779e49d73c4",
-      "format": "png",
-      "character_id": null
-    },
-    {
-      "path": "res://assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_08-10.png",
-      "size_bytes": 2091850,
-      "sha256": "aa7572c0de84a509823a8a1648f8e80ed76fc5c993750edbc2ad83fec4ae6b35",
-      "format": "png",
-      "character_id": null
-    },
-    {
-      "path": "res://assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_08-9.png",
-      "size_bytes": 2140993,
-      "sha256": "5ff8f4684c56b502ec3f6dccd599f23ebeec65a1ec53393cd651d22767310982",
       "format": "png",
       "character_id": null
     }

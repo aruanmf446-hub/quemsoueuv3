@@ -4,7 +4,6 @@ extends RefCounted
 ## MODELO VISUAL DAS TELAS DO JOGADOR — tirado de docs/referencias/personagens/REFERENCIA_APROVADA.png
 ## (ver docs/referencias/README.md). Superfícies azul-noite translúcidas sobre o fundo do lobby,
 ## filete fino frio, cantos de 8–10 px; dourado só no que está selecionado ou é a ação principal.
-## Não usar molduras/placas de imagem (assets/ui/kit, assets/processed/frames): visual reprovado.
 const GOLD := Color("#e8b65e")
 const GOLD_BRIGHT := Color("#f3c66a")
 ## Títulos de seção ("Coleções", "Personagens") e valores em destaque.
@@ -24,8 +23,7 @@ const FIELD_BORDER := Color("#2f3b50")
 ## Item selecionado (aba, coleção, filtro ativo): fundo âmbar escuro com filete dourado.
 const SELECTED_BG := Color(0.17, 0.145, 0.115, 0.95)
 ## Compatibilidade com telas antigas.
-const KIT_INK := INK
-## Cores das coleções (antes texturas do kit).
+## Cores das coleções.
 const SWATCHES := {
 	"azul": Color("#2f6fd6"),
 	"dourada": Color("#d8a531"),

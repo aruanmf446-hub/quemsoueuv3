@@ -1,9 +1,9 @@
-"""Trava do design aprovado dos menus (sem dependências).
+"""Confere o modelo das telas do jogador (sem dependências).
 
-O visual de molduras/placas de imagem azul e dourado (assets/ui/kit e a moldura com brasão
-frame_painel_brasao) foi reprovado para as telas de menu: Personagens, Configurações, Amigos,
-Música, Duelo, Perfil e demais telas do jogador. Este verificador falha se essas imagens
-voltarem a ser referenciadas por scripts ou cenas de menu.
+Painéis, botões e cartões das telas do jogador (Personagens, Configurações, Amigos, Música,
+Duelo, Perfil e demais) são StyleBoxFlat do PlayerUI, seguindo
+docs/referencias/personagens/REFERENCIA_APROVADA.png. Falha se uma dessas telas usar imagem
+como moldura.
 
 python3 tools/player_ui/check_design.py
 """
@@ -16,11 +16,8 @@ ROOT = Path(__file__).resolve().parents[2]
 # scripts/menu) é o design aprovado e tem arte própria; não entra aqui.
 MENU_PATHS = ["scripts/ui", "scripts/skins", "scenes/player", "scenes/skins"]
 FORBIDDEN = [
-    (re.compile(r"res://assets/ui/kit/"), "kit de molduras assets/ui/kit (reprovado)"),
-    (re.compile(r"frame_painel_brasao"), "moldura com brasão (reprovada)"),
-    (re.compile(r"res://assets/ui/Imagem"), "imagem original do kit reprovado (assets/ui)"),
-    (re.compile(r"res://assets/processed/textures/"), "textura colorida do kit reprovado"),
-    (re.compile(r"StyleBoxTexture|NinePatchRect"), "moldura de imagem em tela de menu"),
+    (re.compile(r"StyleBoxTexture|NinePatchRect"), "imagem como moldura em tela do jogador"),
+    (re.compile(r"res://assets/processed/(frames|textures)/"), "moldura/textura de imagem em tela do jogador"),
 ]
 
 
@@ -41,5 +38,5 @@ if __name__ == "__main__":
     problems = violations()
     for problem in problems:
         print(problem)
-    print("Design dos menus: OK" if not problems else f"{len(problems)} referência(s) ao visual reprovado.")
+    print("Design dos menus: OK" if not problems else f"{len(problems)} tela(s) fora do modelo.")
     sys.exit(1 if problems else 0)

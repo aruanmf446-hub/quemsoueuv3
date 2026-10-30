@@ -10,6 +10,8 @@ $root = Resolve-Path (Join-Path $PSScriptRoot '..\..')
 $out = Join-Path $root 'assets\processed'
 New-Item -ItemType Directory -Force -Path $out | Out-Null
 
+# Molduras e texturas do menu principal (assets/processed/frames, textures) já estão processadas
+# e versionadas; os originais delas foram retirados do projeto.
 $map = @(
     @{ src = 'backgrounds\Imagem do ChatGPT 28 de out. de 2026, 00_55_14.png'; dst = 'backgrounds\bg_lobby_fantasia.png'; crop = $false },
     @{ src = 'logos\Imagem do ChatGPT 28 de out. de 2026, 00_55_54.png';       dst = 'logos\logo_menu_principal.png'; crop = $true },
@@ -17,17 +19,7 @@ $map = @(
     @{ src = 'icons\Imagem do ChatGPT 28 de out. de 2026, 00_56_32.png';       dst = 'buttons\btn_modo_duelo.png'; crop = $true },
     @{ src = 'icons\Imagem do ChatGPT 28 de out. de 2026, 00_56_35.png';       dst = 'buttons\btn_skins.png'; crop = $true },
     @{ src = 'icons\Imagem do ChatGPT 28 de out. de 2026, 00_56_39.png';       dst = 'buttons\btn_amizades.png'; crop = $true },
-    @{ src = 'icons\Imagem do ChatGPT 28 de out. de 2026, 00_56_43.png';       dst = 'buttons\btn_configuracoes.png'; crop = $true },
-    @{ src = 'ui\Imagem do ChatGPT 28 de out. de 2026, 01_05_02-1.png';        dst = 'frames\frame_painel_amizades.png'; crop = $true },
-    @{ src = 'ui\Imagem do ChatGPT 28 de out. de 2026, 01_05_03-2.png';        dst = 'frames\frame_card_perfil.png'; crop = $true },
-    @{ src = 'ui\Imagem do ChatGPT 28 de out. de 2026, 01_05_04-3.png';        dst = 'frames\frame_botao_cabecalho.png'; crop = $true },
-    @{ src = 'ui\Imagem do ChatGPT 28 de out. de 2026, 01_05_04-4.png';        dst = 'frames\frame_avatar_anel.png'; crop = $true },
-    @{ src = 'ui\Imagem do ChatGPT 28 de out. de 2026, 01_05_05-5.png';        dst = 'frames\frame_painel_brasao.png'; crop = $true },
-    @{ src = 'ui\Imagem do ChatGPT 28 de out. de 2026, 01_05_06-6.png';        dst = 'textures\textura_azul.png'; crop = $false },
-    @{ src = 'ui\Imagem do ChatGPT 28 de out. de 2026, 01_05_06-7.png';        dst = 'textures\textura_dourada.png'; crop = $false },
-    @{ src = 'ui\Imagem do ChatGPT 28 de out. de 2026, 01_05_07-8.png';        dst = 'textures\textura_vermelha.png'; crop = $false },
-    @{ src = 'ui\Imagem do ChatGPT 28 de out. de 2026, 01_05_08-9.png';        dst = 'textures\textura_roxa.png'; crop = $false },
-    @{ src = 'ui\Imagem do ChatGPT 28 de out. de 2026, 01_05_08-10.png';       dst = 'textures\textura_verde.png'; crop = $false }
+    @{ src = 'icons\Imagem do ChatGPT 28 de out. de 2026, 00_56_43.png';       dst = 'buttons\btn_configuracoes.png'; crop = $true }
 )
 
 $alphaThreshold = 24

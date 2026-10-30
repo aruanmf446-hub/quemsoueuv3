@@ -1,13 +1,13 @@
 extends RefCounted
 ## Medalhões de ataque, defesa e vida: emblema vetorial (SVG, nítido em qualquer tamanho)
-## dentro do anel do kit de arte (assets/ui/kit/ring*.png). Cada tamanho é montado uma vez
+## dentro do anel do HUD (assets/hud/ring*.png). Cada tamanho é montado uma vez
 ## e fica guardado; desenhar depois custa o mesmo que qualquer textura.
 
 const RINGS := {
-	"attack": "res://assets/ui/kit/ring_attack.png",
-	"defense": "res://assets/ui/kit/ring.png",
-	"health": "res://assets/ui/kit/ring_health.png",
-	"empty": "res://assets/ui/kit/ring_empty.png",
+	"attack": "res://assets/hud/ring_attack.png",
+	"defense": "res://assets/hud/ring.png",
+	"health": "res://assets/hud/ring_health.png",
+	"empty": "res://assets/hud/ring_empty.png",
 }
 
 ## Espada dourada em chamas: o golpe de El Fuego.

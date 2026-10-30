@@ -1,6 +1,6 @@
 # Personagens — redesign e validação
 
-Implementado sobre `d75bf2f` em `design/personagens-cinematico`. Referências analisadas: `docs/referencias/personagens/REFERENCIA_APROVADA.png` e `IMPLEMENTACAO_ATUAL.png`.
+Implementado sobre `d75bf2f` em `design/personagens-cinematico`. Referências analisadas: `docs/referencias/personagens/REFERENCIA_APROVADA.png`.
 
 A tela reutiliza a cena original via construção de controles em `skins_panel.gd`. O catálogo, modelos, autorização de equipamento, pesquisa, favoritos em ConfigFile, filtros e cache continuam existentes. Seleção não equipa. Nenhuma cena `.tscn` foi editada. O palco usa uma subclasse exclusiva, sem alterar a iluminação do lobby. A câmera usa altura do catálogo, pose dos ossos e aspecto disponível; a plataforma recebe sombras e acompanha a altura dos pés. Não usa pós-processamento ou shaders novos.
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cv3jkahih7u2k"
-path="res://.godot/imported/plate_small_gold.png-82f5d8f0d4a6c4a0658e1bc0906b2a37.ctex"
+uid="uid://dbvyb3rtjuini"
+path="res://.godot/imported/ring.png-78c56f905c9dca9dfb0dc0e1a0707752.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/kit/plate_small_gold.png"
-dest_files=["res://.godot/imported/plate_small_gold.png-82f5d8f0d4a6c4a0658e1bc0906b2a37.ctex"]
+source_file="res://assets/hud/ring.png"
+dest_files=["res://.godot/imported/ring.png-78c56f905c9dca9dfb0dc0e1a0707752.ctex"]
 
 [params]
 

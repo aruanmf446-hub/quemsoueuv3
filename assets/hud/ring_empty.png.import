@@ -2,28 +2,28 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://82pjo4jskcw"
-path="res://.godot/imported/Imagem do ChatGPT 28 de out. de 2026, 01_05_08-10.png-0793ad5cb824c28fe419c01bc9811fc7.ctex"
+uid="uid://ba2n4owyvglov"
+path="res://.godot/imported/ring_empty.png-aed998c37dd8529fdcc29e05d07e026e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_08-10.png"
-dest_files=["res://.godot/imported/Imagem do ChatGPT 28 de out. de 2026, 01_05_08-10.png-0793ad5cb824c28fe419c01bc9811fc7.ctex"]
+source_file="res://assets/hud/ring_empty.png"
+dest_files=["res://.godot/imported/ring_empty.png-aed998c37dd8529fdcc29e05d07e026e.ctex"]
 
 [params]
 
-compress/mode=1
+compress/mode=0
 compress/high_quality=false
-compress/lossy_quality=0.92
+compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=true
+mipmaps/generate=false
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""

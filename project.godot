@@ -12,6 +12,8 @@ config_version=5
 
 config/name="Quem Sou Eu V3"
 run/main_scene="res://scenes/menu/menu_boot.tscn"
+boot_splash/bg_color=Color(0.0235, 0.043, 0.086, 1)
+boot_splash/show_image=false
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 

@@ -189,6 +189,13 @@ func _build_sidebar() -> void:
 		copy.add_theme_constant_override("icon_max_width",12)
 		copy.tooltip_text = "Copiar código da sala"
 		controls.add_child(copy)
+		# Convite por link: só o ADM gera (o servidor recusa os outros).
+		if duel.is_admin():
+			var share := Style.action("",_share_invite,"share")
+			share.name = "ShareInvite"
+			share.tooltip_text = "Compartilhar convite"
+			share.custom_minimum_size = Vector2(30,30)
+			controls.add_child(share)
 	else:
 		var local := Style.label("LOCAL",10,PlayerUI.GOLD)
 		local.autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -263,6 +270,20 @@ func _build_sidebar() -> void:
 	leave.custom_minimum_size.y = 24
 	leave.add_theme_font_size_override("font_size",11)
 	_side.add_child(leave)
+## Gera um convite (60 min) e copia. Sem rota oficial de link configurada, copia o
+## convite para colar em Duelo → Código do convite; nunca inclui o UUID da sala.
+func _share_invite() -> void:
+	_notice.text = "Gerando convite…"
+	_notice_ttl = 3.5
+	var result := await duel.create_invite(60)
+	if not result.ok or not result.data is Dictionary or str(result.data.get("token","")).is_empty():
+		_notice.text = DuelService.message(str(result.code)) if not result.ok else "Não foi possível gerar o convite."
+		_notice_ttl = 3.5
+		return
+	var link := DuelService.invite_link(str(result.data.token))
+	DisplayServer.clipboard_set(link)
+	_notice.text = "Convite copiado · vale 60 min"
+	_notice_ttl = 3.5
 func refresh() -> void:
 	if not _built: _build()
 	_data = duel.match()

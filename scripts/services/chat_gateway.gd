@@ -34,6 +34,15 @@ func list_messages(conversation_id: String, _after: Variant = null) -> Dictionar
 	return ServiceResult.success({"messages": messages, "complete": true})
 
 
+## Chat da sala do Duelo (DUEL_ROOM_CHAT_API_V1): o GAME confirma que o jogador ainda é
+## membro da sala em toda abertura, leitura e envio.
+func open_room(room_id: String) -> Dictionary:
+	var result := await _post({"action": "open_room", "room_id": room_id})
+	if not result.ok: return result
+	var id := str((result.data as Dictionary).get("conversation_id", ""))
+	return ServiceResult.success({"conversation_id": id}) if not id.is_empty() else ServiceResult.failure("invalid_contract")
+
+
 ## request_id: o mesmo em reenvios da mesma intenção (o servidor não duplica).
 func send_message(conversation_id: String, request_id: String, text: String, me_id: String = "") -> Dictionary:
 	var result := await _post({"action": "send", "conversation_id": conversation_id, "request_id": request_id, "body": text})
@@ -74,6 +83,7 @@ static func code_for(code: String, status: int) -> String:
 	match code:
 		"unauthorized": return "not_authenticated"
 		"friend_required", "invalid_peer": return "not_friend"
+		"room_access_denied", "invalid_room": return "room_access_denied"
 		"forbidden", "invalid_conversation": return "conversation_unavailable"
 		"rate_limited": return "rate_limit"
 		"invalid_body", "invalid_message", "payload_too_large": return "message_blocked"

@@ -244,41 +244,44 @@ func run() -> void:
 	services.duel.room=real_data.duplicate(true)
 	battle.refresh()
 	await settle()
-	# Existing ChatService, simulated transport. No live tokens or messaging.
+	# Chat da SALA (DUEL_ROOM_CHAT_API_V1) com transporte simulado. Sem tokens nem rede.
+	var chat: Control=battle.find_child("BattleChat",true,false)
+	check(chat.find_child("ChatStatus",true,false).text.contains("partida local") and not chat.find_child("ChatInput",true,false).editable,"room_chat_unavailable_in_local_match")
+	check(chat.find_child("ChatFriend",true,false)==null or not chat.find_child("ChatFriend",true,false).visible,"battle_chat_is_not_friend_chat")
 	services.session.user={"id":ME}
 	services.session._expires_at=Time.get_unix_time_from_system()+3600
 	services.client.access_token="fixture-only"
 	for service in [services.friends,services.wallet,services.profile,services.progression]: service.fetched_at=Time.get_ticks_msec()/1000.0
-	services.friends.data={"friends":[{"user_id":FRIEND,"nickname":"Amigo de teste","equipped_character_id":"lana"}],"incoming":[],"outgoing":[]}
-	if services.chat.transport != null: services.chat.transport.queue_free()
 	var fake: Node = load("res://tests/chat/fixture_transport.gd").new()
-	fake.friends=[FRIEND]
+	var room_id: String = services.duel.room_id()
+	fake.rooms=[room_id]
 	root.add_child(fake)
-	services.chat.transport=fake
-	services.chat.me_id=ME
-	var chat: Control=battle.find_child("BattleChat",true,false)
+	services.room_chat.transport=fake
+	services.room_chat.me_id=ME
+	services.duel.mode="online"
 	chat.call("refresh_availability")
-	var selector: OptionButton=chat.find_child("ChatFriend",true,false)
-	selector.select(1)
-	selector.item_selected.emit(1)
-	await settle()
-	check(services.chat.is_open(),"existing_private_chat_open")
+	for _i in range(3): await settle()
+	check(services.room_chat.is_open() and services.room_chat.conversation_id=="room-"+room_id,"room_chat_open")
 	var input: LineEdit=chat.find_child("ChatInput",true,false)
-	input.text="Mensagem da fixture"
+	input.text="Boa partida!"
 	await click(chat.find_child("ChatSend",true,false))
-	check(fake.calls.send==1 and services.chat.messages().size()==1,"existing_chat_service_send")
-	fake.deliver(services.chat.conversation_id,FRIEND,"Resposta da fixture")
-	await services.chat.poll()
+	check(fake.calls.send==1 and services.room_chat.messages().size()==1,"room_chat_send")
+	fake.deliver(services.room_chat.conversation_id,FRIEND,"Boa sorte a todos")
+	await services.room_chat.poll()
 	await settle()
-	check(services.chat.messages().size()==2,"existing_chat_receives")
+	check(services.room_chat.messages().size()==2,"room_chat_receives")
 	geometry("chat_open",9)
 	await capture("chat-fixture")
-	services.chat.clear()
+	fake.fail_next="room_access_denied"
+	await services.room_chat.poll()
+	await settle()
+	check(services.room_chat.messages("room-"+room_id).is_empty() and not services.room_chat.is_open(),"room_access_denied_hides_and_stops")
+	check(chat.get("_rendered").is_empty(),"room_access_denied_clears_bubbles")
+	services.duel.mode="local"
 	services.session.user={}
 	services.client.access_token=""
 	chat.call("refresh_availability")
 	await settle()
-	check(chat.get("_rendered").is_empty(),"logout_clears_private_bubbles")
 	check(not input.editable,"logout_blocks_composer")
 	# Presentation fixtures cover finished/winner and spectator without changing rules.
 	services.duel.room = real_data.duplicate(true)
@@ -304,7 +307,7 @@ func run() -> void:
 	await click(battle.find_child("TogglePrivateCards",true,false))
 	screen.hide()
 	await settle()
-	check(not battle.get("_private_shown") and not services.chat.is_open(),"hide_protects_hand_and_stops_polling")
+	check(not battle.get("_private_shown") and not services.room_chat.is_open(),"hide_protects_hand_and_stops_polling")
 	check(hand.get_child_count()==1 and hand.get_child(0).name=="HiddenHand","hide_removes_private_images_before_return")
 	screen.show()
 	services.duel.room=real_data

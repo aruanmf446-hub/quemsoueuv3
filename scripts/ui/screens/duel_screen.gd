@@ -51,6 +51,18 @@ func show_screen(params: Dictionary = {}) -> void:
 	if _battle_layout and is_instance_valid(_match_view):
 		_match_view.find_child("BattleBack",true,false).grab_focus()
 	if _view == "browse" and _online(): _load_rooms(false)
+	# Web: link com ?invite=<token> entra na sala uma vez, depois do login.
+	var invite := DuelService.invite_token(str(params.get("invite", _web_invite())))
+	if not invite.is_empty() and _online() and not duel.in_room():
+		_web_invite_used = true
+		_join(invite)
+
+
+static var _web_invite_used := false
+static func _web_invite() -> String:
+	if _web_invite_used or not OS.has_feature("web"): return ""
+	var value: Variant = JavaScriptBridge.eval("new URLSearchParams(window.location.search).get('invite') || ''")
+	return str(value) if value != null else ""
 
 
 ## Lista e convites online: só com conta e fora da partida local.
@@ -132,7 +144,7 @@ func _render_browse() -> void:
 	var code := LineEdit.new()
 	code.name = "InviteCode"
 	code.placeholder_text = tr("Código do convite")
-	code.max_length = 9
+	code.max_length = 200
 	code.custom_minimum_size = Vector2(230, 52)
 	code.add_theme_stylebox_override("normal", PlayerUI.button_plate())
 	code.add_theme_stylebox_override("focus", PlayerUI.button_plate(false, Color(1.2, 1.2, 1.25)))
@@ -208,7 +220,9 @@ func _load_rooms(show_loading: bool) -> void:
 
 func _join(code: String) -> void:
 	if code.strip_edges().is_empty(): return
-	await _act(duel.join.bind(code))
+	# Convite (token de 48 hex, sozinho ou num link ?invite=) ou código curto da sala.
+	var token := DuelService.invite_token(code)
+	await _act(duel.join_invite.bind(token) if not token.is_empty() else duel.join.bind(code))
 	if duel.in_room():
 		_view = "room"
 		render()

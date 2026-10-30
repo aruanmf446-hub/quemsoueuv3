@@ -19,6 +19,16 @@ func open_conversation(friend_id: String) -> Dictionary:
 	return ServiceResult.success({"conversation_id": conversations[friend_id]})
 
 
+## Salas em que o jogador da fixture é membro (o GAME real confirma isso).
+var rooms: Array = []
+func open_room(room_id: String) -> Dictionary:
+	calls.open += 1
+	await _wait()
+	if _failing(): return ServiceResult.failure(_take())
+	if not rooms.has(room_id): return ServiceResult.failure("room_access_denied")
+	return ServiceResult.success({"conversation_id": "room-" + room_id})
+
+
 func list_messages(conversation_id: String, _after: Variant = null) -> Dictionary:
 	calls.messages += 1
 	await _wait()

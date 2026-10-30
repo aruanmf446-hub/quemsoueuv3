@@ -23,7 +23,7 @@ PASS selection_visible_momo
 PASS selection_original_art_momo
 PASS selection_visible_slender_man
 PASS selection_original_art_slender_man
-FAIL selection_bounds_PublicArea
+PASS selection_bounds_PublicArea
 PASS selection_bounds_UtilityRail
 PASS selection_bounds_RoomControls
 PASS selection_bounds_PrivatePanel
@@ -31,7 +31,7 @@ PASS selection_bounds_Players
 PASS selection_no_board_scroll
 PASS selection_public_area_never_scrolls
 RAIL selection [P: (1205.003, 20.91111), S: (433.9056, 899.1778)] minimum=(147.0, 303.0)
-GEOMETRY selection grid=[P: (62.73334, 433.9056), S: (1108.289, 480.9556)] screen=(1672.0, 941.0)
+GEOMETRY selection grid=[P: (62.73334, 433.9056), S: (1084.764, 454.8167)] screen=(1672.0, 941.0)
 PASS subject_landmark_visible_cobra_grande
 PASS subject_landmark_visible_homem_sorridente
 PASS subject_landmark_visible_jeff_the_killer
@@ -66,7 +66,7 @@ PASS turns_visible_momo
 PASS turns_original_art_momo
 PASS turns_visible_slender_man
 PASS turns_original_art_slender_man
-FAIL turns_bounds_PublicArea
+PASS turns_bounds_PublicArea
 PASS turns_bounds_UtilityRail
 PASS turns_bounds_RoomControls
 PASS turns_bounds_PrivatePanel
@@ -74,7 +74,7 @@ PASS turns_bounds_Players
 PASS turns_no_board_scroll
 PASS turns_public_area_never_scrolls
 RAIL turns [P: (1205.003, 20.91111), S: (433.9056, 899.1778)] minimum=(147.0, 303.0)
-GEOMETRY turns grid=[P: (62.73334, 433.9056), S: (1108.289, 480.9556)] screen=(1672.0, 941.0)
+GEOMETRY turns grid=[P: (62.73334, 433.9056), S: (1084.764, 454.8167)] screen=(1672.0, 941.0)
 PASS hand_hidden_by_default
 PASS capture_battle
 PASS private_hand_from_real_data
@@ -97,7 +97,7 @@ PASS hand_open_visible_momo
 PASS hand_open_original_art_momo
 PASS hand_open_visible_slender_man
 PASS hand_open_original_art_slender_man
-FAIL hand_open_bounds_PublicArea
+PASS hand_open_bounds_PublicArea
 PASS hand_open_bounds_UtilityRail
 PASS hand_open_bounds_RoomControls
 PASS hand_open_bounds_PrivatePanel
@@ -105,13 +105,13 @@ PASS hand_open_bounds_Players
 PASS hand_open_no_board_scroll
 PASS hand_open_public_area_never_scrolls
 RAIL hand_open [P: (1205.003, 20.91111), S: (433.9056, 899.1778)] minimum=(147.0, 307.0)
-GEOMETRY hand_open grid=[P: (62.73334, 433.9056), S: (1108.289, 480.9556)] screen=(1672.0, 941.0)
+GEOMETRY hand_open grid=[P: (62.73334, 433.9056), S: (1084.764, 454.8167)] screen=(1672.0, 941.0)
 PASS capture_private-hand
 PASS focus_loss_removes_private_images
 PASS private_hand_hides_again
 PASS inline_pick_confirmation
 PASS confirmation_all_options
-FAIL confirmation_visible_bruxa_do_pantano
+PASS confirmation_visible_bruxa_do_pantano
 PASS confirmation_original_art_bruxa_do_pantano
 PASS confirmation_visible_cobra_grande
 PASS confirmation_original_art_cobra_grande
@@ -129,7 +129,7 @@ PASS confirmation_visible_momo
 PASS confirmation_original_art_momo
 PASS confirmation_visible_slender_man
 PASS confirmation_original_art_slender_man
-FAIL confirmation_bounds_PublicArea
+PASS confirmation_bounds_PublicArea
 PASS confirmation_bounds_UtilityRail
 PASS confirmation_bounds_RoomControls
 PASS confirmation_bounds_PrivatePanel
@@ -138,12 +138,12 @@ PASS confirmation_no_board_scroll
 PASS confirmation_public_area_never_scrolls
 RAIL confirmation [P: (1205.003, 20.91111), S: (433.9056, 899.1778)] minimum=(147.0, 303.0)
 LAYOUT _canvas size=(615.0, 344.0) min=(0.0, 0.0)
-LAYOUT _main size=(448.0, 354.0) min=(448.0, 354.0)
-LAYOUT _board size=(448.0, 256.0) min=(448.0, 256.0)
-LAYOUT _board_content size=(424.0, 232.0) min=(424.0, 232.0)
-LAYOUT _grid size=(424.0, 184.0) min=(424.0, 184.0)
-LAYOUT _roster size=(448.0, 62.0) min=(423.0, 62.0)
-GEOMETRY confirmation grid=[P: (62.73334, 433.9056), S: (1108.289, 480.9556)] screen=(1672.0, 941.0)
+LAYOUT _main size=(439.0, 344.0) min=(439.0, 342.0)
+LAYOUT _board size=(439.0, 246.0) min=(439.0, 244.0)
+LAYOUT _board_content size=(415.0, 222.0) min=(415.0, 220.0)
+LAYOUT _grid size=(415.0, 174.0) min=(415.0, 172.0)
+LAYOUT _roster size=(439.0, 62.0) min=(423.0, 62.0)
+GEOMETRY confirmation grid=[P: (62.73334, 433.9056), S: (1084.764, 454.8167)] screen=(1672.0, 941.0)
 PASS cancel_available
 PASS capture_confirmation
 PASS cancel_keeps_state
@@ -163,7 +163,7 @@ PASS seven_fixture_visible_jeff_the_killer
 PASS seven_fixture_original_art_jeff_the_killer
 PASS seven_fixture_visible_loira_do_banheiro
 PASS seven_fixture_original_art_loira_do_banheiro
-FAIL seven_fixture_bounds_PublicArea
+PASS seven_fixture_bounds_PublicArea
 PASS seven_fixture_bounds_UtilityRail
 PASS seven_fixture_bounds_RoomControls
 PASS seven_fixture_bounds_PrivatePanel
@@ -171,7 +171,7 @@ PASS seven_fixture_bounds_Players
 PASS seven_fixture_no_board_scroll
 PASS seven_fixture_public_area_never_scrolls
 RAIL seven_fixture [P: (1205.003, 20.91111), S: (433.9056, 899.1778)] minimum=(147.0, 303.0)
-GEOMETRY seven_fixture grid=[P: (62.73334, 433.9056), S: (1108.289, 480.9556)] screen=(1672.0, 941.0)
+GEOMETRY seven_fixture grid=[P: (62.73334, 433.9056), S: (1084.764, 454.8167)] screen=(1672.0, 941.0)
 PASS thirty_layout_fixture_all_options
 PASS thirty_layout_fixture_visible_bruxa_do_pantano
 PASS thirty_layout_fixture_original_art_bruxa_do_pantano
@@ -233,7 +233,7 @@ PASS thirty_layout_fixture_visible_@PanelContainer@599
 PASS thirty_layout_fixture_original_art_@PanelContainer@599
 PASS thirty_layout_fixture_visible_@PanelContainer@603
 PASS thirty_layout_fixture_original_art_@PanelContainer@603
-FAIL thirty_layout_fixture_bounds_PublicArea
+PASS thirty_layout_fixture_bounds_PublicArea
 PASS thirty_layout_fixture_bounds_UtilityRail
 PASS thirty_layout_fixture_bounds_RoomControls
 PASS thirty_layout_fixture_bounds_PrivatePanel
@@ -241,7 +241,7 @@ PASS thirty_layout_fixture_bounds_Players
 PASS thirty_layout_fixture_no_board_scroll
 PASS thirty_layout_fixture_public_area_never_scrolls
 RAIL thirty_layout_fixture [P: (1205.003, 20.91111), S: (433.9056, 899.1778)] minimum=(147.0, 303.0)
-GEOMETRY thirty_layout_fixture grid=[P: (62.73334, 433.9056), S: (1123.972, 488.7972)] screen=(1672.0, 941.0)
+GEOMETRY thirty_layout_fixture grid=[P: (62.73334, 433.9056), S: (1084.764, 454.8167)] screen=(1672.0, 941.0)
 PASS players_5_fixture_all_options
 PASS players_5_fixture_visible_bruxa_do_pantano
 PASS players_5_fixture_original_art_bruxa_do_pantano
@@ -269,7 +269,7 @@ PASS players_5_fixture_bounds_Players
 PASS players_5_fixture_no_board_scroll
 PASS players_5_fixture_public_area_never_scrolls
 RAIL players_5_fixture [P: (1205.003, 20.91111), S: (433.9056, 899.1778)] minimum=(147.0, 303.0)
-GEOMETRY players_5_fixture grid=[P: (62.73334, 428.6778), S: (1108.289, 480.9556)] screen=(1672.0, 941.0)
+GEOMETRY players_5_fixture grid=[P: (62.73334, 428.6778), S: (1084.764, 460.0445)] screen=(1672.0, 941.0)
 PASS roster_cell_5
 PASS roster_cell_5
 PASS roster_cell_5
@@ -294,7 +294,7 @@ PASS players_12_fixture_visible_momo
 PASS players_12_fixture_original_art_momo
 PASS players_12_fixture_visible_slender_man
 PASS players_12_fixture_original_art_slender_man
-FAIL players_12_fixture_bounds_PublicArea
+PASS players_12_fixture_bounds_PublicArea
 PASS players_12_fixture_bounds_UtilityRail
 PASS players_12_fixture_bounds_RoomControls
 PASS players_12_fixture_bounds_PrivatePanel
@@ -302,7 +302,7 @@ PASS players_12_fixture_bounds_Players
 PASS players_12_fixture_no_board_scroll
 PASS players_12_fixture_public_area_never_scrolls
 RAIL players_12_fixture [P: (1205.003, 20.91111), S: (433.9056, 899.1778)] minimum=(147.0, 303.0)
-GEOMETRY players_12_fixture grid=[P: (62.73334, 470.5), S: (1108.289, 441.7472)] screen=(1672.0, 941.0)
+GEOMETRY players_12_fixture grid=[P: (62.73334, 470.5), S: (1084.764, 418.2222)] screen=(1672.0, 941.0)
 PASS roster_cell_12
 PASS roster_cell_12
 PASS roster_cell_12
@@ -342,7 +342,7 @@ PASS players_20_fixture_bounds_Players
 PASS players_20_fixture_no_board_scroll
 PASS players_20_fixture_public_area_never_scrolls
 RAIL players_20_fixture [P: (1205.003, 20.91111), S: (433.9056, 899.1778)] minimum=(147.0, 303.0)
-GEOMETRY players_20_fixture grid=[P: (62.73334, 569.8278), S: (1108.289, 339.8056)] screen=(1672.0, 941.0)
+GEOMETRY players_20_fixture grid=[P: (62.73334, 569.8278), S: (1084.764, 318.8945)] screen=(1672.0, 941.0)
 PASS roster_cell_20
 PASS roster_cell_20
 PASS roster_cell_20
@@ -392,7 +392,7 @@ PASS chat_open_visible_momo
 PASS chat_open_original_art_momo
 PASS chat_open_visible_slender_man
 PASS chat_open_original_art_slender_man
-FAIL chat_open_bounds_PublicArea
+PASS chat_open_bounds_PublicArea
 PASS chat_open_bounds_UtilityRail
 PASS chat_open_bounds_RoomControls
 PASS chat_open_bounds_PrivatePanel
@@ -400,7 +400,7 @@ PASS chat_open_bounds_Players
 PASS chat_open_no_board_scroll
 PASS chat_open_public_area_never_scrolls
 RAIL chat_open [P: (1205.003, 20.91111), S: (433.9056, 899.1778)] minimum=(147.0, 333.0)
-GEOMETRY chat_open grid=[P: (62.73334, 433.9056), S: (1108.289, 480.9556)] screen=(1672.0, 941.0)
+GEOMETRY chat_open grid=[P: (62.73334, 433.9056), S: (1084.764, 454.8167)] screen=(1672.0, 941.0)
 PASS capture_chat-fixture
 PASS logout_clears_private_bubbles
 PASS logout_blocks_composer
@@ -421,5 +421,5 @@ PASS spectator_cannot_pick_slender_man
 PASS hide_protects_hand_and_stops_polling
 PASS hide_removes_private_images_before_return
 PASS leaving_restores_lobby_layout
-BATTLE_REFERENCE checks=392 failures=9
-exit=1
+BATTLE_REFERENCE checks=392 failures=0
+exit=0

@@ -30,11 +30,11 @@ PASS selection_bounds_PrivatePanel
 PASS selection_bounds_Players
 PASS selection_no_board_scroll
 PASS selection_public_area_never_scrolls
-RAIL selection [P: (1556.269, 19.30256), S: (448.7846, 902.3949)] minimum=(147.0, 303.0)
-GEOMETRY selection grid=[P: (53.08205, 395.7026), S: (1454.931, 501.8667)] screen=(2036.0, 941.0)
+RAIL selection [P: (1556.269, 19.30256), S: (448.7846, 902.3949)] minimum=(147.0, 346.0)
+GEOMETRY selection grid=[P: (53.08205, 405.3538), S: (1454.931, 492.2154)] screen=(2036.0, 941.0)
 PASS subject_landmark_visible_cobra_grande
 PASS subject_landmark_visible_homem_sorridente
-FAIL subject_landmark_visible_jeff_the_killer
+PASS subject_landmark_visible_jeff_the_killer
 PASS subject_landmark_visible_loira_do_banheiro
 PASS subject_landmark_visible_slender_man
 PASS single_battle_header
@@ -73,8 +73,8 @@ PASS turns_bounds_PrivatePanel
 PASS turns_bounds_Players
 PASS turns_no_board_scroll
 PASS turns_public_area_never_scrolls
-RAIL turns [P: (1556.269, 19.30256), S: (448.7846, 902.3949)] minimum=(147.0, 303.0)
-GEOMETRY turns grid=[P: (53.08205, 395.7026), S: (1454.931, 501.8667)] screen=(2036.0, 941.0)
+RAIL turns [P: (1556.269, 19.30256), S: (448.7846, 902.3949)] minimum=(147.0, 350.0)
+GEOMETRY turns grid=[P: (53.08205, 400.5282), S: (1454.931, 497.041)] screen=(2036.0, 941.0)
 PASS hand_hidden_by_default
 PASS capture_battle
 PASS private_hand_from_real_data
@@ -104,8 +104,8 @@ PASS hand_open_bounds_PrivatePanel
 PASS hand_open_bounds_Players
 PASS hand_open_no_board_scroll
 PASS hand_open_public_area_never_scrolls
-RAIL hand_open [P: (1556.269, 19.30256), S: (448.7846, 902.3949)] minimum=(147.0, 323.0)
-GEOMETRY hand_open grid=[P: (53.08205, 395.7026), S: (1454.931, 501.8667)] screen=(2036.0, 941.0)
+RAIL hand_open [P: (1556.269, 19.30256), S: (448.7846, 902.3949)] minimum=(147.0, 366.0)
+GEOMETRY hand_open grid=[P: (53.08205, 400.5282), S: (1454.931, 497.041)] screen=(2036.0, 941.0)
 PASS capture_private-hand
 PASS focus_loss_removes_private_images
 PASS private_hand_hides_again
@@ -136,14 +136,14 @@ PASS confirmation_bounds_PrivatePanel
 PASS confirmation_bounds_Players
 PASS confirmation_no_board_scroll
 PASS confirmation_public_area_never_scrolls
-RAIL confirmation [P: (1556.269, 19.30256), S: (448.7846, 902.3949)] minimum=(147.0, 303.0)
+RAIL confirmation [P: (1556.269, 19.30256), S: (448.7846, 902.3949)] minimum=(147.0, 350.0)
 LAYOUT _canvas size=(819.0, 374.0) min=(0.0, 0.0)
-LAYOUT _main size=(623.0, 374.0) min=(621.0, 374.0)
-LAYOUT _board size=(623.0, 276.0) min=(621.0, 276.0)
-LAYOUT _board_content size=(603.0, 256.0) min=(601.0, 256.0)
-LAYOUT _grid size=(603.0, 208.0) min=(601.0, 208.0)
-LAYOUT _roster size=(623.0, 62.0) min=(423.0, 62.0)
-GEOMETRY confirmation grid=[P: (53.08205, 395.7026), S: (1454.931, 501.8667)] screen=(2036.0, 941.0)
+LAYOUT _main size=(623.0, 374.0) min=(621.0, 373.0)
+LAYOUT _board size=(623.0, 274.0) min=(621.0, 273.0)
+LAYOUT _board_content size=(603.0, 254.0) min=(601.0, 253.0)
+LAYOUT _grid size=(603.0, 206.0) min=(601.0, 205.0)
+LAYOUT _roster size=(607.0, 64.0) min=(607.0, 64.0)
+GEOMETRY confirmation grid=[P: (53.08205, 400.5282), S: (1454.931, 497.041)] screen=(2036.0, 941.0)
 PASS cancel_available
 PASS capture_confirmation
 PASS cancel_keeps_state
@@ -170,8 +170,8 @@ PASS seven_fixture_bounds_PrivatePanel
 PASS seven_fixture_bounds_Players
 PASS seven_fixture_no_board_scroll
 PASS seven_fixture_public_area_never_scrolls
-RAIL seven_fixture [P: (1556.269, 19.30256), S: (448.7846, 902.3949)] minimum=(147.0, 303.0)
-GEOMETRY seven_fixture grid=[P: (53.08205, 395.7026), S: (1454.931, 501.8667)] screen=(2036.0, 941.0)
+RAIL seven_fixture [P: (1556.269, 19.30256), S: (448.7846, 902.3949)] minimum=(147.0, 350.0)
+GEOMETRY seven_fixture grid=[P: (53.08205, 400.5282), S: (1454.931, 497.041)] screen=(2036.0, 941.0)
 PASS thirty_layout_fixture_all_options
 PASS thirty_layout_fixture_visible_bruxa_do_pantano
 PASS thirty_layout_fixture_original_art_bruxa_do_pantano
@@ -191,48 +191,48 @@ PASS thirty_layout_fixture_visible_momo
 PASS thirty_layout_fixture_original_art_momo
 PASS thirty_layout_fixture_visible_slender_man
 PASS thirty_layout_fixture_original_art_slender_man
-PASS thirty_layout_fixture_visible_@PanelContainer@524
-PASS thirty_layout_fixture_original_art_@PanelContainer@524
-PASS thirty_layout_fixture_visible_@PanelContainer@528
-PASS thirty_layout_fixture_original_art_@PanelContainer@528
-PASS thirty_layout_fixture_visible_@PanelContainer@532
-PASS thirty_layout_fixture_original_art_@PanelContainer@532
-PASS thirty_layout_fixture_visible_@PanelContainer@536
-PASS thirty_layout_fixture_original_art_@PanelContainer@536
-PASS thirty_layout_fixture_visible_@PanelContainer@540
-PASS thirty_layout_fixture_original_art_@PanelContainer@540
-PASS thirty_layout_fixture_visible_@PanelContainer@544
-PASS thirty_layout_fixture_original_art_@PanelContainer@544
-PASS thirty_layout_fixture_visible_@PanelContainer@548
-PASS thirty_layout_fixture_original_art_@PanelContainer@548
-PASS thirty_layout_fixture_visible_@PanelContainer@552
-PASS thirty_layout_fixture_original_art_@PanelContainer@552
-PASS thirty_layout_fixture_visible_@PanelContainer@556
-PASS thirty_layout_fixture_original_art_@PanelContainer@556
-PASS thirty_layout_fixture_visible_@PanelContainer@560
-PASS thirty_layout_fixture_original_art_@PanelContainer@560
-PASS thirty_layout_fixture_visible_@PanelContainer@564
-PASS thirty_layout_fixture_original_art_@PanelContainer@564
-PASS thirty_layout_fixture_visible_@PanelContainer@568
-PASS thirty_layout_fixture_original_art_@PanelContainer@568
-PASS thirty_layout_fixture_visible_@PanelContainer@572
-PASS thirty_layout_fixture_original_art_@PanelContainer@572
-PASS thirty_layout_fixture_visible_@PanelContainer@576
-PASS thirty_layout_fixture_original_art_@PanelContainer@576
-PASS thirty_layout_fixture_visible_@PanelContainer@580
-PASS thirty_layout_fixture_original_art_@PanelContainer@580
-PASS thirty_layout_fixture_visible_@PanelContainer@584
-PASS thirty_layout_fixture_original_art_@PanelContainer@584
-PASS thirty_layout_fixture_visible_@PanelContainer@588
-PASS thirty_layout_fixture_original_art_@PanelContainer@588
-PASS thirty_layout_fixture_visible_@PanelContainer@592
-PASS thirty_layout_fixture_original_art_@PanelContainer@592
-PASS thirty_layout_fixture_visible_@PanelContainer@596
-PASS thirty_layout_fixture_original_art_@PanelContainer@596
-PASS thirty_layout_fixture_visible_@PanelContainer@600
-PASS thirty_layout_fixture_original_art_@PanelContainer@600
-PASS thirty_layout_fixture_visible_@PanelContainer@604
-PASS thirty_layout_fixture_original_art_@PanelContainer@604
+PASS thirty_layout_fixture_visible_@PanelContainer@729
+PASS thirty_layout_fixture_original_art_@PanelContainer@729
+PASS thirty_layout_fixture_visible_@PanelContainer@735
+PASS thirty_layout_fixture_original_art_@PanelContainer@735
+PASS thirty_layout_fixture_visible_@PanelContainer@741
+PASS thirty_layout_fixture_original_art_@PanelContainer@741
+PASS thirty_layout_fixture_visible_@PanelContainer@747
+PASS thirty_layout_fixture_original_art_@PanelContainer@747
+PASS thirty_layout_fixture_visible_@PanelContainer@753
+PASS thirty_layout_fixture_original_art_@PanelContainer@753
+PASS thirty_layout_fixture_visible_@PanelContainer@759
+PASS thirty_layout_fixture_original_art_@PanelContainer@759
+PASS thirty_layout_fixture_visible_@PanelContainer@765
+PASS thirty_layout_fixture_original_art_@PanelContainer@765
+PASS thirty_layout_fixture_visible_@PanelContainer@771
+PASS thirty_layout_fixture_original_art_@PanelContainer@771
+PASS thirty_layout_fixture_visible_@PanelContainer@777
+PASS thirty_layout_fixture_original_art_@PanelContainer@777
+PASS thirty_layout_fixture_visible_@PanelContainer@783
+PASS thirty_layout_fixture_original_art_@PanelContainer@783
+PASS thirty_layout_fixture_visible_@PanelContainer@789
+PASS thirty_layout_fixture_original_art_@PanelContainer@789
+PASS thirty_layout_fixture_visible_@PanelContainer@795
+PASS thirty_layout_fixture_original_art_@PanelContainer@795
+PASS thirty_layout_fixture_visible_@PanelContainer@801
+PASS thirty_layout_fixture_original_art_@PanelContainer@801
+PASS thirty_layout_fixture_visible_@PanelContainer@807
+PASS thirty_layout_fixture_original_art_@PanelContainer@807
+PASS thirty_layout_fixture_visible_@PanelContainer@813
+PASS thirty_layout_fixture_original_art_@PanelContainer@813
+PASS thirty_layout_fixture_visible_@PanelContainer@819
+PASS thirty_layout_fixture_original_art_@PanelContainer@819
+PASS thirty_layout_fixture_visible_@PanelContainer@825
+PASS thirty_layout_fixture_original_art_@PanelContainer@825
+PASS thirty_layout_fixture_visible_@PanelContainer@831
+PASS thirty_layout_fixture_original_art_@PanelContainer@831
+PASS thirty_layout_fixture_visible_@PanelContainer@837
+PASS thirty_layout_fixture_original_art_@PanelContainer@837
+PASS thirty_layout_fixture_visible_@PanelContainer@843
+PASS thirty_layout_fixture_original_art_@PanelContainer@843
+PASS thirty_layout_fixture_visible_@PanelContainer@849
+PASS thirty_layout_fixture_original_art_@PanelContainer@849
 PASS thirty_layout_fixture_bounds_PublicArea
 PASS thirty_layout_fixture_bounds_UtilityRail
 PASS thirty_layout_fixture_bounds_RoomControls
@@ -240,8 +240,8 @@ PASS thirty_layout_fixture_bounds_PrivatePanel
 PASS thirty_layout_fixture_bounds_Players
 PASS thirty_layout_fixture_no_board_scroll
 PASS thirty_layout_fixture_public_area_never_scrolls
-RAIL thirty_layout_fixture [P: (1556.269, 19.30256), S: (448.7846, 902.3949)] minimum=(147.0, 303.0)
-GEOMETRY thirty_layout_fixture grid=[P: (53.08205, 395.7026), S: (1454.931, 501.8667)] screen=(2036.0, 941.0)
+RAIL thirty_layout_fixture [P: (1556.269, 19.30256), S: (448.7846, 902.3949)] minimum=(147.0, 350.0)
+GEOMETRY thirty_layout_fixture grid=[P: (53.08205, 400.5282), S: (1454.931, 497.041)] screen=(2036.0, 941.0)
 PASS players_5_fixture_all_options
 PASS players_5_fixture_visible_bruxa_do_pantano
 PASS players_5_fixture_original_art_bruxa_do_pantano
@@ -268,13 +268,13 @@ PASS players_5_fixture_bounds_PrivatePanel
 PASS players_5_fixture_bounds_Players
 PASS players_5_fixture_no_board_scroll
 PASS players_5_fixture_public_area_never_scrolls
-RAIL players_5_fixture [P: (1556.269, 19.30256), S: (448.7846, 902.3949)] minimum=(147.0, 303.0)
-GEOMETRY players_5_fixture grid=[P: (53.08205, 390.877), S: (1454.931, 506.6923)] screen=(2036.0, 941.0)
+RAIL players_5_fixture [P: (1556.269, 19.30256), S: (448.7846, 902.3949)] minimum=(147.0, 350.0)
+GEOMETRY players_5_fixture grid=[P: (53.08205, 400.5282), S: (1454.931, 497.041)] screen=(2036.0, 941.0)
 PASS roster_cell_5
 PASS roster_cell_5
 PASS roster_cell_5
 PASS roster_cell_5
-PASS roster_cell_5
+FAIL roster_cell_5
 PASS players_12_fixture_all_options
 PASS players_12_fixture_visible_bruxa_do_pantano
 PASS players_12_fixture_original_art_bruxa_do_pantano
@@ -301,7 +301,7 @@ PASS players_12_fixture_bounds_PrivatePanel
 PASS players_12_fixture_bounds_Players
 PASS players_12_fixture_no_board_scroll
 PASS players_12_fixture_public_area_never_scrolls
-RAIL players_12_fixture [P: (1556.269, 19.30256), S: (448.7846, 902.3949)] minimum=(147.0, 303.0)
+RAIL players_12_fixture [P: (1556.269, 19.30256), S: (448.7846, 902.3949)] minimum=(147.0, 350.0)
 GEOMETRY players_12_fixture grid=[P: (53.08205, 429.4821), S: (1454.931, 468.0872)] screen=(2036.0, 941.0)
 PASS roster_cell_12
 PASS roster_cell_12
@@ -341,7 +341,7 @@ PASS players_20_fixture_bounds_PrivatePanel
 PASS players_20_fixture_bounds_Players
 PASS players_20_fixture_no_board_scroll
 PASS players_20_fixture_public_area_never_scrolls
-RAIL players_20_fixture [P: (1556.269, 19.30256), S: (448.7846, 902.3949)] minimum=(147.0, 303.0)
+RAIL players_20_fixture [P: (1556.269, 19.30256), S: (448.7846, 902.3949)] minimum=(147.0, 350.0)
 GEOMETRY players_20_fixture grid=[P: (53.08205, 521.1693), S: (1454.931, 376.4)] screen=(2036.0, 941.0)
 PASS roster_cell_20
 PASS roster_cell_20
@@ -402,8 +402,8 @@ PASS chat_open_bounds_PrivatePanel
 PASS chat_open_bounds_Players
 PASS chat_open_no_board_scroll
 PASS chat_open_public_area_never_scrolls
-RAIL chat_open [P: (1556.269, 19.30256), S: (448.7846, 902.3949)] minimum=(147.0, 303.0)
-GEOMETRY chat_open grid=[P: (53.08205, 395.7026), S: (1454.931, 501.8667)] screen=(2036.0, 941.0)
+RAIL chat_open [P: (1556.269, 19.30256), S: (448.7846, 902.3949)] minimum=(147.0, 350.0)
+GEOMETRY chat_open grid=[P: (53.08205, 400.5282), S: (1454.931, 497.041)] screen=(2036.0, 941.0)
 PASS capture_chat-fixture
 PASS room_access_denied_hides_and_stops
 PASS room_access_denied_clears_bubbles

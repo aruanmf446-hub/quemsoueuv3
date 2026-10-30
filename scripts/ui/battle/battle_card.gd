@@ -121,15 +121,15 @@ func _style(hover: bool) -> void:
 	style.bg_color = Color("#070d14")
 	style.set_corner_radius_all(4)
 	add_theme_stylebox_override("panel",style)
-## Carta "tocável": sobe um pouco ao passar o mouse/foco (só se puder ser escolhida).
+## Carta "tocável": acende um pouco ao passar o mouse/foco (só se puder ser escolhida).
+## Sem mudar escala: a carta nunca sai da área do tabuleiro.
 var _lift_tween: Tween
 func _lift(on: bool) -> void:
 	if not interactive or removed: return
 	pivot_offset = size*0.5
 	if _lift_tween != null and _lift_tween.is_valid(): _lift_tween.kill()
-	z_index = 1 if on else 0
 	_lift_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	_lift_tween.tween_property(self,"scale",Vector2.ONE*(1.03 if on else 1.0),0.12)
+	_lift_tween.tween_property(self,"modulate",Color(1.12,1.1,1.05) if on else Color.WHITE,0.12)
 
 
 func _on_gui_input(event: InputEvent) -> void:
@@ -141,7 +141,7 @@ func _on_gui_input(event: InputEvent) -> void:
 		grab_focus()
 		pivot_offset = size*0.5
 		scale = Vector2.ONE*0.97
-		create_tween().tween_property(self,"scale",Vector2.ONE*1.03,0.1)
+		create_tween().tween_property(self,"scale",Vector2.ONE,0.1)
 		activated.emit()
 		accept_event()
 func _crop() -> void:

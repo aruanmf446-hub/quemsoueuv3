@@ -39,6 +39,7 @@ func _run() -> void:
 		for pair in [[services.wallet, "qse_wallet"], [services.friends, "qse_friends"], [services.progression, "qse_progression_snapshot"]]:
 			var path: String = "/rest/v1/rpc/" + pair[1]
 			if int(counter.by_path.get(path, 0)) > int(before.get(path, 0)): pair[0].fetched_at = Time.get_ticks_msec() / 1000.0
+		if _tick < 4: print("DBG ", _tick, " ", counter.by_path, " ", services.wallet.fetched_at, " ", services.wallet.age(), " ", services.wallet.state)
 	var polled: int = counter.count
 	print("CONSUMO poller_1h antes=360 depois=", polled)
 	check(polled <= 100, "poller reduzido")

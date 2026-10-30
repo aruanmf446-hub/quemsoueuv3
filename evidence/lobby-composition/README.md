@@ -46,3 +46,24 @@ Reprodução:
 godot --headless --audio-driver Dummy --path . -s tools/godot/menu_flow.gd
 godot --headless --audio-driver Dummy --path . -s tools/godot/menu_flow.gd -- --resolution=844x390
 ```
+
+## Correção da filtragem dos textos
+
+O valor global `rendering/textures/canvas_textures/default_texture_filter=3`
+corresponde a **Nearest Mipmap** (confirmado pelo enum de ProjectSettings no motor).
+Os textos herdavam essa filtragem mesmo usando fontes MSDF: as bordas apareciam
+em degraus. O lobby agora define `CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS`;
+a interpolação suaviza a leitura dos glifos e preserva os mipmaps das artes.
+O filtro global, os perfis gráficos e a composição não foram alterados.
+
+Comparação na **mesma resolução**, com a mesma fonte, tamanhos e layout:
+[Nearest — antes, 2532×1170](text-quality/before-2532x1170.png) e
+[Linear — depois, 2532×1170](text-quality/after-2532x1170.png).
+A densidade 3× foi simulada com `--ui-scale=3`, equivalente a 844×390 pontos.
+São capturas nativas do motor; não houve ampliação posterior da imagem.
+As faixas de música diferem por reprodução normal.
+
+A captura 844×390 também foi atualizada. A navegação compacta continua passando
+nas 25 verificações e o guard de design passou. Não houve validação em navegador
+móvel físico; esta evidência confirma a correção de filtragem no motor, não toda
+possível causa de baixa resolução no dispositivo.

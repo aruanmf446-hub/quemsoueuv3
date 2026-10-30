@@ -18,6 +18,9 @@ var chapter_title: Label
 
 func _ready() -> void:
 	menu = get_parent()
+	# The project default is Nearest Mipmap: it also reaches the glyph atlas.
+	# Use interpolation for the UI while keeping mipmaps for downscaled artwork.
+	menu.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	var font := preload("res://assets/desert/phase01/interface.ttf").duplicate() as FontFile
 	font.multichannel_signed_distance_field = true
 	var theme := Theme.new()

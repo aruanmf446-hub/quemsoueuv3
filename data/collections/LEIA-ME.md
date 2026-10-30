@@ -21,8 +21,8 @@ Não precisa mexer em código.
 - `id`: único, sem espaços nem acentos.
 - `name`: o nome que aparece na tela.
 - `order`: posição na lista (0 aparece primeiro).
-- `color`: fundo das cartas da coleção. Pode ser `azul`, `dourada`, `roxa`, `verde` ou `vermelha`
-  (as texturas de `assets/processed/textures/`).
+- `color`: cor do marcador da coleção. Pode ser `azul`, `dourada`, `roxa`, `verde` ou `vermelha`
+  (uma cor sólida discreta no marcador da coleção).
 - `source`: `"inventory"` mostra todos os personagens cadastrados (como a coleção Começo);
   `"list"` mostra só os IDs de `character_ids`.
 - `character_ids`: IDs de `data/characters.json`. IDs que não existem são ignorados.

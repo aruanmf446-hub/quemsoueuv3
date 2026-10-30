@@ -4,27 +4,21 @@ extends RefCounted
 const GOLD := Color("#f2cf7d")
 const INK := Color("#12223b")
 const TEXT := Color("#edf3ff")
-const FRAME := preload("res://assets/processed/frames/frame_painel_brasao.png")
-const BLUE := preload("res://assets/processed/textures/textura_azul.png")
-const PURPLE := preload("res://assets/processed/textures/textura_roxa.png")
-## Kit de arte em versões leves (assets/ui/kit, geradas a partir de assets/processed/frames).
-const PLATE := preload("res://assets/ui/kit/plate.png")
-const PLATE_GOLD := preload("res://assets/ui/kit/plate_gold.png")
-const PLATE_SMALL := preload("res://assets/ui/kit/plate_small.png")
-const PLATE_SMALL_GOLD := preload("res://assets/ui/kit/plate_small_gold.png")
-const PANEL_FRAME := preload("res://assets/ui/kit/panel_frame.png")
-const PANEL_FRAME_SMALL := preload("res://assets/ui/kit/panel_frame_small.png")
-const CARD_FRAME := preload("res://assets/ui/kit/card_frame.png")
-const CARD_FRAME_GOLD := preload("res://assets/ui/kit/card_frame_gold.png")
-## Texto sobre a placa dourada do kit (que é âmbar escuro): creme claro, alto contraste.
-const KIT_INK := Color("#ffeec4")
-## Cores das coleções: texturas do kit usadas como fundo de cartas e etiquetas.
+## Aparência aprovada dos menus: superfícies escuras e discretas, filete fino e dourado só
+## no principal/selecionado. Não usar molduras ou placas de imagem (assets/ui/kit,
+## assets/processed/frames) nos menus: esse visual foi reprovado. Ver AGENTS.md.
+const PANEL_BG := Color(0.07, 0.11, 0.19, 0.92)
+const PANEL_BORDER := Color("#2c3a52")
+const FIELD_BG := Color("#16233a")
+## Texto sobre superfícies douradas (principal/selecionado).
+const KIT_INK := INK
+## Cores das coleções (antes texturas do kit).
 const SWATCHES := {
-	"azul": "res://assets/processed/textures/textura_azul.png",
-	"dourada": "res://assets/processed/textures/textura_dourada.png",
-	"roxa": "res://assets/processed/textures/textura_roxa.png",
-	"verde": "res://assets/processed/textures/textura_verde.png",
-	"vermelha": "res://assets/processed/textures/textura_vermelha.png",
+	"azul": Color("#2f6fd6"),
+	"dourada": Color("#d8a531"),
+	"roxa": Color("#7a4fd0"),
+	"verde": Color("#3f9b5a"),
+	"vermelha": Color("#c9473e"),
 }
 
 
@@ -49,8 +43,7 @@ static func button(text: String, action: Callable) -> Button:
 	return node
 
 
-## Botão com a placa do kit de arte: azul com filete dourado; o principal e o selecionado
-## (pressionado) usam a placa dourada com texto escuro.
+## Botão discreto: superfície escura com filete; o principal e o selecionado são dourados.
 static func style_button(node: Button, primary: bool) -> void:
 	var states := {
 		"normal": button_plate(primary),
@@ -65,7 +58,7 @@ static func style_button(node: Button, primary: bool) -> void:
 	focus.draw_center = false
 	focus.border_color = Color(GOLD, 0.9)
 	focus.set_border_width_all(2)
-	focus.set_corner_radius_all(6)
+	focus.set_corner_radius_all(8)
 	focus.set_expand_margin_all(2)
 	node.add_theme_stylebox_override("focus", focus)
 	for color: String in ["font_color", "font_hover_color", "font_focus_color"]:
@@ -152,21 +145,21 @@ static func row(parent: Node) -> HBoxContainer:
 	return node
 
 
-## Linha/cartão de lista: placa do kit esticada.
+## Linha/cartão de lista.
 static func card(parent: Node) -> VBoxContainer:
 	var panel := PanelContainer.new()
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var style := plate()
-	style.content_margin_left = 26
+	style.content_margin_left = 22
 	style.content_margin_top = 18
-	style.content_margin_right = 26
+	style.content_margin_right = 22
 	style.content_margin_bottom = 18
 	panel.add_theme_stylebox_override("panel", style)
 	parent.add_child(panel)
 	return column(panel)
 
 
-## Painel grande do kit (moldura azul com brilho e cantos de cristal).
+## Painel grande (superfície escura com filete fino).
 static func panel(parent: Node, padding := 34) -> VBoxContainer:
 	var node := PanelContainer.new()
 	node.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -175,55 +168,49 @@ static func panel(parent: Node, padding := 34) -> VBoxContainer:
 	return column(node)
 
 
-## Placa do kit como StyleBox esticável (9 partes); tint escurece ou clareia.
-static func plate(gold := false, tint := Color.WHITE) -> StyleBoxTexture:
-	var box := StyleBoxTexture.new()
-	box.texture = PLATE_GOLD if gold else PLATE
-	box.texture_margin_left = 26
-	box.texture_margin_right = 26
-	box.texture_margin_top = 20
-	box.texture_margin_bottom = 20
+static func _flat(bg: Color, border: Color, radius: int, tint: Color) -> StyleBoxFlat:
+	var box := StyleBoxFlat.new()
+	box.bg_color = bg * tint
+	box.border_color = border * tint
+	box.set_border_width_all(1)
+	box.set_corner_radius_all(radius)
+	box.anti_aliasing = true
+	return box
+
+
+## Cartão/linha. `gold`: destaque (o próprio jogador, o selecionado). tint clareia/escurece.
+static func plate(gold := false, tint := Color.WHITE) -> StyleBoxFlat:
+	var box := _flat(Color("#1f2c43") if gold else Color(0.06, 0.10, 0.17, 0.94), Color(GOLD, 0.85) if gold else PANEL_BORDER, 10, tint)
+	if gold: box.set_border_width_all(2)
 	box.content_margin_left = 22
 	box.content_margin_right = 22
 	box.content_margin_top = 8
 	box.content_margin_bottom = 8
-	box.modulate_color = tint
 	return box
 
 
-## Placa fina (1/6 da arte original) para botões, abas e campos: borda delicada.
-static func button_plate(gold := false, tint := Color.WHITE) -> StyleBoxTexture:
-	var box := StyleBoxTexture.new()
-	box.texture = PLATE_SMALL_GOLD if gold else PLATE_SMALL
-	box.texture_margin_left = 18
-	box.texture_margin_right = 18
-	box.texture_margin_top = 14
-	box.texture_margin_bottom = 14
+## Botões, abas e campos: escuros com filete; dourado sólido no principal/selecionado.
+static func button_plate(gold := false, tint := Color.WHITE) -> StyleBoxFlat:
+	var box := _flat(GOLD if gold else FIELD_BG, Color(GOLD, 0.0) if gold else Color("#3a4a64"), 8, tint)
 	box.content_margin_left = 20
 	box.content_margin_right = 20
 	box.content_margin_top = 6
 	box.content_margin_bottom = 6
-	box.modulate_color = tint
 	return box
 
 
-## Moldura de painel do kit. `small` (celular/telas baixas): versão com cantos menores,
-## para a moldura não comer o espaço do conteúdo quando a interface é desenhada em 2×.
-static func frame_panel(padding := 34, small := false) -> StyleBoxTexture:
-	var box := StyleBoxTexture.new()
-	box.texture = PANEL_FRAME_SMALL if small else PANEL_FRAME
-	var corner := 26 if small else 52
-	box.texture_margin_left = corner
-	box.texture_margin_right = corner
-	box.texture_margin_top = corner
-	box.texture_margin_bottom = corner
+## Painel de seção. `small` (celular): cantos menores.
+static func frame_panel(padding := 34, small := false) -> StyleBoxFlat:
+	var box := _flat(PANEL_BG, PANEL_BORDER, 8 if small else 12, Color.WHITE)
+	box.shadow_color = Color(0, 0, 0, 0.35)
+	box.shadow_size = 10
 	for side in [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]:
 		box.set_content_margin(side, padding)
 	return box
 
 
-static func swatch(color_name: String) -> Texture2D:
-	return load(SWATCHES.get(color_name, SWATCHES.azul)) as Texture2D
+static func swatch(color_name: String) -> Color:
+	return SWATCHES.get(color_name, SWATCHES.azul)
 
 
 static func clear(parent: Node) -> void:

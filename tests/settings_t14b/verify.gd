@@ -46,7 +46,7 @@ func _run() -> void:
 	root.add_child(screen)
 	screen.show_screen()
 	await process_frame
-	check(not screen.get_node('CrestFrame').visible, 'ornamental frame removed locally')
+	check(not screen.has_node('CrestFrame'), 'ornamental frame removed')
 	check(screen.heading.text == 'Settings', 'English heading')
 	check(screen.get('_tabs').size() == 4, 'four categories')
 	for index in range(4):

@@ -20,7 +20,6 @@ var _rail: VBoxContainer
 func _ready() -> void:
 	manages_own_scale = true
 	super._ready()
-	$CrestFrame.hide()
 	$Tint.color = Color(0.02, 0.035, 0.07, 0.86)
 	_make_icons()
 	visibility_changed.connect(func() -> void:
@@ -58,7 +57,7 @@ func render() -> void:
 	var panel := PanelContainer.new()
 	panel.name = "ContentPanel"
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	panel.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	panel.add_theme_stylebox_override("panel", _glass(24))
 	_layout.add_child(panel)
 	var scroll := ScrollContainer.new()
@@ -301,10 +300,20 @@ func _button(text: String, action: Callable) -> Button:
 	node.pressed.connect(action)
 	return node
 
-## Botões e abas usam a placa do kit (PlayerUI): a aba selecionada fica dourada.
+## Botões e abas da versão aprovada: superfícies azul-escuras arredondadas; a aba
+## selecionada fica âmbar com filete dourado. Sem placas/molduras de imagem.
 func _style_button(node: Button) -> void:
 	node.add_theme_font_size_override("font_size", 21)
-	PlayerUI.style_button(node, false)
+	var colors := {"normal": Color("#213852"), "hover": Color("#304c6a"), "pressed": Color("#4b4432"), "hover_pressed": Color("#56503a"), "focus": Color("#213852"), "disabled": Color("#1a2638")}
+	for state: String in colors:
+		var style := _box(colors[state], 14)
+		if state in ["pressed", "hover_pressed", "focus"]:
+			style.border_color = ACCENT
+			style.set_border_width_all(2)
+		if state == "focus": style.draw_center = false
+		node.add_theme_stylebox_override(state, style)
+	for color in ["font_color", "font_hover_color", "font_focus_color", "font_pressed_color", "font_hover_pressed_color"]:
+		node.add_theme_color_override(color, Color.WHITE)
 
 func _style_tab(node: Button) -> void:
 	_style_button(node)
@@ -312,8 +321,8 @@ func _style_tab(node: Button) -> void:
 	node.add_theme_color_override("icon_normal_color", Color.WHITE)
 	node.add_theme_color_override("icon_hover_color", Color.WHITE)
 	node.add_theme_color_override("icon_focus_color", Color.WHITE)
-	node.add_theme_color_override("icon_pressed_color", PlayerUI.KIT_INK)
-	node.add_theme_color_override("icon_hover_pressed_color", PlayerUI.KIT_INK)
+	node.add_theme_color_override("icon_pressed_color", Color.WHITE)
+	node.add_theme_color_override("icon_hover_pressed_color", Color.WHITE)
 
 func _style_toggle(node: CheckButton) -> void:
 	node.add_theme_icon_override("checked", _toggle_on)
@@ -330,10 +339,9 @@ func _style_toggle(node: CheckButton) -> void:
 	focus.set_border_width_all(2)
 	node.add_theme_stylebox_override("focus", focus)
 
-## Painel do conteúdo: moldura do kit (azul com brilho e cantos de cristal).
-func _glass(padding: int) -> StyleBoxTexture:
-	var compact := UIScale.is_compact()
-	return PlayerUI.frame_panel(padding + (4 if compact else 14), compact)
+## Painel do conteúdo da versão aprovada: azul-escuro liso, cantos arredondados.
+func _glass(padding: int) -> StyleBoxFlat:
+	return _box(Color("#14243c"), padding)
 
 func _row_box() -> StyleBoxFlat:
 	var box := _box(Color(1, 1, 1, 0.04), 16)

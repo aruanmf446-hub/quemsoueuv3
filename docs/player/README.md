@@ -15,7 +15,7 @@ Implementação na branch `codex/telas-sistemas-jogador-03`, baseada em `d90dcb5
 | Modo História | [Reinos e fases](../../scenes/player/story.tscn) | Quatro reinos e dez fases do Deserto; somente a fase 1 oferece abrir sua cena de protótipo. |
 | Entrar / conta | [Supabase Auth](../../scenes/player/account.tscn) | Login, cadastro sujeito a confirmação de e-mail e saída da sessão local. |
 
-`NavigationManager` instancia cada rota uma única vez, mantém histórico com parâmetros, restaura foco, oferece Voltar/Esc/Android Back e anima a abertura. `StateBanner` compartilha carregamento, sucesso, vazio, offline, erro e acesso não autorizado. As telas usam a arte, moldura com brasão e paleta do projeto, com containers e rolagem. O layout e sua aparência ainda precisam ser vistos no motor.
+`NavigationManager` instancia cada rota uma única vez, mantém histórico com parâmetros, restaura foco, oferece Voltar/Esc/Android Back e anima a abertura. `StateBanner` compartilha carregamento, sucesso, vazio, offline, erro e acesso não autorizado. As telas usam superfícies escuras e discretas com filete dourado no item principal/selecionado, sobre o fundo do lobby, com containers e rolagem (ver **Design dos menus** em `AGENTS.md`). O layout e sua aparência ainda precisam ser vistos no motor.
 
 ## Dados e comportamento entregue
 

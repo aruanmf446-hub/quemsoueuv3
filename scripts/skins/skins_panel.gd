@@ -11,10 +11,8 @@ var _collection_title := "Começo"
 var _collections: Array[Dictionary] = []
 var _collection := 0
 var _collection_list: VBoxContainer
-static var _shade: GradientTexture2D
+static var _atmosphere: GradientTexture2D
 var _collection_count: Label
-const CARD_EDGE := preload("res://assets/ui/kit/card_edge.png")
-const CARD_EDGE_GOLD := preload("res://assets/ui/kit/card_edge_gold.png")
 const CARD_BG := Color("#111d30")
 const CARD_BG_SELECTED := Color("#25344e")
 const CARD_BORDER := Color("#455269")
@@ -60,8 +58,6 @@ func _ready() -> void:
 	$Tint.color = Color(0.025, 0.04, 0.09, 0.90)
 	_load_collections()
 	_thumbnails = ThumbnailCache.new(preload("res://scenes/lobby/lobby_stage.tscn"))
-	# Moldura azul/dourada gigante removida desta tela; o fundo do lobby permanece.
-	$CrestFrame.hide()
 	_load_favorites()
 	_split_layout()
 	get_viewport().size_changed.connect(_responsive_layout)
@@ -101,8 +97,8 @@ func _split_layout() -> void:
 	_search_field = LineEdit.new()
 	_search_field.placeholder_text = "Pesquisar personagem..."
 	_search_field.custom_minimum_size.y = 52
-	_search_field.add_theme_stylebox_override("normal", PlayerUI.button_plate())
-	_search_field.add_theme_stylebox_override("focus", PlayerUI.button_plate(false, Color(1.2, 1.2, 1.25)))
+	_search_field.add_theme_stylebox_override("normal", _panel_style(false))
+	_search_field.add_theme_stylebox_override("focus", _panel_style(true))
 	_search_field.add_theme_font_size_override("font_size", 17)
 	_search_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_search_field.text_changed.connect(func(value: String) -> void:
@@ -133,19 +129,18 @@ func _split_layout() -> void:
 		option.custom_minimum_size = Vector2(118, 52)
 		option.add_theme_font_size_override("font_size", 17)
 		for state in ["normal", "hover", "pressed", "focus"]:
-			option.add_theme_stylebox_override(state, PlayerUI.button_plate(false, Color(1.16, 1.16, 1.2) if state in ["hover", "focus"] else Color.WHITE))
+			option.add_theme_stylebox_override(state, _panel_style(state == "focus"))
 	_collection_sidebar = VBoxContainer.new()
 	_collection_sidebar.name = "Collections"
-	_collection_sidebar.custom_minimum_size.x = 272
+	_collection_sidebar.custom_minimum_size.x = 220
 	_collection_sidebar.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_collection_sidebar.mouse_filter = Control.MOUSE_FILTER_PASS
 	_collection_sidebar.add_theme_constant_override("separation", 14)
 	_split.add_child(_collection_sidebar)
 	_split.move_child(_collection_sidebar, 0)
-	# Painel do tamanho da lista (antes era uma coluna alta e vazia).
 	var collection_panel := PanelContainer.new()
-	collection_panel.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-	collection_panel.add_theme_stylebox_override("panel", PlayerUI.frame_panel(30))
+	collection_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	collection_panel.add_theme_stylebox_override("panel", _column_style())
 	_collection_sidebar.add_child(collection_panel)
 	var categories := VBoxContainer.new()
 	categories.add_theme_constant_override("separation", 12)
@@ -166,7 +161,7 @@ func _split_layout() -> void:
 	_side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_side.size_flags_stretch_ratio = 1.0
 	_side.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_side.add_theme_stylebox_override("panel", PlayerUI.frame_panel(38))
+	_side.add_theme_stylebox_override("panel", _showcase_style())
 	_split.add_child(_side)
 	_preview = VBoxContainer.new()
 	_preview.add_theme_constant_override("separation", 6)
@@ -200,7 +195,6 @@ func _responsive_layout() -> void:
 	# Barra de coleções só quando sobra largura; em telas estreitas a coleção atual
 	# continua no topo ("COMEÇO · 7/8") e a prévia não é empurrada para fora.
 	_collection_sidebar.visible = not compact and get_viewport().get_visible_rect().size.x >= 1200.0
-	_side.add_theme_stylebox_override("panel", PlayerUI.frame_panel(12 if compact else 38, compact))
 	_toolbar.add_theme_constant_override("separation", 4 if compact else 8)
 	_fav_button.text = "Favoritos" if not compact else "FAV"
 	_fav_button.add_theme_color_override("font_color", ACCENT if _favorite_only else PlayerUI.TEXT)
@@ -284,28 +278,21 @@ func _gallery_card(entry: Dictionary) -> PanelContainer:
 	var card := PanelContainer.new()
 	card.mouse_filter = Control.MOUSE_FILTER_STOP
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	card.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+	card.add_theme_stylebox_override("panel", _panel_style(character_id == _selected))
 	_cards[character_id] = card
+	# Fundo discreto aprovado: brilho radial suave atrás do personagem.
 	var backdrop := TextureRect.new()
 	backdrop.name = "Backdrop"
-	backdrop.texture = _collection_swatch()
+	backdrop.texture = _atmosphere_texture()
 	backdrop.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	backdrop.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	backdrop.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	backdrop.modulate = Color(0.7, 0.7, 0.78)
+	backdrop.stretch_mode = TextureRect.STRETCH_SCALE
 	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	card.add_child(backdrop)
-	var shade := TextureRect.new()
-	shade.texture = _shade_texture()
-	shade.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	shade.stretch_mode = TextureRect.STRETCH_SCALE
-	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	card.add_child(shade)
 	var pad := MarginContainer.new()
 	pad.name = "Pad"
 	pad.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	for side in ["left", "right", "top", "bottom"]:
-		pad.add_theme_constant_override("margin_" + side, 26 if side in ["left", "right"] else 20)
+		pad.add_theme_constant_override("margin_" + side, 4)
 	card.add_child(pad)
 	var column := VBoxContainer.new()
 	column.name = "Content"
@@ -351,17 +338,7 @@ func _gallery_card(entry: Dictionary) -> PanelContainer:
 		footer.add_child(_badge("EQUIPADO" if equipped else "BLOQUEADO", equipped))
 	if not unlocked:
 		thumbnail.modulate = Color(0.45, 0.48, 0.55)
-		backdrop.modulate = Color(0.35, 0.37, 0.42)
-	# Moldura do kit por cima de tudo (miolo transparente): dourada na carta selecionada.
-	var frame := NinePatchRect.new()
-	frame.name = "Frame"
-	frame.texture = CARD_EDGE_GOLD if character_id == _selected else CARD_EDGE
-	frame.patch_margin_left = 34
-	frame.patch_margin_right = 34
-	frame.patch_margin_top = 34
-	frame.patch_margin_bottom = 34
-	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	card.add_child(frame)
+		backdrop.modulate = Color(0.55, 0.57, 0.62)
 	card.resized.connect(func() -> void: card.pivot_offset = card.size * 0.5)
 	card.mouse_entered.connect(func() -> void:
 		var hover := card.create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
@@ -461,8 +438,7 @@ func _select_neighbor(direction: int) -> void:
 func _select(character_id: String) -> void:
 	_selected = character_id
 	for id: String in _cards:
-		var frame := (_cards[id] as Node).get_node_or_null("Frame") as NinePatchRect
-		if frame != null: frame.texture = CARD_EDGE_GOLD if id == character_id else CARD_EDGE
+		(_cards[id] as PanelContainer).add_theme_stylebox_override("panel", _panel_style(id == character_id))
 	var kept: LobbyStage = _stage if is_instance_valid(_stage) and _stage.get_parent() == _preview else null
 	if kept != null: _preview.remove_child(kept)
 	PlayerUI.clear(_preview)
@@ -550,6 +526,36 @@ func _generate_thumbnails() -> void:
 			_images[character_id].texture = _portrait_texture(_paths[character_id])
 
 
+func _flat_button(button: Button, primary: bool) -> void:
+	var base := BUTTON_BG if not primary else Color("#6b5530")
+	var states := {"normal": base, "hover": base.lightened(0.12), "pressed": Color("#6b5530").darkened(0.1), "hover_pressed": Color("#6b5530"), "focus": base, "disabled": Color("#1a2333")}
+	for state: String in states:
+		var style := StyleBoxFlat.new()
+		style.bg_color = states[state]
+		style.set_corner_radius_all(7)
+		style.content_margin_left = 10
+		style.content_margin_right = 10
+		style.set_border_width_all(2 if state == "focus" else 1)
+		style.border_color = ACCENT if primary or state in ["focus", "pressed", "hover_pressed"] else Color("#45546a")
+		if state == "focus": style.draw_center = false
+		button.add_theme_stylebox_override(state, style)
+	for color: String in ["font_color", "font_hover_color", "font_focus_color", "font_pressed_color", "font_hover_pressed_color"]:
+		button.add_theme_color_override(color, Color("#f4f1e6"))
+	button.add_theme_color_override("font_disabled_color", Color("#7d8796"))
+
+
+## Coluna das coleções e palco da prévia: mesmas superfícies da versão aprovada.
+func _column_style() -> StyleBoxFlat:
+	return _panel_style(false)
+
+
+func _showcase_style() -> StyleBoxFlat:
+	var style := _panel_style(false)
+	style.border_color = Color(0.31, 0.40, 0.53, 0.8)
+	style.bg_color = Color(0.03, 0.07, 0.13, 0.32)
+	return style
+
+
 func _panel_style(selected: bool) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color("#233449") if selected else Color("#0e1b2b")
@@ -565,14 +571,14 @@ func _panel_style(selected: bool) -> StyleBoxFlat:
 	return style
 
 
-## Botões com a placa do kit (o principal é dourado), como no resto do menu.
+## Botão plano da tela aprovada (o principal tem fundo âmbar e filete dourado).
 func _button(text: String, action: Callable, primary := false) -> Button:
 	var button := Button.new()
 	button.text = text
 	button.custom_minimum_size.y = 52
 	button.focus_mode = Control.FOCUS_ALL
 	button.add_theme_font_size_override("font_size", 22)
-	PlayerUI.style_button(button, primary)
+	_flat_button(button, primary)
 	button.pressed.connect(action)
 	PlayerUI.fluid(button)
 	return button
@@ -631,9 +637,9 @@ func _build_collections() -> void:
 		button.name = "Collection_" + str(collection.id)
 		button.toggle_mode = true
 		button.button_pressed = chosen
-		button.custom_minimum_size = Vector2(0, 66)
+		button.custom_minimum_size = Vector2(0, 52)
 		button.focus_mode = Control.FOCUS_ALL
-		PlayerUI.style_button(button, false)
+		_flat_button(button, chosen)
 		button.pressed.connect(_choose_collection.bind(index))
 		var line := HBoxContainer.new()
 		line.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -645,22 +651,14 @@ func _build_collections() -> void:
 		var chip := PanelContainer.new()
 		chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		# Marcador pequeno com a cor da coleção (sem textura decorativa).
 		var chip_style := StyleBoxFlat.new()
-		chip_style.bg_color = Color(0, 0, 0, 0.4)
-		chip_style.border_color = Color(ACCENT, 0.9)
-		chip_style.set_border_width_all(2)
-		chip_style.set_corner_radius_all(6)
-		chip_style.set_content_margin_all(2)
+		chip_style.bg_color = PlayerUI.swatch(str(collection.get("color", "azul")))
+		chip_style.set_corner_radius_all(5)
+		chip.custom_minimum_size = Vector2(14, 14)
 		chip.add_theme_stylebox_override("panel", chip_style)
-		var swatch := TextureRect.new()
-		swatch.texture = PlayerUI.swatch(str(collection.get("color", "azul")))
-		swatch.custom_minimum_size = Vector2(26, 26)
-		swatch.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		swatch.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-		swatch.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		chip.add_child(swatch)
 		line.add_child(chip)
-		var ink := PlayerUI.KIT_INK if chosen else Color("#f4f1e6")
+		var ink := Color("#f4f1e6")
 		var title := PlayerUI.label(str(collection.get("name", "")).to_upper(), 15, ink)
 		title.autowrap_mode = TextServer.AUTOWRAP_OFF
 		title.clip_text = true
@@ -676,23 +674,18 @@ func _build_collections() -> void:
 		_collection_list.add_child(button)
 
 
-func _collection_swatch() -> Texture2D:
-	return PlayerUI.swatch(str(_collections[_collection].get("color", "azul")) if not _collections.is_empty() else "azul")
-
-
-## Sombra vertical das cartas: transparente em cima, escura embaixo (o nome lê bem).
-func _shade_texture() -> Texture2D:
-	if _shade == null:
-		var ramp := Gradient.new()
-		ramp.offsets = PackedFloat32Array([0.0, 0.55, 1.0])
-		ramp.colors = PackedColorArray([Color(0.02, 0.04, 0.08, 0.0), Color(0.02, 0.04, 0.08, 0.15), Color(0.02, 0.04, 0.08, 0.92)])
-		_shade = GradientTexture2D.new()
-		_shade.gradient = ramp
-		_shade.fill_from = Vector2(0, 0)
-		_shade.fill_to = Vector2(0, 1)
-		_shade.width = 4
-		_shade.height = 128
-	return _shade
+## Fundo das cartas da versão aprovada: brilho radial cinza-azulado atrás do busto.
+func _atmosphere_texture() -> Texture2D:
+	if _atmosphere == null:
+		var gradient := Gradient.new()
+		gradient.colors = PackedColorArray([Color("#374350"), Color("#101d2e"), Color("#0b1421")])
+		gradient.offsets = PackedFloat32Array([0.0, 0.6, 1.0])
+		_atmosphere = GradientTexture2D.new()
+		_atmosphere.gradient = gradient
+		_atmosphere.fill = GradientTexture2D.FILL_RADIAL
+		_atmosphere.fill_from = Vector2(0.5, 0.35)
+		_atmosphere.fill_to = Vector2(1.0, 1.0)
+	return _atmosphere
 
 
 func _showcase(parent: Control, character_id: String) -> LobbyStage:

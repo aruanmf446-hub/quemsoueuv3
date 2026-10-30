@@ -25,6 +25,14 @@ func begin(order: int) -> void:
 	if entries.is_empty():
 		_finish.call_deferred()
 		return
+	# Imagem própria em assets/story/faseNN_MM.(webp|png|jpg) substitui a do JSON.
+	for index in range(entries.size()):
+		for ext in ["webp", "png", "jpg", "jpeg"]:
+			var path := "res://assets/story/fase%02d_%02d.%s" % [order, index + 1, ext]
+			if ResourceLoader.exists(path):
+				entries[index] = (entries[index] as Dictionary).duplicate()
+				entries[index].image = path
+				break
 	_carousel.set_cards_data(entries)
 
 func _unhandled_input(event: InputEvent) -> void:

@@ -1,0 +1,76 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS only_real_public_deck
+PASS official_creator_nine_cards
+PASS missing_metadata_not_invented
+PASS reject_path_traversal
+PASS original_image_bruxa_do_pantano
+PASS original_image_cobra_grande
+PASS original_image_dama_de_branco
+PASS original_image_homem_do_saco
+PASS original_image_homem_sorridente
+PASS original_image_jeff_the_killer
+PASS original_image_loira_do_banheiro
+PASS original_image_momo
+PASS original_image_slender_man
+PASS alphabetical_order
+PASS private_not_readable
+PASS unlisted_read_contract
+PASS minimum_five_enforced
+PASS missing_image_rejects_whole_deck
+PASS valid_metadata_only
+PASS original_language_preserved
+PASS accent_insensitive_search_key
+PASS real_lobby_button_opens_separate_route
+PASS readonly_without_login
+PASS header_within_landscape
+PASS tab_bounds_TabDescobrir
+PASS tab_bounds_TabPopulares
+PASS tab_bounds_TabRecentes
+PASS tab_bounds_TabFavoritos
+PASS tab_bounds_TabMeusDecks
+PASS capture_library
+PASS search_LENDAS
+PASS search_quem sou eu
+PASS search_  Lendas Urbanas
+PASS empty_search
+PASS clear_search
+PASS truthful_empty_1
+PASS truthful_empty_2
+PASS truthful_empty_3
+PASS unavailable_account_action_3
+PASS truthful_empty_4
+PASS unavailable_account_action_4
+PASS real_click_opens_nine_card_gallery
+PASS capture_deck
+PASS last_card_click
+PASS last_card_boundary
+PASS reader_button_returns_gallery
+PASS gallery_scroll_restored
+PASS first_card_boundary
+PASS reader_bounds
+READER_GEOMETRY [P: (40.0, 96.0), S: (1592.0, 817.0)] [P: (978.0, 869.0), S: (654.0, 44.0)]
+PASS reader_actions_within_scroll_viewport
+PASS capture_reader
+PASS next_original_image_1
+PASS next_original_image_2
+PASS next_original_image_3
+PASS next_original_image_4
+PASS next_original_image_5
+PASS next_original_image_6
+PASS next_original_image_7
+PASS next_original_image_8
+PASS keyboard_previous
+PASS rapid_changes_keep_layout_scale
+PASS escape_reader_to_gallery
+PASS android_back_gallery_to_library
+PASS header_back_to_lobby
+PASS local_route_parameters
+PASS local_views_preserve_history
+PASS unavailable_route_safe
+DECK_LIBRARY_CHECKS 67 FAILURES 0
+WARNING: ObjectDB instances leaked at exit (run with --verbose for details).
+   at: cleanup (core/object/object.cpp:2663)

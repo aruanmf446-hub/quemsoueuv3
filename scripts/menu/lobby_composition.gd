@@ -38,6 +38,11 @@ func _ready() -> void:
 	for child in old_menu.get_children(): child.reparent(navigation)
 	menu.set("_menu_buttons", navigation)
 	old_menu.queue_free()
+	var library := preload("res://scenes/menu/components/menu_card_button.tscn").instantiate() as MenuCardButton
+	library.name = "BtnLibrary"
+	library.button_id = &"deck_library"
+	navigation.add_child(library)
+	library.activated.connect(menu._on_menu_button_activated)
 	chapter = _label("MODO HISTÓRIA", 14, ACCENT)
 	chapter_title = _label("REINO DO\nDESERTO", 56, PAPER)
 	menu.get_node("Logo").hide()
@@ -58,7 +63,7 @@ func _ready() -> void:
 	for button: MenuCardButton in menu.get_node("MenuButtons").get_children():
 		button.art_texture = null
 		button.get_node("Padding").hide()
-		button.text = {"story": "História  ›", "duel": "Duelo", "skins": "Personagens", "friends": "Amizades", "settings": "Configurações"}[String(button.button_id)]
+		button.text = {"story": "História  ›", "duel": "Duelo", "skins": "Personagens", "friends": "Amizades", "settings": "Configurações", "deck_library": "Biblioteca"}[String(button.button_id)]
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		_action_content(button)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -215,9 +220,10 @@ func _layout() -> void:
 	_rect(buttons, Vector2.ZERO, menu.size)
 	var x := pad if compact else 225.0
 	var y := 72.0 if compact else 22.0
-	for id: String in ["duel", "skins", "friends", "settings"]:
-		var button: Button = buttons.get_node({"duel":"BtnDuel", "skins":"BtnSkins", "friends":"BtnFriends", "settings":"BtnSettings"}[id])
-		var width: float = {"duel": 88.0, "skins": 150.0, "friends": 126.0, "settings": 100.0}[id]
+	for id: String in ["duel", "skins", "deck_library", "friends", "settings"]:
+		var button: Button = buttons.get_node({"duel":"BtnDuel", "skins":"BtnSkins", "friends":"BtnFriends", "settings":"BtnSettings", "deck_library":"BtnLibrary"}[id])
+		var width: float = {"duel": 88.0, "skins": 150.0, "friends": 126.0, "settings": 100.0, "deck_library": 134.0}[id]
+		if w < 760: width = {"duel": 74.0, "skins": 136.0, "friends": 100.0, "settings": 88.0, "deck_library": 116.0}[id]
 		_rect(button, Vector2(x, y) * unit, Vector2(width, 44) * unit)
 		var body: Control = button.get_node("ActionBody")
 		body.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -226,7 +232,7 @@ func _layout() -> void:
 		body.get_node("Icon").hide()
 		body.get_node("Text/Subtitle").hide()
 		body.get_node("Text/Title").add_theme_font_size_override("font_size", roundi(15 * unit))
-		x += width + 8
+		x += width + (4 if w < 760 else 8)
 	var title_y := h * 0.35 if compact else h * 0.40
 	_rect(chapter, Vector2(pad, title_y) * unit, Vector2(340, 24) * unit)
 	chapter.add_theme_font_size_override("font_size", roundi(12 * unit))
@@ -312,8 +318,8 @@ func intro() -> void:
 
 func _action_content(button: MenuCardButton) -> void:
 	button.text = ""
-	var titles := {"story": ["JOGAR", "Modo História · Reino do Deserto"], "duel": ["DUELO", "Partida local ou salas online"], "skins": ["PERSONAGENS", "Coleção Começo"], "friends": ["AMIZADES", "Sua equipe de aventura"], "settings": ["AJUSTES", "Sua experiência"]}
-	var paths := {"story": '<path d="M12 3 21 8v8l-9 5-9-5V8zM12 3v18M3 8l9 5 9-5"/>', "duel": '<path d="M3 3l10 10M3 3h4M3 3v4M21 3 11 13M21 3h-4M21 3v4"/><path d="M8 16l-4 4M16 16l4 4M6.5 14.5l3 3M17.5 14.5l-3 3"/>', "skins": '<circle cx="12" cy="7" r="4"/><path d="M4 22v-4a8 8 0 0 1 16 0v4M4 18h16"/>', "friends": '<circle cx="8" cy="8" r="3"/><circle cx="18" cy="9" r="3"/><path d="M1 22v-4a7 7 0 0 1 14 0v4M16 15a6 6 0 0 1 7 6"/>', "settings": '<path d="M3 6h18M3 12h18M3 18h18"/><circle cx="8" cy="6" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="9" cy="18" r="2"/>'}
+	var titles := {"story": ["JOGAR", "Modo História · Reino do Deserto"], "duel": ["DUELO", "Partida local ou salas online"], "skins": ["PERSONAGENS", "Coleção Começo"], "friends": ["AMIZADES", "Sua equipe de aventura"], "settings": ["AJUSTES", "Sua experiência"], "deck_library": ["BIBLIOTECA", "Decks e cartas"]}
+	var paths := {"deck_library": '<rect x="4" y="5" width="13" height="16" rx="2"/><path d="M8 2h12v16M8 9h5M8 13h5"/>', "story": '<path d="M12 3 21 8v8l-9 5-9-5V8zM12 3v18M3 8l9 5 9-5"/>', "duel": '<path d="M3 3l10 10M3 3h4M3 3v4M21 3 11 13M21 3h-4M21 3v4"/><path d="M8 16l-4 4M16 16l4 4M6.5 14.5l3 3M17.5 14.5l-3 3"/>', "skins": '<circle cx="12" cy="7" r="4"/><path d="M4 22v-4a8 8 0 0 1 16 0v4M4 18h16"/>', "friends": '<circle cx="8" cy="8" r="3"/><circle cx="18" cy="9" r="3"/><path d="M1 22v-4a7 7 0 0 1 14 0v4M16 15a6 6 0 0 1 7 6"/>', "settings": '<path d="M3 6h18M3 12h18M3 18h18"/><circle cx="8" cy="6" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="9" cy="18" r="2"/>'}
 	var row := HBoxContainer.new()
 	row.name = "ActionBody"
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE

@@ -14,7 +14,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 # Telas do jogador e estilo compartilhado. O menu principal/lobby (scenes/menu, scenes/lobby,
 # scripts/menu) é o design aprovado e tem arte própria; não entra aqui.
-MENU_PATHS = ["scripts/ui", "scripts/skins", "scenes/player", "scenes/skins"]
+MENU_PATHS = ["scripts/decks", "scripts/ui", "scripts/skins", "scenes/player", "scenes/skins"]
 FORBIDDEN = [
     (re.compile(r"StyleBoxTexture|NinePatchRect"), "imagem como moldura em tela do jogador"),
     (re.compile(r"res://assets/processed/(frames|textures)/"), "moldura/textura de imagem em tela do jogador"),

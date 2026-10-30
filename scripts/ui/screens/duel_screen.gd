@@ -64,6 +64,7 @@ func render() -> void:
 		_signed_out()
 		return
 	if duel.in_room(): _view = "room" if _view != "form" else "form"
+	elif _view == "room": _view = "browse"
 	match _view:
 		"form": _render_form()
 		"room": _render_room()
@@ -247,8 +248,9 @@ func _render_form() -> void:
 	public.button_pressed = bool(duel.room.room.is_public) if editing else true
 	public.toggled.connect(func(value: bool) -> void: public.text = tr("Sala pública" if value else "Só por convite"))
 	public.text = tr("Sala pública" if public.button_pressed else "Só por convite")
-	if not local: top.add_child(public)
-	else: public.button_pressed = false
+	top.add_child(public)
+	public.visible = not local
+	if local: public.button_pressed = false
 	_form.public = public
 	var grid := GridContainer.new()
 	grid.columns = 2
@@ -480,3 +482,8 @@ func animate_in() -> void:
 	PlayerUI.cascade(body)
 	var members := body.get_node_or_null("Members")
 	if members != null: PlayerUI.cascade(members, 0, 0.03)
+
+
+func _exit_tree() -> void:
+	# The match is detached while another room view is rendered.
+	if is_instance_valid(_match_view) and _match_view.get_parent() == null: _match_view.free()

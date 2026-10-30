@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/player/components/screen_frame.tscn" id="1_1gu8u"]
+[ext_resource type="Script" path="res://scripts/decks/deck_library_screen.gd" id="2_dbvvr"]
+
+[node name="DeckLibrary" instance=ExtResource("1_1gu8u")]
+script = ExtResource("2_dbvvr")

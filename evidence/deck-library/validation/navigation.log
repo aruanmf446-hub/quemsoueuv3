@@ -1,0 +1,32 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+PASS menu_card_opens_story
+PASS menu_card_closes_story
+PASS menu_card_opens_duel
+PASS menu_card_closes_duel
+PASS menu_card_opens_skins
+PASS menu_card_closes_skins
+PASS menu_card_opens_friends
+PASS menu_card_closes_friends
+PASS menu_card_opens_settings
+PASS menu_card_closes_settings
+PASS menu_card_opens_deck_library
+PASS menu_card_closes_deck_library
+PASS menu_card_count
+PASS topbar_hidden_by_design_MailButton
+PASS topbar_hidden_by_design_FriendsButton
+PASS topbar_hidden_by_design_SettingsButton
+PASS friends_view_all_opens
+PASS friends_view_all_closes
+PASS profile_card_hidden_by_cleanup
+PASS hotspot_opens_coinpill
+PASS hotspot_closes_coinpill
+PASS hotspot_opens_gempill
+PASS hotspot_closes_gempill
+PASS stack_push_settings
+PASS stack_back_to_friends
+PASS stack_back_to_menu
+PASS unknown_route_ignored
+MENU_FLOW_FAILURES 0
+WARNING: ObjectDB instances leaked at exit (run with --verbose for details).
+   at: cleanup (core/object/object.cpp:2663)

@@ -60,7 +60,8 @@ func render() -> void:
 	if is_instance_valid(_match_view) and _match_view.get_parent() == body: body.remove_child(_match_view)
 	PlayerUI.clear(body)
 	banner.show_state("success")
-	if not services.session.authenticated() and not duel.is_local():
+	# Sem conta ou no modo local fora da sala: oferecer a entrada da partida local.
+	if (not services.session.authenticated() and not duel.is_local()) or (duel.is_local() and not duel.in_room() and _view != "form"):
 		_signed_out()
 		return
 	if duel.in_room(): _view = "room" if _view != "form" else "form"

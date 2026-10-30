@@ -207,6 +207,7 @@ func messages(id: String = conversation_id) -> Array:
 
 
 func is_mine(message: Dictionary) -> bool:
+	if message.has("is_you"): return bool(message.is_you)
 	return not me_id.is_empty() and str(message.get("sender_id", "")) == me_id
 
 

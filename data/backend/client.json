@@ -18,5 +18,7 @@
       "publishable_key": "sb_publishable_1JmcnJ7WLSJ3Y71XKG0Mqg_0wEMwc4Y",
       "configuration_status": "connected_public_catalog_only"
     }
-  }
+  },
+  "invite_base_url": "",
+  "invite_base_url_comment": "Android/desktop: origem oficial com rota de convite (?invite=). Na Web usa-se o endereço da página atual."
 }

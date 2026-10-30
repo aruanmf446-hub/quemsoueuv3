@@ -154,7 +154,7 @@ func _append(id: String) -> void:
 		var column := PlayerUI.column(bubble)
 		column.add_theme_constant_override("separation",2)
 		var when := Time.get_datetime_dict_from_unix_time(int(message.get("created_at",0))+int(Time.get_time_zone_from_system().bias)*60)
-		column.add_child(Style.label("%s · %02d:%02d" % ["Você" if chat.is_mine(message) else "Participante",when.hour,when.minute],10,PlayerUI.GOLD))
+		column.add_child(Style.label("%s · %02d:%02d" % ["Você" if chat.is_mine(message) else str(message.get("sender_name","Participante")),when.hour,when.minute],10,PlayerUI.GOLD))
 		var text := Style.label(str(message.text),12)
 		text.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 		column.add_child(text)

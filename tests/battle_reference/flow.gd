@@ -266,10 +266,12 @@ func run() -> void:
 	input.text="Boa partida!"
 	await click(chat.find_child("ChatSend",true,false))
 	check(fake.calls.send==1 and services.room_chat.messages().size()==1,"room_chat_send")
-	fake.deliver(services.room_chat.conversation_id,FRIEND,"Boa sorte a todos")
+	fake.deliver(services.room_chat.conversation_id,FRIEND,"Boa sorte a todos",0.0,"Lua")
 	await services.room_chat.poll()
 	await settle()
 	check(services.room_chat.messages().size()==2,"room_chat_receives")
+	var names: Array = chat.find_children("*","Label",true,false).map(func(l: Label) -> String: return l.text)
+	check(names.any(func(s: String) -> bool: return s.begins_with("Lua ·")) and names.any(func(s: String) -> bool: return s.begins_with("Você ·")),"room_chat_sender_names")
 	geometry("chat_open",9)
 	await capture("chat-fixture")
 	fake.fail_next="room_access_denied"

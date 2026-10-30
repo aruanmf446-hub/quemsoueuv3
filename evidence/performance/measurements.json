@@ -69,7 +69,7 @@
   "historical_baseline_commit": "34c2c37",
   "historical_candidate_before_main_merge": "5e45ac0",
   "integrated_main_commit": "b4cdccf",
-  "final_web_pck_bytes": 35379616,
+  "final_web_pck_bytes": 35379536,
   "mobile_canvas_dpr3": {
     "css_size": [
       844,
@@ -104,5 +104,15 @@
     },
     "errors": [],
     "note": "Software GPU; idle scene, not a running/physical-phone FPS acceptance test."
+  },
+  "desktop_web_quality": {
+    "canvas": [
+      1280,
+      720
+    ],
+    "mobile_canvas_cap_applied": false,
+    "javascript_errors": [],
+    "native_window_profile_tests": "Baixo, M\u00e9dio, Alto passed",
+    "hardware_acceleration_on_user_pc": "unknown"
   }
 }

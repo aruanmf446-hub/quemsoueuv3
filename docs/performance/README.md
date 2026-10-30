@@ -14,9 +14,9 @@ reduz geometria, animação, memória de renderização nem geração de cenári
   agrupamento por material. Trechos distantes entram na fila também no spawn.
 - Cactus reutilizam a biblioteca de animações já processada antes da etapa que
   instanciava novamente os FBX de cada animação.
-- Web/mobile/viewport compacto usam os LODs importados mais cedo, sem sombras
+- Mobile/viewport compacto usam os LODs importados mais cedo, sem sombras
   dos personagens/lua e sem MSAA. Luzes, texturas, colisões e regras permanecem.
-- O palco do lobby/Skins tem teto de 520 mil pixels no Web/celular, sem MSAA ou
+- O palco do lobby/Skins tem teto de 520 mil pixels no celular/tela compacta, sem MSAA ou
   sombra dinâmica. Desktop mantém o perfil escolhido.
 
 ## Medidas e reprodução
@@ -64,3 +64,13 @@ O shell Web agora limita o canvas móvel a DPR 1,25 e 700 mil pixels. Em
 em vez de 2532×1170 (cerca de 83% menos pixels). `UIScale` lê os pontos CSS
 da janela para preservar tamanho e posições dos controles. A captura Web é
 dessa emulação; não é uma captura de iPhone físico.
+
+## Qualidade no navegador de PC
+
+O navegador desktop em janela ampla respeita o perfil escolhido: MSAA, sombras,
+LOD e resolução do palco não recebem o teto móvel. Em Ajustes → Gráficos, Alto
+usa os parâmetros do perfil Alto nativo. A otimização automática vale para
+celular/tela compacta. O teste existente de configurações passou em janela real
+para Baixo/Médio/Alto; o Web em 1280×720 manteve canvas1280×720 e abriu sem
+erros JavaScript. Isso verifica a qualidade/configuração, não igualdade de FPS
+com o executável nativo nem a aceleração de hardware do computador do usuário.

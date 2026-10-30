@@ -120,7 +120,7 @@ func get_socket(socket_name: StringName) -> BoneAttachment3D:
 ## Ajusta apenas o comportamento de luz dos materiais: reduz brilho especular
 ## exagerado e usa filtragem anisotrópica. Cores e texturas originais são preservadas.
 func _tune_materials() -> void:
-	var constrained := OS.has_feature("web") or OS.has_feature("mobile") or UIScale.is_compact()
+	var constrained := OS.has_feature("mobile") or UIScale.is_compact()
 	for mesh_instance: MeshInstance3D in _find_all_of_type(_model_root, MeshInstance3D):
 		if mesh_instance.mesh == null:
 			continue

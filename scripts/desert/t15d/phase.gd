@@ -103,7 +103,7 @@ func _build_environment() -> void:
 	moon.rotation_degrees = Vector3(-40,-30,0)
 	moon.light_color = Color("#aac8f3")
 	moon.light_energy = 0.72
-	moon.shadow_enabled = not (UIScale.is_compact() or OS.has_feature("web") or OS.has_feature("mobile"))
+	moon.shadow_enabled = not (UIScale.is_compact() or OS.has_feature("mobile"))
 	moon.directional_shadow_max_distance = 32
 	moon.shadow_bias = 0.04
 	add_child(moon)
@@ -124,9 +124,9 @@ func _build_environment() -> void:
 	rim.light_energy = 0.9
 	rim.light_specular = 0.6
 	add_child(rim)
-	# O corredor inteiro não usa MSAA/sombra dinâmica no celular/Web: preserva
+	# O corredor inteiro não usa MSAA/sombra dinâmica no celular/tela compacta: preserva
 	# texturas e luzes, reduzindo buffers e passagens extras por quadro.
-	get_viewport().msaa_3d = Viewport.MSAA_DISABLED if UIScale.is_compact() or OS.has_feature("web") or OS.has_feature("mobile") else Viewport.MSAA_4X
+	get_viewport().msaa_3d = Viewport.MSAA_DISABLED if UIScale.is_compact() or OS.has_feature("mobile") else Viewport.MSAA_4X
 ## Tempestade de areia: tela tingida, grãos voando e vento contra quem vai para a direita.
 var _in_storm := false
 func _update_storm() -> void:

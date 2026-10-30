@@ -48,7 +48,7 @@ jobs:
           ls -la "$OUT"
       - name: Smoke do menu principal (main original x teste corrigido)
         run: |
-          set -uo pipefail
+          set +e -uo pipefail
           GODOT="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
           OUT="$GITHUB_WORKSPACE/capturas-pr26"
           cp tools/godot/smoke_pr26_fix.gd "$RUNNER_TEMP/main/tools/godot/"
@@ -57,7 +57,7 @@ jobs:
             export XDG_DATA_HOME="$(mktemp -d)" XDG_CONFIG_HOME="$(mktemp -d)" XDG_CACHE_HOME="$(mktemp -d)"
             timeout 180 "$GODOT" --headless --path "$dir" --rendering-method gl_compatibility \
               --script "res://tools/godot/$script" -- res://scenes/menu/main_menu.tscn > "$OUT/smoke-$name.log" 2>&1
-            echo "exit=$?" >> "$OUT/smoke-$name.log"
+            code=$?; echo "exit=$code" >> "$OUT/smoke-$name.log"
             echo "== $name"; grep -E "SMOKE_|ERROR|exit=" "$OUT/smoke-$name.log" | head -40
           done
       - name: Gravar capturas neste branch

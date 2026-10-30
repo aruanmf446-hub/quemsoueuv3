@@ -12,6 +12,7 @@ var inventory: InventoryService
 var wallet: WalletService
 var friends: FriendsService
 var presence: FriendPresence
+var duel: DuelService
 
 
 func _enter_tree() -> void:
@@ -51,6 +52,10 @@ func _ready() -> void:
 	presence.friends = friends
 	presence.session = session
 	add_child(presence)
+	duel = DuelService.new()
+	duel.client = client
+	duel.session = session
+	add_child(duel)
 	session.changed.connect(_session_changed)
 	var poller := Timer.new()
 	poller.wait_time = 30.0
@@ -71,6 +76,7 @@ func _session_changed() -> void:
 	progression.clear()
 	wallet.clear()
 	friends.clear()
+	duel.clear()
 	inventory.changed.emit()
 	if session.authenticated():
 		refresh_all()

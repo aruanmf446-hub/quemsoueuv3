@@ -9,6 +9,7 @@
     "skins": "res://scenes/skins/skins_panel.tscn",
     "story": "res://scenes/player/story.tscn",
     "account": "res://scenes/player/account.tscn",
-    "music": "res://scenes/player/music.tscn"
+    "music": "res://scenes/player/music.tscn",
+    "duel": "res://scenes/player/duel.tscn"
   }
 }

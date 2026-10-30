@@ -1,6 +1,8 @@
-# Coleções (categorias de personagens) e novos personagens
+# Coleções (categorias de personagens/skins) e novos personagens
 
-## Criar uma coleção ("deck" de personagens)
+> Os **decks do Duelo** são outra coisa: cartas em PNG em `assets/duel/decks/` (veja o LEIA-ME de lá).
+
+## Criar uma coleção (categoria da tela Personagens)
 
 Cada arquivo `.json` desta pasta vira uma categoria na barra **Coleções** da tela Personagens.
 Não precisa mexer em código.

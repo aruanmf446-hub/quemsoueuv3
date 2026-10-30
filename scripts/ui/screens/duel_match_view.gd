@@ -1,0 +1,480 @@
+extends VBoxContainer
+## Partida do Duelo (etapa 2): seleção secreta, contagem regressiva, turnos, revelação com
+## suspense e fim. Tudo vem do servidor (DuelService.match()); aqui só se mostra e se pede.
+## O cronômetro anda localmente entre uma atualização e outra (relógio do servidor).
+
+const CARD_EDGE := preload("res://assets/ui/kit/card_edge.png")
+const CARD_EDGE_GOLD := preload("res://assets/ui/kit/card_edge_gold.png")
+const Icons = preload("res://scripts/desert/t15d/resource_icons.gd")
+const MUTED := Color("#c9d6e6")
+
+var duel: DuelService
+var inventory: InventoryService
+## Executa uma ação do servidor com aviso de erro (a tela de Duelo fornece).
+var act: Callable
+## Camada por cima da tela para confirmações, revelação e campeão.
+var overlay_parent: Control
+var _chosen: Array = []
+var _timer: Label
+var _countdown: Label
+var _overlay: Control
+var _overlay_key := ""
+
+
+func setup(p_duel: DuelService, p_inventory: InventoryService, p_overlay_parent: Control, p_act: Callable) -> void:
+	duel = p_duel
+	inventory = p_inventory
+	overlay_parent = p_overlay_parent
+	act = p_act
+	size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	add_theme_constant_override("separation", 14)
+
+
+func _exit_tree() -> void:
+	_close_overlay()
+
+
+func refresh() -> void:
+	for child in get_children():
+		remove_child(child)
+		child.queue_free()
+	_timer = null
+	_countdown = null
+	var data := duel.match()
+	if data.is_empty():
+		_close_overlay()
+		return
+	var me := _me(data)
+	if not me.is_empty() and me.eliminated:
+		var text := "Você foi eliminado por falta de interação." if me.reason in ["disconnect", "left"] else \
+			("Você foi eliminado por faltas." if me.reason == "faults" else "Você foi eliminado.")
+		add_child(_notice(text + " Acompanhe a partida como espectador.", Color("#ffb8a6")))
+	elif me.is_empty():
+		add_child(_notice("Você está assistindo como espectador e jogará na próxima partida.", PlayerUI.GOLD))
+	match str(data.phase):
+		"selection": _render_selection(data, me)
+		"countdown": _render_countdown()
+		_: _render_board(data, me)
+	_update_overlay(data)
+
+
+func _process(_delta: float) -> void:
+	if not is_visible_in_tree(): return
+	var left := duel.seconds_left()
+	if is_instance_valid(_timer): _timer.text = "%d s" % ceili(left)
+	if is_instance_valid(_countdown): _countdown.text = str(maxi(ceili(left), 1))
+
+
+# --- Seleção secreta -----------------------------------------------------------------------
+func _render_selection(data: Dictionary, me: Dictionary) -> void:
+	var needed := int(data.get("cards_per_player", 1))
+	var header := PlayerUI.row(self)
+	var title := PlayerUI.label("Escolha %d %s em segredo" % [needed, "carta" if needed == 1 else "cartas"], 28, Color.WHITE)
+	header.add_child(title)
+	_timer = _timer_label()
+	header.add_child(_timer)
+	add_child(_players_strip(data, true))
+	if me.is_empty() or me.eliminated:
+		add_child(_notice("Os jogadores estão escolhendo suas cartas…", MUTED))
+		return
+	if me.confirmed:
+		add_child(_notice("PRONTO! Aguardando os outros jogadores.", PlayerUI.GOLD))
+		add_child(PlayerUI.label("Suas cartas", 19, PlayerUI.GOLD))
+		add_child(_card_row(data.my_cards.map(func(c: Dictionary) -> String: return str(c.card_id)), 150, []))
+		return
+	var grid := _card_grid()
+	for item: Dictionary in data.pool:
+		var id := str(item.card_id)
+		var chosen := _chosen.has(id)
+		var card := _card(id, 150, chosen, false)
+		card.mouse_filter = Control.MOUSE_FILTER_STOP
+		card.gui_input.connect(func(event: InputEvent) -> void:
+			if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+				if _chosen.has(id): _chosen.erase(id)
+				elif _chosen.size() < needed: _chosen.append(id)
+				refresh())
+		grid.add_child(card)
+	add_child(grid)
+	var footer := PlayerUI.row(self)
+	footer.add_child(PlayerUI.label("Selecionados: %d/%d" % [_chosen.size(), needed], 20, MUTED))
+	var confirm := PlayerUI.button("Confirmar cartas", func() -> void:
+		var picked := _chosen.duplicate()
+		await act.call(duel.select_cards.bind(picked))
+		_chosen.clear())
+	PlayerUI.style_button(confirm, true)
+	confirm.disabled = _chosen.size() != needed
+	confirm.size_flags_horizontal = Control.SIZE_SHRINK_END
+	footer.add_child(confirm)
+
+
+# --- Contagem regressiva -------------------------------------------------------------------
+func _render_countdown() -> void:
+	_chosen.clear()
+	var center := CenterContainer.new()
+	center.custom_minimum_size.y = 420
+	add_child(center)
+	var column := PlayerUI.column(center)
+	column.alignment = BoxContainer.ALIGNMENT_CENTER
+	var title := PlayerUI.label("A partida vai começar!", 30, Color.WHITE)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(title)
+	_countdown = PlayerUI.label("5", 160, PlayerUI.GOLD)
+	_countdown.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(_countdown)
+
+
+# --- Turnos ----------------------------------------------------------------------------------
+func _render_board(data: Dictionary, me: Dictionary) -> void:
+	add_child(_players_strip(data, false))
+	var turn := _player(data, str(data.get("turn_member", "")))
+	var my_turn: bool = not me.is_empty() and str(data.get("turn_member", "")) == str(me.member_id) and data.phase == "turns"
+	var banner := PlayerUI.row(self)
+	var text := "É a sua vez! Escolha uma carta para eliminar." if my_turn else ("É a vez de %s" % str(turn.get("nickname", "…")))
+	if data.phase == "finished": text = "Fim da partida"
+	banner.add_child(PlayerUI.label(text, 26, PlayerUI.GOLD if my_turn else Color.WHITE))
+	if data.phase == "turns":
+		_timer = _timer_label()
+		banner.add_child(_timer)
+	if not me.is_empty() and not (data.my_cards as Array).is_empty():
+		add_child(PlayerUI.label("Suas cartas (só você vê)", 18, PlayerUI.GOLD))
+		var lost := (data.my_cards as Array).filter(func(c: Dictionary) -> bool: return c.lost).map(func(c: Dictionary) -> String: return str(c.card_id))
+		add_child(_card_row((data.my_cards as Array).map(func(c: Dictionary) -> String: return str(c.card_id)), 104, lost))
+	add_child(PlayerUI.label("Cartas em jogo", 18, MUTED))
+	var grid := _card_grid()
+	for item: Dictionary in data.pool:
+		var id := str(item.card_id)
+		var removed: bool = item.removed
+		var card := _card(id, 132, false, removed)
+		if my_turn and not removed:
+			card.mouse_filter = Control.MOUSE_FILTER_STOP
+			card.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+			card.gui_input.connect(func(event: InputEvent) -> void:
+				if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+					_confirm_pick(id))
+		grid.add_child(card)
+	add_child(grid)
+
+
+func _confirm_pick(id: String) -> void:
+	_close_overlay()
+	var layer := _overlay_layer(0.6)
+	var panel := PlayerUI.panel(_centered(layer), 40)
+	panel.get_parent().custom_minimum_size.x = 460
+	panel.alignment = BoxContainer.ALIGNMENT_CENTER
+	var card := _card(id, 170, true, false)
+	card.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	panel.add_child(card)
+	var question := PlayerUI.label("Eliminar %s?" % _name(id), 26, Color.WHITE)
+	question.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	panel.add_child(question)
+	var row := PlayerUI.row(panel)
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	var yes := PlayerUI.button("Eliminar", func() -> void:
+		_close_overlay()
+		act.call(duel.pick.bind(id)))
+	PlayerUI.style_button(yes, true)
+	row.add_child(yes)
+	row.add_child(PlayerUI.button("Cancelar", _close_overlay))
+	_overlay_key = "confirm"
+
+
+# --- Revelação e fim -------------------------------------------------------------------------
+## Revelação: a carta escolhida aparece em destaque, com suspense, e só depois quem foi
+## atingido (o servidor só manda os atingidos depois do tempo de suspense).
+func _update_overlay(data: Dictionary) -> void:
+	if _overlay_key == "confirm" and data.phase == "turns": return
+	var events: Array = data.events
+	var last: Dictionary = events.back() if not events.is_empty() else {}
+	var key := ""
+	if data.phase == "reveal" and not last.is_empty(): key = "%s:%s" % [last.seq, last.revealed]
+	elif data.phase == "finished": key = "finished"
+	if key == _overlay_key: return
+	var first_time := not _overlay_key.begins_with("%s:" % str(last.get("seq", ""))) or key == "finished"
+	_close_overlay()
+	_overlay_key = key
+	if key.is_empty(): return
+	var layer := _overlay_layer(0.72)
+	var column := PlayerUI.column(_centered(layer))
+	column.alignment = BoxContainer.ALIGNMENT_CENTER
+	column.custom_minimum_size.x = 560
+	if key == "finished":
+		_render_champion(column, data)
+	elif last.kind == "pick":
+		_render_pick(column, data, last, first_time)
+	else:
+		_render_timeout(column, data, last)
+	if first_time:
+		PlayerUI.reveal(column, 0.0, 0.35)
+
+
+func _render_pick(column: VBoxContainer, data: Dictionary, event: Dictionary, first_time: bool) -> void:
+	var actor := _player(data, str(event.get("actor", "")))
+	var kicker := PlayerUI.label("%s escolheu eliminar" % str(actor.get("nickname", "…")), 22, MUTED)
+	kicker.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(kicker)
+	var card := _card(str(event.card_id), 220, true, false)
+	card.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	column.add_child(card)
+	if not event.revealed:
+		var wait := PlayerUI.label("Revelando…", 30, PlayerUI.GOLD)
+		wait.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		column.add_child(wait)
+		if first_time:
+			card.resized.connect(func() -> void: card.pivot_offset = card.size * 0.5)
+			var pulse := card.create_tween().set_loops()
+			pulse.tween_property(card, "scale", Vector2.ONE * 1.06, 0.45).set_trans(Tween.TRANS_SINE)
+			pulse.tween_property(card, "scale", Vector2.ONE, 0.45).set_trans(Tween.TRANS_SINE)
+		return
+	var hits: Array = event.hits if event.hits is Array else []
+	if hits.is_empty():
+		var nobody := PlayerUI.label("NINGUÉM FOI ATINGIDO!", 34, Color.WHITE)
+		nobody.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		column.add_child(nobody)
+		return
+	var title := PlayerUI.label("%s %s!" % ["ATINGIDO" if hits.size() == 1 else "ATINGIDOS", "" if hits.size() == 1 else "(%d)" % hits.size()], 30, Color("#ff8f86"))
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(title)
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 14)
+	column.add_child(row)
+	for hit: Dictionary in hits:
+		row.add_child(_hit_badge(data, hit))
+
+
+func _render_timeout(column: VBoxContainer, data: Dictionary, event: Dictionary) -> void:
+	var actor := _player(data, str(event.get("actor", "")))
+	var hit: Dictionary = (event.hits as Array)[0] if event.hits is Array and not (event.hits as Array).is_empty() else {}
+	var text := "%s não votou a tempo" % str(actor.get("nickname", "…"))
+	if event.kind == "eliminated": text = "%s saiu da partida" % str(actor.get("nickname", "…"))
+	var title := PlayerUI.label(text, 30, Color.WHITE)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(title)
+	var detail := "Eliminado!" if hit.get("eliminated", false) else "Perdeu 1 vida (falta %d de 2)" % int(hit.get("faults", 1))
+	var line := PlayerUI.label(detail, 24, Color("#ff8f86"))
+	line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(line)
+
+
+func _render_champion(column: VBoxContainer, data: Dictionary) -> void:
+	var result: Dictionary = data.get("result", {}) if data.get("result") is Dictionary else {}
+	var winners: Array = result.get("winners", [])
+	if winners.size() == 1:
+		var champion := _player(data, str(winners[0]))
+		var kicker := PlayerUI.label("CAMPEÃO", 26, PlayerUI.GOLD)
+		kicker.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		column.add_child(kicker)
+		var portrait := PlayerUI.portrait(str(champion.get("skin_id", "")), 260)
+		portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		column.add_child(portrait)
+		var name_label := PlayerUI.label(str(champion.get("nickname", "")), 44, Color.WHITE)
+		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		column.add_child(name_label)
+	else:
+		var draw := PlayerUI.label("Empate!", 44, Color.WHITE)
+		draw.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		column.add_child(draw)
+	var back := PlayerUI.label("Voltando ao lobby da sala…", 20, MUTED)
+	back.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(back)
+
+
+func _hit_badge(data: Dictionary, hit: Dictionary) -> Control:
+	var player := _player(data, str(hit.get("member_id", "")))
+	var box := PanelContainer.new()
+	box.add_theme_stylebox_override("panel", _plate(bool(player.get("is_you", false))))
+	var column := PlayerUI.column(box)
+	column.add_theme_constant_override("separation", 2)
+	var portrait := PlayerUI.portrait(str(player.get("skin_id", "")), 84)
+	portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	if hit.get("eliminated", false): portrait.modulate = Color(0.55, 0.45, 0.45)
+	column.add_child(portrait)
+	var nickname := PlayerUI.label(str(player.get("nickname", "")), 18, Color.WHITE)
+	nickname.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(nickname)
+	var state := PlayerUI.label("ELIMINADO" if hit.get("eliminated", false) else "%d %s" % [int(hit.get("lives", 0)), "vida" if int(hit.get("lives", 0)) == 1 else "vidas"], 15, Color("#ff8f86"))
+	state.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(state)
+	return box
+
+
+# --- Peças visuais ---------------------------------------------------------------------------
+## Faixa dos participantes: busto, nome, vidas (corações) e situação. O da vez fica dourado.
+func _players_strip(data: Dictionary, selection: bool) -> Control:
+	var scroll := ScrollContainer.new()
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.custom_minimum_size.y = 150
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	scroll.add_child(row)
+	for player: Dictionary in data.players:
+		var turn: bool = str(player.member_id) == str(data.get("turn_member", "")) and data.phase in ["turns", "reveal"]
+		var box := PanelContainer.new()
+		box.custom_minimum_size = Vector2(150, 0)
+		box.add_theme_stylebox_override("panel", _plate(turn))
+		var column := PlayerUI.column(box)
+		column.add_theme_constant_override("separation", 2)
+		var portrait := PlayerUI.portrait(str(player.skin_id), 64)
+		portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		if player.eliminated: portrait.modulate = Color(0.45, 0.45, 0.5)
+		column.add_child(portrait)
+		var nickname := PlayerUI.label(str(player.nickname) + (" (você)" if player.is_you else ""), 16, Color.WHITE)
+		nickname.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		nickname.autowrap_mode = TextServer.AUTOWRAP_OFF
+		nickname.clip_text = true
+		column.add_child(nickname)
+		if selection:
+			var ready := PlayerUI.label("PRONTO" if player.confirmed else "escolhendo…", 14, PlayerUI.GOLD if player.confirmed else MUTED)
+			ready.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			column.add_child(ready)
+		elif player.eliminated:
+			var out := PlayerUI.label("ELIMINADO", 14, Color("#ff8f86"))
+			out.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			column.add_child(out)
+		else:
+			column.add_child(_hearts(int(player.lives), int(player.faults)))
+		row.add_child(box)
+	return scroll
+
+
+func _hearts(lives: int, faults: int) -> Control:
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 2)
+	for index in range(lives):
+		var heart := TextureRect.new()
+		heart.texture = Icons.heart(20, true)
+		heart.custom_minimum_size = Vector2(18, 18)
+		heart.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		row.add_child(heart)
+	if faults > 0:
+		row.add_child(PlayerUI.label("  falta" if faults == 1 else "  2 faltas", 12, Color("#ffb8a6")))
+	return row
+
+
+## Placa do kit com folga interna: o texto não encosta no filete dourado.
+func _plate(gold: bool) -> StyleBoxTexture:
+	var box := PlayerUI.plate(gold)
+	box.content_margin_top = 14
+	box.content_margin_bottom = 18
+	return box
+
+
+func _card_grid() -> GridContainer:
+	var grid := GridContainer.new()
+	grid.name = "Cards"
+	grid.columns = 4 if UIScale.is_compact() else 8
+	grid.add_theme_constant_override("h_separation", 12)
+	grid.add_theme_constant_override("v_separation", 12)
+	return grid
+
+
+func _card_row(ids: Array, width: float, lost: Array) -> Control:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	for id in ids:
+		row.add_child(_card(str(id), width, false, lost.has(id)))
+	return row
+
+
+## Carta do deck: a imagem PNG da carta (assets/duel/decks/<deck>/<carta>.png). Escolhida:
+## contorno dourado; eliminada: apagada e marcada. Sem imagem, mostra o nome numa moldura.
+func _card(id: String, width: float, gold: bool, out: bool) -> PanelContainer:
+	var card := PanelContainer.new()
+	card.custom_minimum_size = Vector2(width, width * 1.4)
+	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.03, 0.06, 0.12, 0.85)
+	style.set_corner_radius_all(maxi(6, int(width * 0.05)))
+	style.border_color = PlayerUI.GOLD if gold else Color(1, 1, 1, 0.12)
+	style.set_border_width_all(4 if gold else 1)
+	style.set_content_margin_all(3)
+	if gold:
+		style.shadow_color = Color(PlayerUI.GOLD, 0.55)
+		style.shadow_size = 12
+	card.add_theme_stylebox_override("panel", style)
+	var texture := DuelService.card_texture(id)
+	if texture != null:
+		var image := TextureRect.new()
+		image.texture = texture
+		image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		image.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		image.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		card.add_child(image)
+	else:
+		var frame := NinePatchRect.new()
+		frame.texture = CARD_EDGE_GOLD if gold else CARD_EDGE
+		for side in [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]:
+			frame.set_patch_margin(side, mini(34, int(width * 0.2)))
+		frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		card.add_child(frame)
+		var label := PlayerUI.label(_name(id), maxi(13, int(width * 0.12)), Color.WHITE)
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		card.add_child(label)
+	if out:
+		card.modulate = Color(0.42, 0.42, 0.48)
+		var mark := PlayerUI.label("ELIMINADA", maxi(12, int(width * 0.1)), Color("#ff8f86"))
+		mark.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		mark.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		card.add_child(mark)
+	return card
+
+
+func _timer_label() -> Label:
+	var label := PlayerUI.label("", 26, Color.WHITE)
+	label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	label.size_flags_horizontal = Control.SIZE_SHRINK_END
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	return label
+
+
+func _notice(text: String, color: Color) -> Control:
+	var panel := PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", PlayerUI.plate())
+	var label := PlayerUI.label(text, 19, color)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	panel.add_child(label)
+	return panel
+
+
+func _overlay_layer(dim: float) -> Control:
+	_overlay = ColorRect.new()
+	(_overlay as ColorRect).color = Color(0.01, 0.02, 0.05, dim)
+	_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	_overlay.z_index = 5
+	overlay_parent.add_child(_overlay)
+	_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	return _overlay
+
+
+func _centered(layer: Control) -> CenterContainer:
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	layer.add_child(center)
+	return center
+
+
+func _close_overlay() -> void:
+	if is_instance_valid(_overlay): _overlay.queue_free()
+	_overlay = null
+	_overlay_key = ""
+
+
+func _me(data: Dictionary) -> Dictionary:
+	for player: Dictionary in data.players:
+		if player.is_you: return player
+	return {}
+
+
+func _player(data: Dictionary, member_id: String) -> Dictionary:
+	for player: Dictionary in data.players:
+		if str(player.member_id) == member_id: return player
+	return {}
+
+
+func _name(id: String) -> String:
+	return DuelService.card_name(id)

@@ -42,7 +42,6 @@ func _ready() -> void:
 		button.add_theme_constant_override("outline_size", 0)
 		button.focus_mode = Control.FOCUS_ALL
 		_nudge_on_hover(button)
-	menu.get_node("MenuButtons/BtnDuel").hide()
 	for path: String in ["TopBar/CoinPill", "TopBar/GemPill", "ProfileCard"]:
 		var pill := _box(Color(0.035, 0.06, 0.11, 0.88), 3)
 		pill.skew = Vector2(0.16, 0)
@@ -304,10 +303,9 @@ func intro() -> void:
 
 
 func _action_content(button: MenuCardButton) -> void:
-	if button.button_id == &"duel": return
 	button.text = ""
-	var titles := {"story": ["JOGAR", "Modo História · Reino do Deserto"], "skins": ["PERSONAGENS", "Coleção Começo"], "friends": ["AMIZADES", "Sua equipe de aventura"], "settings": ["AJUSTES", "Sua experiência"]}
-	var paths := {"story": '<path d="M12 3 21 8v8l-9 5-9-5V8zM12 3v18M3 8l9 5 9-5"/>', "skins": '<circle cx="12" cy="7" r="4"/><path d="M4 22v-4a8 8 0 0 1 16 0v4M4 18h16"/>', "friends": '<circle cx="8" cy="8" r="3"/><circle cx="18" cy="9" r="3"/><path d="M1 22v-4a7 7 0 0 1 14 0v4M16 15a6 6 0 0 1 7 6"/>', "settings": '<path d="M3 6h18M3 12h18M3 18h18"/><circle cx="8" cy="6" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="9" cy="18" r="2"/>'}
+	var titles := {"story": ["JOGAR", "Modo História · Reino do Deserto"], "duel": ["DUELO", "Multiplayer · Salas online"], "skins": ["PERSONAGENS", "Coleção Começo"], "friends": ["AMIZADES", "Sua equipe de aventura"], "settings": ["AJUSTES", "Sua experiência"]}
+	var paths := {"story": '<path d="M12 3 21 8v8l-9 5-9-5V8zM12 3v18M3 8l9 5 9-5"/>', "duel": '<path d="M3 3l10 10M3 3h4M3 3v4M21 3 11 13M21 3h-4M21 3v4"/><path d="M8 16l-4 4M16 16l4 4M6.5 14.5l3 3M17.5 14.5l-3 3"/>', "skins": '<circle cx="12" cy="7" r="4"/><path d="M4 22v-4a8 8 0 0 1 16 0v4M4 18h16"/>', "friends": '<circle cx="8" cy="8" r="3"/><circle cx="18" cy="9" r="3"/><path d="M1 22v-4a7 7 0 0 1 14 0v4M16 15a6 6 0 0 1 7 6"/>', "settings": '<path d="M3 6h18M3 12h18M3 18h18"/><circle cx="8" cy="6" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="9" cy="18" r="2"/>'}
 	var row := HBoxContainer.new()
 	row.name = "ActionBody"
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE

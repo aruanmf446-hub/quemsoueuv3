@@ -26,7 +26,7 @@ class StaticTests(unittest.TestCase):
 
     def test_all_resources_scripts_and_preservation(self):
         report=check()
-        self.assertEqual(report["routes"],8)
+        self.assertEqual(report["routes"],len(self.routes))
         self.assertEqual(report["previous_offline_deliveries_unchanged"],82)
         self.assertFalse(report["godot_executed"])
 

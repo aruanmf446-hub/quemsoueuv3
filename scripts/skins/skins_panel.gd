@@ -578,47 +578,9 @@ func _button(text: String, action: Callable, primary := false) -> Button:
 	return button
 
 
-## Retratos das cartas: o busto recortado da miniatura (2048 px) fica em memória e numa
-## versão pequena ao lado dela ("_card.png"). Abrir a tela, buscar ou filtrar não relê nem
-## recorta os PNGs grandes de novo; antes isso travava a tela por 1–2 s.
-static var _portraits := {}
-const PORTRAIT_HEIGHT := 360
-
-
+## Retratos das cartas: busto recortado e em cache (PlayerUI.bust).
 func _portrait_texture(path: String) -> Texture2D:
-	var stamp := FileAccess.get_modified_time(path)
-	var key := "%s@%d" % [path, stamp]
-	if _portraits.has(key): return _portraits[key]
-	var small := path.get_basename() + "_card.png"
-	var image: Image
-	if FileAccess.file_exists(small) and FileAccess.get_modified_time(small) >= stamp:
-		image = Image.load_from_file(small)
-	else:
-		image = _crop_portrait(path)
-		if image != null: image.save_png(small)
-	if image == null or image.is_empty(): return null
-	image.generate_mipmaps()
-	var texture := ImageTexture.create_from_image(image)
-	_portraits[key] = texture
-	return texture
-
-
-## Recorte por pixels opacos: chapéus, cabelos e alturas diferentes têm a mesma escala
-## visual sem ajustes arbitrários por personagem.
-static func _crop_portrait(path: String) -> Image:
-	var image := Image.load_from_file(path)
-	if image == null or image.is_empty():
-		return null
-	var bounds := image.get_used_rect()
-	if bounds.size.x == 0 or bounds.size.y == 0:
-		return image
-	var crop_height := mini(image.get_height() - bounds.position.y, int(bounds.size.y * 0.48))
-	var crop_width := mini(image.get_width(), int(crop_height * 1.05))
-	var crop_x := clampi(int(bounds.get_center().x - crop_width * 0.5), 0, image.get_width() - crop_width)
-	var cropped := image.get_region(Rect2i(crop_x, bounds.position.y, crop_width, crop_height))
-	if cropped.get_height() > PORTRAIT_HEIGHT:
-		cropped.resize(roundi(cropped.get_width() * PORTRAIT_HEIGHT / float(cropped.get_height())), PORTRAIT_HEIGHT, Image.INTERPOLATE_LANCZOS)
-	return cropped
+	return PlayerUI.bust(path)
 
 
 func _load_collections() -> void:

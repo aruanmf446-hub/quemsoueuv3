@@ -232,15 +232,58 @@ static func clear(parent: Node) -> void:
 		child.queue_free()
 
 
+## Retrato (busto) do personagem, do cache: não relê a miniatura grande a cada desenho.
 static func portrait(character_id: String, side: int = 82) -> TextureRect:
 	var node := TextureRect.new()
 	node.custom_minimum_size = Vector2(side, side)
 	node.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	node.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	node.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	node.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var path := ThumbnailCache.path_for(character_id)
-	if FileAccess.file_exists(path):
-		node.texture = ImageTexture.create_from_image(Image.load_from_file(path))
-	else:
-		node.texture = preload("res://assets/icons/vector/icon_friends.svg")
+	var texture := bust(ThumbnailCache.path_for(character_id))
+	node.texture = texture if texture != null else preload("res://assets/icons/vector/icon_friends.svg")
 	return node
+
+
+## Bustos recortados das miniaturas (2048 px), guardados em memória e numa versão pequena
+## ao lado delas ("_card.png"): abrir telas, buscar ou filtrar não relê nem recorta os PNGs
+## grandes de novo (antes isso travava as telas por 1–2 s).
+static var _busts := {}
+const BUST_HEIGHT := 360
+
+
+static func bust(path: String) -> Texture2D:
+	if not FileAccess.file_exists(path): return null
+	var stamp := FileAccess.get_modified_time(path)
+	var key := "%s@%d" % [path, stamp]
+	if _busts.has(key): return _busts[key]
+	var small := path.get_basename() + "_card.png"
+	var image: Image
+	if FileAccess.file_exists(small) and FileAccess.get_modified_time(small) >= stamp:
+		image = Image.load_from_file(small)
+	else:
+		image = _crop_bust(path)
+		if image != null: image.save_png(small)
+	if image == null or image.is_empty(): return null
+	image.generate_mipmaps()
+	var texture := ImageTexture.create_from_image(image)
+	_busts[key] = texture
+	return texture
+
+
+## Recorte por pixels opacos: chapéus, cabelos e alturas diferentes têm a mesma escala
+## visual sem ajustes arbitrários por personagem.
+static func _crop_bust(path: String) -> Image:
+	var image := Image.load_from_file(path)
+	if image == null or image.is_empty():
+		return null
+	var bounds := image.get_used_rect()
+	if bounds.size.x == 0 or bounds.size.y == 0:
+		return image
+	var crop_height := mini(image.get_height() - bounds.position.y, int(bounds.size.y * 0.48))
+	var crop_width := mini(image.get_width(), int(crop_height * 1.05))
+	var crop_x := clampi(int(bounds.get_center().x - crop_width * 0.5), 0, image.get_width() - crop_width)
+	var cropped := image.get_region(Rect2i(crop_x, bounds.position.y, crop_width, crop_height))
+	if cropped.get_height() > BUST_HEIGHT:
+		cropped.resize(roundi(cropped.get_width() * BUST_HEIGHT / float(cropped.get_height())), BUST_HEIGHT, Image.INTERPOLATE_LANCZOS)
+	return cropped

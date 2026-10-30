@@ -1,0 +1,15 @@
+{
+  "name": "Lendas Urbanas",
+  "order": 0,
+  "cards": {
+    "loira_do_banheiro": "Loira do Banheiro",
+    "momo": "Momo",
+    "cobra_grande": "Cobra Grande",
+    "jeff_the_killer": "Jeff the Killer",
+    "bruxa_do_pantano": "Bruxa do Pântano",
+    "slender_man": "Slender Man",
+    "dama_de_branco": "Dama de Branco",
+    "homem_do_saco": "Homem do Saco",
+    "homem_sorridente": "Homem Sorridente"
+  }
+}

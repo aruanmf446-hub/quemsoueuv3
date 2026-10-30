@@ -30,7 +30,9 @@ func render() -> void:
 	for item: Array in [["Amigos", "friends"], ["Recebidas", "incoming"], ["Enviadas", "outgoing"], ["Buscar", "search"]]:
 		var count: int = services.friends.data.get(item[1], []).size() if item[1] != "search" else 0
 		var tab := PlayerUI.button(item[0] + ("  %d" % count if count > 0 else ""), _change_tab.bind(item[1]))
-		PlayerUI.style_button(tab, item[1] == _tab)
+		PlayerUI.style_row(tab)
+		tab.toggle_mode = true
+		tab.button_pressed = item[1] == _tab
 		tabs.add_child(tab)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -48,6 +50,7 @@ func render() -> void:
 		query.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		query.text_changed.connect(func(value: String) -> void: _term = value)
 		query.text_submitted.connect(_search)
+		PlayerUI.style_field(query)
 		line.add_child(query)
 		var go := PlayerUI.button("Buscar", func() -> void: _search(query.text))
 		PlayerUI.style_button(go, true)
@@ -64,12 +67,12 @@ func render() -> void:
 
 ## Sem conta: um cartão central com convite para entrar, no lugar da barra solta.
 func _signed_out() -> void:
-	var center := CenterContainer.new()
+	var center := MarginContainer.new()
 	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	center.custom_minimum_size.y = 420
+	center.custom_minimum_size.y = 230
 	body.add_child(center)
-	var card := PlayerUI.panel(center, 42)
-	card.get_parent().custom_minimum_size.x = 480
+	var card := PlayerUI.column(center)
+	card.custom_minimum_size.x = 0
 	card.alignment = BoxContainer.ALIGNMENT_CENTER
 	var icon := TextureRect.new()
 	icon.texture = preload("res://assets/icons/vector/icon_friends.svg")
@@ -79,10 +82,12 @@ func _signed_out() -> void:
 	icon.modulate = PlayerUI.GOLD
 	card.add_child(icon)
 	var title := PlayerUI.label("Jogue com seus amigos", 28, Color.WHITE)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	card.add_child(title)
 	var enter := PlayerUI.button("Entrar na conta", func() -> void: navigate_requested.emit("account", {}))
 	PlayerUI.style_button(enter, true)
+	enter.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	enter.custom_minimum_size.x = 240
 	card.add_child(enter)
 
 

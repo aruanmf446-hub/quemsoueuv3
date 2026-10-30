@@ -1,0 +1,58 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS margin bounds: settings
+PASS header visible: settings
+PASS capture saved: settings
+CAPTURE settings
+PASS margin bounds: duel
+PASS header visible: duel
+PASS capture saved: duel
+CAPTURE duel
+PASS margin bounds: duel-create-fixture
+PASS header visible: duel-create-fixture
+PASS capture saved: duel-create-fixture
+CAPTURE duel-create-fixture
+PASS margin bounds: duel-room-fixture
+PASS header visible: duel-room-fixture
+PASS capture saved: duel-room-fixture
+CAPTURE duel-room-fixture
+PASS margin bounds: duel-selection-fixture
+PASS header visible: duel-selection-fixture
+PASS capture saved: duel-selection-fixture
+CAPTURE duel-selection-fixture
+PASS confirmation disabled before choice
+PASS two cards selected
+PASS confirmation enabled after choice
+PASS one action dispatched
+PASS local choices cleared
+PASS battle selection, enabled confirmation, one dispatched action, cleared local choices
+PASS margin bounds: duel-countdown-fixture
+PASS header visible: duel-countdown-fixture
+PASS capture saved: duel-countdown-fixture
+CAPTURE duel-countdown-fixture
+PASS margin bounds: duel-turns-fixture
+PASS header visible: duel-turns-fixture
+PASS capture saved: duel-turns-fixture
+CAPTURE duel-turns-fixture
+PASS margin bounds: duel-confirm-fixture
+PASS header visible: duel-confirm-fixture
+PASS capture saved: duel-confirm-fixture
+CAPTURE duel-confirm-fixture
+PASS margin bounds: duel-reveal-fixture
+PASS header visible: duel-reveal-fixture
+PASS capture saved: duel-reveal-fixture
+CAPTURE duel-reveal-fixture
+PASS margin bounds: duel-finished-fixture
+PASS header visible: duel-finished-fixture
+PASS capture saved: duel-finished-fixture
+CAPTURE duel-finished-fixture
+PASS capture saved: campaign-pause
+CAPTURE campaign-pause
+PASS capture saved: campaign-defeat
+CAPTURE campaign-defeat
+PASS capture saved: campaign-complete
+CAPTURE campaign-complete
+MENU_SUITE_FAILURES 0

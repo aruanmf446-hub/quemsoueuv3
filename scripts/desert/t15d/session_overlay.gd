@@ -8,7 +8,6 @@ signal checkpoint_requested
 var _veil: ColorRect
 var _panel: PanelContainer
 var _column: VBoxContainer
-var _font: FontFile
 var opened := false
 var _completion := false
 var _death := false
@@ -18,27 +17,15 @@ var total_enemies := 0
 func _ready() -> void:
 	layer = 20
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	_font = preload("res://assets/desert/phase01/interface.ttf").duplicate() as FontFile
-	_font.multichannel_signed_distance_field = true
 	_veil = ColorRect.new()
 	_veil.color = Color(0.015,0.035,0.065,0.75)
-	_veil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_veil.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	add_child(_veil)
 	_panel = PanelContainer.new()
-	_panel.theme = Theme.new()
-	_panel.theme.default_font = _font
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.035,0.06,0.11,0.96)
-	style.border_color = Color("#f2c76e")
-	style.border_width_top = 3
-	style.set_corner_radius_all(10)
-	style.shadow_color = Color(0,0,0,0.55)
-	style.shadow_size = 24
-	style.content_margin_left = 34
-	style.content_margin_right = 34
-	style.content_margin_top = 22
-	style.content_margin_bottom = 24
-	_panel.add_theme_stylebox_override("panel",style)
+	PlayerUI.apply_theme(_panel)
+	var style := PlayerUI.frame_panel(28)
+	style.bg_color.a = 0.97
+	_panel.add_theme_stylebox_override("panel", style)
 	add_child(_panel)
 	_column = VBoxContainer.new()
 	_column.add_theme_constant_override("separation",8)
@@ -53,26 +40,12 @@ func _title(text: String, size: int, color: Color) -> void:
 	label.add_theme_color_override("font_color",color)
 	_column.add_child(label)
 func _button(text: String, action: Callable, primary := false) -> void:
-	var button := Button.new()
-	button.text = text
-	button.custom_minimum_size = Vector2(340,50)
-	button.add_theme_font_size_override("font_size",17)
-	button.add_theme_color_override("font_color",Color("#141006") if primary else Color("#f4e5ca"))
-	for state in ["font_hover_color","font_pressed_color","font_focus_color"]:
-		button.add_theme_color_override(state,Color("#141006") if primary else Color("#ffffff"))
-	for state in ["normal","hover","pressed","focus"]:
-		var box := StyleBoxFlat.new()
-		box.skew = Vector2(0.16,0)
-		box.anti_aliasing = true
-		box.bg_color = Color("#f2c76e") if primary else Color(0.07,0.11,0.18,0.95)
-		if state in ["hover","focus"]: box.bg_color = box.bg_color.lightened(0.12)
-		if state == "pressed": box.bg_color = box.bg_color.darkened(0.15)
-		box.set_corner_radius_all(3)
-		box.border_color = Color("#fff3d0") if state == "focus" else Color("#f2c76e",0.0 if primary else 0.45)
-		box.set_border_width_all(2 if state == "focus" else 1)
-		button.add_theme_stylebox_override(state,box)
-	button.pressed.connect(action)
+	var button := PlayerUI.button(text, action)
+	button.custom_minimum_size = Vector2(300, 50)
+	button.add_theme_font_size_override("font_size", 17)
+	PlayerUI.style_button(button, primary)
 	_column.add_child(button)
+
 func _clear() -> void:
 	for child in _column.get_children():
 		_column.remove_child(child)
@@ -144,7 +117,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _layout() -> void:
 	if not is_instance_valid(_panel): return
 	var viewport_size := get_viewport().get_visible_rect().size
-	var unit := UIScale.unit_for(get_viewport()) if UIScale.is_compact() else 1.0
+	var unit := PlayerUI.unit(_panel)
 	_panel.scale = Vector2.ONE*unit
 	_panel.size = _panel.get_combined_minimum_size()
 	# Escala a partir do centro: o painel continua centralizado com qualquer escala.

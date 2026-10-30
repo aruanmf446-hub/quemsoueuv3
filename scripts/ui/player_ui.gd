@@ -1,27 +1,26 @@
 class_name PlayerUI
 extends RefCounted
 
-## MODELO VISUAL DAS TELAS DO JOGADOR — tirado de docs/referencias/personagens/REFERENCIA_APROVADA.png
-## (ver docs/referencias/README.md). Superfícies azul-noite translúcidas sobre o fundo do lobby,
-## filete fino frio, cantos de 8–10 px; dourado só no que está selecionado ou é a ação principal.
-const GOLD := Color("#e8b65e")
-const GOLD_BRIGHT := Color("#f3c66a")
+## Shared clean menu direction approved by the user; see docs/referencias/README.md.
+## Clear hierarchy, quiet surfaces and a restrained accent for actions and selection.
+const GOLD := Color("#e9b975")
+const GOLD_BRIGHT := Color("#f2cd94")
 ## Títulos de seção ("Coleções", "Personagens") e valores em destaque.
-const TITLE_GOLD := Color("#ecc98e")
+const TITLE_GOLD := Color("#f6f3e9")
 ## Texto sobre o dourado (ação principal).
-const INK := Color("#23170a")
-const TEXT := Color("#eef2f8")
-const MUTED := Color("#9ba7b8")
+const INK := Color("#151e25")
+const TEXT := Color("#f6f3e9")
+const MUTED := Color("#a9b1bb")
 ## Painel grande (galeria, coleções, conteúdo de configurações).
-const PANEL_BG := Color(0.035, 0.065, 0.115, 0.86)
-const PANEL_BORDER := Color("#253145")
+const PANEL_BG := Color(0.035, 0.05, 0.065, 0.82)
+const PANEL_BORDER := Color("#28323c")
 ## Campos, cartões e botões secundários.
-const SURFACE := Color(0.065, 0.10, 0.16, 0.92)
-const SURFACE_HOVER := Color(0.09, 0.135, 0.21, 0.95)
+const SURFACE := Color(0.09, 0.115, 0.14, 0.78)
+const SURFACE_HOVER := Color(0.14, 0.165, 0.19, 0.9)
 const FIELD_BG := SURFACE
-const FIELD_BORDER := Color("#2f3b50")
+const FIELD_BORDER := Color("#3a444d")
 ## Item selecionado (aba, coleção, filtro ativo): fundo âmbar escuro com filete dourado.
-const SELECTED_BG := Color(0.17, 0.145, 0.115, 0.95)
+const SELECTED_BG := Color(0.24, 0.19, 0.12, 0.8)
 ## Compatibilidade com telas antigas.
 ## Cores das coleções.
 const SWATCHES := {
@@ -31,6 +30,69 @@ const SWATCHES := {
 	"verde": Color("#3f9b5a"),
 	"vermelha": Color("#c9473e"),
 }
+
+
+static var _menu_theme: Theme
+
+## All menu entry points, including standalone campaign overlays, share font sampling.
+static func apply_theme(root: Control) -> void:
+	if _menu_theme == null:
+		_menu_theme = Theme.new()
+		var font := preload("res://assets/desert/phase01/interface.ttf").duplicate() as FontFile
+		font.multichannel_signed_distance_field = true
+		_menu_theme.default_font = font
+		_menu_theme.default_font_size = 20
+		var popup_surface := _flat(Color(0.035, 0.05, 0.065, 0.98), FIELD_BORDER, 4, Color.WHITE)
+		_pad(popup_surface, 10, 8)
+		_menu_theme.set_stylebox("panel", "PopupMenu", popup_surface)
+		_menu_theme.set_stylebox("hover", "PopupMenu", selected_plate())
+		_menu_theme.set_color("font_color", "PopupMenu", TEXT)
+		for kind in ["LineEdit", "TextEdit"]:
+			_menu_theme.set_stylebox("normal", kind, button_plate())
+			_menu_theme.set_stylebox("focus", kind, selected_plate())
+			_menu_theme.set_color("font_color", kind, TEXT)
+			_menu_theme.set_color("font_placeholder_color", kind, MUTED)
+		var separator := StyleBoxLine.new()
+		separator.color = Color(1, 1, 1, 0.1)
+		separator.thickness = 1
+		_menu_theme.set_stylebox("separator", "HSeparator", separator)
+	root.theme = _menu_theme
+	root.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+
+
+static func unit(root: Control) -> float:
+	return root.get_viewport_rect().size.y / maxf(float(root.get_window().size.y) / UIScale.device_scale(), 1.0)
+
+
+## Editorial columns collapse on narrow displays instead of squeezing content off-screen.
+static func split(parent: Control, collapse_width := 740.0) -> BoxContainer:
+	var box: BoxContainer = VBoxContainer.new() if parent.get_viewport_rect().size.x / unit(parent) < collapse_width else HBoxContainer.new()
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	box.add_theme_constant_override("separation", 24)
+	parent.add_child(box)
+	return box
+
+
+static func flow(parent: Control) -> HFlowContainer:
+	var box := HFlowContainer.new()
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	box.add_theme_constant_override("h_separation", 10)
+	box.add_theme_constant_override("v_separation", 10)
+	parent.add_child(box)
+	return box
+
+
+static func style_back(button: Button) -> void:
+	style_row(button)
+	button.add_theme_color_override("font_color", MUTED)
+
+
+static func style_backdrop(tint: ColorRect) -> void:
+	var shader := Shader.new()
+	shader.code = "shader_type canvas_item; void fragment(){ float side=1.0-smoothstep(0.0,1.0,UV.x); COLOR=vec4(0.025,0.035,0.045,0.72+side*0.18); }"
+	var material := ShaderMaterial.new()
+	material.shader = shader
+	tint.material = material
 
 
 static func label(text: String, size: int = 22, color: Color = TEXT) -> Label:
@@ -72,14 +134,14 @@ static func style_button(node: Button, primary: bool) -> void:
 	focus.draw_center = false
 	focus.border_color = Color(GOLD_BRIGHT, 0.9)
 	focus.set_border_width_all(2)
-	focus.set_corner_radius_all(9)
+	focus.set_corner_radius_all(4)
 	focus.set_expand_margin_all(2)
 	node.add_theme_stylebox_override("focus", focus)
 	for color: String in ["font_color", "font_hover_color", "font_focus_color"]:
 		node.add_theme_color_override(color, INK if primary else TEXT)
 	for color: String in ["font_pressed_color", "font_hover_pressed_color"]:
 		node.add_theme_color_override(color, INK if primary else TEXT)
-	node.add_theme_color_override("font_disabled_color", Color(1, 1, 1, 0.38))
+	node.add_theme_color_override("font_disabled_color", Color(1, 1, 1, 0.5))
 	fluid(node)
 
 
@@ -126,9 +188,11 @@ static func pill(text: String, kind: String) -> PanelContainer:
 
 ## Campo de texto e seletores (pesquisa, filtros).
 static func style_field(node: Control) -> void:
-	var normal := _flat(SURFACE, FIELD_BORDER, 8, Color.WHITE)
+	if node is OptionButton:
+		node.get_popup().canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	var normal := _flat(SURFACE, FIELD_BORDER, 4, Color.WHITE)
 	_pad(normal, 16, 6)
-	var focus := _flat(SURFACE_HOVER, Color(GOLD, 0.75), 8, Color.WHITE)
+	var focus := _flat(SURFACE_HOVER, Color(GOLD, 0.75), 4, Color.WHITE)
 	_pad(focus, 16, 6)
 	for state in ["normal", "read_only"]:
 		node.add_theme_stylebox_override(state, normal)
@@ -255,7 +319,7 @@ static func _flat(bg: Color, border: Color, radius: int, tint: Color) -> StyleBo
 	var box := StyleBoxFlat.new()
 	box.bg_color = bg * tint
 	box.border_color = border * tint
-	box.set_border_width_all(1)
+	box.set_border_width_all(0 if border.a < 0.01 else 1)
 	box.set_corner_radius_all(radius)
 	box.anti_aliasing = true
 	return box
@@ -263,35 +327,33 @@ static func _flat(bg: Color, border: Color, radius: int, tint: Color) -> StyleBo
 
 ## Cartão/linha. `gold`: destaque (o próprio jogador, o selecionado). tint clareia/escurece.
 static func plate(gold := false, tint := Color.WHITE) -> StyleBoxFlat:
-	var box := _flat(SELECTED_BG if gold else SURFACE, GOLD_BRIGHT if gold else FIELD_BORDER, 10, tint)
+	var box := _flat(SELECTED_BG if gold else SURFACE, Color(GOLD, 0.6) if gold else Color.TRANSPARENT, 4, tint)
 	if gold:
-		box.set_border_width_all(2)
-		box.shadow_color = Color(GOLD, 0.28)
-		box.shadow_size = 8
+		box.set_border_width_all(1)
 	_pad(box, 22, 8)
 	return box
 
 
 ## Botão em repouso: dourado (principal) ou superfície escura com filete (secundário).
 static func button_plate(gold := false, tint := Color.WHITE) -> StyleBoxFlat:
-	var box := _flat(GOLD if gold else SURFACE, Color(GOLD_BRIGHT, 0.0) if gold else FIELD_BORDER, 8, tint)
+	var box := _flat(GOLD if gold else SURFACE, Color.TRANSPARENT, 4, tint)
 	_pad(box, 20, 6)
 	return box
 
 
 ## Botão selecionado/pressionado.
 static func selected_plate(primary := false, tint := Color.WHITE) -> StyleBoxFlat:
-	var box := _flat(GOLD.darkened(0.12) if primary else SELECTED_BG, GOLD_BRIGHT, 8, tint)
-	box.set_border_width_all(1 if primary else 2)
+	var box := _flat(GOLD.darkened(0.12) if primary else SELECTED_BG, Color(GOLD, 0.6), 4, tint)
+	box.set_border_width_all(1)
 	_pad(box, 20, 6)
 	return box
 
 
 ## Painel de seção. `small` (celular): cantos menores.
 static func frame_panel(padding := 34, small := false) -> StyleBoxFlat:
-	var box := _flat(PANEL_BG, PANEL_BORDER, 8 if small else 10, Color.WHITE)
+	var box := _flat(PANEL_BG, Color.TRANSPARENT, 4, Color.WHITE)
 	box.shadow_color = Color(0, 0, 0, 0.3)
-	box.shadow_size = 12
+	box.shadow_size = 0
 	for side in [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]:
 		box.set_content_margin(side, padding)
 	return box
@@ -321,18 +383,18 @@ static func portrait(character_id: String, side: int = 82) -> TextureRect:
 
 
 ## Bustos recortados das miniaturas (2048 px), guardados em memória e numa versão pequena
-## ao lado delas ("_card.png"): abrir telas, buscar ou filtrar não relê nem recorta os PNGs
+## ao lado delas ("_card_720.png"): abrir telas, buscar ou filtrar não relê nem recorta os PNGs
 ## grandes de novo (antes isso travava as telas por 1–2 s).
 static var _busts := {}
-const BUST_HEIGHT := 360
+const BUST_HEIGHT := 720
 
 
 static func bust(path: String) -> Texture2D:
 	if not FileAccess.file_exists(path): return null
 	var stamp := FileAccess.get_modified_time(path)
-	var key := "%s@%d" % [path, stamp]
+	var key := "%s@%d:%d" % [path, stamp, BUST_HEIGHT]
 	if _busts.has(key): return _busts[key]
-	var small := path.get_basename() + "_card.png"
+	var small := path.get_basename() + "_card_%d.png" % BUST_HEIGHT
 	var image: Image
 	if FileAccess.file_exists(small) and FileAccess.get_modified_time(small) >= stamp:
 		image = Image.load_from_file(small)

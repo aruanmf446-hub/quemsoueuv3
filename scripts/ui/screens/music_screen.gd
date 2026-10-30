@@ -6,7 +6,7 @@ const CATEGORIES := {"Alternative": "Alternative", "Funk": "Funk", "k-pop": "K-p
 
 
 func _ready() -> void:
-	manages_own_scale = true
+	manages_own_scale = false
 	super._ready()
 	get_viewport().size_changed.connect(func() -> void:
 		if is_visible_in_tree():
@@ -30,7 +30,7 @@ func animate_in() -> void:
 func render() -> void:
 	PlayerUI.clear(body)
 	var compact := UIScale.is_compact()
-	var k := clampf(UIScale.unit_for(get_viewport()) * 0.75, 1.0, 3.0) if compact else 1.0
+	var k := 1.0
 	heading.text = tr("Músicas do menu")
 	heading.add_theme_font_size_override("font_size", int(34 * k))
 	heading.add_theme_color_override("font_color", Color.WHITE)
@@ -45,7 +45,7 @@ func render() -> void:
 	var on := 0
 	for track: Dictionary in music.tracks:
 		if not music.is_excluded(str(track.id)): on += 1
-	var top := PlayerUI.row(body)
+	var top := PlayerUI.split(body)
 	var count := PlayerUI.label("%d de %d músicas tocando no menu" % [on, music.tracks.size()], int(19 * k), Color("#c9d6e6"))
 	count.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	top.add_child(count)

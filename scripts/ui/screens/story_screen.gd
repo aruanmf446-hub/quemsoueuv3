@@ -63,16 +63,16 @@ func render() -> void:
 	body.add_theme_constant_override("separation", roundi(_px(18,6)))
 	heading.text = tr("MODO HISTÓRIA")
 	heading.add_theme_font_override("font",_font)
-	heading.add_theme_font_size_override("font_size",roundi(_px(40,20)))
+	heading.add_theme_font_size_override("font_size",roundi(_px(40,24)))
 	heading.add_theme_color_override("font_color",Color.WHITE)
 	var back: Button = $Margin/Column/Header/Back
 	_style_slanted(back,false)
-	back.custom_minimum_size = Vector2(_px(150,76),_px(52,30))
+	back.custom_minimum_size = Vector2(_px(150,76),_px(52,44))
 	back.add_theme_font_override("font",_font)
-	back.add_theme_font_size_override("font_size",roundi(_px(20,13)))
+	back.add_theme_font_size_override("font_size",roundi(_px(20,14)))
 	banner.hide()
 	var tabs := PlayerUI.row(body)
-	tabs.add_theme_constant_override("separation",roundi(_px(10,5)))
+	tabs.add_theme_constant_override("separation",roundi(_px(2,1)))
 	for realm: Array in [["Deserto","desert"],["Floresta","forest"],["Mar","sea"],["Lunar","lunar"]]:
 		var tab := Button.new()
 		tab.text = realm[0] if realm[1] == "desert" else realm[0]+"  🔒"
@@ -80,9 +80,9 @@ func render() -> void:
 		tab.button_pressed = realm[1] == _realm
 		tab.disabled = realm[1] != "desert"
 		if tab.disabled: tab.tooltip_text = "Reino em desenvolvimento"
-		tab.custom_minimum_size = Vector2(_px(150,78),_px(42,24))
+		tab.custom_minimum_size = Vector2(_px(150,78),_px(42,40))
 		tab.add_theme_font_override("font",_font)
-		tab.add_theme_font_size_override("font_size",roundi(_px(17,11)))
+		tab.add_theme_font_size_override("font_size",roundi(_px(17,14)))
 		_style_slanted(tab,realm[1] == _realm)
 		tab.pressed.connect(_select_realm.bind(realm[1]))
 		tabs.add_child(tab)
@@ -103,10 +103,10 @@ func render() -> void:
 	summary.add_theme_constant_override("separation",roundi(_px(18,8)))
 	var info := PlayerUI.column(summary)
 	info.add_theme_constant_override("separation",0)
-	info.add_child(_label("REINO DO DESERTO  ·  CIDADE NOTURNA",_px(15,9)/_unit_or_one(),GOLD))
-	info.add_child(_label("El Fuego  —  %d de 9 fases concluídas" % local_completed.size(),_px(22,12)/_unit_or_one()))
+	info.add_child(_label("REINO DO DESERTO  ·  CIDADE NOTURNA",_px(15,11)/_unit_or_one(),GOLD))
+	info.add_child(_label("El Fuego  —  %d de 9 fases concluídas" % local_completed.size(),_px(22,14)/_unit_or_one()))
 	var pips := Control.new()
-	pips.custom_minimum_size = Vector2(_px(300,150),_px(14,8))
+	pips.custom_minimum_size = Vector2(_px(300,150),_px(14,10))
 	pips.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	pips.draw.connect(func() -> void:
 		var w := pips.size.x/9.0
@@ -149,9 +149,9 @@ func render() -> void:
 		start.text = action
 		start.set_meta("phase_order",order)
 		start.disabled = not available or not exists
-		start.custom_minimum_size.y = _px(50,28)
+		start.custom_minimum_size.y = _px(50,44)
 		start.add_theme_font_override("font",_font)
-		start.add_theme_font_size_override("font_size",roundi(_px(18,11)))
+		start.add_theme_font_size_override("font_size",roundi(_px(18,14)))
 		_style_slanted(start,current or (available and not done))
 		start.pressed.connect(_launch.bind(str(phase.id),path))
 		card.get_meta("footer").add_child(start)
@@ -162,14 +162,14 @@ func _unit_or_one() -> float:
 
 func _phase_card(parent: Control, order: int, title: String, description: String, available: bool, done: bool, current: bool) -> PanelContainer:
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(_px(380,190),0)
+	panel.custom_minimum_size = Vector2(_px(380,220),0)
 	var style := StyleBoxFlat.new()
 	style.bg_color = PANEL
 	style.border_color = GOLD if current else (Color("#5fbf9f") if done else Color(1,1,1,0.10))
 	style.set_border_width_all(roundi(_px(3,2)) if current else 1)
-	style.set_corner_radius_all(roundi(_px(12,6)))
+	style.set_corner_radius_all(roundi(_px(4,4)))
 	style.shadow_color = Color(GOLD,0.35) if current else Color(0,0,0,0.45)
-	style.shadow_size = roundi(_px(18,8)) if current else roundi(_px(10,4))
+	style.shadow_size = 0
 	panel.add_theme_stylebox_override("panel",style)
 	parent.add_child(panel)
 	var column := VBoxContainer.new()
@@ -192,7 +192,7 @@ func _phase_card(parent: Control, order: int, title: String, description: String
 	number.add_theme_font_size_override("font_size",roundi(_px(64,32)))
 	number.add_theme_color_override("font_color",Color.WHITE if available else Color(1,1,1,0.5))
 	number.add_theme_color_override("font_outline_color",Color(0,0,0,0.85))
-	number.add_theme_constant_override("outline_size",roundi(_px(10,5)))
+	number.add_theme_constant_override("outline_size",roundi(_px(2,1)))
 	number.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	number.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	number.offset_left = _px(16,8)
@@ -202,7 +202,7 @@ func _phase_card(parent: Control, order: int, title: String, description: String
 	var chip := Label.new()
 	chip.text = "✓ CONCLUÍDA" if done else ("▶ PRÓXIMA" if current else ("LIBERADA" if available else "🔒 BLOQUEADA"))
 	chip.add_theme_font_override("font",_font)
-	chip.add_theme_font_size_override("font_size",roundi(_px(14,8)))
+	chip.add_theme_font_size_override("font_size",roundi(_px(14,10)))
 	chip.add_theme_color_override("font_color",Color("#0e1a12") if done else (Color("#151006") if current else Color.WHITE))
 	var chip_style := StyleBoxFlat.new()
 	chip_style.bg_color = Color("#6fd3ad") if done else (GOLD if current else Color(0,0,0,0.65))
@@ -225,9 +225,9 @@ func _phase_card(parent: Control, order: int, title: String, description: String
 	pad.add_theme_constant_override("margin_bottom",roundi(_px(16,7)))
 	column.add_child(pad)
 	pad.add_child(content)
-	var name_label := _plain(title,_px(26,12),GOLD if available else Color("#9aa6b3"))
+	var name_label := _plain(title,_px(26,16),GOLD if available else Color("#9aa6b3"))
 	content.add_child(name_label)
-	var text := _plain(description if available else "Conclua a fase %02d para liberar." % (order-1),_px(17,8.5),Color("#c3cfdc") if available else Color("#7f8b98"))
+	var text := _plain(description if available else "Conclua a fase %02d para liberar." % (order-1),_px(17,12),Color("#c3cfdc") if available else Color("#7f8b98"))
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text.max_lines_visible = 4 if not _compact else 2
 	text.clip_text = true
@@ -249,22 +249,7 @@ func _plain(text: String, size: float, color: Color) -> Label:
 
 ## Botões e abas inclinados como os menus de jogos esportivos.
 func _style_slanted(button: Button, primary: bool) -> void:
-	for state in ["normal","hover","pressed","focus","disabled"]:
-		var style := StyleBoxFlat.new()
-		style.skew = Vector2(0.22,0)
-		style.bg_color = GOLD if primary else Color(0.06,0.10,0.17,0.92)
-		if state in ["hover","focus"]: style.bg_color = style.bg_color.lightened(0.12)
-		if state == "pressed": style.bg_color = style.bg_color.darkened(0.15)
-		if state == "disabled": style.bg_color = Color(0.05,0.07,0.11,0.85)
-		style.border_color = GOLD if (state == "focus" or not primary) else GOLD.lightened(0.3)
-		style.set_border_width_all(0 if state == "disabled" else 1)
-		style.content_margin_left = _px(18,9)
-		style.content_margin_right = _px(18,9)
-		style.anti_aliasing = true
-		button.add_theme_stylebox_override(state,style)
-	for state in ["font_color","font_hover_color","font_pressed_color","font_focus_color","font_hover_pressed_color"]:
-		button.add_theme_color_override(state,Color("#141006") if primary else Color.WHITE)
-	button.add_theme_color_override("font_disabled_color",Color(1,1,1,0.38))
+	PlayerUI.style_button(button, primary)
 
 func _reveal_next() -> void:
 	await get_tree().process_frame

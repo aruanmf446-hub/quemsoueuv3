@@ -15,13 +15,19 @@ var parameters: Dictionary = {}
 var manages_own_scale := false
 
 func _ready() -> void:
+	PlayerUI.apply_theme(self)
+	PlayerUI.style_backdrop($Tint)
 	services = PlayerServices.current
 	$Margin/Column/Header/Back.pressed.connect(func() -> void: back_requested.emit())
 	# Visual comum: sem a moldura ornamental (cobria o conteúdo), fundo escurecido e
 	# botão Voltar inclinado no estilo do resto do menu.
 	$Tint.color = Color(0.02, 0.035, 0.07, 0.86)
-	PlayerUI.style_button($Margin/Column/Header/Back, false)
+	PlayerUI.style_back($Margin/Column/Header/Back)
 	heading.add_theme_color_override("font_color", Color.WHITE)
+	heading.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	$Margin.grow_horizontal = Control.GROW_DIRECTION_END
+	$Margin.grow_vertical = Control.GROW_DIRECTION_END
+	$Margin.minimum_size_changed.connect(_refit_margin)
 	resized.connect(_adapt_scale)
 	_adapt_scale.call_deferred()
 
@@ -30,20 +36,38 @@ func _ready() -> void:
 func _adapt_scale() -> void:
 	if manages_own_scale or not is_inside_tree(): return
 	var margin: MarginContainer = $Margin
-	var factor := maxf(1.0, UIScale.unit_for(get_viewport()) * 0.75) if UIScale.is_compact() else 1.0
+	var factor := PlayerUI.unit(self)
+	var compact := size.y / factor < 600.0
 	margin.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	margin.scale = Vector2.ONE * factor
 	margin.position = Vector2.ZERO
 	margin.size = size / factor
-	for side in ["left", "right"]: margin.add_theme_constant_override("margin_" + side, 24 if factor > 1.0 else 76)
-	margin.add_theme_constant_override("margin_top", 16 if factor > 1.0 else 70)
-	margin.add_theme_constant_override("margin_bottom", 12 if factor > 1.0 else 62)
+	for side in ["left", "right"]: margin.add_theme_constant_override("margin_" + side, 20 if compact else 40)
+	margin.add_theme_constant_override("margin_top", 16 if compact else 28)
+	margin.add_theme_constant_override("margin_bottom", 16 if compact else 28)
+
+	var back: Button = $Margin/Column/Header/Back
+	back.custom_minimum_size = Vector2(100, 44)
+	back.add_theme_font_size_override("font_size", 16)
+	heading.add_theme_font_size_override("font_size", 28 if compact else 34)
+	$Margin/Column.add_theme_constant_override("separation", 16 if compact else 24)
+
+
+## Wrapping labels can lower the minimum after the first layout pass. Refit the
+## viewport-sized margin so a stale larger minimum does not leave it oversized.
+func _refit_margin() -> void:
+	if not is_inside_tree(): return
+	var margin: MarginContainer = $Margin
+	if is_zero_approx(margin.anchor_right):
+		margin.set_deferred("size", size / margin.scale)
+		margin.set_deferred("position", Vector2.ZERO)
 
 
 func show_screen(params: Dictionary = {}) -> void:
 	parameters = params.duplicate(true)
 	show()
 	render()
+	_refit_margin.call_deferred()
 	$Margin/Column/Header/Back.grab_focus()
 
 
@@ -61,7 +85,10 @@ func status(result: Dictionary) -> void:
 
 
 func account_button(parent: Node) -> void:
-	parent.add_child(PlayerUI.button("Entrar na conta", func() -> void: navigate_requested.emit("account", {})))
+	var enter := PlayerUI.button("Entrar na conta", func() -> void: navigate_requested.emit("account", {}))
+	enter.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	PlayerUI.style_button(enter, true)
+	parent.add_child(enter)
 
 
 func preview(parent: Node, character_id: String) -> LobbyStage:
@@ -70,7 +97,7 @@ func preview(parent: Node, character_id: String) -> LobbyStage:
 		parent.add_child(PlayerUI.label("Skin ainda não disponível.", 20))
 		return null
 	var stage := preload("res://scenes/lobby/lobby_stage.tscn").instantiate() as LobbyStage
-	stage.custom_minimum_size = Vector2(330, 360)
+	stage.custom_minimum_size = Vector2(240, clampf(size.y / PlayerUI.unit(self) - 250, 120, 480))
 	stage.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	stage.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	stage.interactive = true

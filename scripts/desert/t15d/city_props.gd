@@ -11,8 +11,10 @@ var _light_added := false
 var building_count := 0
 var lantern_count := 0
 
-func build(platforms: Array, order: int) -> void:
+## A mesma geometria pode ser criada por etapas sem perder o agrupamento por material.
+func prepare_build(platforms: Array, order: int) -> Array[Callable]:
 	_order = clampi(order,1,9)
+	var tasks: Array[Callable] = []
 	for platform: Dictionary in platforms:
 		if platform.get("kind","") != "ground": continue
 		var p: Array = platform.pos
@@ -23,19 +25,25 @@ func build(platforms: Array, order: int) -> void:
 		var first := ceili((left-4.0)/BUILDING_SPACING)
 		var last := floori((right-4.0)/BUILDING_SPACING)
 		for slot in range(first,last+1):
-			var x := 4.0+float(slot)*BUILDING_SPACING
-			var rng := RandomNumberGenerator.new()
-			rng.seed = absi(_order*1000003+slot*9176+3059)
-			# Deixa janelas para a cidade panorâmica entre as fachadas próximas.
-			var width := rng.randf_range(3.8,5.1)
-			if x-width*0.5 < left+0.15 or x+width*0.5 > right-0.15: continue
-			_building(Vector3(x,top,rng.randf_range(-6.2,-5.3)),width,rng)
-			building_count += 1
+			tasks.append(_build_slot.bind(slot,left,right,top))
 		if bool(platform.get("pit_left",false)):
-			_lantern(Vector3(left+0.55,top,-3.8))
+			tasks.append(_lantern.bind(Vector3(left+0.55,top,-3.8)))
 		if bool(platform.get("pit_right",false)):
-			_lantern(Vector3(right-0.55,top,-3.8))
-	_flush()
+			tasks.append(_lantern.bind(Vector3(right-0.55,top,-3.8)))
+	tasks.append(_flush)
+	return tasks
+
+func build(platforms: Array, order: int) -> void:
+	for task in prepare_build(platforms,order): task.call()
+
+func _build_slot(slot: int, left: float, right: float, top: float) -> void:
+	var x := 4.0+float(slot)*BUILDING_SPACING
+	var rng := RandomNumberGenerator.new()
+	rng.seed = absi(_order*1000003+slot*9176+3059)
+	var width := rng.randf_range(3.8,5.1)
+	if x-width*0.5 < left+0.15 or x+width*0.5 > right-0.15: return
+	_building(Vector3(x,top,rng.randf_range(-6.2,-5.3)),width,rng)
+	building_count += 1
 
 func _building(origin: Vector3, width: float, rng: RandomNumberGenerator) -> void:
 	var district := int((_order-1)/3.0)

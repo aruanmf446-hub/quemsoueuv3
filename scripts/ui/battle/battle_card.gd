@@ -45,8 +45,9 @@ func setup(card_id: String, chosen: bool, out: bool, usable: bool) -> void:
 	grading.set_shader_parameter("saturation",0.0 if out else 1.04)
 	image.material = grading
 	column.add_child(image)
-	caption = Style.label(DuelService.card_name(id),12)
+	caption = Style.label(DuelService.card_name(id),12,Color("#f3ead8"))
 	caption.name = "Caption"
+	Style.strong(caption)
 	caption.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	caption.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -54,12 +55,15 @@ func setup(card_id: String, chosen: bool, out: bool, usable: bool) -> void:
 	caption.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	caption.max_lines_visible = 2
 	var strip := StyleBoxFlat.new()
-	strip.bg_color = Color(0.012,0.019,0.031,0.98)
+	strip.bg_color = Color(0.03,0.045,0.07,0.97)
 	strip.set_content_margin_all(1)
 	strip.content_margin_left = 6
 	strip.content_margin_right = 6
 	strip.border_width_top = 1
-	strip.border_color = Color(0.84,0.65,0.33,0.24)
+	strip.border_color = Color(0.84,0.65,0.33,0.45)
+	strip.shadow_color = Color(0,0,0,0.6)
+	strip.shadow_size = 6
+	strip.shadow_offset = Vector2(0,-3)
 	caption.add_theme_constant_override("outline_size",1)
 	caption.add_theme_color_override("font_outline_color",Color(0,0,0,0.8))
 	caption.add_theme_stylebox_override("normal",strip)
@@ -70,23 +74,41 @@ func setup(card_id: String, chosen: bool, out: bool, usable: bool) -> void:
 	caption_area.add_child(caption)
 	caption.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	if out:
-		image.modulate = Color(0.46,0.46,0.46)
+		image.modulate = Color(0.42,0.42,0.46)
 		caption.add_theme_color_override("font_color", PlayerUI.MUTED)
-		var eliminated := Style.label("ELIMINADA",10,Color("#de9e97"))
-		eliminated.add_theme_constant_override("outline_size",3)
-		eliminated.add_theme_color_override("font_outline_color",Color("#080c13"))
+		# Selo centralizado em vez de texto solto sobre a arte.
+		var holder := CenterContainer.new()
+		holder.name = "Eliminated"
+		holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(holder)
+		var seal := PanelContainer.new()
+		seal.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var seal_style := StyleBoxFlat.new()
+		seal_style.bg_color = Color(0.09,0.03,0.04,0.86)
+		seal_style.border_color = Color("#c4655c")
+		seal_style.set_border_width_all(1)
+		seal_style.set_corner_radius_all(4)
+		seal_style.content_margin_left = 10
+		seal_style.content_margin_right = 10
+		seal_style.content_margin_top = 3
+		seal_style.content_margin_bottom = 3
+		seal_style.shadow_color = Color(0,0,0,0.55)
+		seal_style.shadow_size = 4
+		seal.add_theme_stylebox_override("panel",seal_style)
+		holder.add_child(seal)
+		var eliminated := Style.label("ELIMINADA",11,Color("#f0b3ab"))
+		Style.strong(eliminated)
 		eliminated.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		eliminated.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		add_child(eliminated)
+		seal.add_child(eliminated)
 	var finish := preload("res://scripts/ui/battle/battle_card_finish.gd").new()
 	finish.selected = selected
 	finish.removed = removed
 	add_child(finish)
 	image.resized.connect(_crop)
-	mouse_entered.connect(func() -> void: _style(true))
-	mouse_exited.connect(func() -> void: _style(false))
-	focus_entered.connect(func() -> void: _style(true))
-	focus_exited.connect(func() -> void: _style(false))
+	mouse_entered.connect(func() -> void: _style(true); _lift(true))
+	mouse_exited.connect(func() -> void: _style(false); _lift(false))
+	focus_entered.connect(func() -> void: _style(true); _lift(true))
+	focus_exited.connect(func() -> void: _style(false); _lift(false))
 	gui_input.connect(_on_gui_input)
 	_style(false)
 func _style(hover: bool) -> void:
@@ -99,6 +121,17 @@ func _style(hover: bool) -> void:
 	style.bg_color = Color("#070d14")
 	style.set_corner_radius_all(4)
 	add_theme_stylebox_override("panel",style)
+## Carta "tocável": sobe um pouco ao passar o mouse/foco (só se puder ser escolhida).
+var _lift_tween: Tween
+func _lift(on: bool) -> void:
+	if not interactive or removed: return
+	pivot_offset = size*0.5
+	if _lift_tween != null and _lift_tween.is_valid(): _lift_tween.kill()
+	z_index = 1 if on else 0
+	_lift_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_lift_tween.tween_property(self,"scale",Vector2.ONE*(1.03 if on else 1.0),0.12)
+
+
 func _on_gui_input(event: InputEvent) -> void:
 	if not interactive: return
 	# Handle native touch as well as mouse/keyboard. Ignore the synthetic mouse
@@ -106,13 +139,17 @@ func _on_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.device == InputEvent.DEVICE_ID_EMULATION: return
 	if (event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or event.is_action_pressed("ui_accept"):
 		grab_focus()
+		pivot_offset = size*0.5
+		scale = Vector2.ONE*0.97
+		create_tween().tween_property(self,"scale",Vector2.ONE*1.03,0.1)
 		activated.emit()
 		accept_event()
 func _crop() -> void:
 	if is_instance_valid(caption_area):
 		var dense := size.x < 115
 		caption_area.custom_minimum_size.y = 26 if dense else 20
-		caption.add_theme_font_size_override("font_size",11 if dense else (12 if size.x < 165 else 13))
+		caption.add_theme_font_size_override("font_size",11 if dense else (13 if size.x < 165 else 15))
+		caption_area.custom_minimum_size.y = 26 if dense else (22 if size.x < 165 else 26)
 	if _source == null or image.size.y <= 0: return
 	var source_size := _source.get_size()
 	var ratio := image.size.x / maxf(image.size.y,1)

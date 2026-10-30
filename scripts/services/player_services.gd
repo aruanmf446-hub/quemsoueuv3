@@ -55,6 +55,11 @@ func _ready() -> void:
 	duel = DuelService.new()
 	duel.client = client
 	duel.session = session
+	duel.local_server = LocalDuelServer.new()
+	duel.local_server.skin_provider = inventory.equipped_id
+	duel.local_server.nickname_provider = func() -> String:
+		return str(profile.data.get("nickname", "")) if session.authenticated() else ""
+	duel.add_child(duel.local_server)
 	add_child(duel)
 	session.changed.connect(_session_changed)
 	var poller := Timer.new()
@@ -76,7 +81,8 @@ func _session_changed() -> void:
 	progression.clear()
 	wallet.clear()
 	friends.clear()
-	duel.clear()
+	# A partida local não depende da conta: entrar ou sair dela não a interrompe.
+	if not duel.is_local(): duel.clear()
 	inventory.changed.emit()
 	if session.authenticated():
 		refresh_all()

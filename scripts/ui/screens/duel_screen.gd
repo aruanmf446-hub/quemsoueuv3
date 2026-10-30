@@ -4,6 +4,8 @@ extends PlayerScreen
 ## - "form": criar sala ou (ADM) editar as configurações da sala;
 ## - "room": lobby com participantes, skins, ADM, bots, expulsar e iniciar.
 ## O servidor decide tudo (DuelService); esta tela só mostra e pede ações.
+## Partida local: sem conta, o jogador cria uma sala neste aparelho com bots (LocalDuelServer,
+## mesmas regras e contratos). Ela é sempre identificada como local e nunca é pública.
 
 const SKIN_SIZE := 128
 var duel: DuelService
@@ -36,7 +38,7 @@ func _ready() -> void:
 	_auto_refresh = Timer.new()
 	_auto_refresh.wait_time = 6.0
 	_auto_refresh.timeout.connect(func() -> void:
-		if is_visible_in_tree() and _view == "browse" and not duel.in_room(): _load_rooms(false))
+		if is_visible_in_tree() and _view == "browse" and not duel.in_room() and _online(): _load_rooms(false))
 	add_child(_auto_refresh)
 	_auto_refresh.start()
 
@@ -45,15 +47,20 @@ func show_screen(params: Dictionary = {}) -> void:
 	if duel.in_room(): _view = "room"
 	elif _view == "room": _view = "browse"
 	super.show_screen(params)
-	if _view == "browse" and services.session.authenticated(): _load_rooms(false)
+	if _view == "browse" and _online(): _load_rooms(false)
+
+
+## Lista e convites online: só com conta e fora da partida local.
+func _online() -> bool:
+	return services.session.authenticated() and not duel.is_local()
 
 
 func render() -> void:
-	heading.text = tr("Duelo")
+	heading.text = tr("Duelo · Partida local") if duel.is_local() else tr("Duelo")
 	if is_instance_valid(_match_view) and _match_view.get_parent() == body: body.remove_child(_match_view)
 	PlayerUI.clear(body)
 	banner.show_state("success")
-	if not services.session.authenticated():
+	if not services.session.authenticated() and not duel.is_local():
 		_signed_out()
 		return
 	if duel.in_room(): _view = "room" if _view != "form" else "form"
@@ -72,17 +79,31 @@ func _signed_out() -> void:
 	var card := PlayerUI.column(center)
 	card.custom_minimum_size.x = 0
 	card.alignment = BoxContainer.ALIGNMENT_CENTER
-	var title := PlayerUI.label("Duelos online", 30, Color.WHITE)
+	var title := PlayerUI.label("Partida local", 30, Color.WHITE)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	card.add_child(title)
-	var text := PlayerUI.label("Entre na sua conta para criar ou entrar em salas.", 19, Color("#c9d6e6"))
+	var text := PlayerUI.label("Jogue agora contra bots neste aparelho, sem conta e sem internet.", 19, Color("#c9d6e6"))
 	text.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	card.add_child(text)
+	var local := PlayerUI.button("Criar partida local", _start_local)
+	local.name = "LocalMatch"
+	PlayerUI.style_button(local, true)
+	local.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	local.custom_minimum_size.x = 280
+	card.add_child(local)
+	var online := PlayerUI.label("Duelos online (salas públicas e convites) pedem uma conta.", 17, Color("#a8bad3"))
+	online.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	card.add_child(online)
 	var enter := PlayerUI.button("Entrar na conta", func() -> void: navigate_requested.emit("account", {}))
-	PlayerUI.style_button(enter, true)
+	PlayerUI.style_button(enter, false)
 	enter.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	enter.custom_minimum_size.x = 240
 	card.add_child(enter)
+
+
+func _start_local() -> void:
+	await duel.use_local()
+	_open_form()
 
 
 # --- Lista de salas ------------------------------------------------------------------------
@@ -92,6 +113,10 @@ func _render_browse() -> void:
 	var create := PlayerUI.button("Criar sala", func() -> void: _open_form())
 	PlayerUI.style_button(create, true)
 	actions.add_child(create)
+	var local := PlayerUI.button("Partida local", _start_local)
+	local.name = "LocalMatch"
+	local.tooltip_text = tr("Contra bots, neste aparelho")
+	actions.add_child(local)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	actions.add_child(spacer)
@@ -198,13 +223,18 @@ func _open_form() -> void:
 func _render_form() -> void:
 	var editing := duel.in_room()
 	var base: Dictionary = duel.room.room.settings if editing else duel.defaults
+	var local := duel.is_local()
 	var panel := PlayerUI.panel(body, 36)
-	panel.add_child(PlayerUI.label("Configurações da sala" if editing else "Criar sala", 28, Color.WHITE))
+	var title := ("Configurações da sala" if editing else "Criar sala") if not local else \
+		("Configurações da partida local" if editing else "Criar partida local")
+	panel.add_child(PlayerUI.label(title, 28, Color.WHITE))
+	if local:
+		panel.add_child(PlayerUI.label("Só neste aparelho, contra bots. Não aparece na lista online e não recebe convites.", 17, Color("#c9d6e6")))
 	_form = {}
 	var top := PlayerUI.row(panel)
 	var room_name := LineEdit.new()
 	room_name.placeholder_text = tr("Nome da sala")
-	room_name.text = str(duel.room.room.name) if editing else "Sala de %s" % str(services.profile.data.get("nickname", "Duelo"))
+	room_name.text = str(duel.room.room.name) if editing else ("Partida local" if local else "Sala de %s" % str(services.profile.data.get("nickname", "Duelo")))
 	room_name.max_length = 32
 	room_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	room_name.custom_minimum_size.y = 52
@@ -217,7 +247,8 @@ func _render_form() -> void:
 	public.button_pressed = bool(duel.room.room.is_public) if editing else true
 	public.toggled.connect(func(value: bool) -> void: public.text = tr("Sala pública" if value else "Só por convite"))
 	public.text = tr("Sala pública" if public.button_pressed else "Só por convite")
-	top.add_child(public)
+	if not local: top.add_child(public)
+	else: public.button_pressed = false
 	_form.public = public
 	var grid := GridContainer.new()
 	grid.columns = 2
@@ -262,6 +293,7 @@ func _render_form() -> void:
 	actions.add_child(save)
 	actions.add_child(PlayerUI.button("Cancelar", func() -> void:
 		_view = "room" if duel.in_room() else "browse"
+		if not duel.in_room(): await duel.use_online()
 		render()))
 
 
@@ -277,7 +309,7 @@ func _submit_form() -> void:
 		return
 	settings.deck_ids = decks
 	var room_name: String = (_form.name as LineEdit).text
-	var public: bool = (_form.public as Button).button_pressed
+	var public: bool = (_form.public as Button).button_pressed and not duel.is_local()
 	var result := await _act(duel.configure.bind(room_name, public, settings) if duel.in_room() else duel.create.bind(room_name, public, settings))
 	if result.ok:
 		_view = "room"
@@ -299,16 +331,26 @@ func _render_room() -> void:
 	var players := (duel.room.members as Array).filter(func(m: Dictionary) -> bool: return m.role == "player")
 	var state := "No lobby  ·  %d/%d jogadores" % [players.size(), int(settings.max_players)]
 	if str(data.status) == "in_match": state = "Partida em andamento"
-	titles.add_child(PlayerUI.label(state + ("  ·  Sala pública" if data.is_public else "  ·  Só por convite"), 17, Color("#c9d6e6")))
-	var code := PlayerUI.button("Código  %s" % str(data.code), func() -> void:
-		DisplayServer.clipboard_set(str(data.code))
-		banner.show_state("success", tr("Código copiado: %s") % str(data.code)))
-	code.tooltip_text = tr("Copiar código de convite")
-	code.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	header.add_child(code)
+	if duel.is_local():
+		titles.add_child(PlayerUI.label(state + "  ·  Partida local, só neste aparelho", 17, Color("#c9d6e6")))
+		var tag := PlayerUI.pill("PARTIDA LOCAL", "equipped")
+		tag.name = "LocalBadge"
+		tag.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		header.add_child(tag)
+	else:
+		titles.add_child(PlayerUI.label(state + ("  ·  Sala pública" if data.is_public else "  ·  Só por convite"), 17, Color("#c9d6e6")))
+		var code := PlayerUI.button("Código  %s" % str(data.code), func() -> void:
+			DisplayServer.clipboard_set(str(data.code))
+			banner.show_state("success", tr("Código copiado: %s") % str(data.code)))
+		code.tooltip_text = tr("Copiar código de convite")
+		code.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		header.add_child(code)
+	if str(data.status) == "closed":
+		_render_closed()
+		return
 	if str(data.status) == "in_match" and not duel.match().is_empty():
 		header.hide()
-		heading.text = tr("Batalha")
+		heading.text = tr("Batalha · Partida local") if duel.is_local() else tr("Batalha")
 		if not is_instance_valid(_match_view):
 			_match_view = preload("res://scripts/ui/screens/duel_match_view.gd").new()
 			_match_view.name = "Match"
@@ -357,13 +399,29 @@ func _render_room() -> void:
 	actions.add_child(PlayerUI.button("Sair da sala", _leave_room))
 
 
+## Sala encerrada com você ainda nela: nenhum jogador real ficou vivo (regra do servidor:
+## nunca há bot campeão).
+func _render_closed() -> void:
+	var notice := PlayerUI.label("Partida encerrada: nenhum jogador real continuou vivo, então não há campeão.", 20, PlayerUI.GOLD)
+	notice.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	notice.custom_minimum_size.y = 140
+	notice.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	body.add_child(notice)
+	var row := PlayerUI.row(body)
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	var back := PlayerUI.button("Voltar", _leave_room)
+	PlayerUI.style_button(back, true)
+	row.add_child(back)
+
+
 ## Sair durante a partida elimina o jogador (regra do servidor); no lobby, só sai.
 func _leave_room() -> void:
 	await duel.leave()
+	await duel.use_online()
 	_view = "browse"
 	_rooms = []
 	render()
-	_load_rooms(false)
+	if _online(): _load_rooms(false)
 
 
 ## Cartão do participante: retrato da skin equipada, nome e selos (ADM, BOT, VOCÊ, espectador).

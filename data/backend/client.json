@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "url": "https://xgmlphejalzakucllsmw.supabase.co",
-  "publishable_key": "",
-  "configuration_status": "requires_public_key_and_reviewed_migrations",
+  "url": "https://shuzporktifgiotvnpbz.supabase.co",
+  "publishable_key": "sb_publishable_ZrugXVdGCXztHbMZiIX8Mw_K6Bg-uhW",
+  "configuration_status": "connected_to_game_project",
   "persist_session": false,
   "connections": {
     "game": {
-      "comment": "Conexão atual: usa url e publishable_key acima (autenticação central)."
+      "comment": "Autenticacao GAME, backend de jogadores e Duelo. URL e chave nos campos raiz."
     },
     "chat": {
-      "url": "",
-      "publishable_key": "",
-      "configuration_status": "not_configured"
+      "url": "https://wurkpjgnbqklivjhcvxk.supabase.co",
+      "publishable_key": "sb_publishable_MrfbiUbz-Y1sf4AX2JSiOw_ZwsWTdIA",
+      "configuration_status": "connected_without_cross_project_auth"
     },
     "catalog": {
-      "url": "",
-      "publishable_key": "",
-      "configuration_status": "not_configured"
+      "url": "https://bsxicvlngphazesuzaee.supabase.co",
+      "publishable_key": "sb_publishable_1JmcnJ7WLSJ3Y71XKG0Mqg_0wEMwc4Y",
+      "configuration_status": "connected_public_catalog_only"
     }
   }
 }

@@ -8,8 +8,6 @@ const CATEGORIES := {"Alternative": "Alternative", "Funk": "Funk", "k-pop": "K-p
 func _ready() -> void:
 	manages_own_scale = true
 	super._ready()
-	# A moldura decorativa cobria o texto desta tela; o fundo do lobby permanece.
-	$CrestFrame.hide()
 	get_viewport().size_changed.connect(func() -> void:
 		if is_visible_in_tree():
 			render())

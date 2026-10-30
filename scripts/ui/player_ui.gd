@@ -1,30 +1,35 @@
 class_name PlayerUI
 extends RefCounted
 
-const GOLD := Color("#f2cf7d")
-const INK := Color("#12223b")
-const TEXT := Color("#edf3ff")
-const FRAME := preload("res://assets/processed/frames/frame_painel_brasao.png")
-const BLUE := preload("res://assets/processed/textures/textura_azul.png")
-const PURPLE := preload("res://assets/processed/textures/textura_roxa.png")
-## Kit de arte em versões leves (assets/ui/kit, geradas a partir de assets/processed/frames).
-const PLATE := preload("res://assets/ui/kit/plate.png")
-const PLATE_GOLD := preload("res://assets/ui/kit/plate_gold.png")
-const PLATE_SMALL := preload("res://assets/ui/kit/plate_small.png")
-const PLATE_SMALL_GOLD := preload("res://assets/ui/kit/plate_small_gold.png")
-const PANEL_FRAME := preload("res://assets/ui/kit/panel_frame.png")
-const PANEL_FRAME_SMALL := preload("res://assets/ui/kit/panel_frame_small.png")
-const CARD_FRAME := preload("res://assets/ui/kit/card_frame.png")
-const CARD_FRAME_GOLD := preload("res://assets/ui/kit/card_frame_gold.png")
-## Texto sobre a placa dourada do kit (que é âmbar escuro): creme claro, alto contraste.
-const KIT_INK := Color("#ffeec4")
-## Cores das coleções: texturas do kit usadas como fundo de cartas e etiquetas.
+## MODELO VISUAL DAS TELAS DO JOGADOR — tirado de docs/referencias/personagens/REFERENCIA_APROVADA.png
+## (ver docs/referencias/README.md). Superfícies azul-noite translúcidas sobre o fundo do lobby,
+## filete fino frio, cantos de 8–10 px; dourado só no que está selecionado ou é a ação principal.
+const GOLD := Color("#e8b65e")
+const GOLD_BRIGHT := Color("#f3c66a")
+## Títulos de seção ("Coleções", "Personagens") e valores em destaque.
+const TITLE_GOLD := Color("#ecc98e")
+## Texto sobre o dourado (ação principal).
+const INK := Color("#23170a")
+const TEXT := Color("#eef2f8")
+const MUTED := Color("#9ba7b8")
+## Painel grande (galeria, coleções, conteúdo de configurações).
+const PANEL_BG := Color(0.035, 0.065, 0.115, 0.86)
+const PANEL_BORDER := Color("#253145")
+## Campos, cartões e botões secundários.
+const SURFACE := Color(0.065, 0.10, 0.16, 0.92)
+const SURFACE_HOVER := Color(0.09, 0.135, 0.21, 0.95)
+const FIELD_BG := SURFACE
+const FIELD_BORDER := Color("#2f3b50")
+## Item selecionado (aba, coleção, filtro ativo): fundo âmbar escuro com filete dourado.
+const SELECTED_BG := Color(0.17, 0.145, 0.115, 0.95)
+## Compatibilidade com telas antigas.
+## Cores das coleções.
 const SWATCHES := {
-	"azul": "res://assets/processed/textures/textura_azul.png",
-	"dourada": "res://assets/processed/textures/textura_dourada.png",
-	"roxa": "res://assets/processed/textures/textura_roxa.png",
-	"verde": "res://assets/processed/textures/textura_verde.png",
-	"vermelha": "res://assets/processed/textures/textura_vermelha.png",
+	"azul": Color("#2f6fd6"),
+	"dourada": Color("#d8a531"),
+	"roxa": Color("#7a4fd0"),
+	"verde": Color("#3f9b5a"),
+	"vermelha": Color("#c9473e"),
 }
 
 
@@ -49,31 +54,102 @@ static func button(text: String, action: Callable) -> Button:
 	return node
 
 
-## Botão com a placa do kit de arte: azul com filete dourado; o principal e o selecionado
-## (pressionado) usam a placa dourada com texto escuro.
+## Botão do modelo. Principal: dourado com texto escuro. Secundário: superfície escura com
+## filete frio. Selecionado (toggle pressionado: abas, coleções, filtros): âmbar escuro + filete dourado.
 static func style_button(node: Button, primary: bool) -> void:
 	var states := {
 		"normal": button_plate(primary),
-		"hover": button_plate(primary, Color(1.16, 1.16, 1.2)),
-		"pressed": button_plate(true, Color(0.92, 0.92, 0.92)),
-		"hover_pressed": button_plate(true, Color(1.08, 1.08, 1.08)),
-		"disabled": button_plate(false, Color(0.5, 0.52, 0.58, 0.85)),
+		"hover": button_plate(primary, Color(1.12, 1.12, 1.15)),
+		"pressed": selected_plate(primary),
+		"hover_pressed": selected_plate(primary, Color(1.08, 1.08, 1.08)),
+		"disabled": _flat(Color(0.07, 0.09, 0.13, 0.85), Color("#232c3a"), 8, Color.WHITE),
 	}
 	for state: String in states:
-		node.add_theme_stylebox_override(state, states[state])
+		var box: StyleBoxFlat = states[state]
+		if state == "disabled": _pad(box, 20, 6)
+		node.add_theme_stylebox_override(state, box)
 	var focus := StyleBoxFlat.new()
 	focus.draw_center = false
-	focus.border_color = Color(GOLD, 0.9)
+	focus.border_color = Color(GOLD_BRIGHT, 0.9)
 	focus.set_border_width_all(2)
-	focus.set_corner_radius_all(6)
+	focus.set_corner_radius_all(9)
 	focus.set_expand_margin_all(2)
 	node.add_theme_stylebox_override("focus", focus)
 	for color: String in ["font_color", "font_hover_color", "font_focus_color"]:
-		node.add_theme_color_override(color, KIT_INK if primary else TEXT)
+		node.add_theme_color_override(color, INK if primary else TEXT)
 	for color: String in ["font_pressed_color", "font_hover_pressed_color"]:
-		node.add_theme_color_override(color, KIT_INK)
+		node.add_theme_color_override(color, INK if primary else TEXT)
 	node.add_theme_color_override("font_disabled_color", Color(1, 1, 1, 0.38))
 	fluid(node)
+
+
+## Linha de lista selecionável (coleções, categorias): transparente até passar o mouse;
+## selecionada fica âmbar escuro com filete dourado, como na referência.
+static func style_row(node: Button) -> void:
+	style_button(node, false)
+	var normal := _flat(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 8, Color.WHITE)
+	_pad(normal, 16, 6)
+	node.add_theme_stylebox_override("normal", normal)
+	var hover := _flat(SURFACE_HOVER, Color(0, 0, 0, 0), 8, Color.WHITE)
+	_pad(hover, 16, 6)
+	node.add_theme_stylebox_override("hover", hover)
+
+
+## Selo de estado em largura total na base do cartão (EQUIPADO / DISPONÍVEL / BLOQUEADO).
+static func pill(text: String, kind: String) -> PanelContainer:
+	var node := PanelContainer.new()
+	node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var box := StyleBoxFlat.new()
+	box.set_corner_radius_all(6)
+	box.set_border_width_all(1)
+	_pad(box, 10, 3)
+	var ink := MUTED
+	match kind:
+		"equipped":
+			box.bg_color = Color("#5a4429")
+			box.border_color = Color("#7a5d36")
+			ink = Color("#f6e7c6")
+		"locked":
+			box.bg_color = Color(0.06, 0.08, 0.12, 0.92)
+			box.border_color = Color("#232c3a")
+			ink = Color("#7d8796")
+		_:
+			box.bg_color = Color(0.07, 0.11, 0.17, 0.92)
+			box.border_color = FIELD_BORDER
+	node.add_theme_stylebox_override("panel", box)
+	var text_node := label(text, 12, ink)
+	text_node.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	text_node.autowrap_mode = TextServer.AUTOWRAP_OFF
+	node.add_child(text_node)
+	return node
+
+
+## Campo de texto e seletores (pesquisa, filtros).
+static func style_field(node: Control) -> void:
+	var normal := _flat(SURFACE, FIELD_BORDER, 8, Color.WHITE)
+	_pad(normal, 16, 6)
+	var focus := _flat(SURFACE_HOVER, Color(GOLD, 0.75), 8, Color.WHITE)
+	_pad(focus, 16, 6)
+	for state in ["normal", "read_only"]:
+		node.add_theme_stylebox_override(state, normal)
+	node.add_theme_stylebox_override("focus", focus)
+	if node is Button:
+		var hover := _flat(SURFACE_HOVER, Color("#3c4a62"), 8, Color.WHITE)
+		_pad(hover, 16, 6)
+		for state in ["hover", "pressed", "hover_pressed"]:
+			node.add_theme_stylebox_override(state, hover)
+		for color in ["font_color", "font_hover_color", "font_focus_color", "font_pressed_color", "font_hover_pressed_color"]:
+			node.add_theme_color_override(color, TEXT)
+	else:
+		node.add_theme_color_override("font_color", TEXT)
+		node.add_theme_color_override("font_placeholder_color", MUTED)
+
+
+static func _pad(box: StyleBoxFlat, horizontal: int, vertical: int) -> void:
+	box.content_margin_left = horizontal
+	box.content_margin_right = horizontal
+	box.content_margin_top = vertical
+	box.content_margin_bottom = vertical
 
 
 ## Movimento dos botões: crescem um pouco sob o mouse e afundam ao pressionar.
@@ -152,21 +228,21 @@ static func row(parent: Node) -> HBoxContainer:
 	return node
 
 
-## Linha/cartão de lista: placa do kit esticada.
+## Linha/cartão de lista.
 static func card(parent: Node) -> VBoxContainer:
 	var panel := PanelContainer.new()
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var style := plate()
-	style.content_margin_left = 26
+	style.content_margin_left = 22
 	style.content_margin_top = 18
-	style.content_margin_right = 26
+	style.content_margin_right = 22
 	style.content_margin_bottom = 18
 	panel.add_theme_stylebox_override("panel", style)
 	parent.add_child(panel)
 	return column(panel)
 
 
-## Painel grande do kit (moldura azul com brilho e cantos de cristal).
+## Painel grande (superfície escura com filete fino).
 static func panel(parent: Node, padding := 34) -> VBoxContainer:
 	var node := PanelContainer.new()
 	node.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -175,55 +251,54 @@ static func panel(parent: Node, padding := 34) -> VBoxContainer:
 	return column(node)
 
 
-## Placa do kit como StyleBox esticável (9 partes); tint escurece ou clareia.
-static func plate(gold := false, tint := Color.WHITE) -> StyleBoxTexture:
-	var box := StyleBoxTexture.new()
-	box.texture = PLATE_GOLD if gold else PLATE
-	box.texture_margin_left = 26
-	box.texture_margin_right = 26
-	box.texture_margin_top = 20
-	box.texture_margin_bottom = 20
-	box.content_margin_left = 22
-	box.content_margin_right = 22
-	box.content_margin_top = 8
-	box.content_margin_bottom = 8
-	box.modulate_color = tint
+static func _flat(bg: Color, border: Color, radius: int, tint: Color) -> StyleBoxFlat:
+	var box := StyleBoxFlat.new()
+	box.bg_color = bg * tint
+	box.border_color = border * tint
+	box.set_border_width_all(1)
+	box.set_corner_radius_all(radius)
+	box.anti_aliasing = true
 	return box
 
 
-## Placa fina (1/6 da arte original) para botões, abas e campos: borda delicada.
-static func button_plate(gold := false, tint := Color.WHITE) -> StyleBoxTexture:
-	var box := StyleBoxTexture.new()
-	box.texture = PLATE_SMALL_GOLD if gold else PLATE_SMALL
-	box.texture_margin_left = 18
-	box.texture_margin_right = 18
-	box.texture_margin_top = 14
-	box.texture_margin_bottom = 14
-	box.content_margin_left = 20
-	box.content_margin_right = 20
-	box.content_margin_top = 6
-	box.content_margin_bottom = 6
-	box.modulate_color = tint
+## Cartão/linha. `gold`: destaque (o próprio jogador, o selecionado). tint clareia/escurece.
+static func plate(gold := false, tint := Color.WHITE) -> StyleBoxFlat:
+	var box := _flat(SELECTED_BG if gold else SURFACE, GOLD_BRIGHT if gold else FIELD_BORDER, 10, tint)
+	if gold:
+		box.set_border_width_all(2)
+		box.shadow_color = Color(GOLD, 0.28)
+		box.shadow_size = 8
+	_pad(box, 22, 8)
 	return box
 
 
-## Moldura de painel do kit. `small` (celular/telas baixas): versão com cantos menores,
-## para a moldura não comer o espaço do conteúdo quando a interface é desenhada em 2×.
-static func frame_panel(padding := 34, small := false) -> StyleBoxTexture:
-	var box := StyleBoxTexture.new()
-	box.texture = PANEL_FRAME_SMALL if small else PANEL_FRAME
-	var corner := 26 if small else 52
-	box.texture_margin_left = corner
-	box.texture_margin_right = corner
-	box.texture_margin_top = corner
-	box.texture_margin_bottom = corner
+## Botão em repouso: dourado (principal) ou superfície escura com filete (secundário).
+static func button_plate(gold := false, tint := Color.WHITE) -> StyleBoxFlat:
+	var box := _flat(GOLD if gold else SURFACE, Color(GOLD_BRIGHT, 0.0) if gold else FIELD_BORDER, 8, tint)
+	_pad(box, 20, 6)
+	return box
+
+
+## Botão selecionado/pressionado.
+static func selected_plate(primary := false, tint := Color.WHITE) -> StyleBoxFlat:
+	var box := _flat(GOLD.darkened(0.12) if primary else SELECTED_BG, GOLD_BRIGHT, 8, tint)
+	box.set_border_width_all(1 if primary else 2)
+	_pad(box, 20, 6)
+	return box
+
+
+## Painel de seção. `small` (celular): cantos menores.
+static func frame_panel(padding := 34, small := false) -> StyleBoxFlat:
+	var box := _flat(PANEL_BG, PANEL_BORDER, 8 if small else 10, Color.WHITE)
+	box.shadow_color = Color(0, 0, 0, 0.3)
+	box.shadow_size = 12
 	for side in [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]:
 		box.set_content_margin(side, padding)
 	return box
 
 
-static func swatch(color_name: String) -> Texture2D:
-	return load(SWATCHES.get(color_name, SWATCHES.azul)) as Texture2D
+static func swatch(color_name: String) -> Color:
+	return SWATCHES.get(color_name, SWATCHES.azul)
 
 
 static func clear(parent: Node) -> void:

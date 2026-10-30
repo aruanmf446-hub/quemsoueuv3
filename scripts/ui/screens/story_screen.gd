@@ -25,7 +25,6 @@ func _ready() -> void:
 	super._ready()
 	_font = preload("res://assets/desert/phase01/interface.ttf").duplicate() as FontFile
 	_font.multichannel_signed_distance_field = true
-	$CrestFrame.hide()
 	($Backdrop as TextureRect).texture = ART[2]
 	($Tint as ColorRect).color = Color(0.02, 0.03, 0.07, 0.55)
 	var shade := TextureRect.new()

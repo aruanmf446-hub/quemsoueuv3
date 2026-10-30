@@ -1,6 +1,6 @@
 extends PlayerScreen
 
-const ACCENT := Color("#f2c76e")
+const ACCENT := PlayerUI.GOLD
 const MUTED := Color("#a8bad3")
 const GLASS := Color(0.035, 0.06, 0.11, 0.92)
 const INK := Color("#141006")
@@ -20,7 +20,6 @@ var _rail: VBoxContainer
 func _ready() -> void:
 	manages_own_scale = true
 	super._ready()
-	$CrestFrame.hide()
 	$Tint.color = Color(0.02, 0.035, 0.07, 0.86)
 	_make_icons()
 	visibility_changed.connect(func() -> void:
@@ -58,7 +57,7 @@ func render() -> void:
 	var panel := PanelContainer.new()
 	panel.name = "ContentPanel"
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	panel.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	panel.add_theme_stylebox_override("panel", _glass(24))
 	_layout.add_child(panel)
 	var scroll := ScrollContainer.new()
@@ -301,7 +300,8 @@ func _button(text: String, action: Callable) -> Button:
 	node.pressed.connect(action)
 	return node
 
-## Botões e abas usam a placa do kit (PlayerUI): a aba selecionada fica dourada.
+## Botões e abas no modelo das telas do jogador (PlayerUI, a partir da referência aprovada):
+## superfície escura com filete; a aba/opção selecionada fica âmbar escuro com filete dourado.
 func _style_button(node: Button) -> void:
 	node.add_theme_font_size_override("font_size", 21)
 	PlayerUI.style_button(node, false)
@@ -312,8 +312,8 @@ func _style_tab(node: Button) -> void:
 	node.add_theme_color_override("icon_normal_color", Color.WHITE)
 	node.add_theme_color_override("icon_hover_color", Color.WHITE)
 	node.add_theme_color_override("icon_focus_color", Color.WHITE)
-	node.add_theme_color_override("icon_pressed_color", PlayerUI.KIT_INK)
-	node.add_theme_color_override("icon_hover_pressed_color", PlayerUI.KIT_INK)
+	node.add_theme_color_override("icon_pressed_color", Color.WHITE)
+	node.add_theme_color_override("icon_hover_pressed_color", Color.WHITE)
 
 func _style_toggle(node: CheckButton) -> void:
 	node.add_theme_icon_override("checked", _toggle_on)
@@ -330,10 +330,9 @@ func _style_toggle(node: CheckButton) -> void:
 	focus.set_border_width_all(2)
 	node.add_theme_stylebox_override("focus", focus)
 
-## Painel do conteúdo: moldura do kit (azul com brilho e cantos de cristal).
-func _glass(padding: int) -> StyleBoxTexture:
-	var compact := UIScale.is_compact()
-	return PlayerUI.frame_panel(padding + (4 if compact else 14), compact)
+## Painel do conteúdo no modelo (PlayerUI.frame_panel).
+func _glass(padding: int) -> StyleBoxFlat:
+	return PlayerUI.frame_panel(padding)
 
 func _row_box() -> StyleBoxFlat:
 	var box := _box(Color(1, 1, 1, 0.04), 16)

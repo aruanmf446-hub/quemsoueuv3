@@ -11,7 +11,6 @@
     "FriendRow": "scripts/menu/friend_row.gd",
     "MenuCardButton": "scripts/menu/menu_button.gd",
     "PlayerProgress": "scripts/progress/player_progress.gd",
-    "CharacterViewer": "scripts/skins/character_viewer.gd",
     "ThumbnailCache": "scripts/skins/thumbnail_cache.gd"
   },
   "edges": [
@@ -1087,13 +1086,6 @@
       "exists": true
     },
     {
-      "source": "assets/processed/frames/frame_painel_brasao.png.import",
-      "line": 13,
-      "target": "assets/processed/frames/frame_painel_brasao.png",
-      "kind": "resource",
-      "exists": true
-    },
-    {
       "source": "assets/processed/logos/logo_menu_principal.png.import",
       "line": 13,
       "target": "assets/processed/logos/logo_menu_principal.png",
@@ -1136,79 +1128,9 @@
       "exists": true
     },
     {
-      "source": "assets/references/Imagem do ChatGPT 28 de out. de 2026, 00_58_08.png.import",
+      "source": "docs/referencias/menu/REFERENCIA_MENU.png.import",
       "line": 13,
-      "target": "assets/references/Imagem do ChatGPT 28 de out. de 2026, 00_58_08.png",
-      "kind": "resource",
-      "exists": true
-    },
-    {
-      "source": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_02-1.png.import",
-      "line": 13,
-      "target": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_02-1.png",
-      "kind": "resource",
-      "exists": true
-    },
-    {
-      "source": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_03-2.png.import",
-      "line": 13,
-      "target": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_03-2.png",
-      "kind": "resource",
-      "exists": true
-    },
-    {
-      "source": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_04-3.png.import",
-      "line": 13,
-      "target": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_04-3.png",
-      "kind": "resource",
-      "exists": true
-    },
-    {
-      "source": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_04-4.png.import",
-      "line": 13,
-      "target": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_04-4.png",
-      "kind": "resource",
-      "exists": true
-    },
-    {
-      "source": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_05-5.png.import",
-      "line": 13,
-      "target": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_05-5.png",
-      "kind": "resource",
-      "exists": true
-    },
-    {
-      "source": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_06-6.png.import",
-      "line": 13,
-      "target": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_06-6.png",
-      "kind": "resource",
-      "exists": true
-    },
-    {
-      "source": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_06-7.png.import",
-      "line": 13,
-      "target": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_06-7.png",
-      "kind": "resource",
-      "exists": true
-    },
-    {
-      "source": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_07-8.png.import",
-      "line": 13,
-      "target": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_07-8.png",
-      "kind": "resource",
-      "exists": true
-    },
-    {
-      "source": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_08-10.png.import",
-      "line": 13,
-      "target": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_08-10.png",
-      "kind": "resource",
-      "exists": true
-    },
-    {
-      "source": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_08-9.png.import",
-      "line": 13,
-      "target": "assets/ui/Imagem do ChatGPT 28 de out. de 2026, 01_05_08-9.png",
+      "target": "docs/referencias/menu/REFERENCIA_MENU.png",
       "kind": "resource",
       "exists": true
     },
@@ -1802,13 +1724,6 @@
     },
     {
       "source": "scenes/skins/skins_panel.tscn",
-      "line": 4,
-      "target": "assets/processed/frames/frame_painel_brasao.png",
-      "kind": "resource",
-      "exists": true
-    },
-    {
-      "source": "scenes/skins/skins_panel.tscn",
       "line": 5,
       "target": "assets/processed/textures/textura_roxa.png",
       "kind": "resource",
@@ -1832,20 +1747,6 @@
       "source": "scripts/lobby/character_catalog.gd",
       "line": 11,
       "target": "data/characters.json",
-      "kind": "resource",
-      "exists": true
-    },
-    {
-      "source": "scripts/skins/character_viewer.gd",
-      "line": 11,
-      "target": "scenes/lobby/lobby_stage.tscn",
-      "kind": "resource",
-      "exists": true
-    },
-    {
-      "source": "scripts/skins/character_viewer.gd",
-      "line": 12,
-      "target": "assets/processed/frames/frame_painel_brasao.png",
       "kind": "resource",
       "exists": true
     },
@@ -1955,18 +1856,6 @@
       "exists": true
     },
     {
-      "source": "scripts/skins/character_viewer.gd",
-      "target": "scripts/lobby/lobby_stage.gd",
-      "kind": "class_reference",
-      "exists": true
-    },
-    {
-      "source": "scripts/skins/character_viewer.gd",
-      "target": "scripts/progress/player_progress.gd",
-      "kind": "class_reference",
-      "exists": true
-    },
-    {
       "source": "scripts/skins/skins_panel.gd",
       "target": "scripts/lobby/character_catalog.gd",
       "kind": "class_reference",
@@ -1975,12 +1864,6 @@
     {
       "source": "scripts/skins/skins_panel.gd",
       "target": "scripts/progress/player_progress.gd",
-      "kind": "class_reference",
-      "exists": true
-    },
-    {
-      "source": "scripts/skins/skins_panel.gd",
-      "target": "scripts/skins/character_viewer.gd",
       "kind": "class_reference",
       "exists": true
     },

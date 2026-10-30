@@ -3,8 +3,6 @@ extends VBoxContainer
 ## suspense e fim. Tudo vem do servidor (DuelService.match()); aqui só se mostra e se pede.
 ## O cronômetro anda localmente entre uma atualização e outra (relógio do servidor).
 
-const CARD_EDGE := preload("res://assets/ui/kit/card_edge.png")
-const CARD_EDGE_GOLD := preload("res://assets/ui/kit/card_edge_gold.png")
 const Icons = preload("res://scripts/desert/t15d/resource_icons.gd")
 const MUTED := Color("#c9d6e6")
 
@@ -352,8 +350,8 @@ func _hearts(lives: int, faults: int) -> Control:
 	return row
 
 
-## Placa do kit com folga interna: o texto não encosta no filete dourado.
-func _plate(gold: bool) -> StyleBoxTexture:
+## Placa com folga interna: o texto não encosta no filete dourado.
+func _plate(gold: bool) -> StyleBoxFlat:
 	var box := PlayerUI.plate(gold)
 	box.content_margin_top = 14
 	box.content_margin_bottom = 18
@@ -378,7 +376,7 @@ func _card_row(ids: Array, width: float, lost: Array) -> Control:
 
 
 ## Carta do deck: a imagem PNG da carta (assets/duel/decks/<deck>/<carta>.png). Escolhida:
-## contorno dourado; eliminada: apagada e marcada. Sem imagem, mostra o nome numa moldura.
+## contorno dourado; eliminada: apagada e marcada. Sem imagem, mostra só o nome.
 func _card(id: String, width: float, gold: bool, out: bool) -> PanelContainer:
 	var card := PanelContainer.new()
 	card.custom_minimum_size = Vector2(width, width * 1.4)
@@ -403,12 +401,6 @@ func _card(id: String, width: float, gold: bool, out: bool) -> PanelContainer:
 		image.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		card.add_child(image)
 	else:
-		var frame := NinePatchRect.new()
-		frame.texture = CARD_EDGE_GOLD if gold else CARD_EDGE
-		for side in [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]:
-			frame.set_patch_margin(side, mini(34, int(width * 0.2)))
-		frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		card.add_child(frame)
 		var label := PlayerUI.label(_name(id), maxi(13, int(width * 0.12)), Color.WHITE)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER

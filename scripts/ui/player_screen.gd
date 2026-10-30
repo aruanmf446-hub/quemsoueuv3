@@ -19,7 +19,6 @@ func _ready() -> void:
 	$Margin/Column/Header/Back.pressed.connect(func() -> void: back_requested.emit())
 	# Visual comum: sem a moldura ornamental (cobria o conteúdo), fundo escurecido e
 	# botão Voltar inclinado no estilo do resto do menu.
-	$CrestFrame.hide()
 	$Tint.color = Color(0.02, 0.035, 0.07, 0.86)
 	PlayerUI.style_button($Margin/Column/Header/Back, false)
 	heading.add_theme_color_override("font_color", Color.WHITE)

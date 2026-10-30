@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b4jcosmqiweud"
-path="res://.godot/imported/card_edge.png-d241867ca255d5389b0be57765576413.ctex"
+uid="uid://b2ml5156xbgxp"
+path="res://.godot/imported/ring_health.png-3b021c4bb27a9620246ca966a5e990c4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/kit/card_edge.png"
-dest_files=["res://.godot/imported/card_edge.png-d241867ca255d5389b0be57765576413.ctex"]
+source_file="res://assets/hud/ring_health.png"
+dest_files=["res://.godot/imported/ring_health.png-3b021c4bb27a9620246ca966a5e990c4.ctex"]
 
 [params]
 

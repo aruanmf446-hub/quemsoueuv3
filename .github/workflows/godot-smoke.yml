@@ -13,6 +13,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+      - name: Design aprovado dos menus (sem molduras reprovadas)
+        run: python3 tools/player_ui/check_design.py
       - name: Download exact official engine (no fallback)
         shell: bash
         run: |

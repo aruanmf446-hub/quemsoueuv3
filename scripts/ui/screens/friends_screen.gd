@@ -286,7 +286,7 @@ func _render_chat() -> void:
 
 ## Estado do chat (carregando, vazio, indisponível, erro) e botão de enviar.
 func _chat_state_changed() -> void:
-	if _chat_friend.is_empty() or not is_instance_valid(_chat_status): return
+	if _chat_friend.is_empty() or not _chat_alive(): return
 	var chat := services.chat
 	var text := ""
 	match chat.state:
@@ -306,7 +306,7 @@ func _chat_state_changed() -> void:
 
 ## Acrescenta só as mensagens novas (não redesenha a conversa) e remove as vencidas.
 func _append_messages() -> void:
-	if _chat_friend.is_empty() or not is_instance_valid(_chat_list): return
+	if _chat_friend.is_empty() or not _chat_alive(): return
 	var current := services.chat.messages()
 	var alive := {}
 	for message: Dictionary in current: alive[str(message.id)] = true
@@ -375,3 +375,10 @@ func _send_chat() -> void:
 	elif not result.ok and is_instance_valid(_chat_status):
 		_chat_status.text = ChatService.message_for(str(result.code))
 		_chat_status.visible = true
+
+
+## Nós da conversa ainda vivos (a tela é redesenhada ao trocar de amigo ou de vista).
+func _chat_alive() -> bool:
+	for node: Node in [_chat_status, _chat_list, _chat_scroll, _chat_input, _chat_send]:
+		if not is_instance_valid(node) or node.is_queued_for_deletion(): return false
+	return true

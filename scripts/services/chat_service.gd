@@ -118,7 +118,12 @@ func poll() -> Dictionary:
 		_schedule(POLL_RATE_LIMIT if error_code == "rate_limit" else POLL_ERROR)
 		changed.emit()
 		return result
+	var recovered := not error_code.is_empty()
 	error_code = ""
+	# Saiu de um erro (rede, sessão renovada): a tela tira o aviso.
+	if recovered:
+		if state == "error": state = "ready"
+		changed.emit()
 	# O servidor devolve as mensagens ainda válidas: o que sumiu dele some daqui também.
 	var added := _merge(id, (result.data as Dictionary).get("messages", []), bool((result.data as Dictionary).get("complete", false)))
 	_schedule(POLL_ACTIVE if added > 0 else minf(_poll_wait * 1.6, POLL_IDLE_MAX))

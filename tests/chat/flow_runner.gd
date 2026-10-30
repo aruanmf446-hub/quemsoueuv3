@@ -47,6 +47,13 @@ func bubbles(kind: String) -> int:
 	return screen.find_children(kind, "PanelContainer", true, false).filter(func(n: Node) -> bool: return not n.is_queued_for_deletion()).size()
 
 
+## Aviso da conversa atual (procurado de novo: reabrir a conversa recria a interface).
+func status() -> Label:
+	for node: Node in screen.find_children("ChatStatus", "Label", true, false):
+		if not node.is_queued_for_deletion(): return node
+	return Label.new()
+
+
 func total_calls() -> int:
 	return fake.calls.open + fake.calls.messages + fake.calls.send
 
@@ -95,8 +102,7 @@ func _run() -> void:
 	await settle(8)
 	check(chat.is_open() and fake.calls.open == 1 and fake.calls.messages == 1, "abre a conversa com uma leitura")
 	check(screen.find_child("ChatPanel", true, false) != null, "painel da conversa")
-	var status: Label = screen.find_child("ChatStatus", true, false)
-	check(status.visible and status.text.contains("Nenhuma mensagem"), "estado vazio")
+	check(status().visible and status().text.contains("Nenhuma mensagem"), "estado vazio")
 	await shot("02_vazio")
 
 	# 6. Vazia não envia.
@@ -137,11 +143,11 @@ func _run() -> void:
 	fake.fail_next = "network"
 	await chat.poll()
 	await settle()
-	check(status.visible and status.text.contains("Sem conexão") and bubbles("Theirs") == 2, "aviso de conexão sem perder mensagens")
+	check(status().visible and status().text.contains("Sem conexão") and bubbles("Theirs") == 2, "aviso de conexão sem perder mensagens")
 	await shot("04_sem_conexao")
 	await chat.poll()
 	await settle()
-	check(chat.error_code.is_empty() and not status.text.contains("Sem conexão"), "retoma após reconectar")
+	check(chat.error_code.is_empty() and not status().text.contains("Sem conexão"), "retoma após reconectar")
 
 	# Segundo plano: nada consultado.
 	var before := total_calls()
@@ -171,7 +177,7 @@ func _run() -> void:
 	fake.fail_next = "not_authenticated"
 	await chat.poll()
 	await settle()
-	check(chat.state == "error" and status.text.contains("sessão"), "sessão expirada")
+	check(chat.state == "error" and status().text.contains("sessão"), "sessão expirada")
 	await shot("05_sessao_expirada")
 
 	# Troca de conta: nada fica em memória.

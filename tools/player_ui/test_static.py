@@ -115,9 +115,14 @@ class StaticTests(unittest.TestCase):
         self.assertNotIn("el_fuego",result.save["local_state"]["unlocked_character_ids"])
         self.assertEqual(result.save["local_state"]["completed_phase_ids"],[])
 
-    def test_supabase_configuration_contains_no_key(self):
+    def test_supabase_configuration_contains_only_publishable_keys(self):
         config=load_json(ROOT/"data/backend/client.json")
-        self.assertEqual(config["publishable_key"],"")
+        entries=[config]+[config["connections"][name] for name in ("chat","catalog")]
+        for entry in entries:
+            key=entry.get("publishable_key","")
+            self.assertTrue(key=="" or key.startswith("sb_publishable_"),"só chave publicável no Git")
+            self.assertRegex(entry.get("url",""),r"^(https://[a-z0-9]{20}\.supabase\.co)?$")
+        self.assertEqual(len({e["url"] for e in entries if e.get("url")}),len([e for e in entries if e.get("url")]),"três projetos distintos")
         self.assertFalse(config["persist_session"])
 
     def test_rpc_names_and_parameter_names_match_sql(self):

@@ -17,6 +17,8 @@ var wallet: WalletService
 var friends: FriendsService
 var presence: FriendPresence
 var duel: DuelService
+## Catálogo público (conexão catalog, sem sessão); o local continua como fallback.
+var catalog: CatalogService
 
 
 func _enter_tree() -> void:
@@ -34,6 +36,11 @@ func _ready() -> void:
 	catalog_client = SupabaseClient.new()
 	catalog_client.connection = "catalog"
 	add_child(catalog_client)
+	catalog = CatalogService.new()
+	catalog.client = catalog_client
+	add_child(catalog)
+	# Testes headless (--script) chamam refresh() quando precisam; o jogo lê ao iniciar.
+	if not OS.get_cmdline_args().has("--script"): catalog.refresh.call_deferred()
 	session = SessionService.new()
 	session.client = client
 	add_child(session)

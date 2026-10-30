@@ -5,16 +5,16 @@ extends Node
 ##
 ## Três conexões independentes (cada uma com URL e chave publicável próprias):
 ## - "game": a conexão atual (autenticação, perfis e demais serviços já existentes).
-## - "chat" e "catalog": preparadas, ainda sem projeto definido (configured() = false).
+## - "chat" e "catalog": URLs publicas configuradas, sem JWT compartilhado.
 ## Cada nó fala com uma só conexão. A sessão (JWT) só existe na "game": set_session é
 ## recusado nas outras, para nenhum token de um projeto ir a outro.
 ##
 ## Configuração por conexão (a última vence): data/backend/client.json, user://backend.cfg
 ## (seção [supabase] para "game", [supabase_chat] e [supabase_catalog]), variáveis de
 ## ambiente QSE_SUPABASE_<CONEXÃO>_URL / _PUBLISHABLE_KEY e, na Web, QSE_PUBLIC_CONFIG.
-## A URL de "game" continua fixa na do client.json, como antes.
+## A URL de "game" aponta para o projeto GAME. GAME, CHAT e CATALOG nao compartilham tokens.
 const CONNECTIONS := ["game", "chat", "catalog"]
-const GAME_URL := "https://xgmlphejalzakucllsmw.supabase.co"
+const GAME_URL := "https://shuzporktifgiotvnpbz.supabase.co"
 var connection := "game"
 var endpoint := ""
 var publishable_key := ""
@@ -47,9 +47,9 @@ func _ready() -> void:
 	if OS.has_feature("web"):
 		var browser_config: Variant = JavaScriptBridge.get_interface("QSE_PUBLIC_CONFIG")
 		if browser_config != null:
-			if game:
+			if game and browser_config.publishable_key != null:
 				publishable_key = str(browser_config.publishable_key)
-			elif browser_config.connections != null and browser_config.connections[connection] != null:
+			elif not game and browser_config.connections != null and browser_config.connections[connection] != null:
 				var web_entry: Variant = browser_config.connections[connection]
 				publishable_key = str(web_entry.publishable_key)
 				endpoint = str(web_entry.url).trim_suffix("/")
@@ -62,7 +62,7 @@ func _ready() -> void:
 func configured() -> bool:
 	if connection == "game":
 		return endpoint == GAME_URL and not publishable_key.is_empty()
-	return not endpoint.is_empty() and endpoint != GAME_URL and not publishable_key.is_empty()
+	return _supabase_url(endpoint) and endpoint != GAME_URL and not publishable_key.is_empty()
 
 
 ## Só HTTPS de um projeto Supabase (https://<ref>.supabase.co), sem caminho.

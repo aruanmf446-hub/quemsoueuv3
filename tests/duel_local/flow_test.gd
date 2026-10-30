@@ -141,55 +141,27 @@ func _run() -> void:
 	check(str(duel.match().phase) == "turns", "turnos começam")
 	check((duel.match().turn_order as Array).size() == 3, "ordem sorteada com os 3")
 
-	# Turnos até o fim: na sua vez, escolhe pela interface uma carta que não é sua.
-	var picked_by_me := false
-	for _step in range(80):
-		data = duel.match()
-		if str(duel.room.room.status) != "in_match" or str(data.get("phase", "")) == "finished": break
-		var me: Dictionary = (data.players as Array).filter(func(p: Dictionary) -> bool: return p.is_you)[0]
-		if str(data.phase) == "turns" and str(data.turn_member) == str(me.member_id):
-			var mine: Array = (data.my_cards as Array).map(func(c: Dictionary) -> String: return str(c.card_id))
-			var cards: Control = match_view().find_child("Cards", true, false)
-			var target := -1
-			for index in range(pool.size()):
-				var item: Dictionary = (data.pool as Array)[index]
-				if not item.removed and not mine.has(str(item.card_id)):
-					target = index
-					break
-			if target < 0: target = (data.pool as Array).find_custom(func(c: Dictionary) -> bool: return not c.removed)
-			if not picked_by_me: await shot("07_sua_vez")
-			await click(cards.get_child(target))
-			if not picked_by_me: await shot("08_confirmar")
-			await press("Eliminar")
-			check(str(duel.match().phase) == "reveal", "voto vira revelação")
-			if not picked_by_me:
-				await shot("09_revelando")
-				await skip(2.6)
-				await shot("10_atingidos")
-			picked_by_me = true
-		elif str(data.phase) == "reveal":
-			await skip(6.6)
-		else:
-			await skip(2.6)
+	var picked_by_me := await play_turns(true)
 	check(picked_by_me, "jogador votou pela interface")
-	data = duel.match()
-	var status := str(duel.room.room.status)
-	if status == "closed":
-		# Sem jogador real vivo: a sala é encerrada e não há bot campeão.
-		check(str(data.result.reason) == "only_bots" and (data.result.winners as Array).is_empty(), "nunca há bot campeão")
-		await shot("11_fim")
-		check(button("Voltar") != null, "aviso de sala encerrada")
-	else:
-		check(str(data.phase) == "finished", "partida termina")
-		var result: Dictionary = data.result
-		check(str(result.reason) in ["last_standing", "draw"], "fim com campeão ou empate")
-		var alive := (data.players as Array).filter(func(p: Dictionary) -> bool: return not p.eliminated)
-		check((result.winners as Array).size() == alive.size() and alive.size() <= 1, "vencedores = vivos")
-		await shot("11_campeao")
-		await skip(9.1)
-		check(str(duel.room.room.status) == "lobby" and int(duel.room.room.settings.cards_per_player) == 2, "volta ao lobby com as configurações")
-		await shot("12_lobby_de_novo")
-	print("DUEL_LOCAL_RESULT ", status, " ", data.result)
+	var status := await verify_end(true)
+	# Revanches (mesma regra, outras ordens sorteadas) até ver um campeão real na tela.
+	var attempt := 0
+	while status == "closed" and attempt < 10:
+		attempt += 1
+		await duel.leave()
+		server.rng.seed = 100 + attempt
+		var made := await duel.create("Revanche %d" % attempt, false, {"cards_per_player": 2, "max_players": 4})
+		check(made.ok, "revanche criada")
+		await duel.add_bot()
+		await duel.add_bot()
+		await duel.start()
+		var cards: Array = (duel.match().pool as Array).slice(0, 2).map(func(c: Dictionary) -> String: return str(c.card_id))
+		await duel.select_cards(cards)
+		await skip(5.1)
+		await settle(4)
+		check(await play_turns(false), "voto pela interface na revanche")
+		status = await verify_end(attempt == 1 or status != "closed")
+	check(status == "lobby", "uma partida terminou com campeão real ou empate")
 
 	# Sair da partida local volta ao modo online (preparado para o Supabase).
 	await duel.leave()
@@ -198,7 +170,74 @@ func _run() -> void:
 	var online := await duel.list_rooms("", true)
 	check(not online.ok and str(online.code) == "not_configured", "online continua indo ao Supabase")
 	print("DUEL_LOCAL_PASS ", checks, " verificações")
+	# Encerramento limpo: nada de recurso vivo na saída (o smoke trata vazamento como erro).
+	screen.queue_free()
+	services.queue_free()
+	await settle(10)
+	PlayerUI._busts.clear()
+	PlayerUI._menu_theme = null
+	DuelService._deck_info.clear()
+	preload("res://scripts/desert/t15d/resource_icons.gd")._cache.clear()
+	await settle(4)
 	quit(0)
+
+
+## Turnos até o fim da partida: na sua vez, escolhe pela interface (clique na carta e
+## "Eliminar") uma carta que não é sua; nos outros momentos o relógio avança.
+func play_turns(capture: bool) -> bool:
+	var picked_by_me := false
+	for _step in range(120):
+		var data := duel.match()
+		if str(duel.room.room.status) != "in_match" or str(data.get("phase", "")) == "finished": break
+		var me: Dictionary = (data.players as Array).filter(func(p: Dictionary) -> bool: return p.is_you)[0]
+		if str(data.phase) == "turns" and str(data.turn_member) == str(me.member_id):
+			var mine: Array = (data.my_cards as Array).map(func(c: Dictionary) -> String: return str(c.card_id))
+			var pool: Array = data.pool
+			var target := -1
+			for index in range(pool.size()):
+				if not pool[index].removed and not mine.has(str(pool[index].card_id)):
+					target = index
+					break
+			if target < 0: target = pool.find_custom(func(c: Dictionary) -> bool: return not c.removed)
+			var first := capture and not picked_by_me
+			if first: await shot("07_sua_vez")
+			await click(match_view().find_child("Cards", true, false).get_child(target))
+			if first: await shot("08_confirmar")
+			await press("Eliminar")
+			check(str(duel.match().phase) == "reveal", "voto vira revelação")
+			if first:
+				await shot("09_revelando")
+				await skip(2.6)
+				await shot("10_atingidos")
+			picked_by_me = true
+		elif str(data.phase) == "reveal":
+			await skip(6.6)
+		else:
+			await skip(2.6)
+	return picked_by_me
+
+
+## Confere o fim da partida e devolve "closed" (só bots vivos) ou "lobby" (campeão/empate).
+func verify_end(capture: bool) -> String:
+	var data := duel.match()
+	var status := str(duel.room.room.status)
+	print("DUEL_LOCAL_RESULT ", status, " ", data.result)
+	if status == "closed":
+		check(str(data.result.reason) == "only_bots" and (data.result.winners as Array).is_empty(), "nunca há bot campeão")
+		if capture: await shot("11_sala_encerrada")
+		check(button("Voltar") != null, "aviso de sala encerrada")
+		return "closed"
+	check(str(data.phase) == "finished", "partida termina")
+	var result: Dictionary = data.result
+	check(str(result.reason) in ["last_standing", "draw"], "fim com campeão ou empate")
+	var alive := (data.players as Array).filter(func(p: Dictionary) -> bool: return not p.eliminated)
+	check((result.winners as Array).size() == alive.size() and alive.size() <= 1, "vencedores = vivos")
+	check(alive.is_empty() or not alive[0].is_bot, "campeão é jogador real")
+	await shot("12_campeao")
+	await skip(9.1)
+	check(str(duel.room.room.status) == "lobby" and int(duel.room.room.settings.cards_per_player) == 2, "volta ao lobby com as configurações")
+	await shot("13_lobby_de_novo")
+	return "lobby"
 
 
 ## Regras do servidor local conferidas diretamente (mesmos casos dos testes SQL).

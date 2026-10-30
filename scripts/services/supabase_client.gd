@@ -2,6 +2,20 @@ class_name SupabaseClient
 extends Node
 
 ## HTTP real. Chave pública externa; sessão apenas em memória; uma requisição por nó.
+##
+## Três conexões independentes (cada uma com URL e chave publicável próprias):
+## - "game": a conexão atual (autenticação, perfis e demais serviços já existentes).
+## - "chat" e "catalog": preparadas, ainda sem projeto definido (configured() = false).
+## Cada nó fala com uma só conexão. A sessão (JWT) só existe na "game": set_session é
+## recusado nas outras, para nenhum token de um projeto ir a outro.
+##
+## Configuração por conexão (a última vence): data/backend/client.json, user://backend.cfg
+## (seção [supabase] para "game", [supabase_chat] e [supabase_catalog]), variáveis de
+## ambiente QSE_SUPABASE_<CONEXÃO>_URL / _PUBLISHABLE_KEY e, na Web, QSE_PUBLIC_CONFIG.
+## A URL de "game" continua fixa na do client.json, como antes.
+const CONNECTIONS := ["game", "chat", "catalog"]
+const GAME_URL := "https://xgmlphejalzakucllsmw.supabase.co"
+var connection := "game"
 var endpoint := ""
 var publishable_key := ""
 var access_token := ""
@@ -9,27 +23,58 @@ var generation := 0
 
 
 func _ready() -> void:
+	if not CONNECTIONS.has(connection):
+		push_error("Conexão Supabase desconhecida: %s" % connection)
+		connection = ""
+		return
 	var config := PlayerContracts.read_json("res://data/backend/client.json")
-	endpoint = str(config.get("url", "")).trim_suffix("/")
-	publishable_key = str(config.get("publishable_key", ""))
+	var game := connection == "game"
+	var entry: Dictionary = config if game else config.get("connections", {}).get(connection, {})
+	endpoint = str(entry.get("url", "")).trim_suffix("/")
+	publishable_key = str(entry.get("publishable_key", ""))
+	var section := "supabase" if game else "supabase_" + connection
+	var prefix := "QSE_SUPABASE_" + connection.to_upper() + "_"
 	var external := ConfigFile.new()
 	if external.load("user://backend.cfg") == OK:
-		publishable_key = str(external.get_value("supabase", "publishable_key", publishable_key))
-	if OS.has_environment("QSE_SUPABASE_PUBLISHABLE_KEY"):
+		publishable_key = str(external.get_value(section, "publishable_key", publishable_key))
+		if not game: endpoint = str(external.get_value(section, "url", endpoint)).trim_suffix("/")
+	if game and OS.has_environment("QSE_SUPABASE_PUBLISHABLE_KEY"):
 		publishable_key = OS.get_environment("QSE_SUPABASE_PUBLISHABLE_KEY")
+	if OS.has_environment(prefix + "PUBLISHABLE_KEY"):
+		publishable_key = OS.get_environment(prefix + "PUBLISHABLE_KEY")
+	if not game and OS.has_environment(prefix + "URL"):
+		endpoint = OS.get_environment(prefix + "URL").trim_suffix("/")
 	if OS.has_feature("web"):
 		var browser_config: Variant = JavaScriptBridge.get_interface("QSE_PUBLIC_CONFIG")
 		if browser_config != null:
-			publishable_key = str(browser_config.publishable_key)
+			if game:
+				publishable_key = str(browser_config.publishable_key)
+			elif browser_config.connections != null and browser_config.connections[connection] != null:
+				var web_entry: Variant = browser_config.connections[connection]
+				publishable_key = str(web_entry.publishable_key)
+				endpoint = str(web_entry.url).trim_suffix("/")
 	if not _public_key_only(publishable_key):
 		publishable_key = ""
+	if not game and not _supabase_url(endpoint):
+		endpoint = ""
 
 
 func configured() -> bool:
-	return endpoint == "https://xgmlphejalzakucllsmw.supabase.co" and not publishable_key.is_empty()
+	if connection == "game":
+		return endpoint == GAME_URL and not publishable_key.is_empty()
+	return not endpoint.is_empty() and endpoint != GAME_URL and not publishable_key.is_empty()
+
+
+## Só HTTPS de um projeto Supabase (https://<ref>.supabase.co), sem caminho.
+static func _supabase_url(url: String) -> bool:
+	var found := RegEx.create_from_string("^https://[a-z0-9]{20}\\.supabase\\.co$").search(url)
+	return found != null
 
 
 func set_session(token: String) -> void:
+	if connection != "game" and not token.is_empty():
+		push_warning("Sessão só pertence à conexão game; recusada em %s." % connection)
+		return
 	access_token = token
 	generation += 1
 

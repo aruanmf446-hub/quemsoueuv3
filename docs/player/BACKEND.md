@@ -41,6 +41,22 @@ Uma chave publicável é necessariamente visível ao navegador. Ela não substit
 
 Para distribuir um APK, o pipeline também pode preencher a chave publicável na cópia de `client.json` usada para exportar, mantendo o arquivo do Git vazio. Nunca usar uma chave administrativa nessa etapa.
 
+### Três conexões (game, chat, catalog)
+
+O jogo tem três conexões Supabase independentes (`SupabaseClient.connection`). Por enquanto só
+`game` é usada: é a conexão atual (login, perfis e serviços existentes), com a mesma URL e as
+mesmas fontes de chave acima. `chat` e `catalog` estão preparadas, sem projeto, sem uso e sem
+integração entre bancos; a distribuição de tabelas será definida depois.
+
+| Conexão | client.json | user://backend.cfg | Ambiente | Web (`QSE_PUBLIC_CONFIG`) |
+| --- | --- | --- | --- | --- |
+| game | `url`, `publishable_key` | `[supabase]` | `QSE_SUPABASE_PUBLISHABLE_KEY` ou `QSE_SUPABASE_GAME_PUBLISHABLE_KEY` | `publishable_key` |
+| chat | `connections.chat` | `[supabase_chat]` `url`, `publishable_key` | `QSE_SUPABASE_CHAT_URL`, `QSE_SUPABASE_CHAT_PUBLISHABLE_KEY` | `connections.chat.url/publishable_key` |
+| catalog | `connections.catalog` | `[supabase_catalog]` `url`, `publishable_key` | `QSE_SUPABASE_CATALOG_URL`, `QSE_SUPABASE_CATALOG_PUBLISHABLE_KEY` | `connections.catalog.url/publishable_key` |
+
+Só chaves publicáveis são aceitas; URLs de `chat`/`catalog` precisam ser `https://<ref>.supabase.co`.
+A sessão (JWT) existe apenas na `game`: `set_session` é recusado nas outras conexões.
+
 Tokens de acesso e refresh permanecem em memória, sem logs ou saves. Ao sair, os dados locais da conta são limpos imediatamente e tenta-se revogar apenas a sessão atual (`scope=local`). Se o dispositivo estiver offline, a revogação remota não pode ser confirmada. Recarregar o jogo exige novo login. Preferências do dispositivo e a demonstração não guardam informações de conta.
 
 ## Contratos de RPC

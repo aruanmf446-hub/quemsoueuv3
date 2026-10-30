@@ -3,5 +3,20 @@
   "url": "https://xgmlphejalzakucllsmw.supabase.co",
   "publishable_key": "",
   "configuration_status": "requires_public_key_and_reviewed_migrations",
-  "persist_session": false
+  "persist_session": false,
+  "connections": {
+    "game": {
+      "comment": "Conexão atual: usa url e publishable_key acima (autenticação central)."
+    },
+    "chat": {
+      "url": "",
+      "publishable_key": "",
+      "configuration_status": "not_configured"
+    },
+    "catalog": {
+      "url": "",
+      "publishable_key": "",
+      "configuration_status": "not_configured"
+    }
+  }
 }

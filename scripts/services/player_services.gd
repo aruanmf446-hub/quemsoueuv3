@@ -21,6 +21,8 @@ var duel: DuelService
 var catalog: CatalogService
 ## CHAT preparado e desativado até a identidade GAME→CHAT ser verificada no servidor.
 var chat: ChatService
+## Chat da sala do Duelo (outra instância: não mistura com o chat privado de amigos).
+var room_chat: ChatService
 
 
 func _enter_tree() -> void:
@@ -50,6 +52,10 @@ func _ready() -> void:
 		gateway.game_client = client
 		chat.add_child(gateway)
 		chat.transport = gateway
+	room_chat = ChatService.new()
+	room_chat.client = chat_client
+	room_chat.transport = chat.transport
+	add_child(room_chat)
 	# Testes headless (--script) chamam refresh() quando precisam; o jogo lê ao iniciar.
 	if not OS.get_cmdline_args().has("--script"): catalog.refresh.call_deferred()
 	session = SessionService.new()
@@ -124,6 +130,8 @@ func _session_changed() -> void:
 	friends.clear()
 	chat.clear()
 	chat.me_id = str(session.user.get("id", "")) if session.authenticated() else ""
+	room_chat.clear()
+	room_chat.me_id = chat.me_id
 	# A partida local não depende da conta: entrar ou sair dela não a interrompe.
 	if not duel.is_local(): duel.clear()
 	inventory.changed.emit()

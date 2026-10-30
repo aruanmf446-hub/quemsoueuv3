@@ -105,6 +105,32 @@ func join(code: String) -> Dictionary:
 	return _apply(await _rpc("qse_duel_join", {"p_code": code}))
 
 
+## Convite temporário (T16D): só o ADM gera; um novo invalida o anterior. O token só
+## volta nesta resposta e nunca é registrado em log.
+func create_invite(minutes := 60) -> Dictionary:
+	if is_local() or not in_room(): return ServiceResult.failure("chat_unavailable", "offline")
+	return await _rpc("qse_duel_invite_create", {"p_room": room_id(), "p_minutes": minutes})
+
+
+## Entrada por convite: mesma resposta de join (lobby = jogador; partida = espectador).
+func join_invite(token: String) -> Dictionary:
+	return _apply(await _rpc("qse_duel_invite_join", {"p_token": token.strip_edges().to_lower()}))
+
+
+## Texto do convite. Com invite_base_url em data/backend/client.json (origem oficial com rota
+## /join configurada), vira link <base>?invite=<token>; sem ela, o próprio convite para colar.
+static func invite_link(token: String) -> String:
+	var base := str(PlayerContracts.read_json("res://data/backend/client.json").get("invite_base_url", "")).strip_edges()
+	if base.begins_with("https://"): return "%s?invite=%s" % [base, token]
+	return "Convite Quem Sou Eu (Duelo): %s" % token
+
+
+## Token de convite: 48 hexadecimais (também aceito dentro de um link ?invite=).
+static func invite_token(text: String) -> String:
+	var found := RegEx.create_from_string("(?:invite=)?([0-9a-fA-F]{48})").search(text.strip_edges())
+	return found.get_string(1).to_lower() if found != null else ""
+
+
 func configure(name: Variant, public: Variant, settings: Dictionary) -> Dictionary:
 	return _apply(await _rpc("qse_duel_configure", {"p_room": room_id(), "p_name": name, "p_public": public, "p_settings": settings}))
 
@@ -241,4 +267,6 @@ static func message(code: String) -> String:
 		"not_in_match": return "Você não está participando desta partida."
 		"not_your_turn": return "Não é a sua vez."
 		"card_unavailable": return "Essa carta já foi eliminada."
+		"invalid_invite": return "Convite inválido ou expirado."
+		"forbidden": return "Só o administrador pode gerar convites."
 	return ServiceResult.message({"code": code})

@@ -19,28 +19,12 @@ var _compact := false
 var _rail: ScrollContainer
 
 ## Seleção de fases em cartões lado a lado (estilo seleção de fase de jogos de console),
-## sobre a panorâmica da cidade noturna. Sem a moldura ornamental, que cobria o texto.
+## sobre o fundo sólido compartilhado. A arte das fases fica dentro dos cartões.
 func _ready() -> void:
 	manages_own_scale = true
 	super._ready()
 	_font = preload("res://assets/desert/phase01/interface.ttf").duplicate() as FontFile
 	_font.multichannel_signed_distance_field = true
-	($Backdrop as TextureRect).texture = ART[2]
-	($Tint as ColorRect).color = Color(0.02, 0.03, 0.07, 0.55)
-	var shade := TextureRect.new()
-	shade.name = "Shade"
-	var gradient := Gradient.new()
-	gradient.colors = PackedColorArray([Color(0.01, 0.02, 0.05, 0.15), Color(0.01, 0.02, 0.05, 0.92)])
-	var texture := GradientTexture2D.new()
-	texture.gradient = gradient
-	texture.fill_from = Vector2(0, 0)
-	texture.fill_to = Vector2(0, 1)
-	shade.texture = texture
-	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	shade.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	add_child(shade)
-	move_child(shade, $Tint.get_index()+1)
 	services.progression.changed.connect(func() -> void:
 		if is_visible_in_tree(): render())
 

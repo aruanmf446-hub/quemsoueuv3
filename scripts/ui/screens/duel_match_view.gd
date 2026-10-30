@@ -80,11 +80,11 @@ func _render_selection(data: Dictionary, me: Dictionary) -> void:
 		add_child(PlayerUI.label("Suas cartas", 19, PlayerUI.GOLD))
 		add_child(_card_row(data.my_cards.map(func(c: Dictionary) -> String: return str(c.card_id)), 150, []))
 		return
-	var grid := _card_grid()
+	var grid := _card_grid(data.pool.size())
 	for item: Dictionary in data.pool:
 		var id := str(item.card_id)
 		var chosen := _chosen.has(id)
-		var card := _card(id, 150, chosen, false, true)
+		var card := _card(id, 150, chosen, false, grid.columns)
 		card.mouse_filter = Control.MOUSE_FILTER_STOP
 		card.gui_input.connect(func(event: InputEvent) -> void:
 			if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -131,16 +131,16 @@ func _render_board(data: Dictionary, me: Dictionary) -> void:
 	var banner := PlayerUI.row(self)
 	var text := "É a sua vez! Escolha uma carta para eliminar." if my_turn else ("É a vez de %s" % str(turn.get("nickname", "…")))
 	if data.phase == "finished": text = "Fim da partida"
-	banner.add_child(PlayerUI.label(text, 26, PlayerUI.GOLD if my_turn else Color.WHITE))
+	banner.add_child(PlayerUI.label(text, 18 if UIScale.is_compact() else 26, PlayerUI.GOLD if my_turn else Color.WHITE))
 	if data.phase == "turns":
 		_timer = _timer_label()
 		banner.add_child(_timer)
 	add_child(PlayerUI.label("Cartas em jogo", 18, MUTED))
-	var grid := _card_grid()
+	var grid := _card_grid(data.pool.size())
 	for item: Dictionary in data.pool:
 		var id := str(item.card_id)
 		var removed: bool = item.removed
-		var card := _card(id, 132, false, removed, true)
+		var card := _card(id, 132, false, removed, grid.columns)
 		if my_turn and not removed:
 			card.mouse_filter = Control.MOUSE_FILTER_STOP
 			card.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
@@ -314,7 +314,7 @@ func _players_strip(data: Dictionary, selection: bool) -> Control:
 	var compact := UIScale.is_compact()
 	var scroll := ScrollContainer.new()
 	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.custom_minimum_size.y = 72 if compact else 128
+	scroll.custom_minimum_size.y = 80 if compact else 160
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 10)
 	scroll.add_child(row)
@@ -331,7 +331,7 @@ func _players_strip(data: Dictionary, selection: bool) -> Control:
 		box.add_theme_stylebox_override("panel", style)
 		var content: BoxContainer = PlayerUI.row(box) if compact else PlayerUI.column(box)
 		content.add_theme_constant_override("separation", 8 if compact else 2)
-		var portrait := PlayerUI.portrait(str(player.skin_id), 36 if compact else 56)
+		var portrait := PlayerUI.portrait(str(player.skin_id), 48 if compact else 88)
 		portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		portrait.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		if player.eliminated: portrait.modulate = Color(0.45, 0.45, 0.5)
@@ -379,10 +379,12 @@ func _plate(gold: bool) -> StyleBoxFlat:
 	return box
 
 
-func _card_grid() -> GridContainer:
+func _card_grid(count: int) -> GridContainer:
 	var grid := GridContainer.new()
 	grid.name = "Cards"
-	grid.columns = clampi(int((get_viewport_rect().size.x / PlayerUI.unit(self) - 40) / 100), 1, 8)
+	var available := get_viewport_rect().size.x / PlayerUI.unit(self) - (40 if UIScale.is_compact() else 80)
+	var target := 100 if UIScale.is_compact() else 150
+	grid.columns = clampi(floori((available + 12) / (target + 12)), 1, clampi(count, 1, 10))
 	grid.add_theme_constant_override("h_separation", 12)
 	grid.add_theme_constant_override("v_separation", 12)
 	return grid
@@ -399,11 +401,10 @@ func _card_row(ids: Array, width: float, lost: Array) -> Control:
 
 ## Carta do deck: a imagem PNG da carta (assets/duel/decks/<deck>/<carta>.png). Escolhida:
 ## contorno dourado; eliminada: apagada e marcada. Sem imagem, mostra só o nome.
-func _card(id: String, width: float, gold: bool, out: bool, fit_grid := false) -> PanelContainer:
-	if fit_grid:
-		var available := get_viewport_rect().size.x / PlayerUI.unit(self) - 80
-		var columns := clampi(int((available + 40) / 100), 1, 8)
-		width = minf(width, (available - (columns - 1) * 12) / columns)
+func _card(id: String, width: float, gold: bool, out: bool, columns := 0) -> PanelContainer:
+	if columns > 0:
+		var available := get_viewport_rect().size.x / PlayerUI.unit(self) - (40 if UIScale.is_compact() else 80)
+		width = floorf((available - (columns - 1) * 12) / columns)
 	var card := PanelContainer.new()
 	card.custom_minimum_size = Vector2(width, width * 1.4)
 	card.mouse_filter = Control.MOUSE_FILTER_IGNORE

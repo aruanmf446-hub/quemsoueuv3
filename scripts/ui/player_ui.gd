@@ -3,6 +3,7 @@ extends RefCounted
 
 ## Shared clean menu direction approved by the user; see docs/referencias/README.md.
 ## Clear hierarchy, quiet surfaces and a restrained accent for actions and selection.
+const INTERIOR_BG := Color("#111820")
 const GOLD := Color("#e9b975")
 const GOLD_BRIGHT := Color("#f2cd94")
 ## Títulos de seção ("Coleções", "Personagens") e valores em destaque.
@@ -88,11 +89,8 @@ static func style_back(button: Button) -> void:
 
 
 static func style_backdrop(tint: ColorRect) -> void:
-	var shader := Shader.new()
-	shader.code = "shader_type canvas_item; void fragment(){ float side=1.0-smoothstep(0.0,1.0,UV.x); COLOR=vec4(0.025,0.035,0.045,0.72+side*0.18); }"
-	var material := ShaderMaterial.new()
-	material.shader = shader
-	tint.material = material
+	tint.material = null
+	tint.color = INTERIOR_BG
 
 
 static func label(text: String, size: int = 22, color: Color = TEXT) -> Label:
@@ -377,9 +375,16 @@ static func portrait(character_id: String, side: int = 82) -> TextureRect:
 	node.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	node.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	node.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var texture := bust(ThumbnailCache.path_for(character_id))
-	node.texture = texture if texture != null else preload("res://assets/icons/vector/icon_friends.svg")
+	node.texture = portrait_texture(character_id)
 	return node
+
+
+static func portrait_texture(character_id: String) -> Texture2D:
+	var packaged := "res://assets/portraits/%s.png" % character_id if character_id.is_valid_filename() else ""
+	if not packaged.is_empty() and ResourceLoader.exists(packaged, "Texture2D"):
+		return load(packaged) as Texture2D
+	var cached := bust(ThumbnailCache.path_for(character_id)) if character_id.is_valid_filename() else null
+	return cached if cached != null else preload("res://assets/icons/vector/icon_friends.svg")
 
 
 ## Bustos recortados das miniaturas (2048 px), guardados em memória e numa versão pequena

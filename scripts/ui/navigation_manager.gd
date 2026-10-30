@@ -98,9 +98,11 @@ func _display(route: String, params: Dictionary, animate := true) -> void:
 	var tween := _motion(shown, Tween.EASE_OUT)
 	var margin := shown.get_node_or_null("Margin") as Control
 	if outgoing == null:
-		# Saindo do lobby: a tela inteira (fundo, véu e conteúdo) aparece por cima dele.
-		shown.modulate.a = 0.0
-		tween.tween_property(shown, "modulate:a", 1.0, FADE_IN)
+		# Internal screens cover the lobby immediately; only their content fades in.
+		shown.modulate.a = 1.0
+		if margin != null:
+			margin.modulate.a = 0.0
+			tween.tween_property(margin, "modulate:a", 1.0, FADE_IN)
 	else:
 		# Entre telas o fundo é o mesmo: só o conteúdo troca. Fundo e véu translúcidos ao
 		# mesmo tempo deixavam a imagem clarear no meio da transição.

@@ -1,0 +1,18 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+CAPTURE 01_entrada
+CAPTURE 02_criar
+CAPTURE 03_lobby
+CAPTURE 04_selecao
+CAPTURE 05_selecionadas
+CAPTURE 06_contagem
+CAPTURE 07_sua_vez
+CAPTURE 08_confirmar
+CAPTURE 09_revelando
+CAPTURE 10_atingidos
+CAPTURE 11_fim
+DUEL_LOCAL_RESULT closed { "reason": "only_bots", "winners": [] }
+DUEL_LOCAL_PASS 54 verificações

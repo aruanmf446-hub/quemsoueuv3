@@ -1,35 +1,17 @@
-"""Temporário: sonda os três projetos só com as chaves publicáveis do client.json.
-Imprime status, nomes de rotas/tabelas e contagens. Nunca imprime chaves."""
+"""Temporário: descobre tabelas públicas do CATALOG por nomes candidatos (só leitura)."""
 import json, urllib.request, urllib.error
 c = json.load(open("data/backend/client.json"))
-targets = {"game": (c["url"], c["publishable_key"]),
-           "chat": (c["connections"]["chat"]["url"], c["connections"]["chat"]["publishable_key"]),
-           "catalog": (c["connections"]["catalog"]["url"], c["connections"]["catalog"]["publishable_key"])}
-def get(url, key, path, method="GET", body=None, accept="application/json"):
-    req = urllib.request.Request(url + path, method=method, data=json.dumps(body).encode() if body is not None else None,
-        headers={"apikey": key, "Accept": accept, "Content-Type": "application/json"})
-    try:
-        r = urllib.request.urlopen(req, timeout=20); return r.status, r.read()
-    except urllib.error.HTTPError as e: return e.code, e.read()
-    except Exception as e: return "ERR", str(e).encode()
-for name, (url, key) in targets.items():
-    s, b = get(url, key, "/auth/v1/health"); print(name, "auth/health", s)
-    s, b = get(url, key, "/auth/v1/settings"); print(name, "auth/settings", s)
-    s, b = get(url, key, "/rest/v1/", accept="application/openapi+json")
-    paths = []
-    try:
-        d = json.loads(b); paths = sorted(k for k in d.get("paths", {}) if k != "/")
-        defs = d.get("definitions", {})
-        for t in paths:
-            if not t.startswith("/rpc/"):
-                print(name, "table", t, "cols:", ",".join(defs.get(t.strip("/"), {}).get("properties", {}).keys()))
-        print(name, "rpcs", [p for p in paths if p.startswith("/rpc/")])
-    except Exception: print(name, "openapi", s, b[:160])
-    for t in [p for p in paths if not p.startswith("/rpc/")]:
-        s, b = get(url, key, "/rest/v1" + t + "?select=*&limit=50")
+url, key = c["connections"]["catalog"]["url"], c["connections"]["catalog"]["publishable_key"]
+names = ["characters","character","catalog_characters","skins","catalog_skins","decks","deck","catalog_decks","duel_decks",
+ "cards","card","catalog_cards","deck_cards","duel_cards","personagens","cartas","items","catalog_items","catalog"]
+for schema in ["public","catalog","qse_catalog","qse_v3"]:
+    for n in names:
+        req = urllib.request.Request(f"{url}/rest/v1/{n}?select=*&limit=20", headers={"apikey": key, "Accept-Profile": schema})
         try:
-            rows = json.loads(b); print(name, "read", t, s, (len(rows) if isinstance(rows, list) else rows))
-            if name == "catalog" and isinstance(rows, list): print(json.dumps(rows, ensure_ascii=False)[:3000])
-        except Exception: print(name, "read", t, s, b[:160])
-s, b = get(targets["game"][0], targets["game"][1], "/rest/v1/rpc/qse_duel_decks", "POST", {})
-print("game rpc qse_duel_decks anon", s, b[:200])
+            r = urllib.request.urlopen(req, timeout=20); rows = json.loads(r.read())
+            print("FOUND", schema, n, len(rows)); print(json.dumps(rows, ensure_ascii=False)[:2500])
+        except urllib.error.HTTPError as e:
+            body = e.read()[:120]
+            if e.code != 404 and b"PGRST205" not in body and b"PGRST106" not in body: print(schema, n, e.code, body)
+        except Exception as e: print(schema, n, "ERR", e)
+print("done")

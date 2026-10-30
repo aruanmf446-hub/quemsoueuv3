@@ -61,6 +61,29 @@ async function canMessage(token: string, peerId: string): Promise<boolean | null
   return typeof value?.allowed === "boolean" ? value.allowed : null;
 }
 
+// 16D: autorização pontual (SEM cache) no GAME para membro atual de sala;
+// recusa sala encerrada, saída, kick, sala inexistente ou falha da rede.
+async function canAccessRoom(token: string, roomId: string): Promise<boolean | null> {
+  const response = await fetch(`${GAME_URL}/rest/v1/rpc/qse_duel_chat_access`, {
+    method: "POST",
+    headers: { apikey: GAME_KEY, Authorization: `Bearer ${token}`,
+               "Content-Type": "application/json" },
+    body: JSON.stringify({p_room:roomId}),
+  }).catch(() => null);
+  if (!response?.ok) return null;
+  const value = await response.json().catch(() => null);
+  return typeof value?.allowed === "boolean" ? value.allowed : null;
+}
+
+async function roomConversationId(roomId: string): Promise<string> {
+  const raw = new TextEncoder().encode(`qse-room-v1:${roomId.toLowerCase()}`);
+  const hash = new Uint8Array(await crypto.subtle.digest("SHA-256",raw));
+  hash[6] = (hash[6] & 15) | 0x80;
+  hash[8] = (hash[8] & 63) | 0x80;
+  const hex = [...hash.slice(0,16)].map(x=>x.toString(16).padStart(2,"0")).join("");
+  return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+}
+
 async function directId(a: string, b: string): Promise<string> {
   const raw = new TextEncoder().encode(`qse-direct-v1:${[a,b].sort().join(":")}`);
   const hash = new Uint8Array(await crypto.subtle.digest("SHA-256", raw));
@@ -96,6 +119,23 @@ export default {
     if (typeof action !== "string") return respond({error:"invalid_action"},400);
 
     try {
+      // Duelo: ligação efêmera a uma sala GAME existente, sem espelhar membros.
+      if (action === "open_room") {
+        const roomId = payload.room_id;
+        if (typeof roomId !== "string" || !UUID.test(roomId))
+          return respond({error:"invalid_room"},400);
+        const permitted = await canAccessRoom(token,roomId);
+        if (permitted === null) return respond({error:"game_unavailable"},503);
+        if (!permitted) return respond({error:"room_access_denied"},403);
+        const id = await roomConversationId(roomId);
+        const {error} = await db.from("qse_chat_conversations").upsert(
+          {id,kind:"room",game_room_id:roomId,created_by_game_user_id:userId},
+          {onConflict:"id",ignoreDuplicates:true},
+        );
+        if (error) throw error;
+        return respond({conversation_id:id});
+      }
+
       if (action === "open_direct") {
         const peerId = payload.peer_id;
         if (typeof peerId !== "string" || !UUID.test(peerId) || peerId === userId)
@@ -136,6 +176,42 @@ export default {
         const id = payload.conversation_id;
         if (typeof id !== "string" || !UUID.test(id))
           return respond({error:"invalid_conversation"},400);
+
+        // Chat da sala usa o MESMO messages/send e request_id do privado.
+        // A autorização é refeita em TODA leitura e envio; o CHAT não armazena membros da sala.
+        const {data:room,error:roomError} = await db.from("qse_chat_conversations")
+          .select("kind,game_room_id").eq("id",id).maybeSingle();
+        if (roomError) throw roomError;
+        if (room?.kind === "room") {
+          if (typeof room.game_room_id !== "string" || !UUID.test(room.game_room_id))
+            return respond({error:"room_access_denied"},403);
+          const permitted = await canAccessRoom(token,room.game_room_id);
+          if (permitted === null) return respond({error:"game_unavailable"},503);
+          if (!permitted) return respond({error:"room_access_denied"},403);
+          if (action === "messages") {
+            const {data,error} = await db.rpc("qse_chat_room_read",{
+              p_user_id:userId,p_conversation_id:id,p_limit:50,
+            });
+            if (error) throw error;
+            if (data?.error) return respond({error:data.error},403);
+            return respond({messages:data?.messages ?? []});
+          }
+          const requestId = payload.request_id;
+          const body = typeof payload.body === "string" ? payload.body.trim() : "";
+          if (typeof requestId !== "string" || !UUID.test(requestId))
+            return respond({error:"invalid_request_id"},400);
+          if (!body.length || [...body].length > MAX_MESSAGE_CHARS)
+            return respond({error:"invalid_body"},400);
+          const {data,error} = await db.rpc("qse_chat_room_send",{
+            p_sender:userId,p_conversation_id:id,p_request_id:requestId,p_body:body,
+          });
+          if (error) throw error;
+          if (data?.error) return respond({error:data.error},
+            data.error === "rate_limited" ? 429 :
+            data.error === "idempotency_conflict" ? 409 :
+            data.error === "forbidden" ? 403 : 400);
+          return respond({message:data.message,duplicate:data.duplicate === true});
+        }
 
         // Verifica ambos os integrantes no CHAT, evitando identidade fornecida pelo cliente.
         const {data:members,error:membersError} = await db.from("qse_chat_members")

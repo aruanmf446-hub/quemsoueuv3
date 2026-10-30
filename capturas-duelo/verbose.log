@@ -9,9 +9,15 @@ TextServer: Primary interface set to: "ICU / HarfBuzz / Graphite (Built-in)".
 CORE API HASH: 2004498165
 EDITOR API HASH: 1696660745
 Loading resource: res://tests/duel_local/flow_test.gd remapped: res://tests/duel_local/flow_test.gd
+Completed load for: 'res://tests/duel_local/flow_test.gd' remapped 'res://tests/duel_local/flow_test.gd' at thread -1
+SceneTreeFTI: traversal method DEFAULT
+Loading resource: res://scripts/audio/menu_music.gd remapped: res://scripts/audio/menu_music.gd
+Completed load for: 'res://scripts/audio/menu_music.gd' remapped 'res://scripts/audio/menu_music.gd' at thread -1
+Loading resource: res://scripts/ui/touch_scroll.gd remapped: res://scripts/ui/touch_scroll.gd
+Completed load for: 'res://scripts/ui/touch_scroll.gd' remapped 'res://scripts/ui/touch_scroll.gd' at thread -1
+Loaded system CA certificates
+Loading resource: res://tests/duel_local/flow_runner.gd remapped: res://tests/duel_local/flow_runner.gd
 Loading resource: res://scenes/lobby/lobby_stage.tscn remapped: res://scenes/lobby/lobby_stage.tscn
-Loading resource: res://scripts/lobby/lobby_stage.gd remapped: res://scripts/lobby/lobby_stage.gd
-Completed load for: 'res://scripts/lobby/lobby_stage.gd' remapped 'res://scripts/lobby/lobby_stage.gd' at thread -1
 Loading resource: res://scenes/lobby/character_slot.tscn remapped: res://scenes/lobby/character_slot.tscn
 Completed load for: 'res://scenes/lobby/character_slot.tscn' remapped 'res://scenes/lobby/character_slot.tscn' at thread -1
 Completed load for: 'res://scenes/lobby/lobby_stage.tscn' remapped 'res://scenes/lobby/lobby_stage.tscn' at thread -1
@@ -21,13 +27,7 @@ Completed load for: 'res://assets/desert/phase01/interface.ttf' remapped 'res://
 Loading resource: res://assets/icons/vector/icon_friends.svg remapped: res://assets/icons/vector/icon_friends.svg
 Loading resource: res://.godot/imported/icon_friends.svg-4c2a6e1a94e8ade1ac0a141350af58ac.ctex remapped: res://.godot/imported/icon_friends.svg-4c2a6e1a94e8ade1ac0a141350af58ac.ctex
 Completed load for: 'res://assets/icons/vector/icon_friends.svg' remapped 'res://assets/icons/vector/icon_friends.svg' at thread -1
-Completed load for: 'res://tests/duel_local/flow_test.gd' remapped 'res://tests/duel_local/flow_test.gd' at thread -1
-SceneTreeFTI: traversal method DEFAULT
-Loading resource: res://scripts/audio/menu_music.gd remapped: res://scripts/audio/menu_music.gd
-Completed load for: 'res://scripts/audio/menu_music.gd' remapped 'res://scripts/audio/menu_music.gd' at thread -1
-Loading resource: res://scripts/ui/touch_scroll.gd remapped: res://scripts/ui/touch_scroll.gd
-Completed load for: 'res://scripts/ui/touch_scroll.gd' remapped 'res://scripts/ui/touch_scroll.gd' at thread -1
-Loaded system CA certificates
+Completed load for: 'res://tests/duel_local/flow_runner.gd' remapped 'res://tests/duel_local/flow_runner.gd' at thread -1
 Loading resource: res://scenes/player/duel.tscn remapped: res://scenes/player/duel.tscn
 Loading resource: res://scenes/player/components/screen_frame.tscn remapped: res://scenes/player/components/screen_frame.tscn
 Loading resource: res://assets/processed/backgrounds/bg_lobby_fantasia.png remapped: res://assets/processed/backgrounds/bg_lobby_fantasia.png
@@ -102,195 +102,15 @@ DUEL_LOCAL_RESULT closed { "reason": "only_bots", "winners": [] }
 DUEL_LOCAL_RESULT closed { "reason": "only_bots", "winners": [] }
 DUEL_LOCAL_RESULT in_match { "reason": "last_standing", "winners": ["member-46"] }
 DUEL_LOCAL_PASS 138 verificações
-WARNING: 2 RIDs of type "CanvasItem" were leaked.
-   at: _free_rids (servers/rendering/renderer_canvas_cull.cpp:2735)
-WARNING: 33 ObjectDB instances were leaked at exit (run with `--verbose` for details).
-   at: cleanup (core/object/object.cpp:2536)
-ERROR: Cannot get path of node as it is not in a scene tree.
-   at: get_path (scene/main/node.cpp:2431)
-ERROR: Cannot get path of node as it is not in a scene tree.
-   at: get_path (scene/main/node.cpp:2431)
-ERROR: 3 resources still in use at exit.
-   at: clear (core/io/resource.cpp:817)
-XR: Clearing primary interface
-XR: Removed interface "Native mobile"
-XR: Removed interface "OpenXR"
-ERROR: 4 RID allocations of type 'PN18TextServerAdvanced22ShapedTextDataAdvancedE' were leaked at exit.
-ERROR: 1 RID allocations of type 'PN18TextServerAdvanced12FontAdvancedE' were leaked at exit.
-Leaked instance: GDScriptNativeClass:9223372044505186732 - Reference count: 2
-Leaked instance: FontFile:9223372059017478999 - Reference count: 4
-Leaked instance: GDScriptNativeClass:9223372052726023062 - Reference count: 1
-Leaked instance: DPITexture:9223372059386577854 - Reference count: 4
-Leaked instance: StyleBoxFlat:9223372060745532749 - Reference count: 4
-Leaked instance: StyleBoxFlat:9223372060762309966 - Reference count: 4
-Leaked instance: StyleBoxFlat:9223372060779087183 - Reference count: 4
-Leaked instance: StyleBoxFlat:9223372060795864400 - Reference count: 4
-Leaked instance: StyleBoxFlat:9223372060812641617 - Reference count: 4
-Leaked instance: StyleBoxFlat:9223372062591026618 - Reference count: 24
-Leaked instance: GDScript:9223372063765431749 - Reference count: 2
-Leaked instance: GDScript:9223372064419743178 - Reference count: 10
-Leaked instance: GDScript:9223372077052986894 - Reference count: 2
-Leaked instance: Image:9223372084669842959 - Reference count: 1
-Leaked instance: Button:52193920592 - Node path: 
-Leaked instance: Object:52210697809
-Leaked instance: StyleBoxFlat:9223372089115805268 - Reference count: 1
-Leaked instance: StyleBoxFlat:9223372089099028053 - Reference count: 1
-Leaked instance: TextParagraph:9223372089082250839 - Reference count: 1
-Leaked instance: StyleBoxFlat:9223372089132582499 - Reference count: 1
-Leaked instance: StyleBoxFlat:9223372089149359716 - Reference count: 1
-Leaked instance: StyleBoxFlat:9223372089166136933 - Reference count: 1
-Leaked instance: StyleBoxFlat:9223372089182914150 - Reference count: 1
-Leaked instance: Button:49861887603 - Node path: 
-Leaked instance: Object:49878664820
-Leaked instance: TextParagraph:9223372086750217845 - Reference count: 1
-Leaked instance: StyleBoxFlat:9223372086766995062 - Reference count: 1
-Leaked instance: StyleBoxFlat:9223372086783772279 - Reference count: 1
-Leaked instance: StyleBoxFlat:9223372086800549496 - Reference count: 1
-Leaked instance: StyleBoxFlat:9223372086817326713 - Reference count: 1
-Leaked instance: StyleBoxFlat:9223372086834103930 - Reference count: 1
-Leaked instance: StyleBoxFlat:9223372086850881147 - Reference count: 1
-Leaked instance: Image:9223372087119316617 - Reference count: 1
-Hint: Leaked instances typically happen when nodes are removed from the scene tree (with `remove_child()`) but not freed (with `free()` or `queue_free()`).
-Resource still in use: res://scripts/ui/player_ui.gd (GDScript)
-Resource still in use: res://scripts/ui/player_screen.gd (GDScript)
-Resource still in use: res://scripts/ui/screens/duel_screen.gd (GDScript)
-Orphan StringName: hover_mirrored (static: 0, total: 2)
-Orphan StringName: BUST_HEIGHT (static: 0, total: 1)
-Orphan StringName: card (static: 0, total: 1)
-Orphan StringName: style_back (static: 0, total: 1)
-Orphan StringName: GOLD_BRIGHT (static: 0, total: 1)
-Orphan StringName: _leave_room (static: 0, total: 1)
-Orphan StringName: _ready (static: 1, total: 3)
-Orphan StringName: banner (static: 0, total: 2)
-Orphan StringName: _pad (static: 0, total: 1)
-Orphan StringName: _render_form (static: 0, total: 1)
-Orphan StringName: unit (static: 0, total: 1)
-Orphan StringName: "scripts/ui/screens/duel_screen.gd" (static: 0, total: 1)
-Orphan StringName: animate_in (static: 0, total: 2)
-Orphan StringName: SKIN_SIZE (static: 0, total: 1)
-Orphan StringName: _join (static: 0, total: 1)
-Orphan StringName: portrait (static: 0, total: 1)
-Orphan StringName: SURFACE (static: 0, total: 1)
-Orphan StringName: icon_hover_color (static: 0, total: 2)
-Orphan StringName: hover_pressed (static: 0, total: 4)
-Orphan StringName: _crop_bust (static: 0, total: 1)
-Orphan StringName: label (static: 0, total: 1)
-Orphan StringName: reveal (static: 0, total: 1)
-Orphan StringName: _open_form (static: 0, total: 1)
-Orphan StringName: style_backdrop (static: 0, total: 1)
-Orphan StringName: Control (static: 0, total: 1)
-Orphan StringName: heading (static: 0, total: 2)
-Orphan StringName: selected_plate (static: 0, total: 1)
-Orphan StringName: icon_disabled_color (static: 1, total: 3)
-Orphan StringName: split (static: 0, total: 1)
-Orphan StringName: pill (static: 0, total: 1)
-Orphan StringName: SWATCHES (static: 0, total: 1)
-Orphan StringName: _render_browse (static: 0, total: 1)
-Orphan StringName: style_field (static: 0, total: 1)
-Orphan StringName: metadata/pivot_centered (static: 0, total: 2)
-Orphan StringName: _adapt_scale (static: 0, total: 1)
-Orphan StringName: TEXT (static: 0, total: 1)
-Orphan StringName: parameters (static: 0, total: 2)
-Orphan StringName: SELECTED_BG (static: 0, total: 1)
-Orphan StringName: _submit_form (static: 0, total: 1)
-Orphan StringName: _online (static: 0, total: 1)
-Orphan StringName: style_row (static: 0, total: 1)
-Orphan StringName: focus (static: 0, total: 4)
-Orphan StringName: icon (static: 2, total: 4)
-Orphan StringName: mouse_entered (static: 0, total: 6)
-Orphan StringName: GOLD (static: 0, total: 1)
-Orphan StringName: font_size (static: 0, total: 4)
-Orphan StringName: Font (static: 0, total: 1)
-Orphan StringName: _scale_to (static: 0, total: 1)
-Orphan StringName: resized (static: 0, total: 6)
-Orphan StringName: button (static: 0, total: 1)
-Orphan StringName: pressed_mirrored (static: 0, total: 2)
-Orphan StringName: MUTED (static: 0, total: 1)
-Orphan StringName: _load_rooms (static: 0, total: 1)
-Orphan StringName: button_plate (static: 0, total: 1)
-Orphan StringName: account_button (static: 0, total: 1)
-Orphan StringName: clear (static: 0, total: 1)
-Orphan StringName: _term (static: 0, total: 3)
-Orphan StringName: preview (static: 0, total: 1)
-Orphan StringName: cascade (static: 0, total: 1)
-Orphan StringName: normal (static: 0, total: 4)
-Orphan StringName: _center_pivot (static: 0, total: 1)
-Orphan StringName: disabled (static: 0, total: 4)
-Orphan StringName: PANEL_BG (static: 0, total: 1)
-Orphan StringName: font_pressed_color (static: 1, total: 5)
-Orphan StringName: font_outline_color (static: 0, total: 2)
-Orphan StringName: icon_max_width (static: 0, total: 2)
-Orphan StringName: services (static: 0, total: 2)
-Orphan StringName: status (static: 0, total: 1)
-Orphan StringName: normal_mirrored (static: 0, total: 2)
-Orphan StringName: PANEL_BORDER (static: 0, total: 1)
-Orphan StringName: hover_pressed_mirrored (static: 0, total: 2)
-Orphan StringName: _member_card (static: 0, total: 1)
-Orphan StringName: column (static: 0, total: 1)
-Orphan StringName: align_to_largest_stylebox (static: 0, total: 2)
-Orphan StringName: _view (static: 0, total: 3)
-Orphan StringName: pivot_centered (static: 0, total: 2)
-Orphan StringName: font_focus_color (static: 0, total: 4)
-Orphan StringName: _menu_theme (static: 0, total: 1)
-Orphan StringName: _busts (static: 0, total: 1)
-Orphan StringName: font_hover_pressed_color (static: 0, total: 4)
-Orphan StringName: plate (static: 0, total: 1)
-Orphan StringName: button_up (static: 0, total: 6)
-Orphan StringName: icon_normal_color (static: 1, total: 3)
-Orphan StringName: show_screen (static: 0, total: 2)
-Orphan StringName: row (static: 0, total: 1)
-Orphan StringName: font_disabled_color (static: 0, total: 4)
-Orphan StringName: _render_room (static: 0, total: 1)
-Orphan StringName: metadata/fluid (static: 0, total: 2)
-Orphan StringName: h_separation (static: 0, total: 2)
-Orphan StringName: SURFACE_HOVER (static: 0, total: 1)
-Orphan StringName: body (static: 0, total: 2)
-Orphan StringName: _match_view (static: 0, total: 2)
-Orphan StringName: _room_row (static: 0, total: 1)
-Orphan StringName: _start_local (static: 0, total: 1)
-Orphan StringName: PlayerUI (static: 0, total: 3)
-Orphan StringName: PlayerScreen (static: 0, total: 3)
-Orphan StringName: back_requested (static: 0, total: 2)
-Orphan StringName: _rooms (static: 0, total: 2)
-Orphan StringName: RefCounted (static: 0, total: 1)
-Orphan StringName: panel (static: 0, total: 1)
-Orphan StringName: button_down (static: 0, total: 6)
-Orphan StringName: bust (static: 0, total: 1)
-Orphan StringName: render (static: 0, total: 2)
-Orphan StringName: mouse_exited (static: 0, total: 6)
-Orphan StringName: _render_closed (static: 0, total: 1)
-Orphan StringName: _act (static: 0, total: 1)
-Orphan StringName: swatch (static: 0, total: 1)
-Orphan StringName: _list_epoch (static: 0, total: 3)
-Orphan StringName: hover (static: 0, total: 4)
-Orphan StringName: _busy (static: 0, total: 3)
-Orphan StringName: flow (static: 0, total: 1)
-Orphan StringName: apply_theme (static: 0, total: 1)
-Orphan StringName: font_hover_color (static: 0, total: 4)
-Orphan StringName: _flat (static: 0, total: 1)
-Orphan StringName: disabled_mirrored (static: 0, total: 2)
-Orphan StringName: line_spacing (static: 0, total: 2)
-Orphan StringName: duel (static: 0, total: 2)
-Orphan StringName: font (static: 0, total: 2)
-Orphan StringName: icon_pressed_color (static: 1, total: 3)
-Orphan StringName: icon_focus_color (static: 1, total: 3)
-Orphan StringName: _only_open (static: 0, total: 3)
-Orphan StringName: FIELD_BORDER (static: 0, total: 1)
-Orphan StringName: frame_panel (static: 0, total: 1)
-Orphan StringName: _form (static: 0, total: 2)
-Orphan StringName: TITLE_GOLD (static: 0, total: 1)
-Orphan StringName: _auto_refresh (static: 0, total: 2)
-Orphan StringName: outline_size (static: 0, total: 2)
-Orphan StringName: _signed_out (static: 0, total: 1)
-Orphan StringName: FIELD_BG (static: 0, total: 1)
-Orphan StringName: INK (static: 0, total: 1)
-Orphan StringName: font_color (static: 0, total: 4)
-Orphan StringName: navigate_requested (static: 0, total: 2)
-Orphan StringName: pressed (static: 0, total: 10)
-Orphan StringName: icon_hover_pressed_color (static: 0, total: 2)
-Orphan StringName: changed (static: 0, total: 36)
-Orphan StringName: fluid (static: 0, total: 3)
-Orphan StringName: manages_own_scale (static: 0, total: 3)
-Orphan StringName: style_button (static: 0, total: 1)
-Orphan StringName: _refit_margin (static: 0, total: 1)
-StringName: 139 unclaimed string names at exit.
+ERROR: Object is locked and can't be freed.
+   at: callp (core/object/object.cpp:787)
+   GDScript backtrace (most recent call first):
+       [0] _run (res://tests/duel_local/flow_test.gd:17)
+       [1] _run (res://tests/duel_local/flow_runner.gd:184)
+       [2] settle (res://tests/duel_local/flow_runner.gd:32)
+SCRIPT ERROR: Attempted to free a locked object (calling or emitting).
+          at: _run (res://tests/duel_local/flow_test.gd:17)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tests/duel_local/flow_test.gd:17)
+              [1] _run (res://tests/duel_local/flow_runner.gd:184)
+              [2] settle (res://tests/duel_local/flow_runner.gd:32)

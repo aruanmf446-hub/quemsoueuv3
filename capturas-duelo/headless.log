@@ -10,13 +10,17 @@ DUEL_LOCAL_RESULT closed { "reason": "only_bots", "winners": [] }
 DUEL_LOCAL_RESULT closed { "reason": "only_bots", "winners": [] }
 DUEL_LOCAL_RESULT closed { "reason": "only_bots", "winners": [] }
 DUEL_LOCAL_RESULT in_match { "reason": "last_standing", "winners": ["member-46"] }
-DUEL_LOCAL_PASS 138 verificações
-WARNING: 2 RIDs of type "CanvasItem" were leaked.
-   at: _free_rids (servers/rendering/renderer_canvas_cull.cpp:2735)
-WARNING: 33 ObjectDB instances were leaked at exit (run with `--verbose` for details).
-   at: cleanup (core/object/object.cpp:2536)
-ERROR: 3 resources still in use at exit (run with --verbose for details).
-   at: clear (core/io/resource.cpp:822)
-ERROR: 4 RID allocations of type 'PN18TextServerAdvanced22ShapedTextDataAdvancedE' were leaked at exit.
-ERROR: 1 RID allocations of type 'PN18TextServerAdvanced12FontAdvancedE' were leaked at exit.
-exit=0
+DUEL_LOCAL_PASS 136 verificações
+ERROR: Object is locked and can't be freed.
+   at: callp (core/object/object.cpp:787)
+   GDScript backtrace (most recent call first):
+       [0] _run (res://tests/duel_local/flow_test.gd:17)
+       [1] _run (res://tests/duel_local/flow_runner.gd:184)
+       [2] settle (res://tests/duel_local/flow_runner.gd:32)
+SCRIPT ERROR: Attempted to free a locked object (calling or emitting).
+          at: _run (res://tests/duel_local/flow_test.gd:17)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tests/duel_local/flow_test.gd:17)
+              [1] _run (res://tests/duel_local/flow_runner.gd:184)
+              [2] settle (res://tests/duel_local/flow_runner.gd:32)
+exit=124

@@ -11,10 +11,10 @@ func _ready() -> void:
 func render() -> void:
 	PlayerUI.clear(body)
 	banner.show_state(services.wallet.state)
-	var row := PlayerUI.row(body)
+	var row := PlayerUI.split(body)
 	for currency: String in ["coins", "gems"]:
 		var card := PlayerUI.card(row)
-		card.add_child(PlayerUI.label("Moedas" if currency == "coins" else "Gemas", 28, PlayerUI.GOLD))
+		card.add_child(PlayerUI.label("Moedas" if currency == "coins" else "Gemas", 14, PlayerUI.MUTED))
 		card.add_child(PlayerUI.label(DevicePreferences.number(services.wallet.balance(currency), services.preferences.values.locale), 42))
 	body.add_child(PlayerUI.button("Atualizar saldo", func() -> void: services.wallet.refresh()))
 	if not services.session.authenticated():

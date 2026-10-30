@@ -1,7 +1,7 @@
 extends Control
 
 signal option_selected(option_id: StringName)
-@onready var _menu_buttons: VBoxContainer = $MenuButtons
+@onready var _menu_buttons: Control = $MenuButtons
 @onready var _navigation: NavigationManager = $Navigation
 @onready var _services: PlayerServices = $Services
 var _mode_label: Label
@@ -58,11 +58,15 @@ func _ready() -> void:
 
 func _layout_news_button() -> void:
 	if not is_instance_valid(_news_button): return
-	var compact := UIScale.is_compact()
-	var unit := UIScale.unit_for(get_viewport()) if compact else 1.0
-	_news_button.size = Vector2(180, 48) * unit if compact else Vector2(174, 48)
-	_news_button.position = Vector2(32, size.y - _news_button.size.y - 16 * unit) if compact else Vector2(size.x - _news_button.size.x - 24, size.y - _news_button.size.y - 20)
-	_news_button.add_theme_font_size_override("font_size", roundi((17 if compact else 18) * unit))
+	var unit := size.y / maxf(float(get_window().size.y) / UIScale.device_scale(), 1.0)
+	var pad := 24.0 if UIScale.is_compact() else 40.0
+	_news_button.size = Vector2(140, 38) * unit
+	_news_button.position = Vector2(pad * unit, size.y - 54 * unit)
+	_news_button.add_theme_font_size_override("font_size", roundi(12 * unit))
+	for state in ["normal", "hover", "pressed"]:
+		var style := StyleBoxFlat.new()
+		style.bg_color = Color(1, 1, 1, 0.06) if state == "hover" else Color.TRANSPARENT
+		_news_button.add_theme_stylebox_override(state, style)
 
 func _open_news() -> void:
 	if get_node_or_null("NewsOverlay") != null: return

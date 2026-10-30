@@ -8,11 +8,12 @@
 - Check your work: `godot_run_start` (mode "process"), then `godot_run_output` with level "error".
 <!-- END:godot-mcp -->
 
-## Design dos menus (aprovado pelo dono do projeto — não alterar sem pedido explícito)
+## Design dos menus (direção limpa aprovada pelo dono do projeto)
 
-- **O modelo visual está em [`docs/referencias/README.md`](docs/referencias/README.md).** Telas do jogador (Personagens, Configurações, Amigos, Música, Duelo, Perfil, Carteira, História) seguem `docs/referencias/personagens/REFERENCIA_APROVADA.png`; o menu principal/lobby segue `docs/referencias/menu/REFERENCIA_MENU.png`. Abra essas imagens antes de mexer em interface.
-- Os valores do modelo estão em `scripts/ui/player_ui.gd` (`PlayerUI`: cores e componentes `style_button`, `style_row`, `style_field`, `pill`, `plate`, `frame_panel`). Telas novas usam esses componentes; não definem cores nem estilos próprios.
-- Painéis, botões e cartões são `StyleBoxFlat` do `PlayerUI`; telas do jogador não usam imagem como moldura (`NinePatchRect`/`StyleBoxTexture`).
-- Ao implementar uma função nova, reutilize o modelo. Mudança visual só quando o pedido for visual.
-- Referências de organização e navegação (não de ornamento): menus de Fortnite, Call of Duty e PES — hierarquia clara, poucas cores, foco no conteúdo.
-- `python3 tools/player_ui/check_design.py` (roda no CI) confere essas telas.
+- Leia [`docs/referencias/README.md`](docs/referencias/README.md) e abra [`docs/referencias/menu/DIRECAO_CLEAN_APROVADA.png`](docs/referencias/menu/DIRECAO_CLEAN_APROVADA.png) antes de alterar a interface. O usuário aprovou esse lobby e pediu a continuidade nos demais menus, incluindo batalha.
+- A fonte do estilo é `scripts/ui/player_ui.gd`: use `apply_theme`, `style_button`, `style_row`, `style_back`, `style_field`, `pill`, `plate` e `frame_panel`. Evite temas paralelos e repetição de caixas, filetes, brilhos ou sombras ornamentais.
+- `apply_theme` fornece fonte MSDF e filtragem linear com mipmaps. Preserve a nitidez em telas isoladas, overlays e seletores; não herde o Nearest Mipmap global nos textos.
+- Referências de organização: Fortnite, Call of Duty e PES. Priorize hierarquia, poucos acentos, navegação leve, uma ação principal clara e destaque do personagem.
+- As imagens anteriores identificadas como históricas no README não são autorização para restaurar o visual reprovado. Pedidos funcionais preservam a composição aprovada.
+- Mantenha sinais, ações, estados de seleção/bloqueio, privacidade dos dados e regras dos modos existentes. Fixtures visuais ficam apenas nos testes, identificadas como tal.
+- Execute `python3 tools/player_ui/check_design.py`, os testes de interação pertinentes e confira capturas reais em desktop e janelas horizontais de 844×390 e 640×360. Não declare validação em navegador/aparelho físico a partir de uma captura do motor.

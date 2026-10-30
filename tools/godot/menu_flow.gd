@@ -22,7 +22,7 @@ func frames(count: int) -> void:
 
 
 func click(target: Control) -> void:
-	var point := target.get_global_rect().get_center()
+	var point := root.get_final_transform() * target.get_global_rect().get_center()
 	var press := InputEventMouseButton.new()
 	press.button_index = MOUSE_BUTTON_LEFT
 	press.position = point
@@ -58,7 +58,12 @@ func settle() -> void:
 
 
 func _run() -> void:
-	root.size = Vector2i(1672, 941)
+	var resolution := Vector2i(1672, 941)
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--resolution="):
+			var parts := arg.trim_prefix("--resolution=").split("x")
+			resolution = Vector2i(int(parts[0]), int(parts[1]))
+	root.size = resolution
 	menu = load("res://scenes/menu/main_menu.tscn").instantiate() as Control
 	root.add_child(menu)
 	current_scene = menu

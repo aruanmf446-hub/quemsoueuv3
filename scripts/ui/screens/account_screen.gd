@@ -15,31 +15,37 @@ func _ready() -> void:
 func render() -> void:
 	PlayerUI.clear(body)
 	banner.show_state("success")
-	var card := PlayerUI.card(body)
+	var card := PlayerUI.column(body)
+	card.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	card.custom_minimum_size.x = minf(620, size.x / PlayerUI.unit(self) - 64)
 	if services.session.authenticated():
 		card.add_child(PlayerUI.label(str(services.session.user.get("email", "")), 26, PlayerUI.GOLD))
-		card.add_child(PlayerUI.label("Sessão autenticada • Supabase Auth"))
+		card.add_child(PlayerUI.label("Conta conectada."))
 		card.add_child(PlayerUI.button("Sair da conta", _logout))
 		return
-	card.add_child(PlayerUI.label("Conecte sua aventura", 30, PlayerUI.GOLD))
+	card.add_child(PlayerUI.label("Conecte sua aventura", 30, PlayerUI.TEXT))
 	card.add_child(PlayerUI.label("Entre para acessar perfil, amizades, carteira e progresso confirmado."))
 	if not services.client.configured():
-		banner.show_state("offline", ServiceResult.message(ServiceResult.failure("not_configured")))
+		banner.show_state("offline", tr("A conexão com sua conta está indisponível no momento."))
 		card.add_child(PlayerUI.label("Os menus e as skins iniciais podem ser usados na demonstração local."))
 		return
 	_email = LineEdit.new()
 	_email.placeholder_text = tr("E-mail")
 	_email.virtual_keyboard_type = LineEdit.KEYBOARD_TYPE_EMAIL_ADDRESS
 	_email.custom_minimum_size.y = 56
+	PlayerUI.style_field(_email)
 	card.add_child(_email)
 	_password = LineEdit.new()
 	_password.placeholder_text = tr("Senha")
 	_password.secret = true
 	_password.custom_minimum_size.y = 56
+	PlayerUI.style_field(_password)
 	card.add_child(_password)
 	_password.text_submitted.connect(func(_text: String) -> void: _authenticate(false))
 	var buttons := PlayerUI.row(card)
-	buttons.add_child(PlayerUI.button("Entrar", _authenticate.bind(false)))
+	var enter := PlayerUI.button("Entrar", _authenticate.bind(false))
+	PlayerUI.style_button(enter, true)
+	buttons.add_child(enter)
 	buttons.add_child(PlayerUI.button("Criar conta", _authenticate.bind(true)))
 	card.add_child(PlayerUI.label("A criação de conta pode exigir confirmação por e-mail. A sessão permanece somente em memória neste dispositivo."))
 

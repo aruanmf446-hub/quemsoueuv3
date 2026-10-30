@@ -49,6 +49,7 @@ func show_screen(params: Dictionary = {}) -> void:
 
 
 func render() -> void:
+	heading.text = tr("Duelo")
 	if is_instance_valid(_match_view) and _match_view.get_parent() == body: body.remove_child(_match_view)
 	PlayerUI.clear(body)
 	banner.show_state("success")
@@ -64,21 +65,23 @@ func render() -> void:
 
 # --- Sem conta -----------------------------------------------------------------------------
 func _signed_out() -> void:
-	var center := CenterContainer.new()
+	var center := MarginContainer.new()
 	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	center.custom_minimum_size.y = 420
+	center.custom_minimum_size.y = 230
 	body.add_child(center)
-	var card := PlayerUI.panel(center, 42)
-	card.get_parent().custom_minimum_size.x = 520
+	var card := PlayerUI.column(center)
+	card.custom_minimum_size.x = 0
 	card.alignment = BoxContainer.ALIGNMENT_CENTER
 	var title := PlayerUI.label("Duelos online", 30, Color.WHITE)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	card.add_child(title)
 	var text := PlayerUI.label("Entre na sua conta para criar ou entrar em salas.", 19, Color("#c9d6e6"))
-	text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	text.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	card.add_child(text)
 	var enter := PlayerUI.button("Entrar na conta", func() -> void: navigate_requested.emit("account", {}))
 	PlayerUI.style_button(enter, true)
+	enter.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	enter.custom_minimum_size.x = 240
 	card.add_child(enter)
 
 
@@ -152,7 +155,7 @@ func _room_row(item: Dictionary) -> void:
 	line.add_child(seats)
 	var enter := PlayerUI.button("Entrar", func() -> void: _join(str(item.get("code", ""))))
 	enter.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	PlayerUI.style_button(enter, true)
+	PlayerUI.style_button(enter, false)
 	line.add_child(enter)
 
 
@@ -304,6 +307,8 @@ func _render_room() -> void:
 	code.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	header.add_child(code)
 	if str(data.status) == "in_match" and not duel.match().is_empty():
+		header.hide()
+		heading.text = tr("Batalha")
 		if not is_instance_valid(_match_view):
 			_match_view = preload("res://scripts/ui/screens/duel_match_view.gd").new()
 			_match_view.name = "Match"
@@ -321,7 +326,7 @@ func _render_room() -> void:
 		_match_view = null
 	var grid := GridContainer.new()
 	grid.name = "Members"
-	grid.columns = 5 if not UIScale.is_compact() else 3
+	grid.columns = clampi(int((size.x / PlayerUI.unit(self) - 28) / 202), 1, 5)
 	grid.add_theme_constant_override("h_separation", 12)
 	grid.add_theme_constant_override("v_separation", 12)
 	body.add_child(grid)
@@ -331,7 +336,7 @@ func _render_room() -> void:
 		int(settings.turn_seconds), int(settings.selection_seconds), "permitidos" if settings.bots_allowed else "desativados",
 		", ".join((data.get("decks", []) as Array).map(func(d: Dictionary) -> String: return str(d.get("name", ""))))]
 	body.add_child(PlayerUI.label(summary, 17, Color("#c9d6e6")))
-	var actions := PlayerUI.row(body)
+	var actions := PlayerUI.flow(body)
 	actions.add_theme_constant_override("separation", 10)
 	if admin and str(data.status) == "lobby":
 		var start := PlayerUI.button("Iniciar partida", func() -> void: _act(duel.start))

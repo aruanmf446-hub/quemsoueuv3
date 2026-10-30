@@ -22,7 +22,7 @@ var _favorite_only := false
 var _search := ""
 var _status_filter := 0
 var _reverse_sort := false
-var _toolbar: HBoxContainer
+var _toolbar: BoxContainer
 var _collection_sidebar: VBoxContainer
 var _gallery_section: VBoxContainer
 var _gallery_scroll: ScrollContainer
@@ -88,10 +88,15 @@ func _split_layout() -> void:
 	_split.add_child(_gallery_section)
 	_scroll.reparent(_gallery_section)
 	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_toolbar = HBoxContainer.new()
+	_toolbar = VBoxContainer.new()
 	_toolbar.add_theme_constant_override("separation", 8)
 	_gallery_section.add_child(_toolbar)
 	_gallery_section.move_child(_toolbar, 0)
+	var search_row := HBoxContainer.new()
+	_toolbar.add_child(search_row)
+	var filter_row := HBoxContainer.new()
+	filter_row.add_theme_constant_override("separation", 6)
+	_toolbar.add_child(filter_row)
 	_search_field = LineEdit.new()
 	_search_field.placeholder_text = "Pesquisar personagem..."
 	_search_field.custom_minimum_size.y = 52
@@ -102,10 +107,10 @@ func _split_layout() -> void:
 		_search = value
 		_rebuild_gallery()
 		PlayerUI.cascade(_grid, 0, 0.02))
-	_toolbar.add_child(_search_field)
+	search_row.add_child(_search_field)
 	_fav_button = _button("♡ Favoritos", _toggle_favorite_only)
 	_fav_button.custom_minimum_size = Vector2(112, 42)
-	_toolbar.add_child(_fav_button)
+	filter_row.add_child(_fav_button)
 	_filter_button = OptionButton.new()
 	for value in ["Todos", "Disponíveis", "Bloqueados"]:
 		_filter_button.add_item(value)
@@ -113,7 +118,7 @@ func _split_layout() -> void:
 		_status_filter = index
 		_rebuild_gallery()
 		PlayerUI.cascade(_grid))
-	_toolbar.add_child(_filter_button)
+	filter_row.add_child(_filter_button)
 	_sort_button = OptionButton.new()
 	_sort_button.add_item("A-Z")
 	_sort_button.add_item("Z-A")
@@ -121,7 +126,7 @@ func _split_layout() -> void:
 		_reverse_sort = index == 1
 		_rebuild_gallery()
 		PlayerUI.cascade(_grid))
-	_toolbar.add_child(_sort_button)
+	filter_row.add_child(_sort_button)
 	for option: OptionButton in [_filter_button, _sort_button]:
 		option.custom_minimum_size = Vector2(118, 52)
 		option.add_theme_font_size_override("font_size", 17)
@@ -173,7 +178,7 @@ func _responsive_layout() -> void:
 		_was_compact = compact
 		_select(_selected)
 	var margin: MarginContainer = $Margin
-	var factor := 2.0 if compact else 1.0
+	var factor := PlayerUI.unit(self)
 	margin.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	margin.scale = Vector2.ONE * factor
 	margin.position = Vector2.ZERO
@@ -199,6 +204,11 @@ func _responsive_layout() -> void:
 	_fav_button.add_theme_color_override("font_color", ACCENT if _favorite_only else PlayerUI.TEXT)
 	_fav_button.custom_minimum_size.x = 34 if compact else 112
 	_search_field.placeholder_text = "Pesquisar..." if compact else "Pesquisar personagem..."
+	_search_field.custom_minimum_size.x = 116 if compact else 0
+	_search_field.custom_minimum_size.y = 44 if compact else 52
+	_filter_button.custom_minimum_size.y = 44 if compact else 52
+	_sort_button.custom_minimum_size.y = 44 if compact else 52
+	_sort_button.custom_minimum_size.x = 68 if compact else 118
 	if _grid != null:
 		_grid.columns = _columns()
 		for item in _grid.get_children():

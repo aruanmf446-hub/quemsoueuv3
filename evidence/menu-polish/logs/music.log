@@ -1,0 +1,34 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS 14 faixas liberadas reproduzem
+PASS licença válida: alternative-disappear-for-a-little-while
+PASS licença válida: alternative-people-on-the-moon
+PASS licença válida: alternative-somewhere-in-september
+PASS licença válida: funk-vai-no-automatico
+PASS licença válida: k-pop-bad-desire
+PASS licença válida: k-pop-neon-love
+PASS licença válida: k-pop-venom-kiss
+PASS licença válida: pop-almost-in-love
+PASS licença válida: pop-bad-at-being-good
+PASS licença válida: pop-too-good-to-miss
+PASS licença válida: trap-after-2-am
+PASS licença válida: trap-dont-touch-my-furniture
+PASS licença válida: trap-necromode
+PASS licença válida: trap-smile-for-the-camera
+PASS Configurações T14B preservadas
+PASS Áudio contém Gerenciar músicas
+PASS Configurações → Áudio → Gerenciar músicas abre a tela
+PASS cinco categorias preservadas
+PASS cada música tem uma caixa marcada
+PASS desmarcar tira a música da playlist na hora
+PASS seleção persistida em disco
+PASS marcar de novo devolve a música
+PASS Desmarcar todas esvazia a playlist
+PASS Marcar todas devolve as 14
+PASS Voltar retorna ao Áudio recente
+PASS autorização local exige modo explícito do editor
+PASS catálogo real restaurado com as 14 faixas
+T15B_RESULT checks=28 failures=0

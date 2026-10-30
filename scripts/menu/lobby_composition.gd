@@ -13,9 +13,33 @@ var eyebrow: Label
 var footer: Label
 var social_bg: Panel
 var brand_logo: TextureRect
+var chapter: Label
+var chapter_title: Label
 
 func _ready() -> void:
 	menu = get_parent()
+	# The project default is Nearest Mipmap: it also reaches the glyph atlas.
+	# Use interpolation for the UI while keeping mipmaps for downscaled artwork.
+	menu.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	var font := preload("res://assets/desert/phase01/interface.ttf").duplicate() as FontFile
+	font.multichannel_signed_distance_field = true
+	var theme := Theme.new()
+	theme.default_font = font
+	menu.theme = theme
+	# Reuse the existing buttons and their signals in a freely composed navigation layer.
+	var old_menu := menu.get_node("MenuButtons")
+	var navigation := Control.new()
+	navigation.name = "MenuButtons"
+	navigation.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var order := old_menu.get_index()
+	menu.remove_child(old_menu)
+	menu.add_child(navigation)
+	menu.move_child(navigation, order)
+	for child in old_menu.get_children(): child.reparent(navigation)
+	menu.set("_menu_buttons", navigation)
+	old_menu.queue_free()
+	chapter = _label("MODO HISTÓRIA", 14, ACCENT)
+	chapter_title = _label("REINO DO\nDESERTO", 56, PAPER)
 	menu.get_node("Logo").hide()
 	brand = _label("QUEM SOU EU", 30, PAPER)
 	eyebrow = _label("QUATRO REINOS. UMA JORNADA.", 16, PAPER)
@@ -25,7 +49,7 @@ func _ready() -> void:
 	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var shader := Shader.new()
-	shader.code = "shader_type canvas_item; void fragment() { float left = (1.0-smoothstep(0.0,0.36,UV.x))*0.65; float top = (1.0-smoothstep(0.0,0.22,UV.y))*0.58; float bottom = smoothstep(0.76,1.0,UV.y)*0.48; COLOR = vec4(0.035,0.055,0.07,max(left,max(top,bottom))); }"
+	shader.code = "shader_type canvas_item; void fragment() { float left = (1.0-smoothstep(0.12,0.78,UV.x))*0.94; float top = (1.0-smoothstep(0.0,0.23,UV.y))*0.74; float bottom = smoothstep(0.68,1.0,UV.y)*0.86; COLOR = vec4(0.025,0.035,0.045,max(left,max(top,bottom))); }"
 	var material := ShaderMaterial.new()
 	material.shader = shader
 	shade.material = material
@@ -44,9 +68,9 @@ func _ready() -> void:
 		_nudge_on_hover(button)
 	for path: String in ["TopBar/CoinPill", "TopBar/GemPill", "ProfileCard"]:
 		var pill := _box(Color(0.035, 0.06, 0.11, 0.88), 3)
-		pill.skew = Vector2(0.16, 0)
+		pill.skew = Vector2.ZERO
 		pill.border_color = Color(ACCENT, 0.45)
-		pill.border_width_bottom = 2
+		pill.border_width_bottom = 0
 		menu.get_node(path).add_theme_stylebox_override("panel", pill)
 	for path: String in ["TopBar/MailButton", "TopBar/FriendsButton", "TopBar/SettingsButton"]:
 		menu.get_node(path).hide()
@@ -149,31 +173,26 @@ func _box(color: Color, radius: int = 8) -> StyleBoxFlat:
 	box.content_margin_bottom = 10
 	return box
 
-## Mesmo visual das outras telas: cartões inclinados, o principal dourado e os demais
-## em vidro escuro com filete dourado à esquerda.
+## A single primary action; secondary navigation uses quiet text tabs.
 func _style_button(button: Button, primary: bool) -> void:
-	var states := {
-		"normal": ACCENT if primary else Color(0.035, 0.06, 0.11, 0.90),
-		"hover": Color("f6d08f") if primary else Color(0.08, 0.13, 0.21, 0.94),
-		"pressed": Color("c99a59") if primary else Color(0.02, 0.04, 0.07, 0.95),
-		"disabled": Color(0.05, 0.07, 0.10, 0.70),
-	}
-	for state: String in states:
-		var style := _box(states[state], 3)
-		style.skew = Vector2(0.16, 0)
+	for state: String in ["normal", "hover", "pressed", "disabled"]:
+		var background := ACCENT if primary else Color.TRANSPARENT
+		if state == "hover": background = Color("f5d5a0") if primary else Color(1, 1, 1, 0.08)
+		if state == "pressed": background = Color("c99a59") if primary else Color(1, 1, 1, 0.13)
+		if state == "disabled": background = Color(1, 1, 1, 0.04)
+		var style := _box(background, 4)
+		style.shadow_size = 0
 		style.anti_aliasing = true
-		style.border_color = ACCENT if not primary else Color(1, 1, 1, 0.35)
-		style.border_width_left = 0 if primary else 5
-		style.border_width_top = 1 if primary else 0
 		button.add_theme_stylebox_override(state, style)
-	var focus := _box(Color.TRANSPARENT, 3)
-	focus.skew = Vector2(0.16, 0)
-	focus.set_border_width_all(2)
+	var focus := StyleBoxFlat.new()
+	focus.draw_center = false
 	focus.border_color = PAPER
+	focus.set_border_width_all(2)
+	focus.set_corner_radius_all(4)
 	button.add_theme_stylebox_override("focus", focus)
 	for state: String in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
 		button.add_theme_color_override(state, INK if primary else PAPER)
-	button.add_theme_color_override("font_disabled_color", Color("9ea9ad"))
+
 
 func _rect(control: Control, position: Vector2, dimensions: Vector2) -> void:
 	control.custom_minimum_size = Vector2.ZERO
@@ -182,76 +201,65 @@ func _rect(control: Control, position: Vector2, dimensions: Vector2) -> void:
 	control.size = dimensions
 
 func _layout() -> void:
-	var w := menu.size.x
-	var h := menu.size.y
-	var compact := UIScale.is_compact(500.0)
-	# Em 844x390 a viewport é desenhada com escala ~0,41; o texto precisa de mais unidades de projeto.
-	var type_scale := 1.8 if compact else 1.0
-	var left_width := 530.0 if compact else 400.0
-	_rect(brand, Vector2(32, 24), Vector2(350, 40))
-	_rect(brand_logo, Vector2(24, 12), Vector2(400, 133))
-	_rect(eyebrow, Vector2(34, 68), Vector2(380, 35))
-	_rect(footer, Vector2(34, h - 44), Vector2(500, 32))
-	_rect(menu.get_node("ProfileCard"), Vector2(w * 0.36, 24), Vector2(370, 80))
-	_rect(menu.get_node("TopBar"), Vector2(w - 358, 24), Vector2(326, 64))
+	var unit := menu.size.y / maxf(float(menu.get_window().size.y) / UIScale.device_scale(), 1.0)
+	var w := menu.size.x / unit
+	var h := menu.size.y / unit
+	var compact := h < 600.0
+	var pad := 24.0 if compact else 40.0
+	_rect(brand_logo, Vector2(pad, 12) * unit, Vector2(150, 58) * unit)
+	_rect(menu.get_node("TopBar"), Vector2(w - pad - 200, 20) * unit, Vector2(200, 42) * unit)
 	for currency: String in ["CoinPill", "GemPill"]:
-		menu.get_node("TopBar/" + currency).custom_minimum_size = Vector2(156, 64)
-	menu.get_node("ProfileCard/Content/Info").size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var profile_name: Label = menu.get_node("ProfileCard/Content/Info/Name")
-	profile_name.clip_text = true
-	profile_name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	profile_name.add_theme_font_size_override("font_size", 32 if compact else 20)
-	menu.get_node("ProfileCard/Content/Info/Level").visible = not compact
-	for currency: String in ["CoinPill", "GemPill"]:
-		menu.get_node("TopBar/" + currency + "/Content/Value").add_theme_font_size_override("font_size", 32 if compact else 22)
-	var mode: Label = menu.get("_mode_label")
-	# Compacto: uma linha só, para não invadir o rodapé. Largura limitada antes do nome do personagem.
-	_rect(mode, Vector2(34, h - 90), Vector2(760 if compact else 650, 36))
-	mode.add_theme_color_override("font_color", Color("e5e6dc"))
-	mode.add_theme_font_size_override("font_size", int(18 * (1.3 if compact else 1.0)))
-	var buttons: VBoxContainer = menu.get_node("MenuButtons")
-	_rect(buttons, Vector2(32, h * (0.25 if compact else 0.29)), Vector2(left_width, 0))
-	buttons.add_theme_constant_override("separation", 10)
-	for button: Button in buttons.get_children():
-		button.custom_minimum_size = Vector2(left_width, 130 if compact else 88)
-		button.add_theme_font_size_override("font_size", int(26 * type_scale))
-		var content: HBoxContainer = button.get_node_or_null("ActionBody")
-		if content != null:
-			content.offset_left = BODY_LEFT
-			content.offset_right = BODY_RIGHT
-			content.offset_top = 12
-			content.offset_bottom = -12
-			content.get_node("Icon").custom_minimum_size.x = 60 if compact else 46
-			content.get_node("Text/Title").add_theme_font_size_override("font_size", 38 if compact else 26)
-			content.get_node("Text/Subtitle").add_theme_font_size_override("font_size", 23 if compact else 15)
-	buttons.size.x = left_width
+		menu.get_node("TopBar/" + currency).custom_minimum_size = Vector2(94, 42) * unit
+		menu.get_node("TopBar/" + currency + "/Content/Value").add_theme_font_size_override("font_size", roundi(16 * unit))
+	var buttons: Control = menu.get_node("MenuButtons")
+	_rect(buttons, Vector2.ZERO, menu.size)
+	var x := pad if compact else 225.0
+	var y := 72.0 if compact else 22.0
+	for id: String in ["duel", "skins", "friends", "settings"]:
+		var button: Button = buttons.get_node({"duel":"BtnDuel", "skins":"BtnSkins", "friends":"BtnFriends", "settings":"BtnSettings"}[id])
+		var width: float = {"duel": 88.0, "skins": 150.0, "friends": 126.0, "settings": 100.0}[id]
+		_rect(button, Vector2(x, y) * unit, Vector2(width, 44) * unit)
+		var body: Control = button.get_node("ActionBody")
+		body.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		body.offset_left = 12 * unit
+		body.offset_right = -12 * unit
+		body.get_node("Icon").hide()
+		body.get_node("Text/Subtitle").hide()
+		body.get_node("Text/Title").add_theme_font_size_override("font_size", roundi(15 * unit))
+		x += width + 8
+	var title_y := h * 0.35 if compact else h * 0.40
+	_rect(chapter, Vector2(pad, title_y) * unit, Vector2(340, 24) * unit)
+	chapter.add_theme_font_size_override("font_size", roundi(12 * unit))
+	_rect(chapter_title, Vector2(pad - 2, title_y + 30) * unit, Vector2(400, 150) * unit)
+	chapter_title.add_theme_font_size_override("font_size", roundi((36 if compact else 60) * unit))
+	var play: Button = buttons.get_node("BtnStory")
+	_rect(play, Vector2(pad, h - (118 if compact else 150)) * unit, Vector2(260 if compact else 320, 56 if compact else 64) * unit)
+	var action: Control = play.get_node("ActionBody")
+	action.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	action.offset_left = 20 * unit
+	action.offset_right = -20 * unit
+	action.get_node("Icon").custom_minimum_size.x = 26 * unit
+	action.get_node("Text/Title").add_theme_font_size_override("font_size", roundi(22 * unit))
+	action.get_node("Text/Subtitle").hide()
 	var area: Control = menu.get_node("LobbyArea")
-	_rect(area, Vector2(w * 0.53 - h * 0.43, h * 0.035), Vector2(h * 0.86, h * 0.93))
+	var stage_height := h * (0.86 if compact else 0.92)
+	_rect(area, Vector2(w * 0.68 - stage_height * 0.39, h - stage_height - 15) * unit, Vector2(stage_height * 0.78, stage_height) * unit)
 	area.get_node("Stage").custom_minimum_size = Vector2.ZERO
 	area.get_node("Stage").set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	var name_label: Label = area.get_node("Overlay/NameLabel")
-	_rect(name_label, Vector2(area.size.x * 0.25, area.size.y - 62), Vector2(area.size.x * 0.5, 50))
-	name_label.add_theme_constant_override("outline_size", 2)
-	name_label.add_theme_font_size_override("font_size", int(26 * type_scale))
-	_rect(area.get_node("Overlay/PrevButton"), Vector2(area.size.x * 0.25 - 58, area.size.y - 64), Vector2(54, 54))
-	_rect(area.get_node("Overlay/NextButton"), Vector2(area.size.x * 0.75 + 4, area.size.y - 64), Vector2(54, 54))
 	var friends: Control = menu.get_node("FriendsPanel")
-	_rect(friends, Vector2(w - 350, h * 0.66), Vector2(318, 0))
-	menu.get_node("FriendsPanel/Margin/Content/ViewAllButton").add_theme_font_size_override("font_size", 28 if compact else 18)
-	for child in menu.get_node("FriendsPanel/Margin/Content/FriendList").get_children():
-		if child is Label:
-			child.add_theme_font_size_override("font_size", 28 if compact else 18)
-	friends.size.y = menu.get_node("FriendsPanel/Margin").get_combined_minimum_size().y
-	menu.get_node("FriendsPanel/Margin/Content/Header/Title").add_theme_font_size_override("font_size", int(22 * type_scale))
-	# Captions grow on small landscape screens while the hero stays proportional.
-	eyebrow.add_theme_font_size_override("font_size", int(16 * type_scale))
-	menu.get_node("FriendsPanel/Margin/Content/ViewAllButton").custom_minimum_size.y = 52 if compact else 42
-	# Re-evaluate social height when asynchronous friend data changes the container.
-	if not menu.get_node("FriendsPanel/Margin").minimum_size_changed.is_connected(_social_size):
-		menu.get_node("FriendsPanel/Margin").minimum_size_changed.connect(_social_size)
+	_rect(friends, Vector2(pad + 155, h - 54) * unit, Vector2(140, 38) * unit)
+	social_bg.hide()
+	var margin: MarginContainer = friends.get_node("Margin")
+	for side in ["left", "right", "top", "bottom"]: margin.add_theme_constant_override("margin_" + side, 0)
+	friends.get_node("Margin/Content/Header").hide()
+	friends.get_node("Margin/Content/FriendList").hide()
+	var view_all: Button = friends.get_node("Margin/Content/ViewAllButton")
+	view_all.text = "VER AMIGOS  ›"
+	view_all.custom_minimum_size = Vector2(140, 38) * unit
+	view_all.add_theme_font_size_override("font_size", roundi(12 * unit))
 
 func _social_size() -> void:
-	menu.get_node("FriendsPanel").size.y = menu.get_node("FriendsPanel/Margin").get_combined_minimum_size().y
+	pass # The lobby shows a compact social shortcut; the full list remains in Friends.
 
 func _language() -> void:
 	# Source strings are Portuguese; avoid English fallback on untranslated pt_BR keys.
@@ -277,7 +285,7 @@ func _nudge_on_hover(button: Button) -> void:
 
 func _nudge(button: Button, shift: float, time: float, from := NAN, delay := 0.0) -> void:
 	var body := button.get_node_or_null("ActionBody") as Control
-	if body == null: return
+	if body == null or button.get("button_id") != &"story": return
 	var old: Variant = button.get_meta("nudge") if button.has_meta("nudge") else null
 	if old is Tween and (old as Tween).is_valid(): (old as Tween).kill()
 	var tween := button.create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)

@@ -1,6 +1,5 @@
 extends Control
-## Mini player do lobby no estilo dos menus de jogos esportivos: cartão inclinado com faixa
-## dourada, capa, "TOCANDO AGORA" com equalizador, barra de progresso e botões redondos.
+## Compact lobby music player: cover, title, transport and playback progress.
 ## Usa a API do autoload MenuMusic (a mesma dos atalhos F6–F8); no celular é o único controle.
 ## Fica oculto quando nenhuma faixa está liberada no catálogo.
 const FONT := preload("res://assets/desert/phase01/interface.ttf")
@@ -111,28 +110,10 @@ func _process(delta: float) -> void:
 	_time += delta
 	queue_redraw()
 
-## Cartão em paralelogramo com faixa dourada à esquerda, equalizador e progresso.
+## Restrained surface and playback progress.
 func _draw() -> void:
-	var w := size.x
 	var h := size.y
-	var skew := h * 0.22
-	draw_colored_polygon(PackedVector2Array([Vector2(skew, 0), Vector2(w, 0), Vector2(w - skew, h), Vector2(0, h)]), INK)
-	draw_polyline(PackedVector2Array([Vector2(skew, 0), Vector2(w, 0), Vector2(w - skew, h), Vector2(0, h), Vector2(skew, 0)]), Color(GOLD, 0.35), 1.5, true)
-	var stripe := h * 0.09
-	draw_colored_polygon(PackedVector2Array([Vector2(skew, 0), Vector2(skew + stripe, 0), Vector2(stripe, h), Vector2(0, h)]), GOLD)
-	# Moldura da capa.
-	var cover := Rect2(_cover.position - Vector2.ONE * 2, _cover.size + Vector2.ONE * 4)
-	draw_rect(cover, Color(GOLD, 0.8), false, 2.0)
-	# Equalizador: barras vivas tocando, baixas e paradas na pausa.
-	var playing: bool = is_instance_valid(_music) and not _music.paused
-	var bar_w := h * 0.045
-	var kicker_width := _font.get_string_size(_kicker.text, HORIZONTAL_ALIGNMENT_LEFT, -1, _kicker.get_theme_font_size("font_size")).x
-	var base := Vector2(_kicker.position.x + kicker_width + h * 0.1, _kicker.position.y + _kicker.size.y * 0.78)
-	for index in range(4):
-		var level := 0.25
-		if playing: level = 0.35 + 0.65 * absf(sin(_time * (5.0 + index * 1.7) + index * 1.3))
-		var bar_h := _kicker.size.y * 0.62 * level
-		draw_rect(Rect2(base + Vector2(index * bar_w * 1.8, -bar_h), Vector2(bar_w, bar_h)), GOLD)
+	draw_style_box(_music_surface(), Rect2(Vector2.ZERO, size))
 	# Progresso da faixa.
 	if is_instance_valid(_music):
 		var length: float = _music.track_length()
@@ -164,18 +145,19 @@ func _layout() -> void:
 	var menu := get_parent() as Control
 	if menu == null: return
 	_compact = UIScale.is_compact(500.0)
-	var w := 740.0 if _compact else 500.0
-	var h := 150.0 if _compact else 100.0
+	var unit := menu.size.y / maxf(float(menu.get_window().size.y) / UIScale.device_scale(), 1.0)
+	var w := (280.0 if _compact else 330.0) * unit
+	var h := 52.0 * unit
 	set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	size = Vector2(w, h)
 	custom_minimum_size = size
-	position = Vector2(menu.size.x - 32.0 - w, 108.0)
+	position = Vector2(menu.size.x - 24.0 * unit - w, menu.size.y - h - 16.0 * unit)
 	var pad := h * 0.14
 	var skew := h * 0.22
 	_cover.position = Vector2(skew * 0.5 + h * 0.16, pad)
 	_cover.size = Vector2(h - pad * 2, h - pad * 2)
 	var text_x := _cover.position.x + _cover.size.x + h * 0.14
-	var button_size := h * 0.40
+	var button_size := 44.0 * unit
 	var buttons_x := w - skew * 0.5 - h * 0.1 - button_size * 3 - h * 0.08 * 2
 	_kicker.position = Vector2(text_x, pad * 0.7)
 	_kicker.add_theme_font_size_override("font_size", int(h * 0.13))
@@ -186,9 +168,20 @@ func _layout() -> void:
 	_category.position = Vector2(text_x, h * 0.58)
 	_category.add_theme_font_size_override("font_size", int(h * 0.13))
 	_category.size = Vector2(buttons_x - text_x - h * 0.08, h * 0.2)
+	_kicker.hide()
+	_category.hide()
+	_title.position.y = h * 0.30
+	_title.size.y = 22 * unit
+	_title.add_theme_font_size_override("font_size", roundi(12 * unit))
 	for index in range(3):
 		var button := _buttons[index]
-		var bigger := button_size * (1.15 if index == 1 else 1.0)
+		var bigger := button_size
 		button.size = Vector2(bigger, bigger)
 		button.position = Vector2(buttons_x + index * (button_size + h * 0.08) - (bigger - button_size) * 0.5, (h - bigger) * 0.5)
 	queue_redraw()
+
+func _music_surface() -> StyleBoxFlat:
+	var surface := StyleBoxFlat.new()
+	surface.bg_color = Color(0.035, 0.05, 0.065, 0.9)
+	surface.set_corner_radius_all(4)
+	return surface

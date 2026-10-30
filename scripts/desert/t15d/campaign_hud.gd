@@ -45,8 +45,7 @@ func _ready() -> void:
 	add_child(_flash)
 	_root = Control.new()
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_root.theme = Theme.new()
-	_root.theme.default_font = _font
+	PlayerUI.apply_theme(_root)
 	add_child(_root)
 	_identity = PanelContainer.new()
 	_identity.add_theme_stylebox_override("panel",box())

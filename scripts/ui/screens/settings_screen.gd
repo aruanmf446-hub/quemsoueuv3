@@ -44,21 +44,21 @@ func render() -> void:
 	_layout.add_theme_constant_override("separation", 28)
 	_rail = PlayerUI.column(_layout)
 	_rail.size_flags_horizontal = Control.SIZE_FILL
-	_rail.add_child(PlayerUI.label("AJUSTES", 16, ACCENT))
-	_rail.add_child(PlayerUI.label("Sua experiência", 26))
 	_tabs.clear()
 	var names := ["Áudio", "Gráficos", "Controles", "Idioma"]
 	for i in range(names.size()):
-		var tab := _button("0%d   %s" % [i + 1, tr(names[i])], _select.bind(i))
+		var tab := _button(tr(names[i]), _select.bind(i))
 		tab.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		tab.toggle_mode = true
+		tab.icon = _tab_icon(i)
 		_style_tab(tab)
 		tab.button_pressed = i == _category
 		_rail.add_child(tab)
 		_tabs.append(tab)
 	var panel := PanelContainer.new()
+	panel.name = "ContentPanel"
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	panel.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	panel.add_theme_stylebox_override("panel", _glass(24))
 	_layout.add_child(panel)
 	var scroll := ScrollContainer.new()
@@ -69,7 +69,9 @@ func render() -> void:
 	panel.add_child(scroll)
 	_content = PlayerUI.column(scroll)
 	_content.add_theme_constant_override("separation", 20)
-	_feedback = PlayerUI.label("Preferências salvas neste dispositivo.", 18, MUTED)
+	# Só aparece quando algo dá errado; salvar com sucesso não precisa de aviso.
+	_feedback = PlayerUI.label("", 18, Color("#ff9797"))
+	_feedback.hide()
 	body.add_child(_feedback)
 	_show_category()
 	_adapt()
@@ -85,26 +87,31 @@ func _adapt() -> void:
 	margin.size = size / factor
 	for side in ["left", "right", "top", "bottom"]:
 		margin.add_theme_constant_override("margin_" + side, 16 if compact else 48)
-	_rail.custom_minimum_size.x = 170 if compact else 280
+	_rail.custom_minimum_size.x = 170 if compact else 240
 	_rail.add_theme_constant_override("separation", 8 if compact else 14)
 	_layout.add_theme_constant_override("separation", 20 if compact else 28)
 	$Margin/Column.add_theme_constant_override("separation", 12 if compact else 18)
 	_feedback.add_theme_font_size_override("font_size", 16 if compact else 18)
 	var panel: PanelContainer = _layout.get_child(1)
 	panel.add_theme_stylebox_override("panel", _glass(16 if compact else 24))
-	_rail.get_child(0).visible = not compact
-	_rail.get_child(1).visible = not compact
 	for tab in _tabs:
 		tab.custom_minimum_size = Vector2(150, 48 if compact else 56)
 		tab.add_theme_font_size_override("font_size", 19 if compact else 21)
 	$Margin/Column/Header/Back.custom_minimum_size = Vector2(110 if compact else 170, 48 if compact else 56)
 	heading.add_theme_font_size_override("font_size", 28 if compact else 38)
+	_fit_panel.call_deferred()
 
 func _select(index: int) -> void:
 	_waiting_action = ""
 	_category = index
 	for i in range(_tabs.size()): _tabs[i].button_pressed = i == index
 	_show_category()
+	PlayerUI.cascade(_content)
+
+
+func animate_in() -> void:
+	PlayerUI.cascade(_rail)
+	PlayerUI.cascade(_content)
 
 func _show_category() -> void:
 	_scroll.scroll_vertical = 0
@@ -114,8 +121,33 @@ func _show_category() -> void:
 		1: _graphics()
 		2: _controls()
 		3: _language()
+	_fit_panel.call_deferred()
 
-func _title(title: String, subtitle: String) -> void:
+
+## O painel cresce só até o conteúdo (sem o vazio enorme embaixo); se não couber, rola.
+func _fit_panel() -> void:
+	if not is_instance_valid(_scroll) or not is_instance_valid(_layout): return
+	var panel := _scroll.get_parent() as PanelContainer
+	var chrome := panel.get_theme_stylebox("panel").get_minimum_size().y
+	var room := maxf(_layout.size.y - chrome, 120.0)
+	_scroll.custom_minimum_size.y = minf(_content.get_combined_minimum_size().y, room)
+
+
+const TAB_ICONS := [
+	'<path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/>',
+	'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+	'<path d="M7 8h10a4 4 0 0 1 4 4v2a3 3 0 0 1-5.4 1.8L14 14h-4l-1.6 1.8A3 3 0 0 1 3 14v-2a4 4 0 0 1 4-4z"/><path d="M7 11v3M5.5 12.5h3"/><circle cx="16" cy="11.5" r="0.6"/><circle cx="18" cy="13.5" r="0.6"/>',
+	'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+]
+
+
+func _tab_icon(index: int) -> Texture2D:
+	var svg: String = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + TAB_ICONS[index] + '</g></svg>'
+	var image := Image.new()
+	image.load_svg_from_string(svg, 1.25)
+	return ImageTexture.create_from_image(image)
+
+func _title(title: String) -> void:
 	var head := PlayerUI.label(title.to_upper(), 30, Color.WHITE)
 	_content.add_child(head)
 	var line := ColorRect.new()
@@ -123,10 +155,9 @@ func _title(title: String, subtitle: String) -> void:
 	line.custom_minimum_size = Vector2(56, 3)
 	line.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	_content.add_child(line)
-	_content.add_child(PlayerUI.label(subtitle, 19, MUTED))
 
 func _audio() -> void:
-	_title("Áudio", "Ajuste o som da sua aventura.")
+	_title("Áudio")
 	_slider("Volume geral", "master")
 	_slider("Música", "music")
 	_slider("Efeitos sonoros", "sfx")
@@ -138,7 +169,6 @@ func _audio() -> void:
 	mute.toggled.connect(func(value: bool) -> void:
 		if not _save("muted", value): mute.set_pressed_no_signal(not value))
 	_content.add_child(mute)
-	_content.add_child(PlayerUI.label("A música toca exclusivamente no menu. Seus volumes são mantidos ao silenciar.", 18, MUTED))
 	var manage := _button("Gerenciar músicas", func() -> void: navigate_requested.emit("music", {}))
 	manage.name = "ManageMusic"
 	_content.add_child(manage)
@@ -178,40 +208,46 @@ func _slider(text: String, key: String) -> void:
 	stack.add_child(slider)
 
 func _graphics() -> void:
-	_title("Gráficos", "Qualidade da prévia 3D dos personagens.")
-	var quality := OptionButton.new()
-	quality.custom_minimum_size.y = 56
-	_style_button(quality)
+	_title("Gráficos")
+	var card := PanelContainer.new()
+	card.add_theme_stylebox_override("panel", _row_box())
+	_content.add_child(card)
+	var stack := PlayerUI.column(card)
+	stack.add_child(PlayerUI.label("Qualidade", 22))
+	var choices := PlayerUI.row(stack)
+	choices.add_theme_constant_override("separation", 10)
 	var keys := ["baixo", "medio", "alto"]
-	for text: String in ["Baixa", "Média", "Alta"]: quality.add_item(tr(text))
-	quality.select(keys.find(services.preferences.values.quality))
-	quality.item_selected.connect(func(index: int) -> void:
-		if not _save("quality", keys[index]): quality.select(keys.find(services.preferences.values.quality)))
-	_content.add_child(quality)
-	for text: String in ["Baixa: meia resolução, sem sombras e sem antisserrilhamento.", "Média: resolução integral, sombras e MSAA 2×.", "Alta: resolução integral, sombras e MSAA 4×."]:
-		_content.add_child(PlayerUI.label(text, 20, MUTED))
-	_content.add_child(PlayerUI.label("Aplicado à prévia 3D. As configurações de combate são preservadas.", 18, ACCENT))
+	var names := ["Baixa", "Média", "Alta"]
+	for i in range(keys.size()):
+		var choice := _button(names[i], func() -> void:
+			if _save("quality", keys[i]): _show_category())
+		choice.toggle_mode = true
+		choice.button_pressed = services.preferences.values.quality == keys[i]
+		choice.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		choices.add_child(choice)
 
 func _controls() -> void:
-	_title("Controles", "Personalize as teclas de navegação dos menus.")
+	_title("Controles")
 	for item: Array in [["Confirmar", "accept_key"], ["Voltar", "back_key"]]:
-		var line := PlayerUI.row(_content)
-		line.add_child(PlayerUI.label(item[0]))
+		var row_card := PanelContainer.new()
+		row_card.add_theme_stylebox_override("panel", _row_box())
+		_content.add_child(row_card)
+		var line := PlayerUI.row(row_card)
+		var key_label := PlayerUI.label(item[0], 22)
+		key_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		line.add_child(key_label)
 		var key_button := _button(OS.get_keycode_string(int(services.preferences.values[item[1]])), func() -> void: pass)
 		key_button.pressed.connect(_wait_for_key.bind(item[1], key_button))
 		line.add_child(key_button)
-	for text: String in ["Teclado: Tab e setas para navegar; teclas acima para confirmar e voltar.", "Mouse: clique para selecionar; arraste os controles de volume.", "Toque: toque para selecionar; deslize para rolar e ajustar o volume.", "Combate: A/D ou setas, Espaço e J/K. Comandos do gameplay preservados."]:
-		_content.add_child(PlayerUI.label(text, 19, MUTED))
 
 func _language() -> void:
-	_title("Idioma", "Escolha o idioma da interface.")
+	_title("Idioma")
 	for item: Array in [["Português (Brasil)", "pt_BR"], ["English", "en"]]:
 		var locale_button := _button(item[0], func() -> void:
 			if _save("locale", item[1]): render())
 		locale_button.toggle_mode = true
 		locale_button.button_pressed = services.preferences.values.locale == item[1]
 		_content.add_child(locale_button)
-	_content.add_child(PlayerUI.label("O inglês está disponível parcialmente. Textos sem tradução permanecem em português.", 18, MUTED))
 	var account := PlayerUI.column(_content)
 	account.add_child(PlayerUI.label("Conta", 24, ACCENT))
 	account.add_child(PlayerUI.label(str(services.session.user.get("email", "Demonstração local • sem conta conectada"))))
@@ -232,8 +268,8 @@ func _language() -> void:
 
 func _save(key: String, value: Variant) -> bool:
 	var saved := services.preferences.set_preference(key, value)
-	_feedback.text = tr("Preferências salvas neste dispositivo." if saved else "Não foi possível salvar a preferência neste dispositivo.")
-	_feedback.add_theme_color_override("font_color", MUTED if saved else Color("#ff9797"))
+	_feedback.text = tr("Não foi possível salvar a preferência neste dispositivo.")
+	_feedback.visible = not saved
 	return saved
 
 func _wait_for_key(action: String, button: Button) -> void:
@@ -250,6 +286,7 @@ func _input(event: InputEvent) -> void:
 	var other := "back_key" if _waiting_action == "accept_key" else "accept_key"
 	if code == int(services.preferences.values[other]):
 		_feedback.text = tr("Escolha uma tecla diferente para confirmar e voltar.")
+		_feedback.show()
 		return
 	if _save(_waiting_action, code):
 		_binding_button.text = OS.get_keycode_string(code)
@@ -260,36 +297,23 @@ func _button(text: String, action: Callable) -> Button:
 	node.text = tr(text)
 	node.custom_minimum_size = Vector2(150, 56)
 	_style_button(node)
+	PlayerUI.fluid(node)
 	node.pressed.connect(action)
 	return node
 
-## Botões inclinados no estilo dos menus de jogos esportivos: vidro escuro com borda
-## dourada; pressionado/selecionado fica dourado com texto escuro.
+## Botões e abas usam a placa do kit (PlayerUI): a aba selecionada fica dourada.
 func _style_button(node: Button) -> void:
 	node.add_theme_font_size_override("font_size", 21)
-	for state: String in ["normal", "hover", "pressed", "focus", "hover_pressed"]:
-		var style := _box(Color(0.07, 0.11, 0.18, 0.95), 14)
-		style.skew = Vector2(0.18, 0)
-		style.set_corner_radius_all(3)
-		style.border_color = Color(ACCENT, 0.45)
-		style.set_border_width_all(1)
-		if state == "hover": style.bg_color = Color(0.11, 0.17, 0.26, 0.95)
-		if state in ["pressed", "hover_pressed"]:
-			style.bg_color = ACCENT
-		if state == "focus":
-			style.draw_center = false
-			style.border_color = ACCENT
-			style.set_border_width_all(2)
-		node.add_theme_stylebox_override(state, style)
-	for color in ["font_color", "font_hover_color", "font_focus_color"]:
-		node.add_theme_color_override(color, Color.WHITE)
-	for color in ["font_pressed_color", "font_hover_pressed_color"]:
-		node.add_theme_color_override(color, INK)
+	PlayerUI.style_button(node, false)
 
 func _style_tab(node: Button) -> void:
 	_style_button(node)
-	var normal := node.get_theme_stylebox("normal") as StyleBoxFlat
-	normal.border_color = Color(1, 1, 1, 0.08)
+	node.add_theme_constant_override("h_separation", 12)
+	node.add_theme_color_override("icon_normal_color", Color.WHITE)
+	node.add_theme_color_override("icon_hover_color", Color.WHITE)
+	node.add_theme_color_override("icon_focus_color", Color.WHITE)
+	node.add_theme_color_override("icon_pressed_color", PlayerUI.KIT_INK)
+	node.add_theme_color_override("icon_hover_pressed_color", PlayerUI.KIT_INK)
 
 func _style_toggle(node: CheckButton) -> void:
 	node.add_theme_icon_override("checked", _toggle_on)
@@ -306,14 +330,10 @@ func _style_toggle(node: CheckButton) -> void:
 	focus.set_border_width_all(2)
 	node.add_theme_stylebox_override("focus", focus)
 
-func _glass(padding: int) -> StyleBoxFlat:
-	var box := _box(GLASS, padding)
-	box.set_corner_radius_all(14)
-	box.border_color = Color(ACCENT, 0.25)
-	box.border_width_top = 2
-	box.shadow_color = Color(0, 0, 0, 0.45)
-	box.shadow_size = 18
-	return box
+## Painel do conteúdo: moldura do kit (azul com brilho e cantos de cristal).
+func _glass(padding: int) -> StyleBoxTexture:
+	var compact := UIScale.is_compact()
+	return PlayerUI.frame_panel(padding + (4 if compact else 14), compact)
 
 func _row_box() -> StyleBoxFlat:
 	var box := _box(Color(1, 1, 1, 0.04), 16)

@@ -31,6 +31,8 @@ var _web_request: HTTPRequest
 var _web_cache := {}
 var _web_loading := ""
 var _web_wanted := {}
+var _queue: Array = []
+var _history: Array = []
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -147,6 +149,7 @@ func save_selection(hidden: Array, deselected: Array) -> bool:
 		return false
 	_hidden = _as_set(hidden)
 	_deselected = _as_set(deselected)
+	_queue.clear()
 	state_changed.emit()
 	return true
 
@@ -232,18 +235,37 @@ func previous_track() -> void:
 	_position = 0.0
 	_select(-1)
 
+## Aleatório dentro da seleção do jogador: uma fila embaralhada das faixas marcadas
+## (sem repetir até tocar todas) e um histórico para o botão "anterior".
 func _select(direction: int) -> void:
 	if not _inside: return
-	var start := _index(current_id)
-	if start < 0: start = -1 if direction > 0 else 0
-	for step in range(1, tracks.size() + 1):
-		var index := posmod(start + direction * step, tracks.size())
-		if _available(tracks[index]):
-			_play(tracks[index])
-			return
+	if direction < 0:
+		while not _history.is_empty():
+			var back := _index(str(_history.pop_back()))
+			if back >= 0 and _available(tracks[back]):
+				_play(tracks[back])
+				return
+	for attempt in 2:
+		while not _queue.is_empty():
+			var index := _index(str(_queue.pop_front()))
+			if index >= 0 and _available(tracks[index]):
+				if current_id != "":
+					_history.append(current_id)
+					if _history.size() > 50: _history.pop_front()
+				_play(tracks[index])
+				return
+		_refill_queue()
 	_stop()
 	current_id = ""
 	state_changed.emit()
+
+func _refill_queue() -> void:
+	_queue.clear()
+	for track in tracks:
+		if _available(track) and track.id != current_id: _queue.append(track.id)
+	_queue.shuffle()
+	# Com uma única faixa marcada, ela mesma volta a tocar.
+	if _queue.is_empty() and _index(current_id) >= 0 and _available(current_track()): _queue.append(current_id)
 
 ## No navegador os MP3 ficam fora do pacote do jogo (publicados em music/ ao lado da
 ## página) e são baixados sob demanda: carregar as 14 faixas junto travava o celular.

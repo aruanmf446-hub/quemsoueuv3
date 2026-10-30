@@ -1,6 +1,7 @@
 extends CanvasLayer
 ## HUD em pixels físicos: recursos, distrito e avanço têm hierarquias diferentes.
 signal pause_requested
+const Icons = preload("res://scripts/desert/t15d/resource_icons.gd")
 var _root: Control
 var _identity: PanelContainer
 var _status: PanelContainer
@@ -13,7 +14,6 @@ var _defense: Label
 var _bar: ProgressBar
 var _pause: Button
 var _toast: Label
-var _hint: Label
 var _font: FontFile
 var _kicker: Label
 var _place: Label
@@ -23,6 +23,10 @@ var _icons: Control
 var _hp := 3
 var _atk := 1
 var _def := 1
+var _atk_glow := 0.0
+## Pulso de cada coração (1 → 0) quando ele é perdido ou recuperado.
+var _heart_pop: Array[float] = [0.0, 0.0, 0.0]
+var _def_glow := 0.0
 var _flash_time := 0.0
 var _flash_length := 1.0
 var _flash_peak := 0.0
@@ -65,7 +69,7 @@ func _ready() -> void:
 		item.hide()
 		resources.add_child(item)
 	_icons = Control.new()
-	_icons.custom_minimum_size = Vector2(250,30)
+	_icons.custom_minimum_size = Vector2(240,40)
 	_icons.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_icons.draw.connect(_draw_resources)
 	resources.add_child(_icons)
@@ -110,11 +114,6 @@ func _ready() -> void:
 	_toast.add_theme_stylebox_override("normal",box())
 	_toast.hide()
 	_root.add_child(_toast)
-	_hint = label("A / D  mover     ESPAÇO  pulo ×2     J  ataque     SHIFT  defesa     S  agachar",13,Color("#d2d8df"))
-	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_hint.add_theme_color_override("font_outline_color",Color("#091421"))
-	_hint.add_theme_constant_override("outline_size",4)
-	_root.add_child(_hint)
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 func label(text: String, size: int, color: Color) -> Label:
@@ -156,44 +155,41 @@ func _layout() -> void:
 	_pause.size = Vector2(44,48)
 	_toast.position = Vector2(maxf(14,(screen.x-430)*0.5),92 if compact else 128)
 	_toast.size = Vector2(minf(screen.x-28,430),32)
-	_hint.visible = not compact
-	_hint.position = Vector2(14,screen.y-30)
-	_hint.size = Vector2(screen.x-28,24)
-## Corações para a vida, lâmina dourada para o ataque e escudo azul para a defesa,
-## nas mesmas cores das reposições do mapa. Vazios ficam só com o contorno.
+## Corações para a vida e dois medalhões (espada em chamas = ataque, escudo = defesa), os
+## mesmos dos itens no mapa. Sem carga, o medalhão fica cinza.
 func _draw_resources() -> void:
 	var h := _icons.size.y
+	var px := _root.scale.x
+	var heart_size := h*0.8
 	var x := 0.0
 	for index in range(3):
-		_heart(Vector2(x+h*0.5,h*0.52),h*0.42,index < _hp)
-		x += h*1.05
-	x += h*0.5
-	_blade(Vector2(x+h*0.5,h*0.5),h*0.46,_atk > 0)
-	x += h*1.4
-	_shield_icon(Vector2(x+h*0.5,h*0.5),h*0.42,_def > 0)
-func _heart(c: Vector2, r: float, full: bool) -> void:
-	var points := PackedVector2Array()
-	for step in range(32):
-		var t := TAU*step/32.0
-		points.append(c+Vector2(16*pow(sin(t),3),-(13*cos(t)-5*cos(2*t)-2*cos(3*t)-cos(4*t)))*r/17.0)
-	if full: _icons.draw_colored_polygon(points,Color("#ff5d5d"))
-	points.append(points[0])
-	_icons.draw_polyline(points,Color("#ffd0c4") if full else Color(1,1,1,0.35),1.6,true)
-func _blade(c: Vector2, r: float, full: bool) -> void:
-	var blade := PackedVector2Array([c+Vector2(0,-r),c+Vector2(r*0.22,-r*0.55),c+Vector2(r*0.22,r*0.35),c+Vector2(-r*0.22,r*0.35),c+Vector2(-r*0.22,-r*0.55)])
-	var color := Color("#f2c76e") if full else Color(1,1,1,0.0)
-	if full: _icons.draw_colored_polygon(blade,color)
-	blade.append(blade[0])
-	_icons.draw_polyline(blade,Color("#fff0c4") if full else Color(1,1,1,0.35),1.6,true)
-	_icons.draw_line(c+Vector2(-r*0.55,r*0.42),c+Vector2(r*0.55,r*0.42),Color("#f2c76e") if full else Color(1,1,1,0.35),2.4,true)
-	_icons.draw_line(c+Vector2(0,r*0.45),c+Vector2(0,r*0.95),Color("#b88a3c") if full else Color(1,1,1,0.35),2.8,true)
-func _shield_icon(c: Vector2, r: float, full: bool) -> void:
-	var points := PackedVector2Array([c+Vector2(-r*0.85,-r*0.8),c+Vector2(r*0.85,-r*0.8),c+Vector2(r*0.8,r*0.1),c+Vector2(0,r),c+Vector2(-r*0.8,r*0.1)])
-	if full: _icons.draw_colored_polygon(points,Color("#79cceb"))
-	points.append(points[0])
-	_icons.draw_polyline(points,Color("#d6f3ff") if full else Color(1,1,1,0.35),1.6,true)
+		var pop := _heart_pop[index]
+		var center := Vector2(x+heart_size*0.5,h*0.5)
+		var full := index < _hp
+		# Coração perdido: some crescendo e apagando; recuperado: estufa e assenta.
+		if pop > 0.0 and not full:
+			_icon(Icons.heart(roundi(heart_size*px),true),center,heart_size*(1.0+0.45*(1.0-pop)),pop)
+		_icon(Icons.heart(roundi(heart_size*px),full),center,heart_size*(1.0+0.28*sin(pop*PI) if full else 1.0))
+		x += heart_size*1.08
+	x += h*0.3
+	for slot: Array in [["attack",_atk > 0,_atk_glow],["defense",_def > 0,_def_glow]]:
+		var center := Vector2(x+h*0.5,h*0.5)
+		var glow: float = slot[2]
+		if slot[1]:
+			# Brilho suave atrás do medalhão; acende mais logo depois de recarregar.
+			var tint := Color("#ff9a3c") if slot[0] == "attack" else Color("#5ec4ef")
+			for step in range(4):
+				_icons.draw_circle(center,h*(0.62-step*0.05),Color(tint,(0.06+glow*0.2)*(1.0-step*0.2)))
+		_icon(Icons.medallion(slot[0],roundi(h*px),slot[1]),center,h*(1.0+0.12*sin(glow*PI)))
+		x += h*1.15
+func _icon(texture: Texture2D, center: Vector2, size: float, alpha := 1.0) -> void:
+	_icons.draw_texture_rect(texture,Rect2(center-Vector2.ONE*size*0.5,Vector2.ONE*size),false,Color(1,1,1,alpha))
 func update_resources(player: Node) -> void:
+	for index in range(3):
+		if (index < player.health) != (index < _hp): _heart_pop[index] = 1.0
 	_hp = player.health
+	if player.attack_charges > _atk: _atk_glow = 1.0
+	if player.defense_charges > _def: _def_glow = 1.0
 	_atk = player.attack_charges
 	_def = player.defense_charges
 	if is_instance_valid(_icons): _icons.queue_redraw()
@@ -288,9 +284,15 @@ func clear_pulse() -> void:
 	_flash.color.a = 0.0
 func set_completed(value: bool) -> void:
 	_pause.visible = not value
-	_hint.visible = not value and not UIScale.is_compact()
 	_toast.hide()
 func _process(delta: float) -> void:
+	if _heart_pop.any(func(value: float) -> bool: return value > 0.0):
+		for index in range(3): _heart_pop[index] = maxf(_heart_pop[index]-delta*2.6,0.0)
+		_icons.queue_redraw()
+	if _atk_glow > 0.0 or _def_glow > 0.0:
+		_atk_glow = maxf(_atk_glow-delta*1.4,0.0)
+		_def_glow = maxf(_def_glow-delta*1.4,0.0)
+		_icons.queue_redraw()
 	if _flash_time > 0.0:
 		_flash_time = maxf(_flash_time-delta,0.0)
 		var progress := 1.0-_flash_time/_flash_length

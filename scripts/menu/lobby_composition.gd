@@ -3,6 +3,10 @@ extends Node
 const INK := Color("151e25")
 const PAPER := Color("f6f3e9")
 const ACCENT := Color("e9b975")
+## Margens do conteúdo (ícone + textos) dentro de cada botão do menu; no hover ele avança.
+const BODY_LEFT := 22.0
+const BODY_RIGHT := -18.0
+const NUDGE := 10.0
 var menu: Control
 var brand: Label
 var eyebrow: Label
@@ -37,6 +41,7 @@ func _ready() -> void:
 		_style_button(button, button.button_id == &"story")
 		button.add_theme_constant_override("outline_size", 0)
 		button.focus_mode = Control.FOCUS_ALL
+		_nudge_on_hover(button)
 	menu.get_node("MenuButtons/BtnDuel").hide()
 	for path: String in ["TopBar/CoinPill", "TopBar/GemPill", "ProfileCard"]:
 		var pill := _box(Color(0.035, 0.06, 0.11, 0.88), 3)
@@ -118,6 +123,10 @@ func _ready() -> void:
 	menu.get_node("Services").preferences.changed.connect(_language)
 	menu.resized.connect(_layout)
 	_layout()
+	# Os botões entram em cascata ao abrir o lobby e sempre que uma tela interna fecha.
+	menu.get_node("Navigation").route_changed.connect(func(route: String) -> void:
+		if route.is_empty(): intro())
+	intro.call_deferred()
 
 func _label(text: String, font_size: int, color: Color) -> Label:
 	var label := Label.new()
@@ -209,8 +218,8 @@ func _layout() -> void:
 		button.add_theme_font_size_override("font_size", int(26 * type_scale))
 		var content: HBoxContainer = button.get_node_or_null("ActionBody")
 		if content != null:
-			content.offset_left = 22
-			content.offset_right = -18
+			content.offset_left = BODY_LEFT
+			content.offset_right = BODY_RIGHT
 			content.offset_top = 12
 			content.offset_bottom = -12
 			content.get_node("Icon").custom_minimum_size.x = 60 if compact else 46
@@ -250,6 +259,48 @@ func _language() -> void:
 	var mode := Node.AUTO_TRANSLATE_MODE_INHERIT if TranslationServer.get_locale().begins_with("en") else Node.AUTO_TRANSLATE_MODE_DISABLED
 	for path: String in ["MenuButtons", "ProfileCard", "FriendsPanel", "TopBar", "LobbyArea"]:
 		menu.get_node(path).auto_translate_mode = mode
+
+
+## Hover/foco: o conteúdo do botão avança alguns pixels; ao sair, volta suave.
+func _nudge_on_hover(button: Button) -> void:
+	var state := {"hover": false}
+	var update := func() -> void:
+		_nudge(button, NUDGE if (state.hover or button.has_focus()) and not button.disabled else 0.0, 0.18)
+	button.mouse_entered.connect(func() -> void:
+		state.hover = true
+		update.call())
+	button.mouse_exited.connect(func() -> void:
+		state.hover = false
+		update.call())
+	button.focus_entered.connect(update)
+	button.focus_exited.connect(update)
+
+
+func _nudge(button: Button, shift: float, time: float, from := NAN, delay := 0.0) -> void:
+	var body := button.get_node_or_null("ActionBody") as Control
+	if body == null: return
+	var old: Variant = button.get_meta("nudge") if button.has_meta("nudge") else null
+	if old is Tween and (old as Tween).is_valid(): (old as Tween).kill()
+	var tween := button.create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	var left := tween.tween_property(body, "offset_left", BODY_LEFT + shift, time).set_delay(delay)
+	var right := tween.tween_property(body, "offset_right", BODY_RIGHT + shift, time).set_delay(delay)
+	if not is_nan(from):
+		left.from(BODY_LEFT + from)
+		right.from(BODY_RIGHT + from)
+	button.set_meta("nudge", tween)
+
+
+## Entrada do menu: cada botão surge da esquerda, um pouco depois do anterior.
+func intro() -> void:
+	var index := 0
+	for button: Button in menu.get_node("MenuButtons").get_children():
+		if not button.visible: continue
+		var delay := 0.05 * index
+		button.modulate.a = 0.0
+		var fade := button.create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		fade.tween_property(button, "modulate:a", 1.0, 0.3).set_delay(delay)
+		_nudge(button, NUDGE if button.has_focus() else 0.0, 0.36, -28.0, delay)
+		index += 1
 
 
 func _action_content(button: MenuCardButton) -> void:

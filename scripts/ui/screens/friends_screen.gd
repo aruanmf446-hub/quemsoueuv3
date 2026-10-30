@@ -22,13 +22,23 @@ func _ready() -> void:
 func render() -> void:
 	PlayerUI.clear(body)
 	banner.show_state(services.friends.state)
-	var tabs := PlayerUI.row(body)
-	for item: Array in [["Amigos", "friends"], ["Recebidas", "incoming"], ["Enviadas", "outgoing"], ["Buscar jogadores", "search"]]:
-		tabs.add_child(PlayerUI.button(item[0], _change_tab.bind(item[1])))
-	tabs.add_child(PlayerUI.button("Atualizar", func() -> void: services.friends.refresh()))
 	if not services.session.authenticated():
-		account_button(body)
+		_signed_out()
 		return
+	var tabs := PlayerUI.row(body)
+	tabs.add_theme_constant_override("separation", 8)
+	for item: Array in [["Amigos", "friends"], ["Recebidas", "incoming"], ["Enviadas", "outgoing"], ["Buscar", "search"]]:
+		var count: int = services.friends.data.get(item[1], []).size() if item[1] != "search" else 0
+		var tab := PlayerUI.button(item[0] + ("  %d" % count if count > 0 else ""), _change_tab.bind(item[1]))
+		PlayerUI.style_button(tab, item[1] == _tab)
+		tabs.add_child(tab)
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tabs.add_child(spacer)
+	var refresh := PlayerUI.button("↻", func() -> void: services.friends.refresh())
+	refresh.tooltip_text = tr("Atualizar")
+	refresh.custom_minimum_size = Vector2(56, 52)
+	tabs.add_child(refresh)
 	if _tab == "search":
 		var line := PlayerUI.row(body)
 		var query := LineEdit.new()
@@ -39,22 +49,55 @@ func render() -> void:
 		query.text_changed.connect(func(value: String) -> void: _term = value)
 		query.text_submitted.connect(_search)
 		line.add_child(query)
-		line.add_child(PlayerUI.button("Buscar", func() -> void: _search(query.text)))
+		var go := PlayerUI.button("Buscar", func() -> void: _search(query.text))
+		PlayerUI.style_button(go, true)
+		line.add_child(go)
 		for player: Dictionary in _results:
 			_player_row(player, "send")
-		if _results.is_empty():
-			body.add_child(PlayerUI.label("Busque um nickname ou identificador público com pelo menos 2 caracteres."))
 	else:
 		var players: Array = services.friends.data.get(_tab, [])
 		if players.is_empty():
-			body.add_child(PlayerUI.label("Nenhum jogador nesta lista."))
+			_empty({"friends": "Você ainda não tem amigos aqui.", "incoming": "Nenhum convite recebido.", "outgoing": "Nenhum convite enviado."}[_tab])
 		for player: Dictionary in players:
 			_player_row(player, {"friends": "remove", "incoming": "accept", "outgoing": "cancel"}[_tab])
+
+
+## Sem conta: um cartão central com convite para entrar, no lugar da barra solta.
+func _signed_out() -> void:
+	var center := CenterContainer.new()
+	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	center.custom_minimum_size.y = 420
+	body.add_child(center)
+	var card := PlayerUI.panel(center, 42)
+	card.get_parent().custom_minimum_size.x = 480
+	card.alignment = BoxContainer.ALIGNMENT_CENTER
+	var icon := TextureRect.new()
+	icon.texture = preload("res://assets/icons/vector/icon_friends.svg")
+	icon.custom_minimum_size = Vector2(64, 64)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.modulate = PlayerUI.GOLD
+	card.add_child(icon)
+	var title := PlayerUI.label("Jogue com seus amigos", 28, Color.WHITE)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	card.add_child(title)
+	var enter := PlayerUI.button("Entrar na conta", func() -> void: navigate_requested.emit("account", {}))
+	PlayerUI.style_button(enter, true)
+	card.add_child(enter)
+
+
+func _empty(text: String) -> void:
+	var note := PlayerUI.label(text, 20, Color("#a8bad3"))
+	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	note.custom_minimum_size.y = 120
+	note.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	body.add_child(note)
 
 
 func _change_tab(tab: String) -> void:
 	_tab = tab
 	render()
+	PlayerUI.cascade(body, 1)
 
 
 func show_screen(params: Dictionary = {}) -> void:
@@ -66,24 +109,30 @@ func show_screen(params: Dictionary = {}) -> void:
 func _player_row(player: Dictionary, action: String) -> void:
 	var card := PlayerUI.card(body)
 	var row := PlayerUI.row(card)
-	var info := PlayerUI.column(row)
-	info.add_child(PlayerUI.label(str(player.get("nickname", "Sem nickname")), 26, PlayerUI.GOLD))
-	var entry := services.inventory.entry(str(player.get("equipped_character_id", "")))
-	info.add_child(PlayerUI.label("%s · %s" % [entry.get("name", "Skin indisponível"), services.friends.presence_label(str(player.user_id))], 18))
+	var character_id := str(player.get("equipped_character_id", ""))
 	# Somente PNGs já em cache. Modelos são carregados ao abrir um único perfil.
-	var path := ThumbnailCache.path_for(str(player.get("equipped_character_id", "")))
-	if FileAccess.file_exists(path):
-		var thumbnail := TextureRect.new()
-		thumbnail.custom_minimum_size = Vector2(60, 72)
-		thumbnail.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		thumbnail.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		thumbnail.texture = ImageTexture.create_from_image(Image.load_from_file(path))
-		row.add_child(thumbnail)
-	row.add_child(PlayerUI.button("Ver perfil", func() -> void: navigate_requested.emit("public_profile", {"public_id": player.public_id})))
+	var avatar := PlayerUI.portrait(character_id, 64)
+	row.add_child(avatar)
+	var info := PlayerUI.column(row)
+	info.add_theme_constant_override("separation", 2)
+	info.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	info.add_child(PlayerUI.label(str(player.get("nickname", "Sem nickname")), 24, PlayerUI.GOLD))
+	var presence := services.friends.presence_label(str(player.user_id))
+	var entry := services.inventory.entry(character_id)
+	var online := presence == "Online"
+	info.add_child(PlayerUI.label("%s%s  ·  %s" % ["● " if online else "", presence, entry.get("name", "Skin indisponível")], 16, Color("#7fe0a0") if online else Color("#a8bad3")))
+	var view := PlayerUI.button("Ver perfil", func() -> void: navigate_requested.emit("public_profile", {"public_id": player.public_id}))
+	view.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(view)
 	var actions := {"send": "Adicionar", "accept": "Aceitar", "decline": "Recusar", "cancel": "Cancelar", "remove": "Remover"}
-	row.add_child(PlayerUI.button(actions[action], _act.bind(action, str(player.user_id))))
+	var main := PlayerUI.button(actions[action], _act.bind(action, str(player.user_id)))
+	PlayerUI.style_button(main, action in ["send", "accept"])
+	main.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(main)
 	if action == "accept":
-		row.add_child(PlayerUI.button("Recusar", _act.bind("decline", str(player.user_id))))
+		var decline := PlayerUI.button("Recusar", _act.bind("decline", str(player.user_id)))
+		decline.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(decline)
 
 
 func _search(term: String) -> void:

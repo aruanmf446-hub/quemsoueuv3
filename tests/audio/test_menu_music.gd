@@ -38,11 +38,13 @@ func run() -> void:
 	music._inside = true
 	check(music.reload_catalog("res://tests/audio/catalog.json"), "load authorized technical silence fixtures")
 	check(music.available_tracks().size() == 2, "disabled expired pending future and missing tracks excluded")
-	check(music.current_id == "a" and music._players[music._active].playing, "autoplay first available")
+	check(music.current_id in ["a", "b"] and music._players[music._active].playing, "autoplay a random available track")
+	var first: String = music.current_id
+	var other := "b" if first == "a" else "a"
 	music.next_track()
-	check(music.current_id == "b", "next skips unavailable")
+	check(music.current_id == other, "next skips unavailable")
 	music.previous_track()
-	check(music.current_id == "a", "previous wraps")
+	check(music.current_id == first, "previous returns to history")
 	music.pause()
 	check(music.paused and music._players[music._active].stream_paused, "pause during fade")
 	music.resume()
@@ -64,8 +66,9 @@ func run() -> void:
 	music._inside = true
 	music._restore()
 	check(music._players[music._active].playing, "return restores transport")
+	var before: String = music.current_id
 	await create_timer(2.1).timeout
-	check(music.current_id == "b", "natural finish advances")
+	check(music.current_id != before and music.current_id in ["a", "b"], "natural finish advances")
 	music.tracks[music._index("b")].license.status = "revoked"
 	music.next_track()
 	check(music.current_id == "a", "revocation prevents selection")

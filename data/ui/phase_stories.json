@@ -3,7 +3,8 @@
   "phases": {
     "01": [
       {"image": "res://assets/desert/night_city/outskirts.png", "eyebrow": "CAPÍTULO 01 · ENTRADA DO DESERTO", "title": "Os portões estão abertos", "message": "El Fuego chega à cidade no meio do deserto, sob a luz da lua."},
-      {"image": "res://assets/desert/night_city/bazaar.png", "eyebrow": "CAPÍTULO 01 · A PRIMEIRA ROTA", "title": "Patrulhas na noite", "message": "Cactus bloqueiam as ruas que levam ao interior. É hora de encontrar uma passagem."}
+      {"image": "res://assets/desert/night_city/bazaar.png", "eyebrow": "CAPÍTULO 01 · A PRIMEIRA ROTA", "title": "Patrulhas na noite", "message": "Cactus bloqueiam as ruas que levam ao interior. É hora de encontrar uma passagem."},
+      {"image": "res://assets/desert/night_city/citadel.png", "eyebrow": "CAPÍTULO 01 · A JORNADA COMEÇA", "title": "Rumo ao interior", "message": "El Fuego avança pelas ruas iluminadas, pronto para o que vier."}
     ],
     "02": [
       {"image": "res://assets/desert/night_city/outskirts.png", "eyebrow": "CAPÍTULO 02 · DUNAS PERDIDAS", "title": "A areia cobre as trilhas", "message": "As ruas desaparecem entre dunas e muros antigos."},

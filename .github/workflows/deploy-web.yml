@@ -12,6 +12,7 @@ on:
       - 'project.godot'
       - 'scenes/**'
       - 'scripts/**'
+      - 'web/**'
 
 permissions:
   contents: read

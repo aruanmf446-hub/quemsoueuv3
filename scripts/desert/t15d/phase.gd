@@ -55,6 +55,8 @@ func _ready() -> void:
 		sources[str(entry.model)] = true
 		for source in entry.animations.values(): sources[str(source)] = true
 	for source in sources: _actor_resources.append(load(source) as PackedScene)
+	# Medalhões dos itens (SVG + anel) montados já, e não no meio da corrida.
+	for kind in ["attack","defense","health"]: Pickup.Icons.medallion(kind,256,true,true)
 	_checkpoint = _vec3(_phase.player_spawn)
 	_sfx = preload("res://scripts/desert/t15d/combat_sfx.gd").new()
 	_sfx.name = "CombatSfx"
@@ -308,8 +310,6 @@ func _build_chunk_details(chunk: Node3D, index: int) -> void:
 			item.full_touched.connect(func(kind: String) -> void:
 				if is_instance_valid(_hud): _hud.notify({"attack":"Ataque cheio","defense":"Defesa cheia","health":"Vida cheia"}.get(kind,"Cheio")+" • item preservado"))
 			chunk.add_child(item)
-	for sign: Dictionary in _phase.signs:
-		if _in_chunk(float(sign.pos[0]),index): _build_pit_sign(chunk,sign)
 	for hole: Dictionary in _phase.holes:
 		var middle := (float(hole.start)+float(hole.end))*0.5
 		if hole.get("ferry",false) and _in_chunk(middle,index):
@@ -363,21 +363,10 @@ func _spawn_enemy(chunk: Node3D, spawn: Dictionary) -> void:
 	chunk.add_child(enemy)
 	enemy.setup(_enemy_catalog.cactus,spawn)
 	enemy.winding_up.connect(func() -> void: _sfx.play("windup",0.9,-4.0))
+	enemy.alerted.connect(func() -> void: _sfx.play("windup",1.45,-7.0))
 	enemy.defeated.connect(func() -> void:
 		_defeated_ids[str(spawn.id)] = true
 		_defeated = _defeated_ids.size())
-func _build_pit_sign(chunk: Node3D, entry: Dictionary) -> void:
-	var label := Label3D.new()
-	label.text = "VÃO →" if int(entry.direction)>0 else "← VÃO"
-	label.font = preload("res://assets/desert/phase01/interface.ttf")
-	label.font_size = 44
-	label.pixel_size = 0.006
-	label.position = _vec3(entry.pos)+Vector3.UP*0.8
-	label.modulate = Color("#e1bd7d")
-	label.outline_modulate = Color("#081523")
-	label.outline_size = 8
-	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	chunk.add_child(label)
 ## Fundo do vão: antes o panorama aparecia pelo buraco e o vão parecia uma janela.
 ## Um poço escuro com gradiente deixa claro que ali não há chão.
 func _build_pit_void(chunk: Node3D, x0: float, x1: float) -> void:
@@ -495,6 +484,26 @@ func _build_camera() -> void:
 	_camera.far = 90
 	add_child(_camera)
 	_follow_camera(1.0)
+	_warm_pickup_shaders()
+## O primeiro desenho do medalhão e do halo dos itens compila os shaders deles (um engasgo
+## de dezenas de ms). Desenha uma cópia minúscula à frente da câmera por 3 quadros, já na
+## entrada da fase, e não no meio da corrida.
+func _warm_pickup_shaders() -> void:
+	var warm := Node3D.new()
+	warm.position = Vector3(0, 0, -5)
+	warm.scale = Vector3.ONE*0.01
+	var halo := MeshInstance3D.new()
+	halo.mesh = QuadMesh.new()
+	halo.material_override = Pickup._halo_material(Color.WHITE)
+	warm.add_child(halo)
+	var medal := Sprite3D.new()
+	medal.texture = Pickup.Icons.medallion("attack",256,true,true)
+	medal.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	medal.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	warm.add_child(medal)
+	_camera.add_child(warm)
+	for frame in range(3): await get_tree().process_frame
+	if is_instance_valid(warm): warm.queue_free()
 func _follow_camera(delta: float) -> void:
 	# Telas baixas (844×390) aproximam mais: o personagem não pode virar um ícone.
 	_camera.size = 6.0 if UIScale.is_compact() else 7.0
@@ -642,7 +651,7 @@ func _on_player_died() -> void:
 		_paused = true
 		get_tree().paused = true)
 ## Checkpoints: ao passar pela bandeira de um distrito, guarda posição, cargas, Cactus
-## derrotados e itens coletados. Voltar a ele restaura esse estado com a vida cheia.
+## derrotados e itens coletados. Voltar a ele restaura esse estado com 1 vida e sem cargas.
 func _check_checkpoints() -> void:
 	var points: Array = _phase.get("checkpoints",[])
 	var next := _checkpoint_index+1
@@ -674,15 +683,18 @@ func _respawn_at_checkpoint() -> void:
 	_player.velocity = Vector3.ZERO
 	_player.facing = 1
 	_player.setup(_find_protagonist())
-	_player.attack_charges = int(_snapshot.attack)
-	_player.defense_charges = int(_snapshot.defense)
+	# Penalidade do checkpoint: volta com 1 vida e sem cargas de ataque/defesa.
+	_player.health = 1
+	_player.health_changed.emit(_player.health,_player.RUN_MAX_HEALTH)
+	_player.attack_charges = 0
+	_player.defense_charges = 0
 	_player.inventory_changed.emit()
 	_player._invulnerable = 1.5
 	_player.set_physics_process(true)
 	_touch_pad.set_process(true)
 	_lead = 0.0
 	_hud.clear_pulse()
-	_hud._last_health = 3
+	_hud._last_health = 1
 	_stream_world(_player.position.x,true)
 	_follow_camera(1.0)
 	_sync_resources()

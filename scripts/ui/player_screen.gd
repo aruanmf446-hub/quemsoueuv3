@@ -52,6 +52,11 @@ func render() -> void:
 	pass
 
 
+## Chamado pela navegação ao abrir a tela: o conteúdo entra em cascata.
+func animate_in() -> void:
+	PlayerUI.cascade(body)
+
+
 func status(result: Dictionary) -> void:
 	banner.show_state(result.state, "" if result.ok else ServiceResult.message(result))
 

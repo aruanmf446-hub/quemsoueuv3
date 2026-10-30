@@ -19,6 +19,15 @@ func show_screen(params: Dictionary = {}) -> void:
 	super.show_screen(params)
 
 
+func animate_in() -> void:
+	var list := body.get_node_or_null("TrackList")
+	if list == null:
+		PlayerUI.cascade(body)
+		return
+	PlayerUI.reveal(body.get_child(0))
+	PlayerUI.cascade(list, 0, 0.022)
+
+
 ## Lista única: uma caixa por música. Tocar na linha marca/desmarca e já salva.
 func render() -> void:
 	PlayerUI.clear(body)
@@ -53,8 +62,45 @@ func render() -> void:
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	list.add_theme_constant_override("separation", int(6 * k))
 	body.add_child(list)
+	# Agrupa por gênero, na ordem em que o gênero aparece na lista.
+	var groups := {}
 	for track: Dictionary in music.tracks:
-		list.add_child(_row(music, track, k))
+		var key := str(track.category)
+		if not groups.has(key): groups[key] = []
+		groups[key].append(track)
+	for key: String in groups:
+		list.add_child(_genre_header(music, key, groups[key], k))
+		for track: Dictionary in groups[key]:
+			list.add_child(_row(music, track, k))
+
+
+## Cabeçalho do gênero: nome, quantas tocam e um botão para marcar/desmarcar o gênero inteiro.
+func _genre_header(music: Node, key: String, tracks: Array, k: float) -> HBoxContainer:
+	var on := 0
+	for track: Dictionary in tracks:
+		if not music.is_excluded(str(track.id)): on += 1
+	var header := HBoxContainer.new()
+	header.name = "Genre_" + key
+	header.add_theme_constant_override("separation", int(12 * k))
+	var spacer := Control.new()
+	spacer.custom_minimum_size.y = 10 * k
+	header.add_child(spacer)
+	var name_label := PlayerUI.label(CATEGORIES.get(key, key).to_upper(), int(18 * k), PlayerUI.GOLD)
+	name_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	name_label.size_flags_vertical = Control.SIZE_SHRINK_END
+	header.add_child(name_label)
+	var count := PlayerUI.label("%d de %d" % [on, tracks.size()], int(15 * k), Color("#c9d6e6"))
+	count.autowrap_mode = TextServer.AUTOWRAP_OFF
+	count.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	count.size_flags_vertical = Control.SIZE_SHRINK_END
+	header.add_child(count)
+	var all_on := on == tracks.size()
+	var toggle := PlayerUI.button("Desmarcar gênero" if all_on else "Marcar gênero", _set_genre.bind(tracks, not all_on))
+	toggle.custom_minimum_size = Vector2(170, 38) * k
+	toggle.add_theme_font_size_override("font_size", int(15 * k))
+	toggle.size_flags_horizontal = Control.SIZE_SHRINK_END
+	header.add_child(toggle)
+	return header
 
 
 func _row(music: Node, track: Dictionary, k: float) -> Button:
@@ -115,6 +161,7 @@ func _row(music: Node, track: Dictionary, k: float) -> Button:
 	category.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	line.add_child(category)
 	row.toggled.connect(func(value: bool) -> void: _set_selected(value, id))
+	PlayerUI.fluid(row)
 	return row
 
 
@@ -127,6 +174,20 @@ func _set_selected(pressed: bool, id: String) -> void:
 	hidden.erase(id)
 	if pressed: deselected.erase(id)
 	else: deselected[id] = true
+	_store(hidden, deselected)
+
+
+func _set_genre(tracks: Array, pressed: bool) -> void:
+	var music := _music()
+	if music == null: return
+	var selection: Dictionary = music.selection()
+	var hidden := _as_set(selection.get("hidden", []))
+	var deselected := _as_set(selection.get("deselected", []))
+	for track: Dictionary in tracks:
+		var id := str(track.id)
+		hidden.erase(id)
+		if pressed: deselected.erase(id)
+		else: deselected[id] = true
 	_store(hidden, deselected)
 
 

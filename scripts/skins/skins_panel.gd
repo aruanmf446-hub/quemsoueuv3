@@ -5,9 +5,16 @@ extends PlayerScreen
 signal character_selected(character_id: StringName)
 signal progress_changed
 const PREVIEW_FILL_RATIO := 0.80
-const COLLECTION_FILE := "res://data/collections/comeco.json"
+## Cada arquivo .json desta pasta vira uma categoria (coleção) na barra lateral.
+const COLLECTIONS_DIR := "res://data/collections/"
 var _collection_title := "Começo"
+var _collections: Array[Dictionary] = []
+var _collection := 0
+var _collection_list: VBoxContainer
+static var _shade: GradientTexture2D
 var _collection_count: Label
+const CARD_EDGE := preload("res://assets/ui/kit/card_edge.png")
+const CARD_EDGE_GOLD := preload("res://assets/ui/kit/card_edge_gold.png")
 const CARD_BG := Color("#111d30")
 const CARD_BG_SELECTED := Color("#25344e")
 const CARD_BORDER := Color("#455269")
@@ -51,7 +58,7 @@ func _ready() -> void:
 	super._ready()
 	heading.text = tr("Personagens")
 	$Tint.color = Color(0.025, 0.04, 0.09, 0.90)
-	_load_collection()
+	_load_collections()
 	_thumbnails = ThumbnailCache.new(preload("res://scenes/lobby/lobby_stage.tscn"))
 	# Moldura azul/dourada gigante removida desta tela; o fundo do lobby permanece.
 	$CrestFrame.hide()
@@ -94,13 +101,14 @@ func _split_layout() -> void:
 	_search_field = LineEdit.new()
 	_search_field.placeholder_text = "Pesquisar personagem..."
 	_search_field.custom_minimum_size.y = 52
-	_search_field.add_theme_stylebox_override("normal", _panel_style(false))
-	_search_field.add_theme_stylebox_override("focus", _panel_style(true))
+	_search_field.add_theme_stylebox_override("normal", PlayerUI.button_plate())
+	_search_field.add_theme_stylebox_override("focus", PlayerUI.button_plate(false, Color(1.2, 1.2, 1.25)))
 	_search_field.add_theme_font_size_override("font_size", 17)
 	_search_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_search_field.text_changed.connect(func(value: String) -> void:
 		_search = value
-		_rebuild_gallery())
+		_rebuild_gallery()
+		PlayerUI.cascade(_grid, 0, 0.02))
 	_toolbar.add_child(_search_field)
 	_fav_button = _button("♡ Favoritos", _toggle_favorite_only)
 	_fav_button.custom_minimum_size = Vector2(112, 42)
@@ -110,47 +118,55 @@ func _split_layout() -> void:
 		_filter_button.add_item(value)
 	_filter_button.item_selected.connect(func(index: int) -> void:
 		_status_filter = index
-		_rebuild_gallery())
+		_rebuild_gallery()
+		PlayerUI.cascade(_grid))
 	_toolbar.add_child(_filter_button)
 	_sort_button = OptionButton.new()
 	_sort_button.add_item("A-Z")
 	_sort_button.add_item("Z-A")
 	_sort_button.item_selected.connect(func(index: int) -> void:
 		_reverse_sort = index == 1
-		_rebuild_gallery())
+		_rebuild_gallery()
+		PlayerUI.cascade(_grid))
 	_toolbar.add_child(_sort_button)
+	for option: OptionButton in [_filter_button, _sort_button]:
+		option.custom_minimum_size = Vector2(118, 52)
+		option.add_theme_font_size_override("font_size", 17)
+		for state in ["normal", "hover", "pressed", "focus"]:
+			option.add_theme_stylebox_override(state, PlayerUI.button_plate(false, Color(1.16, 1.16, 1.2) if state in ["hover", "focus"] else Color.WHITE))
 	_collection_sidebar = VBoxContainer.new()
 	_collection_sidebar.name = "Collections"
-	_collection_sidebar.custom_minimum_size.x = 190
+	_collection_sidebar.custom_minimum_size.x = 272
 	_collection_sidebar.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_collection_sidebar.mouse_filter = Control.MOUSE_FILTER_PASS
 	_collection_sidebar.add_theme_constant_override("separation", 14)
 	_split.add_child(_collection_sidebar)
 	_split.move_child(_collection_sidebar, 0)
+	# Painel do tamanho da lista (antes era uma coluna alta e vazia).
 	var collection_panel := PanelContainer.new()
-	collection_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	collection_panel.add_theme_stylebox_override("panel", _panel_style(false))
+	collection_panel.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	collection_panel.add_theme_stylebox_override("panel", PlayerUI.frame_panel(30))
 	_collection_sidebar.add_child(collection_panel)
 	var categories := VBoxContainer.new()
-	categories.add_theme_constant_override("separation", 10)
+	categories.add_theme_constant_override("separation", 12)
 	collection_panel.add_child(categories)
-	categories.add_child(PlayerUI.label("◈  COLEÇÕES", 20, ACCENT))
-	var collection := _button("✦  " + _collection_title.to_upper(), func() -> void: _rebuild_gallery(), true)
-	collection.custom_minimum_size.y = 52
-	categories.add_child(collection)
-	_collection_count = PlayerUI.label("", 15, Color("#a8b9d0"))
-	categories.add_child(_collection_count)
+	categories.add_child(PlayerUI.label("COLEÇÕES", 18, ACCENT))
+	_collection_list = VBoxContainer.new()
+	_collection_list.name = "CollectionList"
+	_collection_list.add_theme_constant_override("separation", 8)
+	categories.add_child(_collection_list)
+	_collection_count = PlayerUI.label("", 17, ACCENT)
+	_collection_count.size_flags_horizontal = Control.SIZE_SHRINK_END
+	_collection_count.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_collection_count.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_header.add_child(_collection_count)
 	_scroll.get_parent().move_child(_scroll, 1)
 	_side = PanelContainer.new()
 	_side.name = "HeroPreview"
 	_side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_side.size_flags_stretch_ratio = 1.0
 	_side.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	var showcase_style := _panel_style(false)
-	showcase_style.bg_color = Color(0.025, 0.07, 0.14, 0.89)
-	showcase_style.border_color = Color(0.31, 0.40, 0.53, 0.8)
-	showcase_style.bg_color = Color(0.03, 0.07, 0.13, 0.32)
-	_side.add_theme_stylebox_override("panel", showcase_style)
+	_side.add_theme_stylebox_override("panel", PlayerUI.frame_panel(38))
 	_split.add_child(_side)
 	_preview = VBoxContainer.new()
 	_preview.add_theme_constant_override("separation", 6)
@@ -181,14 +197,17 @@ func _responsive_layout() -> void:
 	_scroll.size_flags_stretch_ratio = 1.0
 	_gallery_section.size_flags_stretch_ratio = 1.25 if compact else 1.4
 	_side.size_flags_stretch_ratio = 1.0
-	_collection_sidebar.visible = not compact
+	# Barra de coleções só quando sobra largura; em telas estreitas a coleção atual
+	# continua no topo ("COMEÇO · 7/8") e a prévia não é empurrada para fora.
+	_collection_sidebar.visible = not compact and get_viewport().get_visible_rect().size.x >= 1200.0
+	_side.add_theme_stylebox_override("panel", PlayerUI.frame_panel(12 if compact else 38, compact))
 	_toolbar.add_theme_constant_override("separation", 4 if compact else 8)
 	_fav_button.text = "Favoritos" if not compact else "FAV"
 	_fav_button.add_theme_color_override("font_color", ACCENT if _favorite_only else PlayerUI.TEXT)
 	_fav_button.custom_minimum_size.x = 34 if compact else 112
 	_search_field.placeholder_text = "Pesquisar..." if compact else "Pesquisar personagem..."
 	if _grid != null:
-		_grid.columns = 2 if compact else (2 if size.x >= 1400 else 2)
+		_grid.columns = _columns()
 		for item in _grid.get_children():
 			_style_card_height(item, compact)
 	if _stage != null and is_instance_valid(_stage):
@@ -209,6 +228,7 @@ func close() -> void:
 func render() -> void:
 	if _selected.is_empty():
 		_selected = services.inventory.equipped_id()
+	_build_collections()
 	_rebuild_gallery()
 	# Sem texto de demonstração: o banner só aparece para erros e estados de carregamento.
 	banner.show_state("success")
@@ -225,7 +245,7 @@ func _rebuild_gallery() -> void:
 	_images.clear()
 	_cards.clear()
 	_grid = GridContainer.new()
-	_grid.columns = 2 if UIScale.is_compact() else (2 if size.x >= 1400 else 2)
+	_grid.columns = _columns()
 	_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_grid.add_theme_constant_override("h_separation", 10)
 	_grid.add_theme_constant_override("v_separation", 10)
@@ -234,8 +254,10 @@ func _rebuild_gallery() -> void:
 	entries.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return str(a.get("name", "")).nocasecmp_to(str(b.get("name", ""))) > 0 if _reverse_sort else str(a.get("name", "")).nocasecmp_to(str(b.get("name", ""))) < 0)
 	var count := 0
+	var in_collection := _collection_ids(_collections[_collection])
 	for entry: Dictionary in entries:
 		var id: String = str(entry.id)
+		if not in_collection.has(id): continue
 		var unlocked: bool = services.inventory.is_unlocked(id)
 		if not _search.is_empty() and not str(entry.name).to_lower().contains(_search.to_lower()):
 			continue
@@ -253,11 +275,8 @@ func _rebuild_gallery() -> void:
 		_fav_button.text = "FAV" if UIScale.is_compact() else "Favoritos"
 		_fav_button.add_theme_color_override("font_color", ACCENT if _favorite_only else PlayerUI.TEXT)
 	if _collection_count != null:
-		var obtained := 0
-		for item: Dictionary in services.inventory.entries:
-			if services.inventory.is_unlocked(str(item.id)):
-				obtained += 1
-		_collection_count.text = "%d / %d desbloqueados" % [obtained, services.inventory.entries.size()]
+		var obtained := in_collection.filter(func(item: String) -> bool: return services.inventory.is_unlocked(item)).size()
+		_collection_count.text = "%s  ·  %d/%d" % [_collection_title.to_upper(), obtained, in_collection.size()]
 
 
 func _gallery_card(entry: Dictionary) -> PanelContainer:
@@ -265,24 +284,34 @@ func _gallery_card(entry: Dictionary) -> PanelContainer:
 	var card := PanelContainer.new()
 	card.mouse_filter = Control.MOUSE_FILTER_STOP
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	card.add_theme_stylebox_override("panel", _panel_style(character_id == _selected))
+	card.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	_cards[character_id] = card
-	var atmosphere := TextureRect.new()
-	var gradient := Gradient.new()
-	gradient.colors = PackedColorArray([Color("#374350"), Color("#101d2e"), Color("#0b1421")])
-	gradient.offsets = PackedFloat32Array([0.0, 0.6, 1.0])
-	var texture := GradientTexture2D.new()
-	texture.gradient = gradient
-	texture.fill = GradientTexture2D.FILL_RADIAL
-	texture.fill_from = Vector2(0.5, 0.35)
-	texture.fill_to = Vector2(1.0, 1.0)
-	atmosphere.texture = texture
-	atmosphere.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	card.add_child(atmosphere)
+	var backdrop := TextureRect.new()
+	backdrop.name = "Backdrop"
+	backdrop.texture = _collection_swatch()
+	backdrop.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	backdrop.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	backdrop.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	backdrop.modulate = Color(0.7, 0.7, 0.78)
+	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card.add_child(backdrop)
+	var shade := TextureRect.new()
+	shade.texture = _shade_texture()
+	shade.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	shade.stretch_mode = TextureRect.STRETCH_SCALE
+	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card.add_child(shade)
+	var pad := MarginContainer.new()
+	pad.name = "Pad"
+	pad.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for side in ["left", "right", "top", "bottom"]:
+		pad.add_theme_constant_override("margin_" + side, 26 if side in ["left", "right"] else 20)
+	card.add_child(pad)
 	var column := VBoxContainer.new()
 	column.name = "Content"
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	column.add_theme_constant_override("separation", 3)
-	card.add_child(column)
+	pad.add_child(column)
 	var top := HBoxContainer.new()
 	column.add_child(top)
 	var favorite := _favorite_button(character_id)
@@ -311,26 +340,73 @@ func _gallery_card(entry: Dictionary) -> PanelContainer:
 	column.add_child(name_label)
 	var equipped: bool = services.inventory.equipped_id() == character_id
 	var unlocked: bool = services.inventory.is_unlocked(character_id)
-	var state := _button("EQUIPADO" if equipped else ("DISPONÍVEL" if unlocked else "BLOQUEADO"), _select.bind(character_id), equipped)
-	state.custom_minimum_size.y = 30
-	state.add_theme_font_size_override("font_size", 12)
-	column.add_child(state)
+	column.remove_child(name_label)
+	var footer := HBoxContainer.new()
+	footer.add_theme_constant_override("separation", 8)
+	footer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.add_child(footer)
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	footer.add_child(name_label)
+	if equipped or not unlocked:
+		footer.add_child(_badge("EQUIPADO" if equipped else "BLOQUEADO", equipped))
+	if not unlocked:
+		thumbnail.modulate = Color(0.45, 0.48, 0.55)
+		backdrop.modulate = Color(0.35, 0.37, 0.42)
+	# Moldura do kit por cima de tudo (miolo transparente): dourada na carta selecionada.
+	var frame := NinePatchRect.new()
+	frame.name = "Frame"
+	frame.texture = CARD_EDGE_GOLD if character_id == _selected else CARD_EDGE
+	frame.patch_margin_left = 34
+	frame.patch_margin_right = 34
+	frame.patch_margin_top = 34
+	frame.patch_margin_bottom = 34
+	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card.add_child(frame)
+	card.resized.connect(func() -> void: card.pivot_offset = card.size * 0.5)
 	card.mouse_entered.connect(func() -> void:
-		card.create_tween().tween_property(card, "modulate", Color(1.16, 1.12, 1.02), 0.14))
+		var hover := card.create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		hover.tween_property(card, "modulate", Color(1.16, 1.12, 1.02), 0.16)
+		hover.tween_property(card, "scale", Vector2.ONE * 1.025, 0.16))
 	card.mouse_exited.connect(func() -> void:
-		card.create_tween().tween_property(card, "modulate", Color.WHITE, 0.14))
+		var rest := card.create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		rest.tween_property(card, "modulate", Color.WHITE, 0.18)
+		rest.tween_property(card, "scale", Vector2.ONE, 0.18))
 	card.gui_input.connect(func(event: InputEvent) -> void:
-		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-			_select(character_id))
+		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and character_id != _selected:
+			_select(character_id)
+			PlayerUI.reveal(_preview, 0.0, 0.2))
 	_style_card_height(card, UIScale.is_compact())
 	return card
 
 
+func _columns() -> int:
+	return 2 if UIScale.is_compact() or size.x < 1250 else 3
+
+
+## Selo pequeno do cartão: dourado para o equipado, discreto para o bloqueado.
+func _badge(text: String, gold: bool) -> PanelContainer:
+	var badge := PanelContainer.new()
+	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var style := StyleBoxFlat.new()
+	style.bg_color = ACCENT if gold else Color(1, 1, 1, 0.08)
+	style.set_corner_radius_all(10)
+	style.content_margin_left = 9
+	style.content_margin_right = 9
+	style.content_margin_top = 2
+	style.content_margin_bottom = 2
+	badge.add_theme_stylebox_override("panel", style)
+	var label := PlayerUI.label(text, 11, Color("#1b1406") if gold else Color("#b5c0cf"))
+	label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	badge.add_child(label)
+	return badge
+
+
 func _style_card_height(card: Control, compact: bool) -> void:
 	card.custom_minimum_size.y = 0
-	var portrait: TextureRect = card.get_node_or_null("Content/Portrait")
+	var portrait: TextureRect = card.get_node_or_null("Pad/Content/Portrait")
 	if portrait != null:
-		portrait.custom_minimum_size.y = 180 if compact else clampf((size.y - 260) / 2.0 - 110, 170, 270)
+		portrait.custom_minimum_size.y = 180 if compact else clampf((size.y - 260) / 2.0 - 90, 170, 250)
 
 
 func _toggle_favorite(character_id: String) -> void:
@@ -346,6 +422,12 @@ func _toggle_favorite(character_id: String) -> void:
 func _toggle_favorite_only() -> void:
 	_favorite_only = not _favorite_only
 	_rebuild_gallery()
+	PlayerUI.cascade(_grid)
+
+
+func animate_in() -> void:
+	PlayerUI.cascade(_grid, 0, 0.03)
+	PlayerUI.reveal(_side, 0.06, 0.28)
 
 
 func _load_favorites() -> void:
@@ -373,12 +455,16 @@ func _select_neighbor(direction: int) -> void:
 	if index < 0:
 		index = 0
 	_select(ids[posmod(index + direction, ids.size())])
+	PlayerUI.reveal(_preview, 0.0, 0.2)
 
 
 func _select(character_id: String) -> void:
 	_selected = character_id
 	for id: String in _cards:
-		(_cards[id] as PanelContainer).add_theme_stylebox_override("panel", _panel_style(id == character_id))
+		var frame := (_cards[id] as Node).get_node_or_null("Frame") as NinePatchRect
+		if frame != null: frame.texture = CARD_EDGE_GOLD if id == character_id else CARD_EDGE
+	var kept: LobbyStage = _stage if is_instance_valid(_stage) and _stage.get_parent() == _preview else null
+	if kept != null: _preview.remove_child(kept)
 	PlayerUI.clear(_preview)
 	var entry := services.inventory.entry(character_id)
 	if entry.is_empty():
@@ -393,7 +479,7 @@ func _select(character_id: String) -> void:
 	heading_row.add_child(name_label)
 	var equipped := services.inventory.equipped_id() == character_id
 	var unlocked := services.inventory.is_unlocked(character_id)
-	heading_row.add_child(PlayerUI.label("EQUIPADO" if equipped else ("DISPONÍVEL" if unlocked else "BLOQUEADO"), 12 if compact else 16, ACCENT))
+	if equipped or not unlocked: heading_row.add_child(_badge("EQUIPADO" if equipped else "BLOQUEADO", equipped))
 	var favorite := _favorite_button(character_id)
 	favorite.custom_minimum_size = Vector2(36, 34)
 	heading_row.add_child(favorite)
@@ -402,8 +488,7 @@ func _select(character_id: String) -> void:
 	var left_arrow := _button("‹", _select_neighbor.bind(-1))
 	left_arrow.custom_minimum_size = Vector2(44, 36)
 	arrows.add_child(left_arrow)
-	var hint := PlayerUI.label("Arraste para girar • Coleção Começo", 13, Color("#a8b9d0"))
-	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var hint := Control.new()
 	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	arrows.add_child(hint)
 	var right_arrow := _button("›", _select_neighbor.bind(1))
@@ -412,7 +497,12 @@ func _select(character_id: String) -> void:
 	var details := PlayerUI.label(_collection_title + "  •  " + ("Equipado" if equipped else ("Disponível" if unlocked else "Bloqueado")), 15, ACCENT)
 	details.hide()
 	_preview.add_child(details)
-	_stage = _showcase(_preview, character_id)
+	if kept != null:
+		_preview.add_child(kept)
+		kept.show_character(entry)
+		_stage = kept
+	else:
+		_stage = _showcase(_preview, character_id)
 	if _stage != null:
 		_stage.custom_minimum_size = Vector2.ZERO
 		_stage.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -475,58 +565,172 @@ func _panel_style(selected: bool) -> StyleBoxFlat:
 	return style
 
 
-## Botão plano, sem a textura decorativa dos botões gerais do jogo.
+## Botões com a placa do kit (o principal é dourado), como no resto do menu.
 func _button(text: String, action: Callable, primary := false) -> Button:
 	var button := Button.new()
 	button.text = text
 	button.custom_minimum_size.y = 52
 	button.focus_mode = Control.FOCUS_ALL
 	button.add_theme_font_size_override("font_size", 22)
-	var base := BUTTON_BG if not primary else Color("#6b5530")
-	var states := {"normal": base, "hover": base.lightened(0.12), "pressed": base.darkened(0.2), "focus": base, "disabled": Color("#1a2333")}
-	for state: String in states:
-		var style := StyleBoxFlat.new()
-		style.bg_color = states[state]
-		style.set_corner_radius_all(7)
-		style.content_margin_left = 10
-		style.content_margin_right = 10
-		style.set_border_width_all(2 if state == "focus" else 1)
-		style.border_color = ACCENT if primary or state == "focus" else Color("#45546a")
-		button.add_theme_stylebox_override(state, style)
-	button.add_theme_color_override("font_color", Color("#f4f1e6"))
-	button.add_theme_color_override("font_disabled_color", Color("#7d8796"))
+	PlayerUI.style_button(button, primary)
 	button.pressed.connect(action)
+	PlayerUI.fluid(button)
 	return button
 
 
-## Renderiza retratos do cache existente sem alterar os GLB ou a prévia 3D.
-## A região superior da captura contém rosto/tronco, e o corte permanece dentro do canvas.
+## Retratos das cartas: o busto recortado da miniatura (2048 px) fica em memória e numa
+## versão pequena ao lado dela ("_card.png"). Abrir a tela, buscar ou filtrar não relê nem
+## recorta os PNGs grandes de novo; antes isso travava a tela por 1–2 s.
+static var _portraits := {}
+const PORTRAIT_HEIGHT := 360
+
+
 func _portrait_texture(path: String) -> Texture2D:
+	var stamp := FileAccess.get_modified_time(path)
+	var key := "%s@%d" % [path, stamp]
+	if _portraits.has(key): return _portraits[key]
+	var small := path.get_basename() + "_card.png"
+	var image: Image
+	if FileAccess.file_exists(small) and FileAccess.get_modified_time(small) >= stamp:
+		image = Image.load_from_file(small)
+	else:
+		image = _crop_portrait(path)
+		if image != null: image.save_png(small)
+	if image == null or image.is_empty(): return null
+	image.generate_mipmaps()
+	var texture := ImageTexture.create_from_image(image)
+	_portraits[key] = texture
+	return texture
+
+
+## Recorte por pixels opacos: chapéus, cabelos e alturas diferentes têm a mesma escala
+## visual sem ajustes arbitrários por personagem.
+static func _crop_portrait(path: String) -> Image:
 	var image := Image.load_from_file(path)
 	if image == null or image.is_empty():
 		return null
-	# Recorte por pixels opacos: chapéus, cabelos e alturas diferentes têm
-	# a mesma escala visual sem ajustes arbitrários por personagem.
 	var bounds := image.get_used_rect()
 	if bounds.size.x == 0 or bounds.size.y == 0:
-		return ImageTexture.create_from_image(image)
+		return image
 	var crop_height := mini(image.get_height() - bounds.position.y, int(bounds.size.y * 0.48))
 	var crop_width := mini(image.get_width(), int(crop_height * 1.05))
 	var crop_x := clampi(int(bounds.get_center().x - crop_width * 0.5), 0, image.get_width() - crop_width)
 	var cropped := image.get_region(Rect2i(crop_x, bounds.position.y, crop_width, crop_height))
-	cropped.generate_mipmaps()
-	return ImageTexture.create_from_image(cropped)
+	if cropped.get_height() > PORTRAIT_HEIGHT:
+		cropped.resize(roundi(cropped.get_width() * PORTRAIT_HEIGHT / float(cropped.get_height())), PORTRAIT_HEIGHT, Image.INTERPOLATE_LANCZOS)
+	return cropped
 
 
-func _load_collection() -> void:
-	if not FileAccess.file_exists(COLLECTION_FILE):
-		return
-	var file := FileAccess.open(COLLECTION_FILE, FileAccess.READ)
-	if file == null:
-		return
-	var parsed: Variant = JSON.parse_string(file.get_as_text())
-	if parsed is Dictionary:
-		_collection_title = str(parsed.get("name", "Começo"))
+func _load_collections() -> void:
+	_collections.clear()
+	for file in DirAccess.get_files_at(COLLECTIONS_DIR):
+		if not file.ends_with(".json"): continue
+		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(COLLECTIONS_DIR + file))
+		if parsed is Dictionary and parsed.has("id"): _collections.append(parsed)
+	_collections.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		if int(a.get("order", 99)) != int(b.get("order", 99)): return int(a.get("order", 99)) < int(b.get("order", 99))
+		return str(a.get("name", "")).nocasecmp_to(str(b.get("name", ""))) < 0)
+	if _collections.is_empty():
+		_collections.append({"id": "comeco", "name": "Começo", "source": "inventory", "color": "azul"})
+	_collection = clampi(_collection, 0, _collections.size() - 1)
+	_collection_title = str(_collections[_collection].get("name", "Começo"))
+
+
+## "inventory" (ou lista vazia) = todos os personagens cadastrados; senão, os IDs listados.
+func _collection_ids(collection: Dictionary) -> Array[String]:
+	var all: Array[String] = []
+	for entry: Dictionary in services.inventory.entries: all.append(str(entry.id))
+	var listed: Array = collection.get("character_ids", [])
+	if str(collection.get("source", "")) == "inventory" or listed.is_empty(): return all
+	var ids: Array[String] = []
+	for id in listed:
+		if all.has(str(id)): ids.append(str(id))
+	return ids
+
+
+func _choose_collection(index: int) -> void:
+	_collection = index
+	_collection_title = str(_collections[index].get("name", ""))
+	_build_collections()
+	_rebuild_gallery()
+	PlayerUI.cascade(_grid)
+
+
+## Barra lateral: uma placa por coleção com a cor dela, nome e quantos já estão liberados.
+func _build_collections() -> void:
+	if _collection_list == null: return
+	PlayerUI.clear(_collection_list)
+	for index in range(_collections.size()):
+		var collection: Dictionary = _collections[index]
+		var chosen := index == _collection
+		var ids := _collection_ids(collection)
+		var owned := ids.filter(func(id: String) -> bool: return services.inventory.is_unlocked(id)).size()
+		var button := Button.new()
+		button.name = "Collection_" + str(collection.id)
+		button.toggle_mode = true
+		button.button_pressed = chosen
+		button.custom_minimum_size = Vector2(0, 66)
+		button.focus_mode = Control.FOCUS_ALL
+		PlayerUI.style_button(button, false)
+		button.pressed.connect(_choose_collection.bind(index))
+		var line := HBoxContainer.new()
+		line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		line.add_theme_constant_override("separation", 10)
+		button.add_child(line)
+		line.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		line.offset_left = 14
+		line.offset_right = -14
+		var chip := PanelContainer.new()
+		chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		var chip_style := StyleBoxFlat.new()
+		chip_style.bg_color = Color(0, 0, 0, 0.4)
+		chip_style.border_color = Color(ACCENT, 0.9)
+		chip_style.set_border_width_all(2)
+		chip_style.set_corner_radius_all(6)
+		chip_style.set_content_margin_all(2)
+		chip.add_theme_stylebox_override("panel", chip_style)
+		var swatch := TextureRect.new()
+		swatch.texture = PlayerUI.swatch(str(collection.get("color", "azul")))
+		swatch.custom_minimum_size = Vector2(26, 26)
+		swatch.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		swatch.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		swatch.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		chip.add_child(swatch)
+		line.add_child(chip)
+		var ink := PlayerUI.KIT_INK if chosen else Color("#f4f1e6")
+		var title := PlayerUI.label(str(collection.get("name", "")).to_upper(), 15, ink)
+		title.autowrap_mode = TextServer.AUTOWRAP_OFF
+		title.clip_text = true
+		title.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		line.add_child(title)
+		var count := PlayerUI.label("%d/%d" % [owned, ids.size()], 15, ink if chosen else ACCENT)
+		count.autowrap_mode = TextServer.AUTOWRAP_OFF
+		count.size_flags_horizontal = Control.SIZE_SHRINK_END
+		count.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		count.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		line.add_child(count)
+		_collection_list.add_child(button)
+
+
+func _collection_swatch() -> Texture2D:
+	return PlayerUI.swatch(str(_collections[_collection].get("color", "azul")) if not _collections.is_empty() else "azul")
+
+
+## Sombra vertical das cartas: transparente em cima, escura embaixo (o nome lê bem).
+func _shade_texture() -> Texture2D:
+	if _shade == null:
+		var ramp := Gradient.new()
+		ramp.offsets = PackedFloat32Array([0.0, 0.55, 1.0])
+		ramp.colors = PackedColorArray([Color(0.02, 0.04, 0.08, 0.0), Color(0.02, 0.04, 0.08, 0.15), Color(0.02, 0.04, 0.08, 0.92)])
+		_shade = GradientTexture2D.new()
+		_shade.gradient = ramp
+		_shade.fill_from = Vector2(0, 0)
+		_shade.fill_to = Vector2(0, 1)
+		_shade.width = 4
+		_shade.height = 128
+	return _shade
 
 
 func _showcase(parent: Control, character_id: String) -> LobbyStage:
@@ -544,6 +748,8 @@ func _showcase(parent: Control, character_id: String) -> LobbyStage:
 func _favorite_button(character_id: String) -> Button:
 	var button := _button("", _toggle_favorite.bind(character_id))
 	button.set_script(preload("res://scripts/skins/favorite_button.gd"))
+	for state in ["normal", "hover", "pressed", "hover_pressed", "focus", "disabled"]:
+		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	button.set("active", _favorites.has(character_id))
 	button.tooltip_text = "Remover dos favoritos" if _favorites.has(character_id) else "Adicionar aos favoritos"
 	return button

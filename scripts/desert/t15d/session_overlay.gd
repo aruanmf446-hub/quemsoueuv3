@@ -95,7 +95,7 @@ func show_death(fell: bool, checkpoint_label: String) -> void:
 	_title(phase_name.to_upper(),12,Color("#d9b778"))
 	_title("Você caiu" if fell else "Você foi derrotado",28,Color("#f3b4a2"))
 	var has_checkpoint := not checkpoint_label.is_empty()
-	_title("Continue do %s com a vida cheia." % checkpoint_label if has_checkpoint else "Recomece a fase com a vida cheia.",14,Color("#dccdb3"))
+	_title("Continue do %s com 1 vida e sem cargas." % checkpoint_label if has_checkpoint else "Recomece a fase com a vida cheia.",14,Color("#dccdb3"))
 	_button("Voltar ao checkpoint" if has_checkpoint else "Recomeçar do início",checkpoint_requested.emit,true)
 	if has_checkpoint: _button("Recomeçar fase",restart_requested.emit)
 	_button("Voltar ao menu",return_requested.emit)
@@ -113,9 +113,19 @@ func show_completion(defeated: int, seconds: float, saved := true) -> void:
 	_button("Voltar aos reinos",return_requested.emit)
 	_open()
 func _open() -> void:
+	var was_open := opened and visible
 	opened = true
 	show()
 	_layout()
+	# Véu escurece e o painel surge com leve zoom; trocar de painel aberto não repete a entrada.
+	if not was_open:
+		var unit := _panel.scale
+		_veil.modulate.a = 0.0
+		_panel.modulate.a = 0.0
+		var tween := create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		tween.tween_property(_veil, "modulate:a", 1.0, 0.22)
+		tween.tween_property(_panel, "modulate:a", 1.0, 0.22)
+		tween.tween_property(_panel, "scale", unit, 0.26).from(unit * 0.92)
 	# Containers recalculam o mínimo no próximo frame.
 	call_deferred("_layout")
 	for child in _column.get_children():
@@ -137,5 +147,7 @@ func _layout() -> void:
 	var unit := UIScale.unit_for(get_viewport()) if UIScale.is_compact() else 1.0
 	_panel.scale = Vector2.ONE*unit
 	_panel.size = _panel.get_combined_minimum_size()
-	_panel.position = (viewport_size-_panel.size*unit)*0.5
+	# Escala a partir do centro: o painel continua centralizado com qualquer escala.
+	_panel.pivot_offset = _panel.size*0.5
+	_panel.position = (viewport_size-_panel.size)*0.5
 	_veil.size = viewport_size

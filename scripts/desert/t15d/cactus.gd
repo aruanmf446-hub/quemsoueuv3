@@ -1,5 +1,15 @@
 extends CactusEnemy
 signal winding_up
+signal alerted
+## Perseguição: quem passa direto por um Cacto vivo (correndo ou pulando por cima) é
+## perseguido por alguns segundos. Mais rápido que a patrulha, mas abaixo da corrida do
+## jogador (6 m/s): continuar correndo despista; parar ou errar um pulo deixa ele alcançar.
+const PURSUE_SPEED := 5.0
+const PURSUE_TIME := 6.0
+const PURSUE_RANGE := 18.0
+const PASS_WINDOW := 4.0
+var _pursue := 0.0
+var _side := 0.0
 var _windup := 0.0
 var _stagger := 0.0
 var _attack_direction := 1.0
@@ -26,8 +36,11 @@ func _physics_process(delta: float) -> void:
 	_cooldown = maxf(_cooldown - delta, 0.0)
 	_stagger = maxf(_stagger - delta, 0.0)
 	_recovery = maxf(_recovery - delta, 0.0)
+	_pursue = maxf(_pursue - delta, 0.0)
 	velocity.y = maxf(velocity.y - GRAVITY * delta, -26.0)
 	var offset := _player.global_position - global_position if is_instance_valid(_player) and not _player.is_dead else Vector3(INF, INF, 0)
+	_watch_pass(offset)
+	_model.set_rate(1.0)
 	if _stagger > 0.0:
 		velocity.x = move_toward(velocity.x, 0, delta * 10)
 	elif _windup > 0.0:
@@ -56,7 +69,9 @@ func _physics_process(delta: float) -> void:
 		else:
 			_model.play_animation("pronto",true)
 	else:
-		var chasing := absf(offset.x) < detect_range and absf(offset.y) < 1.6
+		var pursuing := _pursue > 0.0 and absf(offset.x) < PURSUE_RANGE and absf(offset.y) < 3.0
+		if _pursue > 0.0 and not pursuing: _pursue = 0.0
+		var chasing := pursuing or (absf(offset.x) < detect_range and absf(offset.y) < 1.6)
 		_state = State.CHASE if chasing else State.PATROL
 		if not chasing:
 			if position.x <= _patrol_min: _direction = 1
@@ -68,12 +83,48 @@ func _physics_process(delta: float) -> void:
 		if is_on_floor() and (not has_ground or wall):
 			velocity.x = 0
 			_direction = -direction
+			# Na beira de um vão ou contra um muro ele não segue: desiste em seguida.
+			if pursuing: _pursue = minf(_pursue, 0.7)
 			_model.play_animation("pronto",true)
 		else:
-			_move_toward(direction, chase_speed if chasing else speed, "correr" if chasing else "base")
+			_move_toward(direction, PURSUE_SPEED if pursuing else (chase_speed if chasing else speed), "correr" if chasing else "base")
+		_model.set_rate(PURSUE_SPEED / chase_speed if pursuing and velocity.x != 0.0 else 1.0)
 	move_and_slide()
 	global_position.z = 0.0
 	_model.rotation.y = lerp_angle(_model.rotation.y,_yaw_target,1.0-exp(-16.0*delta))
+## O jogador cruzou o Cacto (estava de um lado, agora está do outro, perto dele): começa
+## a perseguição. Cruzar de novo enquanto ele persegue só renova o tempo.
+func _watch_pass(offset: Vector3) -> void:
+	if not is_finite(offset.x) or absf(offset.x) > PASS_WINDOW or absf(offset.y) > 3.0:
+		_side = 0.0
+		return
+	var side := signf(offset.x)
+	if side == 0.0: return
+	if _side != 0.0 and side != _side:
+		if _pursue <= 0.0: _alert()
+		_pursue = PURSUE_TIME
+	_side = side
+## "!" dourado sobre a cabeça, para o jogador entender que está sendo seguido.
+func _alert() -> void:
+	alerted.emit()
+	_model.flash(Color("#ffd27a"))
+	var mark := Label3D.new()
+	mark.text = "!"
+	mark.font = preload("res://assets/desert/phase01/interface.ttf")
+	mark.font_size = 96
+	mark.pixel_size = 0.006
+	mark.outline_size = 18
+	mark.modulate = Color("#ffcf5a")
+	mark.outline_modulate = Color("#2a1205")
+	mark.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	mark.no_depth_test = true
+	mark.position = Vector3(0, 2.25, 0)
+	add_child(mark)
+	var pop := mark.create_tween()
+	pop.tween_property(mark, "scale", Vector3.ONE, 0.16).from(Vector3.ONE * 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	pop.tween_interval(0.6)
+	pop.tween_property(mark, "modulate:a", 0.0, 0.25)
+	pop.tween_callback(mark.queue_free)
 ## Virada visual curta, como a do protagonista; a direção lógica muda na hora.
 func _face(direction: float) -> void:
 	if direction != 0.0: _yaw_target = PI*0.5*direction

@@ -31,7 +31,7 @@ PASS selection_bounds_Players
 PASS selection_no_board_scroll
 PASS selection_public_area_never_scrolls
 RAIL selection [P: (1368.981, 6.97037), S: (291.71, 927.0593)] minimum=(147.0, 303.0)
-GEOMETRY selection grid=[P: (29.27555, 254.767), S: (1304.853, 660.2683)] screen=(1672.0, 941.0)
+GEOMETRY selection grid=[P: (26.13889, 251.6304), S: (1311.127, 666.5416)] screen=(1672.0, 941.0)
 PASS subject_landmark_visible_cobra_grande
 PASS subject_landmark_visible_homem_sorridente
 PASS subject_landmark_visible_jeff_the_killer
@@ -74,7 +74,7 @@ PASS turns_bounds_Players
 PASS turns_no_board_scroll
 PASS turns_public_area_never_scrolls
 RAIL turns [P: (1368.981, 6.97037), S: (291.71, 927.0593)] minimum=(147.0, 303.0)
-GEOMETRY turns grid=[P: (29.27555, 254.767), S: (1304.853, 660.2683)] screen=(1672.0, 941.0)
+GEOMETRY turns grid=[P: (26.13889, 251.6304), S: (1311.127, 666.5416)] screen=(1672.0, 941.0)
 PASS hand_hidden_by_default
 PASS capture_battle
 PASS private_hand_from_real_data
@@ -105,7 +105,7 @@ PASS hand_open_bounds_Players
 PASS hand_open_no_board_scroll
 PASS hand_open_public_area_never_scrolls
 RAIL hand_open [P: (1368.981, 6.97037), S: (291.71, 927.0593)] minimum=(147.0, 323.0)
-GEOMETRY hand_open grid=[P: (29.27555, 254.767), S: (1304.853, 660.2683)] screen=(1672.0, 941.0)
+GEOMETRY hand_open grid=[P: (26.13889, 251.6304), S: (1311.127, 666.5416)] screen=(1672.0, 941.0)
 PASS capture_private-hand
 PASS focus_loss_removes_private_images
 PASS private_hand_hides_again
@@ -138,12 +138,12 @@ PASS confirmation_no_board_scroll
 PASS confirmation_public_area_never_scrolls
 RAIL confirmation [P: (1368.981, 6.97037), S: (291.71, 927.0593)] minimum=(147.0, 303.0)
 LAYOUT _canvas size=(1052.222, 591.1111) min=(0.0, 0.0)
-LAYOUT _main size=(856.2223, 591.1111) min=(856.0, 591.0)
-LAYOUT _board size=(856.0, 493.0) min=(856.0, 493.0)
-LAYOUT _board_content size=(832.0, 469.0) min=(832.0, 469.0)
-LAYOUT _grid size=(832.0, 421.0) min=(832.0, 421.0)
+LAYOUT _main size=(856.2223, 591.1111) min=(855.0, 590.0)
+LAYOUT _board size=(856.0, 493.0) min=(855.0, 492.0)
+LAYOUT _board_content size=(836.0, 473.0) min=(835.0, 472.0)
+LAYOUT _grid size=(836.0, 425.0) min=(835.0, 424.0)
 LAYOUT _roster size=(856.0, 62.0) min=(423.0, 62.0)
-GEOMETRY confirmation grid=[P: (29.27555, 254.767), S: (1304.853, 660.2683)] screen=(1672.0, 941.0)
+GEOMETRY confirmation grid=[P: (26.13889, 251.6304), S: (1311.127, 666.5416)] screen=(1672.0, 941.0)
 PASS cancel_available
 PASS capture_confirmation
 PASS cancel_keeps_state
@@ -171,7 +171,7 @@ PASS seven_fixture_bounds_Players
 PASS seven_fixture_no_board_scroll
 PASS seven_fixture_public_area_never_scrolls
 RAIL seven_fixture [P: (1368.981, 6.97037), S: (291.71, 927.0593)] minimum=(147.0, 303.0)
-GEOMETRY seven_fixture grid=[P: (29.27555, 254.767), S: (1304.853, 660.2683)] screen=(1672.0, 941.0)
+GEOMETRY seven_fixture grid=[P: (26.13889, 251.6304), S: (1311.127, 666.5416)] screen=(1672.0, 941.0)
 PASS thirty_layout_fixture_all_options
 PASS thirty_layout_fixture_visible_bruxa_do_pantano
 PASS thirty_layout_fixture_original_art_bruxa_do_pantano
@@ -241,7 +241,7 @@ PASS thirty_layout_fixture_bounds_Players
 PASS thirty_layout_fixture_no_board_scroll
 PASS thirty_layout_fixture_public_area_never_scrolls
 RAIL thirty_layout_fixture [P: (1368.981, 6.97037), S: (291.71, 927.0593)] minimum=(147.0, 303.0)
-GEOMETRY thirty_layout_fixture grid=[P: (29.27555, 254.767), S: (1304.853, 660.2683)] screen=(1672.0, 941.0)
+GEOMETRY thirty_layout_fixture grid=[P: (26.13889, 251.6304), S: (1311.127, 666.5416)] screen=(1672.0, 941.0)
 PASS players_5_fixture_all_options
 PASS players_5_fixture_visible_bruxa_do_pantano
 PASS players_5_fixture_original_art_bruxa_do_pantano
@@ -269,7 +269,7 @@ PASS players_5_fixture_bounds_Players
 PASS players_5_fixture_no_board_scroll
 PASS players_5_fixture_public_area_never_scrolls
 RAIL players_5_fixture [P: (1368.981, 6.97037), S: (291.71, 927.0593)] minimum=(147.0, 303.0)
-GEOMETRY players_5_fixture grid=[P: (29.27555, 251.6304), S: (1304.853, 663.405)] screen=(1672.0, 941.0)
+GEOMETRY players_5_fixture grid=[P: (26.13889, 248.4937), S: (1311.127, 669.6783)] screen=(1672.0, 941.0)
 PASS roster_cell_5
 PASS roster_cell_5
 PASS roster_cell_5
@@ -302,7 +302,7 @@ PASS players_12_fixture_bounds_Players
 PASS players_12_fixture_no_board_scroll
 PASS players_12_fixture_public_area_never_scrolls
 RAIL players_12_fixture [P: (1368.981, 6.97037), S: (291.71, 927.0593)] minimum=(147.0, 303.0)
-GEOMETRY players_12_fixture grid=[P: (29.27555, 276.7237), S: (1304.853, 638.3116)] screen=(1672.0, 941.0)
+GEOMETRY players_12_fixture grid=[P: (26.13889, 273.587), S: (1311.127, 644.585)] screen=(1672.0, 941.0)
 PASS roster_cell_12
 PASS roster_cell_12
 PASS roster_cell_12
@@ -342,7 +342,7 @@ PASS players_20_fixture_bounds_Players
 PASS players_20_fixture_no_board_scroll
 PASS players_20_fixture_public_area_never_scrolls
 RAIL players_20_fixture [P: (1368.981, 6.97037), S: (291.71, 927.0593)] minimum=(147.0, 303.0)
-GEOMETRY players_20_fixture grid=[P: (29.27555, 336.3203), S: (1304.853, 578.715)] screen=(1672.0, 941.0)
+GEOMETRY players_20_fixture grid=[P: (26.13889, 333.1837), S: (1311.127, 584.9883)] screen=(1672.0, 941.0)
 PASS roster_cell_20
 PASS roster_cell_20
 PASS roster_cell_20
@@ -400,7 +400,7 @@ PASS chat_open_bounds_Players
 PASS chat_open_no_board_scroll
 PASS chat_open_public_area_never_scrolls
 RAIL chat_open [P: (1368.981, 6.97037), S: (291.71, 927.0593)] minimum=(147.0, 333.0)
-GEOMETRY chat_open grid=[P: (29.27555, 254.767), S: (1304.853, 660.2683)] screen=(1672.0, 941.0)
+GEOMETRY chat_open grid=[P: (26.13889, 251.6304), S: (1311.127, 666.5416)] screen=(1672.0, 941.0)
 PASS capture_chat-fixture
 PASS logout_clears_private_bubbles
 PASS logout_blocks_composer

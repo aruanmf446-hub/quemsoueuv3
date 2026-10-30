@@ -22,6 +22,6 @@ functional PASS
 duel_local PASS
 supabase_connections PASS
 catalog_remote PASS
-consumption FAIL
+consumption PASS
 chat_flow PASS
 main_menu PASS

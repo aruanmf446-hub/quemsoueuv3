@@ -1,0 +1,7 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+CONSUMO poller_1h antes=360 depois=64
+CONSUMO leituras_simultaneas antes=3 depois=1
+CONSUMO catalogo_3_aberturas antes=9 depois=3
+CONSUMO duelo_lobby_1h antes=1800 depois=720
+CONSUMPTION PASS 6 verificações

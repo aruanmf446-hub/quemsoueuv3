@@ -12,5 +12,3 @@ SMOKE_ROUTE_OPEN music
 SMOKE_ROUTE_OPEN duel
 SMOKE_ROUTE_OPEN deck_library
 SMOKE_OPEN_OK res://scenes/menu/main_menu.tscn
-WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
-   at: cleanup (core/object/object.cpp:2536)

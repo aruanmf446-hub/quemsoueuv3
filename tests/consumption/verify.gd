@@ -32,11 +32,13 @@ func _run() -> void:
 	for _tick in range(120):
 		for service in [services.wallet, services.friends, services.progression]:
 			if service.fetched_at >= 0.0: service.fetched_at -= 30.0
+		var before: Dictionary = counter.by_path.duplicate()
 		services._poll_connected()
 		for _frame in range(2): await process_frame
-		# A fixture não devolve contratos válidos: marca como resposta válida o que foi buscado.
-		for service in [services.wallet, services.friends, services.progression]:
-			if service.fetched_at < 0.0 or service.state == "error": service.fetched_at = Time.get_ticks_msec() / 1000.0
+		# A fixture não devolve contratos válidos: o que foi buscado neste ciclo conta como resposta válida.
+		for pair in [[services.wallet, "qse_wallet"], [services.friends, "qse_friends"], [services.progression, "qse_progression_snapshot"]]:
+			var path: String = "/rest/v1/rpc/" + pair[1]
+			if int(counter.by_path.get(path, 0)) > int(before.get(path, 0)): pair[0].fetched_at = Time.get_ticks_msec() / 1000.0
 	var polled: int = counter.count
 	print("CONSUMO poller_1h antes=360 depois=", polled)
 	check(polled <= 100, "poller reduzido")

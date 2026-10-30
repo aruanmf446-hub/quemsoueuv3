@@ -86,9 +86,41 @@ func open(friend_data: Dictionary) -> Dictionary:
 	return ServiceResult.success({"conversation_id": conversation_id})
 
 
+## Chat da sala do Duelo: uma conversa por sala, autorizada pelo GAME a cada chamada.
+## Sem cache de participação: ao reabrir, o servidor confirma de novo.
+var room_id := ""
+func open_room(id: String) -> Dictionary:
+	_epoch += 1
+	var epoch := _epoch
+	friend = {}
+	room_id = id
+	conversation_id = ""
+	error_code = ""
+	if not gateway_ready() or not transport.has_method("open_room"):
+		state = "unavailable"
+		changed.emit()
+		return ServiceResult.failure("chat_unavailable", "offline")
+	if id.is_empty(): return _fail("room_access_denied")
+	state = "loading"
+	changed.emit()
+	var opened: Dictionary = await transport.open_room(id)
+	if epoch != _epoch: return opened
+	if not opened.ok: return _fail(str(opened.code))
+	conversation_id = str((opened.data as Dictionary).get("conversation_id", ""))
+	if conversation_id.is_empty(): return _fail("invalid_contract")
+	state = "ready"
+	_poll_wait = POLL_ACTIVE
+	changed.emit()
+	await poll()
+	return ServiceResult.success({"conversation_id": conversation_id})
+
+
 ## Fecha a conversa: as consultas param na hora.
 func close() -> void:
 	_epoch += 1
+	# Chat de sala não fica em memória depois de fechado.
+	if not room_id.is_empty() and not conversation_id.is_empty(): _messages.erase(conversation_id)
+	room_id = ""
 	friend = {}
 	conversation_id = ""
 	state = "closed"
@@ -114,6 +146,15 @@ func poll() -> Dictionary:
 	if epoch != _epoch or id != conversation_id: return result
 	if not result.ok:
 		error_code = str(result.code)
+		if error_code == "room_access_denied":
+			# Saiu, foi expulso ou a sala fechou: some o conteúdo e param as consultas.
+			_messages.erase(id)
+			conversation_id = ""
+			state = "error"
+			_next_poll = INF
+			changed.emit()
+			messages_changed.emit(id)
+			return result
 		if error_code in ["not_friend", "conversation_unavailable", "not_authenticated"]: state = "error"
 		_schedule(POLL_RATE_LIMIT if error_code == "rate_limit" else POLL_ERROR)
 		changed.emit()
@@ -166,6 +207,7 @@ func messages(id: String = conversation_id) -> Array:
 
 
 func is_mine(message: Dictionary) -> bool:
+	if message.has("is_you"): return bool(message.is_you)
 	return not me_id.is_empty() and str(message.get("sender_id", "")) == me_id
 
 
@@ -269,4 +311,5 @@ static func message_for(code: String) -> String:
 		"duplicate_send": return "Enviando a mensagem anterior…"
 		"empty_message": return "Escreva uma mensagem."
 		"message_too_long": return "Mensagem longa demais."
+		"room_access_denied": return "Você não está mais nesta sala."
 	return "Não foi possível falar com o chat agora."

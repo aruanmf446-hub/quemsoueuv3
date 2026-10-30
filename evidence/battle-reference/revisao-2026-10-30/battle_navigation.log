@@ -1,0 +1,13 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS actual_route_has_nine_options
+PASS battle_opens_existing_settings
+PASS settings_hides_battle_and_private_hand
+PASS settings_returns_same_battle_instance
+PASS return_preserves_all_options
+PASS return_restores_visible_focus
+PASS battle_back_returns_real_lobby
+PASS navigation_does_not_change_leave_rules
+PASS leave_uses_existing_service
+PASS leave_restores_regular_screen
+BATTLE_NAVIGATION checks=10 failures=0

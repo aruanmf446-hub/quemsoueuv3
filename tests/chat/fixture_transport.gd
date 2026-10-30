@@ -19,6 +19,16 @@ func open_conversation(friend_id: String) -> Dictionary:
 	return ServiceResult.success({"conversation_id": conversations[friend_id]})
 
 
+## Salas em que o jogador da fixture é membro (o GAME real confirma isso).
+var rooms: Array = []
+func open_room(room_id: String) -> Dictionary:
+	calls.open += 1
+	await _wait()
+	if _failing(): return ServiceResult.failure(_take())
+	if not rooms.has(room_id): return ServiceResult.failure("room_access_denied")
+	return ServiceResult.success({"conversation_id": "room-" + room_id})
+
+
 func list_messages(conversation_id: String, _after: Variant = null) -> Dictionary:
 	calls.messages += 1
 	await _wait()
@@ -33,17 +43,22 @@ func send_message(conversation_id: String, request_id: String, text: String, me_
 	await _wait()
 	if _failing(): return ServiceResult.failure(_take())
 	if request_ids.has(request_id): return ServiceResult.success({"message": request_ids[request_id], "duplicate": true})
-	var message := deliver(conversation_id, me_id, text)
+	var message := deliver(conversation_id, me_id, text, 0.0, "Você", true)
 	request_ids[request_id] = message
 	return ServiceResult.success({"message": message, "duplicate": false})
 
 
 ## Mensagem chegando (do amigo, ou com horário no passado para testar expiração).
-func deliver(conversation_id: String, sender: String, text: String, age := 0.0) -> Dictionary:
+## Em sala ("room-"), imita o gateway v5: sender_name/is_you em vez do UUID do jogador.
+func deliver(conversation_id: String, sender: String, text: String, age := 0.0, name := "", mine := false) -> Dictionary:
 	var sent := Time.get_unix_time_from_system() - age
 	var list: Array = store.get(conversation_id, [])
 	var message := {"id": "m%d" % (list.size() + 1 + randi() % 100000), "sender_id": sender, "text": text,
 		"created_at": sent, "expires_at": sent + 24 * 3600.0}
+	if conversation_id.begins_with("room-"):
+		message.erase("sender_id")
+		message.is_you = mine
+		message.sender_name = name if not name.is_empty() else "Participante"
 	list.append(message)
 	store[conversation_id] = list
 	return message

@@ -68,7 +68,7 @@ func show_screen(params: Dictionary = {}) -> void:
 	show()
 	render()
 	_refit_margin.call_deferred()
-	$Margin/Column/Header/Back.grab_focus()
+	if $Margin/Column/Header/Back.is_visible_in_tree(): $Margin/Column/Header/Back.grab_focus()
 
 
 ## A screen with an internal reader may consume Back before the route is popped.

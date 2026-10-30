@@ -184,10 +184,12 @@ func _run() -> void:
 	chat.clear()
 	check(chat.messages("conv-" + LUA).is_empty(), "limpa ao trocar de conta")
 
+	# Lido antes de liberar: o transporte simulado é filho do ChatService.
+	var calls: Dictionary = fake.calls.duplicate()
 	services.session.user = {}
 	services.client.access_token = ""
 	screen.queue_free()
 	services.queue_free()
 	await settle(10)
-	print("CHAT_FLOW ", "FAIL" if failed else "PASS", " ", checks, " verificações; requisições do fixture: ", fake.calls)
+	print("CHAT_FLOW ", "FAIL" if failed else "PASS", " ", checks, " verificações; requisições do fixture: ", calls)
 	finished.emit(1 if failed else 0)

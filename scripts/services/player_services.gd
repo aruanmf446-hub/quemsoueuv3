@@ -98,11 +98,17 @@ func _ready() -> void:
 	_session_changed()
 
 
-## CHAT real só depois da validação: QSE_CHAT_ENABLED=1 ou [chat] enabled=true no backend.cfg.
+## CHAT disponível no jogo. Desligar com QSE_CHAT_ENABLED=0 ou [chat] enabled=false.
+## Scripts de teste headless usam o transporte simulado e não abrem conexão real.
 static func chat_enabled() -> bool:
-	if OS.get_environment("QSE_CHAT_ENABLED") == "1": return true
+	var flag := OS.get_environment("QSE_CHAT_ENABLED")
+	if flag == "0": return false
+	if flag == "1": return true
+	if OS.get_cmdline_args().has("--script"): return false
 	var config := ConfigFile.new()
-	return config.load("user://backend.cfg") == OK and bool(config.get_value("chat", "enabled", false))
+	if config.load("user://backend.cfg") == OK:
+		return bool(config.get_value("chat", "enabled", true))
+	return true
 
 
 func _exit_tree() -> void:

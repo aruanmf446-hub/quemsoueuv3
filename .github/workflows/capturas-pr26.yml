@@ -39,13 +39,27 @@ jobs:
             export XDG_DATA_HOME="$(mktemp -d)" XDG_CONFIG_HOME="$(mktemp -d)"
             "$GODOT" --headless --path "$dir" --editor --import --quit > "$OUT/$name-import.log" 2>&1 || true
             for res in 1920x1080 844x390; do
-              xvfb-run -a -s "-screen 0 1920x1080x24" "$GODOT" --path "$dir" --rendering-method gl_compatibility --audio-driver Dummy \
+              timeout 420 xvfb-run -a -s "-screen 0 1920x1080x24" "$GODOT" --path "$dir" --rendering-method gl_compatibility --audio-driver Dummy \
                 --script res://tools/godot/capture_skins_pr26.gd -- "$OUT/$name-personagens-$res" "$res" > "$OUT/$name-personagens-$res.log" 2>&1 || true
-              xvfb-run -a -s "-screen 0 1920x1080x24" "$GODOT" --path "$dir" --rendering-method gl_compatibility --audio-driver Dummy \
+              timeout 420 xvfb-run -a -s "-screen 0 1920x1080x24" "$GODOT" --path "$dir" --rendering-method gl_compatibility --audio-driver Dummy \
                 --script res://tools/godot/capture_settings.gd -- "$OUT/$name-configuracoes-$res" "$res" > "$OUT/$name-configuracoes-$res.log" 2>&1 || true
             done
           done
           ls -la "$OUT"
+      - name: Smoke do menu principal (main original x teste corrigido)
+        run: |
+          set -uo pipefail
+          GODOT="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+          OUT="$GITHUB_WORKSPACE/capturas-pr26"
+          cp tools/godot/smoke_pr26_fix.gd "$RUNNER_TEMP/main/tools/godot/"
+          for item in "main-original:$RUNNER_TEMP/main:smoke.gd" "main-corrigido:$RUNNER_TEMP/main:smoke_pr26_fix.gd" "pr-corrigido:$GITHUB_WORKSPACE:smoke_pr26_fix.gd"; do
+            name="${item%%:*}"; rest="${item#*:}"; dir="${rest%%:*}"; script="${rest#*:}"
+            export XDG_DATA_HOME="$(mktemp -d)" XDG_CONFIG_HOME="$(mktemp -d)" XDG_CACHE_HOME="$(mktemp -d)"
+            timeout 180 "$GODOT" --headless --path "$dir" --rendering-method gl_compatibility \
+              --script "res://tools/godot/$script" -- res://scenes/menu/main_menu.tscn > "$OUT/smoke-$name.log" 2>&1
+            echo "exit=$?" >> "$OUT/smoke-$name.log"
+            echo "== $name"; grep -E "SMOKE_|ERROR|exit=" "$OUT/smoke-$name.log" | head -40
+          done
       - name: Gravar capturas neste branch
         run: |
           git config user.name "github-actions[bot]"

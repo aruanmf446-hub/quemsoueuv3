@@ -1,0 +1,86 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+PASS lobby_arrows_hidden
+PASS lobby_name_hidden
+PASS skins_has_two_or_more_unlocked (7)
+PASS skins_equip_updates_stage_cowboy
+PASS skins_equip_updates_stage_michelly
+PASS skins_equip_updates_stage_rodrigo
+PASS skins_equip_updates_stage_lorena
+PASS skins_equip_updates_stage_gus
+PASS skins_equip_updates_stage_lana
+PASS skins_equip_updates_stage_halloween
+PASS skins_restore_start_character
+PASS skins_visible
+PASS skins_card_count_matches_catalog
+PASS skins_model_resolves_cowboy
+PASS skins_model_resolves_michelly
+PASS skins_model_resolves_rodrigo
+PASS skins_model_resolves_lorena
+PASS skins_model_resolves_gus
+PASS skins_model_resolves_lana
+PASS skins_model_resolves_halloween
+PASS skins_model_resolves_el_fuego
+PASS skins_ids_unique
+FAIL skins_equip_button_present_cowboy
+FAIL skins_equip_button_present_michelly
+FAIL skins_equip_button_present_rodrigo
+FAIL skins_equip_button_present_lorena
+FAIL skins_equip_button_present_gus
+FAIL skins_equip_button_present_lana
+FAIL skins_equip_button_present_halloween
+FAIL skins_equip_button_present_el_fuego
+PASS skins_back_to_lobby
+PASS settings_has_volume_sliders
+PASS settings_master_saved
+PASS settings_master_applied_to_bus
+PASS settings_zero_mutes_master
+PASS settings_unmute_master
+SCRIPT ERROR: Out of bounds get index '0' (on base: 'Array')
+          at: _test_settings_persistence (res://tools/godot/screens_flow.gd:162)
+          GDScript backtrace (most recent call first):
+              [0] _test_settings_persistence (res://tools/godot/screens_flow.gd:162)
+              [1] frames (res://tools/godot/screens_flow.gd:25)
+PASS offline_session_unauthenticated
+PASS offline_mode_label_shows_demo
+PASS offline_no_invented_friends
+PASS offline_friends_data_empty
+PASS layout_1920x1080_inside_MenuButtons_BtnStory
+PASS layout_1920x1080_inside_MenuButtons_BtnSkins
+PASS layout_1920x1080_inside_MenuButtons_BtnFriends
+PASS layout_1920x1080_inside_MenuButtons_BtnSettings
+PASS layout_1920x1080_inside_ProfileCard
+PASS layout_1920x1080_inside_TopBar_CoinPill
+PASS layout_1920x1080_inside_TopBar_GemPill
+PASS layout_1920x1080_inside_FriendsPanel_Margin_Content_ViewAllButton
+PASS layout_1920x1080_inside_LobbyArea_Overlay_NameLabel
+PASS layout_1920x1080_inside_LobbyArea_Overlay_NextButton
+PASS layout_1920x1080_inside_LobbyArea_Overlay_PrevButton
+PASS layout_1920x1080_story_tap_height
+PASS layout_1280x720_inside_MenuButtons_BtnStory
+PASS layout_1280x720_inside_MenuButtons_BtnSkins
+PASS layout_1280x720_inside_MenuButtons_BtnFriends
+PASS layout_1280x720_inside_MenuButtons_BtnSettings
+PASS layout_1280x720_inside_ProfileCard
+PASS layout_1280x720_inside_TopBar_CoinPill
+PASS layout_1280x720_inside_TopBar_GemPill
+PASS layout_1280x720_inside_FriendsPanel_Margin_Content_ViewAllButton
+PASS layout_1280x720_inside_LobbyArea_Overlay_NameLabel
+PASS layout_1280x720_inside_LobbyArea_Overlay_NextButton
+PASS layout_1280x720_inside_LobbyArea_Overlay_PrevButton
+PASS layout_1280x720_story_tap_height
+PASS layout_844x390_inside_MenuButtons_BtnStory
+PASS layout_844x390_inside_MenuButtons_BtnSkins
+PASS layout_844x390_inside_MenuButtons_BtnFriends
+PASS layout_844x390_inside_MenuButtons_BtnSettings
+PASS layout_844x390_inside_ProfileCard
+PASS layout_844x390_inside_TopBar_CoinPill
+PASS layout_844x390_inside_TopBar_GemPill
+PASS layout_844x390_inside_FriendsPanel_Margin_Content_ViewAllButton
+PASS layout_844x390_inside_LobbyArea_Overlay_NameLabel
+PASS layout_844x390_inside_LobbyArea_Overlay_NextButton
+PASS layout_844x390_inside_LobbyArea_Overlay_PrevButton
+PASS layout_844x390_story_tap_height
+SCREENS_FLOW_FAILURES 8
+WARNING: ObjectDB instances leaked at exit (run with --verbose for details).
+   at: cleanup (core/object/object.cpp:2663)

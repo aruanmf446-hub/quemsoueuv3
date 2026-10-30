@@ -1,0 +1,33 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+ERROR: FAIL painel cabe (960, 540)
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/skins/visual.gd:11)
+       [1] run (res://tests/skins/visual.gd:103)
+       [2] settle (res://tests/skins/visual.gd:15)
+SCRIPT ERROR: Assertion failed: painel cabe (960, 540)
+          at: check (res://tests/skins/visual.gd:13)
+          GDScript backtrace (most recent call first):
+              [0] check (res://tests/skins/visual.gd:13)
+              [1] run (res://tests/skins/visual.gd:103)
+              [2] settle (res://tests/skins/visual.gd:15)
+ERROR: FAIL palco visível (960, 540)
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/skins/visual.gd:11)
+       [1] run (res://tests/skins/visual.gd:105)
+       [2] settle (res://tests/skins/visual.gd:15)
+SCRIPT ERROR: Assertion failed: palco visível (960, 540)
+          at: check (res://tests/skins/visual.gd:13)
+          GDScript backtrace (most recent call first):
+              [0] check (res://tests/skins/visual.gd:13)
+              [1] run (res://tests/skins/visual.gd:105)
+              [2] settle (res://tests/skins/visual.gd:15)
+WARNING: ObjectDB instances leaked at exit (run with --verbose for details).
+   at: cleanup (core/object/object.cpp:2663)
+ERROR: 1 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:810)

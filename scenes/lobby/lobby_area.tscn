@@ -1,36 +1,19 @@
 [gd_scene format=3 uid="uid://c4tbtkikmesvc"]
 
-[ext_resource type="Script" uid="uid://wk6ec6oidjfb" path="res://scripts/lobby/lobby_area.gd" id="1_kgivp"]
-[ext_resource type="PackedScene" uid="uid://c0m77lrhy6l25" path="res://scenes/lobby/lobby_stage.tscn" id="2_dstpc"]
-[ext_resource type="Texture2D" uid="uid://c73oiqf2nycya" path="res://assets/processed/frames/frame_botao_cabecalho.png" id="3_afbls"]
+[ext_resource type="Script" path="res://scripts/lobby/lobby_area.gd" id="1_kgivp"]
+[ext_resource type="PackedScene" path="res://scenes/lobby/lobby_stage.tscn" id="2_dstpc"]
 
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_0tyeo"]
-texture = ExtResource("3_afbls")
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_5e4sn"]
-texture = ExtResource("3_afbls")
-modulate_color = Color(0.8, 0.8, 0.8, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_qd5qa"]
-texture = ExtResource("3_afbls")
-modulate_color = Color(1.15, 1.15, 1.15, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_yawsn"]
-texture = ExtResource("3_afbls")
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_fqrw8"]
-texture = ExtResource("3_afbls")
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_5sf4x"]
-texture = ExtResource("3_afbls")
-modulate_color = Color(0.8, 0.8, 0.8, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_1s82q"]
-texture = ExtResource("3_afbls")
-modulate_color = Color(1.15, 1.15, 1.15, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_pokeh"]
-texture = ExtResource("3_afbls")
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bbqo6"]
+bg_color = Color(0.105882354, 0.14509805, 0.18039216, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
 
 [node name="LobbyArea" type="Control" unique_id=1550354168]
 custom_minimum_size = Vector2(640, 760)
@@ -64,14 +47,14 @@ offset_top = 520.0
 offset_right = 86.0
 offset_bottom = 592.0
 focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/focus = SubResource("StyleBoxFlat_bbqo6")
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0.039215688, 0.08627451, 0.1882353, 1)
-theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 46
-theme_override_styles/normal = SubResource("StyleBoxTexture_0tyeo")
-theme_override_styles/pressed = SubResource("StyleBoxTexture_5e4sn")
-theme_override_styles/hover = SubResource("StyleBoxTexture_qd5qa")
-theme_override_styles/focus = SubResource("StyleBoxTexture_yawsn")
+theme_override_constants/outline_size = 6
+theme_override_colors/font_outline_color = Color(0.039215688, 0.08627451, 0.1882353, 1)
 text = "‹"
 
 [node name="NextButton" type="Button" parent="Overlay" unique_id=271861995]
@@ -82,14 +65,14 @@ offset_top = 520.0
 offset_right = 626.0
 offset_bottom = 592.0
 focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/focus = SubResource("StyleBoxFlat_bbqo6")
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0.039215688, 0.08627451, 0.1882353, 1)
-theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 46
-theme_override_styles/normal = SubResource("StyleBoxTexture_fqrw8")
-theme_override_styles/pressed = SubResource("StyleBoxTexture_5sf4x")
-theme_override_styles/hover = SubResource("StyleBoxTexture_1s82q")
-theme_override_styles/focus = SubResource("StyleBoxTexture_pokeh")
+theme_override_constants/outline_size = 6
+theme_override_colors/font_outline_color = Color(0.039215688, 0.08627451, 0.1882353, 1)
 text = "›"
 
 [node name="NameLabel" type="Label" parent="Overlay" unique_id=431844588]
@@ -97,10 +80,10 @@ layout_mode = 0
 offset_top = 690.0
 offset_right = 640.0
 offset_bottom = 740.0
+theme_override_font_sizes/font_size = 34
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.039215688, 0.08627451, 0.1882353, 1)
 theme_override_constants/outline_size = 8
-theme_override_font_sizes/font_size = 34
 text = "Personagem"
 horizontal_alignment = 1
 vertical_alignment = 1

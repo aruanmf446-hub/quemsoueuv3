@@ -1,0 +1,11 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+LAYOUT_WARN menu_overlaps_status buttons_end=925.25 status_y=851.0
+LAYOUT_WARN side_menu_wide 530.0
+RENDER_BOUNDS [P: (674.45, 32.935), S: (809.2599, 875.13)] output=[P: (674.45, 32.935), S: (809.2599, 875.13)] viewport=(671, 726)
+LOBBY_CAPTURE (844, 390) logical=(2036.0, 941.0) hero_ratio=0.70679995781415 file=/workspace/quemsoueuv3/evidence/menu-design/lobby-844x390.png
+WARNING: ObjectDB instances leaked at exit (run with --verbose for details).
+   at: cleanup (core/object/object.cpp:2663)

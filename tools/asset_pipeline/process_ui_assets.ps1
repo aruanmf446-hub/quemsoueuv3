@@ -1,3 +1,5 @@
+# Legado: frames/buttons/textures gerados aqui foram reprovados para menus.
+# Consulte docs/design/MENUS.md; não reaplicar o kit às telas do jogador.
 # Gera cópias processadas dos PNGs de UI em res://assets/processed/.
 # Os originais em assets/ permanecem intactos.
 #  - Recorta a área com conteúdo (alfa >= 24), com 4 px de margem.

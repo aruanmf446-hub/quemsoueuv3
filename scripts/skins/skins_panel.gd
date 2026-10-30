@@ -13,8 +13,6 @@ var _collection := 0
 var _collection_list: VBoxContainer
 static var _shade: GradientTexture2D
 var _collection_count: Label
-const CARD_EDGE := preload("res://assets/ui/kit/card_edge.png")
-const CARD_EDGE_GOLD := preload("res://assets/ui/kit/card_edge_gold.png")
 const CARD_BG := Color("#111d30")
 const CARD_BG_SELECTED := Color("#25344e")
 const CARD_BORDER := Color("#455269")
@@ -179,7 +177,7 @@ func _responsive_layout() -> void:
 		_was_compact = compact
 		_select(_selected)
 	var margin: MarginContainer = $Margin
-	var factor := 2.0 if compact else 1.0
+	var factor := maxf(1.0, UIScale.unit_for(get_viewport())) if compact else 1.0
 	margin.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	margin.scale = Vector2.ONE * factor
 	margin.position = Vector2.ZERO
@@ -206,6 +204,8 @@ func _responsive_layout() -> void:
 	_fav_button.add_theme_color_override("font_color", ACCENT if _favorite_only else PlayerUI.TEXT)
 	_fav_button.custom_minimum_size.x = 34 if compact else 112
 	_search_field.placeholder_text = "Pesquisar..." if compact else "Pesquisar personagem..."
+	_search_field.custom_minimum_size.x = 116 if compact else 0
+	_sort_button.custom_minimum_size.x = 68 if compact else 118
 	if _grid != null:
 		_grid.columns = _columns()
 		for item in _grid.get_children():
@@ -284,7 +284,7 @@ func _gallery_card(entry: Dictionary) -> PanelContainer:
 	var card := PanelContainer.new()
 	card.mouse_filter = Control.MOUSE_FILTER_STOP
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	card.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+	card.add_theme_stylebox_override("panel", _panel_style(character_id == _selected))
 	_cards[character_id] = card
 	var backdrop := TextureRect.new()
 	backdrop.name = "Backdrop"
@@ -352,16 +352,6 @@ func _gallery_card(entry: Dictionary) -> PanelContainer:
 	if not unlocked:
 		thumbnail.modulate = Color(0.45, 0.48, 0.55)
 		backdrop.modulate = Color(0.35, 0.37, 0.42)
-	# Moldura do kit por cima de tudo (miolo transparente): dourada na carta selecionada.
-	var frame := NinePatchRect.new()
-	frame.name = "Frame"
-	frame.texture = CARD_EDGE_GOLD if character_id == _selected else CARD_EDGE
-	frame.patch_margin_left = 34
-	frame.patch_margin_right = 34
-	frame.patch_margin_top = 34
-	frame.patch_margin_bottom = 34
-	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	card.add_child(frame)
 	card.resized.connect(func() -> void: card.pivot_offset = card.size * 0.5)
 	card.mouse_entered.connect(func() -> void:
 		var hover := card.create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
@@ -390,7 +380,7 @@ func _badge(text: String, gold: bool) -> PanelContainer:
 	badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var style := StyleBoxFlat.new()
 	style.bg_color = ACCENT if gold else Color(1, 1, 1, 0.08)
-	style.set_corner_radius_all(10)
+	style.set_corner_radius_all(3)
 	style.content_margin_left = 9
 	style.content_margin_right = 9
 	style.content_margin_top = 2
@@ -461,8 +451,7 @@ func _select_neighbor(direction: int) -> void:
 func _select(character_id: String) -> void:
 	_selected = character_id
 	for id: String in _cards:
-		var frame := (_cards[id] as Node).get_node_or_null("Frame") as NinePatchRect
-		if frame != null: frame.texture = CARD_EDGE_GOLD if id == character_id else CARD_EDGE
+		(_cards[id] as PanelContainer).add_theme_stylebox_override("panel", _panel_style(id == character_id))
 	var kept: LobbyStage = _stage if is_instance_valid(_stage) and _stage.get_parent() == _preview else null
 	if kept != null: _preview.remove_child(kept)
 	PlayerUI.clear(_preview)
@@ -555,9 +544,9 @@ func _panel_style(selected: bool) -> StyleBoxFlat:
 	style.bg_color = Color("#233449") if selected else Color("#0e1b2b")
 	style.border_color = ACCENT if selected else CARD_BORDER
 	style.set_border_width_all(2 if selected else 1)
-	style.set_corner_radius_all(10)
+	style.set_corner_radius_all(3)
 	style.shadow_color = Color(0.92, 0.65, 0.22, 0.28) if selected else Color(0, 0, 0, 0.25)
-	style.shadow_size = 7 if selected else 3
+	style.shadow_size = 0
 	style.content_margin_left = 8
 	style.content_margin_top = 6
 	style.content_margin_right = 8
@@ -565,7 +554,7 @@ func _panel_style(selected: bool) -> StyleBoxFlat:
 	return style
 
 
-## Botões com a placa do kit (o principal é dourado), como no resto do menu.
+## Buttons share the lobby palette and interaction states.
 func _button(text: String, action: Callable, primary := false) -> Button:
 	var button := Button.new()
 	button.text = text
@@ -660,7 +649,7 @@ func _build_collections() -> void:
 		swatch.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		chip.add_child(swatch)
 		line.add_child(chip)
-		var ink := PlayerUI.KIT_INK if chosen else Color("#f4f1e6")
+		var ink := PlayerUI.PRIMARY_TEXT if chosen else Color("#f4f1e6")
 		var title := PlayerUI.label(str(collection.get("name", "")).to_upper(), 15, ink)
 		title.autowrap_mode = TextServer.AUTOWRAP_OFF
 		title.clip_text = true

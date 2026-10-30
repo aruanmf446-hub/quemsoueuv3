@@ -1,6 +1,6 @@
 # Tarefa 03 — telas e sistemas do jogador
 
-Implementação na branch `codex/telas-sistemas-jogador-03`, baseada em `d90dcb5` (`codex/progressao-offline-02`). O menu de fantasia e o palco 3D existentes continuam sendo a entrada do projeto. Não foi executado Godot ou Blender, e nenhuma migration foi aplicada ao Supabase remoto.
+Implementação na branch `codex/telas-sistemas-jogador-03`, baseada em `d90dcb5` (`codex/progressao-offline-02`). O lobby e o palco 3D existentes continuam sendo a entrada do projeto; a direção visual atual está em [MENUS.md](../design/MENUS.md). Não foi executado Godot ou Blender, e nenhuma migration foi aplicada ao Supabase remoto.
 
 ## Telas implementadas
 
@@ -15,7 +15,7 @@ Implementação na branch `codex/telas-sistemas-jogador-03`, baseada em `d90dcb5
 | Modo História | [Reinos e fases](../../scenes/player/story.tscn) | Quatro reinos e dez fases do Deserto; somente a fase 1 oferece abrir sua cena de protótipo. |
 | Entrar / conta | [Supabase Auth](../../scenes/player/account.tscn) | Login, cadastro sujeito a confirmação de e-mail e saída da sessão local. |
 
-`NavigationManager` instancia cada rota uma única vez, mantém histórico com parâmetros, restaura foco, oferece Voltar/Esc/Android Back e anima a abertura. `StateBanner` compartilha carregamento, sucesso, vazio, offline, erro e acesso não autorizado. As telas usam a arte, moldura com brasão e paleta do projeto, com containers e rolagem. O layout e sua aparência ainda precisam ser vistos no motor.
+`NavigationManager` instancia cada rota uma única vez, mantém histórico com parâmetros, restaura foco, oferece Voltar/Esc/Android Back e anima a abertura. `StateBanner` compartilha carregamento, sucesso, vazio, offline, erro e acesso não autorizado. As telas usam o estilo compartilhado de `PlayerUI`, com superfícies discretas, containers e rolagem. A antiga moldura com brasão foi reprovada; consulte [a direção dos menus](../design/MENUS.md). O layout e sua aparência ainda precisam ser vistos no motor.
 
 ## Dados e comportamento entregue
 

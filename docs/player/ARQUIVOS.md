@@ -9,7 +9,7 @@
 | [data/characters.json](../../data/characters.json) | Troca da autorização legada de El Fuego pela conquista canônica, preservando IDs/modelos/alturas/animações. |
 | [project.godot](../../project.godot) | Orientação landscape; cena principal, renderer e física preservados. |
 | [scenes/menu/main_menu.tscn](../../scenes/menu/main_menu.tscn) | Mantém arte e composição; remove dados fictícios e conecta serviços/navegação/orientação. |
-| [scenes/skins/skins_panel.tscn](../../scenes/skins/skins_panel.tscn) | O mesmo painel passa a usar a moldura e o layout responsivo compartilhados. |
+| [scenes/skins/skins_panel.tscn](../../scenes/skins/skins_panel.tscn) | O mesmo painel passa a usar o estilo discreto e o layout responsivo compartilhados. |
 | [scripts/lobby/lobby_area.gd](../../scripts/lobby/lobby_area.gd) | Consulta e equipa pela fonte única, sem sobrescrever o save legado. |
 | [scripts/lobby/lobby_stage.gd](../../scripts/lobby/lobby_stage.gd) | Inscrição no grupo de prévias e aplicação da preferência gráfica existente. |
 | [scripts/menu/main_menu.gd](../../scripts/menu/main_menu.gd) | Liga botões, perfil, carteira e amizades às fontes compartilhadas. |

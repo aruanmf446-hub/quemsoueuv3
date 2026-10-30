@@ -1,0 +1,31 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+PASS legacy preferences preserved without mute field
+PASS real preview profile baixo
+PASS real preview profile medio
+PASS real preview profile alto
+PASS master saves
+PASS music saves
+PASS effects save
+PASS mute saves
+PASS Master actually muted
+PASS mute preserves gain
+PASS reject invalid mute
+PASS reject invalid gain
+PASS remap confirm
+PASS reject duplicate key
+PASS InputMap applies remap
+PASS quality saves
+PASS locale saves
+PASS preferences survive reload
+PASS ornamental frame removed locally
+PASS English heading
+PASS four categories
+PASS category 0 selected
+PASS category 1 selected
+PASS category 2 selected
+PASS category 3 selected
+PASS duplicate remap stays waiting
+PASS screen remap functional
+PASS unmute restores audio
+SETTINGS_RESULT failures=0

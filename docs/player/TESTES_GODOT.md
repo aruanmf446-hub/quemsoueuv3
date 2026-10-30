@@ -5,7 +5,7 @@
 ## Importação e inicialização
 
 1. Conferir branch e árvore limpa. Consultar `godot_status` e `godot_project_info` conforme `AGENTS.md`. Confirmar a cena principal original `scenes/menu/main_menu.tscn`, renderer e orientação landscape.
-2. Importar os FBX/GLB existentes. Abrir as oito rotas e a moldura herdada no editor; verificar scripts/classes, tipos e NodePaths. Salvar recursos pelo MCP, sem versionar `.godot/`.
+2. Importar os FBX/GLB existentes. Abrir as oito rotas e a tela base herdada no editor; verificar scripts/classes, tipos e NodePaths. Salvar recursos pelo MCP, sem versionar `.godot/`.
 3. Executar com `godot_run_start` e ler `godot_run_output` em nível error. Corrigir erros reais de tipos, APIs e importação antes de avaliar aparência. Capturar evidência, sem declarar sucesso só porque a análise textual passou.
 
 ## Menu, navegação e layout

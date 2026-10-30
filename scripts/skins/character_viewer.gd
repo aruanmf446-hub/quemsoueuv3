@@ -9,7 +9,6 @@ signal equip_requested(character_id: StringName)
 signal closed
 
 const STAGE_SCENE := preload("res://scenes/lobby/lobby_stage.tscn")
-const FRAME_TEXTURE := preload("res://assets/processed/frames/frame_painel_brasao.png")
 
 var _entry: Dictionary = {}
 var _stage: LobbyStage
@@ -53,33 +52,18 @@ func _build() -> void:
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(center)
 
-	var panel := NinePatchRect.new()
-	panel.texture = FRAME_TEXTURE
-	panel.patch_margin_left = 150
-	panel.patch_margin_right = 150
-	panel.patch_margin_top = 170
-	panel.patch_margin_bottom = 120
+	var panel := Panel.new()
+	panel.add_theme_stylebox_override("panel", PlayerUI.frame_panel(24))
 	panel.custom_minimum_size = Vector2(900, 790)
 	panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	center.add_child(panel)
 
-	# Fundo opaco dentro da moldura: a arte do quadro é transparente no centro.
-	var backdrop := ColorRect.new()
-	backdrop.color = Color(0.03, 0.08, 0.18, 0.96)
-	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	backdrop.offset_left = 150
-	backdrop.offset_top = 170
-	backdrop.offset_right = -150
-	backdrop.offset_bottom = -120
-	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	panel.add_child(backdrop)
-
 	var column := VBoxContainer.new()
 	column.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	column.offset_left = 170
-	column.offset_top = 190
-	column.offset_right = -170
-	column.offset_bottom = -175
+	column.offset_left = 28
+	column.offset_top = 28
+	column.offset_right = -28
+	column.offset_bottom = -28
 	column.alignment = BoxContainer.ALIGNMENT_CENTER
 	column.add_theme_constant_override("separation", 8)
 	column.mouse_filter = Control.MOUSE_FILTER_IGNORE

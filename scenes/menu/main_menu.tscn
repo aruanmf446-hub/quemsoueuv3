@@ -1,91 +1,42 @@
 [gd_scene format=3 uid="uid://bqalstx2y0s1g"]
 
-[ext_resource type="Script" uid="uid://cckmelvnkfepu" path="res://scripts/menu/main_menu.gd" id="1_247la"]
-[ext_resource type="PackedScene" uid="uid://bsrusk2vn40uu" path="res://scenes/menu/components/menu_card_button.tscn" id="2_kiqgm"]
-[ext_resource type="Texture2D" uid="uid://blqufp2molbkr" path="res://assets/processed/backgrounds/bg_lobby_fantasia.png" id="2_pstia"]
-[ext_resource type="Texture2D" uid="uid://bt31d2ljy0f0a" path="res://assets/processed/logos/logo_menu_principal.png" id="3_41tvm"]
-[ext_resource type="PackedScene" uid="uid://q7fgofghdik7" path="res://scenes/menu/components/friend_row.tscn" id="3_hj162"]
-[ext_resource type="PackedScene" uid="uid://c4tbtkikmesvc" path="res://scenes/lobby/lobby_area.tscn" id="4_vxdmp"]
-[ext_resource type="Texture2D" uid="uid://8547hwerpb5t" path="res://assets/processed/buttons/btn_modo_historia.png" id="5_vxdmp"]
-[ext_resource type="Texture2D" uid="uid://cdgfhpravddbf" path="res://assets/processed/buttons/btn_modo_duelo.png" id="6_3h20m"]
-[ext_resource type="Texture2D" uid="uid://c20wwe45t1blx" path="res://assets/processed/buttons/btn_skins.png" id="7_uaj4g"]
-[ext_resource type="Texture2D" uid="uid://dwe2p4tnfnq42" path="res://assets/processed/buttons/btn_amizades.png" id="8_si58d"]
-[ext_resource type="Texture2D" uid="uid://brydajbxj2apv" path="res://assets/processed/buttons/btn_configuracoes.png" id="9_anexq"]
-[ext_resource type="Texture2D" uid="uid://dnsbduf8kvi1s" path="res://assets/processed/textures/textura_dourada.png" id="10_qvxhw"]
-[ext_resource type="Texture2D" uid="uid://cenbmrvi5ekbp" path="res://assets/processed/textures/textura_azul.png" id="11_do53f"]
-[ext_resource type="Texture2D" uid="uid://c73oiqf2nycya" path="res://assets/processed/frames/frame_botao_cabecalho.png" id="12_1bw8o"]
-[ext_resource type="Texture2D" uid="uid://pqn58j5c61u7" path="res://assets/processed/frames/frame_card_perfil.png" id="13_q78k2"]
-[ext_resource type="Texture2D" uid="uid://bgeyvq7mnwhdf" path="res://assets/processed/frames/frame_avatar_anel.png" id="14_neoyv"]
-[ext_resource type="Texture2D" uid="uid://dlgsx0h86cvj" path="res://assets/icons/vector/icon_mail.svg" id="14_uaj4g"]
-[ext_resource type="Texture2D" uid="uid://xdcmq3epyhv2" path="res://assets/icons/vector/icon_friends.svg" id="15_si58d"]
-[ext_resource type="Texture2D" uid="uid://bsn468v8nr867" path="res://assets/processed/frames/frame_painel_amizades.png" id="15_wof4p"]
-[ext_resource type="Texture2D" uid="uid://df7rxgp54l2b4" path="res://assets/processed/textures/textura_verde.png" id="17_fgrcj"]
-[ext_resource type="PackedScene" uid="uid://d1a00m0hqe223" path="res://scenes/skins/skins_panel.tscn" id="19_3h20m"]
-
+[ext_resource type="Script" path="res://scripts/menu/main_menu.gd" id="1_247la"]
+[ext_resource type="PackedScene" path="res://scenes/menu/components/menu_card_button.tscn" id="2_kiqgm"]
+[ext_resource type="Texture2D" path="res://assets/processed/backgrounds/bg_lobby_fantasia.png" id="2_pstia"]
+[ext_resource type="Texture2D" path="res://assets/processed/logos/logo_menu_principal.png" id="3_41tvm"]
+[ext_resource type="PackedScene" path="res://scenes/lobby/lobby_area.tscn" id="4_vxdmp"]
+[ext_resource type="Texture2D" path="res://assets/icons/vector/icon_mail.svg" id="14_uaj4g"]
+[ext_resource type="Texture2D" path="res://assets/icons/vector/icon_friends.svg" id="15_si58d"]
+[ext_resource type="PackedScene" path="res://scenes/skins/skins_panel.tscn" id="19_3h20m"]
 [ext_resource type="Script" path="res://scripts/services/player_services.gd" id="30_services"]
 [ext_resource type="Script" path="res://scripts/ui/navigation_manager.gd" id="31_navigation"]
 [ext_resource type="Script" path="res://scripts/ui/orientation_guard.gd" id="32_orientation"]
 
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_uaj4g"]
-texture = ExtResource("5_vxdmp")
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bbqo6"]
+bg_color = Color(0.105882354, 0.14509805, 0.18039216, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
 
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_si58d"]
-texture = ExtResource("5_vxdmp")
-modulate_color = Color(0.82, 0.82, 0.82, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_anexq"]
-texture = ExtResource("5_vxdmp")
-modulate_color = Color(1.12, 1.12, 1.12, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_qvxhw"]
-texture = ExtResource("6_3h20m")
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_do53f"]
-texture = ExtResource("6_3h20m")
-modulate_color = Color(0.82, 0.82, 0.82, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_1bw8o"]
-texture = ExtResource("6_3h20m")
-modulate_color = Color(1.12, 1.12, 1.12, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_q78k2"]
-texture = ExtResource("7_uaj4g")
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_neoyv"]
-texture = ExtResource("7_uaj4g")
-modulate_color = Color(0.82, 0.82, 0.82, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_wof4p"]
-texture = ExtResource("7_uaj4g")
-modulate_color = Color(1.12, 1.12, 1.12, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_fgrcj"]
-texture = ExtResource("8_si58d")
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_idlmi"]
-texture = ExtResource("8_si58d")
-modulate_color = Color(0.82, 0.82, 0.82, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_parxl"]
-texture = ExtResource("8_si58d")
-modulate_color = Color(1.12, 1.12, 1.12, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bcrok"]
-texture = ExtResource("9_anexq")
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_a4ol8"]
-texture = ExtResource("9_anexq")
-modulate_color = Color(0.82, 0.82, 0.82, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_sqyjr"]
-texture = ExtResource("9_anexq")
-modulate_color = Color(1.12, 1.12, 1.12, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ofc3y"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d4hu8"]
 content_margin_left = 14.0
 content_margin_right = 14.0
-texture = ExtResource("10_qvxhw")
-modulate_color = Color(0.85, 0.85, 0.85, 1)
+bg_color = Color(0.105882354, 0.14509805, 0.18039216, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_anexq"]
 bg_color = Color(1, 0.78039217, 0.15686275, 1)
@@ -99,11 +50,6 @@ corner_radius_top_right = 14
 corner_radius_bottom_right = 14
 corner_radius_bottom_left = 14
 
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_fau4l"]
-content_margin_left = 14.0
-content_margin_right = 14.0
-texture = ExtResource("11_do53f")
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qvxhw"]
 bg_color = Color(0.16470589, 0.6156863, 1, 1)
 border_width_left = 3
@@ -115,48 +61,6 @@ corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_42qp1"]
-texture = ExtResource("12_1bw8o")
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_12yd3"]
-texture = ExtResource("12_1bw8o")
-modulate_color = Color(0.8, 0.8, 0.8, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_26v5e"]
-texture = ExtResource("12_1bw8o")
-modulate_color = Color(1.15, 1.15, 1.15, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_rp6ip"]
-texture = ExtResource("12_1bw8o")
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_dckix"]
-texture = ExtResource("12_1bw8o")
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_co4ci"]
-texture = ExtResource("12_1bw8o")
-modulate_color = Color(0.8, 0.8, 0.8, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_d66xx"]
-texture = ExtResource("12_1bw8o")
-modulate_color = Color(1.15, 1.15, 1.15, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_cmcyx"]
-texture = ExtResource("12_1bw8o")
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_7iyuo"]
-texture = ExtResource("12_1bw8o")
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_406qy"]
-texture = ExtResource("12_1bw8o")
-modulate_color = Color(0.8, 0.8, 0.8, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_83b5w"]
-texture = ExtResource("12_1bw8o")
-modulate_color = Color(1.15, 1.15, 1.15, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_gy47a"]
-texture = ExtResource("12_1bw8o")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_do53f"]
 bg_color = Color(0.6117647, 0.7882353, 1, 1)
@@ -170,16 +74,21 @@ corner_radius_top_right = 30
 corner_radius_bottom_right = 30
 corner_radius_bottom_left = 30
 
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_8gjrb"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p1nwe"]
 content_margin_left = 40.0
 content_margin_top = 26.0
 content_margin_right = 28.0
 content_margin_bottom = 6.0
-texture = ExtResource("13_q78k2")
-texture_margin_left = 90.0
-texture_margin_top = 60.0
-texture_margin_right = 90.0
-texture_margin_bottom = 60.0
+bg_color = Color(0.105882354, 0.14509805, 0.18039216, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vxdmp"]
 bg_color = Color(0.16470589, 0.2901961, 0.43137255, 1)
@@ -193,20 +102,6 @@ corner_radius_top_right = 27
 corner_radius_bottom_right = 27
 corner_radius_bottom_left = 27
 
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_lsxs6"]
-texture = ExtResource("17_fgrcj")
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_unoev"]
-texture = ExtResource("17_fgrcj")
-modulate_color = Color(0.8, 0.8, 0.8, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_7wy5f"]
-texture = ExtResource("17_fgrcj")
-modulate_color = Color(1.15, 1.15, 1.15, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_o4h6x"]
-texture = ExtResource("17_fgrcj")
-
 [node name="MainMenu" type="Control" unique_id=1956077792]
 layout_mode = 3
 anchors_preset = 15
@@ -216,7 +111,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_247la")
 
-[node name="Services" type="Node" parent="."]
+[node name="Services" type="Node" parent="." unique_id=790466386]
 script = ExtResource("30_services")
 
 [node name="Background" type="TextureRect" parent="." unique_id=1000286985]
@@ -261,75 +156,70 @@ theme_override_constants/separation = 8
 custom_minimum_size = Vector2(600, 122)
 layout_mode = 2
 size_flags_horizontal = 0
-theme_override_styles/normal = SubResource("StyleBoxTexture_uaj4g")
-theme_override_styles/pressed = SubResource("StyleBoxTexture_si58d")
-theme_override_styles/hover = SubResource("StyleBoxTexture_anexq")
-theme_override_styles/focus = SubResource("StyleBoxTexture_uaj4g")
+theme_override_styles/normal = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/focus = SubResource("StyleBoxFlat_bbqo6")
 button_id = &"story"
 title = "Modo História"
 subtitle = "Viva uma grande aventura
 nos quatro reinos."
 accent_color = Color(0.84705883, 0.6039216, 0.10980392, 1)
-art_texture = ExtResource("5_vxdmp")
 
 [node name="BtnDuel" parent="MenuButtons" unique_id=86780443 instance=ExtResource("2_kiqgm")]
 custom_minimum_size = Vector2(600, 122)
 layout_mode = 2
 size_flags_horizontal = 0
-theme_override_styles/normal = SubResource("StyleBoxTexture_qvxhw")
-theme_override_styles/pressed = SubResource("StyleBoxTexture_do53f")
-theme_override_styles/hover = SubResource("StyleBoxTexture_1bw8o")
-theme_override_styles/focus = SubResource("StyleBoxTexture_qvxhw")
+theme_override_styles/normal = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/focus = SubResource("StyleBoxFlat_bbqo6")
 button_id = &"duel"
 title = "Modo Duelo"
 subtitle = "Desafie outros jogadores
 e prove suas habilidades."
 accent_color = Color(0.7529412, 0.22352941, 0.16862746, 1)
-art_texture = ExtResource("6_3h20m")
 
 [node name="BtnSkins" parent="MenuButtons" unique_id=982841425 instance=ExtResource("2_kiqgm")]
 custom_minimum_size = Vector2(600, 122)
 layout_mode = 2
 size_flags_horizontal = 0
-theme_override_styles/normal = SubResource("StyleBoxTexture_q78k2")
-theme_override_styles/pressed = SubResource("StyleBoxTexture_neoyv")
-theme_override_styles/hover = SubResource("StyleBoxTexture_wof4p")
-theme_override_styles/focus = SubResource("StyleBoxTexture_q78k2")
+theme_override_styles/normal = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/focus = SubResource("StyleBoxFlat_bbqo6")
 button_id = &"skins"
 title = "Skins"
 subtitle = "Personalize seu herói
 com visuais únicos."
 accent_color = Color(0.49019608, 0.23529412, 0.7882353, 1)
-art_texture = ExtResource("7_uaj4g")
 
 [node name="BtnFriends" parent="MenuButtons" unique_id=1298851961 instance=ExtResource("2_kiqgm")]
 custom_minimum_size = Vector2(600, 122)
 layout_mode = 2
 size_flags_horizontal = 0
-theme_override_styles/normal = SubResource("StyleBoxTexture_fgrcj")
-theme_override_styles/pressed = SubResource("StyleBoxTexture_idlmi")
-theme_override_styles/hover = SubResource("StyleBoxTexture_parxl")
-theme_override_styles/focus = SubResource("StyleBoxTexture_fgrcj")
+theme_override_styles/normal = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/focus = SubResource("StyleBoxFlat_bbqo6")
 button_id = &"friends"
 title = "Amizades"
 subtitle = "Jogue com seus amigos
 e forme sua equipe."
 accent_color = Color(0.18039216, 0.61960787, 0.2901961, 1)
-art_texture = ExtResource("8_si58d")
 
 [node name="BtnSettings" parent="MenuButtons" unique_id=407469799 instance=ExtResource("2_kiqgm")]
 custom_minimum_size = Vector2(470, 100)
 layout_mode = 2
 size_flags_horizontal = 0
-theme_override_styles/normal = SubResource("StyleBoxTexture_bcrok")
-theme_override_styles/pressed = SubResource("StyleBoxTexture_a4ol8")
-theme_override_styles/hover = SubResource("StyleBoxTexture_sqyjr")
-theme_override_styles/focus = SubResource("StyleBoxTexture_bcrok")
+theme_override_styles/normal = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/focus = SubResource("StyleBoxFlat_bbqo6")
 button_id = &"settings"
 title = "Configurações"
 subtitle = "Ajuste o jogo do seu jeito."
 accent_color = Color(0.18431373, 0.43529412, 0.8156863, 1)
-art_texture = ExtResource("9_anexq")
 
 [node name="TopBar" type="HBoxContainer" parent="." unique_id=759648291]
 layout_mode = 0
@@ -343,7 +233,7 @@ theme_override_constants/separation = 10
 [node name="CoinPill" type="PanelContainer" parent="TopBar" unique_id=143717158]
 custom_minimum_size = Vector2(150, 46)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxTexture_ofc3y")
+theme_override_styles/panel = SubResource("StyleBoxFlat_d4hu8")
 
 [node name="Content" type="HBoxContainer" parent="TopBar/CoinPill" unique_id=1858055915]
 layout_mode = 2
@@ -360,16 +250,16 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_anexq")
 
 [node name="Value" type="Label" parent="TopBar/CoinPill/Content" unique_id=312286411]
 layout_mode = 2
+theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(1, 0.9529412, 0.76862746, 1)
 theme_override_colors/font_outline_color = Color(0.2901961, 0.16470589, 0, 1)
 theme_override_constants/outline_size = 6
-theme_override_font_sizes/font_size = 22
 text = "—"
 
 [node name="GemPill" type="PanelContainer" parent="TopBar" unique_id=791331894]
 custom_minimum_size = Vector2(130, 46)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxTexture_fau4l")
+theme_override_styles/panel = SubResource("StyleBoxFlat_d4hu8")
 
 [node name="Content" type="HBoxContainer" parent="TopBar/GemPill" unique_id=2128693214]
 layout_mode = 2
@@ -386,20 +276,20 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_qvxhw")
 
 [node name="Value" type="Label" parent="TopBar/GemPill/Content" unique_id=642973286]
 layout_mode = 2
+theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(0.49411765, 0.8901961, 1, 1)
 theme_override_colors/font_outline_color = Color(0.019607844, 0.1254902, 0.22745098, 1)
 theme_override_constants/outline_size = 6
-theme_override_font_sizes/font_size = 22
 text = "—"
 
 [node name="MailButton" type="Button" parent="TopBar" unique_id=763511601]
 custom_minimum_size = Vector2(46, 46)
 layout_mode = 2
 focus_mode = 0
-theme_override_styles/normal = SubResource("StyleBoxTexture_42qp1")
-theme_override_styles/pressed = SubResource("StyleBoxTexture_12yd3")
-theme_override_styles/hover = SubResource("StyleBoxTexture_26v5e")
-theme_override_styles/focus = SubResource("StyleBoxTexture_rp6ip")
+theme_override_styles/normal = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/focus = SubResource("StyleBoxFlat_bbqo6")
 
 [node name="Icon" type="TextureRect" parent="TopBar/MailButton" unique_id=1099393789]
 layout_mode = 0
@@ -420,10 +310,10 @@ stretch_mode = 5
 custom_minimum_size = Vector2(46, 46)
 layout_mode = 2
 focus_mode = 0
-theme_override_styles/normal = SubResource("StyleBoxTexture_dckix")
-theme_override_styles/pressed = SubResource("StyleBoxTexture_co4ci")
-theme_override_styles/hover = SubResource("StyleBoxTexture_d66xx")
-theme_override_styles/focus = SubResource("StyleBoxTexture_cmcyx")
+theme_override_styles/normal = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/focus = SubResource("StyleBoxFlat_bbqo6")
 
 [node name="Icon" type="TextureRect" parent="TopBar/FriendsButton" unique_id=1868831262]
 layout_mode = 0
@@ -444,10 +334,10 @@ stretch_mode = 5
 custom_minimum_size = Vector2(46, 46)
 layout_mode = 2
 focus_mode = 0
-theme_override_styles/normal = SubResource("StyleBoxTexture_7iyuo")
-theme_override_styles/pressed = SubResource("StyleBoxTexture_406qy")
-theme_override_styles/hover = SubResource("StyleBoxTexture_83b5w")
-theme_override_styles/focus = SubResource("StyleBoxTexture_gy47a")
+theme_override_styles/normal = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/focus = SubResource("StyleBoxFlat_bbqo6")
 
 [node name="Icon" type="Panel" parent="TopBar/SettingsButton" unique_id=1283565934]
 layout_mode = 0
@@ -469,7 +359,7 @@ offset_left = 948.0
 offset_top = 146.0
 offset_right = 1248.0
 offset_bottom = 242.0
-theme_override_styles/panel = SubResource("StyleBoxTexture_8gjrb")
+theme_override_styles/panel = SubResource("StyleBoxFlat_p1nwe")
 
 [node name="Content" type="HBoxContainer" parent="ProfileCard" unique_id=1067230905]
 layout_mode = 2
@@ -488,7 +378,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("14_neoyv")
 expand_mode = 1
 stretch_mode = 5
 
@@ -499,21 +388,20 @@ theme_override_constants/separation = 2
 
 [node name="Name" type="Label" parent="ProfileCard/Content/Info" unique_id=1028192388]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 text = "Demonstração local"
 
 [node name="Level" type="Label" parent="ProfileCard/Content/Info" unique_id=575903798]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.8117647, 0.9019608, 1, 1)
 theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.8117647, 0.9019608, 1, 1)
 text = "Entre para acessar seu perfil"
 
 [node name="Xp" type="ProgressBar" parent="ProfileCard/Content/Info" unique_id=266094133]
+visible = false
 custom_minimum_size = Vector2(130, 8)
 layout_mode = 2
-value = 0.0
-visible = false
 show_percentage = false
 
 [node name="FriendsPanel" type="Control" parent="." unique_id=574836991]
@@ -531,7 +419,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("15_wof4p")
 patch_margin_left = 70
 patch_margin_top = 150
 patch_margin_right = 70
@@ -558,15 +445,15 @@ theme_override_constants/separation = 10
 
 [node name="Title" type="Label" parent="FriendsPanel/Margin/Content/Header" unique_id=626769983]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 26
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 text = "Amizades"
 
 [node name="Online" type="Label" parent="FriendsPanel/Margin/Content/Header" unique_id=1855555013]
 layout_mode = 2
 size_flags_horizontal = 10
-theme_override_colors/font_color = Color(0.23921569, 0.8627451, 0.36078432, 1)
 theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.23921569, 0.8627451, 0.36078432, 1)
 text = "—"
 
 [node name="FriendList" type="VBoxContainer" parent="FriendsPanel/Margin/Content" unique_id=331536337]
@@ -577,28 +464,25 @@ theme_override_constants/separation = 4
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_bbqo6")
+theme_override_styles/focus = SubResource("StyleBoxFlat_bbqo6")
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("StyleBoxTexture_lsxs6")
-theme_override_styles/pressed = SubResource("StyleBoxTexture_unoev")
-theme_override_styles/hover = SubResource("StyleBoxTexture_7wy5f")
-theme_override_styles/focus = SubResource("StyleBoxTexture_o4h6x")
 text = "Ver todos os amigos"
 
 [node name="SkinsPanel" parent="." unique_id=2048242588 instance=ExtResource("19_3h20m")]
+layout_mode = 1
+
+[node name="Navigation" type="Control" parent="." unique_id=1754084771]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="Navigation" type="Control" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
 mouse_filter = 2
 script = ExtResource("31_navigation")
 
-[node name="OrientationGuard" type="CanvasLayer" parent="."]
+[node name="OrientationGuard" type="CanvasLayer" parent="." unique_id=1793533384]
 script = ExtResource("32_orientation")

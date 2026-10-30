@@ -312,8 +312,8 @@ func _style_tab(node: Button) -> void:
 	node.add_theme_color_override("icon_normal_color", Color.WHITE)
 	node.add_theme_color_override("icon_hover_color", Color.WHITE)
 	node.add_theme_color_override("icon_focus_color", Color.WHITE)
-	node.add_theme_color_override("icon_pressed_color", PlayerUI.KIT_INK)
-	node.add_theme_color_override("icon_hover_pressed_color", PlayerUI.KIT_INK)
+	node.add_theme_color_override("icon_pressed_color", PlayerUI.PRIMARY_TEXT)
+	node.add_theme_color_override("icon_hover_pressed_color", PlayerUI.PRIMARY_TEXT)
 
 func _style_toggle(node: CheckButton) -> void:
 	node.add_theme_icon_override("checked", _toggle_on)
@@ -331,7 +331,7 @@ func _style_toggle(node: CheckButton) -> void:
 	node.add_theme_stylebox_override("focus", focus)
 
 ## Painel do conteúdo: moldura do kit (azul com brilho e cantos de cristal).
-func _glass(padding: int) -> StyleBoxTexture:
+func _glass(padding: int) -> StyleBoxFlat:
 	var compact := UIScale.is_compact()
 	return PlayerUI.frame_panel(padding + (4 if compact else 14), compact)
 

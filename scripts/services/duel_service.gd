@@ -13,7 +13,9 @@ signal changed
 ## Saiu da sala sem pedir: "closed" (sala encerrada), "removed" (expulso ou caiu do lobby).
 signal removed(reason: String)
 
-const HEARTBEAT_SECONDS := 2.0
+## Lobby: presença (o servidor marca "sem sinal" após 20 s e remove após 45 s). Na partida,
+## 1 s, porque o servidor só avança prazos quando alguém chama.
+const HEARTBEAT_SECONDS := 5.0
 var client: SupabaseClient
 var session: SessionService
 var local_server: LocalDuelServer
@@ -196,7 +198,8 @@ func _apply(result: Dictionary) -> Dictionary:
 		_received_at = Time.get_ticks_msec() / 1000.0
 		# Durante a partida o sinal de vida é mais frequente: turnos e revelações têm prazo curto.
 		_beat.wait_time = 1.0 if str(room.room.get("status", "")) == "in_match" else HEARTBEAT_SECONDS
-		if _beat.is_stopped(): _beat.start()
+		# Uma resposta com a sala inteira já vale como sinal de vida: o próximo conta daqui.
+		_beat.start()
 		changed.emit()
 	return result
 

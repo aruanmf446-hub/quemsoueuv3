@@ -19,6 +19,8 @@ var presence: FriendPresence
 var duel: DuelService
 ## Catálogo público (conexão catalog, sem sessão); o local continua como fallback.
 var catalog: CatalogService
+## CHAT preparado e desativado até a identidade GAME→CHAT ser verificada no servidor.
+var chat: ChatService
 
 
 func _enter_tree() -> void:
@@ -39,6 +41,9 @@ func _ready() -> void:
 	catalog = CatalogService.new()
 	catalog.client = catalog_client
 	add_child(catalog)
+	chat = ChatService.new()
+	chat.client = chat_client
+	add_child(chat)
 	# Testes headless (--script) chamam refresh() quando precisam; o jogo lê ao iniciar.
 	if not OS.get_cmdline_args().has("--script"): catalog.refresh.call_deferred()
 	session = SessionService.new()
@@ -98,6 +103,7 @@ func _session_changed() -> void:
 	progression.clear()
 	wallet.clear()
 	friends.clear()
+	chat.clear()
 	# A partida local não depende da conta: entrar ou sair dela não a interrompe.
 	if not duel.is_local(): duel.clear()
 	inventory.changed.emit()
@@ -120,15 +126,26 @@ func refresh_all() -> void:
 		presence.start()
 
 
+## Idade máxima dos dados antes de o poller buscar de novo (segundos). Ações do jogador
+## (comprar, equipar, amizade) e os botões "Atualizar" continuam buscando na hora.
+const MAX_AGE := {"friends": 90.0, "wallet": 300.0, "progression": 300.0}
+## Sem foco (app em segundo plano/minimizado) o poller não consulta nada.
+var _focused := true
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT: _focused = false
+	elif what == NOTIFICATION_APPLICATION_FOCUS_IN:
+		_focused = true
+		_poll_connected()
+
+
 func _poll_connected() -> void:
-	if not session.authenticated():
+	if not session.authenticated() or not _focused:
 		return
-	if wallet.state != "loading":
-		wallet.refresh()
-	if friends.state != "loading":
-		friends.refresh()
-	if progression.state != "loading":
-		progression.refresh()
+	friends.refresh_if_stale(MAX_AGE.friends)
+	wallet.refresh_if_stale(MAX_AGE.wallet)
+	progression.refresh_if_stale(MAX_AGE.progression)
 
 
 func _equipment_changed() -> void:

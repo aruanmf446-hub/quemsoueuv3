@@ -5,6 +5,15 @@ var session: SessionService
 
 
 func refresh() -> Dictionary:
+	if _inflight: return await _loaded
+	_inflight = true
+	var result := await _refresh()
+	_inflight = false
+	_loaded.emit(result)
+	return result
+
+
+func _refresh() -> Dictionary:
 	_request_sequence += 1
 	var sequence := _request_sequence
 	state = "loading"
@@ -21,6 +30,7 @@ func refresh() -> Dictionary:
 			result = ServiceResult.failure("invalid_contract")
 	error = {} if result.ok else result
 	state = "success" if result.ok else result.state
+	if result.ok: fetched_at = Time.get_ticks_msec() / 1000.0
 	changed.emit()
 	return result
 

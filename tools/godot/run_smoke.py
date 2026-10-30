@@ -28,6 +28,7 @@ if imported:
  run('duel_local',['--script','res://tests/duel_local/flow_test.gd'],240)
  run('supabase_connections',['--script','res://tests/supabase_connections/verify.gd'],120)
  run('catalog_remote',['--script','res://tests/catalog_remote/verify.gd'],120)
+ run('consumption',['--script','res://tests/consumption/verify.gd'],120)
  run('main_menu',['--script','res://tools/godot/smoke.gd','--','res://scenes/menu/main_menu.tscn'],120)
 (out/'results.json').write_text(json.dumps({'engine':version,'headless':True,'visual_tests':False,'tests':results},indent=2))
 raise SystemExit(0 if all(r['passed'] for r in results) else 1)

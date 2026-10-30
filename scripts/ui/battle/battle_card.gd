@@ -55,7 +55,7 @@ func setup(card_id: String, chosen: bool, out: bool, usable: bool) -> void:
 	caption.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	caption.max_lines_visible = 2
 	var strip := StyleBoxFlat.new()
-	strip.bg_color = Color(0.03,0.045,0.07,0.97)
+	strip.bg_color = Color(0.02,0.03,0.05,0.78)
 	strip.set_content_margin_all(1)
 	strip.content_margin_left = 6
 	strip.content_margin_right = 6
@@ -70,7 +70,17 @@ func setup(card_id: String, chosen: bool, out: bool, usable: bool) -> void:
 	caption_area = Control.new()
 	caption_area.custom_minimum_size.y = 20
 	caption_area.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	column.add_child(caption_area)
+	# Nome sobre a parte de baixo da arte (como na referência), não numa faixa abaixo dela:
+	# a ilustração ocupa a carta inteira.
+	var overlay := VBoxContainer.new()
+	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	overlay.add_theme_constant_override("separation",0)
+	add_child(overlay)
+	var spacer := Control.new()
+	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	overlay.add_child(spacer)
+	overlay.add_child(caption_area)
 	caption_area.add_child(caption)
 	caption.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	if out:
@@ -116,13 +126,13 @@ func setup(card_id: String, chosen: bool, out: bool, usable: bool) -> void:
 	_style(false)
 func _style(hover: bool) -> void:
 	var style := Style.panel(1,selected or (hover and interactive))
-	style.border_color = Color("#596273") if removed else (PlayerUI.GOLD_BRIGHT if selected else (PlayerUI.GOLD if hover and interactive else Color("#b78b4b")))
-	style.set_border_width_all(2 if selected or (hover and interactive) else 1)
+	style.border_color = Color("#596273") if removed else (PlayerUI.GOLD_BRIGHT if selected else (PlayerUI.GOLD if hover and interactive else Color("#c39352")))
+	style.set_border_width_all(2)
 	style.shadow_color = Color(1,0.62,0.19,0.25) if selected else Color(0,0,0,0.65)
 	style.shadow_size = 4 if selected else 3
 	style.shadow_offset = Vector2(0,2)
 	style.bg_color = Color("#070d14")
-	style.set_corner_radius_all(4)
+	style.set_corner_radius_all(6)
 	add_theme_stylebox_override("panel",style)
 ## Carta "tocável": acende um pouco ao passar o mouse/foco (só se puder ser escolhida).
 ## Sem mudar escala: a carta nunca sai da área do tabuleiro.

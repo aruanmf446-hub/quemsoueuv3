@@ -178,31 +178,43 @@ func _build_sidebar() -> void:
 	settings.tooltip_text = "Configurações · a rodada continua"
 	settings.custom_minimum_size = Vector2(30,30)
 	controls.add_child(settings)
+	# Sala e convite agrupados num painel próprio (antes disputavam espaço com tempo/ajustes).
+	var room_panel := PanelContainer.new()
+	room_panel.name = "RoomInvite"
+	room_panel.add_theme_stylebox_override("panel",Style.panel(5))
+	_side.add_child(room_panel)
+	var room_row := PlayerUI.row(room_panel)
+	room_row.add_theme_constant_override("separation",4)
+	var room_text := PlayerUI.column(room_row)
+	room_text.add_theme_constant_override("separation",0)
+	room_text.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var code := str(duel.room.get("room",{}).get("code",""))
 	if not duel.is_local() and not code.is_empty():
-		var copy := Style.action(code,func() -> void:
+		room_text.add_child(Style.label("Código da sala",10,PlayerUI.MUTED))
+		var code_label := Style.label(code,16)
+		Style.strong(code_label)
+		code_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		room_text.add_child(code_label)
+		var copy := Style.action("",func() -> void:
 			DisplayServer.clipboard_set(code)
 			_notice.text = "Código copiado"
 			_notice_ttl = 3.5,"copy")
 		copy.name = "CopyRoomCode"
-		copy.add_theme_font_size_override("font_size",11)
-		copy.add_theme_constant_override("icon_max_width",12)
 		copy.tooltip_text = "Copiar código da sala"
-		controls.add_child(copy)
+		copy.custom_minimum_size = Vector2(30,30)
+		copy.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		room_row.add_child(copy)
 		# Convite por link: só o ADM gera (o servidor recusa os outros).
 		if duel.is_admin():
 			var share := Style.action("",_share_invite,"share")
 			share.name = "ShareInvite"
 			share.tooltip_text = "Compartilhar convite"
 			share.custom_minimum_size = Vector2(30,30)
-			controls.add_child(share)
+			share.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			room_row.add_child(share)
 	else:
-		var local := Style.label("LOCAL",10,PlayerUI.GOLD)
-		local.autowrap_mode = TextServer.AUTOWRAP_OFF
-		local.custom_minimum_size.x = 32
-		local.size_flags_horizontal = Control.SIZE_SHRINK_END
-		local.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		controls.add_child(local)
+		room_text.add_child(Style.label("Partida local",13,PlayerUI.GOLD))
+		room_text.add_child(Style.label("Só neste aparelho · sem convite",10,PlayerUI.MUTED))
 	var voice := PanelContainer.new()
 	voice.name = "VoiceUnavailable"
 	voice.add_theme_stylebox_override("panel",Style.panel(5))
@@ -264,7 +276,10 @@ func _build_sidebar() -> void:
 	_notice.max_lines_visible = 2
 	_notice.add_theme_stylebox_override("normal",Style.panel(4,true))
 	_notice.hide()
-	_side.add_child(_notice)
+	# Aviso flutuante no canto inferior esquerdo, sobre o fundo e fora do tabuleiro.
+	_notice.z_index = 4
+	_notice.custom_minimum_size = Vector2(190,0)
+	_canvas.add_child(_notice)
 	var leave := Style.action("Sair da sala",func() -> void: overlay_parent.call("_leave_room"))
 	leave.name = "LeaveBattle"
 	leave.custom_minimum_size.y = 24
@@ -381,7 +396,8 @@ func _render_players() -> void:
 		var local: Dictionary = players.pop_at(mine)
 		players.insert(floori(players.size()/2.0),local)
 	_roster.columns = maxi(players.size(),1) if players.size() <= 5 else ceili(players.size()/(2.0 if players.size() <= 12 else 3.0))
-	_roster.custom_minimum_size.y = 60 if players.size() <= 5 else (76 if players.size() <= 12 else 114)
+	_roster.size_flags_horizontal = Control.SIZE_SHRINK_CENTER if players.size() <= 5 else Control.SIZE_EXPAND_FILL
+	_roster.custom_minimum_size.y = 64 if players.size() <= 5 else (76 if players.size() <= 12 else 114)
 	var winners: Array = (_data.result if _data.get("result") is Dictionary else {}).get("winners",[])
 	for source: Dictionary in players:
 		var player := source.duplicate(true)
@@ -399,6 +415,11 @@ func _render_players() -> void:
 		panel.active = (turn or winner) and not player.eliminated
 		panel.name = "Player_" + str(player.member_id)
 		panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		if players.size() <= 5:
+			# Grupo centralizado; o jogador da vez fica mais alto que os demais.
+			panel.size_flags_horizontal = Control.SIZE_FILL
+			panel.custom_minimum_size = Vector2(minf(_main.size.x/maxf(players.size(),3)-8,230), 64 if panel.active else 54)
+			panel.size_flags_vertical = Control.SIZE_SHRINK_END
 		_roster.add_child(panel)
 		var row := PlayerUI.row(panel)
 		row.add_theme_constant_override("separation",3)
@@ -524,7 +545,7 @@ func _render_hand() -> void:
 	PlayerUI.clear(grid)
 	grid.columns = mini(maxi(entries.size(),1),3) if _private_shown else 1
 	_hand_toggle.icon = load("res://assets/ui/battle/eye_off.svg" if _private_shown else "res://assets/ui/battle/eye.svg")
-	_hand_toggle.text = ("Ocultar" if _private_shown else "Mostrar") + " · %d" % entries.size()
+	_hand_toggle.text = ("Ocultar cartas" if _private_shown else "Mostrar cartas") + " · %d" % entries.size()
 	_hand_toggle.disabled = entries.is_empty()
 	if _private_shown:
 		for entry: Dictionary in entries:
@@ -547,13 +568,24 @@ func _render_hand() -> void:
 			hidden.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 			grid.add_child(hidden)
 		else:
-			var hidden := TextureRect.new()
+			# Leque com uma carta virada por carta na mão (não parece mais uma só).
+			var hidden := HBoxContainer.new()
 			hidden.name = "HiddenHand"
-			hidden.texture = preload("res://assets/ui/battle/private_back.svg")
-			hidden.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			hidden.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			hidden.alignment = BoxContainer.ALIGNMENT_CENTER
+			hidden.add_theme_constant_override("separation",-10 if entries.size() > 3 else -4)
 			hidden.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			hidden.custom_minimum_size.y = 40
+			hidden.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			for index in range(entries.size()):
+				var back := TextureRect.new()
+				back.texture = preload("res://assets/ui/battle/private_back.svg")
+				back.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+				back.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+				back.custom_minimum_size = Vector2(30 if entries.size() > 3 else 36,44)
+				back.pivot_offset = Vector2(15,44)
+				back.rotation_degrees = (index-(entries.size()-1)*0.5)*6.0
+				back.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				if entries[index].get("lost",false): back.modulate = Color("#555967")
+				hidden.add_child(back)
 			grid.add_child(hidden)
 func _layout() -> void:
 	if not _built or size.x <= 0 or size.y <= 0: return
@@ -566,6 +598,9 @@ func _layout() -> void:
 	_main.size = Vector2(width-side_width-10,_canvas.size.y)
 	_side.position = Vector2(width-side_width,0)
 	_side.size = Vector2(side_width,_canvas.size.y)
+	if is_instance_valid(_notice):
+		_notice.reset_size()
+		_notice.position = Vector2(_main.size.x-_notice.size.x-14,_canvas.size.y-_notice.size.y-10)
 	_fit_cards.call_deferred()
 func _fit_cards() -> void:
 	if not is_instance_valid(_grid) or _grid.size.x <= 0 or _grid.size.y <= 0: return

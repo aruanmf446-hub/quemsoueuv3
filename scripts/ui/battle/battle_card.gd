@@ -6,7 +6,7 @@ const Style = preload("res://scripts/ui/battle/battle_style.gd")
 # A uniform top crop hid Cobra Grande and cut off Slender Man / Homem Sorridente.
 const FOCAL_Y := {
 	"bruxa_do_pantano":0.20, "cobra_grande":0.50, "dama_de_branco":0.27,
-	"homem_do_saco":0.16, "homem_sorridente":0.14, "jeff_the_killer":0.30,
+	"homem_do_saco":0.16, "homem_sorridente":0.14, "jeff_the_killer":0.25,
 	"loira_do_banheiro":0.125, "momo":0.30, "slender_man":0.13,
 }
 var id := ""

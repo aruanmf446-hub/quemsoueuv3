@@ -93,7 +93,7 @@ func _build() -> void:
 	_board = Surface.new()
 	_board.name = "BattleBoard"
 	_board.variant = "board"
-	_board.padding = 12
+	_board.padding = 10
 	_board.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_board.mouse_filter = Control.MOUSE_FILTER_PASS
 	_main.add_child(_board)

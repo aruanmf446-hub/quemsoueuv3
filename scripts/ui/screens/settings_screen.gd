@@ -1,6 +1,6 @@
 extends PlayerScreen
 
-const ACCENT := Color("#f2c76e")
+const ACCENT := PlayerUI.GOLD
 const MUTED := Color("#a8bad3")
 const GLASS := Color(0.035, 0.06, 0.11, 0.92)
 const INK := Color("#141006")
@@ -300,20 +300,11 @@ func _button(text: String, action: Callable) -> Button:
 	node.pressed.connect(action)
 	return node
 
-## Botões e abas da versão aprovada: superfícies azul-escuras arredondadas; a aba
-## selecionada fica âmbar com filete dourado. Sem placas/molduras de imagem.
+## Botões e abas no modelo das telas do jogador (PlayerUI, a partir da referência aprovada):
+## superfície escura com filete; a aba/opção selecionada fica âmbar escuro com filete dourado.
 func _style_button(node: Button) -> void:
 	node.add_theme_font_size_override("font_size", 21)
-	var colors := {"normal": Color("#213852"), "hover": Color("#304c6a"), "pressed": Color("#4b4432"), "hover_pressed": Color("#56503a"), "focus": Color("#213852"), "disabled": Color("#1a2638")}
-	for state: String in colors:
-		var style := _box(colors[state], 14)
-		if state in ["pressed", "hover_pressed", "focus"]:
-			style.border_color = ACCENT
-			style.set_border_width_all(2)
-		if state == "focus": style.draw_center = false
-		node.add_theme_stylebox_override(state, style)
-	for color in ["font_color", "font_hover_color", "font_focus_color", "font_pressed_color", "font_hover_pressed_color"]:
-		node.add_theme_color_override(color, Color.WHITE)
+	PlayerUI.style_button(node, false)
 
 func _style_tab(node: Button) -> void:
 	_style_button(node)
@@ -339,9 +330,9 @@ func _style_toggle(node: CheckButton) -> void:
 	focus.set_border_width_all(2)
 	node.add_theme_stylebox_override("focus", focus)
 
-## Painel do conteúdo da versão aprovada: azul-escuro liso, cantos arredondados.
+## Painel do conteúdo no modelo (PlayerUI.frame_panel).
 func _glass(padding: int) -> StyleBoxFlat:
-	return _box(Color("#14243c"), padding)
+	return PlayerUI.frame_panel(padding)
 
 func _row_box() -> StyleBoxFlat:
 	var box := _box(Color(1, 1, 1, 0.04), 16)

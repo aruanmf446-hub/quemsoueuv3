@@ -10,8 +10,9 @@
 
 ## Design dos menus (aprovado pelo dono do projeto — não alterar sem pedido explícito)
 
-- O menu principal/lobby e as telas do jogador (Personagens, Configurações, Amigos, Música, Duelo, Perfil, Carteira, História) têm design aprovado: superfícies escuras e discretas (`StyleBoxFlat`), cantos arredondados, filete fino; dourado só no item principal/selecionado. Capturas de referência: `tests/skins/evidence/1280x720.png` e `tests/settings_t14b/captures/desktop_0.png`.
-- **Reprovado:** molduras e placas de imagem azul/douradas com brilho e cantos de cristal (`assets/ui/kit/*`, `assets/processed/frames/frame_painel_brasao.png`, `NinePatchRect`/`StyleBoxTexture` nessas telas). Não reintroduzir, nem "para combinar com o resto do jogo".
-- Ao implementar uma função nova, reutilize os estilos existentes (`PlayerUI.style_button`, `PlayerUI.plate`, `PlayerUI.panel`, `_panel_style` da tela) em vez de criar um visual novo. Mudança visual só quando o pedido for visual.
+- **O modelo visual está em [`docs/referencias/README.md`](docs/referencias/README.md).** Telas do jogador (Personagens, Configurações, Amigos, Música, Duelo, Perfil, Carteira, História) seguem `docs/referencias/personagens/REFERENCIA_APROVADA.png`; o menu principal/lobby segue `docs/referencias/menu/REFERENCIA_MENU.png`. Abra essas imagens antes de mexer em interface.
+- Os valores do modelo estão em `scripts/ui/player_ui.gd` (`PlayerUI`: cores e componentes `style_button`, `style_row`, `style_field`, `pill`, `plate`, `frame_panel`). Telas novas usam esses componentes; não definem cores nem estilos próprios.
+- **Reprovado:** molduras e placas de imagem azul/douradas com brilho e cantos de cristal (`assets/ui/*`, `assets/ui/kit/*`, `assets/processed/frames/frame_painel_brasao.png`, texturas de `assets/processed/textures/`, `NinePatchRect`/`StyleBoxTexture` nessas telas). Não reintroduzir, nem "para combinar com o resto do jogo".
+- Ao implementar uma função nova, reutilize o modelo. Mudança visual só quando o pedido for visual.
 - Referências de organização e navegação (não de ornamento): menus de Fortnite, Call of Duty e PES — hierarquia clara, poucas cores, foco no conteúdo.
 - `python3 tools/player_ui/check_design.py` (roda no CI) falha se o visual reprovado voltar às telas do jogador.

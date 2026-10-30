@@ -1,16 +1,29 @@
 class_name PlayerUI
 extends RefCounted
 
-const GOLD := Color("#f2cf7d")
-const INK := Color("#12223b")
-const TEXT := Color("#edf3ff")
-## Aparência aprovada dos menus: superfícies escuras e discretas, filete fino e dourado só
-## no principal/selecionado. Não usar molduras ou placas de imagem (assets/ui/kit,
-## assets/processed/frames) nos menus: esse visual foi reprovado. Ver AGENTS.md.
-const PANEL_BG := Color(0.07, 0.11, 0.19, 0.92)
-const PANEL_BORDER := Color("#2c3a52")
-const FIELD_BG := Color("#16233a")
-## Texto sobre superfícies douradas (principal/selecionado).
+## MODELO VISUAL DAS TELAS DO JOGADOR — tirado de docs/referencias/personagens/REFERENCIA_APROVADA.png
+## (ver docs/referencias/README.md). Superfícies azul-noite translúcidas sobre o fundo do lobby,
+## filete fino frio, cantos de 8–10 px; dourado só no que está selecionado ou é a ação principal.
+## Não usar molduras/placas de imagem (assets/ui/kit, assets/processed/frames): visual reprovado.
+const GOLD := Color("#e8b65e")
+const GOLD_BRIGHT := Color("#f3c66a")
+## Títulos de seção ("Coleções", "Personagens") e valores em destaque.
+const TITLE_GOLD := Color("#ecc98e")
+## Texto sobre o dourado (ação principal).
+const INK := Color("#23170a")
+const TEXT := Color("#eef2f8")
+const MUTED := Color("#9ba7b8")
+## Painel grande (galeria, coleções, conteúdo de configurações).
+const PANEL_BG := Color(0.035, 0.065, 0.115, 0.86)
+const PANEL_BORDER := Color("#253145")
+## Campos, cartões e botões secundários.
+const SURFACE := Color(0.065, 0.10, 0.16, 0.92)
+const SURFACE_HOVER := Color(0.09, 0.135, 0.21, 0.95)
+const FIELD_BG := SURFACE
+const FIELD_BORDER := Color("#2f3b50")
+## Item selecionado (aba, coleção, filtro ativo): fundo âmbar escuro com filete dourado.
+const SELECTED_BG := Color(0.17, 0.145, 0.115, 0.95)
+## Compatibilidade com telas antigas.
 const KIT_INK := INK
 ## Cores das coleções (antes texturas do kit).
 const SWATCHES := {
@@ -43,30 +56,102 @@ static func button(text: String, action: Callable) -> Button:
 	return node
 
 
-## Botão discreto: superfície escura com filete; o principal e o selecionado são dourados.
+## Botão do modelo. Principal: dourado com texto escuro. Secundário: superfície escura com
+## filete frio. Selecionado (toggle pressionado: abas, coleções, filtros): âmbar escuro + filete dourado.
 static func style_button(node: Button, primary: bool) -> void:
 	var states := {
 		"normal": button_plate(primary),
-		"hover": button_plate(primary, Color(1.16, 1.16, 1.2)),
-		"pressed": button_plate(true, Color(0.92, 0.92, 0.92)),
-		"hover_pressed": button_plate(true, Color(1.08, 1.08, 1.08)),
-		"disabled": button_plate(false, Color(0.5, 0.52, 0.58, 0.85)),
+		"hover": button_plate(primary, Color(1.12, 1.12, 1.15)),
+		"pressed": selected_plate(primary),
+		"hover_pressed": selected_plate(primary, Color(1.08, 1.08, 1.08)),
+		"disabled": _flat(Color(0.07, 0.09, 0.13, 0.85), Color("#232c3a"), 8, Color.WHITE),
 	}
 	for state: String in states:
-		node.add_theme_stylebox_override(state, states[state])
+		var box: StyleBoxFlat = states[state]
+		if state == "disabled": _pad(box, 20, 6)
+		node.add_theme_stylebox_override(state, box)
 	var focus := StyleBoxFlat.new()
 	focus.draw_center = false
-	focus.border_color = Color(GOLD, 0.9)
+	focus.border_color = Color(GOLD_BRIGHT, 0.9)
 	focus.set_border_width_all(2)
-	focus.set_corner_radius_all(8)
+	focus.set_corner_radius_all(9)
 	focus.set_expand_margin_all(2)
 	node.add_theme_stylebox_override("focus", focus)
 	for color: String in ["font_color", "font_hover_color", "font_focus_color"]:
-		node.add_theme_color_override(color, KIT_INK if primary else TEXT)
+		node.add_theme_color_override(color, INK if primary else TEXT)
 	for color: String in ["font_pressed_color", "font_hover_pressed_color"]:
-		node.add_theme_color_override(color, KIT_INK)
+		node.add_theme_color_override(color, INK if primary else TEXT)
 	node.add_theme_color_override("font_disabled_color", Color(1, 1, 1, 0.38))
 	fluid(node)
+
+
+## Linha de lista selecionável (coleções, categorias): transparente até passar o mouse;
+## selecionada fica âmbar escuro com filete dourado, como na referência.
+static func style_row(node: Button) -> void:
+	style_button(node, false)
+	var normal := _flat(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 8, Color.WHITE)
+	_pad(normal, 16, 6)
+	node.add_theme_stylebox_override("normal", normal)
+	var hover := _flat(SURFACE_HOVER, Color(0, 0, 0, 0), 8, Color.WHITE)
+	_pad(hover, 16, 6)
+	node.add_theme_stylebox_override("hover", hover)
+
+
+## Selo de estado em largura total na base do cartão (EQUIPADO / DISPONÍVEL / BLOQUEADO).
+static func pill(text: String, kind: String) -> PanelContainer:
+	var node := PanelContainer.new()
+	node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var box := StyleBoxFlat.new()
+	box.set_corner_radius_all(6)
+	box.set_border_width_all(1)
+	_pad(box, 10, 3)
+	var ink := MUTED
+	match kind:
+		"equipped":
+			box.bg_color = Color("#5a4429")
+			box.border_color = Color("#7a5d36")
+			ink = Color("#f6e7c6")
+		"locked":
+			box.bg_color = Color(0.06, 0.08, 0.12, 0.92)
+			box.border_color = Color("#232c3a")
+			ink = Color("#7d8796")
+		_:
+			box.bg_color = Color(0.07, 0.11, 0.17, 0.92)
+			box.border_color = FIELD_BORDER
+	node.add_theme_stylebox_override("panel", box)
+	var text_node := label(text, 12, ink)
+	text_node.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	text_node.autowrap_mode = TextServer.AUTOWRAP_OFF
+	node.add_child(text_node)
+	return node
+
+
+## Campo de texto e seletores (pesquisa, filtros).
+static func style_field(node: Control) -> void:
+	var normal := _flat(SURFACE, FIELD_BORDER, 8, Color.WHITE)
+	_pad(normal, 16, 6)
+	var focus := _flat(SURFACE_HOVER, Color(GOLD, 0.75), 8, Color.WHITE)
+	_pad(focus, 16, 6)
+	for state in ["normal", "read_only"]:
+		node.add_theme_stylebox_override(state, normal)
+	node.add_theme_stylebox_override("focus", focus)
+	if node is Button:
+		var hover := _flat(SURFACE_HOVER, Color("#3c4a62"), 8, Color.WHITE)
+		_pad(hover, 16, 6)
+		for state in ["hover", "pressed", "hover_pressed"]:
+			node.add_theme_stylebox_override(state, hover)
+		for color in ["font_color", "font_hover_color", "font_focus_color", "font_pressed_color", "font_hover_pressed_color"]:
+			node.add_theme_color_override(color, TEXT)
+	else:
+		node.add_theme_color_override("font_color", TEXT)
+		node.add_theme_color_override("font_placeholder_color", MUTED)
+
+
+static func _pad(box: StyleBoxFlat, horizontal: int, vertical: int) -> void:
+	box.content_margin_left = horizontal
+	box.content_margin_right = horizontal
+	box.content_margin_top = vertical
+	box.content_margin_bottom = vertical
 
 
 ## Movimento dos botões: crescem um pouco sob o mouse e afundam ao pressionar.
@@ -180,30 +265,35 @@ static func _flat(bg: Color, border: Color, radius: int, tint: Color) -> StyleBo
 
 ## Cartão/linha. `gold`: destaque (o próprio jogador, o selecionado). tint clareia/escurece.
 static func plate(gold := false, tint := Color.WHITE) -> StyleBoxFlat:
-	var box := _flat(Color("#1f2c43") if gold else Color(0.06, 0.10, 0.17, 0.94), Color(GOLD, 0.85) if gold else PANEL_BORDER, 10, tint)
-	if gold: box.set_border_width_all(2)
-	box.content_margin_left = 22
-	box.content_margin_right = 22
-	box.content_margin_top = 8
-	box.content_margin_bottom = 8
+	var box := _flat(SELECTED_BG if gold else SURFACE, GOLD_BRIGHT if gold else FIELD_BORDER, 10, tint)
+	if gold:
+		box.set_border_width_all(2)
+		box.shadow_color = Color(GOLD, 0.28)
+		box.shadow_size = 8
+	_pad(box, 22, 8)
 	return box
 
 
-## Botões, abas e campos: escuros com filete; dourado sólido no principal/selecionado.
+## Botão em repouso: dourado (principal) ou superfície escura com filete (secundário).
 static func button_plate(gold := false, tint := Color.WHITE) -> StyleBoxFlat:
-	var box := _flat(GOLD if gold else FIELD_BG, Color(GOLD, 0.0) if gold else Color("#3a4a64"), 8, tint)
-	box.content_margin_left = 20
-	box.content_margin_right = 20
-	box.content_margin_top = 6
-	box.content_margin_bottom = 6
+	var box := _flat(GOLD if gold else SURFACE, Color(GOLD_BRIGHT, 0.0) if gold else FIELD_BORDER, 8, tint)
+	_pad(box, 20, 6)
+	return box
+
+
+## Botão selecionado/pressionado.
+static func selected_plate(primary := false, tint := Color.WHITE) -> StyleBoxFlat:
+	var box := _flat(GOLD.darkened(0.12) if primary else SELECTED_BG, GOLD_BRIGHT, 8, tint)
+	box.set_border_width_all(1 if primary else 2)
+	_pad(box, 20, 6)
 	return box
 
 
 ## Painel de seção. `small` (celular): cantos menores.
 static func frame_panel(padding := 34, small := false) -> StyleBoxFlat:
-	var box := _flat(PANEL_BG, PANEL_BORDER, 8 if small else 12, Color.WHITE)
-	box.shadow_color = Color(0, 0, 0, 0.35)
-	box.shadow_size = 10
+	var box := _flat(PANEL_BG, PANEL_BORDER, 8 if small else 10, Color.WHITE)
+	box.shadow_color = Color(0, 0, 0, 0.3)
+	box.shadow_size = 12
 	for side in [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]:
 		box.set_content_margin(side, padding)
 	return box

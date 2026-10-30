@@ -110,7 +110,7 @@
     },
     {
       "test": "duel_local",
-      "exit_code": 124,
+      "exit_code": 0,
       "passed": false
     },
     {

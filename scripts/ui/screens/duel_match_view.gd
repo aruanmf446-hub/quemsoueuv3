@@ -396,7 +396,7 @@ func _render_players() -> void:
 		var local: Dictionary = players.pop_at(mine)
 		players.insert(floori(players.size()/2.0),local)
 	_roster.columns = maxi(players.size(),1) if players.size() <= 5 else ceili(players.size()/(2.0 if players.size() <= 12 else 3.0))
-	_roster.size_flags_horizontal = Control.SIZE_SHRINK_CENTER if players.size() <= 5 else Control.SIZE_EXPAND_FILL
+	_roster.size_flags_horizontal = Control.SIZE_SHRINK_CENTER if players.size() <= 3 else Control.SIZE_EXPAND_FILL
 	_roster.custom_minimum_size.y = 64 if players.size() <= 5 else (76 if players.size() <= 12 else 114)
 	var winners: Array = (_data.result if _data.get("result") is Dictionary else {}).get("winners",[])
 	for source: Dictionary in players:
@@ -415,7 +415,7 @@ func _render_players() -> void:
 		panel.active = (turn or winner) and not player.eliminated
 		panel.name = "Player_" + str(player.member_id)
 		panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		if players.size() <= 5:
+		if players.size() <= 3:
 			# Grupo centralizado; o jogador da vez fica mais alto que os demais.
 			panel.size_flags_horizontal = Control.SIZE_FILL
 			panel.custom_minimum_size = Vector2(minf(_main.size.x/maxf(players.size(),3)-8,230), 64 if panel.active else 54)

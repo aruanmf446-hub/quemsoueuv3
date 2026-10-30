@@ -1,0 +1,209 @@
+{
+  "01": {
+    "captured": false,
+    "checks": 11,
+    "collected": 14,
+    "completed": true,
+    "cpu_step": {
+      "max_ms": 15.474,
+      "p95_ms": 0.808
+    },
+    "deaths": 0,
+    "defeated": 14,
+    "failures": 0,
+    "health": 3,
+    "order": 1,
+    "phase_seconds": 216.351666666731,
+    "physics_seconds": 216.533333333333,
+    "position": [
+      1191.17761230469,
+      0.00088374107144773,
+      0.0
+    ],
+    "swings": 14
+  },
+  "02": {
+    "captured": false,
+    "checks": 11,
+    "collected": 15,
+    "completed": true,
+    "cpu_step": {
+      "max_ms": 11.443,
+      "p95_ms": 0.793
+    },
+    "deaths": 0,
+    "defeated": 15,
+    "failures": 0,
+    "health": 3,
+    "order": 2,
+    "phase_seconds": 215.720833333397,
+    "physics_seconds": 215.95,
+    "position": [
+      1191.22888183594,
+      0.000883773376699537,
+      0.0
+    ],
+    "swings": 15
+  },
+  "03": {
+    "captured": false,
+    "checks": 11,
+    "collected": 16,
+    "completed": true,
+    "cpu_step": {
+      "max_ms": 10.096,
+      "p95_ms": 0.836
+    },
+    "deaths": 0,
+    "defeated": 16,
+    "failures": 0,
+    "health": 3,
+    "order": 3,
+    "phase_seconds": 214.440000000063,
+    "physics_seconds": 214.716666666667,
+    "position": [
+      1191.18505859375,
+      0.000883791013620794,
+      0.0
+    ],
+    "swings": 16
+  },
+  "04": {
+    "captured": false,
+    "checks": 11,
+    "collected": 17,
+    "completed": true,
+    "cpu_step": {
+      "max_ms": 8.574,
+      "p95_ms": 0.735
+    },
+    "deaths": 0,
+    "defeated": 17,
+    "failures": 0,
+    "health": 3,
+    "order": 4,
+    "phase_seconds": 219.559166666733,
+    "physics_seconds": 219.883333333333,
+    "position": [
+      1191.24621582031,
+      0.000883754517417401,
+      0.0
+    ],
+    "swings": 17
+  },
+  "05": {
+    "captured": false,
+    "checks": 11,
+    "collected": 18,
+    "completed": true,
+    "cpu_step": {
+      "max_ms": 8.548,
+      "p95_ms": 0.767
+    },
+    "deaths": 0,
+    "defeated": 18,
+    "failures": 0,
+    "health": 3,
+    "order": 5,
+    "phase_seconds": 223.54500000007,
+    "physics_seconds": 223.916666666667,
+    "position": [
+      1191.17199707031,
+      0.000883742701262236,
+      0.0
+    ],
+    "swings": 18
+  },
+  "06": {
+    "captured": false,
+    "checks": 11,
+    "collected": 19,
+    "completed": true,
+    "cpu_step": {
+      "max_ms": 9.511,
+      "p95_ms": 0.78
+    },
+    "deaths": 0,
+    "defeated": 19,
+    "failures": 0,
+    "health": 3,
+    "order": 6,
+    "phase_seconds": 222.280833333402,
+    "physics_seconds": 222.7,
+    "position": [
+      1191.23498535156,
+      0.000883814878761768,
+      0.0
+    ],
+    "swings": 19
+  },
+  "07": {
+    "captured": false,
+    "checks": 11,
+    "collected": 20,
+    "completed": true,
+    "cpu_step": {
+      "max_ms": 22.657,
+      "p95_ms": 0.972
+    },
+    "deaths": 0,
+    "defeated": 20,
+    "failures": 0,
+    "health": 3,
+    "order": 7,
+    "phase_seconds": 220.966666666735,
+    "physics_seconds": 221.433333333333,
+    "position": [
+      1191.22839355469,
+      0.000883730652276427,
+      0.0
+    ],
+    "swings": 20
+  },
+  "08": {
+    "captured": false,
+    "checks": 11,
+    "collected": 20,
+    "completed": true,
+    "cpu_step": {
+      "max_ms": 21.878,
+      "p95_ms": 1.0
+    },
+    "deaths": 0,
+    "defeated": 20,
+    "failures": 0,
+    "health": 3,
+    "order": 8,
+    "phase_seconds": 218.083333333399,
+    "physics_seconds": 218.55,
+    "position": [
+      1191.24060058594,
+      0.00088380859233439,
+      0.0
+    ],
+    "swings": 20
+  },
+  "09": {
+    "captured": false,
+    "checks": 11,
+    "collected": 20,
+    "completed": true,
+    "cpu_step": {
+      "max_ms": 11.46,
+      "p95_ms": 0.878
+    },
+    "deaths": 0,
+    "defeated": 20,
+    "failures": 0,
+    "health": 3,
+    "order": 9,
+    "phase_seconds": 222.766666666736,
+    "physics_seconds": 223.233333333333,
+    "position": [
+      1191.21789550781,
+      0.000883801665622741,
+      0.0
+    ],
+    "swings": 20
+  }
+}

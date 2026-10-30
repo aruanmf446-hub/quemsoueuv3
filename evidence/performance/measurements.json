@@ -1,0 +1,28 @@
+{
+  "scope": "Candidate without automatic graphical reductions; Linux/software renderer; not a physical APK test",
+  "integrated_main_commit": "b4cdccf",
+  "apk_graphics": "Previous shadow, MSAA, LOD and preview-budget behavior preserved",
+  "removed_experiment": "Automatic DPR/pixel/LOD/shadow/MSAA reductions withdrawn before merge; their measurements are not acceptance evidence for this revision",
+  "fps_target_validated": false,
+  "web_pck_bytes": 35379152,
+  "web_canvas_probe": {
+    "viewport": [
+      844,
+      390
+    ],
+    "device_scale_factor": 1,
+    "canvas": [
+      844,
+      390
+    ],
+    "javascript_errors": [],
+    "automatic_dpr_cap": false
+  },
+  "settings_profiles_test": "Baixo, Medio, Alto passed with original assertions",
+  "stream_microbenchmark_us": {
+    "sync_peak": 6972,
+    "queued_task_peak": 2305,
+    "same_counts": true,
+    "renderer": "headless"
+  }
+}

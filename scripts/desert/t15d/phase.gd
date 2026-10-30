@@ -32,7 +32,7 @@ var _saved := false
 var _handoff := false
 var _actor_resources: Array[PackedScene] = []
 var _lead := 0.0
-var _build_queue: Array[Callable] = []
+var _build_queue: Array[Dictionary] = []
 ## Checkpoint ativo (-1 = início da fase) e o estado salvo ao passar por ele.
 var _checkpoint_index := -1
 var _snapshot := {}
@@ -124,8 +124,8 @@ func _build_environment() -> void:
 	rim.light_energy = 0.9
 	rim.light_specular = 0.6
 	add_child(rim)
-	# Antisserrilhado: 4× no computador, 2× em celulares e no navegador.
-	get_viewport().msaa_3d = Viewport.MSAA_2X if UIScale.is_compact() or OS.has_feature("web") else Viewport.MSAA_4X
+	# Antisserrilhado: 4× no computador (incluindo Web), 2× em telas compactas.
+	get_viewport().msaa_3d = Viewport.MSAA_2X if UIScale.is_compact() else Viewport.MSAA_4X
 ## Tempestade de areia: tela tingida, grãos voando e vento contra quem vai para a direita.
 var _in_storm := false
 func _update_storm() -> void:
@@ -197,12 +197,12 @@ func _stream_world(x: float, force := false) -> void:
 			_world.remove_child(old)
 			old.queue_free()
 			_loaded_chunks.erase(index)
-	# O trecho atual e os vizinhos imediatos são montados na hora (spawn, reinício,
-	# checkpoint); os mais distantes entram na fila e são montados aos poucos.
+	# Só a entrada/reinício monta o entorno imediato de uma vez. O restante sempre
+	# usa a fila, inclusive ao voltar pelo mapa; colisores continuam imediatos.
 	var order: Array = wanted.keys()
 	order.sort_custom(func(a: int, b: int) -> bool: return absi(a-center) < absi(b-center))
 	for index in order:
-		if not _loaded_chunks.has(index): _load_chunk(index,force or absi(index-center) <= 1)
+		if not _loaded_chunks.has(index): _load_chunk(index,force and absi(index-center) <= 1)
 ## Monta o trecho em etapas. Antes tudo era feito num único quadro (20–55ms no desktop,
 ## bem mais no celular), o que travava a corrida a cada 64m.
 func _load_chunk(index: int, immediate := true) -> void:
@@ -220,21 +220,26 @@ func _load_chunk(index: int, immediate := true) -> void:
 	if not solid.is_empty():
 		for platform: Dictionary in solid:
 			tasks.append(_build_terrain_piece.bind(chunk,platform))
-		tasks.append(_build_props.bind(chunk,solid))
+		var props := preload("res://scripts/desert/t15d/city_props.gd").new()
+		chunk.add_child(props)
+		for job: Callable in props.prepare_build(solid,_order):
+			tasks.append(_build_props_piece.bind(chunk,job))
 	for spawn: Dictionary in _phase.enemies:
 		if _in_chunk(float(spawn.pos[0]),index) and not _defeated_ids.has(str(spawn.id)):
 			tasks.append(_spawn_enemy.bind(chunk,spawn))
 	tasks.append(_build_chunk_details.bind(chunk,index))
 	for task in tasks:
 		if immediate: task.call()
-		else: _build_queue.append(task)
+		else: _build_queue.append({"chunk_id":chunk.get_instance_id(),"task":task})
 func _process(_delta: float) -> void:
 	# Uma etapa por quadro (mais etapas só enquanto o quadro gastou menos de 1ms).
 	var started := Time.get_ticks_usec()
 	while not _build_queue.is_empty() and Time.get_ticks_usec()-started < 1000:
-		var task: Callable = _build_queue.pop_front()
-		var chunk: Object = task.get_bound_arguments()[0] if not task.get_bound_arguments().is_empty() else null
-		if chunk == null or is_instance_valid(chunk) and (chunk as Node).is_inside_tree(): task.call()
+		var pending: Dictionary = _build_queue.pop_front()
+		var chunk := instance_from_id(int(pending.chunk_id)) as Node
+		if is_instance_valid(chunk) and chunk.is_inside_tree():
+			var task: Callable = pending.task
+			if task.is_valid(): task.call()
 func _chunk_platforms(index: int) -> Array:
 	var left := index*CHUNK_SIZE
 	var right := left+CHUNK_SIZE
@@ -284,6 +289,8 @@ func _build_terrain_piece(chunk: Node3D, platform: Dictionary) -> void:
 	terrain.order = _order
 	chunk.add_child(terrain)
 	terrain.build([platform])
+func _build_props_piece(_chunk: Node3D, job: Callable) -> void:
+	if job.is_valid(): job.call()
 func _build_props(chunk: Node3D, platforms: Array) -> void:
 	var props := preload("res://scripts/desert/t15d/city_props.gd").new()
 	chunk.add_child(props)

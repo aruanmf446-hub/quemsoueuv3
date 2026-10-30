@@ -5,6 +5,17 @@ var _flash_material: StandardMaterial3D
 var _meshes: Array[MeshInstance3D] = []
 var _ground_offsets := {}
 static var _processed := {}
+
+func _merge_animations(entry: Dictionary) -> void:
+	# CharacterSlot chama este método antes de load_entry retomar. Não instanciar
+	# todos os FBX novamente para depois descartar a biblioteca em favor do cache.
+	var key := str(entry.get("id", ""))
+	if _processed.has(key):
+		_anim_player.remove_animation_library(&"")
+		_anim_player.add_animation_library(&"", _processed[key].library)
+		return
+	super._merge_animations(entry)
+
 func load_entry(entry: Dictionary) -> void:
 	super.load_entry(entry)
 	_meshes.clear()

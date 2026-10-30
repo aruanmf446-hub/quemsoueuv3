@@ -59,11 +59,36 @@ func _begin_read(ticket: int) -> void:
 	if _packed == null:
 		_fail(ticket)
 		return
+	# A fase usa modelos dinâmicos do catálogo, fora das dependências do .tscn.
+	# Lê um recurso por quadro sob a capa, em vez de acumular todos no primeiro
+	# quadro após Pular história. As referências sobrevivem até a instanciação.
+	var order := int(_path.get_file().get_basename().trim_prefix("phase_"))
+	if _path.begins_with("res://scenes/desert/phase_") and order >= 1 and order <= 9:
+		var groups := CharacterCatalog.load_all()
+		var entries: Array = []
+		for entry: Dictionary in groups.unlockable + groups.playable:
+			if entry.id == "el_fuego": entries.append(entry)
+		var enemies: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/desert_enemies.json"))
+		entries.append(enemies.enemies.cactus)
+		var paths := {}
+		for entry: Dictionary in entries:
+			paths[str(entry.model)] = true
+			for source in entry.animations.values(): paths[str(source)] = true
+		var held: Array[Resource] = []
+		for source: String in paths:
+			await get_tree().process_frame
+			if ticket != _ticket or not is_inside_tree(): return
+			var resource := load(source)
+			if resource == null:
+				_fail(ticket)
+				return
+			held.append(resource)
+		_packed.set_meta("campaign_warm_resources", held)
 	_can_skip = true
 	if _carousel.advances >= _min_advances: _finish_after_card(ticket)
 
 func _on_advanced(count: int) -> void:
-	if _packed != null and count >= _min_advances:
+	if _packed != null and _can_skip and count >= _min_advances:
 		_finish_after_card(_ticket)
 
 func _finish_after_card(ticket: int) -> void:

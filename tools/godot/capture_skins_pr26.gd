@@ -18,7 +18,7 @@ func _capture() -> void:
 	await process_frame
 	var services := PlayerServices.new()
 	root.add_child(services)
-	var panel := load('res://scenes/skins/skins_panel.tscn').instantiate()
+	var panel: Control = load('res://scenes/skins/skins_panel.tscn').instantiate()
 	root.add_child(panel)
 	panel.call('open', services.inventory.equipped_id())
 	# Miniaturas são renderizadas em segundo plano pelo ThumbnailCache.

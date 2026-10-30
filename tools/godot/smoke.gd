@@ -71,6 +71,10 @@ func _run() -> void:
 			navigation.call("back")
 			for frame in range(3):
 				await physics_frame
+			# A tela que sai anima (FADE_OUT) e a navegação ignora rotas até terminar.
+			var settle_deadline := Time.get_ticks_msec() + 2000
+			while navigation.get("_busy") and Time.get_ticks_msec() < settle_deadline:
+				await process_frame
 			if not navigation.get("_history").is_empty() or navigation.get("_active") != null:
 				push_error("SMOKE_ROUTE_CLOSE_FAILED " + route)
 				quit(1)

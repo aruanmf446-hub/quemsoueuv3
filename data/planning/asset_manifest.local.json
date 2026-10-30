@@ -1552,8 +1552,8 @@
       "runtime_ready": false
     },
     {
-      "asset_id": "source:assets/references/Imagem do ChatGPT 28 de out. de 2026, 00_58_08.png",
-      "source_path": "res://assets/references/Imagem do ChatGPT 28 de out. de 2026, 00_58_08.png",
+      "asset_id": "source:docs/referencias/menu/REFERENCIA_MENU.png",
+      "source_path": "res://docs/referencias/menu/REFERENCIA_MENU.png",
       "character_id": null,
       "realm_id": null,
       "variant": "source",

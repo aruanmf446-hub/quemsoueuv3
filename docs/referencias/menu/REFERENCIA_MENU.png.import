@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://ddc1bnnp7jj8s"
-path="res://.godot/imported/Imagem do ChatGPT 28 de out. de 2026, 00_58_08.png-20c50bd71f79703a3d7073cfd2dc9205.ctex"
+path="res://.godot/imported/REFERENCIA_MENU.png-20c50bd71f79703a3d7073cfd2dc9205.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/references/Imagem do ChatGPT 28 de out. de 2026, 00_58_08.png"
-dest_files=["res://.godot/imported/Imagem do ChatGPT 28 de out. de 2026, 00_58_08.png-20c50bd71f79703a3d7073cfd2dc9205.ctex"]
+source_file="res://docs/referencias/menu/REFERENCIA_MENU.png"
+dest_files=["res://.godot/imported/REFERENCIA_MENU.png-20c50bd71f79703a3d7073cfd2dc9205.ctex"]
 
 [params]
 

@@ -18,6 +18,8 @@ MENU_PATHS = ["scripts/ui", "scripts/skins", "scenes/player", "scenes/skins"]
 FORBIDDEN = [
     (re.compile(r"res://assets/ui/kit/"), "kit de molduras assets/ui/kit (reprovado)"),
     (re.compile(r"frame_painel_brasao"), "moldura com brasão (reprovada)"),
+    (re.compile(r"res://assets/ui/Imagem"), "imagem original do kit reprovado (assets/ui)"),
+    (re.compile(r"res://assets/processed/textures/"), "textura colorida do kit reprovado"),
     (re.compile(r"StyleBoxTexture|NinePatchRect"), "moldura de imagem em tela de menu"),
 ]
 

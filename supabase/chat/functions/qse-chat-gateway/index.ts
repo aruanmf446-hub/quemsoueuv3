@@ -63,7 +63,11 @@ async function canMessage(token: string, peerId: string): Promise<boolean | null
 
 // 16D: autorização pontual (SEM cache) no GAME para membro atual de sala;
 // recusa sala encerrada, saída, kick, sala inexistente ou falha da rede.
-async function canAccessRoom(token: string, roomId: string): Promise<boolean | null> {
+type RoomParticipant = { tag: string; member_id: string; nickname: string };
+type RoomAccess = { allowed: boolean; participants: RoomParticipant[] };
+
+// GAME valida a identidade e devolve tags pseudonimas e nomes, nunca IDs GAME ao cliente.
+async function canAccessRoom(token: string, roomId: string): Promise<RoomAccess | null> {
   const response = await fetch(`${GAME_URL}/rest/v1/rpc/qse_duel_chat_access`, {
     method: "POST",
     headers: { apikey: GAME_KEY, Authorization: `Bearer ${token}`,
@@ -72,7 +76,25 @@ async function canAccessRoom(token: string, roomId: string): Promise<boolean | n
   }).catch(() => null);
   if (!response?.ok) return null;
   const value = await response.json().catch(() => null);
-  return typeof value?.allowed === "boolean" ? value.allowed : null;
+  if (typeof value?.allowed !== "boolean") return null;
+  const participants: RoomParticipant[] = Array.isArray(value?.participants)
+    ? value.participants.filter((p: unknown): p is RoomParticipant =>
+        !!p && typeof p === "object" &&
+        typeof (p as RoomParticipant).tag === "string" &&
+        /^[a-f0-9]{64}$/.test((p as RoomParticipant).tag) &&
+        typeof (p as RoomParticipant).member_id === "string" &&
+        UUID.test((p as RoomParticipant).member_id) &&
+        typeof (p as RoomParticipant).nickname === "string")
+    : [];
+  return { allowed: value.allowed, participants };
+}
+
+async function roomSenderTag(roomId: string, senderId: string): Promise<string> {
+  const bytes = new TextEncoder().encode(
+    `qse-room-member-v1:${roomId.toLowerCase()}:${senderId.toLowerCase()}`
+  );
+  const hash = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
+  return Array.from(hash, b => b.toString(16).padStart(2, "0")).join("");
 }
 
 async function roomConversationId(roomId: string): Promise<string> {
@@ -126,7 +148,7 @@ export default {
           return respond({error:"invalid_room"},400);
         const permitted = await canAccessRoom(token,roomId);
         if (permitted === null) return respond({error:"game_unavailable"},503);
-        if (!permitted) return respond({error:"room_access_denied"},403);
+        if (!permitted.allowed) return respond({error:"room_access_denied"},403);
         const id = await roomConversationId(roomId);
         const {error} = await db.from("qse_chat_conversations").upsert(
           {id,kind:"room",game_room_id:roomId,created_by_game_user_id:userId},
@@ -194,7 +216,28 @@ export default {
             });
             if (error) throw error;
             if (data?.error) return respond({error:data.error},403);
-            return respond({messages:data?.messages ?? []});
+            // ROOM: nunca devolver sender_game_user_id ao cliente.
+            const roster = new Map(permitted.participants.map(p => [p.tag, p]));
+            const messages = Array.isArray(data?.messages) ? data.messages : [];
+            const senders = [...new Set(messages.map((m:{sender_game_user_id?:string}) =>
+              typeof m.sender_game_user_id === "string" && UUID.test(m.sender_game_user_id)
+                ? m.sender_game_user_id.toLowerCase() : ""))].filter(Boolean);
+            const tags = new Map<string,string>();
+            await Promise.all(senders.map(async sender =>
+              tags.set(sender, await roomSenderTag(room.game_room_id, sender))
+            ));
+            const mapped = messages.map((m:{id:string;body:string;sent_at:string;sender_game_user_id?:string}) => {
+              const sender = typeof m.sender_game_user_id === "string"
+                ? m.sender_game_user_id.toLowerCase() : "";
+              const member = roster.get(tags.get(sender) ?? "");
+              return {
+                id:m.id, body:m.body, sent_at:m.sent_at,
+                sender_member_id:member?.member_id ?? null,
+                sender_name:member?.nickname ?? "Ex-participante",
+                is_you:sender === userId.toLowerCase(),
+              };
+            });
+            return respond({messages:mapped});
           }
           const requestId = payload.request_id;
           const body = typeof payload.body === "string" ? payload.body.trim() : "";

@@ -3,7 +3,11 @@ extends Node
 
 ## Composição única para menu, lobby e telas. Não cria contas nem saldos fictícios.
 static var current: PlayerServices
+## Conexão "game" (a atual): login, perfis e serviços existentes.
 var client: SupabaseClient
+## Conexões preparadas, ainda sem projeto nem uso: sem sessão e sem integração com a game.
+var chat_client: SupabaseClient
+var catalog_client: SupabaseClient
 var session: SessionService
 var preferences: DevicePreferences
 var profile: ProfileService
@@ -24,6 +28,12 @@ func _ready() -> void:
 	add_child(preferences)
 	client = SupabaseClient.new()
 	add_child(client)
+	chat_client = SupabaseClient.new()
+	chat_client.connection = "chat"
+	add_child(chat_client)
+	catalog_client = SupabaseClient.new()
+	catalog_client.connection = "catalog"
+	add_child(catalog_client)
 	session = SessionService.new()
 	session.client = client
 	add_child(session)

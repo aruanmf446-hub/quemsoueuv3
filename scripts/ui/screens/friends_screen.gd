@@ -250,7 +250,9 @@ func _render_chat() -> void:
 	_chat_scroll = ScrollContainer.new()
 	_chat_scroll.name = "Messages"
 	_chat_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_chat_scroll.custom_minimum_size.y = 120 if compact else 320
+	# A conversa ocupa a altura disponível (o corpo da tela rola, não estica sozinho).
+	var free_height := get_viewport_rect().size.y / PlayerUI.unit(self) - (230.0 if compact else 330.0)
+	_chat_scroll.custom_minimum_size.y = maxf(free_height, 120.0)
 	_chat_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	column.add_child(_chat_scroll)
 	_chat_list = VBoxContainer.new()

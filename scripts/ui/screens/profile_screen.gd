@@ -16,20 +16,23 @@ func _refresh_visible() -> void:
 func render() -> void:
 	PlayerUI.clear(body)
 	banner.show_state(services.profile.state)
-	var row := PlayerUI.row(body)
-	var visual := PlayerUI.card(row)
-	visual.add_child(PlayerUI.label("Herói equipado", 25, PlayerUI.GOLD))
+	var row := PlayerUI.split(body)
+	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var visual := PlayerUI.column(row)
+	visual.add_child(PlayerUI.label("PERSONAGEM EQUIPADO", 13, PlayerUI.MUTED))
 	preview(visual, services.inventory.equipped_id())
 	visual.add_child(PlayerUI.button("Trocar skin", func() -> void: navigate_requested.emit("skins", {})))
-	var info := PlayerUI.card(row)
-	info.add_child(PlayerUI.portrait(services.inventory.equipped_id()))
+	var info := PlayerUI.column(row)
+	info.add_child(PlayerUI.label("JOGADOR", 13, PlayerUI.GOLD))
+	info.add_theme_constant_override("separation", 8)
 	var data := services.profile.data
-	info.add_child(PlayerUI.label(str(data.get("nickname", "") if data.get("nickname") != null else "Sem nickname"), 32, PlayerUI.GOLD))
+	info.add_child(PlayerUI.label(str(data.get("nickname", "") if data.get("nickname") != null else "Sem nickname"), 32, PlayerUI.TEXT))
 	info.add_child(PlayerUI.label("ID público: " + str(data.get("public_id", "—"))))
 	info.add_child(PlayerUI.label("Nível: " + DevicePreferences.number(data.get("level"), services.preferences.values.locale)))
 	info.add_child(PlayerUI.label("Experiência: " + DevicePreferences.number(data.get("experience"), services.preferences.values.locale)))
 	if not services.session.authenticated():
-		info.add_child(PlayerUI.label("Demonstração local • perfil e estatísticas online indisponíveis."))
+		info.add_child(PlayerUI.label("Demonstração local", 14, PlayerUI.MUTED))
 		account_button(info)
 		return
 	var nickname := LineEdit.new()
@@ -37,7 +40,9 @@ func render() -> void:
 	nickname.max_length = 24
 	nickname.custom_minimum_size.y = 52
 	info.add_child(nickname)
-	info.add_child(PlayerUI.button("Salvar nickname", func() -> void: _save_nickname(nickname.text)))
+	var save := PlayerUI.button("Salvar nickname", func() -> void: _save_nickname(nickname.text))
+	PlayerUI.style_button(save, true)
+	info.add_child(save)
 	info.add_child(PlayerUI.button("Atualizar", func() -> void: services.profile.refresh()))
 	var stats: Dictionary = data.get("statistics", {})
 	info.add_child(PlayerUI.label("Estatísticas", 25, PlayerUI.GOLD))

@@ -29,12 +29,13 @@ func render() -> void:
 		banner.show_state("empty", "Perfil não encontrado ou indisponível.")
 		return
 	var data: Dictionary = result.data
-	var row := PlayerUI.row(body)
-	var visual := PlayerUI.card(row)
+	var row := PlayerUI.split(body)
+	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var visual := PlayerUI.column(row)
 	preview(visual, str(data.get("equipped_character_id", "")))
-	var info := PlayerUI.card(row)
-	info.add_child(PlayerUI.portrait(str(data.get("equipped_character_id", ""))))
-	info.add_child(PlayerUI.label(str(data.get("nickname", "Sem nickname")), 32, PlayerUI.GOLD))
+	var info := PlayerUI.column(row)
+	info.add_child(PlayerUI.label(str(data.get("nickname", "Sem nickname")), 32, PlayerUI.TEXT))
 	info.add_child(PlayerUI.label("ID público: " + str(data.get("public_id", "—"))))
 	info.add_child(PlayerUI.label("Nível: " + DevicePreferences.number(data.get("level"), services.preferences.values.locale)))
 	info.add_child(PlayerUI.label(services.friends.presence_label(str(data.get("user_id", "")))))

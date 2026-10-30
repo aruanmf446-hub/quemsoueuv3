@@ -78,7 +78,7 @@ func render() -> void:
 func _adapt() -> void:
 	if not is_instance_valid(_rail): return
 	var compact := UIScale.is_compact()
-	var factor := maxf(1.0, UIScale.unit_for(get_viewport())) if compact else 1.0
+	var factor := PlayerUI.unit(self)
 	var margin: MarginContainer = $Margin
 	margin.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	margin.scale = Vector2.ONE * factor
@@ -86,18 +86,18 @@ func _adapt() -> void:
 	margin.size = size / factor
 	for side in ["left", "right", "top", "bottom"]:
 		margin.add_theme_constant_override("margin_" + side, 16 if compact else 48)
-	_rail.custom_minimum_size.x = 170 if compact else 240
+	_rail.custom_minimum_size.x = 150 if compact else 240
 	_rail.add_theme_constant_override("separation", 8 if compact else 14)
-	_layout.add_theme_constant_override("separation", 20 if compact else 28)
+	_layout.add_theme_constant_override("separation", 12 if compact else 28)
 	$Margin/Column.add_theme_constant_override("separation", 12 if compact else 18)
 	_feedback.add_theme_font_size_override("font_size", 16 if compact else 18)
 	var panel: PanelContainer = _layout.get_child(1)
-	panel.add_theme_stylebox_override("panel", _glass(16 if compact else 24))
+	panel.add_theme_stylebox_override("panel", _glass(12 if compact else 24))
 	for tab in _tabs:
 		tab.custom_minimum_size = Vector2(150, 48 if compact else 56)
 		tab.add_theme_font_size_override("font_size", 19 if compact else 21)
 	$Margin/Column/Header/Back.custom_minimum_size = Vector2(110 if compact else 170, 48 if compact else 56)
-	heading.add_theme_font_size_override("font_size", 28 if compact else 38)
+	heading.add_theme_font_size_override("font_size", 28 if compact else 34)
 	_fit_panel.call_deferred()
 
 func _select(index: int) -> void:
@@ -220,6 +220,7 @@ func _graphics() -> void:
 	for i in range(keys.size()):
 		var choice := _button(names[i], func() -> void:
 			if _save("quality", keys[i]): _show_category())
+		choice.custom_minimum_size.x = 100
 		choice.toggle_mode = true
 		choice.button_pressed = services.preferences.values.quality == keys[i]
 		choice.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -252,7 +253,7 @@ func _language() -> void:
 	account.add_child(PlayerUI.label(str(services.session.user.get("email", "Demonstração local • sem conta conectada"))))
 	if services.session.authenticated():
 		var discoverable := CheckButton.new()
-		discoverable.text = tr("Permitir busca do meu perfil público")
+		discoverable.text = tr("Permitir busca do perfil")
 		discoverable.button_pressed = services.profile.data.get("discoverable", false)
 		discoverable.disabled = services.profile.state != "success"
 		discoverable.custom_minimum_size.y = 52
@@ -336,7 +337,7 @@ func _glass(padding: int) -> StyleBoxFlat:
 
 func _row_box() -> StyleBoxFlat:
 	var box := _box(Color(1, 1, 1, 0.04), 16)
-	box.set_corner_radius_all(10)
+	box.set_corner_radius_all(4)
 	box.content_margin_top = 12
 	box.content_margin_bottom = 12
 	return box

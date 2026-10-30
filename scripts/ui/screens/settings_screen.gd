@@ -20,7 +20,6 @@ var _rail: VBoxContainer
 func _ready() -> void:
 	manages_own_scale = true
 	super._ready()
-	$Tint.color = Color(0.02, 0.035, 0.07, 0.86)
 	_make_icons()
 	visibility_changed.connect(func() -> void:
 		if not is_visible_in_tree(): _waiting_action = "")

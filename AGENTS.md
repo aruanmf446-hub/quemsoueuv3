@@ -17,3 +17,6 @@
 - As imagens anteriores identificadas como históricas no README não são autorização para restaurar o visual reprovado. Pedidos funcionais preservam a composição aprovada.
 - Mantenha sinais, ações, estados de seleção/bloqueio, privacidade dos dados e regras dos modos existentes. Fixtures visuais ficam apenas nos testes, identificadas como tal.
 - Execute `python3 tools/player_ui/check_design.py`, os testes de interação pertinentes e confira capturas reais em desktop e janelas horizontais de 844×390 e 640×360. Não declare validação em navegador/aparelho físico a partir de uma captura do motor.
+
+- Telas internas (Amizades, Duelo e partida, Configurações, Biblioteca, Perfil e Personagens) usam fundo sólido opaco de `PlayerUI.INTERIOR_BG`. Não reaplicar a imagem do lobby nem um véu translúcido nessas telas. A arte do lobby fica no lobby; artes de cartas e personagens continuam no conteúdo.
+- Retratos dos personagens equipáveis são distribuídos em `assets/portraits`; Amizades e Duelo não podem depender de abrir Personagens antes ou de caches de `user://`. Refaça os retratos pelos modelos reais com `tools/godot/bake_portraits.gd` quando necessário.

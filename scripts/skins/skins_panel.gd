@@ -53,7 +53,6 @@ func _ready() -> void:
 	super._ready()
 	heading.text = tr("Personagens")
 	heading.add_theme_color_override("font_color", PlayerUI.TITLE_GOLD)
-	$Tint.color = Color(0.025, 0.04, 0.09, 0.90)
 	_load_collections()
 	_thumbnails = ThumbnailCache.new(preload("res://scenes/lobby/lobby_stage.tscn"))
 	_load_favorites()

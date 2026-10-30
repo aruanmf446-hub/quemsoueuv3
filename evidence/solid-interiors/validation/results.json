@@ -1,0 +1,18 @@
+{
+  "main_base": "46d9b89b84060ed8f232d72e379ac0b697bb069a",
+  "engine": "4.6.3.stable.official.7d41c59c4",
+  "shared_frame_and_portraits_checks": 21,
+  "navigation_checks": 27,
+  "settings_checks": 28,
+  "duel_checks_per_resolution": 54,
+  "chat_fixture_checks_per_resolution": 20,
+  "resolutions": [
+    "1672x941",
+    "844x390",
+    "640x360"
+  ],
+  "screenshots": 21,
+  "physical_android_tested": false,
+  "browser_tested": false,
+  "full_smoke_run_locally": false
+}

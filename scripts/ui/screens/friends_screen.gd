@@ -248,7 +248,7 @@ func _render_chat() -> void:
 			pick.toggle_mode = true
 			pick.button_pressed = str(item.user_id) == str(_chat_friend.get("user_id", ""))
 			pick.alignment = HORIZONTAL_ALIGNMENT_LEFT
-			pick.icon = PlayerUI.portrait(str(item.get("equipped_character_id", "")), 40).texture
+			pick.icon = PlayerUI.portrait_texture(str(item.get("equipped_character_id", "")))
 			pick.expand_icon = false
 			pick.add_theme_constant_override("icon_max_width", 36)
 			friends.add_child(pick)

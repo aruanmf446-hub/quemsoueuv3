@@ -1,0 +1,24 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+PASS packaged_portrait_cowboy
+PASS portrait_resolution_alpha_cowboy
+PASS packaged_portrait_michelly
+PASS portrait_resolution_alpha_michelly
+PASS packaged_portrait_rodrigo
+PASS portrait_resolution_alpha_rodrigo
+PASS packaged_portrait_lorena
+PASS portrait_resolution_alpha_lorena
+PASS packaged_portrait_gus
+PASS portrait_resolution_alpha_gus
+PASS packaged_portrait_lana
+PASS portrait_resolution_alpha_lana
+PASS packaged_portrait_halloween
+PASS portrait_resolution_alpha_halloween
+PASS packaged_portrait_el_fuego
+PASS portrait_resolution_alpha_el_fuego
+PASS safe_unknown_skin_
+PASS safe_unknown_skin_../not-a-skin
+PASS safe_unknown_skin_unknown
+PASS shared_frame_no_lobby_art
+PASS shared_frame_opaque_solid_surface
+SOLID_INTERIORS checks=21 failures=0

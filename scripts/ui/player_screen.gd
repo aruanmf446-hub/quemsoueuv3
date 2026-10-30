@@ -19,9 +19,9 @@ func _ready() -> void:
 	PlayerUI.style_backdrop($Tint)
 	services = PlayerServices.current
 	$Margin/Column/Header/Back.pressed.connect(func() -> void: back_requested.emit())
-	# Visual comum: sem a moldura ornamental (cobria o conteúdo), fundo escurecido e
-	# botão Voltar inclinado no estilo do resto do menu.
-	$Tint.color = Color(0.02, 0.035, 0.07, 0.86)
+	# Telas internas têm fundo sólido opaco; o cenário ilustrado fica no lobby.
+	$Backdrop.hide()
+	($Backdrop as TextureRect).texture = null
 	PlayerUI.style_back($Margin/Column/Header/Back)
 	heading.add_theme_color_override("font_color", Color.WHITE)
 	heading.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

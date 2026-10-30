@@ -20,8 +20,11 @@ O sistema está centralizado em `scripts/ui/player_ui.gd`:
 - `split`, `flow`, `unit`: distribuição que respeita a largura e a densidade da
   janela, com campos e ações legíveis em telas horizontais compactas.
 
-As telas usam texto claro, cores contidas, espaço entre grupos e personagem direto
-sobre o cenário onde houver prévia. Campos editáveis, foco, bloqueio e erros devem
+As telas internas usam fundo sólido opaco (`PlayerUI.INTERIOR_BG`), texto claro,
+cores contidas e espaço entre grupos. O cenário ilustrado é exclusivo do lobby.
+Personagens e cartas aparecem como conteúdo, sem a imagem do lobby por trás.
+Os retratos reais distribuídos em `assets/portraits` funcionam desde a primeira
+abertura, inclusive no Duelo e em Amizades, sem cache anterior. Campos editáveis, foco, bloqueio e erros devem
 continuar reconhecíveis. Pausa, derrota e conclusão preservam suas ações reais.
 
 As capturas da aplicação nas telas internas estão em

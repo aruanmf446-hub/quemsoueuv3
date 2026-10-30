@@ -44,6 +44,12 @@ func _ready() -> void:
 	chat = ChatService.new()
 	chat.client = chat_client
 	add_child(chat)
+	if chat_enabled():
+		var gateway := ChatGateway.new()
+		gateway.chat_client = chat_client
+		gateway.game_client = client
+		chat.add_child(gateway)
+		chat.transport = gateway
 	# Testes headless (--script) chamam refresh() quando precisam; o jogo lê ao iniciar.
 	if not OS.get_cmdline_args().has("--script"): catalog.refresh.call_deferred()
 	session = SessionService.new()
@@ -92,6 +98,19 @@ func _ready() -> void:
 	_session_changed()
 
 
+## CHAT disponível no jogo. Desligar com QSE_CHAT_ENABLED=0 ou [chat] enabled=false.
+## Scripts de teste headless usam o transporte simulado e não abrem conexão real.
+static func chat_enabled() -> bool:
+	var flag := OS.get_environment("QSE_CHAT_ENABLED")
+	if flag == "0": return false
+	if flag == "1": return true
+	if OS.get_cmdline_args().has("--script"): return false
+	var config := ConfigFile.new()
+	if config.load("user://backend.cfg") == OK:
+		return bool(config.get_value("chat", "enabled", true))
+	return true
+
+
 func _exit_tree() -> void:
 	if current == self:
 		current = null
@@ -104,6 +123,7 @@ func _session_changed() -> void:
 	wallet.clear()
 	friends.clear()
 	chat.clear()
+	chat.me_id = str(session.user.get("id", "")) if session.authenticated() else ""
 	# A partida local não depende da conta: entrar ou sair dela não a interrompe.
 	if not duel.is_local(): duel.clear()
 	inventory.changed.emit()

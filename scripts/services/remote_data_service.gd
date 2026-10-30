@@ -7,8 +7,9 @@ var state := "empty"
 var error: Dictionary = {}
 var data: Dictionary = {}
 var _request_sequence := 0
-## Momento (s, relógio do motor) da última resposta válida; -1 = nunca.
-var fetched_at := -1.0
+## Momento (s, relógio do motor) da última resposta válida; NEVER = nunca.
+const NEVER := -1.0e12
+var fetched_at := NEVER
 var _inflight := false
 signal _loaded(result: Dictionary)
 
@@ -17,19 +18,19 @@ func clear() -> void:
 	_request_sequence += 1
 	data.clear()
 	error.clear()
-	fetched_at = -1.0
+	fetched_at = NEVER
 	state = "unauthorized" if client.configured() else "offline"
 	changed.emit()
 
 
 ## Atualiza só se os dados tiverem mais de max_age segundos (ou nunca vieram).
 func refresh_if_stale(max_age: float) -> Dictionary:
-	if fetched_at >= 0.0 and age() < max_age: return ServiceResult.success(data)
+	if fetched_at != NEVER and age() < max_age: return ServiceResult.success(data)
 	return await call("refresh")
 
 
 func age() -> float:
-	return INF if fetched_at < 0.0 else Time.get_ticks_msec() / 1000.0 - fetched_at
+	return INF if fetched_at == NEVER else Time.get_ticks_msec() / 1000.0 - fetched_at
 
 
 ## Leituras simultâneas da mesma tela/poller compartilham uma só requisição.

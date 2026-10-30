@@ -31,7 +31,7 @@ func _run() -> void:
 	# 1) Uma hora de poller (120 ciclos de 30 s). Antes: 3 consultas por ciclo = 360.
 	for _tick in range(120):
 		for service in [services.wallet, services.friends, services.progression]:
-			if service.fetched_at >= 0.0: service.fetched_at -= 30.0
+			if service.fetched_at != service.NEVER: service.fetched_at -= 30.0
 		var before: Dictionary = counter.by_path.duplicate()
 		services._poll_connected()
 		for _frame in range(2): await process_frame
@@ -54,7 +54,7 @@ func _run() -> void:
 	# 3) Sem foco: nenhuma consulta.
 	counter.count = 0
 	services._notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT)
-	for service in [services.wallet, services.friends, services.progression]: service.fetched_at = -1.0
+	for service in [services.wallet, services.friends, services.progression]: service.fetched_at = service.NEVER
 	services._poll_connected()
 	await process_frame
 	check(counter.count == 0, "sem consultas em segundo plano")

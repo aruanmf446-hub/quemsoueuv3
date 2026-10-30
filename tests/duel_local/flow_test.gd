@@ -14,6 +14,6 @@ func _run() -> void:
 	var runner: Node = load("res://tests/duel_local/flow_runner.gd").new()
 	root.add_child(runner)
 	var code: int = await runner.finished
-	runner.free()
+	runner.queue_free()
 	for _frame in range(6): await process_frame
 	quit(code)

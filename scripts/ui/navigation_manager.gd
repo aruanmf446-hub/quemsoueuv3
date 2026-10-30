@@ -70,6 +70,7 @@ func open(route: String, params: Dictionary = {}) -> void:
 func back() -> void:
 	if _busy or _history.is_empty():
 		return
+	if _active != null and _active.handle_back(): return
 	_history.pop_back()
 	var leaving := _active
 	if _history.is_empty():

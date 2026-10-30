@@ -71,6 +71,11 @@ func show_screen(params: Dictionary = {}) -> void:
 	$Margin/Column/Header/Back.grab_focus()
 
 
+## A screen with an internal reader may consume Back before the route is popped.
+func handle_back() -> bool:
+	return false
+
+
 func render() -> void:
 	pass
 

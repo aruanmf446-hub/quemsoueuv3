@@ -375,6 +375,7 @@ PASS battle_chat_is_not_friend_chat
 PASS room_chat_open
 PASS room_chat_send
 PASS room_chat_receives
+PASS room_chat_sender_names
 PASS chat_open_all_options
 PASS chat_open_visible_bruxa_do_pantano
 PASS chat_open_original_art_bruxa_do_pantano
@@ -424,5 +425,5 @@ PASS spectator_cannot_pick_slender_man
 PASS hide_protects_hand_and_stops_polling
 PASS hide_removes_private_images_before_return
 PASS leaving_restores_lobby_layout
-BATTLE_REFERENCE checks=395 failures=1
+BATTLE_REFERENCE checks=396 failures=1
 exit=1

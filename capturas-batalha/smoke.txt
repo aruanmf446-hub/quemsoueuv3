@@ -19,7 +19,7 @@ phase_09 PASS
 transition_09 PASS
 phase_10 PASS
 functional PASS
-battle_presentation PASS
+battle_presentation FAIL
 battle_navigation PASS
 duel_local PASS
 supabase_connections PASS

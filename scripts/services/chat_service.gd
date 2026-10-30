@@ -2,8 +2,9 @@ class_name ChatService
 extends Node
 ## CHAT privado entre amigos. Identidade e amigos vêm do GAME (já em cache no FriendsService);
 ## conversas e mensagens vêm do CHAT por um transporte. O transporte real é o gateway
-## qse-chat-gateway (Tarefa 16A); enquanto o contrato não estiver publicado e validado,
-## `gateway_ready()` é falso e nada é enviado nem consultado. Testes usam um transporte local.
+## qse-chat-gateway (ChatGateway, contrato docs/backend/CHAT_API_V1.md). Ele só é ligado com
+## QSE_CHAT_ENABLED=1 ou [chat] enabled=true em user://backend.cfg, até a validação com
+## jogadores reais; sem transporte nada é enviado nem consultado. Testes usam um transporte local.
 ##
 ## Economia: só consulta com uma conversa ABERTA e o jogo em primeiro plano; uma requisição
 ## por vez; intervalo cresce quando não chegam mensagens; só pede mensagens novas (after).
@@ -16,11 +17,13 @@ signal messages_changed(conversation_id: String)
 
 const SERVER_RETENTION := 24 * 3600.0
 const MAX_MESSAGES := 200
-const MAX_LENGTH := 500
-## Intervalos de consulta com a conversa aberta: começa rápido e cresce sem atividade.
-const POLL_ACTIVE := 3.0
-const POLL_IDLE_MAX := 20.0
-const POLL_ERROR := 15.0
+## Limite do servidor (1 a 2000 caracteres após recorte).
+const MAX_LENGTH := 2000
+## Consulta com a conversa aberta (contrato: 10–15 s), mais longa sem atividade ou com erro.
+const POLL_ACTIVE := 10.0
+const POLL_IDLE_MAX := 15.0
+const POLL_ERROR := 30.0
+const POLL_RATE_LIMIT := 60.0
 
 var client: SupabaseClient
 ## Transporte: objeto com open_conversation(friend_id), list_messages(conversation_id, after),
@@ -38,6 +41,8 @@ var _messages: Dictionary = {}
 var _conversations: Dictionary = {}
 var _inflight := false
 var _pending_ids: Dictionary = {}
+## Última intenção de envio que falhou por rede: reenviar o mesmo texto reusa o request_id.
+var _retry: Dictionary = {}
 var _focused := true
 var _poll_wait := POLL_ACTIVE
 var _next_poll := INF
@@ -110,13 +115,14 @@ func poll() -> Dictionary:
 	if not result.ok:
 		error_code = str(result.code)
 		if error_code in ["not_friend", "conversation_unavailable", "not_authenticated"]: state = "error"
-		_schedule(POLL_ERROR)
+		_schedule(POLL_RATE_LIMIT if error_code == "rate_limit" else POLL_ERROR)
 		changed.emit()
 		return result
 	error_code = ""
-	var added := _merge(id, (result.data as Dictionary).get("messages", []))
+	# O servidor devolve as mensagens ainda válidas: o que sumiu dele some daqui também.
+	var added := _merge(id, (result.data as Dictionary).get("messages", []), bool((result.data as Dictionary).get("complete", false)))
 	_schedule(POLL_ACTIVE if added > 0 else minf(_poll_wait * 1.6, POLL_IDLE_MAX))
-	if added > 0 or prune(): messages_changed.emit(id)
+	if added != 0 or prune(): messages_changed.emit(id)
 	return result
 
 
@@ -131,11 +137,13 @@ func send(text: String) -> Dictionary:
 	sending = true
 	changed.emit()
 	var id := conversation_id
-	var client_id := PlayerContracts.uuid()
+	var same: bool = _retry.get("conversation") == id and _retry.get("text") == text
+	var client_id: String = _retry.request_id if same else PlayerContracts.uuid()
 	_pending_ids[client_id] = true
-	var result: Dictionary = await transport.send_message(id, client_id, text)
+	var result: Dictionary = await transport.send_message(id, client_id, text, me_id)
 	_pending_ids.erase(client_id)
 	sending = false
+	_retry = {"conversation": id, "text": text, "request_id": client_id} if not result.ok and str(result.code) in ["network", "timeout"] else {}
 	if result.ok and id == conversation_id:
 		var message: Variant = (result.data as Dictionary).get("message")
 		if message is Dictionary: _merge(id, [message])
@@ -174,6 +182,7 @@ func clear() -> void:
 	_messages.clear()
 	_conversations.clear()
 	_pending_ids.clear()
+	_retry.clear()
 	friend = {}
 	conversation_id = ""
 	sending = false
@@ -204,8 +213,17 @@ func _schedule(wait: float) -> void:
 	_next_poll = Time.get_ticks_msec() / 1000.0 + wait
 
 
-func _merge(id: String, incoming: Array) -> int:
+## Junta mensagens (sem repetir id). complete: a lista do servidor é a verdade; o que não
+## veio nela foi removido lá. Devolve quantas entraram (negativo se só saíram).
+func _merge(id: String, incoming: Array, complete := false) -> int:
 	var list: Array = _messages.get(id, [])
+	var before := list.size()
+	if complete:
+		var server := {}
+		for message: Variant in incoming:
+			if message is Dictionary: server[str(message.get("id", ""))] = true
+		list = list.filter(func(m: Dictionary) -> bool: return server.has(str(m.id)))
+	var removed := before - list.size()
 	var known := {}
 	for message: Dictionary in list: known[str(message.id)] = true
 	var added := 0
@@ -218,7 +236,7 @@ func _merge(id: String, incoming: Array) -> int:
 	list.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a.get("created_at", 0)) < float(b.get("created_at", 0)))
 	_messages[id] = list
 	prune()
-	return added
+	return added if added > 0 else -removed
 
 
 static func _expires(message: Dictionary) -> float:

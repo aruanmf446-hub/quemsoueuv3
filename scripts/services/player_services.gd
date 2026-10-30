@@ -44,6 +44,12 @@ func _ready() -> void:
 	chat = ChatService.new()
 	chat.client = chat_client
 	add_child(chat)
+	if chat_enabled():
+		var gateway := ChatGateway.new()
+		gateway.chat_client = chat_client
+		gateway.game_client = client
+		chat.add_child(gateway)
+		chat.transport = gateway
 	# Testes headless (--script) chamam refresh() quando precisam; o jogo lê ao iniciar.
 	if not OS.get_cmdline_args().has("--script"): catalog.refresh.call_deferred()
 	session = SessionService.new()
@@ -90,6 +96,13 @@ func _ready() -> void:
 	add_child(poller)
 	poller.start()
 	_session_changed()
+
+
+## CHAT real só depois da validação: QSE_CHAT_ENABLED=1 ou [chat] enabled=true no backend.cfg.
+static func chat_enabled() -> bool:
+	if OS.get_environment("QSE_CHAT_ENABLED") == "1": return true
+	var config := ConfigFile.new()
+	return config.load("user://backend.cfg") == OK and bool(config.get_value("chat", "enabled", false))
 
 
 func _exit_tree() -> void:

@@ -38,7 +38,7 @@ func _ready() -> void:
 	_refresh_profile()
 	_refresh_wallet()
 	_refresh_friends()
-	$MenuButtons/BtnDuel.tooltip_text = "Duelo online: crie uma sala ou entre com um código"
+	$MenuButtons/BtnDuel.tooltip_text = "Duelo: partida local contra bots ou salas online"
 	get_tree().auto_accept_quit = false
 	var composition := preload("res://scripts/menu/lobby_composition.gd").new()
 	composition.name = "LobbyComposition"

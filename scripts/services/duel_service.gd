@@ -4,6 +4,10 @@ extends Node
 ## tudo; aqui só pedimos ações e mantemos a sala atual em dia. Enquanto o jogador está numa
 ## sala, um sinal de vida a cada 2 s mantém a presença e avisa quando a sala mudou
 ## (revisão); só então a sala inteira é buscada de novo.
+##
+## Partida local: o mesmo contrato roda em LocalDuelServer (neste aparelho, sem conta e sem
+## rede, com bots). use_local()/use_online() escolhem o destino das chamadas; as telas não
+## mudam. Salas locais nunca são públicas nem aparecem na lista online.
 
 signal changed
 ## Saiu da sala sem pedir: "closed" (sala encerrada), "removed" (expulso ou caiu do lobby).
@@ -12,6 +16,9 @@ signal removed(reason: String)
 const HEARTBEAT_SECONDS := 2.0
 var client: SupabaseClient
 var session: SessionService
+var local_server: LocalDuelServer
+## "online" (Supabase) ou "local" (LocalDuelServer).
+var mode := "online"
 ## Última sala recebida do servidor ({} = fora de sala).
 var room: Dictionary = {}
 var decks: Array = []
@@ -50,8 +57,34 @@ func clear() -> void:
 	changed.emit()
 
 
+func is_local() -> bool:
+	return mode == "local"
+
+
+## Troca o destino das chamadas. Sai da sala atual (do destino anterior) antes.
+func use_local() -> void:
+	if is_local(): return
+	if in_room(): await leave()
+	decks = []
+	defaults = {}
+	mode = "local"
+
+
+func use_online() -> void:
+	if not is_local(): return
+	if in_room(): await leave()
+	decks = []
+	defaults = {}
+	mode = "online"
+
+
+func _rpc(name: String, params: Dictionary = {}) -> Dictionary:
+	if is_local(): return local_server.call_rpc(name, params)
+	return await client.call_rpc(name, params)
+
+
 func load_decks() -> Dictionary:
-	var result := await client.call_rpc("qse_duel_decks")
+	var result := await _rpc("qse_duel_decks")
 	if result.ok and result.data is Dictionary:
 		decks = result.data.get("decks", [])
 		defaults = result.data.get("defaults", {})
@@ -59,41 +92,41 @@ func load_decks() -> Dictionary:
 
 
 func list_rooms(term: String, only_open: bool) -> Dictionary:
-	return await client.call_rpc("qse_duel_list", {"p_term": term.strip_edges(), "p_only_open": only_open})
+	return await _rpc("qse_duel_list", {"p_term": term.strip_edges(), "p_only_open": only_open})
 
 
 func create(name: String, public: bool, settings: Dictionary) -> Dictionary:
-	return _apply(await client.call_rpc("qse_duel_create", {"p_name": name.strip_edges(), "p_public": public, "p_settings": settings}))
+	return _apply(await _rpc("qse_duel_create", {"p_name": name.strip_edges(), "p_public": public, "p_settings": settings}))
 
 
 func join(code: String) -> Dictionary:
-	return _apply(await client.call_rpc("qse_duel_join", {"p_code": code}))
+	return _apply(await _rpc("qse_duel_join", {"p_code": code}))
 
 
 func configure(name: Variant, public: Variant, settings: Dictionary) -> Dictionary:
-	return _apply(await client.call_rpc("qse_duel_configure", {"p_room": room_id(), "p_name": name, "p_public": public, "p_settings": settings}))
+	return _apply(await _rpc("qse_duel_configure", {"p_room": room_id(), "p_name": name, "p_public": public, "p_settings": settings}))
 
 
 func add_bot() -> Dictionary:
-	return _apply(await client.call_rpc("qse_duel_add_bot", {"p_room": room_id()}))
+	return _apply(await _rpc("qse_duel_add_bot", {"p_room": room_id()}))
 
 
 func kick(member_id: String) -> Dictionary:
-	return _apply(await client.call_rpc("qse_duel_kick", {"p_room": room_id(), "p_member": member_id}))
+	return _apply(await _rpc("qse_duel_kick", {"p_room": room_id(), "p_member": member_id}))
 
 
 func start() -> Dictionary:
-	return _apply(await client.call_rpc("qse_duel_start", {"p_room": room_id()}))
+	return _apply(await _rpc("qse_duel_start", {"p_room": room_id()}))
 
 
 ## Seleção secreta: exatamente N cartas distintas dos decks da sala.
 func select_cards(cards: Array) -> Dictionary:
-	return _apply(await client.call_rpc("qse_duel_select", {"p_room": room_id(), "p_cards": cards}))
+	return _apply(await _rpc("qse_duel_select", {"p_room": room_id(), "p_cards": cards}))
 
 
 ## Voto do jogador da vez.
 func pick(card_id: String) -> Dictionary:
-	return _apply(await client.call_rpc("qse_duel_pick", {"p_room": room_id(), "p_card": card_id}))
+	return _apply(await _rpc("qse_duel_pick", {"p_room": room_id(), "p_card": card_id}))
 
 
 ## Imagem e nome de uma carta "<deck>/<arquivo>" (assets/duel/decks/<deck>/<arquivo>.png).
@@ -144,14 +177,14 @@ static func _timestamp(text: String) -> float:
 
 func refresh() -> Dictionary:
 	if not in_room(): return ServiceResult.failure("not_member")
-	return _apply(await client.call_rpc("qse_duel_room", {"p_room": room_id()}))
+	return _apply(await _rpc("qse_duel_room", {"p_room": room_id()}))
 
 
 func leave() -> Dictionary:
 	if not in_room(): return ServiceResult.success({})
 	var id := room_id()
 	clear()
-	return await client.call_rpc("qse_duel_leave", {"p_room": id})
+	return await _rpc("qse_duel_leave", {"p_room": id})
 
 
 ## Toda resposta com sala vira o estado atual; o sinal de vida começa/continua.
@@ -172,7 +205,7 @@ func _heartbeat() -> void:
 	if _beating or not in_room(): return
 	_beating = true
 	var id := room_id()
-	var result := await client.call_rpc("qse_duel_heartbeat", {"p_room": id})
+	var result := await _rpc("qse_duel_heartbeat", {"p_room": id})
 	_beating = false
 	if not result.ok or not result.data is Dictionary or id != room_id(): return
 	if not bool(result.data.get("member", false)):

@@ -2,7 +2,7 @@
 
 **Escopo:** somente backend. **Implantado no Supabase:** GAME `shuzporktifgiotvnpbz` e CHAT `wurkpjgnbqklivjhcvxk`. **Nenhuma tela Godot foi modificada nesta tarefa.** Base do chat privado: [CHAT_API_V1.md](CHAT_API_V1.md).
 
-## 1. CHAT — Edge Function existente (v4)
+## 1. CHAT — Edge Function existente (v5)
 
 `POST https://wurkpjgnbqklivjhcvxk.supabase.co/functions/v1/qse-chat-gateway`
 
@@ -36,8 +36,12 @@ O CHAT cria/reutiliza **uma única** conversa `kind='room'` com `game_room_id` r
 ```
 HTTP 200:
 ```json
-{"messages":[{"id":"<UUID>","sender_game_user_id":"<UUID_GAME>","body":"Boa partida!","sent_at":"2026-10-30T20:00:00+00:00"}]}
+{"messages":[{"id":"<UUID>","sender_member_id":"<UUID_PUBLICO_DE_MEMBRO>","sender_name":"Jogador","is_you":false,"body":"Boa partida!","sent_at":"2026-10-30T20:00:00+00:00"}]}
 ```
+
+**Identidade dos remetentes da sala (gateway v5):** `sender_member_id` corresponde a `room.members[].member_id` no snapshot do Duelo, e `sender_name` é o nickname atual do participante. `is_you` identifica mensagens do usuário autenticado. Nenhum `sender_game_user_id` é retornado para chats de sala. Se o autor saiu da sala, `sender_member_id=null` e `sender_name="Ex-participante"`. Os IDs privados do GAME são usados apenas internamente no gateway. O CHAT privado de Amigos conserva o contrato v1 e não foi alterado.
+
+O GAME devolve ao gateway uma lista de participantes autorizados usando **tags SHA-256 por sala**, `member_id` e nickname. A resposta da RPC `qse_duel_chat_access` não entrega `user_id` aos jogadores. A associação dos remetentes é feita somente no gateway, sem segunda consulta ao GAME.
 
 Para `kind='room'`, o gateway consulta novamente o GAME antes de chamar `qse_chat_room_read`. Máximo de 50 mensagens, mais recentes primeiro. O banco exclui **do resultado** qualquer mensagem enviada há 24 horas ou mais, mesmo se o cron ainda não tiver apagado fisicamente. Se o membro sair, for expulso ou a sala fechar, a leitura passa a ser recusada na próxima requisição. Espectadores autorizados possuem as mesmas permissões de chat.
 
@@ -126,4 +130,4 @@ Respostas de erro (HTTP pode ser 200 com `{"error":"..."}`, como nas RPCs existe
 
 ## 4. Estado de implantação e testes
 
-Migrations GAME/CHAT aplicadas e gateway CHAT v4 implantado. Somente verificações de SQL/metadata estão confirmadas; **não houve teste HTTP com dois jogadores reais** neste ambiente. Ver relatório [T16D_TESTES.md](T16D_TESTES.md). **Não ativar a interface para jogadores antes desses testes.**
+Migrations GAME/CHAT aplicadas e gateway CHAT v5 implantado; novo mapeamento de remetentes foi implantado no GAME e no gateway. Somente verificações de SQL/metadata estão confirmadas; **não houve teste HTTP com dois jogadores reais** neste ambiente. Ver relatório [T16D_TESTES.md](T16D_TESTES.md). **Não ativar a interface para jogadores antes desses testes.**

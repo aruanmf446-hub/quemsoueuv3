@@ -99,6 +99,9 @@ func setup(card_id: String, chosen: bool, out: bool, usable: bool) -> void:
 		var eliminated := Style.label("ELIMINADA",11,Color("#f0b3ab"))
 		Style.strong(eliminated)
 		eliminated.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		# Uma linha só: sem isto o rótulo quebrava letra a letra e esticava a carta.
+		eliminated.autowrap_mode = TextServer.AUTOWRAP_OFF
+		holder.clip_contents = true
 		seal.add_child(eliminated)
 	var finish := preload("res://scripts/ui/battle/battle_card_finish.gd").new()
 	finish.selected = selected

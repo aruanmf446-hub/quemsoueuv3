@@ -13,54 +13,27 @@ CAPTURE 07_sua_vez
 CAPTURE 08_confirmar
 CAPTURE 09_revelando
 CAPTURE 10_atingidos
-CAPTURE 11_fim
 DUEL_LOCAL_RESULT closed { "reason": "only_bots", "winners": [] }
-SCRIPT ERROR: Invalid access to property or key 'room' on a base object of type 'Dictionary'.
-          at: _render_room (res://scripts/ui/screens/duel_screen.gd:322)
-          GDScript backtrace (most recent call first):
-              [0] _render_room (res://scripts/ui/screens/duel_screen.gd:322)
-              [1] render (res://scripts/ui/screens/duel_screen.gd:69)
-              [2] <anonymous lambda> (res://scripts/ui/screens/duel_screen.gd:30)
-              [3] clear (res://scripts/services/duel_service.gd:57)
-              [4] leave (res://scripts/services/duel_service.gd:186)
-              [5] _run (res://tests/duel_local/flow_test.gd:195)
-              [6] shot (res://tests/duel_local/flow_test.gd:38)
-DUEL_LOCAL_PASS 54 verificações
-WARNING: 102 RIDs of type "CanvasItem" were leaked.
+CAPTURE 11_sala_encerrada
+DUEL_LOCAL_RESULT closed { "reason": "only_bots", "winners": [] }
+CAPTURE 11_sala_encerrada
+DUEL_LOCAL_RESULT closed { "reason": "only_bots", "winners": [] }
+DUEL_LOCAL_RESULT closed { "reason": "only_bots", "winners": [] }
+DUEL_LOCAL_RESULT closed { "reason": "only_bots", "winners": [] }
+DUEL_LOCAL_RESULT closed { "reason": "only_bots", "winners": [] }
+DUEL_LOCAL_RESULT closed { "reason": "only_bots", "winners": [] }
+DUEL_LOCAL_RESULT closed { "reason": "only_bots", "winners": [] }
+DUEL_LOCAL_RESULT closed { "reason": "only_bots", "winners": [] }
+DUEL_LOCAL_RESULT in_match { "reason": "last_standing", "winners": ["member-46"] }
+CAPTURE 12_campeao
+CAPTURE 13_lobby_de_novo
+DUEL_LOCAL_PASS 138 verificações
+WARNING: 2 RIDs of type "CanvasItem" were leaked.
    at: _free_rids (servers/rendering/renderer_canvas_cull.cpp:2735)
-ERROR: Texture with GL ID of 20: leaked 21844 bytes.
-   at: ~Utilities (drivers/gles3/storage/utilities.cpp:82)
-ERROR: Texture with GL ID of 25: leaked 4092 bytes.
-   at: ~Utilities (drivers/gles3/storage/utilities.cpp:82)
-ERROR: Texture with GL ID of 26: leaked 1048576 bytes.
-   at: ~Utilities (drivers/gles3/storage/utilities.cpp:82)
-ERROR: Texture with GL ID of 27: leaked 4092 bytes.
-   at: ~Utilities (drivers/gles3/storage/utilities.cpp:82)
-ERROR: Texture with GL ID of 33: leaked 2015745 bytes.
-   at: ~Utilities (drivers/gles3/storage/utilities.cpp:82)
-ERROR: Texture with GL ID of 34: leaked 2015745 bytes.
-   at: ~Utilities (drivers/gles3/storage/utilities.cpp:82)
-ERROR: Texture with GL ID of 35: leaked 2015745 bytes.
-   at: ~Utilities (drivers/gles3/storage/utilities.cpp:82)
-ERROR: Texture with GL ID of 36: leaked 2015745 bytes.
-   at: ~Utilities (drivers/gles3/storage/utilities.cpp:82)
-ERROR: Texture with GL ID of 37: leaked 2015745 bytes.
-   at: ~Utilities (drivers/gles3/storage/utilities.cpp:82)
-ERROR: Texture with GL ID of 38: leaked 2015745 bytes.
-   at: ~Utilities (drivers/gles3/storage/utilities.cpp:82)
-ERROR: Texture with GL ID of 39: leaked 2015745 bytes.
-   at: ~Utilities (drivers/gles3/storage/utilities.cpp:82)
-ERROR: Texture with GL ID of 40: leaked 2015745 bytes.
-   at: ~Utilities (drivers/gles3/storage/utilities.cpp:82)
-ERROR: Texture with GL ID of 41: leaked 2015745 bytes.
-   at: ~Utilities (drivers/gles3/storage/utilities.cpp:82)
-ERROR: Texture with GL ID of 42: leaked 1398100 bytes.
-   at: ~Utilities (drivers/gles3/storage/utilities.cpp:82)
-WARNING: 287 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+WARNING: 33 ObjectDB instances were leaked at exit (run with `--verbose` for details).
    at: cleanup (core/object/object.cpp:2536)
-ERROR: 14 resources still in use at exit (run with --verbose for details).
+ERROR: 3 resources still in use at exit (run with --verbose for details).
    at: clear (core/io/resource.cpp:822)
-ERROR: 14 RID allocations of type 'N5GLES37TextureE' were leaked at exit.
-ERROR: 77 RID allocations of type 'PN18TextServerAdvanced22ShapedTextDataAdvancedE' were leaked at exit.
-ERROR: 2 RID allocations of type 'PN18TextServerAdvanced12FontAdvancedE' were leaked at exit.
+ERROR: 4 RID allocations of type 'PN18TextServerAdvanced22ShapedTextDataAdvancedE' were leaked at exit.
+ERROR: 1 RID allocations of type 'PN18TextServerAdvanced12FontAdvancedE' were leaked at exit.
 exit=0

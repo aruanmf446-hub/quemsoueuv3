@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b80h6cggplypm"
-path="res://.godot/imported/844x390_11_fim.png-dc158b62c94d35b5591435f2fbeb5cde.ctex"
+uid="uid://df1o4cwxdugi4"
+path="res://.godot/imported/844x390_11_sala_encerrada.png-dc8b77012b1b1d5bab25cd706a2ee8e3.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://capturas-duelo/844x390_11_fim.png"
-dest_files=["res://.godot/imported/844x390_11_fim.png-dc158b62c94d35b5591435f2fbeb5cde.ctex"]
+source_file="res://capturas-duelo/844x390_11_sala_encerrada.png"
+dest_files=["res://.godot/imported/844x390_11_sala_encerrada.png-dc8b77012b1b1d5bab25cd706a2ee8e3.ctex"]
 
 [params]
 

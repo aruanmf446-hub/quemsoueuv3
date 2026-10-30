@@ -10,114 +10,132 @@ Godot MCP: bridge listening on 127.0.0.1:6520
 [  83% ] [90m[1mfirst_scan_filesystem[22m | Starting file scan...[39m[0m
 [92m[ DONE ][39m [1mfirst_scan_filesystem[22m
 [0m
-[   0% ] [90m[1m_update_scan_actions[22m | Started Scanning actions... (33 steps)[39m[0m
+[   0% ] [90m[1m_update_scan_actions[22m | Started Scanning actions... (39 steps)[39m[0m
 [   0% ] [90m[1m_update_scan_actions[22m | 640x360_01_entrada.png[39m[0m
 [   2% ] [90m[1m_update_scan_actions[22m | 640x360_02_criar.png[39m[0m
 [   5% ] [90m[1m_update_scan_actions[22m | 640x360_03_lobby.png[39m[0m
-[   8% ] [90m[1m_update_scan_actions[22m | 640x360_04_selecao.png[39m[0m
-[  11% ] [90m[1m_update_scan_actions[22m | 640x360_05_selecionadas.png[39m[0m
-[  14% ] [90m[1m_update_scan_actions[22m | 640x360_06_contagem.png[39m[0m
-[  17% ] [90m[1m_update_scan_actions[22m | 640x360_07_sua_vez.png[39m[0m
-[  20% ] [90m[1m_update_scan_actions[22m | 640x360_08_confirmar.png[39m[0m
-[  23% ] [90m[1m_update_scan_actions[22m | 640x360_09_revelando.png[39m[0m
-[  26% ] [90m[1m_update_scan_actions[22m | 640x360_10_atingidos.png[39m[0m
-[  29% ] [90m[1m_update_scan_actions[22m | 640x360_11_fim.png[39m[0m
+[   7% ] [90m[1m_update_scan_actions[22m | 640x360_04_selecao.png[39m[0m
+[  10% ] [90m[1m_update_scan_actions[22m | 640x360_05_selecionadas.png[39m[0m
+[  12% ] [90m[1m_update_scan_actions[22m | 640x360_06_contagem.png[39m[0m
+[  15% ] [90m[1m_update_scan_actions[22m | 640x360_07_sua_vez.png[39m[0m
+[  17% ] [90m[1m_update_scan_actions[22m | 640x360_08_confirmar.png[39m[0m
+[  20% ] [90m[1m_update_scan_actions[22m | 640x360_09_revelando.png[39m[0m
+[  22% ] [90m[1m_update_scan_actions[22m | 640x360_10_atingidos.png[39m[0m
+[  25% ] [90m[1m_update_scan_actions[22m | 640x360_11_sala_encerrada.png[39m[0m
+[  27% ] [90m[1m_update_scan_actions[22m | 640x360_12_campeao.png[39m[0m
+[  30% ] [90m[1m_update_scan_actions[22m | 640x360_13_lobby_de_novo.png[39m[0m
 [  32% ] [90m[1m_update_scan_actions[22m | 844x390_01_entrada.png[39m[0m
 [  35% ] [90m[1m_update_scan_actions[22m | 844x390_02_criar.png[39m[0m
-[  38% ] [90m[1m_update_scan_actions[22m | 844x390_03_lobby.png[39m[0m
-[  41% ] [90m[1m_update_scan_actions[22m | 844x390_04_selecao.png[39m[0m
-[  44% ] [90m[1m_update_scan_actions[22m | 844x390_05_selecionadas.png[39m[0m
-[  47% ] [90m[1m_update_scan_actions[22m | 844x390_06_contagem.png[39m[0m
-[  50% ] [90m[1m_update_scan_actions[22m | 844x390_07_sua_vez.png[39m[0m
-[  52% ] [90m[1m_update_scan_actions[22m | 844x390_08_confirmar.png[39m[0m
-[  55% ] [90m[1m_update_scan_actions[22m | 844x390_09_revelando.png[39m[0m
-[  58% ] [90m[1m_update_scan_actions[22m | 844x390_10_atingidos.png[39m[0m
-[  61% ] [90m[1m_update_scan_actions[22m | 844x390_11_fim.png[39m[0m
-[  64% ] [90m[1m_update_scan_actions[22m | 1920x1080_01_entrada.png[39m[0m
+[  37% ] [90m[1m_update_scan_actions[22m | 844x390_03_lobby.png[39m[0m
+[  40% ] [90m[1m_update_scan_actions[22m | 844x390_04_selecao.png[39m[0m
+[  42% ] [90m[1m_update_scan_actions[22m | 844x390_05_selecionadas.png[39m[0m
+[  45% ] [90m[1m_update_scan_actions[22m | 844x390_06_contagem.png[39m[0m
+[  47% ] [90m[1m_update_scan_actions[22m | 844x390_07_sua_vez.png[39m[0m
+[  50% ] [90m[1m_update_scan_actions[22m | 844x390_08_confirmar.png[39m[0m
+[  52% ] [90m[1m_update_scan_actions[22m | 844x390_09_revelando.png[39m[0m
+[  55% ] [90m[1m_update_scan_actions[22m | 844x390_10_atingidos.png[39m[0m
+[  57% ] [90m[1m_update_scan_actions[22m | 844x390_11_sala_encerrada.png[39m[0m
+[  60% ] [90m[1m_update_scan_actions[22m | 844x390_12_campeao.png[39m[0m
+[  62% ] [90m[1m_update_scan_actions[22m | 844x390_13_lobby_de_novo.png[39m[0m
+[  65% ] [90m[1m_update_scan_actions[22m | 1920x1080_01_entrada.png[39m[0m
 [  67% ] [90m[1m_update_scan_actions[22m | 1920x1080_02_criar.png[39m[0m
 [  70% ] [90m[1m_update_scan_actions[22m | 1920x1080_03_lobby.png[39m[0m
-[  73% ] [90m[1m_update_scan_actions[22m | 1920x1080_04_selecao.png[39m[0m
-[  76% ] [90m[1m_update_scan_actions[22m | 1920x1080_05_selecionadas.png[39m[0m
-[  79% ] [90m[1m_update_scan_actions[22m | 1920x1080_06_contagem.png[39m[0m
-[  82% ] [90m[1m_update_scan_actions[22m | 1920x1080_07_sua_vez.png[39m[0m
-[  85% ] [90m[1m_update_scan_actions[22m | 1920x1080_08_confirmar.png[39m[0m
-[  88% ] [90m[1m_update_scan_actions[22m | 1920x1080_09_revelando.png[39m[0m
-[  91% ] [90m[1m_update_scan_actions[22m | 1920x1080_10_atingidos.png[39m[0m
-[  94% ] [90m[1m_update_scan_actions[22m | 1920x1080_11_fim.png[39m[0m
+[  72% ] [90m[1m_update_scan_actions[22m | 1920x1080_04_selecao.png[39m[0m
+[  75% ] [90m[1m_update_scan_actions[22m | 1920x1080_05_selecionadas.png[39m[0m
+[  77% ] [90m[1m_update_scan_actions[22m | 1920x1080_06_contagem.png[39m[0m
+[  80% ] [90m[1m_update_scan_actions[22m | 1920x1080_07_sua_vez.png[39m[0m
+[  82% ] [90m[1m_update_scan_actions[22m | 1920x1080_08_confirmar.png[39m[0m
+[  85% ] [90m[1m_update_scan_actions[22m | 1920x1080_09_revelando.png[39m[0m
+[  87% ] [90m[1m_update_scan_actions[22m | 1920x1080_10_atingidos.png[39m[0m
+[  90% ] [90m[1m_update_scan_actions[22m | 1920x1080_11_sala_encerrada.png[39m[0m
+[  92% ] [90m[1m_update_scan_actions[22m | 1920x1080_12_campeao.png[39m[0m
+[  95% ] [90m[1m_update_scan_actions[22m | 1920x1080_13_lobby_de_novo.png[39m[0m
 [92m[ DONE ][39m [1m_update_scan_actions[22m
 [0m
-[   0% ] [90m[1mreimport[22m | Started (Re)Importing Assets (33 steps)[39m[0m
+[   0% ] [90m[1mreimport[22m | Started (Re)Importing Assets (39 steps)[39m[0m
 [   0% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
 [   2% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
 [   5% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
-[   8% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
-[  11% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
-[  14% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   7% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  10% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  12% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  15% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
 [  17% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
 [  20% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
-[  23% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
-[  26% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
-[  29% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  22% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  25% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  27% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  30% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
 [  32% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
 [  35% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
-[  38% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
-[  41% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
-[  44% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  37% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  40% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  42% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  45% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
 [  47% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
 [  50% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
 [  52% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
 [  55% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
-[  58% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
-[  61% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
-[  64% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  57% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  60% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  62% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  65% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
 [  67% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
 [  70% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
-[  73% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
-[  76% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
-[  79% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  72% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  75% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  77% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  80% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
 [  82% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
 [  85% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
-[  88% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
-[  91% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
-[  94% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  87% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  90% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  92% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  95% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
 [   0% ] [90m[1mreimport[22m | Executing pre-reimport operations...[39m[0m
-[   0% ] [90m[1mreimport[22m | 1920x1080_11_fim.png[39m[0m
-[   2% ] [90m[1mreimport[22m | 1920x1080_10_atingidos.png[39m[0m
-[   5% ] [90m[1mreimport[22m | 1920x1080_09_revelando.png[39m[0m
-[   8% ] [90m[1mreimport[22m | 1920x1080_08_confirmar.png[39m[0m
-[  11% ] [90m[1mreimport[22m | 1920x1080_07_sua_vez.png[39m[0m
-[  14% ] [90m[1mreimport[22m | 1920x1080_06_contagem.png[39m[0m
-[  17% ] [90m[1mreimport[22m | 1920x1080_05_selecionadas.png[39m[0m
-[  20% ] [90m[1mreimport[22m | 1920x1080_04_selecao.png[39m[0m
-[  23% ] [90m[1mreimport[22m | 1920x1080_03_lobby.png[39m[0m
-[  26% ] [90m[1mreimport[22m | 1920x1080_02_criar.png[39m[0m
-[  29% ] [90m[1mreimport[22m | 1920x1080_01_entrada.png[39m[0m
-[  32% ] [90m[1mreimport[22m | 844x390_11_fim.png[39m[0m
-[  35% ] [90m[1mreimport[22m | 844x390_10_atingidos.png[39m[0m
-[  38% ] [90m[1mreimport[22m | 844x390_09_revelando.png[39m[0m
-[  41% ] [90m[1mreimport[22m | 844x390_08_confirmar.png[39m[0m
-[  44% ] [90m[1mreimport[22m | 844x390_07_sua_vez.png[39m[0m
+[   0% ] [90m[1mreimport[22m | 844x390_08_confirmar.png[39m[0m
+[   2% ] [90m[1mreimport[22m | 844x390_09_revelando.png[39m[0m
+[   5% ] [90m[1mreimport[22m | 844x390_10_atingidos.png[39m[0m
+[   7% ] [90m[1mreimport[22m | 844x390_11_sala_encerrada.png[39m[0m
+[  10% ] [90m[1mreimport[22m | 844x390_12_campeao.png[39m[0m
+[  12% ] [90m[1mreimport[22m | 844x390_13_lobby_de_novo.png[39m[0m
+[  15% ] [90m[1mreimport[22m | 1920x1080_01_entrada.png[39m[0m
+[  17% ] [90m[1mreimport[22m | 1920x1080_02_criar.png[39m[0m
+[  20% ] [90m[1mreimport[22m | 1920x1080_03_lobby.png[39m[0m
+[  22% ] [90m[1mreimport[22m | 1920x1080_04_selecao.png[39m[0m
+[  25% ] [90m[1mreimport[22m | 1920x1080_05_selecionadas.png[39m[0m
+[  27% ] [90m[1mreimport[22m | 1920x1080_06_contagem.png[39m[0m
+[  30% ] [90m[1mreimport[22m | 1920x1080_07_sua_vez.png[39m[0m
+[  32% ] [90m[1mreimport[22m | 1920x1080_08_confirmar.png[39m[0m
+[  35% ] [90m[1mreimport[22m | 1920x1080_09_revelando.png[39m[0m
+[  37% ] [90m[1mreimport[22m | 1920x1080_10_atingidos.png[39m[0m
+[  40% ] [90m[1mreimport[22m | 1920x1080_11_sala_encerrada.png[39m[0m
+[  42% ] [90m[1mreimport[22m | 1920x1080_12_campeao.png[39m[0m
+[  45% ] [90m[1mreimport[22m | 1920x1080_13_lobby_de_novo.png[39m[0m
 [  47% ] [90m[1mreimport[22m | 640x360_01_entrada.png[39m[0m
 [  50% ] [90m[1mreimport[22m | 640x360_02_criar.png[39m[0m
 [  52% ] [90m[1mreimport[22m | 640x360_03_lobby.png[39m[0m
 [  55% ] [90m[1mreimport[22m | 640x360_04_selecao.png[39m[0m
-[  58% ] [90m[1mreimport[22m | 640x360_05_selecionadas.png[39m[0m
-[  61% ] [90m[1mreimport[22m | 640x360_06_contagem.png[39m[0m
-[  64% ] [90m[1mreimport[22m | 640x360_07_sua_vez.png[39m[0m
-[  67% ] [90m[1mreimport[22m | 640x360_08_confirmar.png[39m[0m
-[  70% ] [90m[1mreimport[22m | 640x360_09_revelando.png[39m[0m
-[  73% ] [90m[1mreimport[22m | 640x360_10_atingidos.png[39m[0m
-[  76% ] [90m[1mreimport[22m | 640x360_11_fim.png[39m[0m
-[  79% ] [90m[1mreimport[22m | 844x390_01_entrada.png[39m[0m
+[  57% ] [90m[1mreimport[22m | 640x360_05_selecionadas.png[39m[0m
+[  60% ] [90m[1mreimport[22m | 640x360_06_contagem.png[39m[0m
+[  62% ] [90m[1mreimport[22m | 640x360_07_sua_vez.png[39m[0m
+[  65% ] [90m[1mreimport[22m | 640x360_08_confirmar.png[39m[0m
+[  67% ] [90m[1mreimport[22m | 640x360_09_revelando.png[39m[0m
+[  70% ] [90m[1mreimport[22m | 640x360_10_atingidos.png[39m[0m
+[  72% ] [90m[1mreimport[22m | 640x360_11_sala_encerrada.png[39m[0m
+[  75% ] [90m[1mreimport[22m | 640x360_12_campeao.png[39m[0m
+[  77% ] [90m[1mreimport[22m | 640x360_13_lobby_de_novo.png[39m[0m
+[  80% ] [90m[1mreimport[22m | 844x390_01_entrada.png[39m[0m
 [  82% ] [90m[1mreimport[22m | 844x390_02_criar.png[39m[0m
 [  85% ] [90m[1mreimport[22m | 844x390_03_lobby.png[39m[0m
-[  88% ] [90m[1mreimport[22m | 844x390_04_selecao.png[39m[0m
-[  91% ] [90m[1mreimport[22m | 844x390_05_selecionadas.png[39m[0m
-[  94% ] [90m[1mreimport[22m | 844x390_06_contagem.png[39m[0m
+[  87% ] [90m[1mreimport[22m | 844x390_04_selecao.png[39m[0m
+[  90% ] [90m[1mreimport[22m | 844x390_05_selecionadas.png[39m[0m
+[  92% ] [90m[1mreimport[22m | 844x390_06_contagem.png[39m[0m
+[  95% ] [90m[1mreimport[22m | 844x390_07_sua_vez.png[39m[0m
 [  97% ] [90m[1mreimport[22m | Finalizing Asset Import...[39m[0m
 [92m[ DONE ][39m [1mreimport[22m
 [0m
-[   0% ] [90m[1mreimport[22m | Started (Re)Importing Assets (33 steps)[39m[0m
+[   0% ] [90m[1mreimport[22m | Started (Re)Importing Assets (39 steps)[39m[0m
 [   0% ] [90m[1mreimport[22m | Executing post-reimport operations...[39m[0m
 [92m[ DONE ][39m [1mreimport[22m
 [0m

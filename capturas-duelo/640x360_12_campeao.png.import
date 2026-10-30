@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cdbpcw3kov3fu"
-path="res://.godot/imported/1920x1080_11_fim.png-9ff33ac8431010a81de384d3c31df59d.ctex"
+uid="uid://ce4akpsgduxdc"
+path="res://.godot/imported/640x360_12_campeao.png-7611cb2114933c57d1bb00ceac0b4f50.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://capturas-duelo/1920x1080_11_fim.png"
-dest_files=["res://.godot/imported/1920x1080_11_fim.png-9ff33ac8431010a81de384d3c31df59d.ctex"]
+source_file="res://capturas-duelo/640x360_12_campeao.png"
+dest_files=["res://.godot/imported/640x360_12_campeao.png-7611cb2114933c57d1bb00ceac0b4f50.ctex"]
 
 [params]
 

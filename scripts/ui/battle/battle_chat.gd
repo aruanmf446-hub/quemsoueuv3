@@ -115,6 +115,9 @@ func refresh_availability() -> void:
 func _state() -> void:
 	if not is_inside_tree(): return
 	var chat := _chat
+	# Acesso à sala recusado (saiu, expulso, sala fechada): nada da conversa fica na tela.
+	if _owned and chat.conversation_id.is_empty() and chat.error_code == "room_access_denied" and not _rendered.is_empty():
+		_clear_messages()
 	if _owned and chat.state == "closed":
 		_owned = false
 		_clear_messages()

@@ -130,6 +130,8 @@ func _render_board(data: Dictionary, me: Dictionary) -> void:
 	var my_turn: bool = not me.is_empty() and str(data.get("turn_member", "")) == str(me.member_id) and data.phase == "turns"
 	var banner := PlayerUI.row(self)
 	var text := "É a sua vez! Escolha uma carta para eliminar." if my_turn else ("É a vez de %s" % str(turn.get("nickname", "…")))
+	if data.phase == "reveal" and not my_turn and bool(turn.get("is_you", false)):
+		text = "Sua jogada"
 	if data.phase == "finished": text = "Fim da partida"
 	banner.add_child(PlayerUI.label(text, 26, PlayerUI.GOLD if my_turn else Color.WHITE))
 	if data.phase == "turns":

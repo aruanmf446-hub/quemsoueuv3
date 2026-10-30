@@ -104,6 +104,7 @@ func _session_changed() -> void:
 	wallet.clear()
 	friends.clear()
 	chat.clear()
+	chat.me_id = str(session.user.get("id", "")) if session.authenticated() else ""
 	# A partida local não depende da conta: entrar ou sair dela não a interrompe.
 	if not duel.is_local(): duel.clear()
 	inventory.changed.emit()

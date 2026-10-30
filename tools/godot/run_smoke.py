@@ -25,6 +25,8 @@ if imported:
   run(f'phase_{n:02d}',['--script','res://tools/godot/smoke.gd','--',f'res://scenes/desert/phase_{n:02d}.tscn'],120)
   if n<10:run(f'transition_{n:02d}',['--script','res://tools/godot/smoke.gd','--',f'res://scenes/desert/phase_{n:02d}.tscn','--transition'],120)
  run('functional',['--script','res://tools/godot/functional.gd'],120)
+ run('battle_presentation',['--script','res://tests/battle_reference/flow.gd'],180)
+ run('battle_navigation',['--script','res://tests/battle_reference/navigation.gd'],180)
  run('duel_local',['--script','res://tests/duel_local/flow_test.gd'],240)
  run('supabase_connections',['--script','res://tests/supabase_connections/verify.gd'],120)
  run('catalog_remote',['--script','res://tests/catalog_remote/verify.gd'],120)

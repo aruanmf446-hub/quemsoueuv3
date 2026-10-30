@@ -20,6 +20,7 @@ var _form: Dictionary = {}
 ## Tela da partida: uma só instância, mantida entre atualizações (a seleção em andamento
 ## não se perde quando chega uma atualização do servidor).
 var _match_view: Node
+var _battle_layout := false
 
 
 func _ready() -> void:
@@ -47,6 +48,8 @@ func show_screen(params: Dictionary = {}) -> void:
 	if duel.in_room(): _view = "room"
 	elif _view == "room": _view = "browse"
 	super.show_screen(params)
+	if _battle_layout and is_instance_valid(_match_view):
+		_match_view.find_child("BattleBack",true,false).grab_focus()
 	if _view == "browse" and _online(): _load_rooms(false)
 
 
@@ -56,6 +59,11 @@ func _online() -> bool:
 
 
 func render() -> void:
+	var in_battle := duel.in_room() and str(duel.room.get("room",{}).get("status","")) in ["in_match","closed"] and not duel.match().is_empty()
+	_set_battle_layout(in_battle)
+	if in_battle and is_instance_valid(_match_view) and _match_view.get_parent() == body:
+		_match_view.refresh()
+		return
 	heading.text = tr("Duelo · Partida local") if duel.is_local() else tr("Duelo")
 	if is_instance_valid(_match_view) and _match_view.get_parent() == body: body.remove_child(_match_view)
 	PlayerUI.clear(body)
@@ -347,10 +355,10 @@ func _render_room() -> void:
 		code.tooltip_text = tr("Copiar código de convite")
 		code.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		header.add_child(code)
-	if str(data.status) == "closed":
+	if str(data.status) == "closed" and duel.match().is_empty():
 		_render_closed()
 		return
-	if str(data.status) == "in_match" and not duel.match().is_empty():
+	if str(data.status) in ["in_match","closed"] and not duel.match().is_empty():
 		header.hide()
 		heading.text = tr("Batalha · Partida local") if duel.is_local() else tr("Batalha")
 		if not is_instance_valid(_match_view):
@@ -359,11 +367,6 @@ func _render_room() -> void:
 			_match_view.setup(duel, services.inventory, self, _act)
 		body.add_child(_match_view)
 		_match_view.refresh()
-		var leave_row := PlayerUI.row(body)
-		var gap := Control.new()
-		gap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		leave_row.add_child(gap)
-		leave_row.add_child(PlayerUI.button("Sair da sala", _leave_room))
 		return
 	if is_instance_valid(_match_view):
 		_match_view.queue_free()
@@ -479,6 +482,7 @@ func _act(action: Callable) -> Dictionary:
 
 
 func animate_in() -> void:
+	if _battle_layout: return
 	PlayerUI.cascade(body)
 	var members := body.get_node_or_null("Members")
 	if members != null: PlayerUI.cascade(members, 0, 0.03)
@@ -487,3 +491,34 @@ func animate_in() -> void:
 func _exit_tree() -> void:
 	# The match is detached while another room view is rendered.
 	if is_instance_valid(_match_view) and _match_view.get_parent() == null: _match_view.free()
+
+
+func _set_battle_layout(enabled: bool) -> void:
+	_battle_layout = enabled
+	$Margin/Column/Header.visible = not enabled
+	$Margin/Column/Scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED if enabled else ScrollContainer.SCROLL_MODE_AUTO
+	body.size_flags_vertical = Control.SIZE_EXPAND_FILL if enabled else Control.SIZE_FILL
+	if enabled:
+		banner.hide()
+		$Margin/Column.add_theme_constant_override("separation",0)
+		var safe := DisplayServer.get_display_safe_area()
+		var window := get_window()
+		var mobile := OS.has_feature("mobile")
+		# Safe-area coordinates are physical; margin coordinates are UI points.
+		var density := maxf(UIScale.device_scale(),0.01)
+		var left := maxf(float(safe.position.x-window.position.x),0) / density if mobile else 0.0
+		var right := maxf(float(window.position.x+window.size.x-safe.end.x),0) / density if mobile else 0.0
+		$Margin.add_theme_constant_override("margin_left",12+ceili(left))
+		$Margin.add_theme_constant_override("margin_right",12+ceili(right))
+		var top := maxf(float(safe.position.y-window.position.y),0) / density if mobile else 0.0
+		var bottom := maxf(float(window.position.y+window.size.y-safe.end.y),0) / density if mobile else 0.0
+		$Margin.add_theme_constant_override("margin_top",8+ceili(top))
+		$Margin.add_theme_constant_override("margin_bottom",8+ceili(bottom))
+	else:
+		super._adapt_scale()
+	_refit_margin.call_deferred()
+
+
+func _adapt_scale() -> void:
+	super._adapt_scale()
+	if _battle_layout: _set_battle_layout(true)

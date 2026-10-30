@@ -209,6 +209,47 @@ func update_progress(share: float, seconds: float, district: String) -> void:
 	_bar.value = share*100.0
 	_district.text = district.to_upper()
 	_progress.text = "%d%%   ·   %02d:%02d" % [roundi(share*100),int(seconds)/60,int(seconds)%60]
+## Tempestade: véu cor de areia e grãos atravessando a tela (abaixo dos painéis).
+var _storm_veil: ColorRect
+var _storm_grains: CPUParticles2D
+func set_storm(on: bool) -> void:
+	if not is_instance_valid(_storm_veil):
+		_storm_veil = ColorRect.new()
+		_storm_veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_storm_veil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		_storm_veil.color = Color(0.72,0.52,0.3,0.0)
+		add_child(_storm_veil)
+		move_child(_storm_veil,0)
+		_storm_grains = CPUParticles2D.new()
+		_storm_grains.amount = 220
+		_storm_grains.lifetime = 1.2
+		_storm_grains.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+		_storm_grains.direction = Vector2(-1,0.12)
+		_storm_grains.spread = 6
+		_storm_grains.gravity = Vector2.ZERO
+		_storm_grains.initial_velocity_min = 700
+		_storm_grains.initial_velocity_max = 1300
+		_storm_grains.scale_amount_min = 0.6
+		_storm_grains.scale_amount_max = 1.4
+		_storm_grains.color = Color(0.98,0.85,0.6,0.6)
+		# Risco horizontal com pontas suaves: lê como areia voando, não como pixel.
+		var streak := GradientTexture2D.new()
+		var grad := Gradient.new()
+		grad.offsets = PackedFloat32Array([0.0,0.3,1.0])
+		grad.colors = PackedColorArray([Color(1,1,1,0),Color(1,1,1,1),Color(1,1,1,0)])
+		streak.gradient = grad
+		streak.width = 48
+		streak.height = 3
+		_storm_grains.texture = streak
+		_storm_grains.emitting = false
+		add_child(_storm_grains)
+		move_child(_storm_grains,1)
+	var screen := get_viewport().get_visible_rect().size
+	_storm_grains.position = Vector2(screen.x+20,screen.y*0.5)
+	_storm_grains.emission_rect_extents = Vector2(20,screen.y*0.5)
+	_storm_grains.emitting = on
+	var fade := _storm_veil.create_tween()
+	fade.tween_property(_storm_veil,"color:a",0.34 if on else 0.0,0.8)
 ## Nome do novo lugar em destaque no alto da tela, some sozinho.
 func announce_place(text: String) -> void:
 	if not is_instance_valid(_place):

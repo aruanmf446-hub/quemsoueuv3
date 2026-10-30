@@ -25,6 +25,8 @@ var _yaw := PI*0.5
 var _hurt_timer := 0.0
 var _blink := 0.0
 var _fist: Node3D
+## Vento da tempestade de areia (m/s, negativo empurra para a esquerda).
+var wind := 0.0
 var _actor: ActorSlot:
 	get: return _model as ActorSlot
 func _ready() -> void:
@@ -96,7 +98,8 @@ func _physics_process(delta: float) -> void:
 	if _attack_timer > 0.0 and not _hit_delivered and _attack_timer <= SWING - STRIKE_TIME:
 		_deliver_hit()
 	if _knockback_timer <= 0.0:
-		var target := direction * SPEED
+		# Vento só freia quem anda (parado, o personagem não escorrega).
+		var target := direction * SPEED + (wind if direction != 0.0 else 0.0)
 		if is_defending or is_crouching: target = 0.0
 		if _attack_timer > 0.0: target *= 0.0 if is_on_floor() else 0.7
 		velocity.x = move_toward(velocity.x, target, (48.0 if is_on_floor() else 24.0) * delta)

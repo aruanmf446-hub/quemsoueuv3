@@ -55,10 +55,10 @@
 		{
 			"id": "lorena",
 			"name": "Lorena",
-			"model": "res://assets/characters/Lorena/1.fbx",
+			"model": "res://assets/characters/Lorena/lorena_lite.scn",
 			"height": 1.85,
 			"animations": {
-				"base": "res://assets/characters/Lorena/1.fbx",
+				"base": "res://assets/characters/Lorena/lorena_lite.scn",
 				"anim_2": "res://assets/characters/Lorena/2.fbx",
 				"anim_3": "res://assets/characters/Lorena/3.fbx",
 				"anim_4": "res://assets/characters/Lorena/4.fbx"
@@ -126,10 +126,10 @@
 			"id": "el_fuego",
 			"name": "El Fuego",
 			"description": "Exclusivo do Modo História. Disponível após concluir o Reino do Deserto.",
-			"model": "res://assets/characters/El fuego/Correr.fbx",
+			"model": "res://assets/characters/El fuego/el_fuego_lite.scn",
 			"height": 1.4,
 			"animations": {
-				"base": "res://assets/characters/El fuego/Correr.fbx",
+				"base": "res://assets/characters/El fuego/el_fuego_lite.scn",
 				"agachado": "res://assets/characters/El fuego/agachado.fbx",
 				"ataque": "res://assets/characters/El fuego/ataque.fbx",
 				"defesa": "res://assets/characters/El fuego/defesa.fbx",

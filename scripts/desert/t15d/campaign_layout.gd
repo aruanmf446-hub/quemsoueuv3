@@ -68,12 +68,15 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 		var width := 3.0+float((index+order)%3)*0.25
 		# Vão largo com pedra no meio que desmorona: dois saltos rápidos em vez de um.
 		var stepping := index > 0 and (index*3+order)%5 == 1
+		# Vão de 9m com balsa de pedra indo e voltando: esperar, subir e saltar na hora.
+		var ferry := index > 1 and not stepping and (index*7+order)%6 == 3
+		if ferry: width = 9.0
 		# Pulo normal saindo da borda pousa na pedra (2,4m larga, 2,5m de cada borda).
 		if stepping: width = 7.4
 		var pit_left := center-width*0.5
 		var pit_right := center+width*0.5
 		spans.append({"left":left,"right":pit_left})
-		pits.append({"id":"%s.pit.%02d" % [prefix,index],"start":pit_left,"end":pit_right,"width":width,"stepping":stepping})
+		pits.append({"id":"%s.pit.%02d" % [prefix,index],"start":pit_left,"end":pit_right,"width":width,"stepping":stepping,"ferry":ferry})
 		if stepping:
 			platforms.append({"id":"%s.crumble.%02d" % [prefix,index],"kind":"crumble","pos":[center,-0.3,0.0],"size":[2.4,0.6,3.0],"span_start":center-1.2,"span_end":center+1.2,"chunk":floori(center/CHUNK_LENGTH)})
 		signs.append({"id":"%s.pit.%02d.left" % [prefix,index],"kind":"pit_warning","pos":[pit_left-5.0,0.0,-1.5],"direction":1})
@@ -152,7 +155,7 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 		"maximum_horizontal_speed":MAX_HORIZONTAL_SPEED,
 		"platforms":platforms,"enemies":enemies,"pickups":pickups,"holes":pits,
 		"signs":signs,"districts":districts,"landmarks":landmarks,
-		"checkpoints":checkpoints,"geysers":geysers,"goal":{"pos":[goal_x,1.5,0.0]},
+		"checkpoints":checkpoints,"geysers":geysers,"storms":[_storm(order,spawn_x,distance)],"goal":{"pos":[goal_x,1.5,0.0]},
 		"kill_plane_y":-8.0,"boss_id":null,"legacy_placeholder_visuals":false,
 		"bounds":{"min_x":spawn_x-8.0,"max_x":goal_x+10.0},
 		"next_scene":"res://scenes/desert/phase_%02d.tscn" % (order+1),
@@ -193,6 +196,12 @@ static func _checkpoint_x(value: float, holes: Array, platforms: Array, enemies:
 		if not blocked: return x
 		x += 2.0
 	return x
+
+## Trecho de tempestade de areia: 70m dentro de um distrito do meio (varia por fase).
+static func _storm(order: int, spawn_x: float, distance: float) -> Dictionary:
+	var district := 2 + (order % 4)
+	var start := spawn_x + distance * district / 8.0 + 12.0
+	return {"id": "p%02d.storm" % order, "start": start, "end": start + 70.0}
 
 static func _safe_floor_x(value: float, holes: Array) -> float:
 	for hole: Dictionary in holes:

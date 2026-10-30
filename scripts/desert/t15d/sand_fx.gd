@@ -251,10 +251,12 @@ class SandShield extends Node3D:
 
 	func _process(delta: float) -> void:
 		if active and not _was_active: _dust_burst(14, 1.0)
-		if not active and _was_active: _dust_burst(26, 0.6)
+		if not active and _was_active:
+			_dust_burst(26, 0.6)
+			_crumble()
 		_was_active = active
 		# Sobe rápido (0,12s) e afunda desmoronando quando a defesa termina.
-		_rise = move_toward(_rise, 1.0 if active else 0.0, delta * (8.0 if active else 3.5))
+		_rise = move_toward(_rise, 1.0 if active else 0.0, delta * (11.0 if active else 3.5))
 		_shake = maxf(_shake - delta * 4.0, 0.0)
 		visible = _rise > 0.01
 		_trickle.emitting = active
@@ -284,6 +286,29 @@ class SandShield extends Node3D:
 		chips.emitting = true
 		_dust_burst(10, 1.0, 1.0)
 		get_tree().create_timer(0.9, false).timeout.connect(chips.queue_free)
+
+	## Fim da defesa: torrões de terra caem da parede enquanto ela afunda.
+	func _crumble() -> void:
+		var clods := CPUParticles3D.new()
+		clods.one_shot = true
+		clods.explosiveness = 0.7
+		clods.amount = 16
+		clods.lifetime = 0.7
+		clods.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+		clods.emission_box_extents = Vector3(0.18, 0.8, 0.5)
+		clods.direction = Vector3(facing * 0.3, 0.4, 0)
+		clods.spread = 60
+		clods.initial_velocity_min = 0.6
+		clods.initial_velocity_max = 2.0
+		clods.gravity = Vector3(0, -12, 0)
+		clods.scale_amount_min = 0.6
+		clods.scale_amount_max = 1.3
+		clods.mesh = Res.sprite(0.12)
+		clods.color_ramp = Res.ramp([Color("#7a5a3e", 1.0), Color("#5a3f2a", 0.9), Color("#4a3322", 0.0)])
+		clods.position = Vector3(facing * 0.72, 0.9, 0.1)
+		add_child(clods)
+		clods.emitting = true
+		get_tree().create_timer(0.9, false).timeout.connect(clods.queue_free)
 
 	func _dust_burst(amount: int, height: float, along := 0.0) -> void:
 		var dust := CPUParticles3D.new()

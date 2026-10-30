@@ -1,5 +1,6 @@
 class_name UIScale
 extends RefCounted
+static var _browser_window: Variant
 ## Escala da interface pelo tamanho real da tela, não pelos pixels da janela.
 ## Um iPhone deitado tem ~390 pontos de altura mas 1170 pixels (devicePixelRatio 3):
 ## medir em pixels fazia o jogo usar o layout de computador, com texto minúsculo.
@@ -15,6 +16,12 @@ static func device_scale() -> float:
 
 ## Tamanho da janela em pontos (pixels lógicos).
 static func logical_size() -> Vector2:
+	# O canvas Web pode ter resolução limitada sem mudar a densidade física do
+	# telefone. Medir os pontos CSS evita ampliar a UI pelo DPR original.
+	if OS.has_feature("web"):
+		if _browser_window == null: _browser_window = JavaScriptBridge.get_interface("window")
+		if _browser_window != null:
+			return Vector2(float(_browser_window.innerWidth), float(_browser_window.innerHeight))
 	return Vector2(DisplayServer.window_get_size()) / device_scale()
 
 ## Tela baixa (celular deitado): layout compacto com alvos de toque maiores.

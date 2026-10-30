@@ -65,5 +65,44 @@
       "errors": []
     },
     "limitations": "Single 4s idle-scene sample, software GPU, public baseline versus localhost candidate. Does not validate running FPS or chunk-frame max on a phone."
+  },
+  "historical_baseline_commit": "34c2c37",
+  "historical_candidate_before_main_merge": "5e45ac0",
+  "integrated_main_commit": "b4cdccf",
+  "final_web_pck_bytes": 35379616,
+  "mobile_canvas_dpr3": {
+    "css_size": [
+      844,
+      390
+    ],
+    "device_pixel_ratio": 3,
+    "old_auto_canvas": [
+      2532,
+      1170
+    ],
+    "bounded_canvas": [
+      1055,
+      487
+    ],
+    "pixel_reduction_percent": 82.6574,
+    "phase_opened_with_touch": true,
+    "physical_device": false,
+    "software_gpu": true
+  },
+  "final_web_dpr3_probe": {
+    "url": "http://127.0.0.1:8133/",
+    "canvas": {
+      "width": 1055,
+      "height": 487,
+      "dpr": 3
+    },
+    "frames": {
+      "count": 40,
+      "fps": 9.981285090455396,
+      "p95": 133.3000000000029,
+      "max": 133.3000000000029
+    },
+    "errors": [],
+    "note": "Software GPU; idle scene, not a running/physical-phone FPS acceptance test."
   }
 }

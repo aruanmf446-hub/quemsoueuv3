@@ -34,6 +34,28 @@ $GODOT_HEAD_INCLUDE
 <script>
 const GODOT_CONFIG = $GODOT_CONFIG;
 const GODOT_THREADS_ENABLED = $GODOT_THREADS_ENABLED;
+// A densidade física de um telefone pode multiplicar por nove o framebuffer.
+// Controlar o canvas evita esse custo sem alterar o tamanho CSS nem os gestos.
+if (window.matchMedia('(pointer: coarse)').matches || Math.min(innerWidth, innerHeight) < 600) {
+	GODOT_CONFIG.canvasResizePolicy = 0;
+	const canvas = document.getElementById('canvas');
+	function resizeGameCanvas() {
+		const scale = Math.min(window.devicePixelRatio || 1, 1.25);
+		let width = innerWidth * scale;
+		let height = innerHeight * scale;
+		const budget = 700000;
+		if (width * height > budget) {
+			const ratio = Math.sqrt(budget / (width * height));
+			width *= ratio; height *= ratio;
+		}
+		width = Math.max(1, Math.floor(width));
+		height = Math.max(1, Math.floor(height));
+		if (canvas.width !== width) canvas.width = width;
+		if (canvas.height !== height) canvas.height = height;
+	}
+	resizeGameCanvas();
+	window.addEventListener('resize', resizeGameCanvas);
+}
 const engine = new Engine(GODOT_CONFIG);
 const boot = document.getElementById('boot');
 const fill = document.getElementById('fill');

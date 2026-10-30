@@ -3,7 +3,7 @@
     "test": "import",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 8.09,
+    "wall_seconds": 11.3,
     "graphical": false,
     "fixed_physics_step": false
   },
@@ -19,7 +19,7 @@
     "test": "legacy10",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 3.72,
+    "wall_seconds": 3.44,
     "graphical": false,
     "fixed_physics_step": false
   },
@@ -35,7 +35,7 @@
     "test": "rules-desktop",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 35.11,
+    "wall_seconds": 40.29,
     "graphical": true,
     "fixed_physics_step": false
   },
@@ -43,7 +43,7 @@
     "test": "rules-mobile",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 33.21,
+    "wall_seconds": 29.61,
     "graphical": true,
     "fixed_physics_step": false
   },
@@ -51,7 +51,7 @@
     "test": "navigation-desktop",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 36.06,
+    "wall_seconds": 31.69,
     "graphical": true,
     "fixed_physics_step": false
   },
@@ -59,7 +59,7 @@
     "test": "variety",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 5.03,
+    "wall_seconds": 5.33,
     "graphical": false,
     "fixed_physics_step": false
   },
@@ -67,7 +67,7 @@
     "test": "parkour",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 5.3,
+    "wall_seconds": 6.07,
     "graphical": false,
     "fixed_physics_step": false
   },
@@ -75,7 +75,7 @@
     "test": "checkpoints",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 5.12,
+    "wall_seconds": 5.23,
     "graphical": false,
     "fixed_physics_step": false
   },
@@ -83,7 +83,7 @@
     "test": "touch-scroll",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 15.39,
+    "wall_seconds": 16.67,
     "graphical": false,
     "fixed_physics_step": false
   },
@@ -91,7 +91,7 @@
     "test": "feel-01",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 5.03,
+    "wall_seconds": 4.95,
     "graphical": false,
     "fixed_physics_step": false
   },
@@ -107,7 +107,7 @@
     "test": "feel-09",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 5.03,
+    "wall_seconds": 5.04,
     "graphical": false,
     "fixed_physics_step": false
   },
@@ -115,7 +115,7 @@
     "test": "navigation-mobile",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 25.84,
+    "wall_seconds": 25.41,
     "graphical": true,
     "fixed_physics_step": false
   },
@@ -123,7 +123,7 @@
     "test": "route-01",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 11.65,
+    "wall_seconds": 12.31,
     "graphical": false,
     "fixed_physics_step": true
   },
@@ -131,7 +131,7 @@
     "test": "route-02",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 8.55,
+    "wall_seconds": 12.48,
     "graphical": false,
     "fixed_physics_step": true
   },
@@ -139,7 +139,7 @@
     "test": "route-03",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 8.94,
+    "wall_seconds": 12.41,
     "graphical": false,
     "fixed_physics_step": true
   },
@@ -147,7 +147,7 @@
     "test": "route-04",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 12.12,
+    "wall_seconds": 12.02,
     "graphical": false,
     "fixed_physics_step": true
   },
@@ -155,7 +155,7 @@
     "test": "route-05",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 12.39,
+    "wall_seconds": 12.5,
     "graphical": false,
     "fixed_physics_step": true
   },
@@ -163,7 +163,7 @@
     "test": "route-06",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 12.58,
+    "wall_seconds": 13.61,
     "graphical": false,
     "fixed_physics_step": true
   },
@@ -171,7 +171,7 @@
     "test": "route-07",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 12.29,
+    "wall_seconds": 12.95,
     "graphical": false,
     "fixed_physics_step": true
   },
@@ -179,7 +179,7 @@
     "test": "route-08",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 11.38,
+    "wall_seconds": 12.77,
     "graphical": false,
     "fixed_physics_step": true
   },
@@ -187,7 +187,7 @@
     "test": "route-09",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 12.42,
+    "wall_seconds": 12.58,
     "graphical": false,
     "fixed_physics_step": true
   },
@@ -195,7 +195,7 @@
     "test": "window-route",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 355.46,
+    "wall_seconds": 323.42,
     "graphical": true,
     "fixed_physics_step": false
   },
@@ -203,7 +203,7 @@
     "test": "mobile-route",
     "passed": true,
     "exit_code": 0,
-    "wall_seconds": 229.69,
+    "wall_seconds": 240.04,
     "graphical": true,
     "fixed_physics_step": false
   }

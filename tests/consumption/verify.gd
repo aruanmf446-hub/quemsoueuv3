@@ -77,7 +77,7 @@ func _run() -> void:
 	var lobby: float = 3600.0 / services.duel.HEARTBEAT_SECONDS
 	print("CONSUMO duelo_lobby_1h antes=1800 depois=", int(lobby))
 	check(lobby <= 720.0, "heartbeat do lobby")
-	check(services.chat.send("x", "oi").code == "chat_unavailable", "chat desativado")
+	check((await services.chat.send("oi")).code == "chat_unavailable", "chat desativado")
 
 	services.session.user = {}
 	counter.access_token = ""

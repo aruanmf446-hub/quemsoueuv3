@@ -383,7 +383,11 @@ func _image(path: String) -> TextureRect:
 	return image
 
 func _reveal() -> void:
-	PlayerUI.reveal(body, 0.0, 0.18)
+	# Animate the new content, so rapid card changes never accumulate body scale.
+	for child: Control in body.get_children(): PlayerUI.reveal(child, 0.0, 0.18)
+
+func animate_in() -> void:
+	if _view == "library": PlayerUI.cascade(body)
 
 func _focus(control: Control) -> void:
 	if is_instance_valid(control) and control.is_inside_tree() and control.is_visible_in_tree(): control.grab_focus()

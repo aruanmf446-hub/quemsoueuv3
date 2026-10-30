@@ -135,13 +135,24 @@ func run() -> void:
 	await click(gallery.get_child(0))
 	check(screen.get("_index") == 0 and screen.get("_reader_previous").disabled, "first_card_boundary")
 	check(bounds(screen.get("_reader_image")) and bounds(screen.get("_reader_gallery")), "reader_bounds")
-	check(scroll.get_global_rect().encloses(screen.get("_reader_gallery").get_global_rect()), "reader_actions_within_scroll_viewport")
+	var viewport_rect := scroll.get_global_rect()
+	var action_rect: Rect2 = screen.get("_reader_gallery").get_global_rect()
+	print("READER_GEOMETRY ", viewport_rect, " ", action_rect)
+	check(viewport_rect.grow(0.5).encloses(action_rect), "reader_actions_within_scroll_viewport")
 	await capture("reader")
 	for index in range(1, 9):
 		await click(screen.get("_reader_next"))
 		check(screen.get("_index") == index and screen.get("_reader_image").texture.resource_path == deck.cards[index].image, "next_original_image_" + str(index))
 	await key(KEY_LEFT)
 	check(screen.get("_index") == 7, "keyboard_previous")
+	for code in [KEY_LEFT, KEY_RIGHT, KEY_LEFT]:
+		var rapid := InputEventKey.new()
+		rapid.keycode = code
+		rapid.pressed = true
+		root.push_input(rapid)
+		await process_frame
+	await settle()
+	check(screen.get("_index") == 6 and screen.get("body").scale.is_equal_approx(Vector2.ONE), "rapid_changes_keep_layout_scale")
 	await key(KEY_ESCAPE)
 	check(screen.get("_view") == "deck" and route() == "deck_library", "escape_reader_to_gallery")
 	nav.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)

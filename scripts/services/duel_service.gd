@@ -117,10 +117,15 @@ func join_invite(token: String) -> Dictionary:
 	return _apply(await _rpc("qse_duel_invite_join", {"p_token": token.strip_edges().to_lower()}))
 
 
-## Texto do convite. Com invite_base_url em data/backend/client.json (origem oficial com rota
-## /join configurada), vira link <base>?invite=<token>; sem ela, o próprio convite para colar.
+## Link do convite. Web: o endereço real da página atual (origem + caminho), sem domínio
+## inventado. Android/desktop: invite_base_url em data/backend/client.json, se configurado;
+## sem ele, o próprio convite para colar em Duelo → Código do convite.
 static func invite_link(token: String) -> String:
-	var base := str(PlayerContracts.read_json("res://data/backend/client.json").get("invite_base_url", "")).strip_edges()
+	var base := ""
+	if OS.has_feature("web"):
+		var page: Variant = JavaScriptBridge.eval("window.location.origin + window.location.pathname")
+		base = str(page) if page != null else ""
+	if base.is_empty(): base = str(PlayerContracts.read_json("res://data/backend/client.json").get("invite_base_url", "")).strip_edges()
 	if base.begins_with("https://"): return "%s?invite=%s" % [base, token]
 	return "Convite Quem Sou Eu (Duelo): %s" % token
 

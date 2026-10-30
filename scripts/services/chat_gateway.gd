@@ -29,8 +29,14 @@ func list_messages(conversation_id: String, _after: Variant = null) -> Dictionar
 	for row: Variant in rows:
 		if not row is Dictionary or not row.get("id") is String or not row.get("body") is String: continue
 		var sent := _time(str(row.get("sent_at", "")))
-		messages.append({"id": row.id, "sender_id": str(row.get("sender_game_user_id", "")), "text": row.body,
-			"created_at": sent, "expires_at": sent + RETENTION})
+		var message := {"id": row.id, "sender_id": str(row.get("sender_game_user_id", "")), "text": row.body,
+			"created_at": sent, "expires_at": sent + RETENTION}
+		# Sala (gateway v5): nome e membro do remetente, sem UUID privado do jogador.
+		if row.has("is_you"):
+			message.is_you = bool(row.is_you)
+			message.sender_name = str(row.get("sender_name", "Participante")) if row.get("sender_name") is String else "Participante"
+			message.sender_member_id = str(row.get("sender_member_id", "")) if row.get("sender_member_id") is String else ""
+		messages.append(message)
 	return ServiceResult.success({"messages": messages, "complete": true})
 
 
@@ -50,7 +56,7 @@ func send_message(conversation_id: String, request_id: String, text: String, me_
 	var message: Variant = (result.data as Dictionary).get("message")
 	if not message is Dictionary or not message.get("id") is String: return ServiceResult.failure("invalid_contract")
 	var sent := _time(str(message.get("sent_at", "")))
-	return ServiceResult.success({"message": {"id": message.id, "sender_id": me_id, "text": text,
+	return ServiceResult.success({"message": {"id": message.id, "sender_id": me_id, "is_you": true, "text": text,
 		"created_at": sent, "expires_at": sent + RETENTION}})
 
 

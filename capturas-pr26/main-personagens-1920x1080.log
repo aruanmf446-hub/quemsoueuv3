@@ -3,7 +3,5 @@ WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by 
      at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
 OpenGL API 4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 21.1.8, 256 bits)
 
-SCRIPT ERROR: Parse Error: Cannot infer the type of "panel" variable because the value doesn't have a set type.
-          at: GDScript::reload (res://tools/godot/capture_skins_pr26.gd:21)
-ERROR: Failed to load script "res://tools/godot/capture_skins_pr26.gd" with error "Parse error".
-   at: load (modules/gdscript/gdscript_resource_format.cpp:46)
+CAPTURE /home/runner/work/quemsoueuv3/quemsoueuv3/capturas-pr26/main-personagens-1920x1080_inicio.png
+CAPTURE /home/runner/work/quemsoueuv3/quemsoueuv3/capturas-pr26/main-personagens-1920x1080_selecionado.png

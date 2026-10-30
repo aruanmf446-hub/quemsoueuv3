@@ -1065,4 +1065,3 @@ WARNING: OBJ: Ambient light for material 'tripo_mat_dd1e133e-abf8-44e6-9912-f0f6
 [  16% ] [90m[1mloading_editor_layout[22m | Loading docks...[39m[0m
 [92m[ DONE ][39m [1mloading_editor_layout[22m
 [0m
-cannot connect to daemon at tcp:5037: Connection refused

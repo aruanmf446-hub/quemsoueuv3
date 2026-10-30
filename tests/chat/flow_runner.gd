@@ -80,7 +80,12 @@ func _run() -> void:
 	services.friends.state = "success"
 	chat = services.chat
 	chat.me_id = ME
-	check(chat.transport == null, "gateway real desligado por padrão")
+	# Teste sempre usa o transporte simulado, mesmo com o CHAT liberado por padrão.
+	# Nunca faz chamadas HTTP reais neste fluxo.
+	if chat.transport != null:
+		chat.transport.queue_free()
+		chat.transport = null
+	check(chat.transport == null, "gateway real removido da fixture")
 	fake = load("res://tests/chat/fixture_transport.gd").new()
 	fake.friends = [LUA, ROOK]
 	chat.add_child(fake)

@@ -1,6 +1,12 @@
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
-SCRIPT ERROR: Parse Error: Cannot infer the type of "lobby" variable because the value doesn't have a set type.
-          at: GDScript::reload (res://tests/consumption/verify.gd:72)
-ERROR: Failed to load script "res://tests/consumption/verify.gd" with error "Parse error".
-   at: load (modules/gdscript/gdscript_resource_format.cpp:46)
+CONSUMO poller_1h antes=360 depois=360
+ERROR: CONSUMPTION_FAIL poller reduzido
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/consumption/verify.gd:16)
+       [1] _run (res://tests/consumption/verify.gd:39)
+CONSUMO leituras_simultaneas antes=3 depois=1
+CONSUMO catalogo_3_aberturas antes=9 depois=3
+CONSUMO duelo_lobby_1h antes=1800 depois=720
+CONSUMPTION FAIL 6 verificações

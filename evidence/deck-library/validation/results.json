@@ -1,0 +1,23 @@
+{
+  "desktop": {
+    "checks": 67,
+    "failures": 0
+  },
+  "mobile": {
+    "checks": 67,
+    "failures": 0
+  },
+  "small": {
+    "checks": 67,
+    "failures": 0
+  },
+  "engine": "4.6.3.stable.official.7d41c59c4",
+  "main_base": "e82c6ac815c544cda96869600161171310766669",
+  "editor_import_exit_code": 0,
+  "navigation_checks": 27,
+  "duel_local_checks": 54,
+  "settings_checks": 28,
+  "design_guard": "passed",
+  "physical_android_tested": false,
+  "browser_tested": false
+}

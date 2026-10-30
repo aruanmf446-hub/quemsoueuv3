@@ -1,0 +1,47 @@
+[
+  {
+    "image": "assets/duel/decks/lendas_urbanas/bruxa_do_pantano.png",
+    "sha256": "19bb31031f69b8fabedac614c39a0a2dec2eafbd75ade5cd39e629eb2fe9f31f",
+    "unchanged_from_main": true
+  },
+  {
+    "image": "assets/duel/decks/lendas_urbanas/cobra_grande.png",
+    "sha256": "ff948bcf68598b8a89e04f5897edfefc9c6600849448c8d48f31f1e003a799f5",
+    "unchanged_from_main": true
+  },
+  {
+    "image": "assets/duel/decks/lendas_urbanas/dama_de_branco.png",
+    "sha256": "7947980d754084fd331cfb73a91285c055513d1c34861e105bacfd143a47d426",
+    "unchanged_from_main": true
+  },
+  {
+    "image": "assets/duel/decks/lendas_urbanas/homem_do_saco.png",
+    "sha256": "2b56ea8da188096977a5ccc5f9df7ff3380cfa25167f26254e4249553c7cb7fa",
+    "unchanged_from_main": true
+  },
+  {
+    "image": "assets/duel/decks/lendas_urbanas/homem_sorridente.png",
+    "sha256": "4f3b6e5cc63af802e4c53f8c5e9cadf64fd36bd9a57d74c73f993cf4d12683d5",
+    "unchanged_from_main": true
+  },
+  {
+    "image": "assets/duel/decks/lendas_urbanas/jeff_the_killer.png",
+    "sha256": "05bab2b7a9d46ef6ab4fae257d27bfdfa70670e318c3355d680b9faa9139a42d",
+    "unchanged_from_main": true
+  },
+  {
+    "image": "assets/duel/decks/lendas_urbanas/loira_do_banheiro.png",
+    "sha256": "570a0b4999002ad23ae1e9e2faaf8451a0a55a0309e1c921cf9aef3cfe26998f",
+    "unchanged_from_main": true
+  },
+  {
+    "image": "assets/duel/decks/lendas_urbanas/momo.png",
+    "sha256": "a6a0c2ae8d5a32eb01f16e0322f01114bb0e8a8fdd3fc96652c0932a39fc5fff",
+    "unchanged_from_main": true
+  },
+  {
+    "image": "assets/duel/decks/lendas_urbanas/slender_man.png",
+    "sha256": "fb5750c250684cd6b2524a3c2afa7992e368648e0974e9e186e43a2ab0a7e10f",
+    "unchanged_from_main": true
+  }
+]

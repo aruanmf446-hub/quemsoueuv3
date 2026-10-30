@@ -1,5 +1,22 @@
 # CONTINUIDADE DO PR #39
 
+## Acabamento visual — rodada seguinte de 30/10/2026
+
+O usuário aprovou a **estrutura**, reprovou o acabamento e enviou nova imagem de
+referência. A rodada de polish preserva as regiões e refina a apresentação.
+Leia [POLIMENTO_VISUAL.md](POLIMENTO_VISUAL.md) e veja
+[capturas atuais e testes](../../../evidence/battle-reference/polish-2026-10-30/README.md).
+
+- Retratos/bustos maiores, painéis e tabuleiro com relevo e sombras leves.
+- Foco das ilustrações corrigido, tarjas, bordas e seleção refinadas; nenhum PNG substituído.
+- Tipografia, ambientação, ícones em alta densidade e coluna direita refinados.
+- Destaque ativo desaparece após revelada a eliminação; sigilo e regras preservados.
+- Godot 4.7.2: **392 verificações gráficas por tamanho**, **383 headless**, smoke **30/30**.
+- Chromium: partida local percorrida com toque emulado; limites no relatório.
+- **Mesma branch/PR #39, main intacta, aguardar avaliação visual.**
+
+As atualizações anteriores abaixo são histórico, não substituem as capturas atuais.
+
 ## Atualização de 30/10/2026 — revisão técnica concluída, visual pendente
 
 A continuação está na mesma branch e no mesmo PR, sem alterar a main.

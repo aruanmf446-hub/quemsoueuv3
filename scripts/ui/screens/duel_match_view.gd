@@ -67,7 +67,7 @@ func _build() -> void:
 	add_child(_canvas)
 	_main = VBoxContainer.new()
 	_main.name = "PublicArea"
-	_main.add_theme_constant_override("separation",6)
+	_main.add_theme_constant_override("separation",3)
 	_canvas.add_child(_main)
 	var header := PlayerUI.row(_main)
 	header.name = "BattleHeader"
@@ -77,8 +77,9 @@ func _build() -> void:
 	back.name = "BattleBack"
 	back.custom_minimum_size.x = 72
 	header.add_child(back)
-	var title := Style.label("Batalha · Partida local" if duel.is_local() else "Batalha",17)
+	var title := Style.label("Batalha · Partida local" if duel.is_local() else "Batalha",18)
 	title.name = "BattleTitle"
+	Style.strong(title)
 	title.autowrap_mode = TextServer.AUTOWRAP_OFF
 	title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	title.clip_text = true
@@ -100,7 +101,10 @@ func _build() -> void:
 	instruction_row.add_theme_constant_override("separation",5)
 	var message := PlayerUI.column(instruction_row)
 	message.add_theme_constant_override("separation",0)
-	_instruction = Style.label("",18,PlayerUI.GOLD)
+	_instruction = Style.label("",20,PlayerUI.GOLD)
+	Style.strong(_instruction)
+	_instruction.add_theme_constant_override("shadow_offset_y",1)
+	_instruction.add_theme_color_override("font_shadow_color",Color(0,0,0,0.8))
 	_instruction.name = "RoundInstruction"
 	_instruction.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_instruction.autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -149,12 +153,13 @@ func _build_sidebar() -> void:
 	var hourglass := TextureRect.new()
 	hourglass.texture = load("res://assets/ui/battle/time.svg")
 	hourglass.modulate = PlayerUI.GOLD
-	hourglass.custom_minimum_size = Vector2(18,18)
+	hourglass.custom_minimum_size = Vector2(20,20)
 	hourglass.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	hourglass.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	timer_row.add_child(hourglass)
 	_timer = Style.label("",15)
 	_timer.name = "RoundTimer"
+	Style.strong(_timer)
 	_timer.autowrap_mode = TextServer.AUTOWRAP_OFF
 	timer_row.add_child(_timer)
 	var settings := Style.action("",func() -> void: overlay_parent.emit_signal("navigate_requested","settings",{}))
@@ -167,7 +172,8 @@ func _build_sidebar() -> void:
 	if not duel.is_local() and not code.is_empty():
 		var copy := Style.action(code,func() -> void:
 			DisplayServer.clipboard_set(code)
-			_notice.text = "Código copiado","copy")
+			_notice.text = "Código copiado"
+			_notice_ttl = 3.5,"copy")
 		copy.name = "CopyRoomCode"
 		copy.add_theme_font_size_override("font_size",11)
 		copy.add_theme_constant_override("icon_max_width",12)
@@ -195,7 +201,9 @@ func _build_sidebar() -> void:
 	voice_row.add_child(mic)
 	var voice_text := PlayerUI.column(voice_row)
 	voice_text.add_theme_constant_override("separation",0)
-	voice_text.add_child(Style.label("Chat de voz",13))
+	var voice_title := Style.label("Chat de voz",13)
+	Style.strong(voice_title)
+	voice_text.add_child(voice_title)
 	voice_text.add_child(Style.label("Indisponível",11,PlayerUI.MUTED))
 	var chat := ChatPanel.new()
 	chat.name = "BattleChat"
@@ -215,7 +223,9 @@ func _build_sidebar() -> void:
 	lock.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	lock.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	hand_header.add_child(lock)
-	hand_header.add_child(Style.label("Suas cartas",12))
+	var hand_title := Style.label("Suas cartas",12)
+	Style.strong(hand_title)
+	hand_header.add_child(hand_title)
 	var private_body := GridContainer.new()
 	private_body.name = "PrivateCards"
 	private_body.custom_minimum_size.y = 40
@@ -231,6 +241,8 @@ func _build_sidebar() -> void:
 	_notice = Style.label("",11,PlayerUI.GOLD)
 	_notice.name = "BattleNotice"
 	_notice.max_lines_visible = 2
+	_notice.add_theme_stylebox_override("normal",Style.panel(4,true))
+	_notice.hide()
 	_side.add_child(_notice)
 	var leave := Style.action("Sair da sala",func() -> void: overlay_parent.call("_leave_room"))
 	leave.name = "LeaveBattle"
@@ -256,6 +268,8 @@ func _process(_delta: float) -> void:
 	if _notice_ttl > 0:
 		_notice_ttl -= _delta
 		if _notice_ttl <= 0: _notice.text = ""
+	_notice.visible = not _notice.text.is_empty()
+	_notice.modulate.a = minf(_notice_ttl/0.3,1.0) if _notice_ttl > 0 else 1.0
 	var seconds := maxi(ceili(duel.seconds_left()),0)
 	_timer.text = "FIM" if _closed() else "%d s" % seconds
 	_timer.add_theme_color_override("font_color",Color("#ff8f86") if seconds <= 10 else PlayerUI.TEXT)
@@ -326,7 +340,7 @@ func _render_players() -> void:
 		var local: Dictionary = players.pop_at(mine)
 		players.insert(floori(players.size()/2.0),local)
 	_roster.columns = maxi(players.size(),1) if players.size() <= 5 else ceili(players.size()/(2.0 if players.size() <= 12 else 3.0))
-	_roster.custom_minimum_size.y = 54 if players.size() <= 5 else (76 if players.size() <= 12 else 114)
+	_roster.custom_minimum_size.y = 60 if players.size() <= 5 else (76 if players.size() <= 12 else 114)
 	var winners: Array = (_data.result if _data.get("result") is Dictionary else {}).get("winners",[])
 	for source: Dictionary in players:
 		var player := source.duplicate(true)
@@ -336,22 +350,41 @@ func _render_players() -> void:
 				for key in ["lives","faults","eliminated","reason"]: player[key] = _last_player_states[player.member_id].get(key,player.get(key))
 			else: uncertain = true
 		else: _last_player_states[player.member_id] = player.duplicate(true)
-		var turn: bool = str(player.member_id) == str(_data.get("turn_member","")) and _data.phase in ["turns","reveal"] and not _closed()
+		var turn: bool = str(player.member_id) == str(_data.get("turn_member","")) and _data.phase in ["turns","reveal"] and not _closed() and not player.eliminated
 		var winner: bool = winners.has(player.member_id) and _data.phase == "finished"
 		var panel := Surface.new()
 		panel.padding = 3
-		panel.active = turn or winner
+		panel.active = (turn or winner) and not player.eliminated
 		panel.name = "Player_" + str(player.member_id)
 		panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		_roster.add_child(panel)
 		var row := PlayerUI.row(panel)
 		row.add_theme_constant_override("separation",3)
 		var portrait := PlayerUI.portrait(str(player.skin_id),46 if players.size() <= 3 else (32 if players.size() <= 5 else 20))
+		if players.size() <= 5:
+			# Wider upper-bust crop from the packaged 720px portrait, preserving aspect.
+			# This increases the face size inside the same top strip, without a new layout.
+			var portrait_source: Texture2D = portrait.texture
+			var width := 76.0 if players.size() <= 3 else 46.0
+			var height := 52.0 if players.size() <= 3 else 38.0
+			var crop := AtlasTexture.new()
+			crop.atlas = portrait_source
+			crop.region = Rect2(0,0,portrait_source.get_width(),portrait_source.get_height()*0.88)
+			portrait.texture = crop
+			portrait.custom_minimum_size = Vector2(width,height)
+			portrait.pivot_offset = Vector2(width*0.5,height)
+			portrait.scale = Vector2.ONE*(1.14 if turn or winner else 1.06)
+		var grading := ShaderMaterial.new()
+		grading.shader = preload("res://scripts/ui/battle/battle_illustration.gdshader")
+		grading.set_shader_parameter("saturation",0.0 if player.eliminated else 1.04)
+		portrait.material = grading
 		portrait.name = "Portrait"
 		row.add_child(portrait)
 		var info := PlayerUI.column(row)
+		info.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		info.add_theme_constant_override("separation",0)
-		var nickname := Style.label(str(player.nickname),13 if players.size() <= 5 else 10,PlayerUI.GOLD if turn else PlayerUI.TEXT)
+		var nickname := Style.label(str(player.nickname),14 if players.size() <= 5 else 10,PlayerUI.GOLD if turn else PlayerUI.TEXT)
+		Style.strong(nickname)
 		nickname.text = str(player.nickname)
 		nickname.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 		nickname.autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -364,13 +397,14 @@ func _render_players() -> void:
 		for index in range(0 if uncertain else (int(player.lives) if players.size() <= 3 else 1)):
 			var heart := TextureRect.new()
 			heart.texture = Icons.heart(18,true)
-			heart.custom_minimum_size = Vector2(14,14) if players.size() <= 3 else Vector2(10,10)
+			heart.custom_minimum_size = Vector2(16,16) if players.size() <= 3 else Vector2(10,10)
 			heart.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			heart.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			hearts.add_child(heart)
 		if players.size() > 3 and not uncertain: hearts.add_child(Style.label(str(player.lives),10))
 		if uncertain: info.add_child(Style.label("REVELANDO…",9,PlayerUI.MUTED))
 		elif player.eliminated:
+			nickname.add_theme_color_override("font_color",PlayerUI.MUTED)
 			portrait.modulate = Color("#555967")
 			info.add_child(Style.label("ELIMINADO",9,PlayerUI.MUTED))
 		elif winner: info.add_child(Style.label("VITÓRIA",10,PlayerUI.GOLD))
@@ -378,6 +412,10 @@ func _render_players() -> void:
 		var previous := int(_last_lives.get(player.member_id,player.lives))
 		if int(player.lives) < previous:
 			portrait.modulate = Color("#ff766b")
+			portrait.pivot_offset = portrait.custom_minimum_size*0.5
+			var resting_scale := portrait.scale
+			portrait.scale = resting_scale*1.06
+			portrait.create_tween().tween_property(portrait,"scale",resting_scale,0.2)
 			var reaction := portrait.create_tween()
 			reaction.tween_property(portrait,"modulate",Color("#555967") if player.eliminated else Color.WHITE,0.45)
 		if not uncertain: _last_lives[player.member_id] = int(player.lives)
@@ -437,6 +475,7 @@ func _render_hand() -> void:
 	var grid: GridContainer = _hand.get_node("PrivateCards")
 	PlayerUI.clear(grid)
 	grid.columns = mini(maxi(entries.size(),1),3) if _private_shown else 1
+	_hand_toggle.icon = load("res://assets/ui/battle/eye_off.svg" if _private_shown else "res://assets/ui/battle/eye.svg")
 	_hand_toggle.text = ("Ocultar" if _private_shown else "Mostrar") + " · %d" % entries.size()
 	_hand_toggle.disabled = entries.is_empty()
 	if _private_shown:
@@ -453,11 +492,21 @@ func _render_hand() -> void:
 			if entry.get("lost",false): image.modulate = Color("#555967")
 			grid.add_child(image)
 	else:
-		var hidden := Style.label("?" if not entries.is_empty() else "Seleção em andamento",22 if not entries.is_empty() else 11,PlayerUI.MUTED)
-		hidden.name = "HiddenHand"
-		hidden.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		hidden.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		grid.add_child(hidden)
+		if entries.is_empty():
+			var hidden := Style.label("Seleção em andamento",11,PlayerUI.MUTED)
+			hidden.name = "HiddenHand"
+			hidden.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			hidden.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			grid.add_child(hidden)
+		else:
+			var hidden := TextureRect.new()
+			hidden.name = "HiddenHand"
+			hidden.texture = preload("res://assets/ui/battle/private_back.svg")
+			hidden.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			hidden.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			hidden.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			hidden.custom_minimum_size.y = 40
+			grid.add_child(hidden)
 func _layout() -> void:
 	if not _built or size.x <= 0 or size.y <= 0: return
 	var factor := clampf(size.y/440.0,1,1.8)
@@ -480,7 +529,7 @@ func _fit_cards() -> void:
 	var side_width := 186.0 if _canvas.size.x >= 760 else 166.0
 	var main_width := _canvas.size.x-side_width-10
 	var instruction_row := _board_content.get_child(0) as Control
-	var available_height := _canvas.size.y - 30 - _roster.get_combined_minimum_size().y - 12 - 18 - instruction_row.get_combined_minimum_size().y - 5
+	var available_height := _canvas.size.y - 30 - _roster.get_combined_minimum_size().y - 6 - 18 - instruction_row.get_combined_minimum_size().y - 5
 	var width := floorf((main_width-18-(_grid.columns-1)*6)/_grid.columns)
 	var height := floorf((available_height-(rows-1)*6)/rows)
 	for card: Control in _grid.get_children():

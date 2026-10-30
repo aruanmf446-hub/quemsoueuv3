@@ -2,6 +2,13 @@ extends PanelContainer
 ## Landscape window on the original portrait illustration, with an undistorted focal crop.
 signal activated
 const Style = preload("res://scripts/ui/battle/battle_style.gd")
+# Focal heights of the subjects in the existing portrait PNGs, not replacement art.
+# A uniform top crop hid Cobra Grande and cut off Slender Man / Homem Sorridente.
+const FOCAL_Y := {
+	"bruxa_do_pantano":0.20, "cobra_grande":0.50, "dama_de_branco":0.27,
+	"homem_do_saco":0.16, "homem_sorridente":0.14, "jeff_the_killer":0.30,
+	"loira_do_banheiro":0.125, "momo":0.30, "slender_man":0.13,
+}
 var id := ""
 var selected := false
 var removed := false
@@ -33,6 +40,10 @@ func setup(card_id: String, chosen: bool, out: bool, usable: bool) -> void:
 	image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	image.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	image.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var grading := ShaderMaterial.new()
+	grading.shader = preload("res://scripts/ui/battle/battle_illustration.gdshader")
+	grading.set_shader_parameter("saturation",0.0 if out else 1.04)
+	image.material = grading
 	column.add_child(image)
 	caption = Style.label(DuelService.card_name(id),12)
 	caption.name = "Caption"
@@ -43,8 +54,14 @@ func setup(card_id: String, chosen: bool, out: bool, usable: bool) -> void:
 	caption.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	caption.max_lines_visible = 2
 	var strip := StyleBoxFlat.new()
-	strip.bg_color = Color(0.015,0.02,0.025,0.94)
+	strip.bg_color = Color(0.012,0.019,0.031,0.98)
 	strip.set_content_margin_all(1)
+	strip.content_margin_left = 6
+	strip.content_margin_right = 6
+	strip.border_width_top = 1
+	strip.border_color = Color(0.84,0.65,0.33,0.24)
+	caption.add_theme_constant_override("outline_size",1)
+	caption.add_theme_color_override("font_outline_color",Color(0,0,0,0.8))
 	caption.add_theme_stylebox_override("normal",strip)
 	caption_area = Control.new()
 	caption_area.custom_minimum_size.y = 20
@@ -53,12 +70,18 @@ func setup(card_id: String, chosen: bool, out: bool, usable: bool) -> void:
 	caption_area.add_child(caption)
 	caption.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	if out:
-		image.modulate = Color(0.3,0.32,0.36)
+		image.modulate = Color(0.46,0.46,0.46)
 		caption.add_theme_color_override("font_color", PlayerUI.MUTED)
 		var eliminated := Style.label("ELIMINADA",10,Color("#de9e97"))
+		eliminated.add_theme_constant_override("outline_size",3)
+		eliminated.add_theme_color_override("font_outline_color",Color("#080c13"))
 		eliminated.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		eliminated.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		add_child(eliminated)
+	var finish := preload("res://scripts/ui/battle/battle_card_finish.gd").new()
+	finish.selected = selected
+	finish.removed = removed
+	add_child(finish)
 	image.resized.connect(_crop)
 	mouse_entered.connect(func() -> void: _style(true))
 	mouse_exited.connect(func() -> void: _style(false))
@@ -68,7 +91,11 @@ func setup(card_id: String, chosen: bool, out: bool, usable: bool) -> void:
 	_style(false)
 func _style(hover: bool) -> void:
 	var style := Style.panel(1,selected or (hover and interactive))
-	style.border_color = PlayerUI.GOLD_BRIGHT if selected else (PlayerUI.GOLD if hover and interactive else Color("#98713c"))
+	style.border_color = Color("#596273") if removed else (PlayerUI.GOLD_BRIGHT if selected else (PlayerUI.GOLD if hover and interactive else Color("#b78b4b")))
+	style.set_border_width_all(2 if selected or (hover and interactive) else 1)
+	style.shadow_color = Color(1,0.62,0.19,0.25) if selected else Color(0,0,0,0.65)
+	style.shadow_size = 4 if selected else 3
+	style.shadow_offset = Vector2(0,2)
 	style.bg_color = Color("#070d14")
 	style.set_corner_radius_all(4)
 	add_theme_stylebox_override("panel",style)
@@ -85,14 +112,16 @@ func _crop() -> void:
 	if is_instance_valid(caption_area):
 		var dense := size.x < 115
 		caption_area.custom_minimum_size.y = 26 if dense else 20
-		caption.add_theme_font_size_override("font_size",11 if dense else 12)
+		caption.add_theme_font_size_override("font_size",11 if dense else (12 if size.x < 165 else 13))
 	if _source == null or image.size.y <= 0: return
 	var source_size := _source.get_size()
 	var ratio := image.size.x / maxf(image.size.y,1)
 	var crop_height := minf(source_size.y,source_size.x / maxf(ratio,0.01))
 	var atlas := AtlasTexture.new()
 	atlas.atlas = _source
-	atlas.region = Rect2(0,(source_size.y-crop_height)*0.18,source_size.x,crop_height)
+	var focal := float(FOCAL_Y.get(id.get_file().get_basename(),0.28))
+	var top := clampf(source_size.y*focal-crop_height*0.5,0,source_size.y-crop_height)
+	atlas.region = Rect2(0,top,source_size.x,crop_height)
 	image.texture = atlas
 
 func _ready() -> void:

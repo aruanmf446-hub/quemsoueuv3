@@ -23,6 +23,13 @@ func _ready() -> void:
 	column.add_theme_constant_override("separation",5)
 	_header = Style.action("Chat privado",_toggle,"chat")
 	_header.name = "ChatToggle"
+	Style.strong(_header)
+	_header.add_theme_font_size_override("font_size",14)
+	var title_style := Style.panel(2)
+	title_style.bg_color = Color(0,0,0,0)
+	title_style.set_border_width_all(0)
+	title_style.shadow_size = 0
+	_header.add_theme_stylebox_override("normal",title_style)
 	_header.tooltip_text = "Recolher histórico; a conversa privada continua aberta"
 	_header.custom_minimum_size.y = 26
 	_header.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -65,7 +72,8 @@ func _ready() -> void:
 	composer.add_theme_constant_override("separation",4)
 	_input = LineEdit.new()
 	_input.name = "ChatInput"
-	_input.placeholder_text = "Mensagem privada…"
+	_input.placeholder_text = "Mensagem…"
+	_input.tooltip_text = "Mensagem privada ao amigo selecionado"
 	_input.max_length = ChatService.MAX_LENGTH
 	_input.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_input.custom_minimum_size = Vector2(0,28)
@@ -115,7 +123,7 @@ func _state() -> void:
 		_clear_messages()
 		_input.clear()
 	var text := ""
-	if not services.session.authenticated(): text = "Entre na conta para conversar com amigos. Chat de sala ainda indisponível."
+	if not services.session.authenticated(): text = "Entre na conta para conversar com amigos."
 	elif _friends.is_empty(): text = "Nenhum amigo disponível. O chat atual é privado; não há chat de sala."
 	elif not _owned: text = "Escolha um amigo para conversar. Mensagens privadas, não enviadas à sala."
 	elif chat.state == "loading": text = "Abrindo conversa…"

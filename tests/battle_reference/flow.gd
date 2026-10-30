@@ -104,6 +104,16 @@ func run() -> void:
 	await settle()
 	battle = screen.body.get_node("Match")
 	geometry("selection",9)
+	# Landmarks in the original illustrations: preserve the subject, not just the scenery.
+	# These checks catch the former uniform crop that hid the snake and cut off faces.
+	var landmarks := {"cobra_grande":Vector2(225,415), "slender_man":Vector2(345,95),
+		"homem_sorridente":Vector2(423,110), "loira_do_banheiro":Vector2(310,90),
+		"jeff_the_killer":Vector2(330,195)}
+	for card: Control in battle.find_child("Cards",true,false).get_children():
+		var key := str(card.name).get_basename()
+		if landmarks.has(key):
+			var art: TextureRect = card.find_child("Art",true,false)
+			check(art.texture is AtlasTexture and art.texture.region.has_point(landmarks[key]),"subject_landmark_visible_"+key)
 	check(not screen.get_node("Margin/Column/Header").visible,"single_battle_header")
 	check(battle.find_child("CopyRoomCode",true,false)==null,"offline_no_fake_invite")
 	check(battle.find_child("VoiceUnavailable",true,false)!=null,"voice_truthful_unavailable")
@@ -126,6 +136,7 @@ func run() -> void:
 	check(battle.get("_chosen").size()==1,"synthetic_mouse_does_not_double_toggle_touch")
 	await keyboard_accept(grid.get_child(1))
 	check(battle.get("_chosen").size()==2,"keyboard_selects_second_card")
+	await capture("selected")
 	check(grid.get_child(0).get_global_rect().is_equal_approx(first_bounds),"selection_does_not_shift_cards")
 	await click(battle.find_child("ConfirmSelection",true,false))
 	check(services.duel.match().phase=="countdown","real_selection_committed")
@@ -210,18 +221,24 @@ func run() -> void:
 	victim.eliminated = true
 	victim.reason = "lives"
 	services.duel.room.match.phase = "reveal"
+	services.duel.room.match.turn_member = victim.member_id
 	services.duel.room.match.events = [{"seq":999,"kind":"pick","actor":victim.member_id,"card_id":real_data.match.pool[0].card_id,"revealed":false,"hits":null}]
 	battle.refresh()
 	await settle()
 	check(int(battle.get("_last_lives")[victim.member_id])==previous,"suspense_keeps_last_revealed_lives")
 	services.duel.room.match.events[0].revealed=true
+	services.duel.room.match.pool[0].removed=true
 	services.duel.room.match.events[0].hits=[{"member_id":victim.member_id,"lives":0,"eliminated":true}]
 	battle.refresh()
-	await create_timer(0.55).timeout
+	await create_timer(0.06).timeout
+	await capture("damage-fixture")
+	await create_timer(0.49).timeout
 	check(int(battle.get("_last_lives")[victim.member_id])==0,"revealed_damage_updates_top_panel")
 	var roster: Control=battle.find_child("Players",true,false)
 	var portrait: Control=roster.get_node("Player_"+str(victim.member_id)).find_child("Portrait",true,false)
 	check(portrait.modulate.is_equal_approx(Color("#555967")),"eliminated_avatar_desaturated")
+	check(not roster.get_node("Player_"+str(victim.member_id)).active,"elimination_removes_active_highlight")
+	await capture("eliminated-fixture")
 	await create_timer(3.6).timeout
 	check(battle.find_child("BattleNotice",true,false).text.is_empty(),"notification_expires_outside_board")
 	services.duel.room=real_data.duplicate(true)

@@ -171,6 +171,21 @@ func _player_row(player: Dictionary, action: String) -> void:
 		var decline := PlayerUI.button("Recusar", _act.bind("decline", str(player.user_id)))
 		decline.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		row.add_child(decline)
+	# Telas estreitas (celular deitado): botões menores para todos caberem na linha.
+	if UIScale.is_compact():
+		row.add_theme_constant_override("separation", 8)
+		avatar.custom_minimum_size = Vector2(44, 44)
+		info.custom_minimum_size.x = 80
+		for button: Button in row.find_children("*", "Button", false, false):
+			button.add_theme_font_size_override("font_size", 16)
+			button.custom_minimum_size = Vector2(0, 44)
+			for side in ["left", "right"]:
+				for style in ["normal", "hover", "pressed", "focus", "disabled"]:
+					var box := button.get_theme_stylebox(style)
+					if box != null:
+						box = box.duplicate()
+						box.set("content_margin_" + side, 10)
+						button.add_theme_stylebox_override(style, box)
 
 
 func _search(term: String) -> void:

@@ -36,7 +36,7 @@ func _ready() -> void:
 	services.session.changed.connect(func() -> void:
 		if is_visible_in_tree(): render())
 	_auto_refresh = Timer.new()
-	_auto_refresh.wait_time = 6.0
+	_auto_refresh.wait_time = 15.0
 	_auto_refresh.timeout.connect(func() -> void:
 		if is_visible_in_tree() and _view == "browse" and not duel.in_room() and _online(): _load_rooms(false))
 	add_child(_auto_refresh)

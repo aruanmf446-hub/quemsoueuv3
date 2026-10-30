@@ -9,6 +9,9 @@ signal changed
 
 const TABLES := {"characters": "qse_catalog_characters", "decks": "qse_catalog_decks", "cards": "qse_catalog_cards"}
 const DECKS_ROOT := "res://assets/duel/decks"
+## Cache em disco: o catálogo muda raramente; dentro deste prazo nenhuma consulta é feita.
+const CACHE_PATH := "user://catalog_cache.json"
+const CACHE_TTL := 6 * 3600.0
 var client: SupabaseClient
 ## "local" (só assets), "loading" ou "remote" (catálogo remoto aplicado).
 var state := "local"
@@ -18,7 +21,12 @@ var decks: Dictionary = {}
 var deck_cards: Dictionary = {}
 
 
-func refresh() -> Dictionary:
+## Usa o cache se tiver menos de CACHE_TTL (ou se force for falso e a rede falhar).
+func refresh(force := false) -> Dictionary:
+	var cached := _read_cache()
+	if not force and not cached.is_empty() and now() - float(cached.get("saved_at", 0.0)) < CACHE_TTL:
+		apply(cached.characters, cached.decks, cached.cards)
+		return ServiceResult.success({"cache": true})
 	if client == null or not client.configured():
 		_clear()
 		return ServiceResult.failure("not_configured", "offline")
@@ -27,10 +35,13 @@ func refresh() -> Dictionary:
 	for key: String in TABLES:
 		var result := await client.request("/rest/v1/%s?select=*" % TABLES[key], HTTPClient.METHOD_GET, {}, false)
 		if not result.ok or not result.data is Array:
-			_clear()
+			# Sem rede: o último cache (mesmo vencido) é melhor que nada; senão, o local.
+			if not cached.is_empty(): apply(cached.characters, cached.decks, cached.cards)
+			else: _clear()
 			return result if not result.ok else ServiceResult.failure("invalid_contract")
 		rows[key] = result.data
 	apply(rows.characters, rows.decks, rows.cards)
+	_write_cache(rows)
 	return ServiceResult.success({"characters": characters.size(), "decks": decks.size()})
 
 
@@ -106,6 +117,25 @@ static func _meta(row: Dictionary) -> Dictionary:
 	for key in ["name", "description"]:
 		if row.get(key) is String and not (row[key] as String).strip_edges().is_empty(): result[key] = (row[key] as String).strip_edges()
 	return result
+
+
+func now() -> float:
+	return Time.get_unix_time_from_system()
+
+
+func _read_cache() -> Dictionary:
+	if not FileAccess.file_exists(CACHE_PATH): return {}
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(CACHE_PATH))
+	if not parsed is Dictionary: return {}
+	for key in ["characters", "decks", "cards"]:
+		if not (parsed as Dictionary).get(key) is Array: return {}
+	return parsed
+
+
+func _write_cache(rows: Dictionary) -> void:
+	var file := FileAccess.open(CACHE_PATH, FileAccess.WRITE)
+	if file == null: return
+	file.store_string(JSON.stringify({"saved_at": now(), "characters": rows.characters, "decks": rows.decks, "cards": rows.cards}))
 
 
 func _clear() -> void:

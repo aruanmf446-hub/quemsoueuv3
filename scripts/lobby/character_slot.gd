@@ -120,14 +120,9 @@ func get_socket(socket_name: StringName) -> BoneAttachment3D:
 ## Ajusta apenas o comportamento de luz dos materiais: reduz brilho especular
 ## exagerado e usa filtragem anisotrópica. Cores e texturas originais são preservadas.
 func _tune_materials() -> void:
-	var constrained := OS.has_feature("mobile") or UIScale.is_compact()
 	for mesh_instance: MeshInstance3D in _find_all_of_type(_model_root, MeshInstance3D):
 		if mesh_instance.mesh == null:
 			continue
-		# FBX de El Fuego tem ~359 mil vértices. Os LODs importados mantêm
-		# a silhueta sem desenhar a malha de maior detalhe em telas pequenas.
-		mesh_instance.lod_bias = 0.15 if constrained else 1.0
-		if constrained: mesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		for surface in mesh_instance.mesh.get_surface_count():
 			var source := mesh_instance.get_active_material(surface) as BaseMaterial3D
 			if source == null:

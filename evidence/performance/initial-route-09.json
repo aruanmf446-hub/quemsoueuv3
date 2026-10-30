@@ -1,0 +1,23 @@
+{
+  "captured": false,
+  "checks": 11,
+  "collected": 20,
+  "completed": true,
+  "cpu_step": {
+    "max_ms": 48.53,
+    "p95_ms": 0.932
+  },
+  "deaths": 0,
+  "defeated": 20,
+  "failures": 1,
+  "health": 3,
+  "order": 9,
+  "phase_seconds": 222.766666666736,
+  "physics_seconds": 223.233333333333,
+  "position": [
+    1191.21789550781,
+    0.000883801665622741,
+    0.0
+  ],
+  "swings": 20
+}

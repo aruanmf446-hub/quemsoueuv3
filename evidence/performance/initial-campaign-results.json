@@ -1,0 +1,210 @@
+[
+  {
+    "test": "import",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 8.08,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "layout",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 3.26,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "legacy10",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 3.54,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "progress",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 3.26,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "rules-desktop",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 40.22,
+    "graphical": true,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "rules-mobile",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 34.69,
+    "graphical": true,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "navigation-desktop",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 32.0,
+    "graphical": true,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "variety",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 4.84,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "parkour",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 5.6,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "checkpoints",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 4.97,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "touch-scroll",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 22.8,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "feel-01",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 4.93,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "feel-05",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 4.93,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "feel-09",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 5.03,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "navigation-mobile",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 28.6,
+    "graphical": true,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "route-01",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 11.94,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-02",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 12.4,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-03",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 12.3,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-04",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 12.02,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-05",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 12.29,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-06",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 11.83,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-07",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 14.73,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-08",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 14.21,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-09",
+    "passed": false,
+    "exit_code": 1,
+    "wall_seconds": 14.09,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "window-route",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 337.49,
+    "graphical": true,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "mobile-route",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 243.15,
+    "graphical": true,
+    "fixed_physics_step": false
+  }
+]

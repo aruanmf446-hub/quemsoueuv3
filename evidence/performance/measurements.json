@@ -1,118 +1,28 @@
 {
-  "scope": "Linux software rendering, not a physical phone",
-  "native_viewport": "844x390",
-  "rendered_primitives": {
-    "baseline_lod": 26046,
-    "mobile_lod": 10312
-  },
-  "actor_cached_ms": {
-    "baseline": [
-      3.421,
-      1.875,
-      1.77,
-      1.771,
-      1.737,
-      1.83,
-      1.778,
-      1.801
-    ],
-    "after": [
-      5.261,
-      1.056,
-      0.743,
-      0.58,
-      0.657,
-      0.697,
-      0.63,
-      0.645
-    ]
-  },
-  "props_final_us": {
-    "sync_peak": 11863,
-    "queued_task_peak": 1707,
-    "same_counts": true
-  },
-  "web_pck_bytes": {
-    "before_unused_source_texture_exclusions": 76824616,
-    "after": 66544780
-  },
-  "fps_target_validated": false,
-  "web_software_probe": {
-    "baseline": {
-      "url": "https://aruanmf446-hub.github.io/quemsoueuv3/",
-      "viewport": "844x390",
-      "renderer": "Chromium SwiftShader software GPU",
-      "result": {
-        "samples": 21,
-        "fps": 5.236124270678798,
-        "p95": 250,
-        "max": 266.7000000000007,
-        "over33": 20
-      },
-      "errors": []
-    },
-    "after": {
-      "url": "http://127.0.0.1:8133/",
-      "viewport": "844x390",
-      "renderer": "Chromium SwiftShader software GPU",
-      "result": {
-        "samples": 35,
-        "fps": 8.53408758412172,
-        "p95": 150.09999999999854,
-        "max": 166.60000000000218,
-        "over33": 34
-      },
-      "errors": []
-    },
-    "limitations": "Single 4s idle-scene sample, software GPU, public baseline versus localhost candidate. Does not validate running FPS or chunk-frame max on a phone."
-  },
-  "historical_baseline_commit": "34c2c37",
-  "historical_candidate_before_main_merge": "5e45ac0",
+  "scope": "Candidate without automatic graphical reductions; Linux/software renderer; not a physical APK test",
   "integrated_main_commit": "b4cdccf",
-  "final_web_pck_bytes": 35379536,
-  "mobile_canvas_dpr3": {
-    "css_size": [
+  "apk_graphics": "Previous shadow, MSAA, LOD and preview-budget behavior preserved",
+  "removed_experiment": "Automatic DPR/pixel/LOD/shadow/MSAA reductions withdrawn before merge; their measurements are not acceptance evidence for this revision",
+  "fps_target_validated": false,
+  "web_pck_bytes": 35379152,
+  "web_canvas_probe": {
+    "viewport": [
       844,
       390
     ],
-    "device_pixel_ratio": 3,
-    "old_auto_canvas": [
-      2532,
-      1170
-    ],
-    "bounded_canvas": [
-      1055,
-      487
-    ],
-    "pixel_reduction_percent": 82.6574,
-    "phase_opened_with_touch": true,
-    "physical_device": false,
-    "software_gpu": true
-  },
-  "final_web_dpr3_probe": {
-    "url": "http://127.0.0.1:8133/",
-    "canvas": {
-      "width": 1055,
-      "height": 487,
-      "dpr": 3
-    },
-    "frames": {
-      "count": 40,
-      "fps": 9.981285090455396,
-      "p95": 133.3000000000029,
-      "max": 133.3000000000029
-    },
-    "errors": [],
-    "note": "Software GPU; idle scene, not a running/physical-phone FPS acceptance test."
-  },
-  "desktop_web_quality": {
+    "device_scale_factor": 1,
     "canvas": [
-      1280,
-      720
+      844,
+      390
     ],
-    "mobile_canvas_cap_applied": false,
     "javascript_errors": [],
-    "native_window_profile_tests": "Baixo, M\u00e9dio, Alto passed",
-    "hardware_acceleration_on_user_pc": "unknown"
+    "automatic_dpr_cap": false
+  },
+  "settings_profiles_test": "Baixo, Medio, Alto passed with original assertions",
+  "stream_microbenchmark_us": {
+    "sync_peak": 6972,
+    "queued_task_peak": 2305,
+    "same_counts": true,
+    "renderer": "headless"
   }
 }

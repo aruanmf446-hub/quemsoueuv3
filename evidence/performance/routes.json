@@ -5,16 +5,16 @@
     "collected": 14,
     "completed": true,
     "cpu_step": {
-      "max_ms": 25.095,
-      "p95_ms": 0.833
+      "max_ms": 15.474,
+      "p95_ms": 0.808
     },
     "deaths": 0,
     "defeated": 14,
     "failures": 0,
     "health": 3,
     "order": 1,
-    "phase_seconds": 216.385000000064,
-    "physics_seconds": 216.566666666667,
+    "phase_seconds": 216.351666666731,
+    "physics_seconds": 216.533333333333,
     "position": [
       1191.17761230469,
       0.00088374107144773,
@@ -28,8 +28,8 @@
     "collected": 15,
     "completed": true,
     "cpu_step": {
-      "max_ms": 17.498,
-      "p95_ms": 0.859
+      "max_ms": 11.443,
+      "p95_ms": 0.793
     },
     "deaths": 0,
     "defeated": 15,
@@ -51,8 +51,8 @@
     "collected": 16,
     "completed": true,
     "cpu_step": {
-      "max_ms": 12.432,
-      "p95_ms": 0.862
+      "max_ms": 10.096,
+      "p95_ms": 0.836
     },
     "deaths": 0,
     "defeated": 16,
@@ -74,8 +74,8 @@
     "collected": 17,
     "completed": true,
     "cpu_step": {
-      "max_ms": 8.962,
-      "p95_ms": 0.727
+      "max_ms": 8.574,
+      "p95_ms": 0.735
     },
     "deaths": 0,
     "defeated": 17,
@@ -97,16 +97,16 @@
     "collected": 18,
     "completed": true,
     "cpu_step": {
-      "max_ms": 12.767,
-      "p95_ms": 0.795
+      "max_ms": 8.548,
+      "p95_ms": 0.767
     },
     "deaths": 0,
     "defeated": 18,
     "failures": 0,
     "health": 3,
     "order": 5,
-    "phase_seconds": 223.578333333403,
-    "physics_seconds": 223.95,
+    "phase_seconds": 223.54500000007,
+    "physics_seconds": 223.916666666667,
     "position": [
       1191.17199707031,
       0.000883742701262236,
@@ -120,8 +120,8 @@
     "collected": 19,
     "completed": true,
     "cpu_step": {
-      "max_ms": 12.616,
-      "p95_ms": 0.996
+      "max_ms": 9.511,
+      "p95_ms": 0.78
     },
     "deaths": 0,
     "defeated": 19,
@@ -143,16 +143,16 @@
     "collected": 20,
     "completed": true,
     "cpu_step": {
-      "max_ms": 9.168,
-      "p95_ms": 0.899
+      "max_ms": 22.657,
+      "p95_ms": 0.972
     },
     "deaths": 0,
     "defeated": 20,
     "failures": 0,
     "health": 3,
     "order": 7,
-    "phase_seconds": 220.950000000068,
-    "physics_seconds": 221.416666666667,
+    "phase_seconds": 220.966666666735,
+    "physics_seconds": 221.433333333333,
     "position": [
       1191.22839355469,
       0.000883730652276427,
@@ -166,8 +166,8 @@
     "collected": 20,
     "completed": true,
     "cpu_step": {
-      "max_ms": 13.974,
-      "p95_ms": 0.868
+      "max_ms": 21.878,
+      "p95_ms": 1.0
     },
     "deaths": 0,
     "defeated": 20,
@@ -189,8 +189,8 @@
     "collected": 20,
     "completed": true,
     "cpu_step": {
-      "max_ms": 9.015,
-      "p95_ms": 0.82
+      "max_ms": 11.46,
+      "p95_ms": 0.878
     },
     "deaths": 0,
     "defeated": 20,

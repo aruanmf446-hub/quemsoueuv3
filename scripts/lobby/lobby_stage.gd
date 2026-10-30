@@ -75,11 +75,10 @@ func _ready() -> void:
 
 func apply_profile(name: String) -> void:
 	var settings := GraphicsProfile.settings(name)
-	var constrained := OS.has_feature("mobile") or UIScale.is_compact()
-	_viewport.msaa_3d = Viewport.MSAA_DISABLED if constrained else settings["msaa_3d"]
+	_viewport.msaa_3d = settings["msaa_3d"]
 	_resolution_divisor = settings["stretch_shrink"]
 	_resize_render()
-	_key_light.shadow_enabled = settings["shadows"] and not constrained
+	_key_light.shadow_enabled = settings["shadows"]
 
 
 func show_character(entry: Dictionary) -> void:
@@ -163,10 +162,10 @@ func _resize_render() -> void:
 	var pixels := get_global_transform_with_canvas().get_scale().abs() * size * output_scale
 	var supersample := 2.0 / float(_resolution_divisor)
 	var target := pixels * supersample
-	# Celular e telas compactas: sem supersampling e com teto de ~0,52 megapixel. Em telas de alta
+	# Celular e navegador: sem supersampling e com teto de ~1,2 megapixel. Em telas de alta
 	# densidade o palco chegava a 2560×2560 com MSAA, estourava a memória do WebGL no
 	# iPhone e o navegador recarregava a página ao girar o personagem.
-	var budget := 520_000.0 if OS.has_feature("mobile") or UIScale.is_compact() else 6_000_000.0
-	if OS.has_feature("mobile") or UIScale.is_compact(): target = pixels
+	var budget := 1_200_000.0 if OS.has_feature("mobile") or UIScale.is_compact() else 6_000_000.0
+	if OS.has_feature("mobile") or (OS.has_feature("web") and UIScale.is_compact()): target = pixels
 	if target.x * target.y > budget: target *= sqrt(budget / (target.x * target.y))
 	_viewport.size = Vector2i(clampi(ceili(target.x), 64, 2560), clampi(ceili(target.y), 64, 2560))

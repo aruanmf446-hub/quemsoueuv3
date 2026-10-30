@@ -29,7 +29,7 @@ const { chromium } = require('playwright');
     const canvas = await page.locator('canvas').evaluate(c => ({
       width: c.width, height: c.height, dpr: devicePixelRatio,
     }));
-    if (canvas.width * canvas.height > 700000) throw new Error('Canvas excedeu o orçamento móvel.');
+    if (canvas.width !== 844 * dpr || canvas.height !== 390 * dpr) throw new Error('A resolução nativa do canvas foi alterada.');
     await page.screenshot({ path: process.argv[4] || '/tmp/qse-web-probe.png', scale: 'css' });
     const frames = await page.evaluate(() => new Promise(resolve => {
       const samples = [];

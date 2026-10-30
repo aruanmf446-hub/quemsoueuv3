@@ -136,11 +136,23 @@ func _player_row(player: Dictionary, action: String) -> void:
 	var info := PlayerUI.column(row)
 	info.add_theme_constant_override("separation", 2)
 	info.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	info.add_child(PlayerUI.label(str(player.get("nickname", "Sem nickname")), 24, PlayerUI.GOLD))
+	var nickname := PlayerUI.label(str(player.get("nickname", "Sem nickname")), 24, PlayerUI.GOLD)
+	nickname.autowrap_mode = TextServer.AUTOWRAP_OFF
+	nickname.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	nickname.clip_text = true
+	info.add_child(nickname)
+	info.custom_minimum_size.x = 120
 	var presence := services.friends.presence_label(str(player.user_id))
 	var entry := services.inventory.entry(character_id)
 	var online := presence == "Online"
-	info.add_child(PlayerUI.label("%s%s  ·  %s" % ["● " if online else "", presence, entry.get("name", "Skin indisponível")], 16, Color("#7fe0a0") if online else Color("#a8bad3")))
+	var details := PlayerUI.label("%s%s  ·  %s" % ["● " if online else "", presence, entry.get("name", "Skin indisponível")], 16, Color("#7fe0a0") if online else Color("#a8bad3"))
+	# Em telas estreitas uma linha só, com reticências, em vez de quebrar letra a letra.
+	details.autowrap_mode = TextServer.AUTOWRAP_OFF
+	details.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	details.clip_text = true
+	details.custom_minimum_size.x = 0
+	details.tooltip_text = details.text
+	info.add_child(details)
 	var view := PlayerUI.button("Ver perfil", func() -> void: navigate_requested.emit("public_profile", {"public_id": player.public_id}))
 	view.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(view)

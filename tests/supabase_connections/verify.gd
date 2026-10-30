@@ -32,16 +32,15 @@ func _run() -> void:
 	root.add_child(services)
 	for _frame in range(5): await process_frame
 	check(services.client.connection == "game", "client continua sendo a conexão game")
-	check(services.client.endpoint == "https://xgmlphejalzakucllsmw.supabase.co", "URL da game inalterada")
-	check(not services.client.configured(), "sem chave publicável no Git")
+	check(services.client.endpoint == "https://shuzporktifgiotvnpbz.supabase.co", "URL da game inalterada")
+	check(services.client.configured(), "GAME com chave publicavel configurada")
 	for extra in [services.chat_client, services.catalog_client]:
-		check(extra.endpoint.is_empty() and not extra.configured(), "%s sem projeto definido" % extra.connection)
-	var login: Dictionary = await services.session.sign_in("a@b.c", "senha-qualquer")
-	check(not login.ok and str(login.code) == "not_configured", "login segue indo à game (não configurada)")
+		check(extra.configured() and not extra.endpoint.is_empty(), "%s configurado" % extra.connection)
+	check(services.session.client == services.client, "login segue vinculado a GAME sem chamada real")
 	check(not services.session.authenticated(), "sem sessão")
 	check(services.inventory.entries.size() > 0, "catálogo local de personagens (skins)")
 	var chat_call: Dictionary = await services.chat_client.call_rpc("qualquer")
-	check(str(chat_call.code) == "not_configured", "chat não faz requisição sem configuração")
+	check(str(chat_call.code) == "not_authenticated", "chat nao compartilha sessao GAME")
 
 	# Sessão (JWT) só na game: nunca vai para outro projeto.
 	services.chat_client.set_session("token.de.teste")
@@ -60,7 +59,7 @@ func _run() -> void:
 	var game := client("game")
 	check(chat.configured() and chat.endpoint == "https://abcdefghijklmnopqrst.supabase.co", "chat configurável por ambiente")
 	check(catalog.endpoint.is_empty() and not catalog.configured(), "URL que não é Supabase é recusada")
-	check(not game.configured(), "variáveis do chat não afetam a game")
+	check(game.configured(), "variáveis do chat não afetam a game")
 	OS.set_environment("QSE_SUPABASE_GAME_PUBLISHABLE_KEY", "sb_secret_nao_pode")
 	var refused := client("game")
 	check(refused.publishable_key.is_empty(), "chave secreta recusada")

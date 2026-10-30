@@ -93,3 +93,13 @@ Cada jogador publica presença apenas em `friend-presence:<seu UUID>`. Amigos po
 O adaptador implementa join, track, heartbeat, state/diff por sessão e reconexão. Queda de conexão mostra presença indisponível, sem confundi-la com offline confirmado. Remover amigos reconcilia inscrições. Autorizações Realtime podem ser armazenadas em cache pelo servidor; verificar revogação e renovação JWT em duas sessões reais.
 
 Carteira, relações e progressão são consultadas a cada 30 segundos quando autenticado, além dos botões de atualização. Miniaturas vêm do cache local; a lista de amigos não instancia modelos 3D. Perfil público instancia somente a prévia selecionada. O teste SQL não substitui testes de WebSocket, CORS ou concorrência da UI no Godot.
+
+
+## Implantacao 2026-10-30 (3 projetos)
+
+- GAME: shuzporktifgiotvnpbz. Migrations player_foundation, player_api, duel_rooms, duel_match aplicadas; seed Lendas Urbanas aplicado.
+- CHAT: wurkpjgnbqklivjhcvxk. Tabelas conversations/members/messages prontas, acesso bloqueado por RLS ate existir verificacao confiavel do usuario GAME. Nao compartilhar JWTs entre projetos.
+- CATALOG: bsxicvlngphazesuzaee. Catálogo publico de 8 personagens, 1 deck e 9 cartas; assets e biblioteca permanecem locais no Godot. Mudancas remotas futuras precisam preservar esse fallback.
+- A migration private_presence NAO foi aplicada: precisa configuracao e verificacao especifica do Realtime privado.
+- So URLs e chaves *publicaveis* ficam no cliente. Nunca inserir service_role, segredo de banco ou JWT de usuario no GitHub.
+- Sem transferir dados entre GAME e CATALOG por chamadas HTTP de cliente. Planejar sincronizacao server-side verificada antes da migracao do catalogo do Duelo.

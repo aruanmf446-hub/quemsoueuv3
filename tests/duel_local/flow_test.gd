@@ -197,6 +197,10 @@ func _run() -> void:
 	check(not duel.is_local(), "volta ao modo online")
 	var online := await duel.list_rooms("", true)
 	check(not online.ok and str(online.code) == "not_configured", "online continua indo ao Supabase")
+	screen.queue_free()
+	await settle()
+	services.queue_free()
+	await settle()
 	print("DUEL_LOCAL_PASS ", checks, " verificações")
 	quit(0)
 

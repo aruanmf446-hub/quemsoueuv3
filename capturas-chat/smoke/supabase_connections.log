@@ -1,0 +1,13 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+SUPABASE_CONNECTIONS PASS 15 verificações
+WARNING: Sessão só pertence à conexão game; recusada em chat.
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] set_session (res://scripts/services/supabase_client.gd:76)
+         [1] _run (res://tests/supabase_connections/verify.gd:46)
+WARNING: Sessão só pertence à conexão game; recusada em catalog.
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] set_session (res://scripts/services/supabase_client.gd:76)
+         [1] _run (res://tests/supabase_connections/verify.gd:47)

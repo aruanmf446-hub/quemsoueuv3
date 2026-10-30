@@ -556,9 +556,12 @@ func _fit_cards() -> void:
 	var side_width := 186.0 if _canvas.size.x >= 760 else 166.0
 	var main_width := _canvas.size.x-side_width-10
 	var instruction_row := _board_content.get_child(0) as Control
-	var available_height := _canvas.size.y - 30 - _roster.get_combined_minimum_size().y - 6 - 18 - instruction_row.get_combined_minimum_size().y - 5
-	var width := floorf((main_width-18-(_grid.columns-1)*6)/_grid.columns)
-	var height := floorf((available_height-(rows-1)*6)/rows)
+	# Folgas reais do tabuleiro (padding da moldura e espaço entre cartas), não constantes soltas.
+	var gap := float(_grid.get_theme_constant("h_separation"))
+	var frame := float(_board.padding*2)
+	var available_height := _canvas.size.y - 30 - _roster.get_combined_minimum_size().y - 6 - frame - instruction_row.get_combined_minimum_size().y - 5
+	var width := floorf((main_width-frame-(_grid.columns-1)*gap)/_grid.columns)
+	var height := floorf((available_height-(rows-1)*gap)/rows)
 	for card: Control in _grid.get_children():
 		card.custom_minimum_size = Vector2(maxf(width,1),maxf(height,1))
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL

@@ -65,6 +65,11 @@ jobs:
           test -s build/web/index.pck
           test -s build/web/index.wasm
           # Músicas do menu fora do pacote: o jogo baixa cada faixa sob demanda (menu_music.gd).
+          # Imagens da tela de carregamento: tudo que estiver em web/loading/ (jpg, png, webp).
+          mkdir -p build/web/loading
+          find web/loading -maxdepth 1 -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) -exec cp {} build/web/loading/ \;
+          python3 -c "import json,os; d='build/web/loading'; json.dump(sorted(f for f in os.listdir(d) if f.lower().endswith(('.jpg','.jpeg','.png','.webp'))), open(d+'/list.json','w'))"
+          cat build/web/loading/list.json
           mkdir -p build/web/music
           (cd assets/music && find . -name '*.mp3' -exec cp --parents {} ../../build/web/music/ \;)
           ls -la build/web/index.pck

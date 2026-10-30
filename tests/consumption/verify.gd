@@ -69,7 +69,7 @@ func _run() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://catalog_cache.json"))
 
 	# 5) Duelo: intervalos por hora (lobby e lista de salas).
-	var lobby := 3600.0 / services.duel.HEARTBEAT_SECONDS
+	var lobby: float = 3600.0 / services.duel.HEARTBEAT_SECONDS
 	print("CONSUMO duelo_lobby_1h antes=1800 depois=", int(lobby))
 	check(lobby <= 720.0, "heartbeat do lobby")
 	check(services.chat.send("x", "oi").code == "chat_unavailable", "chat desativado")

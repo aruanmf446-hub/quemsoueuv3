@@ -30,7 +30,7 @@ jobs:
           set -euo pipefail
           cd work && source emsdk/emsdk_env.sh > /dev/null
           cd godot
-          scons platform=web target=template_release threads=no production=yes LINKFLAGS="--profiling-funcs" -j4 > ../build.log 2>&1 || (tail -50 ../build.log; exit 1)
+          scons platform=web target=template_release threads=no production=yes linkflags="--profiling-funcs" -j4 > ../build.log 2>&1 || (tail -50 ../build.log; exit 1)
           ls -la bin/
           unzip -o -q bin/godot.web.template_release.wasm32.nothreads.zip -d ../tpl
           ls -la ../tpl

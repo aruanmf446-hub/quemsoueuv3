@@ -14,7 +14,7 @@ func verify(value: bool, title: String) -> void:
 		push_error("T18A_STARTUP_FAIL " + title)
 
 func _run() -> void:
-	var boot := load("res://scenes/menu/menu_boot.tscn").instantiate()
+	var boot: Node = (load("res://scenes/menu/menu_boot.tscn") as PackedScene).instantiate()
 	root.add_child(boot)
 	verify(boot.has_node("AuthLoadingArt"), "abertura mostra arte de login, sem cartoes")
 	for attempt in range(25):

@@ -34,6 +34,22 @@ jobs:
         run: |
           GODOT="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
           "$GODOT" --headless --path . --script res://tests/t18_auth/flow_test.gd
+      - name: Capture actual auth UI at 3 landscape resolutions
+        shell: bash
+        env:
+          T18_CAPTURE_DIR: ${{ runner.temp }}/t18-auth-captures
+          LIBGL_ALWAYS_SOFTWARE: "1"
+        run: |
+          mkdir -p "$T18_CAPTURE_DIR"
+          xvfb-run -a "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --path . --script res://tests/t18_auth/capture.gd
+          test -s "$T18_CAPTURE_DIR/auth_1920x1080.png"
+          test -s "$T18_CAPTURE_DIR/auth_844x390.png"
+          test -s "$T18_CAPTURE_DIR/auth_640x360.png"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t18-auth-real-interface-screenshots
+          path: ${{ runner.temp }}/t18-auth-captures
       - uses: actions/upload-artifact@v4
         if: always()
         with:

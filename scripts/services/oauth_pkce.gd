@@ -3,6 +3,7 @@ extends RefCounted
 ## PKCE RFC 7636; never send code_verifier to the browser URL or provider.
 const PENDING_KEY := "qse-v3:oauth:pending"
 const REFRESH_KEY := "qse-v3:game:refresh"
+const PREBOOT_CODE_KEY := "qse-v3:oauth:preboot-code"
 const REDIRECT_WINDOWS := "http://127.0.0.1:49173/oauth/callback"
 const REDIRECT_ANDROID := "quemsoueuv3://oauth/callback"
 const MAX_PENDING_SECONDS := 600

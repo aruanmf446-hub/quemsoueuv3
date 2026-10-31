@@ -3,7 +3,7 @@ name: Publish Web preview
 on:
   workflow_dispatch:
   push:
-    branches: [main, codex/gameplay-t15d]
+    branches: [main, codex/gameplay-t15d, work/auth-google-discord-t18c]
     paths:
       - '.github/workflows/deploy-web.yml'
       - 'assets/**'

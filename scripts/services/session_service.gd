@@ -197,6 +197,16 @@ func _restore_web_redirect() -> void:
 	# Remove sensitive codes/fragments from the address bar before any HTTP request.
 	var js := "(function(){var u=new URL(window.location.href);var h=new URLSearchParams(u.hash.slice(1));var q=u.searchParams;var o={code:q.get('code')||'',error:q.get('error')||h.get('error')||'',access_token:h.get('access_token')||'',refresh_token:h.get('refresh_token')||'',expires_in:Number(h.get('expires_in')||3600),type:h.get('type')||''};if(o.code||o.error||o.access_token){q.delete('code');q.delete('error');q.delete('error_description');u.hash='';history.replaceState({},document.title,u.pathname+u.search);}return JSON.stringify(o);})()"
 	var raw: Variant = JavaScriptBridge.eval(js)
+	# web/shell.html consumed ?code before the engine loaded; this bridge is
+	# same-origin, one-time sessionStorage and never writes tokens to a URL.
+	if raw != null:
+		var decoded: Variant = JSON.parse_string(str(raw))
+		if decoded is Dictionary and str(decoded.get("code", "")).is_empty():
+			var preboot := "(function(){try{var k=" + JSON.stringify(OAuthPkce.PREBOOT_CODE_KEY) + ";var code=sessionStorage.getItem(k)||'';sessionStorage.removeItem(k);return code;}catch(e){return '';}})()"
+			var saved: Variant = JavaScriptBridge.eval(preboot)
+			if saved != null and not str(saved).is_empty():
+				decoded["code"] = str(saved)
+				raw = JSON.stringify(decoded)
 	var data: Variant = JSON.parse_string(str(raw))
 	if not data is Dictionary:
 		return

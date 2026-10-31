@@ -36,6 +36,30 @@ func _run() -> void:
 	var loop := OAuthDesktopLoopback.new()
 	root.add_child(loop)
 	check(loop.start(), "loopback binds localhost only")
+	var received: Array[Dictionary] = []
+	loop.callback_received.connect(func(code: String, error: String) -> void:
+		received.append({"code": code, "error": error}))
+	var peer := StreamPeerTCP.new()
+	check(peer.connect_to_host("127.0.0.1", OAuthDesktopLoopback.PORT) == OK, "loopback connection")
+	for attempt in range(80):
+		peer.poll()
+		if peer.get_status() == StreamPeerTCP.STATUS_CONNECTED:
+			break
+		await process_frame
+	var connected := peer.get_status() == StreamPeerTCP.STATUS_CONNECTED
+	check(connected, "local TCP connection established")
+	if connected:
+		var request := "GET /oauth/callback?code=fixture123 HTTP/1.1\r\nHost: 127.0.0.1:49173\r\nConnection: close\r\n\r\n"
+		peer.put_data(request.to_utf8_buffer())
+		for attempt in range(80):
+			await process_frame
+			if not received.is_empty():
+				break
+	check(received.size() == 1, "loopback emits one code")
+	if received.size() == 1:
+		check(received[0].code == "fixture123" and received[0].error.is_empty(), "callback has correct code")
+	else:
+		check(false, "callback has correct code")
 	loop.close()
 	loop.queue_free()
 	var session := SessionService.new()

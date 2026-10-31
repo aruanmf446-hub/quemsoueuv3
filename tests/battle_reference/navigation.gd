@@ -30,6 +30,12 @@ func run() -> void:
 	await settle()
 	var services: PlayerServices=menu.get_node("Services")
 	var nav: NavigationManager=menu.get_node("Navigation")
+	var startup: Array = nav.get("_history")
+	check(startup.size()==1 and startup.back().route=="account","login_is_initial_screen")
+	# O jogador escolheu continuar sem conta antes de entrar em um duelo local.
+	nav.back()
+	await settle()
+	check(nav.get("_history").is_empty(),"guest_explicitly_enters_lobby")
 	nav.open("duel",{})
 	await settle()
 	await services.duel.use_local()

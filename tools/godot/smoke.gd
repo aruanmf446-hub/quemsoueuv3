@@ -56,6 +56,18 @@ func _run() -> void:
 			print("SMOKE_TRANSITION_OK " + next_path)
 	if scene is Control:
 		var navigation := scene.get_node("Navigation")
+		# A T18A coloca account como primeira tela. Este smoke percorre menus
+		# do lobby depois que o visitante escolhe "Jogar sem conta".
+		var initial_history: Array = navigation.get("_history")
+		if not initial_history.is_empty() and initial_history.back().route == "account":
+			navigation.call("back")
+			var startup_deadline := Time.get_ticks_msec() + 2000
+			while navigation.get("_busy") and Time.get_ticks_msec() < startup_deadline:
+				await process_frame
+			if not navigation.get("_history").is_empty():
+				push_error("SMOKE_STARTUP_BACK_FAILED")
+				quit(1)
+				return
 		var routes: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/ui/routes.json"))["routes"]
 		for route: String in routes:
 			navigation.call("open", route, {})

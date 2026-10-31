@@ -34,6 +34,10 @@ jobs:
         run: |
           GODOT="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
           "$GODOT" --headless --path . --script res://tests/t18_auth/flow_test.gd
+      - name: T18C Google + Discord OAuth PKCE regression (no accounts)
+        run: |
+          GODOT="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+          "$GODOT" --headless --path . --script res://tests/t18c_oauth/flow_test.gd
       - name: Verify authentication appears before lobby (T18A startup)
         run: |
           GODOT="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"

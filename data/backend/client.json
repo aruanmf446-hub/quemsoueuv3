@@ -3,7 +3,7 @@
   "url": "https://shuzporktifgiotvnpbz.supabase.co",
   "publishable_key": "sb_publishable_ZrugXVdGCXztHbMZiIX8Mw_K6Bg-uhW",
   "configuration_status": "connected_to_game_project",
-  "persist_session": false,
+  "persist_session": true,
   "connections": {
     "game": {
       "comment": "Autenticacao GAME, backend de jogadores e Duelo. URL e chave nos campos raiz."
@@ -20,5 +20,7 @@
     }
   },
   "invite_base_url": "",
-  "invite_base_url_comment": "Android/desktop: origem oficial com rota de convite (?invite=). Na Web usa-se o endereço da página atual."
+  "invite_base_url_comment": "Android/desktop: origem oficial com rota de convite (?invite=). Na Web usa-se o endereço da página atual.",
+  "oauth_windows_loopback_ready": false,
+  "oauth_android_deeplink_ready": false
 }

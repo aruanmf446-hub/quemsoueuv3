@@ -62,6 +62,10 @@ func _ready() -> void:
 		if is_visible_in_tree(): render())
 	services.session.providers_changed.connect(func() -> void:
 		if is_visible_in_tree() and _mode == "choose": render())
+	services.session.oauth_notice.connect(func(code: String) -> void:
+		_notice = ServiceResult.message(ServiceResult.failure(code))
+		_notice_error = true
+		if is_visible_in_tree(): render())
 	resized.connect(_layout_auth)
 	_layout_auth.call_deferred()
 

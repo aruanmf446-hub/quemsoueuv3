@@ -50,18 +50,25 @@ func show_screen(params: Dictionary = {}) -> void:
 	super.show_screen(params)
 	if _battle_layout and is_instance_valid(_match_view):
 		_match_view.find_child("BattleBack",true,false).grab_focus()
+	# Consome o token apenas após autenticação. Não deixa tentativa pendente no URL.
+	if _online() and not duel.in_room() and not _web_invite_used:
+		var raw_invite := str(params.get("invite", _web_invite()))
+		if not raw_invite.is_empty():
+			_web_invite_used = true
+			var invite := DuelService.invite_token(raw_invite)
+			if invite.is_empty():
+				banner.show_state("error", DuelService.message("invalid_invite"))
+			else:
+				_join(invite)
+			return
 	if _view == "browse" and _online(): _load_rooms(false)
-	# Web: link com ?invite=<token> entra na sala uma vez, depois do login.
-	var invite := DuelService.invite_token(str(params.get("invite", _web_invite())))
-	if not invite.is_empty() and _online() and not duel.in_room():
-		_web_invite_used = true
-		_join(invite)
 
 
 static var _web_invite_used := false
 static func _web_invite() -> String:
 	if _web_invite_used or not OS.has_feature("web"): return ""
-	var value: Variant = JavaScriptBridge.eval("new URLSearchParams(window.location.search).get('invite') || ''")
+	# Remove o segredo da barra de endereços/histórico atual ao consumi-lo.
+	var value: Variant = JavaScriptBridge.eval("(() => { const u = new URL(window.location.href); const token = u.searchParams.get('invite') || ''; if (u.searchParams.has('invite')) { u.searchParams.delete('invite'); window.history.replaceState(window.history.state, '', u.pathname + u.search + u.hash); } return token; })()")
 	return str(value) if value != null else ""
 
 
@@ -220,7 +227,7 @@ func _load_rooms(show_loading: bool) -> void:
 
 
 func _join(code: String) -> void:
-	if code.strip_edges().is_empty(): return
+	if _busy or code.strip_edges().is_empty(): return
 	# Convite (token de 48 hex, sozinho ou num link ?invite=) ou código curto da sala.
 	var token := DuelService.invite_token(code)
 	await _act(duel.join_invite.bind(token) if not token.is_empty() else duel.join.bind(code))

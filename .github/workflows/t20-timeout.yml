@@ -1,0 +1,53 @@
+name: T20 tempo-limite HTTPRequest Web (temporário)
+on:
+  push:
+    branches: [claude/t20-timeout]
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/tpl-names/web_nothreads_release.zip
+          key: godot-4.7.2-web-nothreads-release-names-v1
+      - name: Godot e export
+        shell: bash
+        env:
+          XDG_DATA_HOME: ${{ runner.temp }}/xdg-data
+        run: |
+          set -euo pipefail
+          t="$XDG_DATA_HOME/godot/export_templates/4.7.2.stable"; mkdir -p "$t" g
+          curl -sfL https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip -o g/e.zip
+          unzip -q g/e.zip -d g
+          echo 4.7.2.stable > "$t/version.txt"
+          if [ -f "$RUNNER_TEMP/tpl-names/web_nothreads_release.zip" ]; then
+            cp "$RUNNER_TEMP/tpl-names/web_nothreads_release.zip" "$t/"; echo "template com nomes"
+          else
+            curl -sfL https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz -o g/t.tpz
+            unzip -p g/t.tpz templates/web_nothreads_release.zip > "$t/web_nothreads_release.zip"; echo "template oficial"
+          fi
+          cd tests/web_t20/timeout_probe && mkdir -p out
+          ../../../g/Godot_v4.7.2-stable_linux.x86_64 --headless --import --quit > /dev/null 2>&1 || true
+          ../../../g/Godot_v4.7.2-stable_linux.x86_64 --headless --export-release Web out/index.html 2>&1 | tail -5
+          test -s out/index.wasm
+      - name: Rodar no Chromium
+        run: |
+          cd tests/web_t20/timeout_probe
+          python3 hang.py 8099 &
+          python3 hang.py 8100 silent &
+          (cd out && python3 -m http.server 8098 > /dev/null 2>&1 &)
+          sleep 2
+          npm i playwright > /dev/null
+          npx playwright install chromium > /dev/null
+          node run.cjs | tee result.txt
+      - name: Gravar
+        if: always()
+        run: |
+          mkdir -p evidence/t20/timeout && cp tests/web_t20/timeout_probe/result.txt evidence/t20/timeout/ || true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A evidence/t20/timeout && git commit -m "T20: resultado tempo-limite" && git push origin HEAD:claude/t20-timeout || true

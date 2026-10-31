@@ -5,7 +5,7 @@ extends PlayerScreen
 const ART_FALLBACK := preload("res://assets/desert/night_city/citadel.png")
 const HERO_PATH := "res://assets/auth/login_heroes.webp"
 const GUARDS_PATH := "res://assets/auth/login_guards.webp"
-const LOGO := preload("res://assets/processed/logos/logo_quem_sou_eu_retangular.png")
+const LOGO := preload("res://assets/auth/login_logo.webp")
 const GOLD := Color("#eebc64")
 const WHITE := Color("#fff8ef")
 const MUTED := Color("#d7bfa4")
@@ -130,7 +130,7 @@ func render() -> void:
 	_scroll.add_child(panel)
 	var column := VBoxContainer.new()
 	column.name = "LoginContent"
-	column.add_theme_constant_override("separation", 8 if UIScale.is_compact() else 12)
+	column.add_theme_constant_override("separation", 5 if UIScale.is_compact() else 12)
 	panel.add_child(column)
 	if _mode != "choose":
 		var titles := {
@@ -202,19 +202,9 @@ func _build_social(column: VBoxContainer) -> void:
 			icon.offset_top = -12
 			icon.offset_right = 36
 			icon.offset_bottom = 12
-		if not available:
-			var pending := Label.new()
-			pending.name = "Unavailable"
-			pending.text = "EM BREVE"
-			pending.add_theme_color_override("font_color", Color("#d4ccd9"))
-			pending.add_theme_font_size_override("font_size", 9 if UIScale.is_compact() else 10)
-			pending.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			pending.set_anchors_and_offsets_preset(Control.PRESET_CENTER_RIGHT)
-			pending.offset_left = -70
-			pending.offset_right = -4
-			pending.offset_top = -7
-			pending.offset_bottom = 7
-			button.add_child(pending)
+	var notice := PlayerUI.label("Logins sociais indisponíveis no momento." if not services.session.social_available("google") and not services.session.social_available("apple") and not services.session.social_available("discord") else "Alguns provedores estão indisponíveis.", 10 if UIScale.is_compact() else 12, MUTED)
+	notice.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(notice)
 
 
 func _add_divider(column: VBoxContainer) -> void:
@@ -274,7 +264,7 @@ func _add_button(parent: VBoxContainer, title: String, action: Callable, bg: Col
 	var button := Button.new()
 	button.text = title
 	button.focus_mode = Control.FOCUS_ALL
-	button.custom_minimum_size.y = 38 if UIScale.is_compact() else 55
+	button.custom_minimum_size.y = 35 if UIScale.is_compact() else 55
 	button.add_theme_font_size_override("font_size", 12 if UIScale.is_compact() else 17)
 	for state in ["normal","hover","pressed","disabled","hover_pressed"]:
 		var style := StyleBoxFlat.new()
@@ -312,12 +302,12 @@ func _layout_auth() -> void:
 	panel_width = maxf(panel_width, 202.0 if very_small else 260.0)
 	var mid_x := logical.x * (0.72 if very_small else 0.68)
 	var panel_x := clampf(mid_x - panel_width * 0.5, 8.0, logical.x - panel_width - 8.0)
-	var logo_h := 68.0 if very_small else (95.0 if compact else 178.0)
-	var logo_y := 9.0 if very_small else (14.0 if compact else logical.y * 0.17)
+	var logo_h := 98.0 if very_small else (113.0 if compact else 240.0)
+	var logo_y := 0.0 if very_small else (0.0 if compact else logical.y * 0.20)
 	var logo_w := panel_width * (1.04 if very_small else 1.2)
 	_logo.position = Vector2(panel_x - (logo_w - panel_width)*0.5, logo_y) * factor
 	_logo.size = Vector2(logo_w, logo_h) * factor
-	var panel_y := logo_y + logo_h - (11.0 if very_small else 15.0)
+	var panel_y := logo_y + logo_h - (20.0 if very_small else (16.0 if compact else 23.0))
 	var panel_h := minf(logical.y - panel_y - 9.0, 550.0 if not compact else 360.0)
 	_scroll.position = Vector2(panel_x,panel_y) * factor
 	_scroll.size = Vector2(panel_width,panel_h)

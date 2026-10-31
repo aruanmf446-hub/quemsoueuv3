@@ -6,6 +6,8 @@ signal option_selected(option_id: StringName)
 @onready var _services: PlayerServices = $Services
 var _mode_label: Label
 var _news_button: Button
+var _web_invite_intent := WebInviteIntent.new()
+var _web_invite_navigating := false
 
 
 func _ready() -> void:
@@ -33,6 +35,7 @@ func _ready() -> void:
 	_services.wallet.changed.connect(_refresh_wallet)
 	_services.friends.changed.connect(_refresh_friends)
 	_services.session.changed.connect(_refresh_profile)
+	_services.session.changed.connect(_resume_web_invite)
 	_services.preferences.changed.connect(_refresh_wallet)
 	_navigation.route_changed.connect(_route_changed)
 	_refresh_profile()
@@ -55,6 +58,44 @@ func _ready() -> void:
 	add_child(_news_button)
 	resized.connect(_layout_news_button)
 	_layout_news_button.call_deferred()
+	_check_web_invite.call_deferred()
+
+
+## A URL de convite é detectada no lobby, sem esperar o jogador tocar em Duelo.
+## O token não é copiado para a navegação: duel_screen o consome depois do login.
+func _check_web_invite() -> void:
+	if not OS.has_feature("web"):
+		return
+	var present: Variant = JavaScriptBridge.eval("new URLSearchParams(window.location.search).has('invite')")
+	_web_invite_intent.capture(present == true)
+	_resume_web_invite()
+
+
+func _resume_web_invite() -> void:
+	if _web_invite_navigating:
+		return
+	var route := _web_invite_intent.next_route(_services.session.authenticated())
+	if route.is_empty():
+		return
+	_web_invite_navigating = true
+	_navigate_web_invite(route)
+
+
+func _navigate_web_invite(route: String) -> void:
+	# A transição do login pode estar animando. Espera limitada, sem loop de ingresso.
+	for attempt in range(10):
+		if not bool(_navigation.get("_busy")):
+			break
+		await get_tree().create_timer(0.1).timeout
+	if not is_inside_tree():
+		return
+	if bool(_navigation.get("_busy")):
+		_web_invite_navigating = false
+		return
+	_navigation.open(route)
+	_web_invite_intent.mark_opened(route)
+	_web_invite_navigating = false
+
 
 func _layout_news_button() -> void:
 	if not is_instance_valid(_news_button): return

@@ -34,6 +34,29 @@ func register_screen(route: String, screen: PlayerScreen) -> void:
 	screen.navigate_requested.connect(open)
 
 
+## Entrada instantanea: renderiza a autenticacao antes do primeiro frame do lobby.
+## Evita o LoadingVeil e a animacao que mostrariam o lobby por tras do login.
+func open_initial(route: String, params: Dictionary = {}) -> void:
+	if _busy or not _history.is_empty() or not _routes.has(route):
+		return
+	if not _screens.has(route):
+		var scene := load(_routes[route]) as PackedScene
+		if scene == null:
+			push_error("Tela inicial indisponível: " + route)
+			return
+		var instance := scene.instantiate()
+		var screen := instance as PlayerScreen
+		if screen == null:
+			instance.free()
+			push_error("Tela inicial incompatível: " + route)
+			return
+		add_child(screen)
+		register_screen(route, screen)
+	_previous_focus = weakref(get_viewport().gui_get_focus_owner())
+	_history.append({"route": route, "params": params.duplicate(true)})
+	_display(route, params, false)
+
+
 func open(route: String, params: Dictionary = {}) -> void:
 	if _busy or not _routes.has(route):
 		return

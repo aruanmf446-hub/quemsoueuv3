@@ -25,6 +25,11 @@ jobs:
           "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --version | grep -E '^4[.]7[.]2[.]stable[.]official'
       - name: Import and open actual scenes
         run: python3 tools/godot/run_smoke.py --godot "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --output "$RUNNER_TEMP/results"
+      - name: T17 invite state and local battle regression
+        run: |
+          GODOT="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+          "$GODOT" --headless --path . --script res://tests/t17_web_invites/flow_test.gd
+          "$GODOT" --headless --path . --script res://tests/duel_local/flow_test.gd
       - uses: actions/upload-artifact@v4
         if: always()
         with:

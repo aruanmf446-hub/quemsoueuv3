@@ -14,6 +14,7 @@ const PROVIDERS := [
 ]
 var _mode := "choose"
 var _root: Control
+var _character_stage: LobbyStage
 var _scroll: ScrollContainer
 var _feedback: Label
 var _email: LineEdit
@@ -38,6 +39,14 @@ func _ready() -> void:
 	_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_root)
+	_character_stage = preload("res://scenes/lobby/lobby_stage.tscn").instantiate() as LobbyStage
+	_character_stage.name = "AuthCowboy3D"
+	_character_stage.interactive = false
+	_character_stage.set_meta("auth_stage", true)
+	_root.add_child(_character_stage)
+	var cowboy := services.inventory.entry("cowboy")
+	if not cowboy.is_empty():
+		_character_stage.show_character(cowboy)
 	var back := Button.new()
 	back.name = "AuthBack"
 	back.text = "‹ Voltar ao jogo"
@@ -74,7 +83,7 @@ func render() -> void:
 	elif services.session.authenticated():
 		_mode = "connected"
 	for child in _root.get_children():
-		if not child.has_meta("auth_back"):
+		if not child.has_meta("auth_back") and not child.has_meta("auth_stage"):
 			_root.remove_child(child)
 			child.queue_free()
 	_buttons.clear()
@@ -243,6 +252,15 @@ func _layout_auth() -> void:
 	_scroll.position = Vector2(size.x - (width + (12.0 if compact else 66.0)) * scale_factor, (size.y - height * scale_factor) * 0.5)
 	var panel := _scroll.get_node_or_null("AuthPanel") as PanelContainer
 	if panel != null: panel.custom_minimum_size.x = width - 6.0
+	if is_instance_valid(_character_stage):
+		var area := maxf(logical.x - width - (34.0 if compact else 120.0), 0.0)
+		_character_stage.visible = area >= 240.0
+		if _character_stage.visible:
+			var stage_width := minf(area * 0.92, 730.0)
+			var stage_height := logical.y * (0.89 if compact else 0.94)
+			_character_stage.scale = Vector2.ONE * scale_factor
+			_character_stage.size = Vector2(stage_width, stage_height)
+			_character_stage.position = Vector2(maxf((area - stage_width) * 0.5, 0.0), logical.y - stage_height) * scale_factor
 	var back := _root.get_node_or_null("AuthBack") as Button
 	if back != null:
 		back.position = Vector2(12, 10) * scale_factor

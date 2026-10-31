@@ -98,8 +98,14 @@ func _ready() -> void:
 	refresh_availability()
 func refresh_availability() -> void:
 	if not is_inside_tree(): return
-	_selector.hide()
 	var duel := services.duel
+	# A visibilidade acompanha o modo, inclusive se a sala mudar enquanto a UI existe.
+	# Alterar visible só quando necessário evita recursão do visibility_changed.
+	if duel.is_local() and visible:
+		hide()
+	elif not duel.is_local() and not visible:
+		show()
+	_selector.hide()
 	var room := "" if duel.is_local() or not duel.in_room() else duel.room_id()
 	var allowed: bool = services.session.authenticated() and not room.is_empty() and str(duel.room.get("room",{}).get("status","")) in ["lobby","in_match"]
 	if not allowed:

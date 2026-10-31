@@ -209,7 +209,7 @@ export default {
             return respond({error:"room_access_denied"},403);
           const permitted = await canAccessRoom(token,room.game_room_id);
           if (permitted === null) return respond({error:"game_unavailable"},503);
-          if (!permitted) return respond({error:"room_access_denied"},403);
+          if (!permitted.allowed) return respond({error:"room_access_denied"},403);
           if (action === "messages") {
             const {data,error} = await db.rpc("qse_chat_room_read",{
               p_user_id:userId,p_conversation_id:id,p_limit:50,

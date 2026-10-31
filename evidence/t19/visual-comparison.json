@@ -1,0 +1,29 @@
+[
+  {
+    "size": "844x390",
+    "identical": true,
+    "mean_rgb_difference": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "size": "1920x1080",
+    "identical": true,
+    "mean_rgb_difference": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "size": "640x360",
+    "identical": true,
+    "mean_rgb_difference": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  }
+]

@@ -13,6 +13,11 @@ var _history: Array[Dictionary] = []
 var _active: PlayerScreen
 var _previous_focus: WeakRef
 var _busy := false
+var _load_generation := 0
+var _locked_at := 0
+var _pending: Dictionary = {}
+var _veil: LoadingVeil
+const LOCK_TIMEOUT_MS := 2000
 var _error_dialog: AcceptDialog
 
 
@@ -58,22 +63,33 @@ func open_initial(route: String, params: Dictionary = {}) -> void:
 
 
 func open(route: String, params: Dictionary = {}) -> void:
-	if _busy or not _routes.has(route):
+	var perf_started := Time.get_ticks_usec()
+	if not _routes.has(route): return
+	if _busy:
+		_pending = {"kind":"open","route":route,"params":params.duplicate(true)}
 		return
 	if not _history.is_empty() and _history.back() == {"route": route, "params": params}:
 		return
 	if _history.is_empty():
 		_previous_focus = weakref(get_viewport().gui_get_focus_owner())
 	var veil: LoadingVeil
+	_load_generation += 1
+	var load_generation := _load_generation
+	_lock()
 	if not _screens.has(route):
 		# Primeira abertura carrega a cena: mostra o véu antes, para o toque ter resposta.
-		_busy = true
-		veil = await LoadingVeil.begin(get_tree())
-		_busy = false
+		_lock()
+		veil = await LoadingVeil.begin(get_tree(),"Carregando…",self)
+		if load_generation != _load_generation:
+			veil.finish()
+			return
+		_veil = veil
 		var scene := load(_routes[route]) as PackedScene
 		if scene == null:
 			push_warning("Tela indisponível: %s" % route)
 			veil.finish()
+			_veil = null
+			_unlock()
 			_error_dialog.popup_centered()
 			return
 		var instance := scene.instantiate()
@@ -81,6 +97,8 @@ func open(route: String, params: Dictionary = {}) -> void:
 		if screen == null:
 			instance.free()
 			veil.finish()
+			_veil = null
+			_unlock()
 			_error_dialog.popup_centered()
 			return
 		add_child(screen)
@@ -88,11 +106,15 @@ func open(route: String, params: Dictionary = {}) -> void:
 	_history.append({"route": route, "params": params.duplicate(true)})
 	_display(route, params)
 	if veil != null: veil.finish()
+	_veil = null
+	WebPerf.measure("open",perf_started)
 
 
 func back() -> void:
-	if _busy or _history.is_empty():
+	if _busy:
+		_pending = {"kind":"back"}
 		return
+	if _history.is_empty(): return
 	if _active != null and _active.handle_back(): return
 	_history.pop_back()
 	var leaving := _active
@@ -105,9 +127,12 @@ func back() -> void:
 		_display(_history.back().route, _history.back().params, false)
 	if leaving != null and leaving != _active:
 		_leave(leaving)
+	else:
+		_unlock()
 
 
 func _display(route: String, params: Dictionary, animate := true) -> void:
+	var perf_started := Time.get_ticks_usec()
 	var outgoing := _active
 	_active = _screens[route]
 	_stop_motion(_active)
@@ -115,7 +140,7 @@ func _display(route: String, params: Dictionary, animate := true) -> void:
 	route_changed.emit(route)
 	if not animate:
 		return
-	_busy = true
+	_lock()
 	var shown := _active
 	shown.z_index = 1
 	var tween := _motion(shown, Tween.EASE_OUT)
@@ -146,14 +171,16 @@ func _display(route: String, params: Dictionary, animate := true) -> void:
 		if outgoing != null and outgoing != _active:
 			outgoing.hide()
 			_reset(outgoing)
-		_busy = false)
+		_unlock())
+	WebPerf.measure("_display",perf_started)
 
 
 ## Tela saindo (Voltar): desce e some. Para o lobby, some inteira; para outra tela,
 ## só o conteúdo troca sobre o mesmo fundo.
+
 func _leave(screen: PlayerScreen) -> void:
 	_stop_motion(screen)
-	_busy = true
+	_lock()
 	screen.z_index = 1
 	var tween := _motion(screen, Tween.EASE_IN)
 	var margin := screen.get_node_or_null("Margin") as Control
@@ -174,7 +201,7 @@ func _leave(screen: PlayerScreen) -> void:
 		_reset(screen)
 		if under != null and is_instance_valid(under) and under.get_node_or_null("Margin") != null:
 			(under.get_node("Margin") as CanvasItem).modulate.a = 1.0
-		_busy = false)
+		_unlock())
 
 
 ## Guarda onde a moldura da tela descansa, para qualquer animação interrompida voltar ao lugar.
@@ -187,12 +214,15 @@ func _motion(screen: PlayerScreen, easing: Tween.EaseType) -> Tween:
 
 
 func _stop_motion(screen: PlayerScreen) -> void:
+	var perf_started := Time.get_ticks_usec()
 	var tween: Variant = screen.get_meta("nav_motion") if screen.has_meta("nav_motion") else null
 	if tween is Tween and (tween as Tween).is_valid(): (tween as Tween).kill()
 	_reset(screen)
+	WebPerf.measure("_stop_motion",perf_started)
 
 
 ## Devolve a tela ao estado normal: tudo opaco, na posição de descanso e no plano de baixo.
+
 func _reset(screen: PlayerScreen) -> void:
 	screen.remove_meta("nav_motion")
 	var margin := screen.get_node_or_null("Margin") as Control
@@ -210,6 +240,38 @@ func _set_frame_alpha(screen: PlayerScreen, alpha: float) -> void:
 	for part in ["Backdrop", "Tint"]:
 		var node := screen.get_node_or_null(part) as CanvasItem
 		if node != null: node.modulate.a = alpha
+
+
+func _lock() -> void:
+	_busy = true
+	_locked_at = Time.get_ticks_msec()
+
+func _unlock() -> void:
+	_busy = false
+	_locked_at = 0
+	_drain_pending.call_deferred()
+
+func _drain_pending() -> void:
+	if _busy or _pending.is_empty(): return
+	var next := _pending
+	_pending = {}
+	if next.kind=="back": back()
+	else: open(next.route,next.params)
+
+func _process(_delta: float) -> void:
+	if not _busy: return
+	if _locked_at==0: _locked_at=Time.get_ticks_msec()
+	if Time.get_ticks_msec()-_locked_at < LOCK_TIMEOUT_MS: return
+	# Killed/paused tweens must never own the input lock indefinitely.
+	_load_generation += 1
+	for screen: PlayerScreen in _screens.values():
+		if not is_instance_valid(screen): continue
+		_stop_motion(screen)
+		screen.visible = screen==_active
+	if is_instance_valid(_veil): _veil.finish()
+	_veil = null
+	_unlock()
+	WebPerf.measure("navigation.recovered",Time.get_ticks_usec())
 
 
 func _unhandled_input(event: InputEvent) -> void:

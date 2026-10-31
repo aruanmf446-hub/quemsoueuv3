@@ -19,6 +19,8 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+T19Probe="*res://scripts/diagnostics/web_perf.gd"
+
 MenuMusic="*res://scripts/audio/menu_music.gd"
 TouchScroll="*res://scripts/ui/touch_scroll.gd"
 

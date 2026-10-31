@@ -40,6 +40,9 @@ func _ready() -> void:
 	for i in 2:
 		var player := AudioStreamPlayer.new()
 		player.bus = &"Music"
+		# Web defaults to SAMPLE: play() decodes the entire song to a PCM sample
+		# synchronously. Long menu MP3s must use the incremental AudioWorklet stream.
+		if OS.has_feature("web"): player.playback_type = AudioServer.PLAYBACK_TYPE_STREAM
 		add_child(player)
 		player.finished.connect(_finished.bind(i))
 		_players.append(player)
@@ -204,10 +207,11 @@ func _process(delta: float) -> void:
 			if player.playing and (catalog_index < 0 or not (_available(tracks[catalog_index]) or (_preview_id == playing_id and can_preview(playing_id)))):
 				player.stop()
 		if not paused:
+			# Covers startup AND the end-of-song crossfade window. Only explicit user
+			# commands may replace an in-flight selection; the clock must wait for it.
+			if not _web_wanted.is_empty(): return
 			var player := _players[_active]
 			if not player.playing and _retry_in <= 0.0:
-				if _preview_id != "" and not _web_wanted.is_empty():
-					return  # Aguarda o carregamento do MP3 de prévia.
 				_retry_in = 0.5
 				_select(1)
 			elif player.playing and (_fade == null or not _fade.is_running()):
@@ -222,6 +226,9 @@ func _leave_menu() -> void:
 	_inside = false
 	_menu = null
 	_preferences = null
+	if _web_request != null: _web_request.cancel_request()
+	_web_loading = ""
+	_web_wanted = {}
 	_stop()
 
 func _restore() -> void:
@@ -244,6 +251,7 @@ func previous_track() -> void:
 ## Aleatório dentro da seleção do jogador: uma fila embaralhada das faixas marcadas
 ## (sem repetir até tocar todas) e um histórico para o botão "anterior".
 func _select(direction: int) -> void:
+	var perf_started := Time.get_ticks_usec()
 	_preview_id = ""
 	if not _inside: return
 	if direction < 0:
@@ -265,6 +273,7 @@ func _select(direction: int) -> void:
 	_stop()
 	current_id = ""
 	state_changed.emit()
+	WebPerf.measure("_select",perf_started)
 
 func _refill_queue() -> void:
 	_queue.clear()
@@ -292,30 +301,48 @@ func _fetch_web(track: Dictionary, position: float) -> void:
 	_web_wanted = {"track": track.duplicate(true), "position": position}
 	if _web_request == null:
 		_web_request = HTTPRequest.new()
+		# Read encoded audio in fewer frame-polled chunks. Keep a finite deadline,
+		# but allow slow downloads/low-FPS browsers without restarting every 20 s.
+		_web_request.download_chunk_size = 1024*1024
+		_web_request.timeout = 60.0
 		add_child(_web_request)
 		_web_request.request_completed.connect(_web_loaded)
-	if _web_request.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED: return
+	if not _web_loading.is_empty(): return
 	_web_loading = str(track.id)
-	if _web_request.request(_web_url(str(track.audio))) != OK: _web_loading = ""
+	if _web_request.request(_web_url(str(track.audio))) != OK:
+		_web_loading = ""
+		_web_wanted = {}
+		_retry_in = 3.0
+	state_changed.emit()
 
 func _web_loaded(result: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+	var perf_started := Time.get_ticks_usec()
 	var loaded := _web_loading
 	_web_loading = ""
-	if result == HTTPRequest.RESULT_SUCCESS and code == 200 and not body.is_empty():
-		var stream := AudioStreamMP3.new()
-		stream.data = body
-		# Guarda só as duas últimas faixas: o celular tem pouca memória para áudio.
-		_web_cache[loaded] = stream
-		while _web_cache.size() > 2: _web_cache.erase(_web_cache.keys()[0])
 	var wanted: Dictionary = _web_wanted
-	if wanted.is_empty(): return
+	if wanted.is_empty() or not _inside: return
+	# Next/previous may change intent while downloading. Don't parse a discarded MP3.
 	if str(wanted.track.id) != loaded:
 		_fetch_web(wanted.track, float(wanted.position))
-	elif _web_cache.has(loaded):
-		_web_wanted = {}
+		return
+	_web_wanted = {}
+	if result == HTTPRequest.RESULT_SUCCESS and code == 200 and not body.is_empty():
+		var stream := AudioStreamMP3.new()
+		var prepare_started := Time.get_ticks_usec()
+		stream.data = body
+		stream.loop = false
+		WebPerf.measure("mp3.prepare",prepare_started)
+		_web_cache[loaded] = stream
+		while _web_cache.size() > 2: _web_cache.erase(_web_cache.keys()[0])
 		_play(wanted.track, float(wanted.position))
+	else:
+		_retry_in = 3.0
+		state_changed.emit()
+	WebPerf.measure("_web_loaded",perf_started)
+
 
 func _play(track: Dictionary, position: float = 0.0) -> void:
+	var perf_started := Time.get_ticks_usec()
 	if not _inside or not (_available(track) or (_preview_id == str(track.get("id", "")) and can_preview(str(track.get("id", ""))))):
 		return
 	var stream: AudioStream
@@ -323,12 +350,19 @@ func _play(track: Dictionary, position: float = 0.0) -> void:
 		if not _web_cache.has(str(track.id)):
 			_fetch_web(track, position)
 			return
+		# A cached previous/preview selection supersedes any still-downloading track.
+		# Its late HTTP completion must not hijack the explicit new selection.
+		_web_wanted = {}
 		stream = _web_cache[str(track.id)]
 	else:
 		stream = load(track.audio) as AudioStream
 	if stream == null: return
 	# Imported loop flags must not prevent playlist advancement.
-	stream = stream.duplicate() as AudioStream
+	# Web cache entries are already privately owned, with loop disabled on creation.
+	# duplicate() copies exported data through AudioStreamMP3.set_data and scans it again.
+	var duplicate_started := Time.get_ticks_usec()
+	if not _web(): stream = stream.duplicate() as AudioStream
+	WebPerf.measure("mp3.duplicate",duplicate_started)
 	if stream is AudioStreamOggVorbis or stream is AudioStreamMP3:
 		stream.loop = false
 	elif stream is AudioStreamWAV:
@@ -341,20 +375,26 @@ func _play(track: Dictionary, position: float = 0.0) -> void:
 	incoming.stream = stream
 	incoming.set_meta("track", track.duplicate(true))
 	incoming.volume_db = SILENCE
+	var play_started := Time.get_ticks_usec()
 	incoming.play(position if position < stream.get_length() else 0.0)
+	WebPerf.measure("mp3.start",play_started)
 	incoming.stream_paused = paused
 	outgoing.stream_paused = paused
 	current_id = track.id
 	_fade = create_tween().set_parallel(true)
 	_fade.tween_property(incoming, "volume_db", 0.0, fade_seconds)
 	_fade.tween_property(outgoing, "volume_db", SILENCE, fade_seconds)
-	_fade.chain().tween_callback(outgoing.stop)
+	_fade.chain().tween_callback(func() -> void:
+		outgoing.stop()
+		outgoing.stream = null)
 	if paused: _fade.pause()
 	track_changed.emit(current_track())
 	state_changed.emit()
+	WebPerf.measure("_play",perf_started)
 
 ## Play/Pause individual não altera a checkbox nem a seleção persistida.
 ## O mesmo AudioStreamPlayer do menu toca a faixa (não cria um segundo áudio).
+
 func can_preview(id: String) -> bool:
 	var index := _index(id)
 	return index >= 0 and (licensed(tracks[index]) or local_test_available(tracks[index]))
@@ -423,7 +463,7 @@ func _stop() -> void:
 	for player in _players: player.stop()
 
 func _finished(index: int) -> void:
-	if index == _active and _inside and not paused: next_track()
+	if index == _active and _inside and not paused and _web_wanted.is_empty(): next_track()
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not _inside or not event is InputEventKey or not event.pressed or event.echo: return

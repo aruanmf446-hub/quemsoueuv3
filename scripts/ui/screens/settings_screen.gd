@@ -13,6 +13,7 @@ var _binding_button: Button
 var _content: VBoxContainer
 var _feedback: Label
 var _tabs: Array[Button] = []
+var _tab_icons: Array[Texture2D] = []
 var _layout: HBoxContainer
 var _scroll: ScrollContainer
 var _rail: VBoxContainer
@@ -29,6 +30,7 @@ func _ready() -> void:
 		if is_visible_in_tree(): render())
 
 func render() -> void:
+	var perf_started := Time.get_ticks_usec()
 	_waiting_action = ""
 	PlayerUI.clear(body)
 	heading.text = tr("Configurações")
@@ -73,8 +75,10 @@ func render() -> void:
 	body.add_child(_feedback)
 	_show_category()
 	_adapt()
+	WebPerf.measure("render",perf_started)
 
 func _adapt() -> void:
+	var perf_started := Time.get_ticks_usec()
 	if not is_instance_valid(_rail): return
 	var compact := UIScale.is_compact()
 	var factor := PlayerUI.unit(self)
@@ -98,6 +102,7 @@ func _adapt() -> void:
 	$Margin/Column/Header/Back.custom_minimum_size = Vector2(110 if compact else 170, 48 if compact else 56)
 	heading.add_theme_font_size_override("font_size", 28 if compact else 34)
 	_fit_panel.call_deferred()
+	WebPerf.measure("_adapt",perf_started)
 
 func _select(index: int) -> void:
 	_waiting_action = ""
@@ -112,6 +117,7 @@ func animate_in() -> void:
 	PlayerUI.cascade(_content)
 
 func _show_category() -> void:
+	var perf_started := Time.get_ticks_usec()
 	_scroll.scroll_vertical = 0
 	PlayerUI.clear(_content)
 	match _category:
@@ -120,15 +126,19 @@ func _show_category() -> void:
 		2: _controls()
 		3: _language()
 	_fit_panel.call_deferred()
+	WebPerf.measure("_show_category",perf_started)
 
 
 ## O painel cresce só até o conteúdo (sem o vazio enorme embaixo); se não couber, rola.
+
 func _fit_panel() -> void:
+	var perf_started := Time.get_ticks_usec()
 	if not is_instance_valid(_scroll) or not is_instance_valid(_layout): return
 	var panel := _scroll.get_parent() as PanelContainer
 	var chrome := panel.get_theme_stylebox("panel").get_minimum_size().y
 	var room := maxf(_layout.size.y - chrome, 120.0)
 	_scroll.custom_minimum_size.y = minf(_content.get_combined_minimum_size().y, room)
+	WebPerf.measure("_fit_panel",perf_started)
 
 
 const TAB_ICONS := [
@@ -140,10 +150,13 @@ const TAB_ICONS := [
 
 
 func _tab_icon(index: int) -> Texture2D:
+	if _tab_icons.size()>index: return _tab_icons[index]
 	var svg: String = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + TAB_ICONS[index] + '</g></svg>'
 	var image := Image.new()
 	image.load_svg_from_string(svg, 1.25)
-	return ImageTexture.create_from_image(image)
+	var texture := ImageTexture.create_from_image(image)
+	_tab_icons.append(texture)
+	return texture
 
 func _title(title: String) -> void:
 	var head := PlayerUI.label(title.to_upper(), 30, Color.WHITE)

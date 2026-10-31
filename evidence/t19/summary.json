@@ -1,0 +1,108 @@
+{
+  "baseline_ref": "63de2cc356f19c0418adaa29a132c41c792e703e",
+  "software_gpu": true,
+  "backend": "HTTP fixture, no real account",
+  "cases": {
+    "before-844x390": {
+      "passed": true,
+      "cycles": 20,
+      "audio_confirmed": true,
+      "play_max_ms": 1192.6,
+      "start_max_ms": 0,
+      "render_median_ms": 7.05,
+      "open_settled_median_ms": 746.0,
+      "open_settled_max_ms": 1100,
+      "heap_bytes": 1084040059,
+      "soak_seconds": null,
+      "reload_authenticated": null,
+      "unexpected_errors": []
+    },
+    "before-640x360": {
+      "passed": true,
+      "cycles": 20,
+      "audio_confirmed": true,
+      "play_max_ms": 1308.8,
+      "start_max_ms": 0,
+      "render_median_ms": 12.4,
+      "open_settled_median_ms": 1376.0,
+      "open_settled_max_ms": 2444,
+      "heap_bytes": 726457234,
+      "soak_seconds": null,
+      "reload_authenticated": null,
+      "unexpected_errors": []
+    },
+    "before-1920x1080": {
+      "passed": true,
+      "cycles": 20,
+      "audio_confirmed": true,
+      "play_max_ms": 820.8,
+      "start_max_ms": 0,
+      "render_median_ms": 12.4,
+      "open_settled_median_ms": 3513.0,
+      "open_settled_max_ms": 5008,
+      "heap_bytes": 158597025,
+      "soak_seconds": null,
+      "reload_authenticated": true,
+      "unexpected_errors": [
+        "ERROR: Tween invalid. Either finished or created outside scene tree.",
+        "   at: play (scene/animation/tween.cpp:205)"
+      ]
+    },
+    "after-844x390": {
+      "passed": true,
+      "cycles": 20,
+      "audio_confirmed": true,
+      "play_max_ms": 46.9,
+      "start_max_ms": 1.2,
+      "render_median_ms": 6.5,
+      "open_settled_median_ms": 736.0,
+      "open_settled_max_ms": 1171,
+      "heap_bytes": 86547262,
+      "soak_seconds": null,
+      "reload_authenticated": true,
+      "unexpected_errors": []
+    },
+    "after-640x360": {
+      "passed": true,
+      "cycles": 20,
+      "audio_confirmed": true,
+      "play_max_ms": 93.2,
+      "start_max_ms": 0.7,
+      "render_median_ms": 8.15,
+      "open_settled_median_ms": 1262.0,
+      "open_settled_max_ms": 1978,
+      "heap_bytes": 91871838,
+      "soak_seconds": null,
+      "reload_authenticated": true,
+      "unexpected_errors": []
+    },
+    "after-1920x1080": {
+      "passed": true,
+      "cycles": 20,
+      "audio_confirmed": true,
+      "play_max_ms": 87.7,
+      "start_max_ms": 0.6,
+      "render_median_ms": 11.5,
+      "open_settled_median_ms": 3684.5,
+      "open_settled_max_ms": 5998,
+      "heap_bytes": 75751147,
+      "soak_seconds": null,
+      "reload_authenticated": true,
+      "unexpected_errors": []
+    },
+    "soak-844x390": {
+      "passed": true,
+      "cycles": 20,
+      "audio_confirmed": true,
+      "play_max_ms": 92.6,
+      "start_max_ms": 0.6,
+      "render_median_ms": 11.7,
+      "open_settled_median_ms": 2803.0,
+      "open_settled_max_ms": 4028,
+      "heap_bytes": 85893332,
+      "soak_seconds": 614.856,
+      "reload_authenticated": true,
+      "unexpected_errors": []
+    }
+  }
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "test": "ui_session_music/flow_test",
+    "passed": true,
+    "exit": 0
+  },
+  {
+    "test": "persistence/flow_test",
+    "passed": true,
+    "exit": 0
+  },
+  {
+    "test": "t18_auth/flow_test",
+    "passed": true,
+    "exit": 0
+  },
+  {
+    "test": "t18a_startup/flow_test",
+    "passed": true,
+    "exit": 0
+  },
+  {
+    "test": "settings_t14b/verify",
+    "passed": true,
+    "exit": 0
+  },
+  {
+    "test": "music_t15b/verify",
+    "passed": true,
+    "exit": 0
+  }
+]

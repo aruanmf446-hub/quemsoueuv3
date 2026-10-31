@@ -30,5 +30,7 @@ func _run() -> void:
 	var phase := load("res://scripts/desert/t15d/phase.gd") as GDScript
 	check(phase.source_code.contains("func _restore_game_checkpoint"), "checkpoint restores on phase load")
 	check(phase.source_code.contains("func _sync_game_checkpoint"), "checkpoint sends to GAME")
+	session.free()
+	fake.free()
 	print("PERSISTENCE_RESULT checks=",count," failures=",failed)
 	quit(1 if failed > 0 else 0)

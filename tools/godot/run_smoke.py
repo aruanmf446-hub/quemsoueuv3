@@ -24,6 +24,7 @@ if imported:
  for n in range(1,11):
   run(f'phase_{n:02d}',['--script','res://tools/godot/smoke.gd','--',f'res://scenes/desert/phase_{n:02d}.tscn'],120)
   if n<10:run(f'transition_{n:02d}',['--script','res://tools/godot/smoke.gd','--',f'res://scenes/desert/phase_{n:02d}.tscn','--transition'],120)
+ run('web_responsiveness',['--script','res://tests/web_t19/regression.gd'],180)
  run('functional',['--script','res://tools/godot/functional.gd'],120)
  run('battle_presentation',['--script','res://tests/battle_reference/flow.gd'],180)
  run('battle_navigation',['--script','res://tests/battle_reference/navigation.gd'],180)

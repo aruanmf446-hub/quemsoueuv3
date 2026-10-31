@@ -4,11 +4,14 @@ extends CanvasLayer
 ## iniciar fase). Sem ele o toque parecia travar o celular: nada mudava até o fim do carregamento.
 var _time := 0.0
 var _ring: Control
+var _finishing := false
+var _request_owner: WeakRef
 
 ## Mostra o véu e espera ele ser desenhado; depois o chamador faz o trabalho pesado
 ## e chama finish().
-static func begin(tree: SceneTree, text := "Carregando…") -> LoadingVeil:
+static func begin(tree: SceneTree, text := "Carregando…", request_owner: Node = null) -> LoadingVeil:
 	var veil := LoadingVeil.new()
+	if request_owner != null: veil._request_owner = weakref(request_owner)
 	veil.layer = 90
 	veil.process_mode = Node.PROCESS_MODE_ALWAYS
 	tree.root.add_child(veil)
@@ -20,7 +23,8 @@ static func begin(tree: SceneTree, text := "Carregando…") -> LoadingVeil:
 	return veil
 
 func finish() -> void:
-	if not is_inside_tree(): return
+	if not is_inside_tree() or _finishing: return
+	_finishing = true
 	# Libera o toque na hora; só o desvanecer continua.
 	(get_child(0) as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var fade := create_tween()
@@ -58,5 +62,6 @@ func _build(text: String) -> void:
 	holder.add_child(label)
 
 func _process(delta: float) -> void:
+	if _request_owner != null and not is_instance_valid(_request_owner.get_ref()): finish()
 	_time += delta
 	if is_instance_valid(_ring): _ring.queue_redraw()

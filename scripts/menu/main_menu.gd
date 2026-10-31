@@ -283,6 +283,8 @@ func _refresh_friends() -> void:
 
 func _route_changed(route: String) -> void:
 	$LobbyArea/Stage/Viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS if route.is_empty() else SubViewport.UPDATE_DISABLED
+	# A hidden viewport stops drawing, but its skeleton/idle animations otherwise keep ticking.
+	$LobbyArea/Stage/Viewport/World.process_mode = Node.PROCESS_MODE_INHERIT if route.is_empty() else Node.PROCESS_MODE_DISABLED
 	if is_instance_valid(_news_button): _news_button.visible = route.is_empty()
 	# O mini player é do lobby: nas telas internas ele cobria títulos e conteúdo.
 	var now_playing := get_node_or_null("NowPlaying")

@@ -49,5 +49,7 @@ func _run() -> void:
 	check(recovery.ok and mock.paths.back().begins_with("/auth/v1/recover"), "recuperacao rota oficial")
 	check(not session.social_available("steam"), "steam nao declarado pronto")
 	check(not session.social_available("google"), "oauth sem provedor nao habilitado")
+	session.free()
+	mock.free()
 	print("T18_AUTH_RESULT checks=",count," failures=",failures," HTTP=fixture somente")
 	quit(1 if failures > 0 else 0)

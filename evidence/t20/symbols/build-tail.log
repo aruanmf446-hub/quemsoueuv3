@@ -1,0 +1,80 @@
+[34mCompiling [1mthirdparty/msdfgen/core/edge-coloring.cpp[22;23;24;29m ...[0m
+[34mCompiling [1mthirdparty/msdfgen/core/edge-segments.cpp[22;23;24;29m ...[0m
+[34mCompiling [1mthirdparty/msdfgen/core/edge-selectors.cpp[22;23;24;29m ...[0m
+[34mCompiling [1mthirdparty/msdfgen/core/equation-solver.cpp[22;23;24;29m ...[0m
+[34mCompiling [1mthirdparty/msdfgen/core/msdf-error-correction.cpp[22;23;24;29m ...[0m
+[34mCompiling [1mthirdparty/msdfgen/core/msdfgen.cpp[22;23;24;29m ...[0m
+[34mCompiling [1mthirdparty/msdfgen/core/rasterization.cpp[22;23;24;29m ...[0m
+[34mCompiling [1mthirdparty/msdfgen/core/render-sdf.cpp[22;23;24;29m ...[0m
+[34mCompiling [1mthirdparty/msdfgen/core/sdf-error-estimation.cpp[22;23;24;29m ...[0m
+[34mCompiling [1mthirdparty/msdfgen/core/shape-description.cpp[22;23;24;29m ...[0m
+Creating 'bin/godot.web.template_release.wasm32.nothreads.engine.js'
+Install file: "misc/dist/html/offline-export.html" as "bin/.web_zip/godot.offline.html"
+Install file: "misc/dist/html/service-worker.js" as "bin/.web_zip/godot.service.worker.js"
+[34mGenerating [1mplatform/android/export/logo_svg.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mplatform/android/export/run_icon_svg.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mplatform/ios/export/logo_svg.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mplatform/ios/export/run_icon_svg.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mplatform/linuxbsd/export/logo_svg.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mplatform/linuxbsd/export/run_icon_svg.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mplatform/macos/export/logo_svg.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mplatform/macos/export/run_icon_svg.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mplatform/visionos/export/logo_svg.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mplatform/visionos/export/run_icon_svg.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mplatform/web/export/logo_svg.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mplatform/web/export/run_icon_svg.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mplatform/windows/export/logo_svg.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mplatform/windows/export/run_icon_svg.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mservers/rendering/renderer_rd/shaders/area_lights_inc.glsl.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mservers/rendering/renderer_rd/shaders/canvas_uniforms_inc.glsl.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mservers/rendering/renderer_rd/shaders/cluster_data_inc.glsl.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mservers/rendering/renderer_rd/shaders/environment/voxel_gi_sdf.glsl.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mservers/rendering/renderer_rd/shaders/giprobe_write.glsl.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mservers/rendering/renderer_rd/shaders/half_inc.glsl.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mservers/rendering/renderer_rd/shaders/oct_inc.glsl.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mservers/rendering/renderer_rd/shaders/samplers_inc.glsl.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mservers/rendering/renderer_rd/shaders/scene_forward_aa_inc.glsl.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mservers/rendering/renderer_rd/shaders/scene_forward_gi_inc.glsl.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mservers/rendering/renderer_rd/shaders/scene_forward_lights_inc.glsl.gen.h[22;23;24;29m ...[0m
+[34mGenerating [1mservers/rendering/renderer_rd/shaders/scene_forward_vertex_lights_inc.glsl.gen.h[22;23;24;29m ...[0m
+[34mLinking Static Library [1mbin/obj/modules/msdfgen/libmsdfgen_builtin.web.template_release.wasm32.nothreads.a[22;23;24;29m ...[0m
+[34mRanlib Library [1mbin/obj/modules/msdfgen/libmsdfgen_builtin.web.template_release.wasm32.nothreads.a[22;23;24;29m ...[0m
+[34mLinking Program [1mbin/godot.web.template_release.wasm32.nothreads.js[22;23;24;29m ...[0m
+cache:INFO: generating system library: sysroot/lib/wasm32-emscripten/thinlto/libGL-webgl2-ofb.a... (this will be cached in "/home/runner/work/quemsoueuv3/quemsoueuv3/work/emsdk/upstream/emscripten/cache/sysroot/lib/wasm32-emscripten/thinlto/libGL-webgl2-ofb.a" for subsequent builds)
+system_libs:INFO: compiled 4 inputs in 0.17s
+cache:INFO:  - ok
+cache:INFO: generating system library: sysroot/lib/wasm32-emscripten/thinlto/libal.a... (this will be cached in "/home/runner/work/quemsoueuv3/quemsoueuv3/work/emsdk/upstream/emscripten/cache/sysroot/lib/wasm32-emscripten/thinlto/libal.a" for subsequent builds)
+system_libs:INFO: compiled 1 inputs in 0.16s
+cache:INFO:  - ok
+cache:INFO: generating system library: sysroot/lib/wasm32-emscripten/thinlto/libhtml5.a... (this will be cached in "/home/runner/work/quemsoueuv3/quemsoueuv3/work/emsdk/upstream/emscripten/cache/sysroot/lib/wasm32-emscripten/thinlto/libhtml5.a" for subsequent builds)
+system_libs:INFO: compiled 5 inputs in 0.33s
+cache:INFO:  - ok
+cache:INFO: generating system library: sysroot/lib/wasm32-emscripten/thinlto/libstubs.a... (this will be cached in "/home/runner/work/quemsoueuv3/quemsoueuv3/work/emsdk/upstream/emscripten/cache/sysroot/lib/wasm32-emscripten/thinlto/libstubs.a" for subsequent builds)
+system_libs:INFO: compiled 2 inputs in 0.16s
+cache:INFO:  - ok
+cache:INFO: generating system library: sysroot/lib/wasm32-emscripten/thinlto/libc.a... (this will be cached in "/home/runner/work/quemsoueuv3/quemsoueuv3/work/emsdk/upstream/emscripten/cache/sysroot/lib/wasm32-emscripten/thinlto/libc.a" for subsequent builds)
+system_libs:INFO: compiled 1044 inputs in 7.55s
+cache:INFO:  - ok
+cache:INFO: generating system library: sysroot/lib/wasm32-emscripten/thinlto/libdlmalloc.a... (this will be cached in "/home/runner/work/quemsoueuv3/quemsoueuv3/work/emsdk/upstream/emscripten/cache/sysroot/lib/wasm32-emscripten/thinlto/libdlmalloc.a" for subsequent builds)
+system_libs:INFO: compiled 2 inputs in 0.40s
+cache:INFO:  - ok
+cache:INFO: generating system library: sysroot/lib/wasm32-emscripten/thinlto/libcompiler_rt-legacysjlj.a... (this will be cached in "/home/runner/work/quemsoueuv3/quemsoueuv3/work/emsdk/upstream/emscripten/cache/sysroot/lib/wasm32-emscripten/thinlto/libcompiler_rt-legacysjlj.a" for subsequent builds)
+system_libs:INFO: compiled 182 inputs in 1.92s
+cache:INFO:  - ok
+cache:INFO: generating system library: sysroot/lib/wasm32-emscripten/thinlto/libc++-noexcept.a... (this will be cached in "/home/runner/work/quemsoueuv3/quemsoueuv3/work/emsdk/upstream/emscripten/cache/sysroot/lib/wasm32-emscripten/thinlto/libc++-noexcept.a" for subsequent builds)
+system_libs:INFO: compiled 56 inputs in 15.48s
+cache:INFO:  - ok
+cache:INFO: generating system library: sysroot/lib/wasm32-emscripten/thinlto/libc++abi-noexcept.a... (this will be cached in "/home/runner/work/quemsoueuv3/quemsoueuv3/work/emsdk/upstream/emscripten/cache/sysroot/lib/wasm32-emscripten/thinlto/libc++abi-noexcept.a" for subsequent builds)
+system_libs:INFO: compiled 16 inputs in 1.95s
+cache:INFO:  - ok
+cache:INFO: generating system library: sysroot/lib/wasm32-emscripten/thinlto/libsockets.a... (this will be cached in "/home/runner/work/quemsoueuv3/quemsoueuv3/work/emsdk/upstream/emscripten/cache/sysroot/lib/wasm32-emscripten/thinlto/libsockets.a" for subsequent builds)
+system_libs:INFO: compiled 27 inputs in 0.58s
+cache:INFO:  - ok
+warning: user library symbol '$GodotWebXR' depends on internal symbol '$MainLoop'
+em++: warning: warnings in JS library compilation [-Wjs-compiler]
+Install file: "bin/godot.web.template_release.wasm32.nothreads.wasm" as "bin/.web_zip/godot.wasm"
+Creating 'bin/godot.web.template_release.wasm32.nothreads.wrapped.js'
+Install file: "bin/godot.web.template_release.wasm32.nothreads.wrapped.js" as "bin/.web_zip/godot.js"
+[34mArchiving [1mbin/godot.web.template_release.wasm32.nothreads.zip[22;23;24;29m ...[0m
+scons: done building targets.
+[90m[1mINFO:[22;23;24;29m Time elapsed: 00:21:34.72[0m

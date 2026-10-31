@@ -1,0 +1,105 @@
+funções prod 71003 símbolos 71009 nomes 0
+corpos idênticos por índice 904 de 71003
+[
+ {
+  "func": 2601,
+  "prod_range": [
+   "0x19d47e",
+   "0x19d4b7"
+  ],
+  "name": null,
+  "match": "mesmo índice e corpo"
+ },
+ {
+  "func": 2238,
+  "prod_range": [
+   "0x1696e1",
+   "0x1773f9"
+  ],
+  "match": "sem corpo idêntico",
+  "name_at_index": null
+ },
+ {
+  "func": 43240,
+  "prod_range": [
+   "0x1a7d64e",
+   "0x1a7d715"
+  ],
+  "match": "sem corpo idêntico",
+  "name_at_index": null
+ },
+ {
+  "func": 759,
+  "prod_range": [
+   "0x80ea7",
+   "0x8291c"
+  ],
+  "match": "sem corpo idêntico",
+  "name_at_index": null
+ },
+ {
+  "func": 4965,
+  "prod_range": [
+   "0x2c6fb2",
+   "0x2c6fbb"
+  ],
+  "name": [
+   null
+  ],
+  "match": "corpo idêntico em outro índice"
+ },
+ {
+  "func": 631,
+  "prod_range": [
+   "0x70023",
+   "0x7008e"
+  ],
+  "name": null,
+  "match": "mesmo índice e corpo"
+ },
+ {
+  "func": 23919,
+  "prod_range": [
+   "0xf37858",
+   "0xf37f7e"
+  ],
+  "match": "sem corpo idêntico",
+  "name_at_index": null
+ },
+ {
+  "func": 23922,
+  "prod_range": [
+   "0xf381bb",
+   "0xf38a85"
+  ],
+  "match": "sem corpo idêntico",
+  "name_at_index": null
+ },
+ {
+  "func": 65206,
+  "prod_range": [
+   "0x1efa650",
+   "0x1efaadd"
+  ],
+  "match": "sem corpo idêntico",
+  "name_at_index": null
+ },
+ {
+  "func": 18792,
+  "prod_range": [
+   "0xb056b4",
+   "0xb0749c"
+  ],
+  "match": "sem corpo idêntico",
+  "name_at_index": null
+ },
+ {
+  "func": 21616,
+  "prod_range": [
+   "0xe03a19",
+   "0xe03c02"
+  ],
+  "match": "sem corpo idêntico",
+  "name_at_index": null
+ }
+]

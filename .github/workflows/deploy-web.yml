@@ -13,6 +13,7 @@ on:
       - 'scenes/**'
       - 'scripts/**'
       - 'web/**'
+      - 'tools/web/**'
 
 permissions:
   contents: read
@@ -26,7 +27,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
       - name: Install official Godot 4.7.2 and Web templates
@@ -47,6 +48,31 @@ jobs:
               > "$RUNNER_TEMP/xdg-data/godot/export_templates/4.7.2.stable/$name"
           done
           "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --version | grep -E '^4[.]7[.]2[.]stable[.]official'
+      # T20: template Web 4.7.2 idêntico ao oficial em otimização, mas sem o "-s" que
+      # remove a seção "name" do wasm. Assim a pilha de um erro no navegador vem com os
+      # nomes das funções do motor. Não altera gráficos, áudio nem jogabilidade.
+      - name: Cache do template Web com nomes de funções
+        id: tplcache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/tpl-names/web_nothreads_release.zip
+          key: godot-4.7.2-web-nothreads-release-names-v1
+      - name: Compilar template Web com nomes de funções
+        if: steps.tplcache.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          w="$RUNNER_TEMP/tplbuild"; mkdir -p "$w" "$RUNNER_TEMP/tpl-names"; cd "$w"
+          git clone -q --depth 1 --branch 4.7.2-stable https://github.com/godotengine/godot.git
+          git clone -q --depth 1 https://github.com/emscripten-core/emsdk.git
+          ./emsdk/emsdk install 4.0.11 > /dev/null && ./emsdk/emsdk activate 4.0.11 > /dev/null
+          source emsdk/emsdk_env.sh > /dev/null
+          pip install scons > /dev/null
+          cd godot
+          grep -q 'env.AppendUnique(LINKFLAGS=\["-s"\])' SConstruct
+          sed -i 's/env.AppendUnique(LINKFLAGS=\["-s"\])/pass  # T20: manter nomes/' SConstruct
+          scons platform=web target=template_release threads=no production=yes linkflags="--profiling-funcs" -j4 > "$w/build.log" 2>&1 || (tail -60 "$w/build.log"; exit 1)
+          cp bin/godot.web.template_release.wasm32.nothreads.zip "$RUNNER_TEMP/tpl-names/web_nothreads_release.zip"
       - name: Import and export Web
         shell: bash
         env:
@@ -57,6 +83,7 @@ jobs:
           set -euo pipefail
           engine="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
           mkdir -p "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" build/web
+          cp "$RUNNER_TEMP/tpl-names/web_nothreads_release.zip" "$XDG_DATA_HOME/godot/export_templates/4.7.2.stable/web_nothreads_release.zip"
           "$engine" --headless --editor --import --quit > "$RUNNER_TEMP/import.log" 2>&1
           "$engine" --headless --export-release Web build/web/index.html > "$RUNNER_TEMP/export.log" 2>&1
           # Ignore apenas avisos conhecidos de limpeza do Godot ao encerrar a exportação.
@@ -68,6 +95,7 @@ jobs:
           test -s build/web/index.html
           test -s build/web/index.pck
           test -s build/web/index.wasm
+          python3 tools/web/wasm_has_names.py build/web/index.wasm
           # Músicas do menu fora do pacote: o jogo baixa cada faixa sob demanda (menu_music.gd).
           # Imagens da tela de carregamento: tudo que estiver em web/loading/ (jpg, png, webp).
           mkdir -p build/web/loading

@@ -65,6 +65,8 @@ func _post(body: Dictionary) -> Dictionary:
 	var token := game_client.access_token if game_client != null else ""
 	if token.is_empty(): return ServiceResult.failure("not_authenticated", "unauthorized")
 	var http := HTTPRequest.new()
+	# Na Web o navegador já descompacta a resposta; o Godot não deve descompactar de novo.
+	http.accept_gzip = not OS.has_feature("web")
 	http.timeout = TIMEOUT
 	http.body_size_limit = 262144
 	add_child(http)

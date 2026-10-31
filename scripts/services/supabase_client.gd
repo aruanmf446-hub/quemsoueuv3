@@ -45,7 +45,9 @@ func _ready() -> void:
 	if not game and OS.has_environment(prefix + "URL"):
 		endpoint = OS.get_environment(prefix + "URL").trim_suffix("/")
 	if OS.has_feature("web"):
-		var browser_config: Variant = JavaScriptBridge.get_interface("QSE_PUBLIC_CONFIG")
+		# Só pede a interface se a página a definiu (evita erro "No interface registered").
+		var has_config: Variant = JavaScriptBridge.eval("typeof window.QSE_PUBLIC_CONFIG === 'object' && window.QSE_PUBLIC_CONFIG !== null", true)
+		var browser_config: Variant = JavaScriptBridge.get_interface("QSE_PUBLIC_CONFIG") if bool(has_config) else null
 		if browser_config != null:
 			if game and browser_config.publishable_key != null:
 				publishable_key = str(browser_config.publishable_key)
@@ -90,6 +92,8 @@ func request(path: String, method: HTTPClient.Method, body: Dictionary = {}, aut
 		return ServiceResult.failure("not_authenticated", "unauthorized")
 	var epoch := generation
 	var http := HTTPRequest.new()
+	# Na Web o navegador já descompacta a resposta; o Godot não deve descompactar de novo.
+	http.accept_gzip = not OS.has_feature("web")
 	http.timeout = 15.0
 	http.body_size_limit = 2097152
 	add_child(http)

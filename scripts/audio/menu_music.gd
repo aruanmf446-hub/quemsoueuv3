@@ -304,6 +304,8 @@ func _fetch_web(track: Dictionary, position: float) -> void:
 		# Read encoded audio in fewer frame-polled chunks. Keep a finite deadline,
 		# but allow slow downloads/low-FPS browsers without restarting every 20 s.
 		_web_request.download_chunk_size = 1024*1024
+		# Na Web o navegador já descompacta a resposta; o Godot não deve descompactar de novo.
+		_web_request.accept_gzip = false
 		_web_request.timeout = 60.0
 		add_child(_web_request)
 		_web_request.request_completed.connect(_web_loaded)

@@ -77,7 +77,10 @@ func _process(_delta: float) -> void:
 	if now - _heartbeat_at >= 25.0:
 		_send("phoenix", "heartbeat", {})
 		_heartbeat_at = now
-	while _socket.get_available_packet_count() > 0:
+	# _receive() pode desconectar (phx_error, phx_close, entrada recusada) e zerar _socket.
+	# Na Web release, chamar um método nativo num WebSocketPeer nulo derruba o motor
+	# com "RuntimeError: null function" em vez de gerar erro de script.
+	while _socket != null and _socket.get_available_packet_count() > 0:
 		var message: Variant = JSON.parse_string(_socket.get_packet().get_string_from_utf8())
 		if message is Dictionary:
 			_receive(message)
@@ -110,6 +113,8 @@ func _reconcile() -> void:
 func _send(topic: String, event: String, payload: Dictionary) -> String:
 	_reference += 1
 	var reference := str(_reference)
+	if _socket == null:
+		return reference
 	_socket.send_text(JSON.stringify({"topic": topic, "event": event, "payload": payload, "ref": reference}))
 	return reference
 

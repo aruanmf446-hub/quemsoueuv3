@@ -126,6 +126,20 @@ func _run() -> void:
 	check(str(data.phase) == "selection", "seleção secreta")
 	check((data.players as Array).filter(func(p: Dictionary) -> bool: return p.is_bot and p.confirmed).size() == 2, "bots prontos na hora")
 	check(match_view() != null, "tela da partida")
+	var local_chat := match_view().find_child("BattleChat", true, false) as Control
+	check(local_chat != null and not local_chat.visible, "chat vazio oculto na partida local")
+	check(match_view().find_child("PrivatePanel", true, false) != null, "mao privada mantida")
+	check(match_view().find_child("RoundTimer", true, false) != null, "cronometro mantido")
+	var original_size := root.size
+	for dimensions: Vector2i in [Vector2i(1920, 1080), Vector2i(844, 390), Vector2i(640, 360)]:
+		root.size = dimensions
+		await settle(8)
+		var active := match_view() as Control
+		check(active != null and not local_chat.is_visible_in_tree(), "chat local oculto em %s" % str(dimensions))
+		var cards: Control = active.find_child("Cards", true, false)
+		check(cards != null and cards.get_child_count() > 0, "tabuleiro presente em %s" % str(dimensions))
+	root.size = original_size
+	await settle(8)
 	var pool: Array = data.pool
 	var real_cards := pool.all(func(c: Dictionary) -> bool: return ResourceLoader.exists("res://assets/duel/decks/%s.png" % c.card_id))
 	check(pool.size() >= 9 and real_cards, "cartas reais de assets/duel/decks")
@@ -200,6 +214,15 @@ func _run() -> void:
 	check(button("Criar partida local") != null, "entrada local exibida sem sala")
 	await duel.use_online()
 	check(not duel.is_local(), "volta ao modo online")
+	# Painel real permanece no modo online, sem alterar o serviço ou criar mensagens.
+	var online_view := preload("res://scripts/ui/screens/duel_match_view.gd").new()
+	online_view.setup(duel, services.inventory, screen, Callable(self, "_noop"))
+	screen.body.add_child(online_view)
+	await settle()
+	var online_chat := online_view.find_child("BattleChat", true, false) as Control
+	check(online_chat != null and online_chat.visible, "chat online completo preservado")
+	online_view.queue_free()
+	await settle()
 	var online := await duel.list_rooms("", true)
 	# Sem sessão o cliente GAME recusa antes da rede (ou sem chave: not_configured).
 	var expected := "not_authenticated" if services.client.configured() else "not_configured"
@@ -272,3 +295,7 @@ func _rules() -> void:
 	state = local.call_rpc("qse_duel_room", {"p_room": id})
 	check(str(state.data.room.status) == "closed" and str(state.data.match.result.reason) == "only_bots", "só bots: sala encerrada")
 	local.queue_free()
+
+
+func _noop(_action: Variant = null) -> Dictionary:
+	return ServiceResult.success(null)

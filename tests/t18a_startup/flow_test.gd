@@ -14,9 +14,21 @@ func verify(value: bool, title: String) -> void:
 		push_error("T18A_STARTUP_FAIL " + title)
 
 func _run() -> void:
-	var menu := load("res://scenes/menu/main_menu.tscn").instantiate()
-	root.add_child(menu)
-	await process_frame
+	var boot := load("res://scenes/menu/menu_boot.tscn").instantiate()
+	root.add_child(boot)
+	verify(boot.has_node("AuthLoadingArt"), "abertura mostra arte de login, sem cartoes")
+	for attempt in range(25):
+		await process_frame
+		if current_scene != null and current_scene.name == "MainMenu":
+			break
+	# O boot usa change_scene_to_packed: a cena final tem que ser o lobby
+	# com a conta por cima, nao o carrossel nem o lobby interativo.
+	var menu: Node = current_scene
+	verify(menu != null and menu.name == "MainMenu", "boot termina no menu com login")
+	if menu == null or menu.name != "MainMenu":
+		print("T18A_STARTUP_RESULT checks=", checks, " failures=", failures)
+		quit(1)
+		return
 	var nav := menu.get_node("Navigation") as NavigationManager
 	var history: Array = nav.get("_history")
 	verify(history.size() == 1, "uma unica rota inicial")

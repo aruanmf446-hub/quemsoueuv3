@@ -13,6 +13,7 @@ var _refreshing := false
 
 
 func _ready() -> void:
+	if OS.get_cmdline_args().has("--script"): return
 	# Nenhum cookie, arquivo ou armazenamento persistente para o JWT do jogador.
 	load_providers.call_deferred()
 	_restore_web_redirect.call_deferred()

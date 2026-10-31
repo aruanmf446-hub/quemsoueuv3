@@ -30,6 +30,10 @@ jobs:
           GODOT="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
           "$GODOT" --headless --path . --script res://tests/t17_web_invites/flow_test.gd
           "$GODOT" --headless --path . --script res://tests/duel_local/flow_test.gd
+      - name: T18 auth and session regression (without real users)
+        run: |
+          GODOT="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+          "$GODOT" --headless --path . --script res://tests/t18_auth/flow_test.gd
       - uses: actions/upload-artifact@v4
         if: always()
         with:

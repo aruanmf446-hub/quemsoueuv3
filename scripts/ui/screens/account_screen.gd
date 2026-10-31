@@ -241,6 +241,8 @@ func _layout_auth() -> void:
 	_scroll.scale = Vector2.ONE * scale_factor
 	_scroll.size = Vector2(width, height)
 	_scroll.position = Vector2(size.x - (width + (12.0 if compact else 66.0)) * scale_factor, (size.y - height * scale_factor) * 0.5)
+	var panel := _scroll.get_node_or_null("AuthPanel") as PanelContainer
+	if panel != null: panel.custom_minimum_size.x = width - 6.0
 	var back := _root.get_node_or_null("AuthBack") as Button
 	if back != null:
 		back.position = Vector2(12, 10) * scale_factor
@@ -279,7 +281,7 @@ func _authenticate(create_account: bool) -> void:
 		_notice_error = true
 		render()
 		return
-	var error := services.session.validate_email_password(_remember_email, password, create_account)
+	var error := SessionService.validate_email_password(_remember_email, password, create_account)
 	if not error.is_empty():
 		_notice = ServiceResult.message(ServiceResult.failure(error))
 		_notice_error = true
@@ -288,7 +290,11 @@ func _authenticate(create_account: bool) -> void:
 	_password.clear()
 	if _confirm != null: _confirm.clear()
 	_busy(true)
-	var result: Dictionary = await services.session.sign_up(_remember_email, password) if create_account else await services.session.sign_in(_remember_email, password)
+	var result: Dictionary
+	if create_account:
+		result = await services.session.sign_up(_remember_email, password)
+	else:
+		result = await services.session.sign_in(_remember_email, password)
 	password = ""
 	_busy(false)
 	if result.ok:

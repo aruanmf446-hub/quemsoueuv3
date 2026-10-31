@@ -12,6 +12,26 @@ func _ready() -> void:
 		var requested: Variant = JavaScriptBridge.eval("new URLSearchParams(window.location.search).get('t19probe')",true)
 		enabled = str(requested)=="1"
 	set_process(enabled)
+	# T20 (somente com ?t19probe=1): comandos de teste para dirigir a tela de músicas.
+	if enabled and OS.has_feature("web"):
+		_t20_cb = JavaScriptBridge.create_callback(_t20_command)
+		JavaScriptBridge.get_interface("window").qse_t20 = _t20_cb
+var _t20_cb: JavaScriptObject
+func _t20_command(args: Array) -> void:
+	var cmd := str(args[0]) if not args.is_empty() else ""
+	var menu := get_tree().current_scene
+	if menu == null or menu.name != "MainMenu": return
+	var nav: NavigationManager = menu.get_node("Navigation")
+	var music: Node = get_node("/root/MenuMusic")
+	var ids: Array = music.get("tracks").map(func(t: Dictionary) -> String: return str(t.id))
+	match cmd.get_slice(":", 0):
+		"open": nav.open(cmd.get_slice(":", 1))
+		"back": nav.back()
+		"preview": if not ids.is_empty(): music.toggle_preview(ids[int(cmd.get_slice(":", 1)) % ids.size()])
+		"next": music.next_track()
+		"prev": music.previous_track()
+		"pause": music.pause()
+		"resume": music.resume()
 var elapsed := 0.0
 var worst_frame := 0.0
 func _process(delta: float) -> void:

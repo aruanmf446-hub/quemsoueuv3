@@ -1,20 +1,23 @@
 extends PlayerScreen
-## T18 — Login visual funcional. A arte e o logo sao recursos independentes;
-## todos os controles sao botoes/campos reais do Godot, nao hotspots na imagem.
-const ART := preload("res://assets/desert/night_city/citadel.png")
+## T18A: ilustracao e controles independentes. Nao renderiza Cowboy 3D na tela de login.
+## A camada ilustrada e um arquivo de alta resolucao gerado da referencia aprovada;
+## veja assets/auth/README.md. Sem arquivo, o castelo do jogo fica como fallback.
+const ART_FALLBACK := preload("res://assets/desert/night_city/citadel.png")
+const HERO_PATH := "res://assets/auth/login_heroes.webp"
 const LOGO := preload("res://assets/processed/logos/logo_quem_sou_eu_retangular.png")
-const CREAM := Color("#fff8ec")
-const GOLD := Color("#e9b975")
-const MUTE := Color("#d7c4b2")
+const GOLD := Color("#eebc64")
+const WHITE := Color("#fff8ef")
+const MUTED := Color("#d7bfa4")
 const PROVIDERS := [
-	{"id": "google", "name": "Google", "bg": Color("#f8f8fa"), "ink": Color("#26292f")},
-	{"id": "apple", "name": "Apple", "bg": Color("#161719"), "ink": Color.WHITE},
-	{"id": "steam", "name": "Steam", "bg": Color("#145180"), "ink": Color.WHITE},
-	{"id": "discord", "name": "Discord", "bg": Color("#4f59e6"), "ink": Color.WHITE},
+	{"id":"google","name":"Google","bg":Color("#f8f9fa"),"ink":Color("#22252c"),"icon":"res://assets/auth/google.svg"},
+	{"id":"apple","name":"Apple","bg":Color("#17181c"),"ink":Color.WHITE,"icon":"res://assets/auth/apple.svg"},
+	{"id":"steam","name":"Steam","bg":Color("#144e79"),"ink":Color.WHITE,"icon":"res://assets/auth/steam.svg"},
+	{"id":"discord","name":"Discord","bg":Color("#4f48e8"),"ink":Color.WHITE,"icon":"res://assets/auth/discord.svg"}
 ]
 var _mode := "choose"
 var _root: Control
-var _character_stage: LobbyStage
+var _heroes: TextureRect
+var _logo: TextureRect
 var _scroll: ScrollContainer
 var _feedback: Label
 var _email: LineEdit
@@ -31,31 +34,46 @@ func _ready() -> void:
 	manages_own_scale = true
 	super._ready()
 	$Margin.hide()
-	$Backdrop.texture = ART
+	$Backdrop.texture = ART_FALLBACK
 	$Backdrop.show()
-	$Tint.color = Color(0.012, 0.016, 0.04, 0.25)
+	$Tint.color = Color(0.012, 0.016, 0.04, 0.12)
 	_root = Control.new()
-	_root.name = "AuthOverlay"
-	_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_root.name = "CinematicAuthOverlay"
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(_root)
-	_character_stage = preload("res://scenes/lobby/lobby_stage.tscn").instantiate() as LobbyStage
-	_character_stage.name = "AuthCowboy3D"
-	_character_stage.interactive = false
-	_character_stage.set_meta("auth_stage", true)
-	_root.add_child(_character_stage)
-	var cowboy := services.inventory.entry("cowboy")
-	if not cowboy.is_empty():
-		_character_stage.show_character(cowboy)
+
+	_heroes = TextureRect.new()
+	_heroes.name = "CinematicHeroes"
+	_heroes.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_heroes.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_heroes.stretch_mode = TextureRect.STRETCH_SCALE
+	_heroes.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	var illustration := Image.new()
+	if FileAccess.file_exists(HERO_PATH) and illustration.load(HERO_PATH) == OK:
+		_heroes.texture = ImageTexture.create_from_image(illustration)
+		_heroes.show()
+	else:
+		_heroes.hide()
+	_root.add_child(_heroes)
+
 	var back := Button.new()
 	back.name = "AuthBack"
-	back.text = "‹ Voltar ao jogo"
+	back.text = "‹ Voltar"
 	back.focus_mode = Control.FOCUS_ALL
 	back.pressed.connect(func() -> void: back_requested.emit())
 	PlayerUI.style_button(back, false)
 	_root.add_child(back)
-	back.position = Vector2(22, 18)
 	back.set_meta("auth_back", true)
+
+	_logo = TextureRect.new()
+	_logo.name = "OfficialLogo"
+	_logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_logo.texture = LOGO
+	_logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_root.add_child(_logo)
+
 	services.session.changed.connect(func() -> void:
 		if is_visible_in_tree(): render())
 	services.session.providers_changed.connect(func() -> void:
@@ -76,16 +94,15 @@ func show_screen(params: Dictionary = {}) -> void:
 
 
 func render() -> void:
-	if _root == null:
-		return
+	if _root == null: return
 	if services.session.needs_password_reset:
 		_mode = "reset"
 	elif services.session.authenticated():
 		_mode = "connected"
-	for child in _root.get_children():
-		if not child.has_meta("auth_back") and not child.has_meta("auth_stage"):
-			_root.remove_child(child)
-			child.queue_free()
+	var old_scroll := _root.get_node_or_null("AuthScroll")
+	if old_scroll != null:
+		_root.remove_child(old_scroll)
+		old_scroll.queue_free()
 	_buttons.clear()
 	_email = null
 	_password = null
@@ -97,103 +114,138 @@ func render() -> void:
 	_scroll.mouse_filter = Control.MOUSE_FILTER_PASS
 	_root.add_child(_scroll)
 	var panel := PanelContainer.new()
-	panel.name = "AuthPanel"
+	panel.name = "LoginPanel"
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var frame := StyleBoxFlat.new()
-	frame.bg_color = Color(0.075, 0.046, 0.039, 0.92)
-	frame.border_color = Color(0.66, 0.40, 0.20, 0.86)
-	frame.set_border_width_all(2)
-	frame.set_corner_radius_all(15)
-	frame.content_margin_left = 19
-	frame.content_margin_right = 19
-	frame.content_margin_top = 5 if UIScale.logical_size().x < 760 else 12
-	frame.content_margin_bottom = 7 if UIScale.logical_size().x < 760 else 17
-	frame.shadow_color = Color(0, 0, 0, 0.66)
-	frame.shadow_size = 16
-	panel.add_theme_stylebox_override("panel", frame)
+	panel.add_theme_stylebox_override("panel", _wood_frame())
 	_scroll.add_child(panel)
 	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 3 if UIScale.logical_size().x < 760 else 7)
+	column.name = "LoginContent"
+	column.add_theme_constant_override("separation", 8 if UIScale.is_compact() else 12)
 	panel.add_child(column)
-	var logo := TextureRect.new()
-	logo.name = "OfficialLogo"
-	logo.texture = LOGO
-	logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	logo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	column.add_child(logo)
-	logo.custom_minimum_size.y = (58 if UIScale.logical_size().x < 760 else 95) if UIScale.is_compact() else 150
-	var heading_text := "Sua aventura começa aqui"
-	match _mode:
-		"login": heading_text = "Entre na sua conta"
-		"signup": heading_text = "Crie sua conta"
-		"recover": heading_text = "Recuperar senha"
-		"reset": heading_text = "Escolha uma nova senha"
-		"pending": heading_text = "Confirme seu e-mail"
-		"connected": heading_text = "Você está conectado"
-	var title := PlayerUI.label(heading_text, 17 if UIScale.is_compact() else 22, CREAM)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	column.add_child(title)
+	if _mode != "choose":
+		var titles := {
+			"login":"ENTRAR COM E-MAIL","signup":"CRIAR CONTA",
+			"recover":"RECUPERAR SENHA","reset":"NOVA SENHA",
+			"pending":"CONFIRME SEU E-MAIL","connected":"CONTA CONECTADA"
+		}
+		var label := PlayerUI.label(titles.get(_mode, "SUA CONTA"), 15 if UIScale.is_compact() else 21, GOLD)
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		column.add_child(label)
 	match _mode:
 		"choose":
 			_build_social(column)
-			_add_button(column, "Entrar com e-mail", _switch.bind("login"), Color("#9a5a25"), CREAM, true)
+			_add_divider(column)
+			_add_button(column, "✉  Entrar com e-mail", _switch.bind("login"), Color("#603019"), WHITE, true)
 		"login", "signup", "recover", "reset":
 			_build_email_form(column)
 		"pending":
-			column.add_child(PlayerUI.label("Enviamos instruções para o seu e-mail. Confirme a conta antes de entrar.", 14, MUTE))
-			_add_button(column, "Reenviar confirmação", _resend, Color("#a76b2f"), CREAM, true)
-			_add_button(column, "Já confirmei — entrar", _switch.bind("login"), Color("#34363e"), CREAM)
+			column.add_child(PlayerUI.label("Confira sua caixa de entrada e spam. Confirme o e-mail antes de entrar.", 14, MUTED))
+			_add_button(column, "Reenviar confirmação", _resend, Color("#945120"), WHITE, true)
+			_add_button(column, "Já confirmei — entrar", _switch.bind("login"), Color("#34313a"), WHITE)
 		"connected":
-			column.add_child(PlayerUI.label(str(services.session.user.get("email", "Conta verificada")), 15, MUTE))
-			_add_button(column, "Voltar ao jogo", func() -> void: back_requested.emit(), Color("#a76b2f"), CREAM, true)
-			_add_button(column, "Sair da conta", _logout, Color("#242832"), CREAM)
-	_feedback = PlayerUI.label(_notice, 12 if UIScale.is_compact() else 15, Color("#ffc5b6") if _notice_error else Color("#fce0ab"))
+			column.add_child(PlayerUI.label(str(services.session.user.get("email", "Conta verificada")), 15, MUTED))
+			_add_button(column, "Voltar ao jogo", func() -> void: back_requested.emit(), Color("#945120"), WHITE, true)
+			_add_button(column, "Sair da conta", _logout, Color("#242832"), WHITE)
+	_feedback = PlayerUI.label(_notice, 11 if UIScale.is_compact() else 14, Color("#ffc2b0") if _notice_error else Color("#f8dea8"))
 	_feedback.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_feedback.visible = not _notice.is_empty()
 	column.add_child(_feedback)
-	var copyright := PlayerUI.label("QUEM SOU EU  •  GAME", 10, Color(1, 0.85, 0.66, 0.65))
-	copyright.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	column.add_child(copyright)
 	_layout_auth()
 
 
+func _wood_frame() -> StyleBoxFlat:
+	var box := StyleBoxFlat.new()
+	box.bg_color = Color("#24150ff0")
+	box.border_color = Color("#b67a43")
+	box.set_border_width_all(2)
+	box.set_corner_radius_all(7)
+	box.shadow_color = Color(0,0,0,0.7)
+	box.shadow_size = 20
+	var edge := 16 if UIScale.is_compact() else 27
+	box.content_margin_left = edge
+	box.content_margin_right = edge
+	box.content_margin_top = 14 if UIScale.is_compact() else 20
+	box.content_margin_bottom = 16 if UIScale.is_compact() else 24
+	return box
+
+
 func _build_social(column: VBoxContainer) -> void:
-	for provider: Dictionary in PROVIDERS:
-		var pid := str(provider.id)
-		var ready := pid != "steam" and services.session.social_available(pid)
-		var label := "Continuar com " + str(provider.name) if ready else str(provider.name) + " · indisponível"
-		var btn := _add_button(column, label, _social.bind(pid), provider.bg, provider.ink)
-		btn.disabled = not ready
-		btn.tooltip_text = "Requer configuração oficial no Supabase GAME" if pid != "steam" else "Steam exige integração de identidade específica"
-	var hint := PlayerUI.label("Logins sociais indisponíveis." if UIScale.logical_size().x < 760 else "Login social depende da ativação oficial dos provedores.", 10 if UIScale.logical_size().x < 760 else 11, MUTE)
-	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	column.add_child(hint)
+	for entry: Dictionary in PROVIDERS:
+		var provider := str(entry.id)
+		var available := provider != "steam" and services.session.social_available(provider)
+		var button := _add_button(column, "Continuar com " + str(entry.name), _social.bind(provider), entry.bg, entry.ink)
+		button.name = "Provider_" + provider
+		button.disabled = not available
+		button.tooltip_text = "" if available else "Em breve: precisa de configuração oficial no Supabase GAME"
+		var icon_path := str(entry.icon)
+		var icon_asset := load(icon_path) as Texture2D
+		if icon_asset != null:
+			var icon := TextureRect.new()
+			icon.name = "ProviderIcon"
+			icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			icon.texture = icon_asset
+			icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			button.add_child(icon)
+			icon.set_anchors_and_offsets_preset(Control.PRESET_CENTER_LEFT)
+			icon.offset_left = 12
+			icon.offset_top = -12
+			icon.offset_right = 36
+			icon.offset_bottom = 12
+		if not available:
+			var pending := Label.new()
+			pending.name = "Unavailable"
+			pending.text = "EM BREVE"
+			pending.add_theme_color_override("font_color", Color("#d4ccd9"))
+			pending.add_theme_font_size_override("font_size", 9 if UIScale.is_compact() else 10)
+			pending.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			pending.set_anchors_and_offsets_preset(Control.PRESET_CENTER_RIGHT)
+			pending.offset_left = -70
+			pending.offset_right = -4
+			pending.offset_top = -7
+			pending.offset_bottom = 7
+			button.add_child(pending)
+
+
+func _add_divider(column: VBoxContainer) -> void:
+	var line := HBoxContainer.new()
+	line.add_theme_constant_override("separation", 8)
+	column.add_child(line)
+	for i in range(3):
+		if i == 1:
+			var gem := PlayerUI.label("◆", 14, GOLD)
+			gem.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+			line.add_child(gem)
+		else:
+			var rule := HSeparator.new()
+			rule.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			rule.modulate = GOLD
+			line.add_child(rule)
 
 
 func _build_email_form(column: VBoxContainer) -> void:
 	if _mode != "reset":
 		_email = _field(column, "Seu e-mail", false)
 		_email.text = _remember_email
-	if _mode in ["login", "signup", "reset"]:
+	if _mode in ["login","signup","reset"]:
 		_password = _field(column, "Senha (mínimo 6 caracteres)" if _mode != "login" else "Sua senha", true)
-	if _mode in ["signup", "reset"]:
+	if _mode in ["signup","reset"]:
 		_confirm = _field(column, "Confirmar senha", true)
 	if _mode == "login":
-		_add_button(column, "Entrar", _authenticate.bind(false), Color("#b2702e"), CREAM, true)
-		_add_button(column, "Criar conta", _switch.bind("signup"), Color("#34313a"), CREAM)
-		_add_button(column, "Esqueci minha senha", _switch.bind("recover"), Color("#292c34"), MUTE)
+		_add_button(column,"Entrar",_authenticate.bind(false),Color("#93521f"),WHITE,true)
+		_add_button(column,"Criar conta",_switch.bind("signup"),Color("#403128"),WHITE)
+		_add_button(column,"Esqueci minha senha",_switch.bind("recover"),Color("#342720"),MUTED)
 	elif _mode == "signup":
-		_add_button(column, "Criar minha conta", _authenticate.bind(true), Color("#b2702e"), CREAM, true)
-		_add_button(column, "Já tenho conta", _switch.bind("login"), Color("#292c34"), MUTE)
+		_add_button(column,"Criar minha conta",_authenticate.bind(true),Color("#93521f"),WHITE,true)
+		_add_button(column,"Já tenho conta",_switch.bind("login"),Color("#342720"),MUTED)
 	elif _mode == "recover":
-		column.add_child(PlayerUI.label("Enviaremos um link para definir uma nova senha.", 12, MUTE))
-		_add_button(column, "Enviar link de recuperação", _recover, Color("#b2702e"), CREAM, true)
-		_add_button(column, "Voltar ao login", _switch.bind("login"), Color("#292c34"), MUTE)
+		column.add_child(PlayerUI.label("Enviaremos um link para definir uma nova senha.", 13, MUTED))
+		_add_button(column,"Enviar link de recuperação",_recover,Color("#93521f"),WHITE,true)
+		_add_button(column,"Voltar ao login",_switch.bind("login"),Color("#342720"),MUTED)
 	elif _mode == "reset":
-		_add_button(column, "Salvar nova senha", _reset_password, Color("#b2702e"), CREAM, true)
+		_add_button(column,"Salvar nova senha",_reset_password,Color("#93521f"),WHITE,true)
 	if _mode != "reset":
-		_add_button(column, "‹ Outros métodos", _switch.bind("choose"), Color("#232127"), MUTE)
+		_add_button(column,"‹ Outros métodos",_switch.bind("choose"),Color("#211914"),MUTED)
 
 
 func _field(parent: VBoxContainer, placeholder: String, secret: bool) -> LineEdit:
@@ -201,72 +253,80 @@ func _field(parent: VBoxContainer, placeholder: String, secret: bool) -> LineEdi
 	field.placeholder_text = placeholder
 	field.secret = secret
 	field.virtual_keyboard_type = LineEdit.KEYBOARD_TYPE_DEFAULT if secret else LineEdit.KEYBOARD_TYPE_EMAIL_ADDRESS
-	field.custom_minimum_size.y = 35 if UIScale.is_compact() else 47
-	field.add_theme_font_size_override("font_size", 13 if UIScale.is_compact() else 18)
-	field.add_theme_color_override("font_color", CREAM)
+	field.custom_minimum_size.y = 38 if UIScale.is_compact() else 51
+	field.add_theme_font_size_override("font_size", 15 if UIScale.is_compact() else 18)
 	PlayerUI.style_field(field)
 	parent.add_child(field)
 	return field
 
 
-func _add_button(parent: VBoxContainer, label: String, action: Callable, bg: Color, ink: Color, primary := false) -> Button:
-	var btn := Button.new()
-	btn.text = label
-	btn.focus_mode = Control.FOCUS_ALL
-	btn.custom_minimum_size.y = (28 if UIScale.logical_size().x < 760 else 31) if UIScale.is_compact() else 49
-	btn.add_theme_font_size_override("font_size", 13 if UIScale.is_compact() else 17)
-	for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
-		var plate := StyleBoxFlat.new()
-		plate.bg_color = (bg.lightened(0.13) if state == "hover" else (bg.darkened(0.12) if state == "pressed" else bg))
-		if state == "disabled": plate.bg_color = Color(0.13, 0.13, 0.17, 0.84)
-		plate.set_corner_radius_all(8)
-		if primary:
-			plate.border_color = GOLD
-			plate.set_border_width_all(1)
-		btn.add_theme_stylebox_override(state, plate)
-	for name in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
-		btn.add_theme_color_override(name, ink)
-	btn.add_theme_color_override("font_disabled_color", Color("#9a9299"))
+func _add_button(parent: VBoxContainer, title: String, action: Callable, bg: Color, ink: Color, primary := false) -> Button:
+	var button := Button.new()
+	button.text = title
+	button.focus_mode = Control.FOCUS_ALL
+	button.custom_minimum_size.y = 38 if UIScale.is_compact() else 55
+	button.add_theme_font_size_override("font_size", 12 if UIScale.is_compact() else 17)
+	for state in ["normal","hover","pressed","disabled","hover_pressed"]:
+		var style := StyleBoxFlat.new()
+		style.bg_color = bg.lightened(0.08) if state == "hover" else (bg.darkened(0.15) if state == "pressed" else bg)
+		if state == "disabled": style.bg_color = bg.darkened(0.10)
+		style.border_color = Color("#e4b46d") if primary else Color(0,0,0,0.35)
+		style.set_border_width_all(2 if primary else 1)
+		style.set_corner_radius_all(7)
+		style.shadow_color = Color(0,0,0,0.38)
+		style.shadow_size = 5
+		button.add_theme_stylebox_override(state, style)
+	for name in ["font_color","font_focus_color","font_hover_color","font_pressed_color"]:
+		button.add_theme_color_override(name, ink)
+	button.add_theme_color_override("font_disabled_color", ink * Color(0.8,0.8,0.8,1.0))
 	var focus := StyleBoxFlat.new()
 	focus.draw_center = false
 	focus.border_color = GOLD
 	focus.set_border_width_all(2)
-	focus.set_corner_radius_all(9)
-	btn.add_theme_stylebox_override("focus", focus)
-	btn.pressed.connect(action)
-	parent.add_child(btn)
-	_buttons.append(btn)
-	return btn
+	focus.set_corner_radius_all(7)
+	button.add_theme_stylebox_override("focus", focus)
+	button.pressed.connect(action)
+	parent.add_child(button)
+	_buttons.append(button)
+	return button
 
 
 func _layout_auth() -> void:
 	if _root == null or _scroll == null:
 		return
-	var scale_factor := PlayerUI.unit(self)
-	var logical := size / scale_factor
-	var compact := logical.y < 600
-	var width := minf(385.0 if not compact else (305.0 if logical.x < 760 else 340.0), logical.x * 0.65)
-	var height := minf(logical.y - (24.0 if compact else 65.0), 740.0)
-	_scroll.scale = Vector2.ONE * scale_factor
-	_scroll.size = Vector2(width, height)
-	_scroll.position = Vector2(size.x - (width + (12.0 if compact else 66.0)) * scale_factor, (size.y - height * scale_factor) * 0.5)
-	var panel := _scroll.get_node_or_null("AuthPanel") as PanelContainer
-	if panel != null: panel.custom_minimum_size.x = width - 6.0
-	if is_instance_valid(_character_stage):
-		var area := maxf(logical.x - width - (34.0 if compact else 120.0), 0.0)
-		_character_stage.visible = area >= 240.0
-		if _character_stage.visible:
-			var stage_width := minf(area * 0.92, 730.0)
-			var stage_height := logical.y * (0.89 if compact else 0.94)
-			_character_stage.scale = Vector2.ONE * scale_factor
-			_character_stage.size = Vector2(stage_width, stage_height)
-			_character_stage.position = Vector2(maxf((area - stage_width) * 0.5, 0.0), logical.y - stage_height) * scale_factor
+	var factor := PlayerUI.unit(self)
+	var logical := size / maxf(factor,0.01)
+	var compact := logical.y < 600.0
+	var very_small := logical.x < 760.0
+	var panel_width := minf(logical.x * (0.39 if very_small else 0.26), 375 if not compact else 280)
+	panel_width = maxf(panel_width, 202.0 if very_small else 260.0)
+	var mid_x := logical.x * (0.72 if very_small else 0.68)
+	var panel_x := clampf(mid_x - panel_width * 0.5, 8.0, logical.x - panel_width - 8.0)
+	var logo_h := 68.0 if very_small else (95.0 if compact else 178.0)
+	var logo_y := 9.0 if very_small else (14.0 if compact else logical.y * 0.17)
+	var logo_w := panel_width * (1.04 if very_small else 1.2)
+	_logo.position = Vector2(panel_x - (logo_w - panel_width)*0.5, logo_y) * factor
+	_logo.size = Vector2(logo_w, logo_h) * factor
+	var panel_y := logo_y + logo_h - (11.0 if very_small else 15.0)
+	var panel_h := minf(logical.y - panel_y - 9.0, 550.0 if not compact else 360.0)
+	_scroll.position = Vector2(panel_x,panel_y) * factor
+	_scroll.size = Vector2(panel_width,panel_h) * factor
+	_scroll.scale = Vector2.ONE * factor
+	var panel := _scroll.get_node_or_null("LoginPanel") as PanelContainer
+	if panel != null: panel.custom_minimum_size.x = panel_width - 6.0
+	if _heroes != null and _heroes.visible:
+		# Os personagens ocupam os 60% esquerdos da referencia, sem arte do login embutida.
+		var heroes_height := logical.y
+		var heroes_width := heroes_height * 1060.0 / 900.0
+		_heroes.position = Vector2.ZERO
+		_heroes.scale = Vector2.ONE * factor
+		_heroes.size = Vector2(heroes_width,heroes_height)
 	var back := _root.get_node_or_null("AuthBack") as Button
 	if back != null:
-		back.position = Vector2(12, 10) * scale_factor
-		back.scale = Vector2.ONE * scale_factor
+		back.position = Vector2(12,8) * factor
+		back.scale = Vector2.ONE * factor
+		back.custom_minimum_size = Vector2(112 if compact else 162, 34 if compact else 45)
 		back.add_theme_font_size_override("font_size", 12 if compact else 17)
-		back.custom_minimum_size = Vector2(145, 33) if compact else Vector2(200, 45)
 
 
 func _switch(mode: String) -> void:

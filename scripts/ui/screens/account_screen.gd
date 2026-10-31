@@ -68,6 +68,9 @@ func _ready() -> void:
 
 func show_screen(params: Dictionary = {}) -> void:
 	parameters = params.duplicate(true)
+	var back_button := _root.get_node_or_null("AuthBack") as Button
+	if back_button != null:
+		back_button.text = "Jogar sem conta" if bool(params.get("startup", false)) else "‹ Voltar"
 	show()
 	if services.session.needs_password_reset:
 		_mode = "reset"

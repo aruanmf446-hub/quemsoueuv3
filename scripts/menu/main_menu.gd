@@ -58,6 +58,9 @@ func _ready() -> void:
 	add_child(_news_button)
 	resized.connect(_layout_news_button)
 	_layout_news_button.call_deferred()
+	# Primeira tela interativa: login cinematografico, antes de revelar o lobby.
+	# O visitante pode escolher explicitamente jogar sem conta.
+	_navigation.open_initial("account", {"startup": true})
 	_check_web_invite.call_deferred()
 
 
@@ -72,12 +75,32 @@ func _check_web_invite() -> void:
 
 
 func _auth_redirect_ready() -> void:
-	# Recuperacao de senha tem prioridade sobre convites; a entrada na sala
-	# so continua depois de efetivamente salvar a nova senha.
+	# Um retorno de recovery conclui a senha antes de qualquer convite.
 	if _services.session.needs_password_reset:
 		_open_auth_recovery.call_deferred()
-	else:
-		_resume_web_invite()
+		return
+	# O convite nao pode ser descartado por uma volta antecipada ao lobby.
+	if OS.has_feature("web"):
+		var has_invite: Variant = JavaScriptBridge.eval("new URLSearchParams(window.location.search).has('invite')")
+		_web_invite_intent.capture(has_invite == true)
+	_resume_web_invite()
+	if _services.session.authenticated() and not _web_invite_intent.pending:
+		_finish_startup_login.call_deferred()
+
+
+func _finish_startup_login() -> void:
+	if not _services.session.authenticated() or _web_invite_intent.pending or _services.session.needs_password_reset:
+		return
+	# Somente fechar a conta quando for de fato a primeira tela do jogo.
+	var history: Array = _navigation.get("_history")
+	if history.size() != 1 or str(history[0].get("route", "")) != "account":
+		return
+	if not bool(history[0].get("params", {}).get("startup", false)):
+		return
+	if bool(_navigation.get("_busy")):
+		await get_tree().create_timer(0.2).timeout
+	if not bool(_navigation.get("_busy")) and _navigation.get("_active") != null:
+		_navigation.back()
 
 
 func _open_auth_recovery() -> void:
@@ -97,6 +120,11 @@ func _resume_web_invite() -> void:
 	var route := _web_invite_intent.next_route(_services.session.authenticated())
 	if route.is_empty():
 		return
+	# A tela account ja esta aberta no primeiro frame. Nao empilhar outra.
+	if route == "account":
+		var history: Array = _navigation.get("_history")
+		if not history.is_empty() and str(history.back().get("route", "")) == "account":
+			return
 	_web_invite_navigating = true
 	_navigate_web_invite(route)
 

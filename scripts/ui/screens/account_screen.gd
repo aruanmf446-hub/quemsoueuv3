@@ -2,9 +2,7 @@ extends PlayerScreen
 ## T18A: ilustracao e controles independentes. Nao renderiza Cowboy 3D na tela de login.
 ## A camada ilustrada e um arquivo de alta resolucao gerado da referencia aprovada;
 ## veja assets/auth/README.md. Sem arquivo, o castelo do jogo fica como fallback.
-const ART_FALLBACK := preload("res://assets/desert/night_city/citadel.png")
-const HERO_PATH := "res://assets/auth/login_heroes.webp"
-const GUARDS_PATH := "res://assets/auth/login_guards.webp"
+const ART_FALLBACK := preload("res://assets/auth/login_cinematic_bg.webp")
 const LOGO := preload("res://assets/auth/login_logo.webp")
 const GOLD := Color("#eebc64")
 const WHITE := Color("#fff8ef")
@@ -17,8 +15,6 @@ const PROVIDERS := [
 ]
 var _mode := "choose"
 var _root: Control
-var _heroes: TextureRect
-var _guards: TextureRect
 var _logo: TextureRect
 var _scroll: ScrollContainer
 var _feedback: Label
@@ -44,28 +40,6 @@ func _ready() -> void:
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(_root)
-
-	_guards = TextureRect.new()
-	_guards.name = "CinematicGuards"
-	_guards.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_guards.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_guards.stretch_mode = TextureRect.STRETCH_SCALE
-	_guards.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	if ResourceLoader.exists(GUARDS_PATH):
-		_guards.texture = load(GUARDS_PATH) as Texture2D
-	_guards.visible = _guards.texture != null
-	_root.add_child(_guards)
-
-	_heroes = TextureRect.new()
-	_heroes.name = "CinematicHeroes"
-	_heroes.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_heroes.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_heroes.stretch_mode = TextureRect.STRETCH_SCALE
-	_heroes.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	if ResourceLoader.exists(HERO_PATH):
-		_heroes.texture = load(HERO_PATH) as Texture2D
-	_heroes.visible = _heroes.texture != null
-	_root.add_child(_heroes)
 
 	var back := Button.new()
 	back.name = "AuthBack"
@@ -123,6 +97,7 @@ func render() -> void:
 	_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	_scroll.mouse_filter = Control.MOUSE_FILTER_PASS
 	_root.add_child(_scroll)
+	_root.move_child(_logo, _root.get_child_count() - 1)
 	var panel := PanelContainer.new()
 	panel.name = "LoginPanel"
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -302,30 +277,18 @@ func _layout_auth() -> void:
 	panel_width = maxf(panel_width, 202.0 if very_small else 260.0)
 	var mid_x := logical.x * (0.72 if very_small else 0.68)
 	var panel_x := clampf(mid_x - panel_width * 0.5, 8.0, logical.x - panel_width - 8.0)
-	var logo_h := 98.0 if very_small else (113.0 if compact else 240.0)
-	var logo_y := 0.0 if very_small else (0.0 if compact else logical.y * 0.20)
+	var logo_h := 98.0 if very_small else (113.0 if compact else 260.0)
+	var logo_y := 0.0 if very_small else (0.0 if compact else logical.y * 0.24)
 	var logo_w := panel_width * (1.04 if very_small else 1.2)
 	_logo.position = Vector2(panel_x - (logo_w - panel_width)*0.5, logo_y) * factor
 	_logo.size = Vector2(logo_w, logo_h) * factor
-	var panel_y := logo_y + logo_h - (20.0 if very_small else (16.0 if compact else 23.0))
+	var panel_y := logo_y + logo_h - (20.0 if very_small else (16.0 if compact else 18.0))
 	var panel_h := minf(logical.y - panel_y - 9.0, 550.0 if not compact else 360.0)
 	_scroll.position = Vector2(panel_x,panel_y) * factor
 	_scroll.size = Vector2(panel_width,panel_h)
 	_scroll.scale = Vector2.ONE * factor
 	var panel := _scroll.get_node_or_null("LoginPanel") as PanelContainer
 	if panel != null: panel.custom_minimum_size.x = panel_width - 6.0
-	if _heroes != null and _heroes.visible:
-		# Os personagens ocupam os 60% esquerdos da referencia, sem arte do login embutida.
-		var heroes_height := logical.y
-		var heroes_width := heroes_height * 1060.0 / 900.0
-		_heroes.position = Vector2.ZERO
-		_heroes.scale = Vector2.ONE * factor
-		_heroes.size = Vector2(heroes_width,heroes_height)
-	if _guards != null and _guards.visible:
-		var guards_width := logical.y * 470.0 / 900.0
-		_guards.position = Vector2(size.x - guards_width * factor,0)
-		_guards.size = Vector2(guards_width,logical.y)
-		_guards.scale = Vector2.ONE * factor
 	var back := _root.get_node_or_null("AuthBack") as Button
 	if back != null:
 		back.position = Vector2(12,8) * factor

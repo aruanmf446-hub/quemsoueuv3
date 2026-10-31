@@ -35,7 +35,7 @@ func _ready() -> void:
 	_services.wallet.changed.connect(_refresh_wallet)
 	_services.friends.changed.connect(_refresh_friends)
 	_services.session.changed.connect(_refresh_profile)
-	_services.session.changed.connect(_resume_web_invite)
+	_services.session.changed.connect(_auth_redirect_ready)
 	_services.preferences.changed.connect(_refresh_wallet)
 	_navigation.route_changed.connect(_route_changed)
 	_refresh_profile()
@@ -71,7 +71,27 @@ func _check_web_invite() -> void:
 	_resume_web_invite()
 
 
+func _auth_redirect_ready() -> void:
+	# Recuperacao de senha tem prioridade sobre convites; a entrada na sala
+	# so continua depois de efetivamente salvar a nova senha.
+	if _services.session.needs_password_reset:
+		_open_auth_recovery.call_deferred()
+	else:
+		_resume_web_invite()
+
+
+func _open_auth_recovery() -> void:
+	if not _services.session.needs_password_reset:
+		return
+	if bool(_navigation.get("_busy")):
+		await get_tree().create_timer(0.25).timeout
+	if not bool(_navigation.get("_busy")):
+		_navigation.open("account")
+
+
 func _resume_web_invite() -> void:
+	if _services.session.needs_password_reset:
+		return
 	if _web_invite_navigating:
 		return
 	var route := _web_invite_intent.next_route(_services.session.authenticated())

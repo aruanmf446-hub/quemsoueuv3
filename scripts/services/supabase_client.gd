@@ -109,17 +109,22 @@ func request(path: String, method: HTTPClient.Method, body: Dictionary = {}, aut
 	if response[0] != HTTPRequest.RESULT_SUCCESS:
 		return ServiceResult.failure("network", "offline")
 	var status := int(response[1])
-	if status == 401 or status == 403:
-		return ServiceResult.failure("not_authenticated", "unauthorized")
+	var data: Variant = JSON.parse_string(response[3].get_string_from_utf8())
 	if status == 429:
 		return ServiceResult.failure("rate_limit")
-	var data: Variant = JSON.parse_string(response[3].get_string_from_utf8())
 	if status < 200 or status >= 300:
-		return ServiceResult.failure("invalid_credentials" if path.begins_with("/auth/") else "request_failed")
+		# GoTrue envia error_code; nao esconder cadastro invalido com 'invalid_credentials'.
+		var code := ""
+		if data is Dictionary:
+			code = str(data.get("error_code", data.get("code", "")))
+		if code.is_empty():
+			code = "invalid_credentials" if path.begins_with("/auth/v1/token") else ("auth_request_failed" if path.begins_with("/auth/") else "request_failed")
+		if (status == 401 or status == 403) and not path.begins_with("/auth/"):
+			code = "not_authenticated"
+		return ServiceResult.failure(code, "unauthorized" if status == 401 or status == 403 else "error")
 	if data is Dictionary and data.has("error"):
-		return ServiceResult.failure(str(data.error))
+		return ServiceResult.failure(str(data.get("error_code", "auth_request_failed")))
 	return ServiceResult.success(data)
-
 
 static func _public_key_only(key: String) -> bool:
 	if key.begins_with("sb_publishable_"):

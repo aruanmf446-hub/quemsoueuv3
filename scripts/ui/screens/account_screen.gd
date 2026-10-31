@@ -4,6 +4,7 @@ extends PlayerScreen
 ## veja assets/auth/README.md. Sem arquivo, o castelo do jogo fica como fallback.
 const ART_FALLBACK := preload("res://assets/desert/night_city/citadel.png")
 const HERO_PATH := "res://assets/auth/login_heroes.webp"
+const GUARDS_PATH := "res://assets/auth/login_guards.webp"
 const LOGO := preload("res://assets/processed/logos/logo_quem_sou_eu_retangular.png")
 const GOLD := Color("#eebc64")
 const WHITE := Color("#fff8ef")
@@ -17,6 +18,7 @@ const PROVIDERS := [
 var _mode := "choose"
 var _root: Control
 var _heroes: TextureRect
+var _guards: TextureRect
 var _logo: TextureRect
 var _scroll: ScrollContainer
 var _feedback: Label
@@ -42,6 +44,17 @@ func _ready() -> void:
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(_root)
+
+	_guards = TextureRect.new()
+	_guards.name = "CinematicGuards"
+	_guards.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_guards.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_guards.stretch_mode = TextureRect.STRETCH_SCALE
+	_guards.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	if ResourceLoader.exists(GUARDS_PATH):
+		_guards.texture = load(GUARDS_PATH) as Texture2D
+	_guards.visible = _guards.texture != null
+	_root.add_child(_guards)
 
 	_heroes = TextureRect.new()
 	_heroes.name = "CinematicHeroes"
@@ -318,6 +331,11 @@ func _layout_auth() -> void:
 		_heroes.position = Vector2.ZERO
 		_heroes.scale = Vector2.ONE * factor
 		_heroes.size = Vector2(heroes_width,heroes_height)
+	if _guards != null and _guards.visible:
+		var guards_width := logical.y * 470.0 / 900.0
+		_guards.position = Vector2(size.x - guards_width * factor,0)
+		_guards.size = Vector2(guards_width,logical.y)
+		_guards.scale = Vector2.ONE * factor
 	var back := _root.get_node_or_null("AuthBack") as Button
 	if back != null:
 		back.position = Vector2(12,8) * factor

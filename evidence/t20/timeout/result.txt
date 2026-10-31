@@ -1,21 +1,23 @@
 console: Godot Engine v4.7.2.stable.custom_build.ed1daf0bf (2026-08-17 01:18:38 UTC) - https://godotengine.org
 console: OpenGL API OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium)) - Compatibility - Using Device: WebKit - WebKit WebGL
 console: Build configuration: Emscripten 4.0.11, single-threaded, no GDExtension support.
-console: [.WebGL-0x11bc0b6c3a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
-console: [.WebGL-0x11bc0b6c3a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
-console: [.WebGL-0x11bc0b6c3a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
-console: [.WebGL-0x11bc0b6c3a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)
-console: T20_ROUND 0 result=13
+console: T20_START
+console: [.WebGL-0xfc401e65c00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+console: [.WebGL-0xfc401e65c00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+console: [.WebGL-0xfc401e65c00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+console: [.WebGL-0xfc401e65c00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)
+console: T20_ALIVE 60
 console: T20_ALIVE 120
-console: T20_ALIVE 240
-console: T20_ALIVE 360
-console: T20_ROUND 1 result=13
-console: T20_ALIVE 480
-console: T20_ROUND 2 result=13
-console: T20_ALIVE 600
-console: T20_ALIVE 720
-console: T20_DONE frames=728
-console: T20_ALIVE 840
-console: T20_ALIVE 960
-console: T20_ALIVE 1080
-console: T20_ALIVE 1200
+console: T20_NULL_CALL
+PAGEERROR: null function
+RuntimeError: null function
+    at godot.web.template_release.wasm32.nothreads.wasm.MethodBindTR<int>::validated_call(Object*, Variant const**, Variant*) const (wasm://wasm/godot.web.template_release.wasm32.nothreads.wasm-0aeb24ea:wasm-function[2584]:0x19ed52)
+    at godot.web.template_release.wasm32.nothreads.wasm.GDScriptFunction::call(GDScriptInstance*, Variant const**, int, Callable::CallError&, GDScriptFunction::CallState*) (wasm://wasm/godot.web.template_release.wasm32.nothreads.wasm-0aeb24ea:wasm-function[2269]:0x17263b)
+    at godot.web.template_release.wasm32.nothreads.wasm.GDScriptInstance::callp(StringName const&, Variant const**, int, Callable::CallError&) (wasm://wasm/godot.web.template_release.wasm32.nothreads.wasm-0aeb24ea:wasm-function[64765]:0x1f9149c)
+    at godot.web.template_release.wasm32.nothreads.wasm.Node::_notification(int) (wasm://wasm/godot.web.template_release.wasm32.nothreads.wasm-0aeb24ea:wasm-function[759]:0x814a6)
+    at godot.web.template_release.wasm32.nothreads.wasm.InstancePlaceholder::_notification_forwardv(int) (wasm://wasm/godot.web.template_release.wasm32.nothreads.wasm-0aeb24ea:wasm-function[4862]:0x2b5420)
+    at godot.web.template_release.wasm32.nothreads.wasm.Object::_notification_forward(int) (wasm://wasm/godot.web.template_release.wasm32.nothreads.wasm-0aeb24ea:wasm-function[631]:0x70168)
+    at godot.web.template_release.wasm32.nothreads.wasm.SceneTree::_process_group(SceneTree::ProcessGroup*, bool) (wasm://wasm/godot.web.template_release.wasm32.nothreads.wasm-0aeb24ea:wasm-function[19102]:0xc6ecdd)
+    at godot.web.template_release.wasm32.nothreads.wasm.SceneTree::_process(bool) (wasm://wasm/godot.web.template_release.wasm32.nothreads.wasm-0aeb24ea:wasm-function[19103]:0xc6f3d6)
+    at godot.web.template_release.wasm32.nothreads.wasm.SceneTree::process(double) (wasm://wasm/godot.web.template_release.wasm32.nothreads.wasm-0aeb24ea:wasm-function[44514]:0x19793cd)
+    at godot.web.template_release.wasm32.nothreads.wasm.Main::iteration() (wasm://wasm/godot.web.template_release.wasm32.nothreads.wasm-0aeb24ea:wasm-function[22769]:0xfa88fe)

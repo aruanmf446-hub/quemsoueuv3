@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main, codex/testes-godot-08, work/integracao-tarefas-04-08, chatgpt/t18a-cinematic-login, work/fix-login-progress-before-main]
+    branches: [main, codex/testes-godot-08, work/integracao-tarefas-04-08, chatgpt/t18a-cinematic-login, work/fix-login-progress-before-main, work/startup-profile-music-fix]
 permissions:
   contents: read
 jobs:
@@ -38,6 +38,10 @@ jobs:
         run: |
           GODOT="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
           "$GODOT" --headless --path . --script res://tests/persistence/flow_test.gd
+      - name: Validate restored startup, profile logout and music playback
+        run: |
+          GODOT="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+          "$GODOT" --headless --path . --script res://tests/ui_session_music/flow_test.gd
       - name: Verify authentication appears before lobby (T18A startup)
         run: |
           GODOT="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"

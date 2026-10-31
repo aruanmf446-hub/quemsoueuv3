@@ -442,7 +442,8 @@ func resume() -> void:
 	if _inside:
 		if _players[_active].playing:
 			for player in _players: player.stream_paused = false
-			if _fade != null: _fade.play()
+			# Crossfade já terminado não pode voltar a tocar (erro "Can't play finished Tween").
+			if _fade != null and _fade.is_valid() and not _fade.is_running(): _fade.play()
 		else: _restore()
 	state_changed.emit()
 

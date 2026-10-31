@@ -106,7 +106,8 @@ func _check_web_invite() -> void:
 	if not OS.has_feature("web"):
 		return
 	var present: Variant = JavaScriptBridge.eval("new URLSearchParams(window.location.search).has('invite')")
-	_web_invite_intent.capture(present == true)
+	# eval devolve número/booleano conforme o navegador: compara como bool.
+	_web_invite_intent.capture(bool(present))
 	_resume_web_invite()
 
 

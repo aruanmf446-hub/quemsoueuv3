@@ -49,12 +49,9 @@ func _ready() -> void:
 	_heroes.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_heroes.stretch_mode = TextureRect.STRETCH_SCALE
 	_heroes.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	var illustration := Image.new()
-	if FileAccess.file_exists(HERO_PATH) and illustration.load(HERO_PATH) == OK:
-		_heroes.texture = ImageTexture.create_from_image(illustration)
-		_heroes.show()
-	else:
-		_heroes.hide()
+	if ResourceLoader.exists(HERO_PATH):
+		_heroes.texture = load(HERO_PATH) as Texture2D
+	_heroes.visible = _heroes.texture != null
 	_root.add_child(_heroes)
 
 	var back := Button.new()
@@ -310,7 +307,7 @@ func _layout_auth() -> void:
 	var panel_y := logo_y + logo_h - (11.0 if very_small else 15.0)
 	var panel_h := minf(logical.y - panel_y - 9.0, 550.0 if not compact else 360.0)
 	_scroll.position = Vector2(panel_x,panel_y) * factor
-	_scroll.size = Vector2(panel_width,panel_h) * factor
+	_scroll.size = Vector2(panel_width,panel_h)
 	_scroll.scale = Vector2.ONE * factor
 	var panel := _scroll.get_node_or_null("LoginPanel") as PanelContainer
 	if panel != null: panel.custom_minimum_size.x = panel_width - 6.0

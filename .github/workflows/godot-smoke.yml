@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main, codex/testes-godot-08, work/integracao-tarefas-04-08]
+    branches: [main, codex/testes-godot-08, work/integracao-tarefas-04-08, chatgpt/t18a-cinematic-login]
 permissions:
   contents: read
 jobs:

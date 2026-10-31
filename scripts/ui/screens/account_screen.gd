@@ -1,8 +1,8 @@
 extends PlayerScreen
 ## T18 — Login visual funcional. A arte e o logo sao recursos independentes;
 ## todos os controles sao botoes/campos reais do Godot, nao hotspots na imagem.
-const ART := preload("res://assets/processed/backgrounds/bg_lobby_fantasia.png")
-const LOGO := preload("res://assets/processed/logos/logo_menu_principal.png")
+const ART := preload("res://assets/desert/night_city/citadel.png")
+const LOGO := preload("res://assets/processed/logos/logo_quem_sou_eu_retangular.png")
 const CREAM := Color("#fff8ec")
 const GOLD := Color("#e9b975")
 const MUTE := Color("#d7c4b2")
@@ -97,14 +97,14 @@ func render() -> void:
 	frame.set_corner_radius_all(15)
 	frame.content_margin_left = 19
 	frame.content_margin_right = 19
-	frame.content_margin_top = 12
-	frame.content_margin_bottom = 17
+	frame.content_margin_top = 5 if UIScale.logical_size().x < 760 else 12
+	frame.content_margin_bottom = 7 if UIScale.logical_size().x < 760 else 17
 	frame.shadow_color = Color(0, 0, 0, 0.66)
 	frame.shadow_size = 16
 	panel.add_theme_stylebox_override("panel", frame)
 	_scroll.add_child(panel)
 	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 7)
+	column.add_theme_constant_override("separation", 3 if UIScale.logical_size().x < 760 else 7)
 	panel.add_child(column)
 	var logo := TextureRect.new()
 	logo.name = "OfficialLogo"
@@ -113,7 +113,7 @@ func render() -> void:
 	logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	logo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	column.add_child(logo)
-	logo.custom_minimum_size.y = 95 if UIScale.is_compact() else 150
+	logo.custom_minimum_size.y = (58 if UIScale.logical_size().x < 760 else 95) if UIScale.is_compact() else 150
 	var heading_text := "Sua aventura começa aqui"
 	match _mode:
 		"login": heading_text = "Entre na sua conta"
@@ -157,7 +157,7 @@ func _build_social(column: VBoxContainer) -> void:
 		var btn := _add_button(column, label, _social.bind(pid), provider.bg, provider.ink)
 		btn.disabled = not ready
 		btn.tooltip_text = "Requer configuração oficial no Supabase GAME" if pid != "steam" else "Steam exige integração de identidade específica"
-	var hint := PlayerUI.label("Login social depende da ativação oficial dos provedores.", 11, MUTE)
+	var hint := PlayerUI.label("Logins sociais indisponíveis." if UIScale.logical_size().x < 760 else "Login social depende da ativação oficial dos provedores.", 10 if UIScale.logical_size().x < 760 else 11, MUTE)
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	column.add_child(hint)
 
@@ -204,7 +204,7 @@ func _add_button(parent: VBoxContainer, label: String, action: Callable, bg: Col
 	var btn := Button.new()
 	btn.text = label
 	btn.focus_mode = Control.FOCUS_ALL
-	btn.custom_minimum_size.y = 31 if UIScale.is_compact() else 49
+	btn.custom_minimum_size.y = (28 if UIScale.logical_size().x < 760 else 31) if UIScale.is_compact() else 49
 	btn.add_theme_font_size_override("font_size", 13 if UIScale.is_compact() else 17)
 	for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
 		var plate := StyleBoxFlat.new()

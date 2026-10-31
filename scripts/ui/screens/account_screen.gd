@@ -9,8 +9,6 @@ const WHITE := Color("#fff8ef")
 const MUTED := Color("#d7bfa4")
 const PROVIDERS := [
 	{"id":"google","name":"Google","bg":Color("#f8f9fa"),"ink":Color("#22252c"),"icon":"res://assets/auth/google.svg"},
-	{"id":"apple","name":"Apple","bg":Color("#17181c"),"ink":Color.WHITE,"icon":"res://assets/auth/apple.svg"},
-	{"id":"steam","name":"Steam","bg":Color("#144e79"),"ink":Color.WHITE,"icon":"res://assets/auth/steam.svg"},
 	{"id":"discord","name":"Discord","bg":Color("#4f48e8"),"ink":Color.WHITE,"icon":"res://assets/auth/discord.svg"}
 ]
 var _mode := "choose"
@@ -160,7 +158,7 @@ func _wood_frame() -> StyleBoxFlat:
 func _build_social(column: VBoxContainer) -> void:
 	for entry: Dictionary in PROVIDERS:
 		var provider := str(entry.id)
-		var available := provider != "steam" and services.session.social_available(provider)
+		var available := services.session.social_available(provider)
 		var button := _add_button(column, "Continuar com " + str(entry.name), _social.bind(provider), entry.bg, entry.ink)
 		button.name = "Provider_" + provider
 		button.disabled = not available
@@ -180,9 +178,14 @@ func _build_social(column: VBoxContainer) -> void:
 			icon.offset_top = -12
 			icon.offset_right = 36
 			icon.offset_bottom = 12
-	var notice := PlayerUI.label("Logins sociais indisponíveis no momento." if not services.session.social_available("google") and not services.session.social_available("apple") and not services.session.social_available("discord") else "Alguns provedores estão indisponíveis.", 10 if UIScale.is_compact() else 12, MUTED)
-	notice.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	column.add_child(notice)
+	var available_count := 0
+	for name: String in ["google", "discord"]:
+		if services.session.social_available(name):
+			available_count += 1
+	if available_count < 2:
+		var notice := PlayerUI.label("Aguardando conexão GAME..." if available_count == 0 else "Um provedor está indisponível.", 10 if UIScale.is_compact() else 12, MUTED)
+		notice.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		column.add_child(notice)
 
 
 func _add_divider(column: VBoxContainer) -> void:

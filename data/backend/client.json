@@ -3,7 +3,7 @@
   "url": "https://shuzporktifgiotvnpbz.supabase.co",
   "publishable_key": "sb_publishable_ZrugXVdGCXztHbMZiIX8Mw_K6Bg-uhW",
   "configuration_status": "connected_to_game_project",
-  "persist_session": false,
+  "persist_session": true,
   "connections": {
     "game": {
       "comment": "Autenticacao GAME, backend de jogadores e Duelo. URL e chave nos campos raiz."

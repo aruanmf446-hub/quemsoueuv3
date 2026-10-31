@@ -4,6 +4,9 @@ const SAVE_PATH := "user://desert_campaign_v1.cfg"
 const TEMP_PATH := "user://desert_campaign_v1.cfg.tmp"
 const VERSION := 1
 const LAST_UPDATED_PHASE := 9
+## Backup local Web contra falhas de sincronizacao do user:// no navegador.
+## Não valida recompensas/achievements no GAME. Storage exclusivo da origem.
+const WEB_BACKUP := "qse-v3:desert:campaign:v1"
 
 static func completed_orders() -> Array[int]:
 	var result: Array[int] = []
@@ -31,14 +34,30 @@ static func complete(order: int) -> Error:
 	if result != OK: return result
 	result = DirAccess.rename_absolute(ProjectSettings.globalize_path(TEMP_PATH),ProjectSettings.globalize_path(SAVE_PATH))
 	if result != OK: DirAccess.remove_absolute(ProjectSettings.globalize_path(TEMP_PATH))
+	if result == OK:
+		_write_web_backup(order)
 	return result
 
+
+static func _write_web_backup(order: int) -> void:
+	if not OS.has_feature("web"): return
+	JavaScriptBridge.eval("(function(){try{var k=" + JSON.stringify(WEB_BACKUP) + ";var n=Number(localStorage.getItem(k)||0);localStorage.setItem(k,String(Math.max(n," + str(order) + ")));}catch(e){}})()")
+
+
 static func _highest_completed() -> int:
+	var backup := _read_web_backup()
 	var config := ConfigFile.new()
-	if config.load(SAVE_PATH) != OK: return 0
-	if not config.has_section_key("campaign","version") or not config.has_section_key("campaign","highest_completed"): return 0
+	if config.load(SAVE_PATH) != OK: return backup
+	if not config.has_section_key("campaign","version") or not config.has_section_key("campaign","highest_completed"): return backup
 	var version: Variant = config.get_value("campaign","version")
 	var highest: Variant = config.get_value("campaign","highest_completed")
-	if typeof(version) != TYPE_INT or version != VERSION: return 0
-	if typeof(highest) != TYPE_INT or highest < 0 or highest > LAST_UPDATED_PHASE: return 0
-	return highest
+	if typeof(version) != TYPE_INT or version != VERSION: return backup
+	if typeof(highest) != TYPE_INT or highest < 0 or highest > LAST_UPDATED_PHASE: return backup
+	return maxi(highest, backup)
+
+
+static func _read_web_backup() -> int:
+	if not OS.has_feature("web"): return 0
+	var value: Variant = JavaScriptBridge.eval("(function(){try{return Number(localStorage.getItem(" + JSON.stringify(WEB_BACKUP) + ")||0);}catch(e){return 0;}})()")
+	if value == null or not (value is float or value is int): return 0
+	return clampi(int(value), 0, LAST_UPDATED_PHASE)

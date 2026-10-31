@@ -10,11 +10,15 @@ var needs_password_reset := false
 var _refresh_token := ""
 var _expires_at := 0.0
 var _refreshing := false
+var _persist_web := false
+const WEB_REFRESH_KEY := "qse-v3:game:refresh"
 
 
 func _ready() -> void:
 	if OS.get_cmdline_args().has("--script"): return
-	# Nenhum cookie, arquivo ou armazenamento persistente para o JWT do jogador.
+	# Web: restore using a rotating GAME refresh token scoped to the Pages origin.
+	# Native builds stay in-memory until a platform keystore is integrated.
+	_persist_web = OS.has_feature("web") and bool(PlayerContracts.read_json("res://data/backend/client.json").get("persist_session", false))
 	load_providers.call_deferred()
 	_restore_web_redirect.call_deferred()
 
@@ -150,6 +154,7 @@ func _restore_web_redirect() -> void:
 	# imediatamente e valida identidade no endpoint GAME antes de aceitar a sessao.
 	var json: Variant = JavaScriptBridge.eval("(function(){var h=new URLSearchParams(window.location.hash.slice(1));if(!h.has('access_token'))return '';var o={access_token:h.get('access_token'),refresh_token:h.get('refresh_token'),expires_in:Number(h.get('expires_in')||3600),type:h.get('type')||''};history.replaceState({},document.title,window.location.pathname+window.location.search);return JSON.stringify(o);})()")
 	if json == null or str(json).is_empty():
+		await _restore_saved_web_session()
 		return
 	var payload: Variant = JSON.parse_string(str(json))
 	if not payload is Dictionary or str(payload.get("access_token", "")).is_empty():
@@ -162,6 +167,34 @@ func _restore_web_redirect() -> void:
 	_accept(payload)
 
 
+func _store_web_refresh() -> void:
+	if not _persist_web or _refresh_token.is_empty():
+		return
+	JavaScriptBridge.eval("(function(){try{localStorage.setItem(" + JSON.stringify(WEB_REFRESH_KEY) + "," + JSON.stringify(_refresh_token) + ");return true;}catch(e){return false;}})()")
+
+
+func _clear_web_refresh() -> void:
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("(function(){try{localStorage.removeItem(" + JSON.stringify(WEB_REFRESH_KEY) + ");}catch(e){}})()")
+
+
+func _restore_saved_web_session() -> void:
+	if not _persist_web or authenticated():
+		return
+	var script := "(function(){try{return localStorage.getItem(" + JSON.stringify(WEB_REFRESH_KEY) + ")||'';}catch(e){return '';}})()"
+	var token := str(JavaScriptBridge.eval(script))
+	if token.is_empty():
+		return
+	var result := await client.request("/auth/v1/token?grant_type=refresh_token", HTTPClient.METHOD_POST, {"refresh_token": token}, false)
+	token = ""
+	if result.ok:
+		var accepted := _accept(result.data)
+		if accepted.ok:
+			return
+	if result.code not in ["network", "rate_limit", "session_changed"]:
+		_clear_web_refresh()
+
+
 func _accept(data: Variant) -> Dictionary:
 	if not data is Dictionary or not data.get("user") is Dictionary or str(data.get("access_token", "")).is_empty():
 		return ServiceResult.failure("invalid_contract")
@@ -172,6 +205,7 @@ func _accept(data: Variant) -> Dictionary:
 	client.set_session(str(data.access_token))
 	user = incoming
 	_refresh_token = str(data.get("refresh_token", ""))
+	_store_web_refresh()
 	_expires_at = Time.get_unix_time_from_system() + maxf(float(data.get("expires_in", 3600)) - 90.0, 1.0)
 	# Renovar JWT nao limpa perfil/inventario/amizades/duelo como nova conta.
 	if old_id != str(user.id):
@@ -202,6 +236,7 @@ func _refresh() -> void:
 
 
 func _clear() -> void:
+	_clear_web_refresh()
 	client.set_session("")
 	user.clear()
 	_refresh_token = ""

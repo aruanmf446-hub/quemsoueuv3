@@ -242,6 +242,8 @@ func _build_sidebar() -> void:
 	chat.setup(overlay_parent.get("services") as PlayerServices)
 	chat.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_side.add_child(chat)
+	# Bots da partida local não conversam: não reservar uma coluna vazia.
+	chat.visible = not duel.is_local()
 	var private_panel := PanelContainer.new()
 	private_panel.name = "PrivatePanel"
 	private_panel.add_theme_stylebox_override("panel",Style.panel(6))
@@ -590,13 +592,18 @@ func _render_hand() -> void:
 				if entries[index].get("lost",false): back.modulate = Color("#555967")
 				hidden.add_child(back)
 			grid.add_child(hidden)
+func _utility_width(width: float) -> float:
+	if duel.is_local():
+		return 164.0 if width >= 760 else 150.0
+	return 186.0 if width >= 760 else 166.0
+
 func _layout() -> void:
 	if not _built or size.x <= 0 or size.y <= 0: return
 	var factor := clampf(size.y/440.0,1,1.8)
 	_canvas.scale = Vector2.ONE * factor
 	_canvas.size = size/factor
 	var width := _canvas.size.x
-	var side_width := 186.0 if width >= 760 else 166.0
+	var side_width := _utility_width(width)
 	_main.position = Vector2.ZERO
 	_main.size = Vector2(width-side_width-10,_canvas.size.y)
 	_side.position = Vector2(width-side_width,0)
@@ -612,7 +619,7 @@ func _fit_cards() -> void:
 	var columns := 3 if count <= 9 else ceili(sqrt(count*1.2))
 	_grid.columns = mini(columns,count)
 	var rows := ceili(float(count)/_grid.columns)
-	var side_width := 186.0 if _canvas.size.x >= 760 else 166.0
+	var side_width := _utility_width(_canvas.size.x)
 	var main_width := _canvas.size.x-side_width-10
 	var instruction_row := _board_content.get_child(0) as Control
 	# Folgas reais do tabuleiro (padding da moldura e espaço entre cartas), não constantes soltas.

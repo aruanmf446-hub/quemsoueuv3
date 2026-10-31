@@ -267,6 +267,14 @@ func _launch(phase_id: String, path: String) -> void:
 			order = candidate
 			break
 	if order < 1: return
+	# Sincroniza o inicio da fase no GAME (conta autenticada). A conclusao
+	# local não substitui a prova antifraude exigida pelo backend.
+	var cloud_start_ok := false
+	if services.session.authenticated():
+		var started: Dictionary = await services.progression.campaign_command({"type": "start_phase", "phase_id": phase_id})
+		cloud_start_ok = started.ok
+		if not cloud_start_ok:
+			push_warning("Fase iniciada localmente; checkpoint GAME indisponível: " + str(started.code))
 	var confirmed: Array = services.progression.data.get("completed_phase_ids",[]) if services.progression.state == "success" else []
 	if not LocalCampaign.is_unlocked(order) and order > _confirmed_unlocked(confirmed): return
 	var menu := get_tree().current_scene as Control

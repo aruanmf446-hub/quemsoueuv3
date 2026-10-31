@@ -68,3 +68,54 @@ func equip(character_id: String) -> Dictionary:
 	if response.get("status") not in ["applied", "noop"]:
 		return ServiceResult.failure(str(response.get("code", "request_failed")))
 	return ServiceResult.success(data)
+
+
+## O servidor GAME é a autoridade. Não aceita conclusões sem evidence_id válido.
+## Comandos de começo/checkpoint usam o mesmo snapshot/revision do inventário.
+var _campaign_busy := false
+
+func campaign_command(operation: Dictionary) -> Dictionary:
+	if not session.authenticated():
+		return ServiceResult.failure("not_authenticated", "unauthorized")
+	while _campaign_busy:
+		await get_tree().process_frame
+	_campaign_busy = true
+	var result := await _campaign_command_impl(operation)
+	_campaign_busy = false
+	return result
+
+
+func _campaign_command_impl(operation: Dictionary) -> Dictionary:
+	if state != "success":
+		var loaded := await refresh()
+		if not loaded.ok:
+			return loaded
+	var request := {
+		"protocol_version": 2,
+		"rules_version": data.rules_version,
+		"request_id": PlayerContracts.uuid(),
+		"expected_revision": data.revision,
+		"operation": operation
+	}
+	var response := await client.call_rpc("qse_progression_command", {"p_request": request})
+	if not response.ok:
+		return response
+	var value: Variant = response.data
+	if not value is Dictionary or value.get("request_id") != request.request_id:
+		return ServiceResult.failure("invalid_contract")
+	if value.get("protocol_version") != 2 or value.get("rules_version") != request.rules_version:
+		return ServiceResult.failure("invalid_contract")
+	if value.get("status") not in ["applied", "noop", "conflict", "rejected"] or not value.has("code"):
+		return ServiceResult.failure("invalid_contract")
+	if not PlayerContracts.valid_snapshot(value.get("snapshot"), str(session.user.get("id", ""))):
+		return ServiceResult.failure("invalid_contract")
+	if int(value.snapshot.revision) >= int(data.revision):
+		data = value.snapshot
+		state = "success"
+		fetched_at = Time.get_ticks_msec() / 1000.0
+		changed.emit()
+	if value.status in ["applied", "noop"]:
+		return ServiceResult.success(data)
+	if value.status == "conflict":
+		await refresh()
+	return ServiceResult.failure(str(value.get("code", "request_failed")))

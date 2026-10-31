@@ -66,6 +66,7 @@ func _ready() -> void:
 	_world.name = "StreamedCity"
 	add_child(_world)
 	_build_player()
+	_restore_game_checkpoint()
 	_build_goal()
 	_stream_world(_player.position.x,true)
 	_build_camera()
@@ -661,8 +662,10 @@ func _check_checkpoints() -> void:
 	_checkpoint = _vec3(points[next].pos)
 	_snapshot = {"defeated":_defeated_ids.duplicate(),"collected":_collected_ids.duplicate(),"attack":_player.attack_charges,"defense":_player.defense_charges}
 	_sfx.play("checkpoint")
-	_hud.notify("Checkpoint %d de %d salvo" % [next+1,points.size()])
+	_hud.notify("Checkpoint %d de %d salvo neste dispositivo" % [next+1,points.size()])
 	get_tree().call_group("campaign_checkpoints","refresh_lit",_checkpoint_index)
+	if PlayerServices.current != null and PlayerServices.current.session.authenticated():
+		_sync_game_checkpoint(_checkpoint_index)
 func _respawn_at_checkpoint() -> void:
 	if _checkpoint_index < 0:
 		_restart_level()
@@ -781,3 +784,56 @@ func _exit_tree() -> void:
 			if sibling is PrototypeReturnOverlay:
 				sibling.show()
 				sibling.process_mode = Node.PROCESS_MODE_INHERIT
+
+
+## Apenas sincroniza checkpoints. A API não aceita a conclusão sem prova assinada.
+func _sync_game_checkpoint(index: int) -> void:
+	if PlayerServices.current == null:
+		return
+	var owner := PlayerServices.current
+	if not owner.session.authenticated():
+		return
+	var ids: Array = PlayerContracts.read_json(PlayerContracts.RULES_PATH).get("phases", []) 
+	if _order < 1 or _order > ids.size():
+		return
+	var checkpoints: Array = ids[_order - 1].get("checkpoint_ids", [])
+	if index < 0 or index >= checkpoints.size():
+		return
+	var phase_id := str(ids[_order - 1].get("id", ""))
+	var result: Dictionary = await owner.progression.campaign_command({
+		"type": "record_checkpoint",
+		"phase_id": phase_id,
+		"checkpoint_id": str(checkpoints[index])
+	})
+	if is_inside_tree() and is_instance_valid(_hud):
+		if result.ok:
+			_hud.notify("Checkpoint sincronizado com sua conta")
+		else:
+			_hud.notify("Checkpoint local • sincronização indisponível", true)
+
+
+func _restore_game_checkpoint() -> void:
+	if PlayerServices.current == null or not PlayerServices.current.session.authenticated():
+		return
+	var progress := PlayerServices.current.progression
+	if progress.state != "success":
+		return
+	var data: Dictionary = progress.data
+	var expected := "desert_phase_%02d" % _order
+	if str(data.get("active_phase_id", "")) != expected:
+		return
+	var checkpoint: Variant = data.get("checkpoint")
+	if not checkpoint is Dictionary or str(checkpoint.get("phase_id", "")) != expected:
+		return
+	var ids: Array = PlayerContracts.read_json(PlayerContracts.RULES_PATH).get("phases", [])
+	if _order < 1 or _order > ids.size():
+		return
+	var cp_ids: Array = ids[_order - 1].get("checkpoint_ids", [])
+	var index := cp_ids.find(str(checkpoint.get("checkpoint_id", "")))
+	var points: Array = _phase.get("checkpoints", [])
+	if index < 0 or index >= points.size():
+		return
+	_checkpoint_index = index
+	_checkpoint = _vec3(points[index].pos)
+	_snapshot = {"defeated": {}, "collected": {}, "attack": 0, "defense": 0}
+	_player.position = _checkpoint + Vector3.UP * 0.05

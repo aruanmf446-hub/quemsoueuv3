@@ -34,14 +34,18 @@ static func complete(order: int) -> Error:
 	if result != OK: return result
 	result = DirAccess.rename_absolute(ProjectSettings.globalize_path(TEMP_PATH),ProjectSettings.globalize_path(SAVE_PATH))
 	if result != OK: DirAccess.remove_absolute(ProjectSettings.globalize_path(TEMP_PATH))
-	if result == OK:
-		_write_web_backup(order)
+	# O navegador pode falhar ao persistir user:// (IndexedDB/rename).
+	# Salva uma cópia simples na própria origem, sem conceder recompensas GAME.
+	var backup_ok := _write_web_backup(order)
+	if result != OK and backup_ok:
+		return OK
 	return result
 
 
-static func _write_web_backup(order: int) -> void:
-	if not OS.has_feature("web"): return
-	JavaScriptBridge.eval("(function(){try{var k=" + JSON.stringify(WEB_BACKUP) + ";var n=Number(localStorage.getItem(k)||0);localStorage.setItem(k,String(Math.max(n," + str(order) + ")));}catch(e){}})()")
+static func _write_web_backup(order: int) -> bool:
+	if not OS.has_feature("web"): return false
+	var success: Variant = JavaScriptBridge.eval("(function(){try{var k=" + JSON.stringify(WEB_BACKUP) + ";var n=Number(localStorage.getItem(k)||0);localStorage.setItem(k,String(Math.max(n," + str(order) + ")));return true;}catch(e){return false;}})()")
+	return success == true
 
 
 static func _highest_completed() -> int:

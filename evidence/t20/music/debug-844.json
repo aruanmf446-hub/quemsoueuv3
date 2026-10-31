@@ -1,0 +1,297 @@
+{
+ "url": "http://127.0.0.1:8801/",
+ "steps": 1654,
+ "errors": [
+  {
+   "console": "ERROR: No interface 'QSE_PUBLIC_CONFIG' registered."
+  },
+  {
+   "console": "   at: get_interface (platform/web/javascript_bridge_singleton.cpp:305)"
+  },
+  {
+   "console": "   GDScript backtrace (most recent call first):"
+  },
+  {
+   "console": "       [0] _ready (res://scripts/services/supabase_client.gd:48)"
+  },
+  {
+   "console": "       [1] _ready (res://scripts/services/player_services.gd:36)"
+  },
+  {
+   "console": "ERROR: No interface 'QSE_PUBLIC_CONFIG' registered."
+  },
+  {
+   "console": "   at: get_interface (platform/web/javascript_bridge_singleton.cpp:305)"
+  },
+  {
+   "console": "   GDScript backtrace (most recent call first):"
+  },
+  {
+   "console": "       [0] _ready (res://scripts/services/supabase_client.gd:48)"
+  },
+  {
+   "console": "       [1] _ready (res://scripts/services/player_services.gd:39)"
+  },
+  {
+   "console": "ERROR: No interface 'QSE_PUBLIC_CONFIG' registered."
+  },
+  {
+   "console": "   at: get_interface (platform/web/javascript_bridge_singleton.cpp:305)"
+  },
+  {
+   "console": "   GDScript backtrace (most recent call first):"
+  },
+  {
+   "console": "       [0] _ready (res://scripts/services/supabase_client.gd:48)"
+  },
+  {
+   "console": "       [1] _ready (res://scripts/services/player_services.gd:42)"
+  },
+  {
+   "console": "SCRIPT ERROR: Invalid operands 'int' and 'bool' in operator '=='."
+  },
+  {
+   "console": "   at: _check_web_invite (res://scripts/menu/main_menu.gd:109)"
+  },
+  {
+   "console": "   GDScript backtrace (most recent call first):"
+  },
+  {
+   "console": "       [0] _check_web_invite (res://scripts/menu/main_menu.gd:109)"
+  },
+  {
+   "console": "ERROR: Can't play finished Tween, use stop() first to reset its state."
+  },
+  {
+   "console": "   at: play (scene/animation/tween.cpp:206)"
+  },
+  {
+   "console": "   GDScript backtrace (most recent call first):"
+  },
+  {
+   "console": "       [0] resume (res://scripts/audio/menu_music.gd:445)"
+  },
+  {
+   "console": "       [1] _t20_command (res://scripts/diagnostics/web_perf.gd:34)"
+  },
+  {
+   "console": "ERROR: Tween invalid. Either finished or created outside scene tree."
+  },
+  {
+   "console": "   at: play (scene/animation/tween.cpp:205)"
+  },
+  {
+   "console": "   GDScript backtrace (most recent call first):"
+  },
+  {
+   "console": "       [0] resume (res://scripts/audio/menu_music.gd:445)"
+  },
+  {
+   "console": "       [1] _t20_command (res://scripts/diagnostics/web_perf.gd:34)"
+  }
+ ],
+ "crash": null,
+ "log": [
+  "preview:4",
+  "preview:0",
+  "next",
+  "next",
+  "prev",
+  "back",
+  "prev",
+  "preview:0",
+  "preview:1",
+  "preview:2",
+  "next",
+  "next",
+  "prev",
+  "pause",
+  "resume",
+  "back",
+  "open:settings",
+  "back",
+  "open:music",
+  "preview:3",
+  "preview:4",
+  "preview:3",
+  "next",
+  "next",
+  "prev",
+  "preview:1",
+  "open:music",
+  "preview:0",
+  "preview:1",
+  "preview:2",
+  "preview:1",
+  "next",
+  "prev",
+  "pause",
+  "resume",
+  "next",
+  "preview:0",
+  "back",
+  "back",
+  "preview:3",
+  "preview:4",
+  "preview:0",
+  "next",
+  "next",
+  "prev",
+  "back",
+  "preview:4",
+  "open:settings",
+  "next",
+  "back",
+  "preview:1",
+  "next",
+  "next",
+  "pause",
+  "preview:1",
+  "back",
+  "open:settings",
+  "back",
+  "next",
+  "preview:3",
+  "preview:4",
+  "preview:0",
+  "next",
+  "next",
+  "prev",
+  "back",
+  "open:music",
+  "preview:0",
+  "preview:2",
+  "preview:2",
+  "preview:4",
+  "back",
+  "prev",
+  "next",
+  "resume",
+  "back",
+  "open:settings",
+  "next",
+  "open:music",
+  "preview:3",
+  "open:music",
+  "next",
+  "next",
+  "next",
+  "prev",
+  "back",
+  "prev",
+  "preview:3",
+  "preview:1",
+  "preview:2",
+  "back",
+  "next",
+  "prev",
+  "pause",
+  "resume",
+  "prev",
+  "open:settings",
+  "back",
+  "open:music",
+  "preview:3",
+  "next",
+  "open:settings",
+  "preview:1",
+  "open:music",
+  "prev",
+  "back",
+  "preview:1",
+  "back",
+  "preview:1",
+  "preview:2",
+  "next",
+  "next",
+  "prev",
+  "pause",
+  "resume",
+  "back",
+  "open:settings",
+  "back",
+  "open:music",
+  "resume",
+  "open:music",
+  "preview:0",
+  "next",
+  "next",
+  "preview:1",
+  "back",
+  "open:music",
+  "preview:0",
+  "next",
+  "back",
+  "preview:4",
+  "next",
+  "prev",
+  "pause",
+  "resume",
+  "back",
+  "open:settings",
+  "preview:3",
+  "open:music",
+  "preview:3",
+  "preview:0",
+  "preview:4",
+  "resume",
+  "next",
+  "prev",
+  "back",
+  "open:music",
+  "preview:0",
+  "preview:1",
+  "preview:2",
+  "preview:1",
+  "next",
+  "prev",
+  "pause",
+  "back",
+  "preview:1",
+  "open:settings",
+  "back",
+  "preview:1",
+  "preview:3",
+  "preview:4",
+  "preview:0",
+  "next",
+  "next",
+  "prev",
+  "back",
+  "next",
+  "preview:0",
+  "preview:1",
+  "preview:2",
+  "preview:1",
+  "next",
+  "prev",
+  "preview:0",
+  "next",
+  "back",
+  "open:settings",
+  "back",
+  "open:music",
+  "next",
+  "preview:4",
+  "preview:0",
+  "next",
+  "next",
+  "preview:4",
+  "back",
+  "open:music",
+  "preview:0",
+  "preview:1",
+  "preview:2",
+  "preview:1",
+  "preview:1",
+  "prev",
+  "pause",
+  "resume",
+  "back",
+  "open:settings",
+  "back",
+  "resume",
+  "preview:3"
+ ],
+ "hooked": true
+}

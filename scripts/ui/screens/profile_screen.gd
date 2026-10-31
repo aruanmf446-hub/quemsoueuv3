@@ -6,6 +6,7 @@ func _ready() -> void:
 	heading.text = tr("Meu perfil")
 	services.profile.changed.connect(_refresh_visible)
 	services.inventory.changed.connect(_refresh_visible)
+	services.session.changed.connect(_refresh_visible)
 
 
 func _refresh_visible() -> void:
@@ -44,6 +45,10 @@ func render() -> void:
 	PlayerUI.style_button(save, true)
 	info.add_child(save)
 	info.add_child(PlayerUI.button("Atualizar", func() -> void: services.profile.refresh()))
+	info.add_child(PlayerUI.label("Conta: " + str(services.session.user.get("email", "Conectada")), 14, PlayerUI.MUTED))
+	var logout := PlayerUI.button("Desconectar / trocar conta", _disconnect)
+	logout.name = "DisconnectAccount"
+	info.add_child(logout)
 	var stats: Dictionary = data.get("statistics", {})
 	info.add_child(PlayerUI.label("Estatísticas", 25, PlayerUI.GOLD))
 	if stats.is_empty():
@@ -59,6 +64,19 @@ func render() -> void:
 		progress.add_child(PlayerUI.label("Deserto · %d de 10 fases concluídas" % snapshot.completed_phase_ids.size()))
 		progress.add_child(PlayerUI.label("Reino do Deserto concluído" if PlayerContracts.ACHIEVEMENT in snapshot.achievement_ids else "Nenhuma conquista registrada."))
 	progress.add_child(PlayerUI.label("Floresta · Mar · Lunar: campanhas futuras"))
+
+
+## Apenas o perfil permite trocar de conta. Nao altera progresso salvo no GAME.
+func _disconnect() -> void:
+	if not services.session.authenticated():
+		return
+	var result: Dictionary = await services.session.sign_out()
+	if not is_inside_tree():
+		return
+	if not result.ok:
+		banner.show_state("error", "Sessão encerrada neste dispositivo; não foi possível confirmar a saída remota.")
+	# Abre escolha Google, Discord ou e-mail. Login não força retorno ao lobby.
+	navigate_requested.emit("account", {})
 
 
 func _save_nickname(value: String) -> void:

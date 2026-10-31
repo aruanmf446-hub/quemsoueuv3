@@ -8,6 +8,9 @@ const CATEGORIES := {"Alternative": "Alternative", "Funk": "Funk", "k-pop": "K-p
 func _ready() -> void:
 	manages_own_scale = false
 	super._ready()
+	var player := _music()
+	if player != null:
+		player.state_changed.connect(_update_preview_buttons)
 	get_viewport().size_changed.connect(func() -> void:
 		if is_visible_in_tree():
 			render())
@@ -158,9 +161,45 @@ func _row(music: Node, track: Dictionary, k: float) -> Button:
 	category.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	category.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	line.add_child(category)
+	var preview := Button.new()
+	preview.name = "Preview_" + id
+	preview.custom_minimum_size = Vector2(58, 42) * k
+	preview.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	preview.mouse_filter = Control.MOUSE_FILTER_STOP
+	preview.focus_mode = Control.FOCUS_ALL
+	preview.disabled = not music.can_preview(id)
+	preview.text = "Ⅱ" if music.is_previewing(id) else "▶"
+	preview.tooltip_text = "Pausar faixa" if music.is_previewing(id) else "Ouvir faixa"
+	preview.pressed.connect(_preview.bind(id))
+	PlayerUI.style_button(preview, false)
+	line.add_child(preview)
 	row.toggled.connect(func(value: bool) -> void: _set_selected(value, id))
 	PlayerUI.fluid(row)
 	return row
+
+
+func _preview(id: String) -> void:
+	var player := _music()
+	if player == null or not player.toggle_preview(id):
+		banner.show_state("error", "Esta faixa não está disponível para reprodução.")
+
+
+func _update_preview_buttons() -> void:
+	if not is_visible_in_tree():
+		return
+	var player := _music()
+	var list := body.get_node_or_null("TrackList")
+	if player == null or list == null:
+		return
+	for row in list.get_children():
+		if row is HBoxContainer and str(row.name).begins_with("Genre_"):
+			continue
+		var button := row.find_child("Preview_*", true, false) as Button
+		if button != null:
+			var id := str(button.name).trim_prefix("Preview_")
+			button.text = "Ⅱ" if player.is_previewing(id) else "▶"
+			button.tooltip_text = "Pausar faixa" if player.is_previewing(id) else "Ouvir faixa"
+			button.disabled = not player.can_preview(id)
 
 
 func _set_selected(pressed: bool, id: String) -> void:

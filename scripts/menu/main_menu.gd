@@ -8,6 +8,8 @@ var _mode_label: Label
 var _news_button: Button
 var _web_invite_intent := WebInviteIntent.new()
 var _web_invite_navigating := false
+var _initial_login_pending := true
+var _startup_cover: TextureRect
 
 
 func _ready() -> void:
@@ -58,10 +60,44 @@ func _ready() -> void:
 	add_child(_news_button)
 	resized.connect(_layout_news_button)
 	_layout_news_button.call_deferred()
-	# Primeira tela interativa: login cinematografico, antes de revelar o lobby.
-	# O visitante pode escolher explicitamente jogar sem conta.
-	_navigation.open_initial("account", {"startup": true})
+	# Nao mostrar o login quando um refresh token valido ja existe.
+	# A arte cobre o lobby durante a validacao (sem permitir cliques).
 	_check_web_invite.call_deferred()
+	if OS.get_cmdline_args().has("--script"):
+		# Smoke headless nao chama Auth remoto; cobre o caminho de visitante.
+		_initial_login_pending = false
+		_navigation.open_initial("account", {"startup": true})
+	else:
+		_show_startup_cover()
+		_services.session.initial_restore_finished.connect(_initial_auth_resolved)
+		if _services.session.initial_restore_complete:
+			_initial_auth_resolved.call_deferred()
+
+
+## A cena de login deixa de ser obrigatoria quando uma sessao valida ja foi
+## restaurada. O overlay impede que o lobby receba toques antes da verificacao.
+func _show_startup_cover() -> void:
+	_startup_cover = TextureRect.new()
+	_startup_cover.name = "StartupSessionCover"
+	_startup_cover.texture = preload("res://assets/auth/login_cinematic_bg.webp")
+	_startup_cover.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_startup_cover.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_startup_cover.mouse_filter = Control.MOUSE_FILTER_STOP
+	_startup_cover.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_startup_cover)
+	move_child(_startup_cover, get_child_count() - 1)
+
+
+func _initial_auth_resolved() -> void:
+	if not _initial_login_pending or not is_inside_tree():
+		return
+	_initial_login_pending = false
+	if not _services.session.authenticated() or _services.session.needs_password_reset:
+		_navigation.open_initial("account", {"startup": true})
+	if is_instance_valid(_startup_cover):
+		_startup_cover.queue_free()
+	_startup_cover = null
+	_resume_web_invite()
 
 
 ## A URL de convite é detectada no lobby, sem esperar o jogador tocar em Duelo.
@@ -75,6 +111,8 @@ func _check_web_invite() -> void:
 
 
 func _auth_redirect_ready() -> void:
+	if _initial_login_pending:
+		return
 	# Um retorno de recovery conclui a senha antes de qualquer convite.
 	if _services.session.needs_password_reset:
 		_open_auth_recovery.call_deferred()
@@ -113,6 +151,8 @@ func _open_auth_recovery() -> void:
 
 
 func _resume_web_invite() -> void:
+	if _initial_login_pending:
+		return
 	if _services.session.needs_password_reset:
 		return
 	if _web_invite_navigating:

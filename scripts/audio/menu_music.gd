@@ -15,6 +15,7 @@ var _hidden := {}
 var _deselected := {}
 var current_id := ""
 var paused := false
+var _preview_id := ""
 var fade_seconds := 0.8
 var _players: Array[AudioStreamPlayer] = []
 var _active := 0
@@ -200,11 +201,13 @@ func _process(delta: float) -> void:
 		for player in _players:
 			var playing_id := str(player.get_meta("track", {}).get("id", ""))
 			var catalog_index := _index(playing_id)
-			if player.playing and (catalog_index < 0 or not _available(tracks[catalog_index])):
+			if player.playing and (catalog_index < 0 or not (_available(tracks[catalog_index]) or (_preview_id == playing_id and can_preview(playing_id)))):
 				player.stop()
 		if not paused:
 			var player := _players[_active]
 			if not player.playing and _retry_in <= 0.0:
+				if _preview_id != "" and not _web_wanted.is_empty():
+					return  # Aguarda o carregamento do MP3 de prévia.
 				_retry_in = 0.5
 				_select(1)
 			elif player.playing and (_fade == null or not _fade.is_running()):
@@ -214,6 +217,7 @@ func _process(delta: float) -> void:
 
 func _leave_menu() -> void:
 	if not _inside: return
+	_preview_id = ""
 	_position = _players[_active].get_playback_position()
 	_inside = false
 	_menu = null
@@ -228,16 +232,19 @@ func _restore() -> void:
 		_select(1)
 
 func next_track() -> void:
+	_preview_id = ""
 	_position = 0.0
 	_select(1)
 
 func previous_track() -> void:
+	_preview_id = ""
 	_position = 0.0
 	_select(-1)
 
 ## Aleatório dentro da seleção do jogador: uma fila embaralhada das faixas marcadas
 ## (sem repetir até tocar todas) e um histórico para o botão "anterior".
 func _select(direction: int) -> void:
+	_preview_id = ""
 	if not _inside: return
 	if direction < 0:
 		while not _history.is_empty():
@@ -309,7 +316,8 @@ func _web_loaded(result: int, code: int, _headers: PackedStringArray, body: Pack
 		_play(wanted.track, float(wanted.position))
 
 func _play(track: Dictionary, position: float = 0.0) -> void:
-	if not _inside or not _available(track): return
+	if not _inside or not (_available(track) or (_preview_id == str(track.get("id", "")) and can_preview(str(track.get("id", ""))))):
+		return
 	var stream: AudioStream
 	if _web():
 		if not _web_cache.has(str(track.id)):
@@ -344,6 +352,35 @@ func _play(track: Dictionary, position: float = 0.0) -> void:
 	if paused: _fade.pause()
 	track_changed.emit(current_track())
 	state_changed.emit()
+
+## Play/Pause individual não altera a checkbox nem a seleção persistida.
+## O mesmo AudioStreamPlayer do menu toca a faixa (não cria um segundo áudio).
+func can_preview(id: String) -> bool:
+	var index := _index(id)
+	return index >= 0 and (licensed(tracks[index]) or local_test_available(tracks[index]))
+
+
+func is_previewing(id: String) -> bool:
+	return _preview_id == id and not paused and current_id == id
+
+
+func toggle_preview(id: String) -> bool:
+	if not _inside or not can_preview(id):
+		return false
+	if _preview_id == id:
+		if paused:
+			resume()
+		else:
+			pause()
+		return true
+	_preview_id = id
+	paused = false
+	_position = 0.0
+	_stop()
+	_play(tracks[_index(id)])
+	state_changed.emit()
+	return true
+
 
 ## Posição e duração da faixa atual, para a barra de progresso do mini player.
 func playback_position() -> float:

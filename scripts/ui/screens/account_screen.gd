@@ -131,7 +131,6 @@ func render() -> void:
 		"connected":
 			column.add_child(PlayerUI.label(str(services.session.user.get("email", "Conta verificada")), 15, MUTED))
 			_add_button(column, "Voltar ao jogo", func() -> void: back_requested.emit(), Color("#945120"), WHITE, true)
-			_add_button(column, "Sair da conta", _logout, Color("#242832"), WHITE)
 	_feedback = PlayerUI.label(_notice, 11 if UIScale.is_compact() else 14, Color("#ffc2b0") if _notice_error else Color("#f8dea8"))
 	_feedback.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_feedback.visible = not _notice.is_empty()
@@ -415,15 +414,3 @@ func _social(provider: String) -> void:
 		_notice = ServiceResult.message(result)
 		_notice_error = true
 		render()
-
-
-func _logout() -> void:
-	if _working:
-		return
-	_busy(true)
-	var result := await services.session.sign_out()
-	_busy(false)
-	_mode = "choose"
-	_notice = "" if result.ok else ServiceResult.message(result)
-	_notice_error = not result.ok
-	render()

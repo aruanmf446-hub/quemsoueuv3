@@ -3,6 +3,7 @@ extends Node
 
 signal changed
 signal providers_changed
+signal initial_restore_finished
 var client: SupabaseClient
 var user: Dictionary = {}
 var providers := {"google": false, "apple": false, "discord": false}
@@ -11,6 +12,7 @@ var _refresh_token := ""
 var _expires_at := 0.0
 var _refreshing := false
 var _persist_web := false
+var initial_restore_complete := false
 const WEB_REFRESH_KEY := "qse-v3:game:refresh"
 
 
@@ -20,7 +22,15 @@ func _ready() -> void:
 	# Native builds stay in-memory until a platform keystore is integrated.
 	_persist_web = OS.has_feature("web") and bool(PlayerContracts.read_json("res://data/backend/client.json").get("persist_session", false))
 	load_providers.call_deferred()
-	_restore_web_redirect.call_deferred()
+	_initialize_initial_session.call_deferred()
+
+
+## O lobby so decide qual tela mostrar depois de restaurar a sessao GAME.
+func _initialize_initial_session() -> void:
+	if OS.has_feature("web") and client.configured():
+		await _restore_web_redirect()
+	initial_restore_complete = true
+	initial_restore_finished.emit()
 
 
 func authenticated() -> bool:

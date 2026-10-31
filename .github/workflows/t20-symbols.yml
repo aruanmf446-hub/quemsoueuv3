@@ -1,0 +1,52 @@
+name: T20 símbolos do template Web (temporário)
+on:
+  push:
+    branches: [claude/t20-symbols]
+permissions:
+  contents: write
+jobs:
+  symbols:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - name: Produção e código do Godot 4.7.2
+        run: |
+          set -euo pipefail
+          mkdir -p work && cd work
+          curl -fsSL https://aruanmf446-hub.github.io/quemsoueuv3/index.wasm -o prod.wasm
+          git clone -q --depth 1 --branch 4.7.2-stable https://github.com/godotengine/godot.git
+          grep -rn "EM_VERSION\|emscripten" godot/.github/workflows/web_builds.yml | head -10 || true
+          grep -rhoE "EM_VERSION: *[0-9.]+" godot/.github/workflows/ | head -1 | grep -oE "[0-9.]+" > em_version.txt || echo 4.0.11 > em_version.txt
+          cat em_version.txt
+      - name: emsdk
+        run: |
+          set -euo pipefail
+          cd work && git clone -q --depth 1 https://github.com/emscripten-core/emsdk.git
+          ./emsdk/emsdk install $(cat em_version.txt) > /dev/null && ./emsdk/emsdk activate $(cat em_version.txt) > /dev/null
+          pip install scons > /dev/null
+      - name: Compilar template release sem threads, com nomes
+        run: |
+          set -euo pipefail
+          cd work && source emsdk/emsdk_env.sh > /dev/null
+          cd godot
+          scons platform=web target=template_release threads=no production=yes LINKFLAGS="--profiling-funcs" -j4 > ../build.log 2>&1 || (tail -50 ../build.log; exit 1)
+          ls -la bin/
+          unzip -o -q bin/godot.web.template_release.wasm32.nothreads.zip -d ../tpl
+          ls -la ../tpl
+      - name: Nomear a pilha
+        run: |
+          cd work
+          STACK=2601,2238,43240,759,4965,631,23919,23922,65206,18792,21616
+          python3 ../tools/t20/wasm_names.py prod.wasm tpl/godot.wasm $STACK | tee ../evidence-names.txt
+      - name: Gravar
+        if: always()
+        run: |
+          mkdir -p evidence/t20/symbols
+          cp evidence-names.txt work/em_version.txt evidence/t20/symbols/ 2>/dev/null
+          tail -80 work/build.log > evidence/t20/symbols/build-tail.log 2>/dev/null
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A evidence/t20/symbols
+          git commit -m "T20: pilha nomeada" || exit 0
+          git push origin HEAD:claude/t20-symbols

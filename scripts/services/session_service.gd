@@ -3,6 +3,7 @@ extends Node
 
 signal changed
 signal providers_changed
+signal oauth_notice(code: String)
 var client: SupabaseClient
 var user: Dictionary = {}
 var providers := {"google": false, "apple": false, "discord": false}
@@ -130,7 +131,18 @@ func social_authorize(provider: String) -> Dictionary:
 	if destination.is_empty():
 		return ServiceResult.failure("provider_unavailable")
 	var url := client.endpoint + "/auth/v1/authorize?provider=" + provider.uri_encode() + "&redirect_to=" + destination.uri_encode()
-	# A autorizacao acontece no navegador. Nenhum client_secret fica no Godot.
+	if provider == "google":
+		# Google na Web usa Authorization Code + PKCE. O verificador fica
+		# somente no sessionStorage da aba que iniciou a autorizacao.
+		var verifier := OAuthPkce.generate_verifier()
+		var code_challenge := OAuthPkce.challenge(verifier)
+		if verifier.is_empty() or code_challenge.is_empty():
+			return ServiceResult.failure("oauth_unavailable")
+		var save_js := "(function(){try{sessionStorage.setItem(" + JSON.stringify(OAuthPkce.KEY) + "," + JSON.stringify(verifier) + ");return true;}catch(e){return false;}})()"
+		if JavaScriptBridge.eval(save_js) != true:
+			return ServiceResult.failure("oauth_storage_unavailable")
+		url = client.endpoint + OAuthPkce.google_authorize_path(destination, code_challenge)
+	# Nenhuma credencial Google vai para o Godot nem para o GitHub.
 	JavaScriptBridge.eval("window.location.assign(" + JSON.stringify(url) + ")")
 	return ServiceResult.success(null)
 
@@ -146,6 +158,21 @@ func _web_redirect_url() -> String:
 func _restore_web_redirect() -> void:
 	if not OS.has_feature("web") or not client.configured():
 		return
+	# Codigo PKCE ou erro OAuth vem nos parametros de consulta. Elimina da
+	# barra e do historico ANTES de trocar o codigo por tokens.
+	var callback_js := "(function(){var u=new URL(window.location.href);var h=new URLSearchParams(u.hash.slice(1));var code=u.searchParams.get('code')||'';var error=u.searchParams.get('error')||h.get('error')||'';if(!code&&!error)return '';u.searchParams.delete('code');u.searchParams.delete('error');u.searchParams.delete('error_description');if(error)u.hash='';history.replaceState({},document.title,u.pathname+u.search+u.hash);return JSON.stringify({code:code,error:error});})()"
+	var callback_raw: Variant = JavaScriptBridge.eval(callback_js)
+	if callback_raw != null and not str(callback_raw).is_empty():
+		var callback: Variant = JSON.parse_string(str(callback_raw))
+		if callback is Dictionary:
+			if not str(callback.get("error", "")).is_empty():
+				# Nao mostrar descricoes externas nao confiaveis; mensagem local.
+				oauth_notice.emit("oauth_access_denied" if str(callback.error) == "access_denied" else "oauth_exchange_failed")
+				return
+			if not str(callback.get("code", "")).is_empty():
+				await _exchange_google_code(str(callback.code))
+				return
+
 	# Le token do fragmento (retorno do GoTrue), remove-o da barra/historico
 	# imediatamente e valida identidade no endpoint GAME antes de aceitar a sessao.
 	var json: Variant = JavaScriptBridge.eval("(function(){var h=new URLSearchParams(window.location.hash.slice(1));if(!h.has('access_token'))return '';var o={access_token:h.get('access_token'),refresh_token:h.get('refresh_token'),expires_in:Number(h.get('expires_in')||3600),type:h.get('type')||''};history.replaceState({},document.title,window.location.pathname+window.location.search);return JSON.stringify(o);})()")
@@ -160,6 +187,25 @@ func _restore_web_redirect() -> void:
 	payload["user"] = verified.data
 	needs_password_reset = str(payload.get("type", "")) == "recovery"
 	_accept(payload)
+
+
+func _exchange_google_code(auth_code: String) -> void:
+	if not OS.has_feature("web"):
+		return
+	# O callback so e valido na aba que criou o verifier.
+	var js := "(function(){try{var key=" + JSON.stringify(OAuthPkce.KEY) + ";var v=sessionStorage.getItem(key)||'';sessionStorage.removeItem(key);return v;}catch(e){return '';}})()"
+	var code_verifier := str(JavaScriptBridge.eval(js))
+	if code_verifier.is_empty():
+		oauth_notice.emit("oauth_missing_verifier")
+		return
+	var response := await client.request("/auth/v1/token?grant_type=pkce", HTTPClient.METHOD_POST, {"auth_code": auth_code, "code_verifier": code_verifier}, false)
+	code_verifier = ""
+	if not response.ok:
+		oauth_notice.emit("oauth_exchange_failed")
+		return
+	var accepted := _accept(response.data)
+	if not accepted.ok:
+		oauth_notice.emit("oauth_exchange_failed")
 
 
 func _accept(data: Variant) -> Dictionary:

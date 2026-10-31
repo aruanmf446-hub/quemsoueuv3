@@ -53,19 +53,19 @@ cache:INFO: generating system library: sysroot/lib/wasm32-emscripten/thinlto/lib
 system_libs:INFO: compiled 2 inputs in 0.16s
 cache:INFO:  - ok
 cache:INFO: generating system library: sysroot/lib/wasm32-emscripten/thinlto/libc.a... (this will be cached in "/home/runner/work/quemsoueuv3/quemsoueuv3/work/emsdk/upstream/emscripten/cache/sysroot/lib/wasm32-emscripten/thinlto/libc.a" for subsequent builds)
-system_libs:INFO: compiled 1044 inputs in 7.55s
+system_libs:INFO: compiled 1044 inputs in 7.84s
 cache:INFO:  - ok
 cache:INFO: generating system library: sysroot/lib/wasm32-emscripten/thinlto/libdlmalloc.a... (this will be cached in "/home/runner/work/quemsoueuv3/quemsoueuv3/work/emsdk/upstream/emscripten/cache/sysroot/lib/wasm32-emscripten/thinlto/libdlmalloc.a" for subsequent builds)
 system_libs:INFO: compiled 2 inputs in 0.40s
 cache:INFO:  - ok
 cache:INFO: generating system library: sysroot/lib/wasm32-emscripten/thinlto/libcompiler_rt-legacysjlj.a... (this will be cached in "/home/runner/work/quemsoueuv3/quemsoueuv3/work/emsdk/upstream/emscripten/cache/sysroot/lib/wasm32-emscripten/thinlto/libcompiler_rt-legacysjlj.a" for subsequent builds)
-system_libs:INFO: compiled 182 inputs in 1.92s
+system_libs:INFO: compiled 182 inputs in 1.97s
 cache:INFO:  - ok
 cache:INFO: generating system library: sysroot/lib/wasm32-emscripten/thinlto/libc++-noexcept.a... (this will be cached in "/home/runner/work/quemsoueuv3/quemsoueuv3/work/emsdk/upstream/emscripten/cache/sysroot/lib/wasm32-emscripten/thinlto/libc++-noexcept.a" for subsequent builds)
-system_libs:INFO: compiled 56 inputs in 15.48s
+system_libs:INFO: compiled 56 inputs in 15.00s
 cache:INFO:  - ok
 cache:INFO: generating system library: sysroot/lib/wasm32-emscripten/thinlto/libc++abi-noexcept.a... (this will be cached in "/home/runner/work/quemsoueuv3/quemsoueuv3/work/emsdk/upstream/emscripten/cache/sysroot/lib/wasm32-emscripten/thinlto/libc++abi-noexcept.a" for subsequent builds)
-system_libs:INFO: compiled 16 inputs in 1.95s
+system_libs:INFO: compiled 16 inputs in 1.94s
 cache:INFO:  - ok
 cache:INFO: generating system library: sysroot/lib/wasm32-emscripten/thinlto/libsockets.a... (this will be cached in "/home/runner/work/quemsoueuv3/quemsoueuv3/work/emsdk/upstream/emscripten/cache/sysroot/lib/wasm32-emscripten/thinlto/libsockets.a" for subsequent builds)
 system_libs:INFO: compiled 27 inputs in 0.58s
@@ -77,4 +77,4 @@ Creating 'bin/godot.web.template_release.wasm32.nothreads.wrapped.js'
 Install file: "bin/godot.web.template_release.wasm32.nothreads.wrapped.js" as "bin/.web_zip/godot.js"
 [34mArchiving [1mbin/godot.web.template_release.wasm32.nothreads.zip[22;23;24;29m ...[0m
 scons: done building targets.
-[90m[1mINFO:[22;23;24;29m Time elapsed: 00:21:34.72[0m
+[90m[1mINFO:[22;23;24;29m Time elapsed: 00:21:26.94[0m

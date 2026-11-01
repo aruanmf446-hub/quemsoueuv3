@@ -13,6 +13,8 @@ static func failure(code: String, state: String = "error") -> Dictionary:
 static func message(result: Dictionary) -> String:
 	match result.get("code", ""):
 		"not_configured": return "Conexão ainda não configurada. Você está na demonstração local."
+		"backend_pending": return "Publicar decks depende do servidor, que ainda está em preparação. Seu rascunho continua salvo neste aparelho."
+		"invalid_draft", "save_failed": return "Não foi possível salvar o rascunho neste aparelho."
 		"not_authenticated", "session_changed": return "Entre na sua conta para continuar."
 		"network": return "Sem conexão. Tente novamente quando estiver online."
 		"revision_conflict": return "O progresso mudou em outro dispositivo. Atualize e tente novamente."

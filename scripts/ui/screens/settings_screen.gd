@@ -45,7 +45,7 @@ func render() -> void:
 	_rail = PlayerUI.column(_layout)
 	_rail.size_flags_horizontal = Control.SIZE_FILL
 	_tabs.clear()
-	var names := ["Áudio", "Gráficos", "Controles", "Idioma"]
+	var names := ["Meu Perfil", "Áudio", "Gráficos", "Controles", "Idioma"]
 	for i in range(names.size()):
 		var tab := _button(tr(names[i]), _select.bind(i))
 		tab.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -121,10 +121,11 @@ func _show_category() -> void:
 	_scroll.scroll_vertical = 0
 	PlayerUI.clear(_content)
 	match _category:
-		0: _audio()
-		1: _graphics()
-		2: _controls()
-		3: _language()
+		0: _my_profile()
+		1: _audio()
+		2: _graphics()
+		3: _controls()
+		4: _language()
 	_fit_panel.call_deferred()
 	WebPerf.measure("_show_category",perf_started)
 
@@ -142,6 +143,7 @@ func _fit_panel() -> void:
 
 
 const TAB_ICONS := [
+	'<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/>',
 	'<path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/>',
 	'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
 	'<path d="M7 8h10a4 4 0 0 1 4 4v2a3 3 0 0 1-5.4 1.8L14 14h-4l-1.6 1.8A3 3 0 0 1 3 14v-2a4 4 0 0 1 4-4z"/><path d="M7 11v3M5.5 12.5h3"/><circle cx="16" cy="11.5" r="0.6"/><circle cx="18" cy="13.5" r="0.6"/>',
@@ -166,6 +168,93 @@ func _title(title: String) -> void:
 	line.custom_minimum_size = Vector2(56, 3)
 	line.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	_content.add_child(line)
+
+## Meu Perfil: os mesmos serviços do Perfil (nickname, conta, skin, estatísticas, saída).
+func _my_profile() -> void:
+	_title("Meu Perfil")
+	var data := services.profile.data
+	if services.session.authenticated() and services.profile.state != "success":
+		var reload := _button("Carregar perfil", func() -> void:
+			await services.profile.refresh()
+			if is_visible_in_tree() and _category == 0: _show_category())
+		_content.add_child(PlayerUI.label("Perfil ainda não carregado.", 20, MUTED))
+		_content.add_child(reload)
+	var card := PanelContainer.new()
+	card.name = "ProfileCard"
+	card.add_theme_stylebox_override("panel", _row_box())
+	_content.add_child(card)
+	var line := PlayerUI.row(card)
+	line.add_theme_constant_override("separation", 22)
+	var who := PlayerUI.column(line)
+	who.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	who.add_theme_constant_override("separation", 6)
+	var nickname: Variant = data.get("nickname")
+	var shown := str(nickname) if nickname != null and not str(nickname).is_empty() else tr("Sem nickname")
+	if not services.session.authenticated(): shown = tr("Visitante")
+	who.add_child(PlayerUI.label(shown, 28, Color.WHITE))
+	if services.session.authenticated():
+		who.add_child(PlayerUI.label(_account_identity(), 18, MUTED))
+		if data.has("public_id"): who.add_child(PlayerUI.label(tr("ID público: ") + str(data.public_id), 16, MUTED))
+	else:
+		who.add_child(PlayerUI.label(tr("Sem conta conectada neste dispositivo"), 18, MUTED))
+	var skin := services.inventory.entry(services.inventory.equipped_id())
+	var equipped := PlayerUI.column(line)
+	equipped.add_child(PlayerUI.label(tr("PERSONAGEM"), 14, ACCENT))
+	equipped.add_child(PlayerUI.label(str(skin.get("name", "—")), 20, Color.WHITE))
+	var skins := _button("Personagens e skins", func() -> void: navigate_requested.emit("skins", {}))
+	skins.name = "OpenSkins"
+	_content.add_child(skins)
+	if not services.session.authenticated():
+		var enter := _button("Entrar na conta", func() -> void: navigate_requested.emit("account", {}))
+		enter.name = "EnterAccount"
+		_content.add_child(enter)
+		return
+	var edit := PlayerUI.row(_content)
+	var field := LineEdit.new()
+	field.name = "NicknameField"
+	field.placeholder_text = tr("Novo nickname (3 a 24)")
+	field.max_length = 24
+	field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	field.custom_minimum_size.y = 52
+	PlayerUI.style_field(field)
+	edit.add_child(field)
+	var save := _button("Alterar nickname", func() -> void:
+		banner.show_state("loading")
+		var result: Dictionary = await services.profile.update_nickname(field.text)
+		status(result)
+		if result.ok and is_visible_in_tree() and _category == 0: _show_category())
+	save.name = "SaveNickname"
+	edit.add_child(save)
+	var stats: Dictionary = data.get("statistics", {}) if data.get("statistics") is Dictionary else {}
+	_content.add_child(PlayerUI.label(tr("Estatísticas"), 22, ACCENT))
+	_content.add_child(PlayerUI.label(tr("Nível: ") + DevicePreferences.number(data.get("level"), services.preferences.values.locale) + "   ·   " + tr("Experiência: ") + DevicePreferences.number(data.get("experience"), services.preferences.values.locale), 18))
+	if stats.is_empty():
+		_content.add_child(PlayerUI.label(tr("Ainda não há estatísticas registradas."), 18, MUTED))
+	for key: String in stats:
+		_content.add_child(PlayerUI.label("%s: %s" % [key, DevicePreferences.number(stats[key], services.preferences.values.locale)], 18))
+	var discoverable := CheckButton.new()
+	discoverable.text = tr("Permitir busca do perfil")
+	discoverable.button_pressed = data.get("discoverable", false)
+	discoverable.disabled = services.profile.state != "success"
+	discoverable.custom_minimum_size.y = 52
+	_style_toggle(discoverable)
+	discoverable.toggled.connect(func(value: bool) -> void: status(await services.profile.set_discoverable(value)))
+	_content.add_child(discoverable)
+	var logout := _button("Desconectar / trocar conta", disconnect_account)
+	logout.name = "DisconnectAccount"
+	_content.add_child(logout)
+
+
+## E-mail, ou o provedor (Google/Discord) quando a conta não expõe e-mail.
+func _account_identity() -> String:
+	var user: Dictionary = services.session.user
+	var email := str(user.get("email", ""))
+	var meta: Variant = user.get("app_metadata", {})
+	var provider := str(meta.get("provider", "")) if meta is Dictionary else ""
+	var via: String = {"google": "Google", "discord": "Discord", "email": "e-mail"}.get(provider, provider.capitalize())
+	if email.is_empty(): return tr("Conta conectada") + (" · " + via if not via.is_empty() else "")
+	return email + (" · " + via if not via.is_empty() else "")
+
 
 func _audio() -> void:
 	_title("Áudio")
@@ -260,23 +349,7 @@ func _language() -> void:
 		locale_button.toggle_mode = true
 		locale_button.button_pressed = services.preferences.values.locale == item[1]
 		_content.add_child(locale_button)
-	var account := PlayerUI.column(_content)
-	account.add_child(PlayerUI.label("Conta", 24, ACCENT))
-	account.add_child(PlayerUI.label(str(services.session.user.get("email", "Demonstração local • sem conta conectada"))))
-	if services.session.authenticated():
-		var discoverable := CheckButton.new()
-		discoverable.text = tr("Permitir busca do perfil")
-		discoverable.button_pressed = services.profile.data.get("discoverable", false)
-		discoverable.disabled = services.profile.state != "success"
-		discoverable.custom_minimum_size.y = 52
-		_style_toggle(discoverable)
-		discoverable.toggled.connect(func(value: bool) -> void: status(await services.profile.set_discoverable(value)))
-		account.add_child(discoverable)
-	account.add_child(_button("Entrar na conta", func() -> void: navigate_requested.emit("account", {})))
-	if services.session.authenticated():
-		account.add_child(_button("Sair da conta", func() -> void:
-			await services.session.sign_out()
-			render()))
+
 
 func _save(key: String, value: Variant) -> bool:
 	var saved := services.preferences.set_preference(key, value)

@@ -22,7 +22,9 @@ func _run() -> void:
 	check(menu_src.contains("if not _services.session.authenticated() or _services.session.needs_password_reset:"), "guest opens account only after restoration")
 	check(menu_src.contains("func _show_startup_cover"), "block premature lobby input")
 	check(session_src.contains("initial_restore_finished.emit()"), "login restore completion signaled")
-	check(profile_src.contains("DisconnectAccount") and profile_src.contains("services.session.sign_out()"), "profile has real signout")
+	# T21: uma única implementação de saída (PlayerScreen.disconnect_account), usada por Perfil e Ajustes.
+	var screen_src := (load("res://scripts/ui/player_screen.gd") as GDScript).source_code
+	check(profile_src.contains("DisconnectAccount") and profile_src.contains("disconnect_account") and screen_src.contains("services.session.sign_out()"), "profile has real signout")
 	check(not account_src.contains('"Sair da conta"'), "no signout on login screen")
 	check(music_src.contains('preview.name = "Preview_" + id'), "play button per track")
 	check(music_src.contains('preview.pressed.connect(_preview.bind(id))'), "preview has real event handler")

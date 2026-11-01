@@ -132,6 +132,10 @@ func _session_changed() -> void:
 	chat.me_id = str(session.user.get("id", "")) if session.authenticated() else ""
 	room_chat.clear()
 	room_chat.me_id = chat.me_id
+	# Playlist do menu é pessoal: cada conta (e o visitante) tem a sua neste aparelho.
+	var music := get_node_or_null("/root/MenuMusic")
+	if music != null and music.has_method("set_owner_scope"):
+		music.set_owner_scope(chat.me_id)
 	# A partida local não depende da conta: entrar ou sair dela não a interrompe.
 	if not duel.is_local(): duel.clear()
 	inventory.changed.emit()

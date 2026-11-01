@@ -43,6 +43,12 @@ func _ready() -> void:
 	library.button_id = &"deck_library"
 	navigation.add_child(library)
 	library.activated.connect(menu._on_menu_button_activated)
+	# O jogo não é só Modo História: a navegação superior também leva a ele.
+	var history := preload("res://scenes/menu/components/menu_card_button.tscn").instantiate() as MenuCardButton
+	history.name = "BtnHistory"
+	history.button_id = &"story"
+	navigation.add_child(history)
+	history.activated.connect(menu._on_menu_button_activated)
 	chapter = _label("MODO HISTÓRIA", 14, ACCENT)
 	chapter_title = _label("REINO DO\nDESERTO", 56, PAPER)
 	menu.get_node("Logo").hide()
@@ -63,11 +69,11 @@ func _ready() -> void:
 	for button: MenuCardButton in menu.get_node("MenuButtons").get_children():
 		button.art_texture = null
 		button.get_node("Padding").hide()
-		button.text = {"story": "História  ›", "duel": "Duelo", "skins": "Personagens", "friends": "Amizades", "settings": "Configurações", "deck_library": "Biblioteca"}[String(button.button_id)]
+		button.text = {"story": "História", "duel": "Duelo", "skins": "Personagens", "friends": "Amizades", "settings": "Configurações", "deck_library": "Biblioteca"}[String(button.button_id)]
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		_action_content(button)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		_style_button(button, button.button_id == &"story")
+		_style_button(button, _primary(button))
 		button.add_theme_constant_override("outline_size", 0)
 		button.focus_mode = Control.FOCUS_ALL
 		_nudge_on_hover(button)
@@ -220,19 +226,32 @@ func _layout() -> void:
 	_rect(buttons, Vector2.ZERO, menu.size)
 	var x := pad if compact else 225.0
 	var y := 72.0 if compact else 22.0
-	for id: String in ["duel", "skins", "deck_library", "friends", "settings"]:
-		var button: Button = buttons.get_node({"duel":"BtnDuel", "skins":"BtnSkins", "friends":"BtnFriends", "settings":"BtnSettings", "deck_library":"BtnLibrary"}[id])
-		var width: float = {"duel": 88.0, "skins": 150.0, "friends": 126.0, "settings": 100.0, "deck_library": 134.0}[id]
-		if w < 760: width = {"duel": 74.0, "skins": 136.0, "friends": 100.0, "settings": 88.0, "deck_library": 116.0}[id]
+	var tabs := ["history", "duel", "skins", "deck_library", "friends", "settings"]
+	var nodes := {"history":"BtnHistory", "duel":"BtnDuel", "skins":"BtnSkins", "friends":"BtnFriends", "settings":"BtnSettings", "deck_library":"BtnLibrary"}
+	# Largura de cada aba = texto real + respiro; nada de larguras fixas que cortam rótulos.
+	var gap := 18.0 if w < 760 else 34.0
+	var widths := {}
+	var total := gap * (tabs.size() - 1)
+	for id: String in tabs:
+		var title: Label = buttons.get_node(nodes[id]).get_node("ActionBody/Text/Title")
+		var font := title.get_theme_font("font")
+		widths[id] = font.get_string_size(title.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 15).x + 4.0
+		total += float(widths[id])
+	# Na mesma linha das moedas (desktop), as abas terminam antes delas.
+	var right := w - pad if compact else w - pad - 200.0 - 16.0
+	var fit := minf(1.0, (right - x) / total)
+	for id: String in tabs:
+		var button: Button = buttons.get_node(nodes[id])
+		var width: float = float(widths[id]) * fit
 		_rect(button, Vector2(x, y) * unit, Vector2(width, 44) * unit)
 		var body: Control = button.get_node("ActionBody")
 		body.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		body.offset_left = 12 * unit
-		body.offset_right = -12 * unit
+		body.offset_left = 0
+		body.offset_right = 0
 		body.get_node("Icon").hide()
 		body.get_node("Text/Subtitle").hide()
-		body.get_node("Text/Title").add_theme_font_size_override("font_size", roundi(15 * unit))
-		x += width + (4 if w < 760 else 8)
+		body.get_node("Text/Title").add_theme_font_size_override("font_size", roundi(15 * unit * fit))
+		x += width + gap * fit
 	var title_y := h * 0.35 if compact else h * 0.40
 	_rect(chapter, Vector2(pad, title_y) * unit, Vector2(340, 24) * unit)
 	chapter.add_theme_font_size_override("font_size", roundi(12 * unit))
@@ -249,6 +268,8 @@ func _layout() -> void:
 	action.get_node("Text/Subtitle").hide()
 	var area: Control = menu.get_node("LobbyArea")
 	var stage_height := h * (0.86 if compact else 0.92)
+	# Em telas baixas o palco começa abaixo da linha de abas: o chapéu não cobre os rótulos.
+	if compact: stage_height = minf(stage_height, h - 15.0 - (y + 48.0))
 	_rect(area, Vector2(w * 0.68 - stage_height * 0.39, h - stage_height - 15) * unit, Vector2(stage_height * 0.78, stage_height) * unit)
 	area.get_node("Stage").custom_minimum_size = Vector2.ZERO
 	area.get_node("Stage").set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -291,7 +312,7 @@ func _nudge_on_hover(button: Button) -> void:
 
 func _nudge(button: Button, shift: float, time: float, from := NAN, delay := 0.0) -> void:
 	var body := button.get_node_or_null("ActionBody") as Control
-	if body == null or button.get("button_id") != &"story": return
+	if body == null or not _primary(button): return
 	var old: Variant = button.get_meta("nudge") if button.has_meta("nudge") else null
 	if old is Tween and (old as Tween).is_valid(): (old as Tween).kill()
 	var tween := button.create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
@@ -328,7 +349,7 @@ func _action_content(button: MenuCardButton) -> void:
 	row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var icon := TextureRect.new()
 	icon.name = "Icon"
-	var ink := "#152437" if button.button_id == &"story" else "#e9c995"
+	var ink := "#152437" if _primary(button) else "#e9c995"
 	var svg: String = '<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 24 24"><g fill="none" stroke="' + ink + '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' + paths[String(button.button_id)] + '</g></svg>'
 	var image := Image.new()
 	image.load_svg_from_string(svg)
@@ -343,11 +364,16 @@ func _action_content(button: MenuCardButton) -> void:
 	text.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(text)
-	var values: Array = titles[String(button.button_id)]
+	var values: Array = titles[String(button.button_id)] if _primary(button) or button.button_id != &"story" else ["HISTÓRIA", "Modo História"]
 	for index in range(2):
 		var label := Label.new()
 		label.name = "Title" if index == 0 else "Subtitle"
 		label.text = values[index]
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		label.add_theme_color_override("font_color", INK if button.button_id == &"story" else (PAPER if index == 0 else Color("#a8bdd1")))
+		label.add_theme_color_override("font_color", INK if _primary(button) else (PAPER if index == 0 else Color("#a8bdd1")))
 		text.add_child(label)
+
+
+## JOGAR é a única ação principal; "História" na navegação usa o estilo das abas.
+func _primary(button: Button) -> bool:
+	return button.name == "BtnStory"

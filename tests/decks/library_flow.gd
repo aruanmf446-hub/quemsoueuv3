@@ -96,6 +96,10 @@ func run() -> void:
 	await settle()
 	await settle()
 	nav = menu.get_node("Navigation")
+	# T18A abre a conta primeiro; o teste segue como visitante ("Jogar sem conta").
+	if not nav.get("_history").is_empty() and nav.get("_history").back().route == "account":
+		nav.back()
+		await settle()
 	await click(menu.get_node("MenuButtons/BtnLibrary"))
 	check(route() == "deck_library", "real_lobby_button_opens_separate_route")
 	screen = nav.get("_active")

@@ -96,6 +96,19 @@ func account_button(parent: Node) -> void:
 	parent.add_child(enter)
 
 
+## Única implementação de "Desconectar / trocar conta" (Perfil e Ajustes → Meu Perfil).
+## Encerra a sessão GAME e abre a escolha Google, Discord ou e-mail. Não altera progresso salvo.
+func disconnect_account() -> void:
+	if not services.session.authenticated():
+		return
+	var result: Dictionary = await services.session.sign_out()
+	if not is_inside_tree():
+		return
+	if not result.ok:
+		banner.show_state("error", "Sessão encerrada neste dispositivo; não foi possível confirmar a saída remota.")
+	navigate_requested.emit("account", {})
+
+
 func preview(parent: Node, character_id: String) -> LobbyStage:
 	var entry := services.inventory.entry(character_id)
 	if entry.is_empty():

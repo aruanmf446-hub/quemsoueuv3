@@ -46,6 +46,12 @@ jobs:
         run: |
           GODOT="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
           "$GODOT" --headless --path . --script res://tests/nickname_onboarding/flow_test.gd
+      - name: T21 preferences per owner, deck drafts, favorites and card framing
+        run: |
+          GODOT="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+          "$GODOT" --headless --path . --script res://tests/preferences_t21/flow_test.gd
+          "$GODOT" --headless --path . --script res://tests/decks_t21/flow_test.gd
+          "$GODOT" --headless --path . --script res://tests/decks/library_flow.gd
       - name: Verify authentication appears before lobby (T18A startup)
         run: |
           GODOT="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"

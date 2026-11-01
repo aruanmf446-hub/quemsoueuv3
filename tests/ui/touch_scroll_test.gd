@@ -24,6 +24,8 @@ func run() -> void:
 	nav.open("settings",{})
 	for i in 40: await process_frame
 	var screen = nav._active
+	screen._select(1)
+	for i in 5: await process_frame
 	var scroll: ScrollContainer = screen._scroll
 	check(scroll.get_v_scroll_bar().max_value > scroll.get_v_scroll_bar().page, "lista de áudio tem o que rolar")
 	# Arrasta por cima do botão "Gerenciar músicas"/linhas: deve rolar e não clicar.
@@ -40,13 +42,13 @@ func run() -> void:
 	check(scroll.scroll_vertical >= mini(before + 40, room), "arrastar sobre os itens rola a lista (%d→%d de %d)" % [before, scroll.scroll_vertical, room])
 	check(nav._history.back().route == "settings", "arraste não aciona botão")
 	# Toque parado: o clique ainda funciona (aba Gráficos).
-	var tab: Button = screen._tabs[1]
+	var tab: Button = screen._tabs[2]
 	var c := tab.get_global_rect().get_center()
 	mouse(c, true); await process_frame; mouse(c, false)
 	for i in 5: await process_frame
-	check(screen._category == 1, "toque parado continua clicando (aba Gráficos)")
+	check(screen._category == 2, "toque parado continua clicando (aba Gráficos)")
 	# Arraste lateral num slider ajusta o volume em vez de rolar.
-	screen._tabs[0].pressed.emit()
+	screen._tabs[1].pressed.emit()
 	for i in 10: await process_frame
 	scroll.scroll_vertical = 0
 	for i in 3: await process_frame

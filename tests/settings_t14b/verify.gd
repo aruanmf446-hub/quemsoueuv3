@@ -48,13 +48,13 @@ func _run() -> void:
 	await process_frame
 	check(not screen.has_node('CrestFrame'), 'ornamental frame removed')
 	check(screen.heading.text == 'Settings', 'English heading')
-	check(screen.get('_tabs').size() == 4, 'four categories')
-	for index in range(4):
+	check(screen.get('_tabs').size() == 5, 'five categories, Meu Perfil first')
+	for index in range(5):
 		screen.call('_select', index)
 		await process_frame
 		check(screen.get('_tabs')[index].button_pressed, 'category %d selected' % index)
 	# Real screen input, including duplicate rejection and save feedback.
-	screen.call('_select', 2)
+	screen.call('_select', 3)
 	var button := Button.new()
 	screen.add_child(button)
 	screen.call('_wait_for_key', 'accept_key', button)

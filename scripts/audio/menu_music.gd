@@ -6,6 +6,7 @@ signal state_changed
 signal catalog_error(message: String)
 
 const CATALOG := "res://data/music/catalog.json"
+## Arquivo antigo, único por aparelho. É herdado uma vez pelo primeiro dono que abrir o jogo.
 const SELECTION_PATH := "user://menu_music_selection.cfg"
 const MENU := "res://scenes/menu/main_menu.tscn"
 const SILENCE := -60.0
@@ -34,6 +35,8 @@ var _web_loading := ""
 var _web_wanted := {}
 var _queue: Array = []
 var _history: Array = []
+## Dono das escolhas: "" é o visitante; senão o id da conta GAME (nunca sincronizado).
+var _owner := ""
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -144,12 +147,13 @@ func is_excluded(id: String) -> bool:
 func selection() -> Dictionary:
 	return {"hidden": _hidden.keys(), "deselected": _deselected.keys()}
 
-## Grava a escolha no disco e aplica imediatamente à playlist. Retorna false se não gravar.
+## Grava a escolha do dono atual e aplica imediatamente à playlist. Retorna false se não gravar.
 func save_selection(hidden: Array, deselected: Array) -> bool:
 	var cfg := ConfigFile.new()
 	cfg.set_value("menu_music", "hidden", hidden)
 	cfg.set_value("menu_music", "deselected", deselected)
-	if cfg.save(SELECTION_PATH) != OK:
+	DirAccess.make_dir_recursive_absolute(selection_path().get_base_dir())
+	if cfg.save(selection_path()) != OK:
 		return false
 	_hidden = _as_set(hidden)
 	_deselected = _as_set(deselected)
@@ -157,10 +161,31 @@ func save_selection(hidden: Array, deselected: Array) -> bool:
 	state_changed.emit()
 	return true
 
-func _load_selection() -> void:
-	var cfg := ConfigFile.new()
-	if cfg.load(SELECTION_PATH) != OK:
+## Troca o dono (login, logout, troca de conta) e recarrega as escolhas dele.
+func set_owner_scope(user_id: String) -> void:
+	var owner := OwnerStorage.safe(user_id)
+	if owner == _owner:
 		return
+	_owner = owner
+	_load_selection()
+	_queue.clear()
+	state_changed.emit()
+
+func selection_path() -> String:
+	return OwnerStorage.folder(_owner) + "/menu_music_selection.cfg"
+
+func _load_selection() -> void:
+	_hidden = {}
+	_deselected = {}
+	var cfg := ConfigFile.new()
+	if cfg.load(selection_path()) != OK:
+		# Migração: o arquivo antigo do aparelho passa para o primeiro dono que abrir o jogo
+		# e é renomeado, para não ser herdado também pelas outras contas.
+		if cfg.load(SELECTION_PATH) != OK:
+			return
+		DirAccess.make_dir_recursive_absolute(selection_path().get_base_dir())
+		if cfg.save(selection_path()) == OK:
+			DirAccess.rename_absolute(SELECTION_PATH, SELECTION_PATH + ".migrated")
 	_hidden = _as_set(cfg.get_value("menu_music", "hidden", []))
 	_deselected = _as_set(cfg.get_value("menu_music", "deselected", []))
 

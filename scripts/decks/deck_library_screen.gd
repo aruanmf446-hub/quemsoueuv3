@@ -598,6 +598,8 @@ func _deck_menu(entry: Dictionary) -> Control:
 	popup.add_item(tr("Abrir / Editar"), 0)
 	popup.add_item(tr("Duplicar"), 1)
 	popup.add_item(tr("Revisar e publicar"), 2)
+	if str(entry.draft.get("sync_state", "")) in ["error", "pending"] and _sync().available():
+		popup.add_item(tr("Tentar novamente"), 4)
 	popup.add_separator()
 	popup.add_item(tr("Excluir"), 3)
 	popup.id_pressed.connect(_menu_action.bind(entry))
@@ -613,6 +615,25 @@ func _menu_action(id: int, entry: Dictionary) -> void:
 			_draft = draft
 			_render_review()
 		3: _confirm_delete(draft)
+		4: _retry_draft(draft)
+
+
+## Mantém o retry de rascunhos individuais, existente antes do redesign T23.
+func _retry_draft(draft: Dictionary) -> void:
+	var sync := _sync()
+	if not sync.available():
+		banner.show_state("error", "Entre na conta para sincronizar este rascunho.")
+		return
+	banner.show_state("loading")
+	var result: Dictionary = await sync.push(draft)
+	if not is_inside_tree(): return
+	if result.ok:
+		banner.show_state("success", "Rascunho salvo neste aparelho e na sua conta.")
+	elif str(result.get("code", "")) == "deck_incomplete":
+		banner.show_state("error", CreatorSync.deck_ready(draft))
+	else:
+		banner.show_state("error", "Sincronização não concluída (%s). Seus dados permanecem neste aparelho." % str(result.get("code", "erro")))
+	if _view == "library": _update_results()
 
 
 func _duplicate_draft(draft: Dictionary) -> void:
@@ -1224,7 +1245,7 @@ func _report(result: Dictionary) -> void:
 	if not is_inside_tree(): return
 	if result.ok: banner.show_state("success", "Rascunho salvo neste aparelho e na sua conta.")
 	elif result.code == "deck_incomplete": banner.show_state("success", "Salvo neste aparelho. " + CreatorSync.deck_ready(_draft if not _draft.is_empty() else {}))
-	else: banner.show_state("error", "Salvo neste aparelho, mas não na conta (%s). Use \"Tentar novamente\" em Meus Decks." % str(result.code))
+	else: banner.show_state("error", "Salvo neste aparelho, mas não na conta (%s). Use \"Tentar novamente\" no menu ⋯ do rascunho em Meus Decks." % str(result.code))
 
 
 func _render_review() -> void:

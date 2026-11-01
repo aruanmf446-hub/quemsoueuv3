@@ -1,31 +1,42 @@
 extends SceneTree
-## Capturas reais das cinco categorias de Configurações.
-## Uso: --script res://tools/godot/capture_settings.gd -- <pasta> <LxA>
 func _initialize() -> void:
-	call_deferred("_run")
-
-
-func _run() -> void:
+	call_deferred('_capture')
+func _capture() -> void:
 	var args := OS.get_cmdline_user_args()
-	var dims := args[1].split("x")
+	var output := args[0]
+	var resolution := args[1].split('x')
 	root.mode = Window.MODE_WINDOWED
-	root.size = Vector2i(int(dims[0]), int(dims[1]))
+	root.size = Vector2i(int(resolution[0]), int(resolution[1]))
 	await process_frame
-	var menu := load("res://scenes/menu/main_menu.tscn").instantiate() as Control
-	root.add_child(menu)
-	current_scene = menu
-	for i in 20: await process_frame
-	var nav: Node = menu.get_node("Navigation")
-	if not nav.get("_history").is_empty() and nav.get("_history").back().route == "account":
-		nav.back()
-		for i in 30: await process_frame
-	nav.open("settings", {})
-	for i in 30: await process_frame
-	var screen: Node = nav.get("_active")
+	var services := PlayerServices.new()
+	root.add_child(services)
+	services.preferences.set_preference('locale', 'en' if args.size() > 2 else 'pt_BR')
+	var screen := load('res://scenes/player/settings.tscn').instantiate() as PlayerScreen
+	root.add_child(screen)
+	screen.show_screen()
 	for index in range(5):
-		screen._select(index)
-		for i in 30: await process_frame
+		screen.call('_select', index)
+		for frame in range(4): await process_frame
 		await RenderingServer.frame_post_draw
-		root.get_texture().get_image().save_png("%s/settings_%d_%s.png" % [args[0], index, args[1]])
-		print("CAPTURED ", index)
-	quit(0)
+		var bounds := Rect2(Vector2.ZERO, screen.size)
+		for tab: Button in screen.get('_tabs'):
+			if not bounds.encloses(tab.get_global_rect()):
+				push_error('SETTINGS_TAB_OUT_OF_BOUNDS')
+				quit(1)
+				return
+		if not bounds.encloses(screen.get('_feedback').get_global_rect()):
+			push_error('SETTINGS_FEEDBACK_OUT_OF_BOUNDS')
+			quit(1)
+			return
+		var picture := root.get_texture().get_image()
+		var error := picture.save_png(output + '_%d.png' % index)
+		if error != OK:
+			quit(1)
+			return
+		print('CAPTURE ', index, ' logical=', screen.size, ' pixels=', picture.get_size())
+		if index == 0 and int(resolution[1]) < 600:
+			screen.get('_scroll').scroll_vertical = 100000
+			for frame in range(3): await process_frame
+			await RenderingServer.frame_post_draw
+			root.get_texture().get_image().save_png(output + '_audio_scrolled.png')
+	quit()

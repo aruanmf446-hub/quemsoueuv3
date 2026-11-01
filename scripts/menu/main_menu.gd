@@ -10,6 +10,7 @@ var _web_invite_intent := WebInviteIntent.new()
 var _web_invite_navigating := false
 var _initial_login_pending := true
 var _startup_cover: TextureRect
+var _nickname_modal: Control
 
 
 func _ready() -> void:
@@ -33,6 +34,8 @@ func _ready() -> void:
 	add_child(_mode_label)
 	move_child(_mode_label, 2)
 	_services.profile.changed.connect(_refresh_profile)
+	_services.profile.changed.connect(_nickname_profile_changed)
+	_services.session.changed.connect(_nickname_profile_changed)
 	_services.inventory.changed.connect(_refresh_profile)
 	_services.wallet.changed.connect(_refresh_wallet)
 	_services.friends.changed.connect(_refresh_friends)
@@ -98,6 +101,34 @@ func _initial_auth_resolved() -> void:
 		_startup_cover.queue_free()
 	_startup_cover = null
 	_resume_web_invite()
+	_nickname_profile_changed.call_deferred()
+
+
+## Perfil sem nickname precisa da confirmação do próprio jogador.
+## O modal cobre qualquer tela, inclusive uma sala aberta por convite.
+func _nickname_profile_changed() -> void:
+	if _initial_login_pending or OS.get_cmdline_args().has("--script"):
+		return
+	_nickname_offer.call_deferred()
+
+
+func _nickname_offer() -> void:
+	if not is_inside_tree() or _initial_login_pending:
+		return
+	var logged := _services.session.authenticated()
+	var ready := _services.profile.state == "success"
+	var nickname := str(_services.profile.data.get("nickname", "")).strip_edges()
+	if not logged or (ready and not nickname.is_empty()):
+		if is_instance_valid(_nickname_modal):
+			_nickname_modal.queue_free()
+			_nickname_modal = null
+		return
+	if not ready or is_instance_valid(_nickname_modal):
+		return
+	_nickname_modal = preload("res://scripts/ui/nickname_onboarding.gd").new()
+	_nickname_modal.setup(_services)
+	add_child(_nickname_modal)
+	move_child(_nickname_modal, get_child_count() - 1)
 
 
 ## A URL de convite é detectada no lobby, sem esperar o jogador tocar em Duelo.

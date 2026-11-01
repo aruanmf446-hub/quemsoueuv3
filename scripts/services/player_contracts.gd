@@ -110,7 +110,7 @@ static func valid_public_profile(value: Variant, allow_unset_nickname: bool = fa
 	var nickname: Variant = value.get("nickname")
 	if not nickname is String and not (allow_unset_nickname and nickname == null):
 		return false
-	var nickname_ok := (nickname is String and nickname.length() >= 3)
+	var nickname_ok: bool = (nickname is String and nickname.length() >= 3)
 	if allow_unset_nickname and (nickname == null or (nickname is String and nickname.is_empty())):
 		nickname_ok = true
 	if not value.has("level") or (value.level != null and (not _integer(value.level) or value.level < 0)):

@@ -13,6 +13,11 @@ const INK := Color("#141006")
 const ONLINE := Color("#4cd964")
 const OFFLINE := Color("#8a94a6")
 const ICONS := {
+	"layers": '<path d="M12 3 2 8l10 5 10-5z"/><path d="M2 13l10 5 10-5"/>',
+	"tag": '<path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="8" cy="8" r="1.4"/>',
+	"cards": '<rect x="3" y="6" width="12" height="15" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v13"/>',
+	"filter": '<path d="M3 5h18l-7 8v6l-4 2v-8z"/>',
+	"pencil": '<path d="M4 20l1-5L16 4l4 4L9 19z"/><path d="M14 6l4 4"/>',
 	"back": '<path d="M15 6l-6 6 6 6"/>',
 	"crown": '<path d="M3 18h18l-1.5-10-4.5 4-3-6-3 6-4.5-4z"/><path d="M4 21h16"/>',
 	"friends": '<circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.6"/><path d="M2 20v-1a6 6 0 0 1 12 0v1M14 14.5a5 5 0 0 1 8 4.5v1"/>',

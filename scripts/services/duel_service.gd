@@ -127,7 +127,7 @@ static func invite_link(token: String) -> String:
 		base = str(page) if page != null else ""
 	if base.is_empty(): base = str(PlayerContracts.read_json("res://data/backend/client.json").get("invite_base_url", "")).strip_edges()
 	if base.begins_with("https://"): return "%s?invite=%s" % [base, token]
-	return "Convite Quem Sou Eu (Duelo): %s" % token
+	return "Convite Quem Sou Eu (Mata-Mata): %s" % token
 
 
 ## Token de convite: 48 hexadecimais (também aceito dentro de um link ?invite=).

@@ -50,6 +50,10 @@ func search(value: String) -> void:
 func bounds(target: Control) -> bool:
 	var rect := target.get_global_rect()
 	return rect.position.x >= -1 and rect.end.x <= screen.size.x + 1 and rect.position.y >= -1 and rect.end.y <= screen.size.y + 1
+func has_deck() -> bool:
+	return screen.get("_results").find_child("Deck_lendas_urbanas", true, false) != null
+
+
 func run() -> void:
 	var args := OS.get_cmdline_user_args()
 	var resolution := (args[0] if args.size() else "1672x941").split("x")
@@ -110,17 +114,18 @@ func run() -> void:
 	await capture("library")
 	for term in ["LENDAS", "quem sou eu", "  Lendas Urbanas  "]:
 		await search(term)
-		check(screen.get("_results").has_node("Deck_lendas_urbanas"), "search_" + term)
+		check(has_deck(), "search_" + term)
 	await search("inexistente")
-	check(not screen.get("_results").has_node("Deck_lendas_urbanas"), "empty_search")
-	await click(screen.get("_results").get_child(2))
-	check(screen.get("_query").is_empty() and screen.get("_results").has_node("Deck_lendas_urbanas"), "clear_search")
+	check(not has_deck(), "empty_search")
+	await click(screen.get("_results").find_child("ClearSearch", true, false))
+	check(screen.get("_query").is_empty() and has_deck(), "clear_search")
 	for index in range(1, 5):
 		await click(screen.get("_tabs")[index])
-		check(not screen.get("_results").has_node("Deck_lendas_urbanas"), "truthful_empty_" + str(index))
-		if index >= 3: check(not screen.get("_search").editable, "unavailable_account_action_" + str(index))
+		# Populares/Recentes listam o catálogo real com aviso de métrica indisponível; Favoritos/Meus Decks sem conta ficam vazios.
+		check(has_deck() == (index <= 2), "truthful_tab_" + str(index))
+		check(screen.get("_search").editable, "search_all_tabs_" + str(index))
 	await click(screen.get("_tabs")[0])
-	await click(screen.get("_results").get_node("Deck_lendas_urbanas"))
+	await click(screen.get("_results").find_child("Deck_lendas_urbanas", true, false))
 	check(screen.get("_view") == "deck" and screen.get("_grid").get_child_count() == 9, "real_click_opens_nine_card_gallery")
 	await capture("deck")
 	var gallery: GridContainer = screen.get("_grid")

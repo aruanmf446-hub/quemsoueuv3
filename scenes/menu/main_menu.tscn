@@ -281,7 +281,7 @@ theme_override_styles/pressed = SubResource("StyleBoxTexture_do53f")
 theme_override_styles/hover = SubResource("StyleBoxTexture_1bw8o")
 theme_override_styles/focus = SubResource("StyleBoxTexture_qvxhw")
 button_id = &"duel"
-title = "Modo Duelo"
+title = "Modo Mata-Mata"
 subtitle = "Desafie outros jogadores
 e prove suas habilidades."
 accent_color = Color(0.7529412, 0.22352941, 0.16862746, 1)

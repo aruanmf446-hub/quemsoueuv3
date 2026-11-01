@@ -178,3 +178,19 @@ static func _unsigned_string(value: Variant) -> bool:
 		if digit < "0" or digit > "9":
 			return false
 	return true
+
+
+## ISO 8601 do servidor (UTC) → segundos Unix; 0 se ausente/inválido.
+static func iso_seconds(text: String) -> float:
+	if text.length() < 19: return 0.0
+	return float(Time.get_unix_time_from_datetime_string(text.substr(0, 19)))
+
+
+## "agora", "há 5 min", "há 2 h", "há 3 dias".
+static func ago(seconds: float) -> String:
+	if seconds <= 0.0: return ""
+	var delta := maxf(Time.get_unix_time_from_system() - seconds, 0.0)
+	if delta < 60.0: return "agora"
+	if delta < 3600.0: return "há %d min" % int(delta / 60.0)
+	if delta < 86400.0: return "há %d h" % int(delta / 3600.0)
+	return "há %d dia%s" % [int(delta / 86400.0), "s" if int(delta / 86400.0) > 1 else ""]

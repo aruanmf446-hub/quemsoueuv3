@@ -17,6 +17,10 @@ func _run() -> void:
 	root.add_child(services)
 	await process_frame
 	Fixture.apply(services)
+	var fake: SupabaseClient = load("res://tests/friends_t22/fake_client.gd").new()
+	fake.data = Fixture.data()
+	root.add_child(fake)
+	services.friends.client = fake
 	var screen := load("res://scenes/player/friends.tscn").instantiate() as PlayerScreen
 	root.add_child(screen)
 	screen.show_screen()

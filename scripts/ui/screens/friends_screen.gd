@@ -1,8 +1,7 @@
 extends PlayerScreen
 ## Amizades (referências T22): barra lateral com Amigos/Recebidas/Enviadas/Buscar e a lista
 ## do momento; à direita o jogador selecionado, ações reais e painéis de contexto.
-## Só dados reais do GAME. O que o servidor ainda não fornece aparece como indisponível
-## (contrato em docs/contracts/T22_AMIZADES.md); fixtures só nos testes.
+## Só dados reais do GAME (contrato em docs/contracts/T22_GAME_BACKEND.md); fixtures só nos testes.
 
 const MIN_LOGICAL_WIDTH := 900.0
 const TABS := [["Amigos", "friends", "friends"], ["Recebidas", "incoming", "inbox"], ["Enviadas", "outgoing", "outbox"], ["Buscar", "search", "search"]]
@@ -23,6 +22,9 @@ var _rendered_ids: Dictionary = {}
 var _backdrop: ColorRect
 var _brand: HBoxContainer
 var _title_icon: TextureRect
+## Consultas por jogador (amigos em comum, convites, estatísticas...): uma vez por seleção.
+var _remote := {}
+var _request_message := ""
 
 
 func _ready() -> void:
@@ -35,6 +37,7 @@ func _ready() -> void:
 		_search_epoch += 1
 		_results.clear()
 		_selected.clear()
+		_remote.clear()
 		_searched = false
 		_term = "")
 	services.friends.changed.connect(func() -> void:
@@ -313,7 +316,7 @@ func _nickname(player: Dictionary) -> String:
 	return str(nickname) if nickname is String and not str(nickname).is_empty() else tr("Sem nickname")
 
 
-## "online"/"offline" conhecidos só para amigos (presença do GAME); demais: desconhecido.
+## Presença real: online / em partida / offline (com "há X min"). Sem dado: nível.
 func _status_line(player: Dictionary, font: int) -> Control:
 	var id := str(player.get("user_id", ""))
 	if _relation(id) == "outgoing" and _tab == "outgoing":
@@ -322,11 +325,54 @@ func _status_line(player: Dictionary, font: int) -> Control:
 		waiting.add_child(PremiumUI.icon_rect("clock", PremiumUI.GOLD, font + 2))
 		waiting.add_child(PremiumUI.plain("Aguardando resposta", font, PremiumUI.GOLD_LIGHT))
 		return waiting
-	if services.friends.presence_known.has(id):
-		var online := services.friends.online_ids.has(id)
-		return PremiumUI.presence(tr("Online") if online else tr("Offline"), online, font)
+	match services.friends.presence_status(id):
+		"online": return PremiumUI.presence(tr("Online"), true, font)
+		"in_match":
+			var row := PremiumUI.presence(tr("Em partida"), true, font)
+			(row.get_child(0) as Panel).add_theme_stylebox_override("panel", PremiumUI.flat(Color("#f0b429"), Color.TRANSPARENT, font, 0, 0))
+			(row.get_child(1) as Label).add_theme_color_override("font_color", Color("#f0b429"))
+			return row
+		"offline":
+			var ago := PlayerContracts.ago(services.friends.last_seen(id))
+			return PremiumUI.presence(tr("Offline") + (" (%s)" % ago if not ago.is_empty() else ""), false, font)
 	var level: Variant = player.get("level")
 	return PremiumUI.plain(tr("Nível ") + str(level) if level != null else tr("Presença indisponível"), font, PremiumUI.MUTED, false)
+
+
+## Consulta com cache por chave; re-renderiza ao chegar se a tela ainda estiver aberta.
+func _fetch(key: String, rpc_name: String, params: Dictionary) -> Dictionary:
+	if _remote.has(key): return _remote[key]
+	_remote[key] = {"state": "loading"}
+	_run_fetch(key, rpc_name, params)
+	return _remote[key]
+
+
+func _run_fetch(key: String, rpc_name: String, params: Dictionary) -> void:
+	var result: Dictionary = await services.friends.call_game(rpc_name, params)
+	if not _remote.has(key): return
+	_remote[key] = {"state": "ok", "data": result.data} if result.ok and not (result.data is Dictionary and result.data.has("error")) else {"state": "error", "code": str(result.get("code", result.data.get("error", "erro") if result.data is Dictionary else "erro"))}
+	if is_visible_in_tree() and _chat_friend.is_empty(): render()
+
+
+## Mostra carregando/erro; devolve os dados quando prontos (ou null).
+func _remote_data(parent: Control, key: String, rpc_name: String, params: Dictionary) -> Variant:
+	var entry := _fetch(key, rpc_name, params)
+	if entry.state == "loading":
+		_unavailable(parent, "Carregando…")
+		return null
+	if entry.state == "error":
+		_unavailable(parent, tr("Não foi possível carregar (%s).") % str(entry.get("code", "")))
+		var retry := Button.new()
+		retry.name = "Retry"
+		retry.text = tr("Tentar novamente")
+		retry.flat = true
+		retry.add_theme_color_override("font_color", PremiumUI.GOLD)
+		retry.pressed.connect(func() -> void:
+			_remote.erase(key)
+			render())
+		parent.add_child(retry)
+		return null
+	return entry.data
 
 
 func _relation(user_id: String) -> String:
@@ -384,7 +430,21 @@ func _detail(parent: Control, player: Dictionary, kind: String) -> void:
 	line.add_child(labels)
 	labels.add_child(PremiumUI.plain("Personagem equipado", 11 if compact else 16, PremiumUI.MUTED))
 	labels.add_child(PremiumUI.plain(str(services.inventory.entry(character_id).get("name", "—")), 16 if compact else 28, Color.WHITE, false))
+	if kind == "search" and _relation(str(player.user_id)) == "none":
+		var message := LineEdit.new()
+		message.name = "RequestMessage"
+		message.placeholder_text = tr("Mensagem do pedido (opcional, até 140)")
+		message.max_length = 140
+		message.text = _request_message
+		message.custom_minimum_size.y = 36 if compact else 48
+		message.text_changed.connect(func(value: String) -> void: _request_message = value)
+		PlayerUI.style_field(message)
+		parent.add_child(message)
+	elif kind == "search" and _relation(str(player.user_id)) == "friends":
+		pass
 	_actions(parent, player, kind)
+	if kind == "search" and _relation(str(player.user_id)) == "none":
+		_mutual_line(parent, str(player.user_id))
 	var rule := ColorRect.new()
 	rule.color = Color(1, 1, 1, 0.08)
 	rule.custom_minimum_size.y = 1
@@ -408,7 +468,9 @@ func _actions(parent: Control, player: Dictionary, kind: String) -> void:
 		"outgoing":
 			buttons = [["Cancelar solicitação", "x", true, _act.bind("cancel", id), "CancelRequest"], ["Ver perfil", "user", false, _view.bind(player), "ViewProfile"], ["Enviar mensagem", "chat", false, func() -> void: pass, "Talk"]]
 		_:
-			buttons = [["Adicionar amigo", "user_plus", true, _act.bind("send", id), "AddFriend"], ["Ver perfil", "user", false, _view.bind(player), "ViewProfile"], ["Enviar mensagem", "chat", false, func() -> void: pass, "Talk"]]
+			buttons = [["Adicionar amigo", "user_plus", true, func() -> void:
+				await _act("send", id, _request_message)
+				_request_message = "", "AddFriend"], ["Ver perfil", "user", false, _view.bind(player), "ViewProfile"], ["Enviar mensagem", "chat", false, func() -> void: pass, "Talk"]]
 	# Telas baixas: rótulos curtos para as três ações caberem lado a lado.
 	var short := {"Enviar mensagem": "Mensagem", "Remover amizade": "Remover", "Cancelar solicitação": "Cancelar", "Adicionar amigo": "Adicionar"}
 	for item: Array in buttons:
@@ -423,6 +485,17 @@ func _actions(parent: Control, player: Dictionary, kind: String) -> void:
 		row.add_child(button)
 
 
+func _mutual_line(parent: Control, id: String) -> void:
+	var entry := _fetch("mutual:" + id, "qse_mutual_friends", {"p_target": id})
+	if entry.state == "ok" and entry.data is Dictionary and int(entry.data.get("count", 0)) > 0:
+		var line := HBoxContainer.new()
+		line.name = "MutualCount"
+		line.add_theme_constant_override("separation", 8)
+		line.add_child(PremiumUI.icon_rect("friends", PremiumUI.GOLD, 18 if _compact() else 26))
+		line.add_child(PremiumUI.plain(tr("Amigos em comum: %d") % int(entry.data.count), 13 if _compact() else 19, Color.WHITE, false))
+		parent.add_child(line)
+
+
 func _view(player: Dictionary) -> void:
 	navigate_requested.emit("public_profile", {"public_id": player.public_id})
 
@@ -435,31 +508,89 @@ func _context_panels(parent: Control, player: Dictionary) -> void:
 	row.add_theme_constant_override("separation", 12 if _compact() else 22)
 	parent.add_child(row)
 	var id := str(player.user_id)
+	var request := services.friends.request_info(id)
 	match _tab:
 		"friends":
 			var shared := _sub_panel(row, "bolt", "Ações em comum", "")
 			_link_row(shared, "gamepad", "Convidar para uma partida", _invite.bind(player), "InviteRow")
 			_link_row(shared, "chat", "Abrir conversa", _open_chat.bind(player), "ChatRow")
-			_link_row(shared, "user", "Ver perfil público", _view.bind(player), "ProfileRow")
-			var invites := _sub_panel(row, "mail", "Convites pendentes", tr("Convites de jogo entre você e %s.") % _nickname(player))
-			_unavailable(invites, "Convites de partida ainda não aparecem aqui. Use Convidar: o link da sua sala vai pela conversa.")
+			var stats: Variant = _remote_data(shared, "stats:" + id, "qse_friend_stats", {"p_friend": id})
+			if stats is Dictionary:
+				var last := PlayerContracts.ago(PlayerContracts.iso_seconds(str(stats.get("last_played_at", ""))))
+				_info_row(shared, "stats", tr("Partidas juntos: %d") % int(stats.get("matches_together", 0)) + ("  ·  " + tr("última ") + last if not last.is_empty() else ""))
+			var invites := _sub_panel(row, "mail", "Convites pendentes", tr("Convites de jogo que você ou %s enviaram.") % _nickname(player))
+			var list: Variant = _remote_data(invites, "invites:" + id, "qse_duel_invites_between", {"p_friend": id})
+			if list is Array:
+				for invite: Dictionary in list: _invite_row(invites, invite, player)
+				if list.is_empty(): _unavailable(invites, "Nenhum convite pendente.")
 		"incoming":
 			var mutual := _sub_panel(row, "friends", "Amigos em comum", "")
-			_unavailable(mutual, "O servidor ainda não informa amigos em comum.")
-			var others := _sub_panel(row, "inbox", tr("Outras solicitações (%d)") % maxi(services.friends.data.get("incoming", []).size() - 1, 0), "")
+			_mutual(mutual, id)
+			var right := VBoxContainer.new()
+			right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			right.add_theme_constant_override("separation", 12)
+			row.add_child(right)
+			var message: Variant = request.get("message")
+			if message is String and not str(message).is_empty():
+				var note := _sub_panel(right, "chat", "Mensagem do pedido", "")
+				_info_row(note, "chat", "“%s”" % message)
+			var others := _sub_panel(right, "inbox", tr("Outras solicitações (%d)") % maxi(services.friends.data.get("incoming", []).size() - 1, 0), "")
 			for other: Dictionary in services.friends.data.get("incoming", []):
 				if str(other.user_id) == id: continue
 				_request_row(others, other)
 			if others.get_child_count() <= 1: _unavailable(others, "Nenhuma outra solicitação.")
 		"outgoing":
 			var details := _sub_panel(row, "info", "Detalhes do envio", "")
-			_info_row(details, "send", tr("Solicitação enviada para %s") % _nickname(player))
+			var sent := PlayerContracts.ago(PlayerContracts.iso_seconds(str(request.get("requested_at", ""))))
+			_info_row(details, "send", tr("Solicitação enviada ") + (sent if not sent.is_empty() else tr("para %s") % _nickname(player)))
+			var message: Variant = request.get("message")
+			if message is String and not str(message).is_empty(): _info_row(details, "chat", tr("Mensagem enviada: ") + "“%s”" % message)
 			_info_row(details, "clock", "Aguardando resposta do jogador")
-			var others := _sub_panel(row, "outbox", "Outras solicitações enviadas", "")
-			for other: Dictionary in services.friends.data.get("outgoing", []):
-				if str(other.user_id) == id: continue
-				_link_row(others, "user", _nickname(other), _select.bind(other), "Other_" + str(other.public_id))
-			if others.get_child_count() <= 1: _unavailable(others, "Nenhuma outra solicitação enviada.")
+			var mutual := _sub_panel(row, "friends", "Amigos em comum", "")
+			_mutual(mutual, id)
+
+
+func _mutual(parent: Control, id: String) -> void:
+	var data: Variant = _remote_data(parent, "mutual:" + id, "qse_mutual_friends", {"p_target": id})
+	if not data is Dictionary: return
+	var players: Array = data.get("players", []) if data.get("players") is Array else []
+	(parent.get_child(0).get_child(1) as Label).text = tr("Amigos em comum (%d)") % int(data.get("count", players.size()))
+	for friend: Dictionary in players:
+		_link_row(parent, "user", _nickname(friend), func() -> void:
+			_selected["friends"] = str(friend.user_id)
+			_change_tab("friends"), "Mutual_" + str(friend.public_id))
+	if players.is_empty(): _unavailable(parent, "Nenhum amigo em comum.")
+
+
+## Convite entre amigos: o destinatário recebe o token e pode entrar direto.
+func _invite_row(parent: Control, invite: Dictionary, friend: Dictionary) -> void:
+	var compact := _compact()
+	var card := PanelContainer.new()
+	card.name = "Invite_" + str(invite.get("room_id", ""))
+	card.add_theme_stylebox_override("panel", PremiumUI.row_box(compact))
+	parent.add_child(card)
+	var line := HBoxContainer.new()
+	line.add_theme_constant_override("separation", 12)
+	card.add_child(line)
+	line.add_child(PremiumUI.icon_rect("gamepad", PremiumUI.GOLD, 20 if compact else 30))
+	var text := VBoxContainer.new()
+	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	text.add_theme_constant_override("separation", 0)
+	line.add_child(text)
+	text.add_child(PremiumUI.plain(str(invite.get("room_name", "Sala")), 13 if compact else 18, Color.WHITE, false))
+	var mine := str(invite.get("sent_by", "")) == str(services.session.user.get("id", ""))
+	var when := PlayerContracts.ago(PlayerContracts.iso_seconds(str(invite.get("created_at", ""))))
+	text.add_child(PremiumUI.plain(("Enviado por você" if mine else tr("Enviado por %s") % _nickname(friend)) + ("  ·  " + when if not when.is_empty() else ""), 11 if compact else 14, PremiumUI.MUTED, false))
+	var token := str(invite.get("token", ""))
+	if not token.is_empty():
+		var enter := PremiumUI.action("Entrar", "check", false, func() -> void:
+			banner.show_state("loading")
+			var result: Dictionary = await services.duel.join_invite(token)
+			if result.ok: navigate_requested.emit("duel", {})
+			else: status(result), compact)
+		enter.name = "JoinInvite"
+		enter.custom_minimum_size.x = 90 if compact else 130
+		line.add_child(enter)
 
 
 func _sub_panel(parent: Control, icon: String, title: String, subtitle: String) -> VBoxContainer:
@@ -552,6 +683,31 @@ func _request_row(parent: Control, player: Dictionary) -> void:
 		line.add_child(button)
 
 
+func _suggestion_row(parent: Control, player: Dictionary, mutual: int) -> void:
+	var compact := _compact()
+	var card := PanelContainer.new()
+	card.name = "Suggestion_" + str(player.public_id)
+	card.add_theme_stylebox_override("panel", PremiumUI.row_box(compact))
+	parent.add_child(card)
+	var line := HBoxContainer.new()
+	line.add_theme_constant_override("separation", 10)
+	card.add_child(line)
+	line.add_child(PremiumUI.avatar(PlayerUI.portrait_texture(str(player.get("equipped_character_id", ""))), 30 if compact else 46, 2))
+	var text := VBoxContainer.new()
+	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	text.add_theme_constant_override("separation", 0)
+	line.add_child(text)
+	text.add_child(PremiumUI.plain(_nickname(player), 13 if compact else 18, Color.WHITE, false))
+	text.add_child(PremiumUI.plain(tr("%d amigo(s) em comum") % mutual, 11 if compact else 14, PremiumUI.MUTED, false))
+	var add := PremiumUI.action("Adicionar", "user_plus", false, func() -> void:
+		await _act("send", str(player.user_id))
+		_remote.erase("suggestions")
+		render(), compact)
+	add.name = "AddSuggestion"
+	add.custom_minimum_size.x = 100 if compact else 150
+	line.add_child(add)
+
+
 func _unavailable(parent: Control, text: String) -> void:
 	var note := PlayerUI.label(text, 12 if _compact() else 16, PremiumUI.MUTED)
 	note.name = "Unavailable"
@@ -618,8 +774,22 @@ func _render_search(parent: Control) -> void:
 	bottom.name = "SearchContext"
 	bottom.add_theme_constant_override("separation", 12 if compact else 20)
 	parent.add_child(bottom)
-	_unavailable(_sub_panel(bottom, "bolt", "Jogaram recentemente", ""), "O histórico de partidas com outros jogadores ainda não está disponível.")
-	_unavailable(_sub_panel(bottom, "friends", "Jogadores parecidos", ""), "Sugestões de jogadores ainda não estão disponíveis.")
+	var recent := _sub_panel(bottom, "bolt", "Jogaram recentemente", "")
+	if current.is_empty():
+		_unavailable(recent, "Selecione um jogador.")
+	else:
+		var history: Variant = _remote_data(recent, "recent:" + str(current.user_id), "qse_recent_matches_with", {"p_player": str(current.user_id), "p_limit": 5})
+		if history is Dictionary:
+			for match: Dictionary in (history.get("matches", []) if history.get("matches") is Array else []):
+				_info_row(recent, "gamepad", tr("Duelo · ") + PlayerContracts.ago(PlayerContracts.iso_seconds(str(match.get("played_at", "")))))
+			if int(history.get("count", 0)) == 0: _unavailable(recent, tr("Vocês ainda não jogaram juntos."))
+	var similar := _sub_panel(bottom, "friends", "Jogadores parecidos", "")
+	var suggestions: Variant = _remote_data(similar, "suggestions", "qse_player_suggestions", {"p_limit": 5})
+	if suggestions is Dictionary:
+		var counts: Dictionary = suggestions.get("mutual_counts", {}) if suggestions.get("mutual_counts") is Dictionary else {}
+		for suggestion: Dictionary in (suggestions.get("players", []) if suggestions.get("players") is Array else []):
+			_suggestion_row(similar, suggestion, int(counts.get(str(suggestion.user_id), 0)))
+		if similar.get_child_count() <= 1: _unavailable(similar, "Sem sugestões por enquanto.")
 
 
 # --- Estados e ações reais -------------------------------------------------------------
@@ -686,9 +856,10 @@ func _search(term: String) -> void:
 		status(result)
 
 
-func _act(action: String, player_id: String) -> void:
+func _act(action: String, player_id: String, message := "") -> void:
 	banner.show_state("loading")
-	status(await services.friends.act(action, player_id))
+	_remote.erase("mutual:" + player_id)
+	status(await services.friends.act(action, player_id, "", message))
 
 
 func _confirm_remove(player: Dictionary) -> void:
@@ -704,8 +875,8 @@ func _confirm_remove(player: Dictionary) -> void:
 	dialog.popup_centered()
 
 
-## Convidar: com uma sala online sua, gera o convite real (T16D) e o envia pela conversa.
-## Sem sala, leva ao Duelo para criar uma.
+## Convidar (T22): convite privado da sua sala online para este amigo (qse_duel_invite_send).
+## Sem sala sua, leva ao Duelo para criar uma.
 func _invite(player: Dictionary) -> void:
 	var duel := services.duel
 	if duel.is_local() or not duel.in_room() or not duel.is_admin():
@@ -713,14 +884,13 @@ func _invite(player: Dictionary) -> void:
 		navigate_requested.emit("duel", {})
 		return
 	banner.show_state("loading")
-	var result: Dictionary = await duel.create_invite()
-	if not result.ok or not result.data is Dictionary or str(result.data.get("token", "")).is_empty():
-		status(result if not result.ok else ServiceResult.failure("invalid_contract"))
-		return
-	var link := DuelService.invite_link(str(result.data.token))
-	await _open_chat(player)
-	var sent: Dictionary = await services.chat.send(link)
-	if not sent.ok: status(sent)
+	var result: Dictionary = await services.friends.call_game("qse_duel_invite_send", {"p_room": duel.room_id(), "p_friend": str(player.user_id)})
+	if result.ok and result.data is Dictionary and result.data.get("status") == "sent":
+		banner.show_state("success", tr("Convite enviado para %s.") % _nickname(player))
+		_remote.erase("invites:" + str(player.user_id))
+		render()
+	else:
+		status(result if not result.ok else ServiceResult.failure(str(result.data.get("error", "invalid_contract")) if result.data is Dictionary else "invalid_contract"))
 
 
 # --- Chat privado --------------------------------------------------------------------------

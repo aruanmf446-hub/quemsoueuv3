@@ -140,7 +140,9 @@ func _session_changed() -> void:
 	if not duel.is_local(): duel.clear()
 	inventory.changed.emit()
 	if session.authenticated():
+		_last_heartbeat = -INF
 		refresh_all()
+		_heartbeat()
 
 
 func refresh_all() -> void:
@@ -176,8 +178,19 @@ func _poll_connected() -> void:
 	if not session.authenticated() or not _focused:
 		return
 	friends.refresh_if_stale(MAX_AGE.friends)
+	_heartbeat()
 	wallet.refresh_if_stale(MAX_AGE.wallet)
 	progression.refresh_if_stale(MAX_AGE.progression)
+
+
+## Presença T22 (qse_presence_heartbeat): no máximo 1 chamada por minuto, só com o jogo
+## em foco. O servidor marca "offline" após 90 s sem heartbeat e calcula "in_match".
+var _last_heartbeat := -INF
+func _heartbeat() -> void:
+	var now := Time.get_ticks_msec() / 1000.0
+	if now - _last_heartbeat < 55.0: return
+	_last_heartbeat = now
+	await client.call_rpc("qse_presence_heartbeat")
 
 
 func _equipment_changed() -> void:

@@ -78,7 +78,10 @@ func apply_profile(name: String) -> void:
 	_viewport.msaa_3d = settings["msaa_3d"]
 	_resolution_divisor = settings["stretch_shrink"]
 	_resize_render()
-	_key_light.shadow_enabled = settings["shadows"]
+	# Ajustes → Gráficos → Sombras pode desligar as sombras mesmo nos perfis que as usam.
+	var services := PlayerServices.current
+	var allowed: bool = services == null or services.preferences == null or bool(services.preferences.values.get("shadows", true))
+	_key_light.shadow_enabled = settings["shadows"] and allowed
 
 
 func show_character(entry: Dictionary) -> void:

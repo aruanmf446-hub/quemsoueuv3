@@ -17,18 +17,19 @@ func run() -> void:
 		print("SCROLL_SKIPPED precisa de janela real (coordenadas de toque)")
 		quit(0)
 		return
-	root.size = Vector2i(1280,560)
+	root.size = Vector2i(844,390)
 	change_scene_to_file("res://scenes/menu/main_menu.tscn")
 	for i in 60: await process_frame
 	var nav = current_scene.get_node("Navigation")
 	nav.open("settings",{})
 	for i in 40: await process_frame
 	var screen = nav._active
-	screen._select(1)
+	# T22: Áudio cabe sem rolagem; Controles (teclado, toque e remapear) rola em janela baixa.
+	screen._select(3)
 	for i in 5: await process_frame
 	var scroll: ScrollContainer = screen._scroll
-	check(scroll.get_v_scroll_bar().max_value > scroll.get_v_scroll_bar().page, "lista de áudio tem o que rolar")
-	# Arrasta por cima do botão "Gerenciar músicas"/linhas: deve rolar e não clicar.
+	check(scroll.get_v_scroll_bar().max_value > scroll.get_v_scroll_bar().page, "conteúdo de Controles tem o que rolar")
+	# Arrasta por cima dos botões/linhas: deve rolar e não clicar.
 	var rect := scroll.get_global_rect()
 	var p := rect.get_center() + Vector2(-rect.size.x*0.3, 60)
 	var before := scroll.scroll_vertical

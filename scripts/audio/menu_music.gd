@@ -256,6 +256,10 @@ func _process(delta: float) -> void:
 		var services := scene.get_node_or_null("Services")
 		_preferences = services.get("preferences") if services != null else null
 		_inside = true
+		# Ajustes → Áudio → "Música nos menus" desligada: entra no menu pausado.
+		if is_instance_valid(_preferences) and not bool(_preferences.values.get("menu_music", true)):
+			paused = true
+			state_changed.emit()
 		if not paused: _restore()
 	elif not in_menu and _inside:
 		_leave_menu()

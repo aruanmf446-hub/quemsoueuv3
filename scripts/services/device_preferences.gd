@@ -3,7 +3,10 @@ extends Node
 
 signal changed
 const SAVE_PATH := "user://device_preferences_v1.cfg"
-const DEFAULTS := {"muted": false, "master": 1.0, "music": 1.0, "sfx": 1.0, "quality": "medio", "locale": "pt_BR", "accept_key": KEY_ENTER, "back_key": KEY_ESCAPE}
+const DEFAULTS := {"muted": false, "master": 1.0, "music": 1.0, "sfx": 1.0, "quality": "medio", "locale": "pt_BR", "accept_key": KEY_ENTER, "back_key": KEY_ESCAPE,
+	"menu_music": true, "shadows": true, "window": ""}
+## Tamanhos de janela oferecidos no desktop ("" = o do sistema; "fullscreen" = tela cheia).
+const WINDOW_SIZES := ["", "1280x720", "1600x900", "1920x1080", "fullscreen"]
 var values: Dictionary = DEFAULTS.duplicate()
 var last_error := OK
 
@@ -69,6 +72,22 @@ func apply() -> void:
 		key_event.physical_keycode = int(values[binding[1]])
 		InputMap.action_add_event(binding[0], key_event)
 	get_tree().call_group("player_preview_stages", "apply_profile", values.quality)
+	_apply_window()
+
+
+## Janela só existe no desktop; no navegador e no Android quem manda é o aparelho.
+static func window_supported() -> bool:
+	return not OS.has_feature("web") and not OS.has_feature("android") and not OS.has_feature("ios") and DisplayServer.get_name() != "headless"
+
+
+func _apply_window() -> void:
+	if not window_supported() or str(values.window).is_empty(): return
+	if values.window == "fullscreen":
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+		return
+	var parts := str(values.window).split("x")
+	if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN: DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+	DisplayServer.window_set_size(Vector2i(int(parts[0]), int(parts[1])))
 
 
 static func _valid(key: String, value: Variant) -> bool:
@@ -78,6 +97,8 @@ static func _valid(key: String, value: Variant) -> bool:
 		"accept_key", "back_key": return value is int and value > 0 and value <= 0x7fffffff
 		"quality": return value in ["baixo", "medio", "alto"]
 		"locale": return value in ["pt_BR", "en"]
+		"menu_music", "shadows": return value is bool
+		"window": return value in WINDOW_SIZES
 	return false
 
 

@@ -66,3 +66,29 @@ As mensagens de validação do cliente estão em `DeckDrafts.problems()` (`scrip
 
 ## 5. Integração prevista no cliente
 `DeckDrafts.publish()` e `set_favorite()` passam a chamar as RPCs acima quando o backend existir; a migração envia os rascunhos locais do dono ao primeiro login com o servidor disponível, sem apagar o local até confirmar.
+
+---
+
+## 6. Integração implementada no cliente (T21-B)
+
+`scripts/decks/creator_sync.gd` usa a Data API e o Storage do GAME com o JWT da conta
+(nunca `service_role`). Todos os nomes de tabela/coluna estão em `CreatorSync.SCHEMA`.
+
+| Recurso | Chamada |
+|---|---|
+| Deck | `POST /rest/v1/qse_creator_decks?on_conflict=id` (upsert) com `id`, `owner_id` (= usuário da sessão), `name`, `description`, `category`, `requested_visibility`. **Não envia** `visibility` nem `status`. |
+| Cartas | `POST /rest/v1/qse_creator_cards?on_conflict=id` (upsert) com `id`, `deck_id`, `position`, `name`, `description`, `image_original_path`, `portrait_center_x/y`, `portrait_zoom`, `duel_center_x/y`, `duel_zoom`; depois `DELETE ...?deck_id=eq.<id>&id=not.in.(...)` para as cartas removidas. |
+| Imagens | `POST /storage/v1/object/qse-deck-originals/<user>/<deck>/<card>_original.<ext>` (`x-upsert: true`), mais `<card>_library.png` e `<card>_duel.png`. Download por `/storage/v1/object/authenticated/...`. |
+| Favoritos | `GET/POST(on_conflict=user_id,deck_ref)/DELETE /rest/v1/qse_deck_favorites` com `official:<id>` ou `creator:<uuid>`. |
+| Playlist | `GET` e `POST ?on_conflict=user_id` em `qse_user_music_selection` (`hidden_track_ids`, `deselected_track_ids`). |
+
+Mapeamento local → servidor: o UUID v4 do deck (`server_id`) e de cada carta é gerado no
+cliente e gravado no rascunho local **antes** do envio; repetir após falha faz upsert no
+mesmo id (sem duplicar). O rascunho local só é apagado depois que o servidor confirma a exclusão.
+
+### Pontos para o ChatGPT confirmar no GAME
+1. `qse_creator_cards` tem as colunas `deck_id` (FK) e `position` (ordem)? Se os nomes forem outros, basta trocar `card_deck`/`card_order` em `CreatorSync.SCHEMA`.
+2. As tabelas aceitam `id` gerado pelo cliente (UUID v4) em `insert`, com `default gen_random_uuid()` só como alternativa?
+3. Upsert (`on_conflict=id`, `on_conflict=user_id,deck_ref`, `on_conflict=user_id`) é permitido pelas políticas de `insert` + `update` do dono?
+4. O original é enviado com a **extensão real** do arquivo importado (`png`/`jpg`/`webp`), sem reconverter, para preservar os bytes. O caminho fica `<card>_original.png|jpg|webp`, não só `.webp`. Se a política do bucket exigir exatamente `.webp`, avisar.
+5. Excluir uma carta do rascunho remove a linha; os arquivos dela no Storage só são apagados quando o deck inteiro é excluído.

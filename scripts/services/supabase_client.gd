@@ -130,6 +130,46 @@ func request(path: String, method: HTTPClient.Method, body: Dictionary = {}, aut
 		return ServiceResult.failure(str(data.get("error_code", "auth_request_failed")))
 	return ServiceResult.success(data)
 
+## Data API/Storage com o JWT da conta: corpo JSON qualquer (lista ou objeto) ou bytes,
+## cabeçalhos extras (Prefer) e resposta binária (download). Nunca usa service_role.
+## Resultado: success({"status", "data", "bytes"}) ou failure como request().
+func send(path: String, method: HTTPClient.Method, body: Variant = null, headers: PackedStringArray = PackedStringArray(), raw := PackedByteArray(), content_type := "application/json", timeout := 30.0) -> Dictionary:
+	if not configured():
+		return ServiceResult.failure("not_configured", "offline")
+	if access_token.is_empty():
+		return ServiceResult.failure("not_authenticated", "unauthorized")
+	var epoch := generation
+	var http := HTTPRequest.new()
+	http.accept_gzip = not OS.has_feature("web")
+	http.timeout = timeout
+	http.body_size_limit = 16 * 1024 * 1024
+	add_child(http)
+	var all := PackedStringArray(["apikey: " + publishable_key, "Authorization: Bearer " + access_token, "Content-Type: " + content_type])
+	all.append_array(headers)
+	var payload := raw if not raw.is_empty() else (JSON.stringify(body).to_utf8_buffer() if body != null else PackedByteArray())
+	var error := http.request_raw(endpoint + path, all, method, payload)
+	if error != OK:
+		http.queue_free()
+		return ServiceResult.failure("network", "offline")
+	var response: Array = await http.request_completed
+	http.queue_free()
+	if epoch != generation:
+		return ServiceResult.failure("session_changed", "unauthorized")
+	if response[0] != HTTPRequest.RESULT_SUCCESS:
+		return ServiceResult.failure("timeout" if response[0] == HTTPRequest.RESULT_TIMEOUT else "network", "offline")
+	var status := int(response[1])
+	var bytes: PackedByteArray = response[3]
+	var data: Variant = JSON.parse_string(bytes.get_string_from_utf8()) if not bytes.is_empty() and content_type != "application/octet-stream" else null
+	if status == 429:
+		return ServiceResult.failure("rate_limit")
+	if status == 401 or status == 403:
+		return ServiceResult.failure("not_authenticated" if status == 401 else "forbidden", "unauthorized")
+	if status < 200 or status >= 300:
+		var code := str(data.get("code", data.get("error", "request_failed"))) if data is Dictionary else "request_failed"
+		return ServiceResult.failure(code, "error")
+	return ServiceResult.success({"status": status, "data": data, "bytes": bytes})
+
+
 static func _public_key_only(key: String) -> bool:
 	if key.begins_with("sb_publishable_"):
 		return true

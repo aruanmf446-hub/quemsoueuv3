@@ -25,6 +25,10 @@ var _drafts: DeckDrafts
 var _picker: ImagePicker
 var _pending_card := -1
 var _editor_overlay: CardFrameEditor
+## Uma busca no servidor por visita à aba (evita repetir a cada redesenho).
+var _pulled_decks := false
+var _pulled_favorites := false
+var _remote_busy := false
 const SURFACE_SHADER := """shader_type canvas_item;
 // Textura muito sutil e uma linha orgânica discreta: só estética, sem contraste extra.
 uniform float seed = 0.0;
@@ -63,6 +67,9 @@ func _ready() -> void:
 	if services != null: services.session.changed.connect(func() -> void:
 		# Trocar de conta troca também os rascunhos e favoritos visíveis.
 		_drafts = null
+		_pulled_decks = false
+		_pulled_favorites = false
+		_remote_error.clear()
 		if is_visible_in_tree() and _view in ["library", "editor", "review"]:
 			_draft = {}
 			_render_library())
@@ -499,11 +506,61 @@ func _heart(deck_id: String) -> Button:
 			return
 		heart.text = "♥" if value else "♡"
 		heart.tooltip_text = tr("Remover dos favoritos" if value else "Adicionar aos favoritos")
-		if _view == "library" and _tab == "Favoritos": _update_results.call_deferred())
+		if _view == "library" and _tab == "Favoritos": _update_results.call_deferred()
+		var sync := _sync()
+		if sync.available():
+			var result: Dictionary = await sync.set_remote_favorite(deck_id, value)
+			if result.ok and not value: _store().clear_pending_favorite(deck_id)
+			if not result.ok and is_inside_tree():
+				banner.show_state("error", "Favorito salvo neste aparelho; a conta será atualizada na próxima conexão."))
 	return heart
 
 
+func _sync() -> CreatorSync:
+	return CreatorSync.for_current(_store())
+
+
+## Busca no servidor uma vez por visita; mostra carregando, erro e "Tentar novamente".
+## Falha não repete sozinha: só pelo botão, para não martelar o servidor.
+var _remote_error := {}
+func _remote_section(kind: String) -> void:
+	if not is_instance_valid(_results): return
+	var sync := _sync()
+	if not sync.available():
+		_results.add_child(_text("Entre na conta para guardar também no servidor. Aqui tudo fica salvo neste aparelho.", 14, PlayerUI.MUTED))
+		return
+	if _remote_busy:
+		var loading := _text("Sincronizando com a sua conta…", 14, PlayerUI.MUTED)
+		loading.name = "RemoteLoading"
+		_results.add_child(loading)
+		return
+	if _remote_error.has(kind):
+		_results.add_child(_text("Não foi possível falar com o servidor (%s). Seus dados continuam salvos neste aparelho." % str(_remote_error[kind]), 14, Color("#ff9797")))
+		var retry := _action("Tentar novamente", func() -> void:
+			_remote_error.erase(kind)
+			if kind == "decks": _pulled_decks = false
+			else: _pulled_favorites = false
+			_update_results())
+		retry.name = "RetrySync"
+		_results.add_child(retry)
+		return
+	if (_pulled_decks if kind == "decks" else _pulled_favorites): return
+	_remote_busy = true
+	var loading := _text("Sincronizando com a sua conta…", 14, PlayerUI.MUTED)
+	loading.name = "RemoteLoading"
+	_results.add_child(loading)
+	var result: Dictionary
+	if kind == "decks": result = await sync.pull()
+	else: result = await sync.sync_favorites()
+	_remote_busy = false
+	if kind == "decks": _pulled_decks = true
+	else: _pulled_favorites = true
+	if not result.ok: _remote_error[kind] = str(result.get("code", "erro"))
+	if is_inside_tree() and _view == "library": _update_results()
+
+
 func _render_favorites() -> void:
+	_remote_section.call_deferred("favorites")
 	var ids := _store().favorites()
 	var shown := 0
 	_results.add_child(_text("FAVORITOS", 12, PlayerUI.GOLD))
@@ -513,7 +570,7 @@ func _render_favorites() -> void:
 			shown += 1
 	if shown == 0:
 		_empty(_results, "Nenhum favorito ainda", _empty_message("Favoritos"))
-	_results.add_child(_text("Favoritos ficam salvos neste aparelho, na sua conta ou como visitante.", 14, PlayerUI.MUTED))
+	_results.add_child(_text("Favoritos ficam neste aparelho e, com a conta conectada, também no servidor.", 14, PlayerUI.MUTED))
 
 
 func _render_my_decks() -> void:
@@ -525,6 +582,7 @@ func _render_my_decks() -> void:
 	create.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	create.custom_minimum_size.x = 200
 	_results.add_child(create)
+	_remote_section.call_deferred("decks")
 	var drafts := _store().list()
 	_results.add_child(_text("RASCUNHOS", 12, PlayerUI.GOLD))
 	if drafts.is_empty():
@@ -535,7 +593,18 @@ func _render_my_decks() -> void:
 		var label := _data_text("%s  ·  %d cartas" % [str(draft.name) if not str(draft.name).is_empty() else tr("Sem nome"), draft.cards.size()], 18)
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(label)
-		row.add_child(PlayerUI.pill("RASCUNHO", "available"))
+		var state := str(draft.get("sync_state", "local"))
+		var pill_text: String = {"synced": "NA CONTA", "pending": "ENVIANDO", "error": "ERRO AO ENVIAR"}.get(state, "SÓ NESTE APARELHO")
+		var pill := PlayerUI.pill(pill_text, "equipped" if state == "synced" else "available")
+		pill.name = "SyncState"
+		row.add_child(pill)
+		if state in ["error", "pending"] and _sync().available():
+			var retry := _action("Tentar novamente", func() -> void:
+				banner.show_state("loading")
+				_report(await _sync().push(draft))
+				_update_results())
+			retry.name = "RetryDraft"
+			row.add_child(retry)
 		var edit := _action("Editar", func() -> void:
 			_draft = draft
 			_render_editor())
@@ -545,20 +614,22 @@ func _render_my_decks() -> void:
 		remove.name = "DeleteDraft"
 		row.add_child(remove)
 	_results.add_child(_text("PUBLICADOS", 12, PlayerUI.GOLD))
-	_results.add_child(_text("Publicar e sincronizar decks depende do servidor, que ainda está em preparação.", 15, PlayerUI.MUTED))
+	_results.add_child(_text("A publicação para a comunidade ainda não está habilitada. Rascunhos ficam neste aparelho e na sua conta.", 15, PlayerUI.MUTED))
 
 
 func _confirm_delete(draft: Dictionary) -> void:
 	var dialog := ConfirmationDialog.new()
 	dialog.name = "ConfirmDeleteDraft"
 	dialog.title = tr("Excluir rascunho")
-	dialog.dialog_text = tr("Excluir \"%s\" deste aparelho? Não dá para desfazer.") % (str(draft.name) if not str(draft.name).is_empty() else tr("Sem nome"))
+	dialog.dialog_text = tr("Excluir \"%s\" deste aparelho e da sua conta? Não dá para desfazer.") % (str(draft.name) if not str(draft.name).is_empty() else tr("Sem nome"))
 	dialog.ok_button_text = tr("Excluir")
 	dialog.cancel_button_text = tr("Cancelar")
 	add_child(dialog)
 	dialog.confirmed.connect(func() -> void:
 		# Só o dono atual enxerga (e apaga) a própria pasta de rascunhos.
-		_store().delete(str(draft.id))
+		# Servidor primeiro; a cópia local só sai depois que ele confirmar.
+		var result: Dictionary = await _sync().remove(draft)
+		if not result.ok: banner.show_state("error", "Não foi possível excluir na conta. O rascunho continua salvo; tente novamente.")
 		_update_results())
 	dialog.visibility_changed.connect(func() -> void: if not dialog.visible: dialog.queue_free())
 	dialog.popup_centered()
@@ -756,8 +827,22 @@ func _close_framer() -> void:
 
 func _save_draft() -> void:
 	var result := _store().save(_draft)
-	if not result.ok: status(result)
-	else: banner.show_state("success", "Rascunho salvo neste aparelho.")
+	if not result.ok:
+		status(result)
+		return
+	var sync := _sync()
+	if not sync.available():
+		banner.show_state("success", "Rascunho salvo neste aparelho.")
+		return
+	banner.show_state("loading")
+	_report(await sync.push(_draft))
+
+
+func _report(result: Dictionary) -> void:
+	if not is_inside_tree(): return
+	if result.ok: banner.show_state("success", "Rascunho salvo neste aparelho e na sua conta.")
+	elif result.code == "deck_incomplete": banner.show_state("success", "Salvo neste aparelho. " + CreatorSync.deck_ready(_draft if not _draft.is_empty() else {}))
+	else: banner.show_state("error", "Salvo neste aparelho, mas não na conta (%s). Use \"Tentar novamente\" em Meus Decks." % str(result.code))
 
 
 func _render_review() -> void:
@@ -793,5 +878,5 @@ func _render_review() -> void:
 	publish.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	publish.custom_minimum_size.x = 200
 	body.add_child(publish)
-	body.add_child(_text("Publicar depende do servidor, que ainda está em preparação. O rascunho fica salvo neste aparelho.", 14, PlayerUI.MUTED))
+	body.add_child(_text("A publicação para a comunidade ainda não está habilitada no servidor. O rascunho fica salvo neste aparelho e na sua conta.", 14, PlayerUI.MUTED))
 	_reveal()

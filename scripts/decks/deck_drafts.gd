@@ -1,8 +1,8 @@
 class_name DeckDrafts
 extends RefCounted
 ## Rascunhos de deck e favoritos do dono atual, salvos NESTE aparelho (user://players/<dono>/).
-## Publicar, sincronizar e favoritar no servidor dependem do backend (docs/contracts/T21_DECKS.md):
-## enquanto ele não existir, publish() responde "backend_pending" e nada finge estar online.
+## Envio para a conta GAME: CreatorSync. Publicação para a comunidade ainda não está habilitada
+## no servidor: publish() responde "backend_pending" e nada finge estar publicado.
 const Catalog = preload("res://scripts/decks/deck_library_catalog.gd")
 const NAME_MIN := 3
 const NAME_MAX := 60
@@ -77,6 +77,16 @@ func store_previews(draft_id: String, card: Dictionary, image: Image) -> void:
 		preview.save_png(_dir(draft_id + "/" + str(card.id) + "_" + format + ".png"))
 
 
+func file_bytes(draft_id: String, file_name: String) -> PackedByteArray:
+	if not draft_id.is_valid_filename() or not file_name.is_valid_filename(): return PackedByteArray()
+	var path := OwnerStorage.folder(owner) + "/deck_drafts/" + draft_id + "/" + file_name
+	return FileAccess.get_file_as_bytes(path) if FileAccess.file_exists(path) else PackedByteArray()
+
+
+func preview_bytes(draft_id: String, card: Dictionary, format: String) -> PackedByteArray:
+	return file_bytes(draft_id, str(card.get("id", "")) + "_" + format + ".png")
+
+
 func preview_path(draft_id: String, card: Dictionary, format := "library") -> String:
 	return OwnerStorage.folder(owner) + "/deck_drafts/" + draft_id + "/" + str(card.get("id", "")) + "_" + format + ".png"
 
@@ -144,9 +154,35 @@ func is_favorite(deck_id: String) -> bool:
 
 
 func set_favorite(deck_id: String, value: bool) -> bool:
-	var ids := favorites()
+	var config := _favorites_config()
+	var ids: Array = config.get_value("favorites", "deck_ids", [])
+	var removed: Array = config.get_value("favorites", "pending_removals", [])
 	if value and not ids.has(deck_id): ids.append(deck_id)
-	if not value: ids.erase(deck_id)
-	var config := ConfigFile.new()
+	if value: removed.erase(deck_id)
+	if not value:
+		ids.erase(deck_id)
+		# Lembra a remoção até o servidor confirmar, para não "ressuscitar" o favorito.
+		if not removed.has(deck_id): removed.append(deck_id)
 	config.set_value("favorites", "deck_ids", ids)
+	config.set_value("favorites", "pending_removals", removed)
 	return config.save(OwnerStorage.path(owner, "deck_favorites.cfg")) == OK
+
+
+func pending_favorite_removals() -> Array[String]:
+	var result: Array[String] = []
+	for id: Variant in _favorites_config().get_value("favorites", "pending_removals", []): result.append(str(id))
+	return result
+
+
+func clear_pending_favorite(deck_id: String) -> void:
+	var config := _favorites_config()
+	var removed: Array = config.get_value("favorites", "pending_removals", [])
+	removed.erase(deck_id)
+	config.set_value("favorites", "pending_removals", removed)
+	config.save(OwnerStorage.path(owner, "deck_favorites.cfg"))
+
+
+func _favorites_config() -> ConfigFile:
+	var config := ConfigFile.new()
+	config.load(OwnerStorage.folder(owner) + "/deck_favorites.cfg")
+	return config

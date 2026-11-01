@@ -159,6 +159,7 @@ func save_selection(hidden: Array, deselected: Array) -> bool:
 	_deselected = _as_set(deselected)
 	_queue.clear()
 	state_changed.emit()
+	_push_remote(hidden, deselected)
 	return true
 
 ## Troca o dono (login, logout, troca de conta) e recarrega as escolhas dele.
@@ -170,6 +171,40 @@ func set_owner_scope(user_id: String) -> void:
 	_load_selection()
 	_queue.clear()
 	state_changed.emit()
+	_pull_remote(owner)
+
+
+## Conta conectada: a playlist do servidor vence; sem registro lá, envia a escolha local.
+## Falha de rede não apaga nada: a cópia local continua valendo.
+func _pull_remote(owner: String) -> void:
+	if owner.is_empty(): return
+	var sync := CreatorSync.for_current(DeckDrafts.for_current())
+	if sync.client == null or OwnerStorage.safe(sync.user_id) != owner: return
+	var result: Dictionary = await sync.pull_music()
+	if owner != _owner or not result.ok: return
+	var row: Dictionary = result.data
+	if row.is_empty():
+		var local := selection()
+		if not local.hidden.is_empty() or not local.deselected.is_empty(): await sync.push_music(local.hidden, local.deselected)
+		return
+	var hidden: Array = row.get("hidden_track_ids", []) if row.get("hidden_track_ids") is Array else []
+	var deselected: Array = row.get("deselected_track_ids", []) if row.get("deselected_track_ids") is Array else []
+	var cfg := ConfigFile.new()
+	cfg.set_value("menu_music", "hidden", hidden)
+	cfg.set_value("menu_music", "deselected", deselected)
+	DirAccess.make_dir_recursive_absolute(selection_path().get_base_dir())
+	cfg.save(selection_path())
+	_hidden = _as_set(hidden)
+	_deselected = _as_set(deselected)
+	_queue.clear()
+	state_changed.emit()
+
+
+func _push_remote(hidden: Array, deselected: Array) -> void:
+	if _owner.is_empty(): return
+	var sync := CreatorSync.for_current(DeckDrafts.for_current())
+	if sync.client == null or OwnerStorage.safe(sync.user_id) != _owner: return
+	await sync.push_music(hidden, deselected)
 
 func selection_path() -> String:
 	return OwnerStorage.folder(_owner) + "/menu_music_selection.cfg"

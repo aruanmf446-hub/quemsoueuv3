@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://ddc1bnnp7jj8s"
-path="res://.godot/imported/REFERENCIA_MENU.png-20c50bd71f79703a3d7073cfd2dc9205.ctex"
+path="res://.godot/imported/REFERENCIA_MENU.png-17696b48258884b3d87032e1b57f6a77.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://docs/referencias/menu/REFERENCIA_MENU.png"
-dest_files=["res://.godot/imported/REFERENCIA_MENU.png-20c50bd71f79703a3d7073cfd2dc9205.ctex"]
+dest_files=["res://.godot/imported/REFERENCIA_MENU.png-17696b48258884b3d87032e1b57f6a77.ctex"]
 
 [params]
 

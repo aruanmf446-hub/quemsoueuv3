@@ -7,7 +7,7 @@ signal cancelled
 
 const FORMATS := {
 	"library": {"title": "Biblioteca · retrato", "aspect": CardFramer.LIBRARY_ASPECT},
-	"duel": {"title": "Duelo · horizontal", "aspect": CardFramer.DUEL_ASPECT},
+	"duel": {"title": "Mata-Mata · horizontal", "aspect": CardFramer.DUEL_ASPECT},
 }
 var framer: CardFramer
 var _image: Image

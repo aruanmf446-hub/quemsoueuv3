@@ -54,7 +54,7 @@ func _ready() -> void:
 	var title := PlayerUI.label("Como quer ser chamado?", 27, PlayerUI.TEXT)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(title)
-	var subtitle := PlayerUI.label("Seu apelido aparecerá nos duelos e no seu perfil.", 15, PlayerUI.MUTED)
+	var subtitle := PlayerUI.label("Seu apelido aparecerá nas partidas Mata-Mata e no seu perfil.", 15, PlayerUI.MUTED)
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(subtitle)
 

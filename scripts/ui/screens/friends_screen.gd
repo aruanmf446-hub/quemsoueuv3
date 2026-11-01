@@ -781,7 +781,7 @@ func _render_search(parent: Control) -> void:
 		var history: Variant = _remote_data(recent, "recent:" + str(current.user_id), "qse_recent_matches_with", {"p_player": str(current.user_id), "p_limit": 5})
 		if history is Dictionary:
 			for match: Dictionary in (history.get("matches", []) if history.get("matches") is Array else []):
-				_info_row(recent, "gamepad", tr("Duelo · ") + PlayerContracts.ago(PlayerContracts.iso_seconds(str(match.get("played_at", "")))))
+				_info_row(recent, "gamepad", tr("Mata-Mata · ") + PlayerContracts.ago(PlayerContracts.iso_seconds(str(match.get("played_at", "")))))
 			if int(history.get("count", 0)) == 0: _unavailable(recent, tr("Vocês ainda não jogaram juntos."))
 	var similar := _sub_panel(bottom, "friends", "Jogadores parecidos", "")
 	var suggestions: Variant = _remote_data(similar, "suggestions", "qse_player_suggestions", {"p_limit": 5})
@@ -880,7 +880,7 @@ func _confirm_remove(player: Dictionary) -> void:
 func _invite(player: Dictionary) -> void:
 	var duel := services.duel
 	if duel.is_local() or not duel.in_room() or not duel.is_admin():
-		banner.show_state("empty", tr("Crie uma sala online em Duelo para convidar %s.") % _nickname(player))
+		banner.show_state("empty", tr("Crie uma sala online em Mata-Mata para convidar %s.") % _nickname(player))
 		navigate_requested.emit("duel", {})
 		return
 	banner.show_state("loading")

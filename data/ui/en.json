@@ -125,5 +125,12 @@
   "Escolha o idioma da interface.": "Choose your interface language.",
   "O inglês está disponível parcialmente. Textos sem tradução permanecem em português.": "English is partially available. Untranslated text remains in Portuguese.",
   "Escolha uma tecla diferente para confirmar e voltar.": "Choose different keys for confirm and back.",
-  "Demonstração local • sem conta conectada": "Local demo • not signed in"
+  "Demonstração local • sem conta conectada": "Local demo • not signed in",
+  "Mata-Mata": "Knockout",
+  "Mata-Mata · Partida local": "Knockout · Local match",
+  "Mata-Mata · horizontal": "Knockout · landscape",
+  "Partidas Mata-Mata online (salas públicas e convites) pedem uma conta.": "Online Knockout matches (public rooms and invites) require an account.",
+  "Crie uma sala online em Mata-Mata para convidar %s.": "Create an online Knockout room to invite %s.",
+  "Mata-Mata · ": "Knockout · ",
+  "Modo Mata-Mata": "Knockout mode"
 }

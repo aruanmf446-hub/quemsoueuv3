@@ -25,7 +25,7 @@ var _battle_layout := false
 
 func _ready() -> void:
 	super._ready()
-	heading.text = tr("Duelo")
+	heading.text = tr("Mata-Mata")
 	duel = services.duel
 	duel.changed.connect(func() -> void:
 		if is_visible_in_tree() and not _busy: render())
@@ -83,7 +83,7 @@ func render() -> void:
 	if in_battle and is_instance_valid(_match_view) and _match_view.get_parent() == body:
 		_match_view.refresh()
 		return
-	heading.text = tr("Duelo · Partida local") if duel.is_local() else tr("Duelo")
+	heading.text = tr("Mata-Mata · Partida local") if duel.is_local() else tr("Mata-Mata")
 	if is_instance_valid(_match_view) and _match_view.get_parent() == body: body.remove_child(_match_view)
 	PlayerUI.clear(body)
 	banner.show_state("success")
@@ -120,7 +120,7 @@ func _signed_out() -> void:
 	local.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	local.custom_minimum_size.x = 280
 	card.add_child(local)
-	var online := PlayerUI.label("Duelos online (salas públicas e convites) pedem uma conta.", 17, Color("#a8bad3"))
+	var online := PlayerUI.label("Partidas Mata-Mata online (salas públicas e convites) pedem uma conta.", 17, Color("#a8bad3"))
 	online.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	card.add_child(online)
 	var enter := PlayerUI.button("Entrar na conta", func() -> void: navigate_requested.emit("account", {}))
@@ -265,7 +265,7 @@ func _render_form() -> void:
 	var top := PlayerUI.row(panel)
 	var room_name := LineEdit.new()
 	room_name.placeholder_text = tr("Nome da sala")
-	room_name.text = str(duel.room.room.name) if editing else ("Partida local" if local else "Sala de %s" % str(services.profile.data.get("nickname", "Duelo")))
+	room_name.text = str(duel.room.room.name) if editing else ("Partida local" if local else "Sala de %s" % str(services.profile.data.get("nickname", "Mata-Mata")))
 	room_name.max_length = 32
 	room_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	room_name.custom_minimum_size.y = 52

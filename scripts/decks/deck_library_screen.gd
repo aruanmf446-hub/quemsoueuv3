@@ -5,7 +5,6 @@ const Catalog = preload("res://scripts/decks/deck_library_catalog.gd")
 const TABS := ["Descobrir", "Populares", "Recentes", "Favoritos", "Meus Decks"]
 var _query := ""
 var _tab := "Descobrir"
-var _category := ""
 var _deck: Dictionary = {}
 var _index := -1
 var _view := "library"
@@ -29,6 +28,14 @@ var _editor_overlay: CardFrameEditor
 var _pulled_decks := false
 var _pulled_favorites := false
 var _remote_busy := false
+## Filtros e ordenação (T23). _demo_entries só é preenchido por testes/capturas.
+var _types := {}
+var _themes := {}
+var _sort := ""
+var _featured := 0
+var _covers := {}
+var _filter_panel: Control
+var _demo_entries: Array[Dictionary] = []
 const SURFACE_SHADER := """shader_type canvas_item;
 // Textura muito sutil e uma linha orgânica discreta: só estética, sem contraste extra.
 uniform float seed = 0.0;
@@ -111,7 +118,8 @@ func _layout_changed() -> void:
 	$Margin/Column/Header.add_theme_constant_override("separation", 16 if width < 900 else 28)
 	if not is_equal_approx(_refresh_width, width):
 		_refresh_width = width
-		if is_instance_valid(_grid): _fit_grid()
+		if _view == "library": _fit_tiles()
+		elif is_instance_valid(_grid): _fit_grid()
 
 func _page(title: String, view: String) -> void:
 	_view = view
@@ -135,151 +143,583 @@ func _render_library() -> void:
 	_index = -1
 	_page("BIBLIOTECA DE DECKS", "library")
 	_search.text = _query
-	var tabs := PlayerUI.flow(body)
+	_search.editable = true
+	var compact := _compact()
+	var tabs := HBoxContainer.new()
 	tabs.name = "LibraryTabs"
+	tabs.add_theme_constant_override("separation", 6 if compact else 12)
+	body.add_child(tabs)
 	_tabs.clear()
 	for text: String in TABS:
-		var button := _action(text, _select_tab.bind(text))
+		var button := Button.new()
 		button.name = "Tab" + text.replace(" ", "")
-		PlayerUI.style_row(button)
-		button.custom_minimum_size.x = 0
-		button.add_theme_font_size_override("font_size", 14 if _compact() else 16)
+		button.text = tr(text)
 		button.toggle_mode = true
 		button.button_pressed = _tab == text
+		button.custom_minimum_size = Vector2(0, 34 if compact else 46)
+		button.add_theme_font_size_override("font_size", 14 if compact else 18)
+		PremiumUI.style_tab(button)
+		for state in ["normal", "disabled"]: button.add_theme_stylebox_override(state, PremiumUI.flat(Color.TRANSPARENT, Color.TRANSPARENT, 10, 0, 14 if compact else 22))
+		for state in ["pressed", "hover_pressed"]:
+			var box := button.get_theme_stylebox(state).duplicate() as StyleBoxFlat
+			box.set_content_margin_all(14 if compact else 22)
+			box.content_margin_top = 4
+			box.content_margin_bottom = 4
+			button.add_theme_stylebox_override(state, box)
+		button.pressed.connect(_select_tab.bind(text))
 		tabs.add_child(button)
 		_tabs.append(button)
-	_results = PlayerUI.column(body)
+	var rule := ColorRect.new()
+	rule.color = Color(PremiumUI.GOLD, 0.25)
+	rule.custom_minimum_size.y = 1
+	body.add_child(rule)
+	var layout := HBoxContainer.new()
+	layout.name = "LibraryLayout"
+	layout.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	layout.add_theme_constant_override("separation", 12 if compact else 24)
+	body.add_child(layout)
+	_results = VBoxContainer.new()
 	_results.name = "DeckResults"
+	_results.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_results.add_theme_constant_override("separation", 10 if compact else 18)
+	layout.add_child(_results)
+	_filter_panel = _filters()
+	layout.add_child(_filter_panel)
 	_update_results()
+
 
 func _select_tab(tab: String) -> void:
 	_tab = tab
-	_query = ""
-	_search.clear()
-	_search.editable = not tab in ["Favoritos", "Meus Decks"]
+	# "Meus Decks" mostra os próprios; nas outras abas o filtro de tipo continua o do jogador.
+	if tab == "Meus Decks": _types = {"mine": true}
+	elif _types.size() == 1 and _types.has("mine"): _types = {}
 	for i in range(_tabs.size()): _tabs[i].button_pressed = TABS[i] == tab
-	_update_results()
+	_sort = ""
+	_render_library()
 	PlayerUI.cascade(_results)
+
+
+# --- Modelo único das abas: oficiais, comunidade e meus rascunhos ---------------------
+
+## Entradas reais. Decks de demonstração só existem quando um TESTE preenche _demo_entries.
+func _entries() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for item in _catalog:
+		result.append({"id": str(item.id), "name": str(item.name), "origin": "official" if item.official else "community",
+			"creator": str(item.creator), "category": str(item.category), "count": int(item.count),
+			"cover": str(item.cards[0].image) if not item.cards.is_empty() else "", "item": item})
+	for draft: Dictionary in _store().list():
+		var cards: Array = draft.get("cards", [])
+		result.append({"id": "draft:" + str(draft.id), "name": str(draft.name) if not str(draft.name).is_empty() else tr("Sem nome"),
+			"origin": "mine", "creator": tr("Você"), "category": str(draft.get("category", "")), "count": cards.size(),
+			"cover": _store().preview_path(str(draft.id), cards[0]) if not cards.is_empty() else "",
+			"edited": float(draft.get("updated_at", 0)), "draft": draft})
+	for demo: Dictionary in _demo_entries: result.append(demo)
+	return result
+
+
+func _matches(entry: Dictionary) -> bool:
+	if not _types.is_empty() and not _types.has(str(entry.origin)): return false
+	if not _themes.is_empty() and not _themes.has(str(entry.category)): return false
+	var term := Catalog.search_key(_query)
+	return term.is_empty() or Catalog.search_key("%s %s" % [entry.name, entry.creator]).contains(term)
+
+
+## Ordenações sustentadas pelos dados atuais (sem popularidade nem datas inventadas).
+func _sort_options() -> Array:
+	match _tab:
+		"Favoritos": return [["recent_favorite", "Adicionados recentemente"], ["name", "Nome A–Z"]]
+		"Meus Decks": return [["edited", "Última edição"], ["name", "Nome A–Z"]]
+	return [["name", "Nome A–Z"]]
+
+
+func _sorted(list: Array[Dictionary]) -> Array[Dictionary]:
+	var mode := _sort if not _sort.is_empty() else str(_sort_options()[0][0])
+	if mode == "edited":
+		list.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a.get("edited", 0)) > float(b.get("edited", 0)))
+	elif mode == "recent_favorite":
+		var order := _store().favorites()
+		list.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return order.find(str(a.id)) > order.find(str(b.id)))
+	else:
+		list.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return Catalog.search_key(a.name).naturalnocasecmp_to(Catalog.search_key(b.name)) < 0)
+	return list
+
 
 func _update_results() -> void:
 	if not is_instance_valid(_results): return
 	PlayerUI.clear(_results)
-	if _tab == "Favoritos":
-		_render_favorites()
+	var all := _entries()
+	var shown: Array[Dictionary] = []
+	for entry in all:
+		if _tab == "Favoritos" and not _store().is_favorite(str(entry.id)): continue
+		if _tab == "Meus Decks" and entry.origin != "mine": continue
+		if _matches(entry): shown.append(entry)
+	shown = _sorted(shown)
+	if _tab == "Descobrir": _discover_top(all)
+	var titles := {"Descobrir": ["layers", "Resultados"], "Populares": ["bolt", "Decks populares"], "Recentes": ["clock", "Decks recentes"], "Favoritos": ["star", "Meus favoritos"], "Meus Decks": ["layers", "Meus decks"]}
+	_results_header(titles[_tab][0], "%s (%d)" % [tr(titles[_tab][1]), shown.size()])
+	if _tab == "Populares": _notice("A popularidade ainda não é medida pelo servidor. Mostrando todos os decks de A a Z.")
+	if _tab == "Recentes": _notice("As datas de publicação ainda não estão disponíveis. Mostrando todos os decks de A a Z.")
+	if _tab == "Meus Decks": _remote_section.call_deferred("decks")
+	if _tab == "Favoritos": _remote_section.call_deferred("favorites")
+	if shown.is_empty():
+		_empty_results()
 		return
+	_grid = GridContainer.new()
+	_grid.name = "DeckGrid"
+	_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_grid.add_theme_constant_override("h_separation", 10 if _compact() else 18)
+	_grid.add_theme_constant_override("v_separation", 10 if _compact() else 18)
+	_results.add_child(_grid)
+	for entry in shown: _grid.add_child(_deck_tile(entry))
+	if _tab == "Meus Decks": _grid.add_child(_create_tile())
+	_fit_tiles()
+
+
+func _results_header(icon: String, title: String) -> void:
+	var compact := _compact()
+	var row := HBoxContainer.new()
+	row.name = "ResultsHeader"
+	row.add_theme_constant_override("separation", 10)
+	_results.add_child(row)
+	row.add_child(PremiumUI.icon_rect(icon, PremiumUI.GOLD, 22 if compact else 32))
+	var label := PremiumUI.plain(title, 17 if compact else 26, Color.WHITE, false)
+	label.name = "ResultsTitle"
+	row.add_child(label)
 	if _tab == "Meus Decks":
-		_render_my_decks()
-		return
-	if _tab != "Descobrir":
-		_empty(_results, _tab, _empty_message(_tab))
-		return
-	var matches: Array[Dictionary] = []
-	var term := Catalog.search_key(_query)
-	for item in _catalog:
-		if (_category.is_empty() or item.category == _category) and (term.is_empty() or Catalog.search_key("%s %s" % [item.name, item.creator]).contains(term)):
-			matches.append(item)
-	if matches.is_empty():
-		_empty(_results, "Nenhum deck encontrado", "Experimente outro nome de deck ou criador.")
-		_results.add_child(_action("Limpar busca", func() -> void:
-			_query = ""
-			_category = ""
-			_search.clear()
-			_update_results()))
-		return
-	var all_official := matches.all(func(item: Dictionary) -> bool: return item.official)
-	_results.add_child(_text(("DESTAQUES OFICIAIS" if all_official else "COLEÇÕES") if term.is_empty() else "RESULTADOS DA BUSCA", 12, PlayerUI.GOLD))
-	for item in matches: _results.add_child(_deck_card(item))
-	_results.add_child(_text("CATEGORIAS", 12, PlayerUI.GOLD))
-	var categories: Array[String] = []
-	for item in _catalog:
-		if not str(item.category).is_empty() and not categories.has(item.category): categories.append(item.category)
-	if categories.is_empty():
-		_results.add_child(_text("Os decks deste catálogo ainda não têm categorias informadas.", 15, PlayerUI.MUTED))
+		var create := PremiumUI.action("Criar novo deck", "user_plus", true, _create_deck, compact)
+		create.name = "CreateDeck"
+		create.icon = null
+		create.text = "+  " + tr("Criar novo deck")
+		row.add_child(create)
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(spacer)
+	row.add_child(PremiumUI.plain("Ordenar por:", 12 if compact else 16, PremiumUI.MUTED))
+	var options := OptionButton.new()
+	options.name = "SortBy"
+	var modes := _sort_options()
+	for mode: Array in modes: options.add_item(tr(mode[1]))
+	var current := _sort if not _sort.is_empty() else str(modes[0][0])
+	for i in range(modes.size()): if modes[i][0] == current: options.select(i)
+	options.custom_minimum_size = Vector2(140 if compact else 220, 32 if compact else 44)
+	options.add_theme_font_size_override("font_size", 13 if compact else 17)
+	PremiumUI.style_outline(options)
+	options.item_selected.connect(func(index: int) -> void:
+		_sort = str(modes[index][0])
+		_update_results())
+	row.add_child(options)
+
+
+func _notice(text: String) -> void:
+	var note := PlayerUI.label(text, 12 if _compact() else 15, PremiumUI.MUTED)
+	note.name = "DataNotice"
+	_results.add_child(note)
+
+
+func _empty_results() -> void:
+	var box := VBoxContainer.new()
+	box.name = "EmptyResults"
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.custom_minimum_size.y = 160 if _compact() else 280
+	box.add_theme_constant_override("separation", 12)
+	_results.add_child(box)
+	var filtered := not _query.strip_edges().is_empty() or not _themes.is_empty() or (not _types.is_empty() and _tab != "Meus Decks")
+	var title: String = "Nenhum deck encontrado" if filtered else {"Favoritos": "Você ainda não tem decks favoritos.", "Meus Decks": "Você ainda não criou decks."}.get(_tab, "Nenhum deck disponível")
+	var heading_label := PlayerUI.label(title, 18 if _compact() else 26, Color.WHITE)
+	heading_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(heading_label)
+	var button: Button
+	if filtered:
+		button = PremiumUI.action("Limpar filtros", "refresh", false, _clear_filters, _compact())
+		button.name = "ClearSearch"
+	elif _tab == "Meus Decks":
+		button = PremiumUI.action("Criar novo deck", "user_plus", true, _create_deck, _compact())
+		button.name = "CreateDeckEmpty"
 	else:
-		var topics := PlayerUI.flow(_results)
-		for category: String in ["Todos"] + categories:
-			var target := "" if category == "Todos" else category
-			var chip := _action(category, func() -> void:
-				_category = target
+		button = PremiumUI.action("Explorar decks", "search", true, _select_tab.bind("Descobrir"), _compact())
+		button.name = "ExploreDecks"
+	button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	button.custom_minimum_size.x = 220 if _compact() else 300
+	box.add_child(button)
+
+
+func _clear_filters() -> void:
+	_query = ""
+	_search.clear()
+	_themes.clear()
+	_types = {"mine": true} if _tab == "Meus Decks" else {}
+	_render_library()
+
+
+func _create_deck() -> void:
+	_draft = _store().new_draft()
+	_render_editor()
+
+
+## Descobrir: destaque oficial e coleções (contagens calculadas dos dados reais).
+func _discover_top(all: Array[Dictionary]) -> void:
+	var compact := _compact()
+	var featured: Array[Dictionary] = []
+	for entry in all:
+		if entry.origin == "official": featured.append(entry)
+	if not featured.is_empty() and _query.strip_edges().is_empty():
+		_featured = clampi(_featured, 0, featured.size() - 1)
+		_results.add_child(_banner(featured[_featured], featured.size()))
+	var counts := {"official": 0, "themed": 0, "community": 0, "mine": 0}
+	for entry in all:
+		counts[entry.origin] = int(counts.get(entry.origin, 0)) + 1
+		if not str(entry.category).is_empty(): counts.themed += 1
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 10)
+	head.add_child(PremiumUI.icon_rect("layers", PremiumUI.GOLD, 22 if compact else 30))
+	head.add_child(PremiumUI.plain("Coleções em destaque", 16 if compact else 24, Color.WHITE))
+	_results.add_child(head)
+	var row := HBoxContainer.new()
+	row.name = "Collections"
+	row.add_theme_constant_override("separation", 8 if compact else 16)
+	_results.add_child(row)
+	for item: Array in [["Oficiais", "crown", "official", counts.official], ["Temáticos", "tag", "themed", counts.themed], ["Comunidade", "friends", "community", counts.community], ["Meus Decks", "cards", "mine", counts.mine]]:
+		var card := Button.new()
+		card.name = "Collection_" + str(item[2])
+		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		card.custom_minimum_size.y = 52 if compact else 86
+		PremiumUI.style_tab(card)
+		card.pressed.connect(_open_collection.bind(str(item[2])))
+		var line := HBoxContainer.new()
+		line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		line.add_theme_constant_override("separation", 10 if compact else 18)
+		card.add_child(line)
+		line.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		line.offset_left = 12 if compact else 24
+		line.add_child(PremiumUI.icon_rect(item[1], PremiumUI.GOLD, 22 if compact else 40))
+		var text := VBoxContainer.new()
+		text.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		text.alignment = BoxContainer.ALIGNMENT_CENTER
+		text.add_theme_constant_override("separation", 0)
+		line.add_child(text)
+		text.add_child(PremiumUI.plain(item[0], 13 if compact else 21, Color.WHITE))
+		text.add_child(PremiumUI.plain(tr("%d decks") % int(item[3]) if int(item[3]) != 1 else tr("1 deck"), 11 if compact else 17, PremiumUI.MUTED, false))
+		row.add_child(card)
+	var rule := ColorRect.new()
+	rule.color = Color(1, 1, 1, 0.08)
+	rule.custom_minimum_size.y = 1
+	_results.add_child(rule)
+
+
+func _open_collection(kind: String) -> void:
+	_themes.clear()
+	if kind == "mine":
+		_select_tab("Meus Decks")
+		return
+	if kind == "themed":
+		_types = {}
+		for entry in _entries():
+			if not str(entry.category).is_empty(): _themes[str(entry.category)] = true
+	else:
+		_types = {kind: true}
+	_render_library()
+
+
+func _banner(entry: Dictionary, total: int) -> Control:
+	var compact := _compact()
+	var banner_panel := PanelContainer.new()
+	banner_panel.name = "FeaturedBanner"
+	banner_panel.custom_minimum_size.y = 150 if compact else 250
+	var frame := PremiumUI.flat(Color(0.03, 0.04, 0.07), Color(PremiumUI.GOLD, 0.45), 16, 1, 0)
+	banner_panel.add_theme_stylebox_override("panel", frame)
+	banner_panel.clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
+	var art := TextureRect.new()
+	art.texture = _cover(str(entry.cover))
+	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	art.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	banner_panel.add_child(art)
+	var shade := ColorRect.new()
+	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var material := ShaderMaterial.new()
+	var shader := Shader.new()
+	shader.code = "shader_type canvas_item; void fragment(){ float a = 1.0 - smoothstep(0.18, 0.62, UV.x); COLOR = vec4(0.02, 0.03, 0.06, 0.25 + a * 0.7); }"
+	material.shader = shader
+	shade.material = material
+	banner_panel.add_child(shade)
+	var margin := MarginContainer.new()
+	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for side in ["left", "right", "top", "bottom"]: margin.add_theme_constant_override("margin_" + side, 16 if compact else 44)
+	banner_panel.add_child(margin)
+	var text := VBoxContainer.new()
+	text.alignment = BoxContainer.ALIGNMENT_CENTER
+	text.add_theme_constant_override("separation", 4 if compact else 10)
+	margin.add_child(text)
+	if entry.origin == "official":
+		var seal := PlayerUI.pill("OFICIAL", "equipped")
+		seal.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		text.add_child(seal)
+	text.add_child(PremiumUI.plain(str(entry.name), 22 if compact else 44, Color.WHITE, false))
+	text.add_child(PremiumUI.plain("%s  •  %s" % [entry.creator, tr("%d cartas") % int(entry.count)], 13 if compact else 20, Color("#d6dbe4"), false))
+	var explore := PremiumUI.action("Explorar coleção  →", "layers", true, _open_entry.bind(entry), compact)
+	explore.name = "ExploreFeatured"
+	explore.icon = null
+	explore.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	text.add_child(explore)
+	# Pontos só quando há mais de um destaque real.
+	if total > 1:
+		var dots := HBoxContainer.new()
+		dots.name = "BannerDots"
+		dots.add_theme_constant_override("separation", 8)
+		for i in total:
+			var dot := Button.new()
+			dot.custom_minimum_size = Vector2(14, 14)
+			dot.add_theme_stylebox_override("normal", PremiumUI.flat(PremiumUI.GOLD if i == _featured else Color(1, 1, 1, 0.35), Color.TRANSPARENT, 7, 0, 0))
+			dot.pressed.connect(func() -> void:
+				_featured = i
 				_update_results())
-			PlayerUI.style_row(chip)
-			chip.toggle_mode = true
-			chip.button_pressed = _category == target
-			topics.add_child(chip)
-	if term.is_empty():
-		var sections := PlayerUI.split(_results)
-		for title: String in ["Populares", "Recentes"]:
-			var section := PlayerUI.column(sections)
-			section.add_child(HSeparator.new())
-			_empty(section, title, _empty_message(title), 18)
+			dots.add_child(dot)
+		text.add_child(dots)
+	return banner_panel
 
-func _empty_message(section: String) -> String:
-	return {
-		"Populares": "Ainda não há dados de popularidade disponíveis.",
-		"Recentes": "As datas de publicação ainda não estão disponíveis.",
-		"Favoritos": "Toque no coração de um deck para guardá-lo aqui.",
-		"Meus Decks": "Crie um deck: os rascunhos ficam salvos neste aparelho."
-	}.get(section, "")
 
+func _open_entry(entry: Dictionary) -> void:
+	if entry.has("item") and not entry.item.is_empty(): _render_deck(entry.item)
+	elif entry.has("draft"):
+		_draft = entry.draft
+		_render_editor()
+
+
+## Cartão de deck: capa horizontal enquadrada, selo, nome, cartas e coração (ou menu ⋯).
 func _empty(parent: Node, title: String, message: String, font_size := 26) -> void:
 	parent.add_child(_text(title, font_size))
 	parent.add_child(_text(message, 16, PlayerUI.MUTED))
 
-func _deck_card(item: Dictionary) -> Button:
-	var card := _action("", _render_deck.bind(item))
-	card.name = "Deck_" + str(item.id)
-	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	card.custom_minimum_size.y = 176 if _compact() else 260
-	card.clip_contents = true
-	card.tooltip_text = tr("Explorar coleção") + ": " + str(item.name)
-	var margin := MarginContainer.new()
-	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	card.add_child(margin)
-	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	for side in ["left", "right", "top", "bottom"]: margin.add_theme_constant_override("margin_" + side, 16 if _compact() else 28)
-	var row := PlayerUI.row(margin)
-	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var info := PlayerUI.column(row)
-	info.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	info.size_flags_stretch_ratio = 1.2
-	if item.official:
+
+func _deck_tile(entry: Dictionary) -> Control:
+	var compact := _compact()
+	var tile := Button.new()
+	tile.name = "Deck_" + str(entry.id).replace(":", "_")
+	tile.tooltip_text = str(entry.name)
+	tile.focus_mode = Control.FOCUS_ALL
+	tile.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	for state in ["normal", "hover", "pressed", "focus"]:
+		var box := PremiumUI.flat(Color(0.05, 0.07, 0.11), PremiumUI.EDGE if state == "normal" else Color(PremiumUI.GOLD, 0.7), 14, 1 if state == "normal" else 2, 0)
+		if state == "focus": box.draw_center = false
+		tile.add_theme_stylebox_override(state, box)
+	tile.clip_contents = true
+	tile.pressed.connect(_open_entry.bind(entry))
+	var column := VBoxContainer.new()
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.add_theme_constant_override("separation", 0)
+	tile.add_child(column)
+	column.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var cover := TextureRect.new()
+	cover.name = "Cover"
+	cover.texture = _cover(str(entry.cover))
+	cover.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	cover.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	cover.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	cover.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	cover.size_flags_stretch_ratio = 1.5
+	cover.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cover.clip_contents = true
+	column.add_child(cover)
+	if entry.origin == "official":
 		var seal := PlayerUI.pill("OFICIAL", "equipped")
-		seal.name = "OfficialSeal"
-		seal.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-		info.add_child(seal)
-	info.add_child(_data_text(item.name, 28 if _compact() else 44))
-	info.add_child(_data_text("%s  ·  %d cartas" % [item.creator if not str(item.creator).is_empty() else "Autoria não informada", item.count], 15, PlayerUI.MUTED))
-	var actions := PlayerUI.row(info)
-	actions.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	actions.add_theme_constant_override("separation", 18)
-	var explore := _text("EXPLORAR COLEÇÃO  →", 14, PlayerUI.GOLD)
-	explore.autowrap_mode = TextServer.AUTOWRAP_OFF
-	explore.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	explore.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	actions.add_child(explore)
-	actions.add_child(_heart(str(item.id)))
-	_surface(card, str(item.id).hash() % 97)
-	var art := Control.new()
-	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	art.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	art.custom_minimum_size.x = 160 if _physical_size().x < 760 else (230 if _compact() else 360)
-	row.add_child(art)
-	for index in range(mini(3, item.cards.size())):
-		var image := _image(item.cards[index].image)
-		art.add_child(image)
-		image.z_index = 2 if index == 1 else 1
-	var fit := func() -> void:
-		var height := maxf(art.size.y - 16, 1)
-		var width := height * 5.0 / 7.0
-		for index in range(art.get_child_count()):
-			var image: Control = art.get_child(index)
-			image.size = Vector2(width, height)
-			image.position = Vector2((art.size.x - width) * 0.5 + (index - 1) * width * 0.58, 8)
-			image.pivot_offset = image.size * 0.5
-			image.rotation = (index - 1) * 0.09
-	art.resized.connect(fit)
-	fit.call_deferred()
-	return card
+		seal.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		cover.add_child(seal)
+		seal.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
+		seal.position += Vector2(10, -32)
+	var info := MarginContainer.new()
+	info.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	info.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	for side in ["left", "right"]: info.add_theme_constant_override("margin_" + side, 10 if compact else 14)
+	for side in ["top", "bottom"]: info.add_theme_constant_override("margin_" + side, 4 if compact else 8)
+	column.add_child(info)
+	var lines := VBoxContainer.new()
+	lines.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	lines.add_theme_constant_override("separation", 2)
+	info.add_child(lines)
+	var title := PremiumUI.plain(str(entry.name), 14 if compact else 21, Color.WHITE, false)
+	title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	title.clip_text = true
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	lines.add_child(title)
+	var meta := HBoxContainer.new()
+	meta.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	meta.add_theme_constant_override("separation", 6)
+	lines.add_child(meta)
+	if entry.origin == "mine":
+		var edited := PlayerContracts.ago(float(entry.get("edited", 0)))
+		if not edited.is_empty():
+			meta.add_child(PremiumUI.icon_rect("pencil", PremiumUI.MUTED, 12 if compact else 16))
+			meta.add_child(PremiumUI.plain(tr("Editado ") + edited, 11 if compact else 14, PremiumUI.MUTED, false))
+	meta.add_child(PremiumUI.icon_rect("cards", PremiumUI.MUTED, 12 if compact else 16))
+	meta.add_child(PremiumUI.plain(tr("%d cartas") % int(entry.count), 11 if compact else 14, PremiumUI.MUTED, false))
+	if entry.origin == "mine":
+		var state := str(entry.draft.get("sync_state", "local"))
+		var pill_text: String = {"synced": "NA CONTA", "pending": "ENVIANDO", "error": "ERRO AO ENVIAR"}.get(state, "RASCUNHO")
+		var pill := PlayerUI.pill(pill_text, "equipped" if state == "synced" else "available")
+		pill.name = "SyncState"
+		pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		meta.add_child(pill)
+	var corner := _deck_menu(entry) if entry.origin == "mine" else _heart(str(entry.id))
+	tile.add_child(corner)
+	corner.anchor_left = 1.0
+	corner.anchor_right = 1.0
+	corner.anchor_top = 1.0
+	corner.anchor_bottom = 1.0
+	corner.offset_left = -50
+	corner.offset_right = -6
+	corner.offset_top = -46
+	corner.offset_bottom = -6
+	return tile
+
+
+func _create_tile() -> Control:
+	var tile := Button.new()
+	tile.name = "CreateDeckTile"
+	tile.text = "+\n" + tr("Criar novo deck")
+	tile.add_theme_font_size_override("font_size", 14 if _compact() else 20)
+	var dashed := PremiumUI.flat(Color(0.04, 0.06, 0.1), Color(1, 1, 1, 0.22), 14, 1, 0)
+	for state in ["normal", "hover", "pressed", "focus"]: tile.add_theme_stylebox_override(state, dashed)
+	tile.add_theme_color_override("font_color", Color.WHITE)
+	tile.pressed.connect(_create_deck)
+	return tile
+
+
+## Menu ⋯ dos decks próprios: só ações que existem de verdade.
+func _deck_menu(entry: Dictionary) -> Control:
+	var menu := MenuButton.new()
+	menu.name = "DeckMenu"
+	menu.text = "⋯"
+	menu.flat = true
+	menu.add_theme_font_size_override("font_size", 22)
+	menu.add_theme_color_override("font_color", Color.WHITE)
+	var popup := menu.get_popup()
+	popup.add_item(tr("Abrir / Editar"), 0)
+	popup.add_item(tr("Duplicar"), 1)
+	popup.add_item(tr("Revisar e publicar"), 2)
+	popup.add_separator()
+	popup.add_item(tr("Excluir"), 3)
+	popup.id_pressed.connect(_menu_action.bind(entry))
+	return menu
+
+
+func _menu_action(id: int, entry: Dictionary) -> void:
+	var draft: Dictionary = entry.draft
+	match id:
+		0: _open_entry(entry)
+		1: _duplicate_draft(draft)
+		2:
+			_draft = draft
+			_render_review()
+		3: _confirm_delete(draft)
+
+
+func _duplicate_draft(draft: Dictionary) -> void:
+	var copy := _store().new_draft()
+	copy.name = (str(draft.name) + " " + tr("(cópia)")).left(DeckDrafts.NAME_MAX)
+	for key in ["description", "category", "visibility"]: copy[key] = draft.get(key, copy[key])
+	for card: Dictionary in draft.get("cards", []):
+		var clone := {"id": "card_%d_%d" % [Time.get_ticks_msec(), randi() % 100000], "name": card.get("name", ""), "description": card.get("description", ""), "crops": card.get("crops", {}).duplicate(true), "image_file": ""}
+		var bytes := _store().file_bytes(str(draft.id), str(card.get("image_file", "")))
+		if not bytes.is_empty():
+			clone.image_file = _store().store_original(str(copy.id), str(clone.id), bytes, str(card.image_file).get_extension())
+			var image := _store().original_image(str(copy.id), clone)
+			if image != null: _store().store_previews(str(copy.id), clone, image)
+		copy.cards.append(clone)
+	_store().save(copy)
+	banner.show_state("success", "Cópia criada neste aparelho.")
+	_update_results()
+
+
+## Capas: texturas importadas (res://) ou prévias locais em cache (sem reler o disco a cada filtro).
+func _cover(path: String) -> Texture2D:
+	if path.is_empty(): return null
+	if path.begins_with("res://"): return load(path) as Texture2D if ResourceLoader.exists(path) else null
+	if not FileAccess.file_exists(path): return null
+	var key := "%s@%d" % [path, FileAccess.get_modified_time(path)]
+	if not _covers.has(key):
+		var image := Image.load_from_file(path)
+		_covers[key] = ImageTexture.create_from_image(image) if image != null else null
+	return _covers[key]
+
+
+func _fit_tiles() -> void:
+	if not is_instance_valid(_grid) or _grid.name != "DeckGrid": return
+	var width := _physical_size().x - (_filter_panel.custom_minimum_size.x if is_instance_valid(_filter_panel) and _filter_panel.visible else 0.0) - (60 if _compact() else 130)
+	_grid.columns = clampi(floori(width / (190 if _compact() else 300)), 2, 4)
+	var tile_width := (width - (_grid.columns - 1) * 18) / _grid.columns
+	for tile: Control in _grid.get_children(): tile.custom_minimum_size = Vector2(tile_width, tile_width * (0.62 if _compact() else 0.6))
+
+
+# --- Painel "Filtrar decks" --------------------------------------------------------------
+
+func _filters() -> Control:
+	var compact := _compact()
+	var panel := PremiumUI.panel("FilterPanel", 10 if compact else 20)
+	panel.custom_minimum_size.x = 170 if compact else 300
+	panel.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 4 if compact else 8)
+	panel.add_child(column)
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 10)
+	head.add_child(PremiumUI.icon_rect("filter", PremiumUI.GOLD, 18 if compact else 28))
+	head.add_child(PremiumUI.plain("Filtrar decks", 15 if compact else 24, Color.WHITE))
+	column.add_child(head)
+	column.add_child(_filter_group("Tipo", [["Oficiais", "official"], ["Comunidade", "community"], ["Meus decks", "mine"]], _types, "Type_"))
+	var themes: Array = []
+	for entry in _entries():
+		var category := str(entry.category)
+		if not category.is_empty() and not themes.has([category, category]): themes.append([category, category])
+	themes.sort_custom(func(a: Array, b: Array) -> bool: return str(a[0]) < str(b[0]))
+	var theme_group := _filter_group("Temática", themes, _themes, "Theme_")
+	if themes.is_empty(): theme_group.add_child(PlayerUI.label("Os decks ainda não informam temática.", 11 if compact else 14, PremiumUI.MUTED))
+	column.add_child(theme_group)
+	var clear := PremiumUI.action("Limpar filtros", "refresh", false, _clear_filters, compact)
+	clear.name = "ClearFilters"
+	column.add_child(clear)
+	return panel
+
+
+func _filter_group(title: String, options: Array, selected: Dictionary, prefix: String) -> VBoxContainer:
+	var compact := _compact()
+	var group := VBoxContainer.new()
+	group.name = "Group_" + title
+	group.add_theme_constant_override("separation", 0 if compact else 4)
+	var rule := ColorRect.new()
+	rule.color = Color(1, 1, 1, 0.08)
+	rule.custom_minimum_size.y = 1
+	group.add_child(rule)
+	group.add_child(PremiumUI.plain(title, 13 if compact else 20, Color.WHITE))
+	for option: Array in options:
+		var box := CheckBox.new()
+		box.name = prefix + str(option[1]).replace(" ", "_")
+		box.text = tr(str(option[0]))
+		box.button_pressed = selected.has(str(option[1]))
+		box.add_theme_font_size_override("font_size", 12 if compact else 17)
+		box.add_theme_color_override("font_color", Color("#e8edf5"))
+		box.add_theme_color_override("font_pressed_color", Color.WHITE)
+		box.add_theme_icon_override("checked", _check_icon(true))
+		box.add_theme_icon_override("unchecked", _check_icon(false))
+		box.toggled.connect(func(value: bool) -> void:
+			if value: selected[str(option[1])] = true
+			else: selected.erase(str(option[1]))
+			_update_results())
+		group.add_child(box)
+	return group
+
+
+func _check_icon(on: bool) -> Texture2D:
+	var key := "check_%s" % on
+	if _covers.has(key): return _covers[key]
+	var svg := '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24">' + ('<rect x="2" y="2" width="20" height="20" rx="5" fill="#e8b860"/><path d="M6.5 12.5l3.5 3.5 7.5-8" fill="none" stroke="#141006" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>' if on else '<rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="#a8bad3" stroke-width="1.6"/>') + '</svg>'
+	var image := Image.new()
+	image.load_svg_from_string(svg)
+	image.resize(22, 22, Image.INTERPOLATE_LANCZOS)
+	_covers[key] = ImageTexture.create_from_image(image)
+	return _covers[key]
+
 
 func _render_deck(item: Dictionary) -> void:
 	if _deck.get("id", "") != item.id: _gallery_scroll = 0
@@ -557,64 +997,6 @@ func _remote_section(kind: String) -> void:
 	else: _pulled_favorites = true
 	if not result.ok: _remote_error[kind] = str(result.get("code", "erro"))
 	if is_inside_tree() and _view == "library": _update_results()
-
-
-func _render_favorites() -> void:
-	_remote_section.call_deferred("favorites")
-	var ids := _store().favorites()
-	var shown := 0
-	_results.add_child(_text("FAVORITOS", 12, PlayerUI.GOLD))
-	for item in _catalog:
-		if ids.has(str(item.id)):
-			_results.add_child(_deck_card(item))
-			shown += 1
-	if shown == 0:
-		_empty(_results, "Nenhum favorito ainda", _empty_message("Favoritos"))
-	_results.add_child(_text("Favoritos ficam neste aparelho e, com a conta conectada, também no servidor.", 14, PlayerUI.MUTED))
-
-
-func _render_my_decks() -> void:
-	var create := _action("+  Criar deck", func() -> void:
-		_draft = _store().new_draft()
-		_render_editor())
-	create.name = "CreateDeck"
-	PlayerUI.style_button(create, true)
-	create.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	create.custom_minimum_size.x = 200
-	_results.add_child(create)
-	_remote_section.call_deferred("decks")
-	var drafts := _store().list()
-	_results.add_child(_text("RASCUNHOS", 12, PlayerUI.GOLD))
-	if drafts.is_empty():
-		_empty(_results, "Nenhum rascunho", _empty_message("Meus Decks"), 20)
-	for draft: Dictionary in drafts:
-		var row := PlayerUI.row(_results)
-		row.name = "Draft_" + str(draft.id)
-		var label := _data_text("%s  ·  %d cartas" % [str(draft.name) if not str(draft.name).is_empty() else tr("Sem nome"), draft.cards.size()], 18)
-		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		row.add_child(label)
-		var state := str(draft.get("sync_state", "local"))
-		var pill_text: String = {"synced": "NA CONTA", "pending": "ENVIANDO", "error": "ERRO AO ENVIAR"}.get(state, "SÓ NESTE APARELHO")
-		var pill := PlayerUI.pill(pill_text, "equipped" if state == "synced" else "available")
-		pill.name = "SyncState"
-		row.add_child(pill)
-		if state in ["error", "pending"] and _sync().available():
-			var retry := _action("Tentar novamente", func() -> void:
-				banner.show_state("loading")
-				_report(await _sync().push(draft))
-				_update_results())
-			retry.name = "RetryDraft"
-			row.add_child(retry)
-		var edit := _action("Editar", func() -> void:
-			_draft = draft
-			_render_editor())
-		edit.name = "EditDraft"
-		row.add_child(edit)
-		var remove := _action("Excluir", _confirm_delete.bind(draft))
-		remove.name = "DeleteDraft"
-		row.add_child(remove)
-	_results.add_child(_text("PUBLICADOS", 12, PlayerUI.GOLD))
-	_results.add_child(_text("A publicação para a comunidade ainda não está habilitada. Rascunhos ficam neste aparelho e na sua conta.", 15, PlayerUI.MUTED))
 
 
 func _confirm_delete(draft: Dictionary) -> void:

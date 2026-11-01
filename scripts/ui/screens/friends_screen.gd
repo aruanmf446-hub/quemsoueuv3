@@ -1,9 +1,17 @@
 extends PlayerScreen
+## Amizades (referências T22): barra lateral com Amigos/Recebidas/Enviadas/Buscar e a lista
+## do momento; à direita o jogador selecionado, ações reais e painéis de contexto.
+## Só dados reais do GAME. O que o servidor ainda não fornece aparece como indisponível
+## (contrato em docs/contracts/T22_AMIZADES.md); fixtures só nos testes.
 
+const MIN_LOGICAL_WIDTH := 900.0
+const TABS := [["Amigos", "friends", "friends"], ["Recebidas", "incoming", "inbox"], ["Enviadas", "outgoing", "outbox"], ["Buscar", "search", "search"]]
 var _tab := "friends"
 var _term := ""
 var _results: Array = []
 var _search_epoch := 0
+var _selected := {}
+var _searched := false
 ## Conversa aberta (amigo) ou {} na lista. O chat só consulta o servidor com ela aberta.
 var _chat_friend: Dictionary = {}
 var _chat_list: VBoxContainer
@@ -12,14 +20,22 @@ var _chat_input: LineEdit
 var _chat_status: Label
 var _chat_send: Button
 var _rendered_ids: Dictionary = {}
+var _backdrop: ColorRect
+var _brand: HBoxContainer
+var _title_icon: TextureRect
 
 
 func _ready() -> void:
+	manages_own_scale = true
 	super._ready()
 	heading.text = tr("Amizades")
+	_build_header()
+	resized.connect(_fit)
 	services.session.changed.connect(func() -> void:
 		_search_epoch += 1
 		_results.clear()
+		_selected.clear()
+		_searched = false
 		_term = "")
 	services.friends.changed.connect(func() -> void:
 		if not services.session.authenticated():
@@ -31,87 +47,251 @@ func _ready() -> void:
 		if not is_visible_in_tree() and not _chat_friend.is_empty(): _close_chat(false))
 
 
+func _build_header() -> void:
+	_backdrop = PremiumUI.backdrop()
+	add_child(_backdrop)
+	move_child(_backdrop, 0)
+	_backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	if has_node("Tint"): $Tint.hide()
+	var header: HBoxContainer = $Margin/Column/Header
+	var back: Button = $Margin/Column/Header/Back
+	var divider := ColorRect.new()
+	divider.color = Color(1, 1, 1, 0.16)
+	divider.custom_minimum_size = Vector2(1, 36)
+	divider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	header.add_child(divider)
+	header.move_child(divider, back.get_index() + 1)
+	_brand = HBoxContainer.new()
+	_brand.name = "Brand"
+	_brand.add_theme_constant_override("separation", 8)
+	_brand.add_child(PremiumUI.icon_rect("crown", PremiumUI.GOLD, 30))
+	_brand.add_child(PremiumUI.plain("Quem Sou Eu V3", 24, Color.WHITE, false))
+	header.add_child(_brand)
+	header.move_child(_brand, divider.get_index() + 1)
+	var divider2 := divider.duplicate() as ColorRect
+	header.add_child(divider2)
+	header.move_child(divider2, _brand.get_index() + 1)
+	_title_icon = PremiumUI.icon_rect("friends", PremiumUI.GOLD, 36)
+	header.add_child(_title_icon)
+	header.move_child(_title_icon, divider2.get_index() + 1)
+	$Margin/Column/Scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+
+
+func _compact() -> bool:
+	return size.y / _factor() < 600.0
+
+
+func _factor() -> float:
+	return minf(PlayerUI.unit(self), size.x / MIN_LOGICAL_WIDTH) if size.x > 0 else 1.0
+
+
+## Escala própria: em janelas estreitas o layout inteiro reduz junto (nada cortado).
+func _fit() -> void:
+	if not is_inside_tree(): return
+	var factor := _factor()
+	var compact := _compact()
+	var margin: MarginContainer = $Margin
+	margin.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	margin.scale = Vector2.ONE * factor
+	margin.position = Vector2.ZERO
+	margin.size = size / factor
+	for side in ["left", "right"]: margin.add_theme_constant_override("margin_" + side, 16 if compact else 28)
+	margin.add_theme_constant_override("margin_top", 8 if compact else 16)
+	margin.add_theme_constant_override("margin_bottom", 10 if compact else 22)
+	$Margin/Column.add_theme_constant_override("separation", 8 if compact else 18)
+	var back: Button = $Margin/Column/Header/Back
+	back.custom_minimum_size = Vector2(96 if compact else 126, 38 if compact else 50)
+	back.add_theme_font_size_override("font_size", 15 if compact else 20)
+	heading.add_theme_font_size_override("font_size", 24 if compact else 38)
+	heading.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_title_icon.custom_minimum_size = Vector2.ONE * (26 if compact else 36)
+	_brand.visible = size.x / factor >= 760.0
+
+
+func _adapt_scale() -> void:
+	_fit()
+
+
 func render() -> void:
 	PlayerUI.clear(body)
+	heading.text = tr("Amizades")
 	banner.show_state(services.friends.state)
+	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_fit()
 	if not services.session.authenticated():
 		_signed_out()
 		return
 	if not _chat_friend.is_empty():
 		_render_chat()
 		return
-	var tabs := PlayerUI.row(body)
-	tabs.add_theme_constant_override("separation", 8)
-	for item: Array in [["Amigos", "friends"], ["Recebidas", "incoming"], ["Enviadas", "outgoing"], ["Buscar", "search"]]:
-		var count: int = services.friends.data.get(item[1], []).size() if item[1] != "search" else 0
-		var tab := PlayerUI.button(item[0] + ("  %d" % count if count > 0 else ""), _change_tab.bind(item[1]))
-		PlayerUI.style_row(tab)
+	var compact := _compact()
+	var layout := HBoxContainer.new()
+	layout.name = "FriendsLayout"
+	layout.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	layout.add_theme_constant_override("separation", 12 if compact else 22)
+	body.add_child(layout)
+	layout.add_child(_sidebar())
+	var main := PremiumUI.panel("MainPanel", 14 if compact else 26)
+	main.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	main.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	main.size_flags_stretch_ratio = 2.3
+	layout.add_child(main)
+	var scroll := ScrollContainer.new()
+	scroll.name = "MainScroll"
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	main.add_child(scroll)
+	var content := VBoxContainer.new()
+	content.name = "MainContent"
+	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	content.add_theme_constant_override("separation", 12 if compact else 20)
+	scroll.add_child(content)
+	if _tab == "search":
+		_render_search(content)
+		return
+	var players: Array = services.friends.data.get(_tab, [])
+	var player := _current(players)
+	if player.is_empty():
+		_empty_state(content)
+		return
+	_detail(content, player, _tab)
+	_context_panels(content, player)
+
+
+# --- Barra lateral --------------------------------------------------------------------
+
+func _sidebar() -> Control:
+	var compact := _compact()
+	var side := PremiumUI.panel("Sidebar", 10 if compact else 16)
+	side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	side.size_flags_stretch_ratio = 1.0
+	side.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 6 if compact else 10)
+	side.add_child(column)
+	for item: Array in TABS:
+		var count: int = services.friends.data.get(item[1], []).size() if item[1] != "search" else -1
+		var tab := Button.new()
+		tab.name = "Tab_" + item[1]
+		tab.text = tr(item[0])
+		tab.icon = PremiumUI.icon(item[2], PremiumUI.GOLD if item[1] != _tab else Color.WHITE, 40)
+		tab.expand_icon = false
+		tab.add_theme_constant_override("icon_max_width", 18 if compact else 28)
+		tab.add_theme_constant_override("h_separation", 14)
+		tab.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		tab.toggle_mode = true
 		tab.button_pressed = item[1] == _tab
-		tabs.add_child(tab)
+		tab.custom_minimum_size.y = 36 if compact else 56
+		tab.add_theme_font_size_override("font_size", 15 if compact else 22)
+		PremiumUI.style_tab(tab)
+		tab.pressed.connect(_change_tab.bind(item[1]))
+		if count >= 0:
+			var badge := PremiumUI.plain(str(count), 13 if compact else 18, Color.WHITE, false)
+			badge.name = "Count"
+			badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			badge.add_theme_stylebox_override("normal", PremiumUI.flat(Color(1, 1, 1, 0.12), Color.TRANSPARENT, 12, 0, 4))
+			badge.custom_minimum_size = Vector2(28 if compact else 40, 0)
+			tab.add_child(badge)
+			badge.anchor_left = 1.0
+			badge.anchor_right = 1.0
+			badge.anchor_top = 0.5
+			badge.anchor_bottom = 0.5
+			badge.offset_left = -(40 if compact else 56)
+			badge.offset_right = -10
+			badge.offset_top = -(11 if compact else 15)
+			badge.offset_bottom = 11 if compact else 15
+		column.add_child(tab)
+	# Em Buscar, os resultados ficam no painel principal; a lateral mostra seus amigos.
+	var titles := {"friends": "Seus amigos", "incoming": "Solicitações recebidas", "outgoing": "Solicitações enviadas", "search": "Seus amigos"}
+	var list_key := "friends" if _tab == "search" else _tab
+	var list_items: Array = services.friends.data.get(list_key, [])
+	var section := HBoxContainer.new()
+	section.add_theme_constant_override("separation", 8)
+	var title := PremiumUI.plain("%s (%d)" % [tr(titles[_tab]), list_items.size()], 15 if compact else 22, Color.WHITE, false)
+	title.name = "SectionTitle"
+	section.add_child(title)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	tabs.add_child(spacer)
-	var refresh := PlayerUI.button("↻", func() -> void: services.friends.refresh())
+	section.add_child(spacer)
+	var refresh := Button.new()
+	refresh.name = "Refresh"
 	refresh.tooltip_text = tr("Atualizar")
-	refresh.custom_minimum_size = Vector2(56, 52)
-	tabs.add_child(refresh)
-	if _tab == "search":
-		var line := PlayerUI.row(body)
-		var query := LineEdit.new()
-		query.text = _term
-		query.placeholder_text = tr("Nickname ou ID público")
-		query.custom_minimum_size = Vector2(420, 52)
-		query.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		query.text_changed.connect(func(value: String) -> void: _term = value)
-		query.text_submitted.connect(_search)
-		PlayerUI.style_field(query)
-		line.add_child(query)
-		var go := PlayerUI.button("Buscar", func() -> void: _search(query.text))
-		PlayerUI.style_button(go, true)
-		line.add_child(go)
-		for player: Dictionary in _results:
-			_player_row(player, "send")
-	else:
-		var players: Array = services.friends.data.get(_tab, [])
-		if players.is_empty():
-			_empty({"friends": "Você ainda não tem amigos aqui.", "incoming": "Nenhum convite recebido.", "outgoing": "Nenhum convite enviado."}[_tab])
-		for player: Dictionary in players:
-			_player_row(player, {"friends": "remove", "incoming": "accept", "outgoing": "cancel"}[_tab])
+	refresh.icon = PremiumUI.icon("refresh", PremiumUI.GOLD, 32)
+	refresh.expand_icon = false
+	refresh.flat = true
+	refresh.pressed.connect(func() -> void: services.friends.refresh())
+	section.add_child(refresh)
+	column.add_child(section)
+	var scroll := ScrollContainer.new()
+	scroll.name = "PlayerListScroll"
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	column.add_child(scroll)
+	var list := VBoxContainer.new()
+	list.name = "PlayerList"
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	list.add_theme_constant_override("separation", 4)
+	scroll.add_child(list)
+	var current := _current(list_items) if _tab != "search" else {}
+	for player: Dictionary in list_items:
+		var row := _list_row(player, str(player.user_id) == str(current.get("user_id", "")))
+		if _tab == "search":
+			row.pressed.disconnect(_select.bind(player))
+			row.pressed.connect(func() -> void:
+				_selected["friends"] = str(player.user_id)
+				_change_tab("friends"))
+		list.add_child(row)
+	if list_items.is_empty():
+		var note := PlayerUI.label({"friends": "Nenhum amigo ainda. Use Buscar para encontrar jogadores.", "incoming": "Nenhuma solicitação recebida.", "outgoing": "Nenhuma solicitação enviada.", "search": "Nenhum amigo ainda."}[_tab], 13 if compact else 16, PremiumUI.MUTED)
+		note.name = "EmptyList"
+		list.add_child(note)
+	return side
 
 
-## Sem conta: um cartão central com convite para entrar, no lugar da barra solta.
-func _signed_out() -> void:
-	var center := MarginContainer.new()
-	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	center.custom_minimum_size.y = 230
-	body.add_child(center)
-	var card := PlayerUI.column(center)
-	card.custom_minimum_size.x = 0
-	card.alignment = BoxContainer.ALIGNMENT_CENTER
-	var icon := TextureRect.new()
-	icon.texture = preload("res://assets/icons/vector/icon_friends.svg")
-	icon.custom_minimum_size = Vector2(64, 64)
-	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.modulate = PlayerUI.GOLD
-	card.add_child(icon)
-	var title := PlayerUI.label("Jogue com seus amigos", 28, Color.WHITE)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	card.add_child(title)
-	var enter := PlayerUI.button("Entrar na conta", func() -> void: navigate_requested.emit("account", {}))
-	PlayerUI.style_button(enter, true)
-	enter.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	enter.custom_minimum_size.x = 240
-	card.add_child(enter)
+func _list_row(player: Dictionary, selected: bool) -> Button:
+	var compact := _compact()
+	var row := Button.new()
+	row.name = "Player_" + str(player.public_id)
+	row.toggle_mode = true
+	row.button_pressed = selected
+	row.custom_minimum_size.y = 50 if compact else 78
+	row.focus_mode = Control.FOCUS_ALL
+	PremiumUI.style_tab(row)
+	var flat := StyleBoxEmpty.new()
+	row.add_theme_stylebox_override("normal", flat)
+	row.pressed.connect(_select.bind(player))
+	var line := HBoxContainer.new()
+	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	line.add_theme_constant_override("separation", 10 if compact else 14)
+	row.add_child(line)
+	line.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	line.offset_left = 8
+	line.offset_right = -8
+	line.add_child(PremiumUI.avatar(PlayerUI.portrait_texture(str(player.get("equipped_character_id", ""))), 36 if compact else 58, 2))
+	var text := VBoxContainer.new()
+	text.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	text.alignment = BoxContainer.ALIGNMENT_CENTER
+	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	text.add_theme_constant_override("separation", 0)
+	line.add_child(text)
+	var name := PremiumUI.plain(_nickname(player), 14 if compact else 20, Color.WHITE, false)
+	name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name.clip_text = true
+	text.add_child(name)
+	text.add_child(_status_line(player, 11 if compact else 15))
+	return row
 
 
-func _empty(text: String) -> void:
-	var note := PlayerUI.label(text, 20, Color("#a8bad3"))
-	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	note.custom_minimum_size.y = 120
-	note.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	body.add_child(note)
+func _current(players: Array) -> Dictionary:
+	var wanted := str(_selected.get(_tab, ""))
+	for player: Dictionary in players:
+		if str(player.user_id) == wanted: return player
+	return players[0] if not players.is_empty() else {}
+
+
+func _select(player: Dictionary) -> void:
+	_selected[_tab] = str(player.user_id)
+	render()
 
 
 func _change_tab(tab: String) -> void:
@@ -126,66 +306,366 @@ func show_screen(params: Dictionary = {}) -> void:
 	super.show_screen(params)
 
 
-func _player_row(player: Dictionary, action: String) -> void:
-	var card := PlayerUI.card(body)
-	var row := PlayerUI.row(card)
+# --- Jogador selecionado ---------------------------------------------------------------
+
+func _nickname(player: Dictionary) -> String:
+	var nickname: Variant = player.get("nickname")
+	return str(nickname) if nickname is String and not str(nickname).is_empty() else tr("Sem nickname")
+
+
+## "online"/"offline" conhecidos só para amigos (presença do GAME); demais: desconhecido.
+func _status_line(player: Dictionary, font: int) -> Control:
+	var id := str(player.get("user_id", ""))
+	if _relation(id) == "outgoing" and _tab == "outgoing":
+		var waiting := HBoxContainer.new()
+		waiting.add_theme_constant_override("separation", 6)
+		waiting.add_child(PremiumUI.icon_rect("clock", PremiumUI.GOLD, font + 2))
+		waiting.add_child(PremiumUI.plain("Aguardando resposta", font, PremiumUI.GOLD_LIGHT))
+		return waiting
+	if services.friends.presence_known.has(id):
+		var online := services.friends.online_ids.has(id)
+		return PremiumUI.presence(tr("Online") if online else tr("Offline"), online, font)
+	var level: Variant = player.get("level")
+	return PremiumUI.plain(tr("Nível ") + str(level) if level != null else tr("Presença indisponível"), font, PremiumUI.MUTED, false)
+
+
+func _relation(user_id: String) -> String:
+	for key: String in ["friends", "incoming", "outgoing"]:
+		for player: Dictionary in services.friends.data.get(key, []):
+			if str(player.user_id) == user_id: return key
+	return "none"
+
+
+func _detail(parent: Control, player: Dictionary, kind: String) -> void:
+	var compact := _compact()
+	var top := HBoxContainer.new()
+	top.name = "PlayerHeader"
+	top.add_theme_constant_override("separation", 16 if compact else 34)
+	parent.add_child(top)
 	var character_id := str(player.get("equipped_character_id", ""))
-	# Somente PNGs já em cache. Modelos são carregados ao abrir um único perfil.
-	var avatar := PlayerUI.portrait(character_id, 64)
-	row.add_child(avatar)
-	var info := PlayerUI.column(row)
-	info.add_theme_constant_override("separation", 2)
-	info.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	var nickname := PlayerUI.label(str(player.get("nickname", "Sem nickname")), 24, PlayerUI.GOLD)
-	nickname.autowrap_mode = TextServer.AUTOWRAP_OFF
-	nickname.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	nickname.clip_text = true
-	info.add_child(nickname)
-	info.custom_minimum_size.x = 120
-	var presence := services.friends.presence_label(str(player.user_id))
-	var entry := services.inventory.entry(character_id)
-	var online := presence == "Online"
-	var details := PlayerUI.label("%s%s  ·  %s" % ["● " if online else "", presence, entry.get("name", "Skin indisponível")], 16, Color("#7fe0a0") if online else Color("#a8bad3"))
-	# Em telas estreitas uma linha só, com reticências, em vez de quebrar letra a letra.
-	details.autowrap_mode = TextServer.AUTOWRAP_OFF
-	details.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	details.clip_text = true
-	details.custom_minimum_size.x = 0
-	details.tooltip_text = details.text
-	info.add_child(details)
-	var view := PlayerUI.button("Ver perfil", func() -> void: navigate_requested.emit("public_profile", {"public_id": player.public_id}))
-	view.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	row.add_child(view)
-	if action == "remove":
-		var talk := PlayerUI.button("Conversar", _open_chat.bind(player))
-		talk.name = "Talk"
-		PlayerUI.style_button(talk, true)
-		talk.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		row.add_child(talk)
-	var actions := {"send": "Adicionar", "accept": "Aceitar", "decline": "Recusar", "cancel": "Cancelar", "remove": "Remover"}
-	var main := PlayerUI.button(actions[action], _act.bind(action, str(player.user_id)))
-	PlayerUI.style_button(main, action in ["send", "accept"])
-	main.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	row.add_child(main)
-	if action == "accept":
-		var decline := PlayerUI.button("Recusar", _act.bind("decline", str(player.user_id)))
-		decline.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		row.add_child(decline)
-	# Telas estreitas (celular deitado): botões menores para todos caberem na linha.
-	if UIScale.is_compact():
-		row.add_theme_constant_override("separation", 8)
-		avatar.custom_minimum_size = Vector2(44, 44)
-		info.custom_minimum_size.x = 80
-		for button: Button in row.find_children("*", "Button", false, false):
-			button.add_theme_font_size_override("font_size", 16)
-			button.custom_minimum_size = Vector2(0, 44)
-			for side in ["left", "right"]:
-				for style in ["normal", "hover", "pressed", "focus", "disabled"]:
-					var box := button.get_theme_stylebox(style)
-					if box != null:
-						box = box.duplicate()
-						box.set("content_margin_" + side, 10)
-						button.add_theme_stylebox_override(style, box)
+	top.add_child(PremiumUI.avatar(PlayerUI.portrait_texture(character_id), (72 if kind == "search" else 100) if compact else (170 if kind == "search" else 220), 4))
+	var info := VBoxContainer.new()
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	info.alignment = BoxContainer.ALIGNMENT_CENTER
+	info.add_theme_constant_override("separation", 4 if compact else 8)
+	top.add_child(info)
+	var name := PremiumUI.plain(_nickname(player), 22 if compact else 46, Color.WHITE, false)
+	name.name = "PlayerName"
+	info.add_child(name)
+	var id_line := HBoxContainer.new()
+	id_line.add_theme_constant_override("separation", 10)
+	var public_id := str(player.get("public_id", ""))
+	id_line.add_child(PremiumUI.plain(tr("ID Público: ") + public_id, 13 if compact else 22, PremiumUI.MUTED, false))
+	var copy := Button.new()
+	copy.name = "CopyPublicId"
+	copy.tooltip_text = tr("Copiar ID público")
+	copy.icon = PremiumUI.icon("copy", Color.WHITE, 32)
+	copy.expand_icon = false
+	copy.flat = true
+	copy.pressed.connect(func() -> void:
+		DisplayServer.clipboard_set(public_id)
+		banner.show_state("success", tr("ID público copiado.")))
+	id_line.add_child(copy)
+	info.add_child(id_line)
+	info.add_child(_status_line(player, 14 if compact else 22))
+	var equipped := PanelContainer.new()
+	equipped.name = "EquippedCharacter"
+	var box := PremiumUI.flat(Color(0.07, 0.09, 0.13), Color(1, 1, 1, 0.14), 12, 1, 12 if compact else 16)
+	equipped.add_theme_stylebox_override("panel", box)
+	equipped.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	equipped.custom_minimum_size.x = 220 if compact else 460
+	info.add_child(equipped)
+	var line := HBoxContainer.new()
+	line.add_theme_constant_override("separation", 14)
+	equipped.add_child(line)
+	line.add_child(PremiumUI.icon_rect("star", PremiumUI.GOLD, 22 if compact else 34))
+	var labels := VBoxContainer.new()
+	labels.add_theme_constant_override("separation", 0)
+	line.add_child(labels)
+	labels.add_child(PremiumUI.plain("Personagem equipado", 11 if compact else 16, PremiumUI.MUTED))
+	labels.add_child(PremiumUI.plain(str(services.inventory.entry(character_id).get("name", "—")), 16 if compact else 28, Color.WHITE, false))
+	_actions(parent, player, kind)
+	var rule := ColorRect.new()
+	rule.color = Color(1, 1, 1, 0.08)
+	rule.custom_minimum_size.y = 1
+	parent.add_child(rule)
+
+
+func _actions(parent: Control, player: Dictionary, kind: String) -> void:
+	var compact := _compact()
+	var row := HBoxContainer.new()
+	row.name = "PlayerActions"
+	row.add_theme_constant_override("separation", 10 if compact else 22)
+	parent.add_child(row)
+	var id := str(player.user_id)
+	var relation := _relation(id)
+	var buttons: Array = []
+	match relation if kind == "search" else kind:
+		"friends":
+			buttons = [["Convidar", "gamepad", true, _invite.bind(player), "Invite"], ["Enviar mensagem", "chat", false, _open_chat.bind(player), "Talk"], ["Remover amizade", "user_minus", false, _confirm_remove.bind(player), "Remove"]]
+		"incoming":
+			buttons = [["Aceitar", "user_plus", true, _act.bind("accept", id), "Accept"], ["Recusar", "x", false, _act.bind("decline", id), "Decline"], ["Ver perfil", "user", false, _view.bind(player), "ViewProfile"]]
+		"outgoing":
+			buttons = [["Cancelar solicitação", "x", true, _act.bind("cancel", id), "CancelRequest"], ["Ver perfil", "user", false, _view.bind(player), "ViewProfile"], ["Enviar mensagem", "chat", false, func() -> void: pass, "Talk"]]
+		_:
+			buttons = [["Adicionar amigo", "user_plus", true, _act.bind("send", id), "AddFriend"], ["Ver perfil", "user", false, _view.bind(player), "ViewProfile"], ["Enviar mensagem", "chat", false, func() -> void: pass, "Talk"]]
+	# Telas baixas: rótulos curtos para as três ações caberem lado a lado.
+	var short := {"Enviar mensagem": "Mensagem", "Remover amizade": "Remover", "Cancelar solicitação": "Cancelar", "Adicionar amigo": "Adicionar"}
+	for item: Array in buttons:
+		var label: String = short.get(item[0], item[0]) if compact else item[0]
+		var button := PremiumUI.action(label, item[1], item[2], item[3], compact)
+		button.name = item[4]
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		# Conversa privada só entre amigos (regra do gateway de chat).
+		if item[4] == "Talk" and relation != "friends":
+			button.disabled = true
+			button.tooltip_text = tr("A conversa abre quando vocês forem amigos.")
+		row.add_child(button)
+
+
+func _view(player: Dictionary) -> void:
+	navigate_requested.emit("public_profile", {"public_id": player.public_id})
+
+
+# --- Painéis de contexto (inferiores) --------------------------------------------------
+
+func _context_panels(parent: Control, player: Dictionary) -> void:
+	var row := HBoxContainer.new()
+	row.name = "ContextPanels"
+	row.add_theme_constant_override("separation", 12 if _compact() else 22)
+	parent.add_child(row)
+	var id := str(player.user_id)
+	match _tab:
+		"friends":
+			var shared := _sub_panel(row, "bolt", "Ações em comum", "")
+			_link_row(shared, "gamepad", "Convidar para uma partida", _invite.bind(player), "InviteRow")
+			_link_row(shared, "chat", "Abrir conversa", _open_chat.bind(player), "ChatRow")
+			_link_row(shared, "user", "Ver perfil público", _view.bind(player), "ProfileRow")
+			var invites := _sub_panel(row, "mail", "Convites pendentes", tr("Convites de jogo entre você e %s.") % _nickname(player))
+			_unavailable(invites, "Convites de partida ainda não aparecem aqui. Use Convidar: o link da sua sala vai pela conversa.")
+		"incoming":
+			var mutual := _sub_panel(row, "friends", "Amigos em comum", "")
+			_unavailable(mutual, "O servidor ainda não informa amigos em comum.")
+			var others := _sub_panel(row, "inbox", tr("Outras solicitações (%d)") % maxi(services.friends.data.get("incoming", []).size() - 1, 0), "")
+			for other: Dictionary in services.friends.data.get("incoming", []):
+				if str(other.user_id) == id: continue
+				_request_row(others, other)
+			if others.get_child_count() <= 1: _unavailable(others, "Nenhuma outra solicitação.")
+		"outgoing":
+			var details := _sub_panel(row, "info", "Detalhes do envio", "")
+			_info_row(details, "send", tr("Solicitação enviada para %s") % _nickname(player))
+			_info_row(details, "clock", "Aguardando resposta do jogador")
+			var others := _sub_panel(row, "outbox", "Outras solicitações enviadas", "")
+			for other: Dictionary in services.friends.data.get("outgoing", []):
+				if str(other.user_id) == id: continue
+				_link_row(others, "user", _nickname(other), _select.bind(other), "Other_" + str(other.public_id))
+			if others.get_child_count() <= 1: _unavailable(others, "Nenhuma outra solicitação enviada.")
+
+
+func _sub_panel(parent: Control, icon: String, title: String, subtitle: String) -> VBoxContainer:
+	var compact := _compact()
+	var panel := PanelContainer.new()
+	panel.name = "Panel_" + title.get_slice(" ", 0)
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	panel.add_theme_stylebox_override("panel", PremiumUI.flat(Color(0.05, 0.07, 0.11), PremiumUI.EDGE, 14, 1, 10 if compact else 18))
+	parent.add_child(panel)
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 6 if compact else 10)
+	panel.add_child(column)
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 10)
+	head.add_child(PremiumUI.icon_rect(icon, PremiumUI.GOLD, 20 if compact else 30))
+	head.add_child(PremiumUI.plain(title, 15 if compact else 24, Color.WHITE, false))
+	column.add_child(head)
+	if not subtitle.is_empty() and not compact: column.add_child(PlayerUI.label(subtitle, 15, PremiumUI.MUTED))
+	return column
+
+
+func _link_row(parent: Control, icon: String, text: String, callback: Callable, node_name: String) -> void:
+	var compact := _compact()
+	var button := Button.new()
+	button.name = node_name
+	button.text = tr(text)
+	button.icon = PremiumUI.icon(icon, PremiumUI.GOLD, 36)
+	button.expand_icon = false
+	button.add_theme_constant_override("icon_max_width", 18 if compact else 26)
+	button.add_theme_constant_override("h_separation", 14)
+	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	button.custom_minimum_size.y = 36 if compact else 54
+	button.add_theme_font_size_override("font_size", 13 if compact else 19)
+	for state in ["normal", "hover", "pressed", "focus"]:
+		var box := PremiumUI.row_box(compact)
+		if state != "normal": box.border_color = Color(PremiumUI.GOLD, 0.55)
+		button.add_theme_stylebox_override(state, box)
+	button.add_theme_color_override("font_color", Color.WHITE)
+	var chevron := PremiumUI.icon_rect("chevron", PremiumUI.MUTED, 18)
+	button.add_child(chevron)
+	chevron.anchor_left = 1.0
+	chevron.anchor_right = 1.0
+	chevron.anchor_top = 0.5
+	chevron.anchor_bottom = 0.5
+	chevron.offset_left = -34
+	chevron.offset_right = -14
+	chevron.offset_top = -9
+	chevron.offset_bottom = 9
+	button.pressed.connect(callback)
+	parent.add_child(button)
+
+
+func _info_row(parent: Control, icon: String, text: String) -> void:
+	var card := PanelContainer.new()
+	card.add_theme_stylebox_override("panel", PremiumUI.row_box(_compact()))
+	parent.add_child(card)
+	var line := HBoxContainer.new()
+	line.add_theme_constant_override("separation", 12)
+	card.add_child(line)
+	line.add_child(PremiumUI.icon_rect(icon, PremiumUI.GOLD, 18 if _compact() else 26))
+	var label := PlayerUI.label(text, 13 if _compact() else 18, Color.WHITE)
+	label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	line.add_child(label)
+
+
+func _request_row(parent: Control, player: Dictionary) -> void:
+	var compact := _compact()
+	var card := PanelContainer.new()
+	card.name = "Request_" + str(player.public_id)
+	card.add_theme_stylebox_override("panel", PremiumUI.row_box(compact))
+	parent.add_child(card)
+	var line := HBoxContainer.new()
+	line.add_theme_constant_override("separation", 10)
+	card.add_child(line)
+	line.add_child(PremiumUI.avatar(PlayerUI.portrait_texture(str(player.get("equipped_character_id", ""))), 30 if compact else 48, 2))
+	var name := PremiumUI.plain(_nickname(player), 13 if compact else 19, Color.WHITE, false)
+	name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	line.add_child(name)
+	var id := str(player.user_id)
+	for item: Array in [["check", true, "accept", "AcceptOther"], ["x", false, "decline", "DeclineOther"]]:
+		var button := Button.new()
+		button.name = item[3]
+		button.icon = PremiumUI.icon(item[0], PremiumUI.INK if item[1] else Color.WHITE, 32)
+		button.expand_icon = false
+		button.custom_minimum_size = Vector2(40, 32) if compact else Vector2(60, 44)
+		if item[1]: PremiumUI.style_gold(button)
+		else: PremiumUI.style_outline(button)
+		# A pessoa selecionada continua selecionada após responder a outra solicitação.
+		button.pressed.connect(_act.bind(item[2], id))
+		line.add_child(button)
+
+
+func _unavailable(parent: Control, text: String) -> void:
+	var note := PlayerUI.label(text, 12 if _compact() else 16, PremiumUI.MUTED)
+	note.name = "Unavailable"
+	parent.add_child(note)
+
+
+# --- Buscar ----------------------------------------------------------------------------
+
+func _render_search(parent: Control) -> void:
+	var compact := _compact()
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 14)
+	parent.add_child(head)
+	head.add_child(PremiumUI.icon_rect("search", PremiumUI.GOLD, 30 if compact else 52))
+	var titles := VBoxContainer.new()
+	titles.add_theme_constant_override("separation", 0)
+	head.add_child(titles)
+	titles.add_child(PremiumUI.plain("Buscar jogadores", 20 if compact else 40, Color.WHITE))
+	titles.add_child(PremiumUI.plain("Encontre amigos por nickname ou ID público.", 12 if compact else 20, PremiumUI.MUTED))
+	var line := HBoxContainer.new()
+	line.add_theme_constant_override("separation", 12)
+	parent.add_child(line)
+	var query := LineEdit.new()
+	query.name = "SearchField"
+	query.text = _term
+	query.placeholder_text = tr("Nickname ou ID público")
+	query.right_icon = PremiumUI.icon("search", PremiumUI.MUTED, 32)
+	query.custom_minimum_size.y = 40 if compact else 56
+	query.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	query.add_theme_font_size_override("font_size", 15 if compact else 22)
+	query.text_changed.connect(func(value: String) -> void: _term = value)
+	query.text_submitted.connect(_search)
+	PlayerUI.style_field(query)
+	line.add_child(query)
+	var go := PremiumUI.action("Buscar", "search", true, func() -> void: _search(query.text), compact)
+	go.name = "SearchButton"
+	go.custom_minimum_size.x = 110 if compact else 180
+	line.add_child(go)
+	var split := HBoxContainer.new()
+	split.name = "SearchResults"
+	split.add_theme_constant_override("separation", 12 if compact else 20)
+	parent.add_child(split)
+	var results := _sub_panel(split, "friends", tr("Resultados (%d)") % _results.size(), "")
+	results.get_parent().size_flags_stretch_ratio = 0.8
+	var current := _current(_results)
+	for player: Dictionary in _results:
+		results.add_child(_list_row(player, str(player.user_id) == str(current.get("user_id", ""))))
+	if _results.is_empty():
+		_unavailable(results, "Nenhum jogador encontrado." if _searched else "Digite pelo menos 2 caracteres e toque em Buscar.")
+	var detail := PanelContainer.new()
+	detail.name = "SearchDetail"
+	detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	detail.size_flags_stretch_ratio = 1.4
+	detail.add_theme_stylebox_override("panel", PremiumUI.flat(Color(0.05, 0.07, 0.11), PremiumUI.EDGE, 14, 1, 12 if compact else 20))
+	split.add_child(detail)
+	var detail_column := VBoxContainer.new()
+	detail_column.add_theme_constant_override("separation", 10)
+	detail.add_child(detail_column)
+	if current.is_empty():
+		_unavailable(detail_column, "Selecione um jogador para ver os detalhes.")
+	else:
+		_detail(detail_column, current, "search")
+	var bottom := HBoxContainer.new()
+	bottom.name = "SearchContext"
+	bottom.add_theme_constant_override("separation", 12 if compact else 20)
+	parent.add_child(bottom)
+	_unavailable(_sub_panel(bottom, "bolt", "Jogaram recentemente", ""), "O histórico de partidas com outros jogadores ainda não está disponível.")
+	_unavailable(_sub_panel(bottom, "friends", "Jogadores parecidos", ""), "Sugestões de jogadores ainda não estão disponíveis.")
+
+
+# --- Estados e ações reais -------------------------------------------------------------
+
+## Sem conta: um cartão central com convite para entrar.
+func _signed_out() -> void:
+	var center := MarginContainer.new()
+	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	center.custom_minimum_size.y = 230
+	body.add_child(center)
+	var card := PlayerUI.column(center)
+	card.custom_minimum_size.x = 0
+	card.alignment = BoxContainer.ALIGNMENT_CENTER
+	card.add_child(PremiumUI.icon_rect("friends", PremiumUI.GOLD, 64))
+	var title := PlayerUI.label("Jogue com seus amigos", 28, Color.WHITE)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	card.add_child(title)
+	var enter := PremiumUI.action("Entrar na conta", "user", true, func() -> void: navigate_requested.emit("account", {}))
+	enter.name = "EnterAccount"
+	enter.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	enter.custom_minimum_size.x = 260
+	card.add_child(enter)
+
+
+func _empty_state(parent: Control) -> void:
+	var box := VBoxContainer.new()
+	box.name = "EmptyState"
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	box.custom_minimum_size.y = 220 if _compact() else 420
+	box.add_theme_constant_override("separation", 14)
+	parent.add_child(box)
+	var icon := PremiumUI.icon_rect({"friends": "friends", "incoming": "inbox", "outgoing": "outbox"}[_tab], PremiumUI.GOLD, 56 if _compact() else 96)
+	icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	box.add_child(icon)
+	var title := PlayerUI.label({"friends": "Você ainda não tem amigos aqui", "incoming": "Nenhuma solicitação recebida", "outgoing": "Nenhuma solicitação enviada"}[_tab], 20 if _compact() else 32, Color.WHITE)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(title)
+	var hint := PlayerUI.label("Encontre jogadores pelo nickname ou ID público e envie um pedido de amizade.", 13 if _compact() else 18, PremiumUI.MUTED)
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(hint)
+	var go := PremiumUI.action("Buscar jogadores", "search", true, _change_tab.bind("search"), _compact())
+	go.name = "GoSearch"
+	go.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	go.custom_minimum_size.x = 240 if _compact() else 320
+	box.add_child(go)
 
 
 func _search(term: String) -> void:
@@ -195,8 +675,10 @@ func _search(term: String) -> void:
 	var result := await services.friends.search(term)
 	if epoch != _search_epoch:
 		return
+	_searched = true
 	if result.ok and result.data is Dictionary:
 		_results = result.data.get("players", [])
+		_selected.erase("search")
 		render()
 		if _results.is_empty():
 			banner.show_state("empty", "Nenhum jogador encontrado.")
@@ -207,6 +689,38 @@ func _search(term: String) -> void:
 func _act(action: String, player_id: String) -> void:
 	banner.show_state("loading")
 	status(await services.friends.act(action, player_id))
+
+
+func _confirm_remove(player: Dictionary) -> void:
+	var dialog := ConfirmationDialog.new()
+	dialog.name = "ConfirmRemove"
+	dialog.title = tr("Remover amizade")
+	dialog.dialog_text = tr("Remover %s dos seus amigos?") % _nickname(player)
+	dialog.ok_button_text = tr("Remover")
+	dialog.cancel_button_text = tr("Cancelar")
+	add_child(dialog)
+	dialog.confirmed.connect(_act.bind("remove", str(player.user_id)))
+	dialog.visibility_changed.connect(func() -> void: if not dialog.visible: dialog.queue_free())
+	dialog.popup_centered()
+
+
+## Convidar: com uma sala online sua, gera o convite real (T16D) e o envia pela conversa.
+## Sem sala, leva ao Duelo para criar uma.
+func _invite(player: Dictionary) -> void:
+	var duel := services.duel
+	if duel.is_local() or not duel.in_room() or not duel.is_admin():
+		banner.show_state("empty", tr("Crie uma sala online em Duelo para convidar %s.") % _nickname(player))
+		navigate_requested.emit("duel", {})
+		return
+	banner.show_state("loading")
+	var result: Dictionary = await duel.create_invite()
+	if not result.ok or not result.data is Dictionary or str(result.data.get("token", "")).is_empty():
+		status(result if not result.ok else ServiceResult.failure("invalid_contract"))
+		return
+	var link := DuelService.invite_link(str(result.data.token))
+	await _open_chat(player)
+	var sent: Dictionary = await services.chat.send(link)
+	if not sent.ok: status(sent)
 
 
 # --- Chat privado --------------------------------------------------------------------------

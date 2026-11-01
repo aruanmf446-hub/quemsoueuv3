@@ -4,8 +4,10 @@
 import { withSupabase } from "jsr:@supabase/server@1";
 import { createRemoteJWKSet, decodeProtectedHeader, jwtVerify } from "npm:jose@6.1.0";
 
-const GAME_URL = (Deno.env.get("GAME_URL") ?? "").replace(/\/$/, "");
-const GAME_KEY = Deno.env.get("GAME_PUBLISHABLE_KEY") ?? "";
+// The GAME URL and publishable key are public client configuration, not secrets.
+// Keep dashboard env overrides; fallback only when env is unset on CHAT.
+const GAME_URL = (Deno.env.get("GAME_URL")?.trim() || "https://shuzporktifgiotvnpbz.supabase.co").replace(/\/$/, "");
+const GAME_KEY = Deno.env.get("GAME_PUBLISHABLE_KEY")?.trim() || "sb_publishable_ZrugXVdGCXztHbMZiIX8Mw_K6Bg-uhW";
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_REQUEST_BYTES = 8192;
 const MAX_MESSAGE_CHARS = 2000;

@@ -125,8 +125,9 @@ func _nickname_offer() -> void:
 		return
 	if not ready or is_instance_valid(_nickname_modal):
 		return
-	_nickname_modal = preload("res://scripts/ui/nickname_onboarding.gd").new()
-	_nickname_modal.setup(_services)
+	var prompt = preload("res://scripts/ui/nickname_onboarding.gd").new()
+	prompt.setup(_services)
+	_nickname_modal = prompt
 	add_child(_nickname_modal)
 	move_child(_nickname_modal, get_child_count() - 1)
 

@@ -99,17 +99,25 @@ static func uuid() -> String:
 	return "%s-%s-%s-%s-%s" % [hex.substr(0, 8), hex.substr(8, 4), hex.substr(12, 4), hex.substr(16, 4), hex.substr(20)]
 
 
-static func valid_public_profile(value: Variant) -> bool:
+static func valid_public_profile(value: Variant, allow_unset_nickname: bool = false) -> bool:
 	if not value is Dictionary or value.size() != 5:
 		return false
-	for key: String in ["user_id", "public_id", "nickname", "equipped_character_id"]:
+	for key: String in ["user_id", "public_id", "equipped_character_id"]:
 		if not value.get(key) is String:
 			return false
+	if not value.has("nickname"):
+		return false
+	var nickname: Variant = value.get("nickname")
+	if not nickname is String and not (allow_unset_nickname and nickname == null):
+		return false
+	var nickname_ok := (nickname is String and nickname.length() >= 3)
+	if allow_unset_nickname and (nickname == null or (nickname is String and nickname.is_empty())):
+		nickname_ok = true
 	if not value.has("level") or (value.level != null and (not _integer(value.level) or value.level < 0)):
 		return false
 	var ids := initial_ids().duplicate()
 	ids.append("el_fuego")
-	return value.equipped_character_id in ids and value.public_id.begins_with("QSE-") and value.nickname.length() >= 3
+	return value.equipped_character_id in ids and value.public_id.begins_with("QSE-") and nickname_ok
 
 
 static func valid_profile(value: Variant) -> bool:
@@ -118,7 +126,7 @@ static func valid_profile(value: Variant) -> bool:
 	var public_part: Dictionary = value.duplicate(true)
 	for key: String in ["experience", "statistics", "discoverable"]:
 		public_part.erase(key)
-	if not valid_public_profile(public_part):
+	if not valid_public_profile(public_part, true):
 		return false
 	if not value.has("experience") or (value.experience != null and not _unsigned_string(value.experience)):
 		return false

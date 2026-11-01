@@ -38,6 +38,27 @@ func _run() -> void:
 		check(save.disabled, "nickname curto bloqueado")
 	check(script.source_code.contains("services.profile.update_nickname(nickname)"), "salva pelo GAME")
 	check(script.source_code.contains("services.session.authenticated()"), "somente usuario autenticado")
+	var valid_skin: String = str(PlayerContracts.initial_ids()[0])
+	var first_profile := {
+		"user_id": "11111111-1111-4111-8111-111111111111",
+		"public_id": "QSE-TEST-0001",
+		"nickname": null,
+		"equipped_character_id": valid_skin,
+		"level": null,
+		"experience": "0",
+		"statistics": {},
+		"discoverable": true
+	}
+	check(PlayerContracts.valid_profile(first_profile), "perfil proprio permite nickname nulo no primeiro acesso")
+	var public_profile: Dictionary = first_profile.duplicate()
+	public_profile.erase("statistics")
+	public_profile.erase("discoverable")
+	public_profile.erase("experience")
+	check(not PlayerContracts.valid_public_profile(public_profile), "perfil publico rejeita nickname nulo")
+	first_profile.nickname = "Aruan"
+	check(PlayerContracts.valid_profile(first_profile), "perfil proprio com nickname valido")
+	public_profile.nickname = "Aruan"
+	check(PlayerContracts.valid_public_profile(public_profile), "perfil publico com nickname valido")
 	check(script.source_code.contains('str(services.profile.data.get("nickname", "")) == nickname'), "confere gravacao real")
 	var main_source := (load("res://scripts/menu/main_menu.gd") as GDScript).source_code
 	check(main_source.contains("services.profile.state == \"success\"") or main_source.contains("_services.profile.state == \"success\""), "espera carga do perfil")

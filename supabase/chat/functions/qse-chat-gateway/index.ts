@@ -21,26 +21,53 @@ const respond = (obj: unknown, status = 200): Response =>
 const jwks = GAME_URL ? createRemoteJWKSet(new URL(`${GAME_URL}/auth/v1/.well-known/jwks.json`)) : null;
 
 async function gameIdentity(token: string): Promise<string | null> {
-  if (!jwks || !GAME_KEY || !GAME_URL || token.length > 8192) return null;
+  // CHAT não valida JWTs do GAME na plataforma; esta função sempre exige
+  // uma validação criptográfica JWKS ou uma resposta positiva do Auth GAME.
+  if (!GAME_URL || !GAME_KEY || !jwks) {
+    console.error("qse-chat-gateway: GAME_AUTH_CONFIG_MISSING");
+    return null;
+  }
+  if (!token || token.length > 8192) return null;
+
+  let algorithm: string;
   try {
-    const header = decodeProtectedHeader(token);
-    if (header.alg === "RS256" || header.alg === "ES256") {
+    algorithm = decodeProtectedHeader(token).alg;
+  } catch {
+    return null;
+  }
+  if (!["RS256", "ES256", "HS256"].includes(algorithm)) return null;
+
+  if (algorithm !== "HS256") {
+    try {
       const result = await jwtVerify(token, jwks, {
         issuer: `${GAME_URL}/auth/v1`, audience: "authenticated",
       });
       const id = result.payload.sub;
-      return result.payload.role === "authenticated" && typeof id === "string" && UUID.test(id)
-        ? id : null;
+      if (result.payload.role === "authenticated" && typeof id === "string" && UUID.test(id)) {
+        return id;
+      }
+    } catch {
+      // Chaves JWKS indisponíveis, rotação ou claims inesperadas:
+      // a autoridade definitiva continua sendo o Auth do GAME.
+      console.warn("qse-chat-gateway: GAME_JWKS_REJECTED_CHECKING_AUTH");
     }
-    if (header.alg !== "HS256") return null;
+  }
+
+  // Fallback seguro para JWTs assimétricos e validação principal dos HS256.
+  // Não aceita decodificação simples, assinatura não verificada ou dados do cliente.
+  let response: Response;
+  try {
+    response = await fetch(`${GAME_URL}/auth/v1/user`, {
+      headers: { apikey: GAME_KEY, Authorization: `Bearer ${token}` },
+    });
   } catch {
+    console.warn("qse-chat-gateway: GAME_AUTH_UNREACHABLE");
     return null;
   }
-  // Para tokens HS256 legados, a validação é feita no próprio GAME.
-  const response = await fetch(`${GAME_URL}/auth/v1/user`, {
-    headers: { apikey: GAME_KEY, Authorization: `Bearer ${token}` },
-  }).catch(() => null);
-  if (!response?.ok) return null;
+  if (!response.ok) {
+    console.warn("qse-chat-gateway: GAME_AUTH_REJECTED_STATUS_" + response.status);
+    return null;
+  }
   const user = await response.json().catch(() => null);
   return typeof user?.id === "string" && UUID.test(user.id) ? user.id : null;
 }

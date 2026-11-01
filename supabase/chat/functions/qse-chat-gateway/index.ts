@@ -103,9 +103,19 @@ async function canAccessRoom(token: string, roomId: string): Promise<RoomAccess 
                "Content-Type": "application/json" },
     body: JSON.stringify({p_room:roomId}),
   }).catch(() => null);
-  if (!response?.ok) return null;
+  if (!response?.ok) {
+    // Apenas código HTTP e código PostgREST conhecido, nunca tokens, nicknames ou UUIDs.
+    const diagnostic = await response?.json().catch(() => null);
+    const code = typeof diagnostic?.code === "string" && /^[A-Za-z0-9_]{1,16}$/.test(diagnostic.code)
+      ? diagnostic.code : "unknown";
+    console.warn("qse-chat-gateway: GAME_ROOM_RPC_FAILURE_" + (response?.status ?? "network") + "_" + code);
+    return null;
+  }
   const value = await response.json().catch(() => null);
-  if (typeof value?.allowed !== "boolean") return null;
+  if (typeof value?.allowed !== "boolean") {
+    console.warn("qse-chat-gateway: GAME_ROOM_RPC_INVALID_RESPONSE");
+    return null;
+  }
   const participants: RoomParticipant[] = Array.isArray(value?.participants)
     ? value.participants.filter((p: unknown): p is RoomParticipant =>
         !!p && typeof p === "object" &&

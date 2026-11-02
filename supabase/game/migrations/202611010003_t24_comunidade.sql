@@ -118,6 +118,7 @@ create table if not exists public.qse_deck_reports(
  primary key(deck_id,user_id)
 );
 create index if not exists qse_deck_reports_window_idx on public.qse_deck_reports(deck_id,reported_at desc);
+create index if not exists qse_deck_reports_user_idx on public.qse_deck_reports(user_id);
 alter table public.qse_deck_reports enable row level security;
 revoke all on public.qse_deck_reports from public,anon,authenticated;
 

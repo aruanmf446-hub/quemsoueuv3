@@ -1,0 +1,6 @@
+-- T24 backfill: Report user index already created in consolidated community.
+-- The consolidated migration 20261102003754 (GAME) or 20261102003349 (CATALOG)
+-- applies this object's full schema during a fresh installation.
+-- This placeholder preserves the EXACT migration version recorded by the original
+-- multi-step production deployment, without replaying non-idempotent DDL.
+-- Intentionally no SQL statements.

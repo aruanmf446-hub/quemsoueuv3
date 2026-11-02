@@ -11,7 +11,6 @@ const SKIN_SIZE := 128
 var duel: DuelService
 var _view := "browse"
 var _term := ""
-var _only_open := true
 var _rooms: Array = []
 var _list_epoch := 0
 var _busy := false
@@ -87,6 +86,7 @@ func render() -> void:
 	if is_instance_valid(_match_view) and _match_view.get_parent() == body: body.remove_child(_match_view)
 	PlayerUI.clear(body)
 	banner.show_state("success")
+	_header_extras(_view == "browse" and _online() and not duel.in_room())
 	# A partida local permanece acessível ao sair da sala, sem exigir login.
 	if (not services.session.authenticated() and not duel.is_local()) or (duel.is_local() and not duel.in_room() and _view != "form"):
 		_signed_out()
@@ -135,106 +135,480 @@ func _start_local() -> void:
 	_open_form()
 
 
-# --- Lista de salas ------------------------------------------------------------------------
+# --- Lista de salas (navegador de servidores, T25) -----------------------------------------
+## Linhas horizontais: CÓDIGO | JOGADORES | DECK | STATUS | AÇÃO. A identificação é o código
+## real da sala (o nome técnico do contrato não aparece). A descoberta mostra só salas no lobby
+## com vaga: o servidor já filtra status 'lobby' e p_only_open; o cliente confere de novo.
+const BG := Color("#081323")
+const SURFACE := Color("#101d2d")
+const ROW_BG := Color("#0f1b2b")
+const ROW_SELECTED := Color("#152438")
+const LINE := Color(0.62, 0.7, 0.82, 0.22)
+const SECONDARY := Color("#b8c2d1")
+var _selected_code := ""
+var _list_state := "loading"
+var _list_error := ""
+var _compact_layout := false
+
+
+func _compact() -> bool:
+	return size.x / maxf(PlayerUI.unit(self), 0.01) < 1000.0
+
+
+## Código para comparação: só letras e números, maiúsculo (como o servidor normaliza).
+static func code_key(value: String) -> String:
+	return RegEx.create_from_string("[^A-Za-z0-9]").sub(value, "", true).to_upper()
+
+
+## Salas exibidas: com vaga, no lobby e cujo código contém o termo buscado.
+func _visible_rooms() -> Array:
+	var term := code_key(_term)
+	return _rooms.filter(func(item: Dictionary) -> bool:
+		var open := int(item.get("players", 0)) < int(item.get("max_players", 0))
+		var lobby := str(item.get("status", "lobby")) == "lobby"
+		return open and lobby and (term.is_empty() or code_key(str(item.get("code", ""))).contains(term)))
+
+
+func _header_extras(show: bool) -> void:
+	var header: HBoxContainer = $Margin/Column/Header
+	var icon := header.get_node_or_null("ModeIcon") as TextureRect
+	if icon == null:
+		icon = PremiumUI.icon_rect("swords", PremiumUI.GOLD, 40)
+		icon.name = "ModeIcon"
+		header.add_child(icon)
+		header.move_child(icon, heading.get_index())
+		var divider := ColorRect.new()
+		divider.name = "ModeDivider"
+		divider.color = LINE
+		divider.custom_minimum_size = Vector2(1, 30)
+		divider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		header.add_child(divider)
+		header.move_child(divider, heading.get_index() + 1)
+		var tag := PremiumUI.plain("S E R V I D O R E S   O N L I N E", 14, SECONDARY, false)
+		tag.name = "ModeTag"
+		tag.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		header.add_child(tag)
+		header.move_child(tag, heading.get_index() + 2)
+		var line := StyleBoxFlat.new()
+		line.draw_center = false
+		line.border_color = Color(PremiumUI.GOLD, 0.7)
+		line.border_width_bottom = 2
+		line.content_margin_bottom = 4
+		heading.set_meta("underline", line)
+	var compact := _compact()
+	icon.custom_minimum_size = Vector2.ONE * (28 if compact else 40)
+	icon.visible = show
+	header.get_node("ModeDivider").visible = show and not compact
+	header.get_node("ModeTag").visible = show and not compact
+	heading.add_theme_font_size_override("font_size", 26 if compact else 40)
+	# Sublinhado só sob o título (como na referência); fora da lista o título volta a ocupar a linha.
+	heading.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if show else Control.SIZE_EXPAND_FILL
+	heading.autowrap_mode = TextServer.AUTOWRAP_OFF if show else TextServer.AUTOWRAP_WORD_SMART
+	if show:
+		heading.add_theme_stylebox_override("normal", heading.get_meta("underline"))
+	else:
+		heading.remove_theme_stylebox_override("normal")
+
+
+func _secondary(button: Button) -> void:
+	var box := PremiumUI.flat(SURFACE, LINE, 12, 1)
+	var hover := box.duplicate() as StyleBoxFlat
+	hover.bg_color = Color("#16263a")
+	var focus := PremiumUI.flat(Color.TRANSPARENT, PremiumUI.GOLD_LIGHT, 12, 2)
+	focus.draw_center = false
+	button.add_theme_stylebox_override("normal", box)
+	button.add_theme_stylebox_override("hover", hover)
+	button.add_theme_stylebox_override("pressed", hover)
+	button.add_theme_stylebox_override("focus", focus)
+	button.add_theme_stylebox_override("disabled", PremiumUI.flat(SURFACE, Color(LINE, 0.4), 12, 1))
+	for state in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]: button.add_theme_color_override(state, Color("#f5f6fa"))
+
+
+func _tool(text: String, icon_name: String, primary: bool, callback: Callable) -> Button:
+	var compact := _compact()
+	var button := Button.new()
+	# Ícone colado ao texto e o par centralizado (o Button nativo põe o ícone na borda).
+	button.tooltip_text = tr(text)
+	button.set_meta("label", tr(text))
+	var content := HBoxContainer.new()
+	content.name = "Content"
+	content.alignment = BoxContainer.ALIGNMENT_CENTER
+	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	content.add_theme_constant_override("separation", 10 if compact else 16)
+	button.add_child(content)
+	content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var glyph := PremiumUI.icon_rect(icon_name, PremiumUI.INK if primary else Color.WHITE, 16 if compact else 24)
+	glyph.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	content.add_child(glyph)
+	var caption := PremiumUI.plain(text, 15 if compact else 24, PremiumUI.INK if primary else Color("#f5f6fa"))
+	caption.name = "Caption"
+	caption.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	content.add_child(caption)
+	button.custom_minimum_size = Vector2(0, 44 if compact else 64)
+	button.focus_mode = Control.FOCUS_ALL
+	if primary: PremiumUI.style_gold(button)
+	else: _secondary(button)
+	button.pressed.connect(callback)
+	return button
+
+
 func _render_browse() -> void:
-	var actions := PlayerUI.row(body)
-	actions.add_theme_constant_override("separation", 10)
-	var create := PlayerUI.button("Criar sala", func() -> void: _open_form())
-	PlayerUI.style_button(create, true)
+	var compact := _compact()
+	_compact_layout = compact
+	var gap := 10 if compact else 18
+	body.add_theme_constant_override("separation", gap)
+	# Ações: Criar sala e Partida local (sem o antigo campo "Código do convite").
+	var actions := HBoxContainer.new()
+	actions.name = "BrowseActions"
+	actions.add_theme_constant_override("separation", gap)
+	body.add_child(actions)
+	var create := _tool("Criar sala", "plus", true, func() -> void: _open_form())
+	create.name = "CreateRoom"
+	create.custom_minimum_size.x = 200 if compact else 380
 	actions.add_child(create)
-	var local := PlayerUI.button("Partida local", _start_local)
+	var local := _tool("Partida local", "gamepad", false, _start_local)
 	local.name = "LocalMatch"
 	local.tooltip_text = tr("Contra bots, neste aparelho")
+	local.custom_minimum_size.x = 200 if compact else 420
 	actions.add_child(local)
-	var spacer := Control.new()
-	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	actions.add_child(spacer)
-	var code := LineEdit.new()
-	code.name = "InviteCode"
-	code.placeholder_text = tr("Código do convite")
-	code.max_length = 200
-	code.custom_minimum_size = Vector2(230, 52)
-	code.add_theme_stylebox_override("normal", PlayerUI.button_plate())
-	code.add_theme_stylebox_override("focus", PlayerUI.button_plate(false, Color(1.2, 1.2, 1.25)))
-	code.text_submitted.connect(func(value: String) -> void: _join(value))
-	actions.add_child(code)
-	actions.add_child(PlayerUI.button("Entrar", func() -> void: _join(code.text)))
-	var filters := PlayerUI.row(body)
-	filters.add_theme_constant_override("separation", 10)
+	# Busca pelo código, "Só com vaga" e atualizar.
+	var filters := HBoxContainer.new()
+	filters.name = "BrowseFilters"
+	filters.add_theme_constant_override("separation", gap)
+	body.add_child(filters)
+	var field := PanelContainer.new()
+	field.name = "SearchField"
+	field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	field.size_flags_stretch_ratio = 3.0
+	var field_box := PremiumUI.flat(Color("#0a1626"), LINE, 12, 1)
+	field_box.content_margin_left = 12 if compact else 22
+	field_box.content_margin_top = 0
+	field_box.content_margin_bottom = 0
+	field.add_theme_stylebox_override("panel", field_box)
+	filters.add_child(field)
+	var field_row := HBoxContainer.new()
+	field_row.add_theme_constant_override("separation", 10 if compact else 18)
+	field.add_child(field_row)
+	var lens := PremiumUI.icon_rect("search", Color.WHITE, 20 if compact else 28)
+	lens.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	field_row.add_child(lens)
 	var search := LineEdit.new()
-	search.placeholder_text = tr("Buscar sala pelo nome")
+	search.name = "RoomSearch"
+	search.placeholder_text = tr("Buscar pelo código (ex.: QSE482)")
 	search.text = _term
+	search.max_length = 200
 	search.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	search.custom_minimum_size.y = 52
-	search.add_theme_stylebox_override("normal", PlayerUI.button_plate())
-	search.add_theme_stylebox_override("focus", PlayerUI.button_plate(false, Color(1.2, 1.2, 1.25)))
+	search.custom_minimum_size.y = 44 if compact else 64
+	search.add_theme_font_size_override("font_size", 15 if compact else 22)
+	search.add_theme_color_override("font_placeholder_color", Color(SECONDARY, 0.8))
+	var empty_box := StyleBoxEmpty.new()
+	for state in ["normal", "focus", "read_only"]: search.add_theme_stylebox_override(state, empty_box)
+	# Filtra a lista já carregada (sem consulta nova por tecla); Enter tenta entrar pelo código/convite.
+	search.text_changed.connect(func(value: String) -> void:
+		_term = value
+		_refresh_list())
 	search.text_submitted.connect(func(value: String) -> void:
 		_term = value
-		_load_rooms(true))
-	filters.add_child(search)
-	var open := PlayerUI.button("Só com vaga", func() -> void: pass)
-	open.toggle_mode = true
-	open.button_pressed = _only_open
+		var matches := _visible_rooms()
+		if matches.size() == 1: _join(str(matches[0].code))
+		elif _direct_entry(value) != "": _join(value))
+	field_row.add_child(search)
+	if not compact:
+		var bar := ColorRect.new()
+		bar.color = LINE
+		bar.custom_minimum_size = Vector2(1, 40)
+		bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		filters.add_child(bar)
+	# A descoberta pública nunca mostra salas cheias ou em partida; o filtro fica ligado e
+	# explica a regra em vez de prometer salas que não podem receber jogadores.
+	var open := CheckButton.new()
+	open.name = "OnlyOpen"
+	open.text = tr("Só com vaga")
+	open.button_pressed = true
+	# Desligar não traz salas cheias de volta: o controle explica e permanece ligado.
 	open.toggled.connect(func(value: bool) -> void:
-		_only_open = value
-		_load_rooms(true))
+		if not value:
+			open.set_pressed_no_signal(true)
+			banner.show_state("success", tr("Salas cheias ou com partida em andamento não aparecem na lista.")))
+	open.tooltip_text = tr("Salas cheias ou com partida em andamento não aparecem na lista.")
+	open.add_theme_font_size_override("font_size", 15 if compact else 22)
+	open.add_theme_color_override("font_disabled_color", Color("#f5f6fa"))
+	open.add_theme_color_override("font_color", Color("#f5f6fa"))
+	open.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	filters.add_child(open)
-	filters.add_child(PlayerUI.button("↻", func() -> void:
-		_term = search.text
-		_load_rooms(true)))
-	if _rooms.is_empty():
-		var empty := PlayerUI.label("Nenhuma sala pública aberta agora. Crie a sua ou entre com um código.", 19, Color("#a8bad3"))
-		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		empty.custom_minimum_size.y = 140
-		empty.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		body.add_child(empty)
-	for item: Dictionary in _rooms:
-		_room_row(item)
+	var refresh := Button.new()
+	refresh.name = "RefreshRooms"
+	refresh.tooltip_text = tr("Atualizar salas")
+	refresh.icon = PremiumUI.icon("refresh", Color.WHITE, 40)
+	refresh.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	refresh.add_theme_constant_override("icon_max_width", 20 if compact else 28)
+	refresh.custom_minimum_size = Vector2(48, 44) if compact else Vector2(110, 64)
+	_secondary(refresh)
+	refresh.pressed.connect(func() -> void: _load_rooms(true))
+	filters.add_child(refresh)
+	# Painel de servidores.
+	var panel := PanelContainer.new()
+	panel.name = "ServerList"
+	var panel_box := PremiumUI.flat(Color(SURFACE, 0.55), Color(LINE, 0.5), 14, 1)
+	panel_box.set_content_margin_all(8 if compact else 14)
+	panel.add_theme_stylebox_override("panel", panel_box)
+	body.add_child(panel)
+	var list := VBoxContainer.new()
+	list.name = "Rows"
+	list.add_theme_constant_override("separation", 8 if compact else 12)
+	panel.add_child(list)
+	_refresh_list()
 
 
-func _room_row(item: Dictionary) -> void:
-	var card := PlayerUI.card(body)
-	var line := PlayerUI.row(card)
-	var info := PlayerUI.column(line)
-	info.add_theme_constant_override("separation", 2)
-	info.add_child(PlayerUI.label(str(item.get("name", "")), 24, PlayerUI.GOLD))
-	var decks := ", ".join((item.get("decks", []) as Array).map(func(d: Dictionary) -> String: return str(d.get("name", ""))))
-	var details := "ADM %s  ·  %d cartas por jogador  ·  %ds por turno  ·  Decks: %s" % [str(item.get("admin", "")),
-		int(item.get("cards_per_player", 0)), int(item.get("turn_seconds", 0)), decks]
-	info.add_child(PlayerUI.label(details, 16, Color("#c9d6e6")))
-	var seats := PlayerUI.label("%d/%d" % [int(item.get("players", 0)), int(item.get("max_players", 0))], 22, Color.WHITE)
-	seats.autowrap_mode = TextServer.AUTOWRAP_OFF
-	seats.size_flags_horizontal = Control.SIZE_SHRINK_END
-	seats.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	line.add_child(seats)
-	var enter := PlayerUI.button("Entrar", func() -> void: _join(str(item.get("code", ""))))
+## Reconstrói só as linhas (busca e atualização não refazem a tela inteira).
+func _refresh_list() -> void:
+	var list := body.find_child("Rows", true, false) as VBoxContainer
+	if list == null: return
+	for child in list.get_children(): child.queue_free()
+	list.add_child(_columns())
+	if _list_state == "loading" and _rooms.is_empty():
+		list.add_child(_list_message("Carregando servidores…", ""))
+		return
+	if _list_state == "error" and _rooms.is_empty():
+		var box := _list_message("Não foi possível atualizar as salas.", _list_error)
+		var retry := _tool("Tentar novamente", "refresh", false, func() -> void: _load_rooms(true))
+		retry.name = "RetryRooms"
+		retry.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		box.add_child(retry)
+		list.add_child(box)
+		return
+	var shown := _visible_rooms()
+	if shown.is_empty():
+		if code_key(_term).is_empty():
+			list.add_child(_list_message("Nenhuma sala disponível no momento.", "Crie uma sala para começar uma partida."))
+		else:
+			var none := _list_message("Nenhuma sala pública com esse código.", "Salas privadas também podem ser abertas pelo código ou convite.")
+			var target := _direct_entry(_term)
+			if not target.is_empty():
+				var direct := _tool("Entrar com " + target, "play", true, func() -> void: _join(_term))
+				direct.name = "DirectJoin"
+				direct.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+				none.add_child(direct)
+			list.add_child(none)
+		return
+	if not shown.any(func(item: Dictionary) -> bool: return str(item.code) == _selected_code): _selected_code = str(shown[0].get("code", ""))
+	for item: Dictionary in shown: list.add_child(_room_row(item))
+
+
+## Texto da entrada direta: código curto (salas privadas) ou convite (token/link).
+func _direct_entry(value: String) -> String:
+	if not DuelService.invite_token(value).is_empty(): return tr("o convite")
+	var key := code_key(value)
+	return key if key.length() >= 4 and key.length() <= 12 else ""
+
+
+func _list_message(title: String, detail: String) -> VBoxContainer:
+	var box := VBoxContainer.new()
+	box.name = "ListMessage"
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.custom_minimum_size.y = 150 if _compact() else 260
+	box.add_theme_constant_override("separation", 10)
+	var head := PremiumUI.plain(title, 18 if _compact() else 26, Color("#f5f6fa"))
+	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	head.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	box.add_child(head)
+	if not detail.is_empty():
+		var text := PremiumUI.plain(detail, 13 if _compact() else 18, SECONDARY)
+		text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		box.add_child(text)
+	return box
+
+
+## Larguras compartilhadas entre o cabeçalho das colunas e as linhas.
+func _widths() -> Array:
+	return [104, 70, 0, 124, 104] if _compact() else [300, 190, 0, 250, 250]
+
+
+func _columns() -> Control:
+	var compact := _compact()
+	var row := HBoxContainer.new()
+	row.name = "ServerColumns"
+	row.add_theme_constant_override("separation", 10 if compact else 24)
+	var widths := _widths()
+	var titles := ["CÓDIGO", "JOGADORES", "DECK", "STATUS", "AÇÃO"]
+	for i in titles.size():
+		var label := PremiumUI.plain(titles[i], 11 if compact else 15, Color(SECONDARY, 0.9))
+		label.custom_minimum_size.x = widths[i]
+		if i == 0: label.custom_minimum_size.x -= 0 if compact else 0
+		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL if widths[i] == 0 else Control.SIZE_FILL
+		if i == 4: label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		row.add_child(label)
+	var holder := MarginContainer.new()
+	holder.add_theme_constant_override("margin_left", 16 if compact else 30)
+	holder.add_theme_constant_override("margin_right", 10 if compact else 18)
+	holder.add_child(row)
+	return holder
+
+
+func _room_row(item: Dictionary) -> Control:
+	var compact := _compact()
+	var code := str(item.get("code", ""))
+	var selected := code == _selected_code
+	var row := PanelContainer.new()
+	row.name = "Room_" + code_key(code)
+	row.focus_mode = Control.FOCUS_ALL
+	row.mouse_filter = Control.MOUSE_FILTER_STOP
+	row.custom_minimum_size.y = 58 if compact else 92
+	row.set_meta("code", code)
+	var box := PremiumUI.flat(ROW_SELECTED if selected else ROW_BG, Color(PremiumUI.GOLD, 0.95) if selected else LINE, 14, 2 if selected else 1)
+	box.content_margin_left = 0
+	box.content_margin_top = 0
+	box.content_margin_bottom = 0
+	box.content_margin_right = 10 if compact else 18
+	if selected:
+		box.shadow_color = Color(PremiumUI.GOLD, 0.22)
+		box.shadow_size = 10
+	row.add_theme_stylebox_override("panel", box)
+	row.clip_contents = true
+	var line := HBoxContainer.new()
+	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	line.add_theme_constant_override("separation", 10 if compact else 24)
+	row.add_child(line)
+	var widths := _widths()
+	# 1. Código com recorte diagonal.
+	var code_cell := _CodeCell.new()
+	code_cell.selected = selected
+	code_cell.custom_minimum_size.x = widths[0] + (16 if compact else 30)
+	code_cell.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var code_label := PremiumUI.plain(code, 20 if compact else 38, Color.WHITE, false)
+	code_label.name = "Code"
+	code_label.add_theme_constant_override("outline_size", 0)
+	code_label.position = Vector2(16 if compact else 30, 0)
+	code_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	code_label.set_anchors_preset(Control.PRESET_LEFT_WIDE)
+	code_label.offset_left = 16 if compact else 30
+	code_cell.add_child(code_label)
+	line.add_child(code_cell)
+	line.add_child(_divider())
+	# 2. Jogadores.
+	line.add_child(_fact("friends", "%d/%d" % [int(item.get("players", 0)), int(item.get("max_players", 0))], widths[1], "Players"))
+	# 3. Deck(s) reais da sala.
+	var decks: Array = (item.get("decks", []) as Array).map(func(d: Variant) -> String: return str(d.get("name", "")) if d is Dictionary else str(d))
+	var deck_text := tr("Sem deck") if decks.is_empty() else str(decks[0]) + ("  +%d" % (decks.size() - 1) if decks.size() > 1 else "")
+	var deck := _fact("cards", deck_text, 0, "Deck")
+	deck.tooltip_text = ", ".join(decks)
+	deck.mouse_filter = Control.MOUSE_FILTER_PASS
+	line.add_child(deck)
+	line.add_child(_divider())
+	# 4. Status (neutro).
+	line.add_child(_fact("hourglass", tr("Aguardando"), widths[3], "Status"))
+	# 5. Entrar.
+	var enter := _tool("Entrar", "play", true, func() -> void: _join(code))
+	enter.name = "JoinRoom"
+	enter.disabled = _busy
+	enter.custom_minimum_size = Vector2(widths[4], 40 if compact else 60)
 	enter.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	PlayerUI.style_button(enter, false)
 	line.add_child(enter)
+	row.gui_input.connect(func(event: InputEvent) -> void:
+		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT: _select_room(code)
+		elif event.is_action_pressed("ui_accept"): _join(code))
+	row.focus_entered.connect(_select_room.bind(code))
+	row.mouse_entered.connect(func() -> void: if code != _selected_code: (row.get_theme_stylebox("panel") as StyleBoxFlat).bg_color = Color("#13223a"))
+	row.mouse_exited.connect(func() -> void: if code != _selected_code: (row.get_theme_stylebox("panel") as StyleBoxFlat).bg_color = ROW_BG)
+	return row
+
+
+func _select_room(code: String) -> void:
+	if code == _selected_code: return
+	_selected_code = code
+	var focused := code
+	_refresh_list()
+	var list := body.find_child("Rows", true, false)
+	if list != null:
+		var row := list.find_child("Room_" + code_key(focused), false, false) as Control
+		if row != null: row.grab_focus.call_deferred()
+
+
+func _divider() -> ColorRect:
+	var line := ColorRect.new()
+	line.color = LINE
+	line.custom_minimum_size = Vector2(1, 30 if _compact() else 46)
+	line.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return line
+
+
+func _fact(icon_name: String, text: String, width: int, node_name: String) -> HBoxContainer:
+	var compact := _compact()
+	var fact := HBoxContainer.new()
+	fact.name = node_name
+	fact.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fact.add_theme_constant_override("separation", 6 if compact else 14)
+	fact.custom_minimum_size.x = width
+	fact.size_flags_horizontal = Control.SIZE_EXPAND_FILL if width == 0 else Control.SIZE_FILL
+	var icon := PremiumUI.icon_rect(icon_name, Color.WHITE, 18 if compact else 32)
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	fact.add_child(icon)
+	var label := PremiumUI.plain(text, 14 if compact else 24, Color("#f5f6fa"), false)
+	label.name = "Value"
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	label.clip_text = true
+	label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	fact.add_child(label)
+	return fact
+
+
+## Primeira coluna: faixa grafite com corte diagonal; selecionada, o corte fica dourado.
+class _CodeCell extends Control:
+	var selected := false
+
+	func _draw() -> void:
+		var cut := minf(size.y * 0.55, 46.0)
+		var points := PackedVector2Array([Vector2.ZERO, Vector2(size.x, 0), Vector2(size.x - cut, size.y), Vector2(0, size.y)])
+		draw_colored_polygon(points, Color("#1a2a3e") if selected else Color("#162436"))
+		if selected:
+			draw_polygon(PackedVector2Array([Vector2.ZERO, Vector2(size.x * 0.75, 0), Vector2(size.x * 0.75 - cut, size.y), Vector2(0, size.y)]),
+				PackedColorArray([Color(PlayerUI.GOLD, 0.28), Color(PlayerUI.GOLD, 0.0), Color(PlayerUI.GOLD, 0.0), Color(PlayerUI.GOLD, 0.18)]))
+			draw_line(Vector2(size.x, 0), Vector2(size.x - cut, size.y), Color(PlayerUI.GOLD, 0.95), 2.0, true)
+			draw_rect(Rect2(0, 0, 3, size.y), PlayerUI.GOLD)
+		else:
+			draw_line(Vector2(size.x, 0), Vector2(size.x - cut, size.y), Color(1, 1, 1, 0.08), 1.5, true)
+
+	func _notification(what: int) -> void:
+		if what == NOTIFICATION_RESIZED: queue_redraw()
 
 
 func _load_rooms(show_loading: bool) -> void:
 	_list_epoch += 1
 	var epoch := _list_epoch
-	if show_loading: banner.show_state("loading")
-	var result := await duel.list_rooms(_term, _only_open)
+	if show_loading:
+		_list_state = "loading"
+		_refresh_list()
+	# Termo vazio: o servidor só procura o código exato; a busca parcial pelo código é local.
+	var result := await duel.list_rooms("", true)
 	if epoch != _list_epoch or _view != "browse" or duel.in_room(): return
 	if result.ok and result.data is Dictionary:
 		_rooms = result.data.get("rooms", [])
-		render()
-	elif show_loading:
-		banner.show_state("error", DuelService.message(str(result.code)))
+		_list_state = "ok"
+		if body.find_child("Rows", true, false) != null and _compact() == _compact_layout: _refresh_list()
+		else: render()
+	else:
+		_list_state = "error"
+		_list_error = DuelService.message(str(result.code))
+		_refresh_list()
+		if show_loading: banner.show_state("error", _list_error)
 
 
 func _join(code: String) -> void:
 	if _busy or code.strip_edges().is_empty(): return
 	# Convite (token de 48 hex, sozinho ou num link ?invite=) ou código curto da sala.
 	var token := DuelService.invite_token(code)
-	await _act(duel.join_invite.bind(token) if not token.is_empty() else duel.join.bind(code))
+	_refresh_list()
+	var result := await _act(duel.join_invite.bind(token) if not token.is_empty() else duel.join.bind(code))
 	if duel.in_room():
 		_view = "room"
 		render()
 		animate_in()
+	elif not result.ok and _view == "browse":
+		# Sala cheia/fechada entre a lista e o clique: o erro aparece e a lista se atualiza.
+		_load_rooms(false)
 
 
 # --- Criar / editar sala -------------------------------------------------------------------
@@ -263,16 +637,9 @@ func _render_form() -> void:
 		panel.add_child(PlayerUI.label("Só neste aparelho, contra bots. Não aparece na lista online e não recebe convites.", 17, Color("#c9d6e6")))
 	_form = {}
 	var top := PlayerUI.row(panel)
-	var room_name := LineEdit.new()
-	room_name.placeholder_text = tr("Nome da sala")
-	room_name.text = str(duel.room.room.name) if editing else ("Partida local" if local else "Sala de %s" % str(services.profile.data.get("nickname", "Mata-Mata")))
-	room_name.max_length = 32
-	room_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	room_name.custom_minimum_size.y = 52
-	room_name.add_theme_stylebox_override("normal", PlayerUI.button_plate())
-	room_name.add_theme_stylebox_override("focus", PlayerUI.button_plate(false, Color(1.2, 1.2, 1.25)))
-	top.add_child(room_name)
-	_form.name = room_name
+	# Sem nome personalizado: a sala é identificada pelo código gerado no servidor. O contrato
+	# ainda exige p_name (3–32): vai um nome técnico fixo, nunca exibido na lista.
+	_form.name = str(duel.room.room.name) if editing else ("Partida local" if local else "Mata-Mata")
 	var public := PlayerUI.button("Sala pública", func() -> void: pass)
 	public.toggle_mode = true
 	public.button_pressed = bool(duel.room.room.is_public) if editing else true
@@ -340,7 +707,7 @@ func _submit_form() -> void:
 		banner.show_state("error", tr("Escolha pelo menos um deck."))
 		return
 	settings.deck_ids = decks
-	var room_name: String = (_form.name as LineEdit).text
+	var room_name := str(_form.name)
 	var public: bool = (_form.public as Button).button_pressed and not duel.is_local()
 	var result := await _act(duel.configure.bind(room_name, public, settings) if duel.in_room() else duel.create.bind(room_name, public, settings))
 	if result.ok:
@@ -359,7 +726,8 @@ func _render_room() -> void:
 	header.add_theme_constant_override("separation", 12)
 	var titles := PlayerUI.column(header)
 	titles.add_theme_constant_override("separation", 0)
-	titles.add_child(PlayerUI.label(str(data.name), 30, Color.WHITE))
+	var room_title := tr("Partida local") if duel.is_local() else tr("Sala %s") % str(data.get("code", data.name))
+	titles.add_child(PlayerUI.label(room_title, 30, Color.WHITE))
 	var players := (duel.room.members as Array).filter(func(m: Dictionary) -> bool: return m.role == "player")
 	var state := "No lobby  ·  %d/%d jogadores" % [players.size(), int(settings.max_players)]
 	if str(data.status) == "in_match": state = "Partida em andamento"
@@ -543,4 +911,5 @@ func _set_battle_layout(enabled: bool) -> void:
 
 func _adapt_scale() -> void:
 	super._adapt_scale()
+	if is_visible_in_tree() and _view == "browse" and not _battle_layout and _compact() != _compact_layout: render.call_deferred()
 	if _battle_layout: _set_battle_layout(true)

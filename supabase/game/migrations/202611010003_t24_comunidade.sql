@@ -11,8 +11,7 @@ alter table public.qse_creator_decks add constraint qse_t24_review_note_length
 create index if not exists qse_creator_decks_published_idx
  on public.qse_creator_decks(published_at desc,id)
  where status='published';
-create index if not exists qse_creator_cards_cover_idx
- on public.qse_creator_cards(deck_id,position,id);
+-- Já existe qse_creator_cards_deck_position_idx com os mesmos campos.
 
 -- O dono pode editar metadados do RASCUNHO, mas nunca status/review_note/visibility/published_at diretamente.
 create or replace function qse_v3.t24_deck_guard()

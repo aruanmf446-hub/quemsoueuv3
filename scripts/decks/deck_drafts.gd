@@ -75,6 +75,7 @@ func store_previews(draft_id: String, card: Dictionary, image: Image) -> void:
 		var aspect := CardFramer.LIBRARY_ASPECT if format == "library" else CardFramer.DUEL_ASPECT
 		var preview := CardFramer.preview(image, aspect, crops.get(format, {}), 360 if format == "library" else 480)
 		preview.save_png(_dir(draft_id + "/" + str(card.id) + "_" + format + ".png"))
+		DeckCover.touch(preview_path(draft_id, card, format))
 
 
 func file_bytes(draft_id: String, file_name: String) -> PackedByteArray:
@@ -89,6 +90,30 @@ func preview_bytes(draft_id: String, card: Dictionary, format: String) -> Packed
 
 func preview_path(draft_id: String, card: Dictionary, format := "library") -> String:
 	return OwnerStorage.folder(owner) + "/deck_drafts/" + draft_id + "/" + str(card.get("id", "")) + "_" + format + ".png"
+
+
+## Capa própria (T24): original guardado sem alteração e a versão enquadrada em 16:10.
+func cover_path(draft_id: String) -> String:
+	return OwnerStorage.folder(owner) + "/deck_drafts/" + draft_id + "/cover.png"
+
+
+func store_cover(draft_id: String, image: Image, crop: Dictionary, bytes := PackedByteArray(), extension := "png") -> bool:
+	if not draft_id.is_valid_filename() or image == null or image.is_empty(): return false
+	DirAccess.make_dir_recursive_absolute(OwnerStorage.folder(owner) + "/deck_drafts/" + draft_id)
+	if not bytes.is_empty() and extension in ["png", "jpg", "jpeg", "webp"]:
+		var file := FileAccess.open(_dir(draft_id + "/cover_original." + extension), FileAccess.WRITE)
+		if file != null: file.store_buffer(bytes)
+	var saved := CardFramer.preview(image, DeckCover.ASPECT, crop, 960).save_png(cover_path(draft_id)) == OK
+	DeckCover.touch(cover_path(draft_id))
+	return saved
+
+
+func remove_cover(draft_id: String) -> void:
+	if not draft_id.is_valid_filename(): return
+	var folder := OwnerStorage.folder(owner) + "/deck_drafts/" + draft_id
+	for file in DirAccess.get_files_at(folder) if DirAccess.dir_exists_absolute(folder) else PackedStringArray():
+		if file.begins_with("cover"): DirAccess.remove_absolute(folder + "/" + file)
+	DeckCover.touch(cover_path(draft_id))
 
 
 func save(draft: Dictionary) -> Dictionary:

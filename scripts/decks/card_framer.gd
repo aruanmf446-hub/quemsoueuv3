@@ -4,10 +4,13 @@ extends Control
 ## e ampliada por baixo dela. A imagem nunca é esticada nem deformada; a moldura sempre
 ## fica coberta. O original não é alterado: só os parâmetros {x, y, zoom} são guardados.
 ##   x, y : centro da moldura no original, normalizado (0..1)
-##   zoom : 1 = menor ampliação que ainda cobre a moldura; até MAX_ZOOM
+##   zoom : 1 = menor ampliação que ainda cobre a moldura; até MAX_ZOOM. Abaixo de 1 (até a
+##          imagem inteira caber, nunca menos que MIN_ZOOM) a imagem pode se mover dentro da
+##          moldura; a sobra é preenchida pela própria imagem desfocada, sem faixas vazias.
 signal changed(crop: Dictionary)
 
 const MAX_ZOOM := 6.0
+const MIN_ZOOM := 0.35
 ## Biblioteca: carta em retrato 5:7, a mesma proporção da galeria atual.
 const LIBRARY_ASPECT := 5.0 / 7.0
 ## Duelo: faixa horizontal das cartas no tabuleiro (9 cartas em 3×3, 1920×1080 ≈ 16:5).
@@ -21,6 +24,8 @@ var _touches := {}
 var _pinch_start := 0.0
 var _pinch_zoom := 1.0
 var _dragging := false
+var _blur: Texture2D
+var _blur_source: Texture2D
 
 
 func _init() -> void:
@@ -49,8 +54,8 @@ static func normalized(value: Dictionary) -> Dictionary:
 	var result := DEFAULT.duplicate()
 	for key: String in ["x", "y", "zoom"]:
 		var number: Variant = value.get(key, result[key])
-		if (number is float or number is int) and is_finite(float(number)): result[key] = float(number)
-	result.zoom = clampf(result.zoom, 1.0, MAX_ZOOM)
+		if (number is float or number is int) and is_finite(float(number)) and (key != "zoom" or float(number) > 0.0): result[key] = float(number)
+	result.zoom = clampf(result.zoom, MIN_ZOOM, MAX_ZOOM)
 	result.x = clampf(result.x, 0.0, 1.0)
 	result.y = clampf(result.y, 0.0, 1.0)
 	return result
@@ -62,21 +67,69 @@ static func region(image_size: Vector2, frame_aspect: float, value: Dictionary) 
 	var c := normalized(value)
 	var base := Vector2(image_size.x, image_size.x / frame_aspect)
 	if base.y > image_size.y: base = Vector2(image_size.y * frame_aspect, image_size.y)
-	var size: Vector2 = base / float(c.zoom)
+	var size: Vector2 = base / maxf(float(c.zoom), min_zoom(image_size, frame_aspect))
 	var center := Vector2(float(c.x), float(c.y)) * image_size
-	var origin: Vector2 = (center - size * 0.5).clamp(Vector2.ZERO, image_size - size)
+	# Em cada eixo: se a moldura é menor que a imagem, ela fica dentro da imagem; se é maior
+	# (zoom < 1), a imagem fica dentro da moldura. Nunca sobra borda vazia além do necessário.
+	var low := Vector2(minf(0.0, image_size.x - size.x), minf(0.0, image_size.y - size.y))
+	var high := Vector2(maxf(0.0, image_size.x - size.x), maxf(0.0, image_size.y - size.y))
+	var origin: Vector2 = (center - size * 0.5).clamp(low, high)
 	return Rect2(origin, size)
+
+
+## Menor zoom: a imagem inteira cabe na moldura com folga (60% do "caber exato"), para que
+## mesmo uma imagem no formato da carta possa ser movida. Nunca abaixo de MIN_ZOOM.
+static func min_zoom(image_size: Vector2, frame_aspect: float) -> float:
+	var base := Vector2(image_size.x, image_size.x / frame_aspect)
+	if base.y > image_size.y: base = Vector2(image_size.y * frame_aspect, image_size.y)
+	return clampf(minf(base.x / image_size.x, base.y / image_size.y) * 0.6, MIN_ZOOM, 1.0)
 
 
 ## Prévia leve para Web/Android: recorte do original reduzido até max_width (nunca ampliado).
 static func preview(image: Image, frame_aspect: float, value: Dictionary, max_width := 360) -> Image:
-	var rect := region(Vector2(image.get_size()), frame_aspect, value)
-	var area := Rect2i(Vector2i(rect.position.round()), Vector2i(rect.size.round()).max(Vector2i.ONE))
-	area = area.intersection(Rect2i(Vector2i.ZERO, image.get_size()))
-	var result := image.get_region(area)
-	if result.get_width() > max_width:
-		result.resize(max_width, maxi(1, roundi(max_width / frame_aspect)), Image.INTERPOLATE_LANCZOS)
-	return result
+	var source := image
+	if source.is_compressed(): source = image.duplicate() as Image
+	if source.is_compressed(): source.decompress()
+	if source.get_format() != Image.FORMAT_RGBA8:
+		source = source.duplicate() as Image
+		source.convert(Image.FORMAT_RGBA8)
+	var image_size := Vector2(source.get_size())
+	var rect := region(image_size, frame_aspect, value)
+	var inside := Rect2(Vector2.ZERO, image_size)
+	if inside.encloses(rect.grow(-0.5)):
+		var area := Rect2i(Vector2i(rect.position.round()), Vector2i(rect.size.round()).max(Vector2i.ONE))
+		area = area.intersection(Rect2i(Vector2i.ZERO, source.get_size()))
+		var result := source.get_region(area)
+		if result.get_width() > max_width:
+			result.resize(max_width, maxi(1, roundi(max_width / frame_aspect)), Image.INTERPOLATE_LANCZOS)
+		return result
+	# Zoom < 1: tela do tamanho da moldura, fundo desfocado da própria imagem e a imagem inteira por cima.
+	var width := mini(max_width, maxi(1, roundi(rect.size.x)))
+	var out_size := Vector2i(width, maxi(1, roundi(width / frame_aspect)))
+	var canvas := backdrop(source, out_size)
+	var scale := float(out_size.x) / rect.size.x
+	var placed := Vector2i(((-rect.position) * scale).round())
+	var scaled := source.duplicate() as Image
+	scaled.resize(maxi(1, roundi(image_size.x * scale)), maxi(1, roundi(image_size.y * scale)), Image.INTERPOLATE_LANCZOS)
+	canvas.blend_rect(scaled, Rect2i(Vector2i.ZERO, scaled.get_size()), placed)
+	return canvas
+
+
+## Fundo "cinema": a imagem cobrindo a área, reduzida e ampliada (desfoque) e escurecida.
+static func backdrop(source: Image, out_size: Vector2i) -> Image:
+	var small := source.duplicate() as Image
+	var ratio := maxf(float(out_size.x) / small.get_width(), float(out_size.y) / small.get_height())
+	var cover := Vector2i(maxi(1, ceili(small.get_width() * ratio)), maxi(1, ceili(small.get_height() * ratio)))
+	small.resize(maxi(1, cover.x / 14), maxi(1, cover.y / 14), Image.INTERPOLATE_BILINEAR)
+	# Ampliação em duas etapas: desfoque suave, sem blocos.
+	small.resize(maxi(1, cover.x / 6), maxi(1, cover.y / 6), Image.INTERPOLATE_CUBIC)
+	small.resize(cover.x, cover.y, Image.INTERPOLATE_CUBIC)
+	var canvas := small.get_region(Rect2i((cover - out_size) / 2, out_size))
+	canvas.convert(Image.FORMAT_RGBA8)
+	var shade := Image.create(out_size.x, out_size.y, false, Image.FORMAT_RGBA8)
+	shade.fill(Color(0.02, 0.03, 0.05, 0.55))
+	canvas.blend_rect(shade, Rect2i(Vector2i.ZERO, out_size), Vector2i.ZERO)
+	return canvas
 
 
 func frame_rect() -> Rect2:
@@ -97,6 +150,7 @@ func _scale() -> float:
 
 func _clamp() -> void:
 	crop = normalized(crop)
+	crop.zoom = maxf(float(crop.zoom), minimum_zoom())
 	var image := _image_size()
 	var rect := region(image, aspect, crop)
 	var center := rect.get_center() / image
@@ -113,6 +167,13 @@ func _draw() -> void:
 	var scale := _scale()
 	# A imagem inteira desenhada na mesma escala (uniforme); fora da moldura fica escurecida.
 	var whole := Rect2(frame.position - rect.position * scale, image * scale)
+	if not Rect2(Vector2.ZERO, image).encloses(rect.grow(-0.5)):
+		# Mesma aparência da prévia salva: a sobra da moldura mostra a imagem desfocada.
+		if _blur == null or _blur_source != texture:
+			_blur_source = texture
+			var source := texture.get_image()
+			_blur = ImageTexture.create_from_image(backdrop(source, Vector2i(160, maxi(1, roundi(160 / aspect))))) if source != null else null
+		if _blur != null: draw_texture_rect(_blur, frame, false)
 	draw_texture_rect(texture, whole, false)
 	var shade := Color(0.01, 0.015, 0.03, 0.66)
 	draw_rect(Rect2(0, 0, size.x, frame.position.y), shade)
@@ -139,7 +200,7 @@ func _pan(screen_delta: Vector2) -> void:
 
 func _zoom_at(factor: float, screen_point: Vector2) -> void:
 	var before := _screen_to_image(screen_point)
-	crop.zoom = clampf(float(crop.zoom) * factor, 1.0, MAX_ZOOM)
+	crop.zoom = clampf(float(crop.zoom) * factor, minimum_zoom(), MAX_ZOOM)
 	_clamp()
 	# Mantém o ponto sob o cursor/dedos parado enquanto amplia.
 	var after := _screen_to_image(screen_point)
@@ -151,6 +212,28 @@ func _zoom_at(factor: float, screen_point: Vector2) -> void:
 
 func zoom_by(factor: float) -> void:
 	_zoom_at(factor, frame_rect().get_center())
+
+
+func set_zoom(value: float) -> void:
+	if texture == null or is_equal_approx(value, float(crop.zoom)): return
+	zoom_by(clampf(value, minimum_zoom(), MAX_ZOOM) / float(crop.zoom))
+
+
+## Move a moldura em frações da própria moldura (botões acessíveis no Android).
+func nudge(direction: Vector2) -> void:
+	if texture == null: return
+	_pan(-direction * frame_rect().size * 0.06)
+
+
+## Centraliza a imagem sem mudar o zoom.
+func center_crop() -> void:
+	crop.x = 0.5
+	crop.y = 0.5
+	_commit()
+
+
+func minimum_zoom() -> float:
+	return min_zoom(_image_size(), aspect)
 
 
 func _screen_to_image(point: Vector2) -> Vector2:
@@ -202,7 +285,7 @@ func _gui_input(event: InputEvent) -> void:
 			var points: Array = _touches.values()
 			var distance := (points[0] as Vector2).distance_to(points[1])
 			var middle := ((points[0] as Vector2) + (points[1] as Vector2)) * 0.5
-			var target := clampf(_pinch_zoom * distance / _pinch_start, 1.0, MAX_ZOOM)
+			var target := clampf(_pinch_zoom * distance / _pinch_start, minimum_zoom(), MAX_ZOOM)
 			_zoom_at(target / float(crop.zoom), middle)
 		else:
 			_pan(drag.relative)

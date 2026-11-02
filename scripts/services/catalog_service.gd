@@ -19,6 +19,9 @@ var characters: Dictionary = {}
 var decks: Dictionary = {}
 ## deck_id -> ids de carta "<deck>/<carta>" do remoto.
 var deck_cards: Dictionary = {}
+## T24: regras de destaque (qse_catalog_featured). Opcional: sem a tabela, fica vazio e a
+## Biblioteca usa popularidade, lançamentos e o deck oficial padrão.
+var featured: Array = []
 
 
 ## Usa o cache se tiver menos de CACHE_TTL (ou se force for falso e a rede falhar).
@@ -26,6 +29,7 @@ func refresh(force := false) -> Dictionary:
 	var cached := _read_cache()
 	if not force and not cached.is_empty() and now() - float(cached.get("saved_at", 0.0)) < CACHE_TTL:
 		apply(cached.characters, cached.decks, cached.cards)
+		featured = _valid_rules(cached.get("featured", []))
 		return ServiceResult.success({"cache": true})
 	if client == null or not client.configured():
 		_clear()
@@ -40,7 +44,10 @@ func refresh(force := false) -> Dictionary:
 			else: _clear()
 			return result if not result.ok else ServiceResult.failure("invalid_contract")
 		rows[key] = result.data
+	var extra := await client.request("/rest/v1/qse_catalog_featured?select=*", HTTPClient.METHOD_GET, {}, false)
+	rows.featured = extra.data if extra.ok and extra.data is Array else []
 	apply(rows.characters, rows.decks, rows.cards)
+	featured = _valid_rules(rows.featured)
 	_write_cache(rows)
 	return ServiceResult.success({"characters": characters.size(), "decks": decks.size()})
 
@@ -121,6 +128,16 @@ static func _meta(row: Dictionary) -> Dictionary:
 	return result
 
 
+## Só linhas com o formato esperado; datas são validadas pelo FeaturedPicker.
+static func _valid_rules(rows: Variant) -> Array:
+	var result: Array = []
+	if not rows is Array: return result
+	for row: Variant in rows:
+		if row is Dictionary and str(row.get("kind", "")) in ["pin", "campaign"] and (row.get("deck_ref") is String or row.get("theme") is String):
+			result.append(row)
+	return result
+
+
 func now() -> float:
 	return Time.get_unix_time_from_system()
 
@@ -137,7 +154,7 @@ func _read_cache() -> Dictionary:
 func _write_cache(rows: Dictionary) -> void:
 	var file := FileAccess.open(CACHE_PATH, FileAccess.WRITE)
 	if file == null: return
-	file.store_string(JSON.stringify({"saved_at": now(), "characters": rows.characters, "decks": rows.decks, "cards": rows.cards}))
+	file.store_string(JSON.stringify({"saved_at": now(), "characters": rows.characters, "decks": rows.decks, "cards": rows.cards, "featured": rows.get("featured", [])}))
 
 
 func _clear() -> void:

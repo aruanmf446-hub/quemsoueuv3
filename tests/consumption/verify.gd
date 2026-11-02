@@ -61,7 +61,7 @@ func _run() -> void:
 	services._notification(Node.NOTIFICATION_APPLICATION_FOCUS_IN)
 	await process_frame
 
-	# 4) CATALOG: 1ª abertura lê 3 tabelas e grava cache; aberturas seguintes, 0.
+	# 4) CATALOG: 1ª abertura lê 3 tabelas + regras de destaque (T24) e grava cache; seguintes, 0.
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://catalog_cache.json"))
 	counter.count = 0
 	services.catalog.client = counter
@@ -69,8 +69,8 @@ func _run() -> void:
 	var first: int = counter.count
 	await services.catalog.refresh()
 	await services.catalog.refresh()
-	print("CONSUMO catalogo_3_aberturas antes=9 depois=", counter.count)
-	check(first == 3 and counter.count == 3, "cache do catálogo")
+	print("CONSUMO catalogo_3_aberturas antes=12 depois=", counter.count)
+	check(first == 4 and counter.count == 4, "cache do catálogo")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://catalog_cache.json"))
 
 	# 5) Duelo: intervalos por hora (lobby e lista de salas).

@@ -33,6 +33,12 @@ var _types := {}
 var _themes := {}
 var _sort := ""
 var _featured := 0
+## T24: destaques escolhidos (FeaturedPicker) e rotação automática do header.
+var _slides: Array[Dictionary] = []
+var _rotation: Timer
+## Só para testes/capturas: regras de destaque e relógio fixos.
+var _demo_rules: Array = []
+var _clock := 0.0
 var _covers := {}
 var _filter_panel: Control
 var _demo_entries: Array[Dictionary] = []
@@ -148,6 +154,8 @@ func _page(title: String, view: String) -> void:
 func _render_library() -> void:
 	_deck = {}
 	_index = -1
+	# Ao (re)abrir a Biblioteca o header começa no destaque de maior prioridade.
+	_featured = 0
 	_page("BIBLIOTECA DE DECKS", "library")
 	_search.text = _query
 	_search.editable = true
@@ -212,16 +220,19 @@ func _select_tab(tab: String) -> void:
 func _entries() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for item in _catalog:
+		var images: Array = (item.cards as Array).map(func(card: Dictionary) -> String: return str(card.image))
 		result.append({"id": str(item.id), "name": str(item.name), "origin": "official" if item.official else "community",
-			"creator": str(item.creator), "category": str(item.category), "count": int(item.count),
-			"cover": str(item.cards[0].image) if not item.cards.is_empty() else "", "item": item,
+			"creator": str(item.creator), "category": str(item.category), "count": int(item.count), "tags": item.get("tags", []),
+			"cover": DeckCover.resolve_item(item), "focus": DeckCover.PORTRAIT_FOCUS, "images": images, "item": item,
 			"ref": ("official:" if item.official else "creator:") + str(item.id),
 			"published": PlayerContracts.iso_seconds(str(item.get("published_at", "")))})
 	for draft: Dictionary in _store().list():
 		var cards: Array = draft.get("cards", [])
+		var cover := DeckCover.resolve_draft(_store(), draft)
 		result.append({"id": "draft:" + str(draft.id), "name": str(draft.name) if not str(draft.name).is_empty() else tr("Sem nome"),
 			"origin": "mine", "creator": tr("Você"), "category": str(draft.get("category", "")), "count": cards.size(),
-			"cover": _store().preview_path(str(draft.id), cards[0]) if not cards.is_empty() else "",
+			"cover": cover.path, "focus": cover.focus, "cover_mode": cover.mode,
+			"images": cards.map(func(card: Dictionary) -> String: return _store().preview_path(str(draft.id), card)),
 			"edited": float(draft.get("updated_at", 0)), "draft": draft})
 	for demo: Dictionary in _demo_entries: result.append(demo)
 	return result
@@ -401,7 +412,7 @@ func _load_stats() -> void:
 		_stats_state = "ok"
 	else:
 		_stats_state = "error"
-	if is_inside_tree() and _view == "library" and _tab == "Populares": _update_results()
+	if is_inside_tree() and _view == "library" and _tab in ["Populares", "Descobrir"]: _update_results()
 
 
 func _notice(text: String) -> void:
@@ -453,12 +464,13 @@ func _create_deck() -> void:
 ## Descobrir: destaque oficial e coleções (contagens calculadas dos dados reais).
 func _discover_top(all: Array[Dictionary]) -> void:
 	var compact := _compact()
-	var featured: Array[Dictionary] = []
-	for entry in all:
-		if entry.origin == "official": featured.append(entry)
-	if not featured.is_empty() and _query.strip_edges().is_empty():
-		_featured = clampi(_featured, 0, featured.size() - 1)
-		_results.add_child(_banner(featured[_featured], featured.size()))
+	_slides.clear()
+	if _query.strip_edges().is_empty(): _slides = FeaturedPicker.pick(all, _featured_rules(), _stats, _now())
+	if not _slides.is_empty():
+		_featured = clampi(_featured, 0, _slides.size() - 1)
+		_results.add_child(_banner(_slides[_featured], _slides.size()))
+		_arm_rotation()
+	_load_stats.call_deferred()
 	var counts := {"official": 0, "themed": 0, "community": 0, "mine": 0}
 	for entry in all:
 		counts[entry.origin] = int(counts.get(entry.origin, 0)) + 1
@@ -476,7 +488,7 @@ func _discover_top(all: Array[Dictionary]) -> void:
 		var card := Button.new()
 		card.name = "Collection_" + str(item[2])
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		card.custom_minimum_size.y = 52 if compact else 86
+		card.custom_minimum_size.y = 48 if compact else 72
 		PremiumUI.style_tab(card)
 		card.pressed.connect(_open_collection.bind(str(item[2])))
 		var line := HBoxContainer.new()
@@ -514,43 +526,94 @@ func _open_collection(kind: String) -> void:
 	_render_library()
 
 
-func _banner(entry: Dictionary, total: int) -> Control:
+## Regras de destaque do CATALOG; testes podem injetar as próprias (_demo_rules).
+func _featured_rules() -> Array:
+	if not _demo_rules.is_empty(): return _demo_rules
+	var services := PlayerServices.current
+	return services.catalog.featured if services != null and services.catalog != null else []
+
+
+func _now() -> float:
+	return _clock if _clock > 0.0 else Time.get_unix_time_from_system()
+
+
+## Personagens do header: a capa primeiro, depois os mais representativos (até 16 avaliados).
+func _banner_images(entry: Dictionary) -> Array:
+	var images: Array = entry.get("images", [])
+	if images.size() > 16:
+		var spread: Array = []
+		for i in 16: spread.append(images[int(i * images.size() / 16.0)])
+		images = spread
+	var ordered: Array = []
+	if DeckCover.exists(str(entry.get("cover", ""))): ordered.append(str(entry.cover))
+	for index in DeckCover.ranked(images):
+		if not ordered.has(images[index]): ordered.append(images[index])
+	return ordered.slice(0, CinematicBanner.MAX_CHARACTERS)
+
+
+func _arm_rotation() -> void:
+	if _slides.size() <= 1: return
+	if not is_instance_valid(_rotation):
+		_rotation = Timer.new()
+		_rotation.name = "FeaturedTimer"
+		_rotation.wait_time = 9.0
+		_rotation.timeout.connect(func() -> void:
+			if is_visible_in_tree() and _view == "library" and _tab == "Descobrir" and _slides.size() > 1:
+				_show_slide((_featured + 1) % _slides.size()))
+		add_child(_rotation)
+	_rotation.start()
+
+
+## Troca só o banner (sem refazer a lista).
+func _show_slide(index: int) -> void:
+	var old := _results.find_child("FeaturedBanner", false, false)
+	if old == null or _slides.is_empty(): return
+	_featured = clampi(index, 0, _slides.size() - 1)
+	old.name = "FeaturedBannerOld"
+	var fresh := _banner(_slides[_featured], _slides.size())
+	_results.add_child(fresh)
+	_results.move_child(fresh, old.get_index())
+	old.queue_free()
+	fresh.name = "FeaturedBanner"
+	if is_instance_valid(_rotation): _rotation.start()
+
+
+func _banner(slide: Dictionary, total: int) -> Control:
+	var entry: Dictionary = slide.entry
 	var compact := _compact()
 	var banner_panel := PanelContainer.new()
 	banner_panel.name = "FeaturedBanner"
-	banner_panel.custom_minimum_size.y = 150 if compact else 250
-	var frame := PremiumUI.flat(Color(0.03, 0.04, 0.07), Color(PremiumUI.GOLD, 0.45), 16, 1, 0)
+	banner_panel.set_meta("reason", slide.reason)
+	banner_panel.set_meta("deck", str(entry.get("ref", entry.id)))
+	banner_panel.custom_minimum_size.y = 138 if compact else 236
+	var frame := PremiumUI.flat(Color(0.03, 0.04, 0.07), Color(PremiumUI.GOLD, 0.4), 16, 1, 0)
 	banner_panel.add_theme_stylebox_override("panel", frame)
 	banner_panel.clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
-	var art := TextureRect.new()
-	art.texture = _cover(str(entry.cover))
-	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	art.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var art := CinematicBanner.new()
+	art.name = "Cinematic"
+	art.setup(_banner_images(entry))
 	banner_panel.add_child(art)
-	var shade := ColorRect.new()
-	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var material := ShaderMaterial.new()
-	var shader := Shader.new()
-	shader.code = "shader_type canvas_item; void fragment(){ float a = 1.0 - smoothstep(0.18, 0.62, UV.x); COLOR = vec4(0.02, 0.03, 0.06, 0.25 + a * 0.7); }"
-	material.shader = shader
-	shade.material = material
-	banner_panel.add_child(shade)
 	var margin := MarginContainer.new()
 	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for side in ["left", "right", "top", "bottom"]: margin.add_theme_constant_override("margin_" + side, 16 if compact else 44)
+	for side in ["left", "right"]: margin.add_theme_constant_override("margin_" + side, 16 if compact else 44)
+	for side in ["top", "bottom"]: margin.add_theme_constant_override("margin_" + side, 12 if compact else 30)
 	banner_panel.add_child(margin)
 	var text := VBoxContainer.new()
 	text.alignment = BoxContainer.ALIGNMENT_CENTER
-	text.add_theme_constant_override("separation", 4 if compact else 10)
+	text.add_theme_constant_override("separation", 3 if compact else 8)
 	margin.add_child(text)
+	var badges := HBoxContainer.new()
+	badges.add_theme_constant_override("separation", 8)
+	var reason := PlayerUI.pill(tr(str(slide.label)).to_upper(), "equipped" if slide.reason in ["pin", "campaign"] else "")
+	reason.name = "FeaturedReason"
+	badges.add_child(reason)
 	if entry.origin == "official":
-		var seal := PlayerUI.pill("OFICIAL", "equipped")
-		seal.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-		text.add_child(seal)
-	text.add_child(PremiumUI.plain(str(entry.name), 22 if compact else 44, Color.WHITE, false))
-	text.add_child(PremiumUI.plain("%s  •  %s" % [entry.creator, tr("%d cartas") % int(entry.count)], 13 if compact else 20, Color("#d6dbe4"), false))
+		badges.add_child(PlayerUI.pill("OFICIAL", "equipped"))
+	text.add_child(badges)
+	var title := PremiumUI.plain(str(entry.name), 22 if compact else 42, Color.WHITE, false)
+	title.name = "FeaturedTitle"
+	text.add_child(title)
+	text.add_child(PremiumUI.plain("%s  •  %s" % [entry.creator, tr("%d cartas") % int(entry.count)], 12 if compact else 19, Color("#d6dbe4"), false))
 	var explore := PremiumUI.action("Explorar coleção  →", "layers", true, _open_entry.bind(entry), compact)
 	explore.name = "ExploreFeatured"
 	explore.icon = null
@@ -563,11 +626,12 @@ func _banner(entry: Dictionary, total: int) -> Control:
 		dots.add_theme_constant_override("separation", 8)
 		for i in total:
 			var dot := Button.new()
-			dot.custom_minimum_size = Vector2(14, 14)
-			dot.add_theme_stylebox_override("normal", PremiumUI.flat(PremiumUI.GOLD if i == _featured else Color(1, 1, 1, 0.35), Color.TRANSPARENT, 7, 0, 0))
-			dot.pressed.connect(func() -> void:
-				_featured = i
-				_update_results())
+			dot.name = "Dot_%d" % i
+			dot.custom_minimum_size = Vector2(26, 14) if i == _featured else Vector2(14, 14)
+			dot.tooltip_text = str(_slides[i].entry.name)
+			for state in ["normal", "hover", "pressed", "focus"]:
+				dot.add_theme_stylebox_override(state, PremiumUI.flat(PremiumUI.GOLD if i == _featured else Color(1, 1, 1, 0.35), Color.TRANSPARENT, 7, 0, 0))
+			dot.pressed.connect(_show_slide.bind(i))
 			dots.add_child(dot)
 		text.add_child(dots)
 	return banner_panel
@@ -606,12 +670,13 @@ func _deck_tile(entry: Dictionary) -> Control:
 	column.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var cover := TextureRect.new()
 	cover.name = "Cover"
-	cover.texture = _cover(str(entry.cover))
+	cover.texture = DeckCover.framed(str(entry.cover), DeckCover.ASPECT, entry.get("focus", DeckCover.PORTRAIT_FOCUS)) if DeckCover.exists(str(entry.get("cover", ""))) else null
+	if cover.texture == null: _monogram(cover, str(entry.name))
 	cover.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	cover.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	cover.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	cover.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	cover.size_flags_stretch_ratio = 1.5
+	cover.size_flags_stretch_ratio = 3.2
 	cover.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	cover.clip_contents = true
 	column.add_child(cover)
@@ -759,12 +824,40 @@ func _cover(path: String) -> Texture2D:
 	return _covers[key]
 
 
+## Sem capa possível (deck sem imagens): monograma dourado sobre degradê — nunca vazio.
+func _monogram(cover: TextureRect, title: String) -> void:
+	cover.name = "Cover"
+	var back := ColorRect.new()
+	back.name = "Monogram"
+	back.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	back.color = Color(0.07, 0.09, 0.14)
+	cover.add_child(back)
+	back.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var initial := "?"
+	for character in title.replace("[DEMO]", "").strip_edges():
+		if character.to_upper() != character.to_lower() or character.is_valid_int():
+			initial = character.to_upper()
+			break
+	var letter := PremiumUI.plain(initial, 34 if _compact() else 56, Color(PremiumUI.GOLD, 0.85), false)
+	letter.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	letter.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	back.add_child(letter)
+	letter.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+
+## Colunas pela largura disponível, sem comprimir as capas: cada cartão tem largura mínima
+## (desktop 320, compacto 200) e a capa mantém 16:10 + faixa de texto.
 func _fit_tiles() -> void:
 	if not is_instance_valid(_grid) or _grid.name != "DeckGrid": return
-	var width := _physical_size().x - (_filter_panel.custom_minimum_size.x if is_instance_valid(_filter_panel) and _filter_panel.visible else 0.0) - (60 if _compact() else 130)
-	_grid.columns = clampi(floori(width / (190 if _compact() else 300)), 2, 4)
-	var tile_width := (width - (_grid.columns - 1) * 18) / _grid.columns
-	for tile: Control in _grid.get_children(): tile.custom_minimum_size = Vector2(tile_width, tile_width * (0.62 if _compact() else 0.6))
+	var compact := _compact()
+	var panel := _filter_panel.custom_minimum_size.x + 18.0 if is_instance_valid(_filter_panel) and _filter_panel.visible else 0.0
+	var width := _physical_size().x - panel - (60 if compact else 130)
+	var gap := 10.0 if compact else 18.0
+	var minimum := 200.0 if compact else 320.0
+	_grid.columns = clampi(floori((width + gap) / (minimum + gap)), 1, 5)
+	var tile_width := floorf((width - (_grid.columns - 1) * gap) / _grid.columns)
+	var text_band := 52.0 if compact else 74.0
+	for tile: Control in _grid.get_children(): tile.custom_minimum_size = Vector2(tile_width, tile_width / DeckCover.ASPECT + text_band)
 
 
 # --- Painel "Filtrar decks" --------------------------------------------------------------
@@ -1160,6 +1253,7 @@ func _render_editor() -> void:
 	right.add_child(_options("DeckCategory", DeckDrafts.CATEGORIES, DeckDrafts.CATEGORIES, "category"))
 	right.add_child(_text("VISIBILIDADE", 12, PlayerUI.GOLD))
 	right.add_child(_options("DeckVisibility", ["Privado", "Não listado", "Público"], DeckDrafts.VISIBILITY, "visibility"))
+	right.add_child(_cover_section())
 	body.add_child(_text("CARTAS  ·  %d (mínimo %d, máximo %d)" % [_draft.cards.size(), Catalog.MIN_CARDS, Catalog.MAX_CARDS], 12, PlayerUI.GOLD))
 	var list := PlayerUI.column(body)
 	list.name = "DraftCards"
@@ -1278,8 +1372,88 @@ func _move_card(index: int, direction: int) -> void:
 	_render_editor()
 
 
+## Capa (T24): Automática, Escolher carta ou Enviar imagem. A prévia mostra a capa resolvida
+## (que volta para a automática sozinha se a carta/arquivo escolhido sumir).
+func _cover_section() -> Control:
+	var box := VBoxContainer.new()
+	box.name = "CoverSection"
+	box.add_theme_constant_override("separation", 6)
+	box.add_child(_text("CAPA", 12, PlayerUI.GOLD))
+	var resolved := DeckCover.resolve_draft(_store(), _draft)
+	var preview := TextureRect.new()
+	preview.name = "CoverPreview"
+	preview.custom_minimum_size = Vector2(240, 150)
+	preview.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	preview.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	preview.texture = DeckCover.framed(str(resolved.path), DeckCover.ASPECT, resolved.focus) if DeckCover.exists(str(resolved.path)) else null
+	if preview.texture == null: _monogram(preview, str(_draft.get("name", "")))
+	preview.name = "CoverPreview"
+	box.add_child(preview)
+	var hint := {"auto": "Automática: o jogo escolhe a carta mais representativa.", "card": "Carta escolhida por você.", "upload": "Imagem enviada por você."}
+	var mode := str(resolved.mode)
+	var note := PlayerUI.label(hint.get(mode, ""), 12, PlayerUI.MUTED)
+	note.name = "CoverMode"
+	note.set_meta("mode", mode)
+	box.add_child(note)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	box.add_child(row)
+	var auto := _action("Automática", func() -> void: _set_cover({"mode": "auto"}))
+	auto.name = "CoverAuto"
+	row.add_child(auto)
+	var upload := _action("Enviar imagem", func() -> void:
+		_pending_card = -2
+		_picker.pick())
+	upload.name = "CoverUpload"
+	row.add_child(upload)
+	var cards: Array = _draft.get("cards", [])
+	var pick := OptionButton.new()
+	pick.name = "CoverCardPick"
+	pick.add_item(tr("Escolher carta…"))
+	for card: Dictionary in cards: pick.add_item(str(card.get("name", "")) if not str(card.get("name", "")).is_empty() else tr("Carta sem nome"))
+	pick.disabled = cards.is_empty()
+	if mode == "card":
+		for i in cards.size(): if str(cards[i].id) == str(resolved.card_id): pick.select(i + 1)
+	PremiumUI.style_outline(pick)
+	pick.item_selected.connect(func(index: int) -> void:
+		if index > 0: _set_cover({"mode": "card", "card_id": str(cards[index - 1].id)}))
+	box.add_child(pick)
+	return box
+
+
+func _set_cover(choice: Dictionary) -> void:
+	_draft.cover = choice
+	if str(choice.get("mode", "")) != "upload": _store().remove_cover(str(_draft.id))
+	_store().save(_draft)
+	_render_editor()
+
+
+func _open_cover_framer(image: Image, bytes: PackedByteArray, extension: String) -> void:
+	_close_framer()
+	_editor_overlay = CardFrameEditor.new()
+	add_child(_editor_overlay)
+	_editor_overlay.open(image, {}, CardFrameEditor.COVER_FORMATS)
+	_editor_overlay.confirmed.connect(func(crops: Dictionary) -> void:
+		if not _store().store_cover(str(_draft.id), image, crops.get("cover", {}), bytes, extension):
+			banner.show_state("error", "Não foi possível guardar a capa neste aparelho.")
+		else:
+			_draft.cover = {"mode": "upload", "crop": crops.get("cover", {})}
+			_store().save(_draft)
+		_close_framer()
+		_render_editor())
+	_editor_overlay.cancelled.connect(func() -> void:
+		_close_framer()
+		_render_editor())
+
+
 func _image_picked(image: Image, bytes: PackedByteArray, extension: String) -> void:
 	if _view != "editor": return
+	if _pending_card == -2:
+		_pending_card = -1
+		_open_cover_framer(image, bytes, extension)
+		return
 	var index := _pending_card
 	if index < 0:
 		if _draft.cards.size() >= Catalog.MAX_CARDS: return

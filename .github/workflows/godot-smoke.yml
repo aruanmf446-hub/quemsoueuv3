@@ -56,6 +56,7 @@ jobs:
           "$GODOT" --headless --path . --script res://tests/decks_t23/flow_test.gd
           "$GODOT" --headless --path . --script res://tests/decks_t24/flow_test.gd
           "$GODOT" --headless --path . --script res://tests/library_t24/flow_test.gd
+          "$GODOT" --headless --path . --script res://tests/library_t24/sync_cover_test.gd
           "$GODOT" --headless --path . --script res://tests/settings_t22/flow_test.gd
           "$GODOT" --headless --path . --script res://tests/friends_t22/flow_test.gd
       - name: Verify authentication appears before lobby (T18A startup)

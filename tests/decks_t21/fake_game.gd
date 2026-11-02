@@ -39,6 +39,16 @@ func send(path: String, method: HTTPClient.Method, body: Variant = null, _header
 				else:
 					db[table].append(row.duplicate(true))
 			return _ok([])
+		HTTPClient.METHOD_PATCH:
+			# FK + trigger do GAME (T24): a carta da capa precisa existir e ser deste deck.
+			if body is Dictionary and body.get("cover_card_id") != null:
+				var card_ok := false
+				for card: Dictionary in db.qse_creator_cards:
+					if str(card.id) == str(body.cover_card_id) and query.contains(str(card.get("deck_id"))): card_ok = true
+				if not card_ok: return ServiceResult.failure("23503", "error")
+			for row: Dictionary in db[table]:
+				if _owns(table, row) and _matches(row, query): row.merge(body, true)
+			return _ok([])
 		HTTPClient.METHOD_DELETE:
 			db[table] = db[table].filter(func(row: Dictionary) -> bool: return not (_owns(table, row) and _matches(row, query)))
 			return _ok([])

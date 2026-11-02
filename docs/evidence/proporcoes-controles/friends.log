@@ -1,0 +1,26 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS qse_friends T22 (requests + presence) aceito
+PASS presença in_match do servidor
+PASS barra lateral e painel principal
+PASS contadores reais
+PASS primeiro amigo selecionado
+PASS ações de amigo
+PASS convite pendente real com Entrar
+PASS seleção pela lista
+PASS Recebidas mostra o pedido
+PASS mensagem do pedido exibida
+PASS amigos em comum carregados
+PASS aceitar chama qse_friend_action
+PASS contadores atualizam após aceitar
+PASS seleção preservada após responder outra
+PASS recusar atualiza a lista
+PASS Enviadas: cancelar e chat bloqueado para não amigos
+PASS cancelar atualiza contador e seleção
+PASS remover pede confirmação
+PASS remover amizade aplica
+PASS Buscar: Adicionar amigo para desconhecido
+PASS pedido enviado com mensagem (p_message)
+PASS Buscar: amigo já existente mostra ações de amigo
+PASS conta sem amizades mostra estado vazio
+T22_FRIENDS checks=23 failures=0

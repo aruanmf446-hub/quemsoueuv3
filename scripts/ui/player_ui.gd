@@ -3,6 +3,13 @@ extends RefCounted
 
 ## Shared clean menu direction approved by the user; see docs/referencias/README.md.
 ## Clear hierarchy, quiet surfaces and a restrained accent for actions and selection.
+## Medidas únicas em unidades da base 1672×941; nunca variam por aparelho.
+const CONTROL_HEIGHT := 64
+const CONTROL_FONT := 26
+const SMALL_CONTROL_HEIGHT := 56
+const SMALL_CONTROL_FONT := 22
+const BACK_SIZE := Vector2(152, 60)
+
 const INTERIOR_BG := Color("#111820")
 const GOLD := Color("#e9b975")
 const GOLD_BRIGHT := Color("#f2cd94")
@@ -42,7 +49,7 @@ static func apply_theme(root: Control) -> void:
 		var font := preload("res://assets/desert/phase01/interface.ttf").duplicate() as FontFile
 		font.multichannel_signed_distance_field = true
 		_menu_theme.default_font = font
-		_menu_theme.default_font_size = 20
+		_menu_theme.default_font_size = 24
 		var popup_surface := _flat(Color(0.035, 0.05, 0.065, 0.98), FIELD_BORDER, 4, Color.WHITE)
 		_pad(popup_surface, 10, 8)
 		_menu_theme.set_stylebox("panel", "PopupMenu", popup_surface)
@@ -107,9 +114,9 @@ static func label(text: String, size: int = 22, color: Color = TEXT) -> Label:
 static func button(text: String, action: Callable) -> Button:
 	var node := Button.new()
 	node.text = TranslationServer.translate(text)
-	node.custom_minimum_size = Vector2(130, 52)
+	node.custom_minimum_size = Vector2(144, CONTROL_HEIGHT)
 	node.focus_mode = Control.FOCUS_ALL
-	node.add_theme_font_size_override("font_size", 21)
+	node.add_theme_font_size_override("font_size", CONTROL_FONT)
 	style_button(node, false)
 	node.pressed.connect(action)
 	return node

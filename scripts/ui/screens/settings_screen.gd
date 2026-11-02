@@ -280,8 +280,8 @@ func _adapt() -> void:
 	margin.add_theme_constant_override("margin_bottom", 10 if compact else 30)
 	$Margin/Column.add_theme_constant_override("separation", 8 if compact else 22)
 	var back: Button = $Margin/Column/Header/Back
-	back.custom_minimum_size = Vector2(104 if compact else 160, 40 if compact else 56)
-	back.add_theme_font_size_override("font_size", 16 if compact else 22)
+	back.custom_minimum_size = PlayerUI.BACK_SIZE
+	back.add_theme_font_size_override("font_size", PlayerUI.CONTROL_FONT)
 	heading.add_theme_font_size_override("font_size", 26 if compact else 46)
 	_gear.custom_minimum_size = Vector2.ONE * (28 if compact else 48)
 	_divider.custom_minimum_size.y = 28 if compact else 52
@@ -291,8 +291,8 @@ func _adapt() -> void:
 	_brand.visible = logical.x >= 760.0
 	_nav.add_theme_constant_override("separation", 6 if compact else 14)
 	for tab in _tabs:
-		tab.custom_minimum_size = Vector2(0, 40 if compact else 70)
-		tab.add_theme_font_size_override("font_size", 14 if compact else (20 if narrow else 25))
+		tab.custom_minimum_size = Vector2(0, 40 if compact else 76)
+		tab.add_theme_font_size_override("font_size", 14 if compact else (20 if narrow else 28))
 		tab.expand_icon = false
 		tab.add_theme_constant_override("icon_max_width", 18 if compact else 30)
 		tab.icon = null if compact and narrow else _icon(CATEGORIES[_tabs.find(tab)][1], Color.WHITE, 30)
@@ -435,6 +435,7 @@ func _my_profile() -> void:
 	if not signed:
 		var enter := _action_button("Entrar na conta", "login", true, func() -> void: navigate_requested.emit("account", {}))
 		enter.name = "EnterAccount"
+		enter.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		_side.add_child(enter)
 		return
 	var provider := _provider()
@@ -629,7 +630,7 @@ func _graphics() -> void:
 		choice.toggle_mode = true
 		choice.button_pressed = _graphics_pending.quality == keys[i]
 		choice.custom_minimum_size = Vector2(64 if compact else 110, 36 if compact else 52)
-		choice.add_theme_font_size_override("font_size", 14 if compact else 20)
+		choice.add_theme_font_size_override("font_size", 14 if compact else 24)
 		_style_tab(choice)
 		choice.pressed.connect(func() -> void:
 			_graphics_pending.quality = keys[i]
@@ -852,7 +853,7 @@ func _keycap(text: String, wide := false) -> Control:
 	cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	cap.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	cap.custom_minimum_size = Vector2((64 if wide else 38) if compact else (86 if wide else 54), 34 if compact else 50)
-	cap.add_theme_font_size_override("font_size", 14 if compact else 20)
+	cap.add_theme_font_size_override("font_size", 14 if compact else 24)
 	cap.add_theme_color_override("font_color", Color.WHITE)
 	var box := _flat(Color(0.06, 0.06, 0.07), ACCENT, 8, 2)
 	box.shadow_color = Color(ACCENT, 0.25)
@@ -1100,7 +1101,7 @@ func _info_row(parent: Control, icon: String, title: String, value: String) -> P
 	card.add_theme_stylebox_override("panel", _row_box())
 	parent.add_child(card)
 	var line := HBoxContainer.new()
-	line.add_theme_constant_override("separation", 14 if compact else 20)
+	line.add_theme_constant_override("separation", 14 if compact else 24)
 	card.add_child(line)
 	line.add_child(_icon_rect(icon, MUTED, 20 if compact else 30))
 	var label := _plain(title, 13 if compact else 18, MUTED)
@@ -1129,7 +1130,7 @@ func _side_row(icon: String, title: String, detail: String, action: Callable) ->
 	button.add_theme_constant_override("h_separation", 16)
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	button.custom_minimum_size.y = 44 if compact else (74 if not detail.is_empty() else 64)
-	button.add_theme_font_size_override("font_size", 14 if compact else 20)
+	button.add_theme_font_size_override("font_size", 14 if compact else 24)
 	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
 		var box := _row_box()
 		if state == "hover" or state == "focus": box.border_color = Color(ACCENT, 0.6)
@@ -1165,7 +1166,7 @@ func _setting_row(icon: String, title: String, detail: String) -> HBoxContainer:
 	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	text.add_theme_constant_override("separation", 0)
 	line.add_child(text)
-	text.add_child(PlayerUI.label(title, 15 if compact else 23, Color.WHITE))
+	text.add_child(PlayerUI.label(title, PlayerUI.CONTROL_FONT, Color.WHITE))
 	text.add_child(PlayerUI.label(detail, 11 if compact else 15, MUTED))
 	return line
 
@@ -1246,8 +1247,8 @@ func _action_button(text: String, icon: String, primary: bool, action: Callable)
 	button.expand_icon = false
 	button.add_theme_constant_override("icon_max_width", 20 if compact else 28)
 	button.add_theme_constant_override("h_separation", 12)
-	button.custom_minimum_size = Vector2(120 if compact else 200, 42 if compact else 62)
-	button.add_theme_font_size_override("font_size", 15 if compact else 23)
+	button.custom_minimum_size = Vector2(220, 72)
+	button.add_theme_font_size_override("font_size", PlayerUI.CONTROL_FONT)
 	if primary: _style_gold(button)
 	else: _style_outline(button)
 	button.pressed.connect(action)
@@ -1342,7 +1343,7 @@ func _style_outline(node: Button) -> void:
 
 func _style_option(node: OptionButton) -> void:
 	_style_outline(node)
-	node.add_theme_font_size_override("font_size", 14 if _compact() else 20)
+	node.add_theme_font_size_override("font_size", 14 if _compact() else 24)
 
 
 func _style_toggle(node: CheckButton) -> void:
@@ -1350,7 +1351,7 @@ func _style_toggle(node: CheckButton) -> void:
 	node.add_theme_icon_override("unchecked", _toggle_off)
 	node.add_theme_icon_override("checked_disabled", _toggle_on)
 	node.add_theme_icon_override("unchecked_disabled", _toggle_off)
-	node.add_theme_font_size_override("font_size", 14 if _compact() else 19)
+	node.add_theme_font_size_override("font_size", 14 if _compact() else 24)
 	var card := _row_box()
 	for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]: node.add_theme_stylebox_override(state, card)
 	var focus := _row_box()

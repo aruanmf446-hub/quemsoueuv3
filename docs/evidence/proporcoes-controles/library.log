@@ -1,0 +1,131 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS prioridade pin > campanha > popular > lançamento (["pin", "campaign", "popular", "recent"])
+PASS campanha por temática usa o título configurado
+PASS rascunho próprio nunca vira destaque
+PASS campanha encerrada sai; sem dados volta ao oficial padrão
+PASS data inválida invalida a regra
+PASS regra desativada é ignorada
+PASS fixar só vale para deck oficial
+PASS score 0 não conta como popular
+PASS 1 imagens → 1 personagens
+PASS 1 imagens: proporção preservada e dentro do banner
+PASS 1 imagens: principal na frente
+PASS 1 imagens: fundo desfocado e gradiente
+PASS 2 imagens → 2 personagens
+PASS 2 imagens: proporção preservada e dentro do banner
+PASS 2 imagens: principal na frente
+PASS 2 imagens: fundo desfocado e gradiente
+PASS 3 imagens → 3 personagens
+PASS 3 imagens: proporção preservada e dentro do banner
+PASS 3 imagens: principal na frente
+PASS 3 imagens: fundo desfocado e gradiente
+PASS 5 imagens → 5 personagens
+PASS 5 imagens: proporção preservada e dentro do banner
+PASS 5 imagens: principal na frente
+PASS 5 imagens: fundo desfocado e gradiente
+PASS 6 imagens → 6 personagens
+PASS 6 imagens: proporção preservada e dentro do banner
+PASS 6 imagens: principal na frente
+PASS 6 imagens: fundo desfocado e gradiente
+PASS 10 imagens → 6 personagens
+PASS 10 imagens: proporção preservada e dentro do banner
+PASS 10 imagens: principal na frente
+PASS 10 imagens: fundo desfocado e gradiente
+PASS 30 imagens → 6 personagens
+PASS 30 imagens: proporção preservada e dentro do banner
+PASS 30 imagens: principal na frente
+PASS 30 imagens: fundo desfocado e gradiente
+PASS 30 imagens montadas em 30 ms
+PASS reabrir usa o cache (1 ms)
+PASS vertical 0.71: zoom mínimo mostra a imagem inteira
+PASS vertical 0.71: moldura nunca deformada
+PASS vertical 0.71: prévia fiel com zoom reduzido
+PASS vertical 3.20: zoom mínimo mostra a imagem inteira
+PASS vertical 3.20: moldura nunca deformada
+PASS vertical 3.20: prévia fiel com zoom reduzido
+PASS horizontal 0.71: zoom mínimo mostra a imagem inteira
+PASS horizontal 0.71: moldura nunca deformada
+PASS horizontal 0.71: prévia fiel com zoom reduzido
+PASS horizontal 3.20: zoom mínimo mostra a imagem inteira
+PASS horizontal 3.20: moldura nunca deformada
+PASS horizontal 3.20: prévia fiel com zoom reduzido
+PASS square 0.71: zoom mínimo mostra a imagem inteira
+PASS square 0.71: moldura nunca deformada
+PASS square 0.71: prévia fiel com zoom reduzido
+PASS square 3.20: zoom mínimo mostra a imagem inteira
+PASS square 3.20: moldura nunca deformada
+PASS square 3.20: prévia fiel com zoom reduzido
+PASS odd 0.71: zoom mínimo mostra a imagem inteira
+PASS odd 0.71: moldura nunca deformada
+PASS odd 0.71: prévia fiel com zoom reduzido
+PASS odd 3.20: zoom mínimo mostra a imagem inteira
+PASS odd 3.20: moldura nunca deformada
+PASS odd 3.20: prévia fiel com zoom reduzido
+PASS card 0.71: zoom mínimo mostra a imagem inteira
+PASS card 0.71: moldura nunca deformada
+PASS card 0.71: prévia fiel com zoom reduzido
+PASS card 3.20: zoom mínimo mostra a imagem inteira
+PASS card 3.20: moldura nunca deformada
+PASS card 3.20: prévia fiel com zoom reduzido
+PASS imagem do mesmo formato da carta pode subir e descer
+PASS limites de zoom
+PASS retrato e Mata-Mata seguem separados nas colunas portrait_*/duel_*
+PASS controle de zoom abre sem alterar o enquadramento
+PASS reduzir o zoom pelo controle
+PASS botão ↓ move a imagem (toque)
+PASS ampliar e ver o valor
+PASS Restaurar volta ao original
+PASS arrastar com o dedo move a imagem
+PASS 0 cartas: capa automática
+PASS 1 cartas: capa automática
+PASS 2 cartas: capa automática
+PASS 3 cartas: capa automática
+PASS 3 cartas: escolher carta
+PASS 3 cartas: carta da capa excluída → automática
+PASS 3 cartas: enviar capa
+PASS 3 cartas: capa enviada em 16:10
+PASS 3 cartas: substituir capa atualiza a imagem
+PASS 3 cartas: arquivo da capa apagado → automática
+PASS 5 cartas: capa automática
+PASS 5 cartas: escolher carta
+PASS 5 cartas: carta da capa excluída → automática
+PASS 5 cartas: enviar capa
+PASS 5 cartas: capa enviada em 16:10
+PASS 5 cartas: substituir capa atualiza a imagem
+PASS 5 cartas: arquivo da capa apagado → automática
+PASS 6 cartas: capa automática
+PASS 6 cartas: escolher carta
+PASS 6 cartas: carta da capa excluída → automática
+PASS 6 cartas: enviar capa
+PASS 6 cartas: capa enviada em 16:10
+PASS 6 cartas: substituir capa atualiza a imagem
+PASS 6 cartas: arquivo da capa apagado → automática
+PASS 10 cartas: capa automática
+PASS 10 cartas: escolher carta
+PASS 10 cartas: carta da capa excluída → automática
+PASS 10 cartas: enviar capa
+PASS 10 cartas: capa enviada em 16:10
+PASS 10 cartas: substituir capa atualiza a imagem
+PASS 10 cartas: arquivo da capa apagado → automática
+PASS 30 cartas: capa automática
+PASS 30 cartas: escolher carta
+PASS 30 cartas: carta da capa excluída → automática
+PASS 30 cartas: enviar capa
+PASS 30 cartas: capa enviada em 16:10
+PASS 30 cartas: substituir capa atualiza a imagem
+PASS 30 cartas: arquivo da capa apagado → automática
+PASS sem regras nem dados: oficial padrão com composição
+PASS Lendas Urbanas (9 cartas) → 6 personagens
+PASS campanha ativa assume o header
+PASS vários destaques reais → pontos
+PASS troca de destaque (popularidade real)
+PASS deck oficial fixado vem primeiro
+PASS 1920: 3 colunas, cartão 396 px
+PASS capa 16:10 sem compressão
+PASS trocar de aba reaproveita a capa em cache
+PASS 844×390: 4 colunas legíveis
+PASS editor mostra a capa automática
+PASS escolher carta grava a capa
+PASS voltar para automática
+T24_PREMIUM checks=128 failures=0

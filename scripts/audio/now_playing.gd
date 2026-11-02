@@ -146,8 +146,8 @@ func _layout() -> void:
 	if menu == null: return
 	_compact = UIScale.is_compact(500.0)
 	var unit := 1.0
-	var w := (280.0 if _compact else 330.0) * unit
-	var h := 52.0 * unit
+	var w := 400.0 * unit
+	var h := 68.0 * unit
 	set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	size = Vector2(w, h)
 	custom_minimum_size = size
@@ -157,7 +157,7 @@ func _layout() -> void:
 	_cover.position = Vector2(skew * 0.5 + h * 0.16, pad)
 	_cover.size = Vector2(h - pad * 2, h - pad * 2)
 	var text_x := _cover.position.x + _cover.size.x + h * 0.14
-	var button_size := 44.0 * unit
+	var button_size := 56.0 * unit
 	var buttons_x := w - skew * 0.5 - h * 0.1 - button_size * 3 - h * 0.08 * 2
 	_kicker.position = Vector2(text_x, pad * 0.7)
 	_kicker.add_theme_font_size_override("font_size", int(h * 0.13))
@@ -171,8 +171,8 @@ func _layout() -> void:
 	_kicker.hide()
 	_category.hide()
 	_title.position.y = h * 0.30
-	_title.size.y = 22 * unit
-	_title.add_theme_font_size_override("font_size", roundi(12 * unit))
+	_title.size.y = 30 * unit
+	_title.add_theme_font_size_override("font_size", roundi(20 * unit))
 	for index in range(3):
 		var button := _buttons[index]
 		var bigger := button_size

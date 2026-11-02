@@ -103,8 +103,8 @@ func _fit() -> void:
 	margin.add_theme_constant_override("margin_bottom", 10 if compact else 22)
 	$Margin/Column.add_theme_constant_override("separation", 8 if compact else 18)
 	var back: Button = $Margin/Column/Header/Back
-	back.custom_minimum_size = Vector2(96 if compact else 126, 38 if compact else 50)
-	back.add_theme_font_size_override("font_size", 15 if compact else 20)
+	back.custom_minimum_size = PlayerUI.BACK_SIZE
+	back.add_theme_font_size_override("font_size", PlayerUI.CONTROL_FONT)
 	heading.add_theme_font_size_override("font_size", 24 if compact else 38)
 	heading.autowrap_mode = TextServer.AUTOWRAP_OFF
 	_title_icon.custom_minimum_size = Vector2.ONE * (26 if compact else 36)

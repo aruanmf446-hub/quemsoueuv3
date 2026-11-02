@@ -70,9 +70,9 @@ func _ready() -> void:
 	_search.name = "DeckSearch"
 	_search.placeholder_text = tr("Pesquisar deck ou criador")
 	_search.tooltip_text = tr("Pesquisar pelo nome do deck ou do criador")
-	_search.custom_minimum_size = Vector2(360, 44)
+	_search.custom_minimum_size = Vector2(360, PlayerUI.SMALL_CONTROL_HEIGHT)
 	_search.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_search.add_theme_font_size_override("font_size", 16)
+	_search.add_theme_font_size_override("font_size", PlayerUI.SMALL_CONTROL_FONT)
 	PlayerUI.style_field(_search)
 	_search.text_changed.connect(func(value: String) -> void:
 		_query = value
@@ -127,7 +127,7 @@ func _layout_changed() -> void:
 	if not is_instance_valid(_search): return
 	var width := _physical_size().x
 	_search.custom_minimum_size.x = 360 if width >= 1100 else (240 if width >= 800 else 190)
-	heading.add_theme_font_size_override("font_size", 24 if width < 900 else 34)
+	heading.add_theme_font_size_override("font_size", 24 if width < 900 else 40)
 	$Margin/Column/Header.add_theme_constant_override("separation", 16 if width < 900 else 28)
 	if not is_equal_approx(_refresh_width, width):
 		_refresh_width = width
@@ -147,7 +147,7 @@ func _page(title: String, view: String) -> void:
 	_search.visible = view == "library"
 	var back: Button = $Margin/Column/Header/Back
 	back.text = tr("‹ Voltar" if view == "library" else ("‹ Biblioteca" if view == "deck" else "‹ Galeria"))
-	back.custom_minimum_size.x = 100 if view == "library" else 120
+	back.custom_minimum_size.x = 152 if view == "library" else 180
 	_layout_changed()
 	_refit_margin.call_deferred()
 
@@ -171,8 +171,8 @@ func _render_library() -> void:
 		button.text = tr(text)
 		button.toggle_mode = true
 		button.button_pressed = _tab == text
-		button.custom_minimum_size = Vector2(0, 34 if compact else 46)
-		button.add_theme_font_size_override("font_size", 14 if compact else 18)
+		button.custom_minimum_size = Vector2(0, 34 if compact else PlayerUI.CONTROL_HEIGHT)
+		button.add_theme_font_size_override("font_size", 14 if compact else PlayerUI.CONTROL_FONT)
 		PremiumUI.style_tab(button)
 		for state in ["normal", "disabled"]: button.add_theme_stylebox_override(state, PremiumUI.flat(Color.TRANSPARENT, Color.TRANSPARENT, 10, 0, 14 if compact else 22))
 		for state in ["pressed", "hover_pressed"]:
@@ -1215,8 +1215,8 @@ func _input(event: InputEvent) -> void:
 
 func _action(text: String, callback: Callable) -> Button:
 	var button := PlayerUI.button(text, callback)
-	button.custom_minimum_size = Vector2(100, 44)
-	button.add_theme_font_size_override("font_size", 16)
+	button.custom_minimum_size = Vector2(132, PlayerUI.SMALL_CONTROL_HEIGHT)
+	button.add_theme_font_size_override("font_size", PlayerUI.SMALL_CONTROL_FONT)
 	return button
 
 func _text(value: String, font_size := 20, color := PlayerUI.TEXT) -> Label:

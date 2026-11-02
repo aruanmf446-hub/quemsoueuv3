@@ -1,0 +1,20 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS navegação horizontal com 5 categorias
+PASS cabeçalho com marca e fundo do sistema visual
+PASS painel principal e lateral
+PASS retrato do personagem equipado
+PASS visitante vê Entrar na conta
+PASS Música nos menus grava a preferência
+PASS Gerenciar músicas
+PASS prévia só de sons reais
+PASS sem canal de diálogos inexistente
+PASS qualidade só muda ao aplicar
+PASS Aplicar alterações grava qualidade e sombras
+PASS sombras desligadas no palco real
+PASS Restaurar padrão + Aplicar
+PASS desempenho com medições do motor
+PASS remapear Confirmar
+PASS escolher idioma não aplica antes de confirmar
+PASS Confirmar aplica o idioma
+T22_SETTINGS checks=17 failures=0

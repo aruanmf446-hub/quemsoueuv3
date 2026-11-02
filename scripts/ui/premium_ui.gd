@@ -13,6 +13,9 @@ const INK := Color("#141006")
 const ONLINE := Color("#4cd964")
 const OFFLINE := Color("#8a94a6")
 const ICONS := {
+	"swords": '<path d="M4 4l9.5 9.5M4 4h4l9 9M4 4v4l9 9" fill="currentColor" fill-opacity="0.25"/><path d="M20 4l-9.5 9.5M20 4h-4l-3.2 3.2M20 4v4l-3.2 3.2"/><path d="M13.5 13.5l4 4M10.5 13.5l-4 4M16 19l3-3M8 19l-3-3M18.5 20.5l2-2M5.5 20.5l-2-2"/>',
+	"plus": '<path d="M12 5v14M5 12h14"/>',
+	"play": '<path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/>',
 	"layers": '<path d="M12 3 2 8l10 5 10-5z"/><path d="M2 13l10 5 10-5"/>',
 	"tag": '<path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="8" cy="8" r="1.4"/>',
 	"cards": '<rect x="3" y="6" width="12" height="15" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v13"/>',

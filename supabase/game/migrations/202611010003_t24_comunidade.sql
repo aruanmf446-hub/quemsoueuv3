@@ -16,7 +16,7 @@ create index if not exists qse_creator_cards_cover_idx
 
 -- O dono pode editar metadados do RASCUNHO, mas nunca status/review_note/visibility/published_at diretamente.
 create or replace function qse_v3.t24_deck_guard()
-returns trigger language plpgsql security definer set search_path=''
+returns trigger language plpgsql security invoker set search_path=''
 as $$
 begin
  if tg_op='UPDATE' then
@@ -44,7 +44,7 @@ create trigger qse_t24_deck_guard before insert or update on public.qse_creator_
  for each row execute function qse_v3.t24_deck_guard();
 
 create or replace function qse_v3.t24_card_guard()
-returns trigger language plpgsql security definer set search_path=''
+returns trigger language plpgsql security invoker set search_path=''
 as $$
 declare v_deck uuid; v_status text;
 begin

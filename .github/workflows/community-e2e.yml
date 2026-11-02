@@ -1,0 +1,33 @@
+name: Comunidade E2E (contas de teste)
+
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: "publish | community | finish"
+        required: true
+        default: publish
+      deck_id:
+        description: "DECK_ID (community/finish)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Etapa ${{ inputs.stage }}
+        env:
+          QSE_TEST_OWNER_EMAIL: ${{ secrets.QSE_TEST_OWNER_EMAIL }}
+          QSE_TEST_OWNER_PASSWORD: ${{ secrets.QSE_TEST_OWNER_PASSWORD }}
+          QSE_TEST_READER_EMAIL: ${{ secrets.QSE_TEST_READER_EMAIL }}
+          QSE_TEST_READER_PASSWORD: ${{ secrets.QSE_TEST_READER_PASSWORD }}
+          QSE_TEST_R1_EMAIL: ${{ secrets.QSE_TEST_R1_EMAIL }}
+          QSE_TEST_R1_PASSWORD: ${{ secrets.QSE_TEST_R1_PASSWORD }}
+          STAGE: ${{ inputs.stage }}
+          DECK_ID: ${{ inputs.deck_id }}
+        run: python3 tools/e2e/community_e2e.py "$STAGE" "$DECK_ID"

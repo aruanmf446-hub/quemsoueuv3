@@ -27,7 +27,8 @@ Data de execução: 01/11/2026 horário de Belém (2026-11-02 UTC em logs).
 8. Community deck/cards têm RLS `true`. Policy `qse_creator_decks_read` existente filtra `owner_id = auth.uid()`, então `review_note` não está em leitura direta de outros usuários. A publicação pública ocorre apenas pelas RPCs de projeção segura.
 9. Storage: bucket `qse-deck-originals` privado; policy `qse_deck_published_previews_read` foi criada para `authenticated`; não concede leitura pública de originais e não modifica policy owner-only de leitura de originais.
 10. Performance: índice duplicado detectado em `qse_creator_cards` e **removido**; índice sobre `qse_deck_reports(user_id)` acrescentado. A última execução do advisor já não acusa `duplicate_index`.
-11. CATALOG: `published_at` confirmado distinto de `updated_at`; advisors de segurança/performance sem lints na última consulta.
+11. **Correção de segurança no Storage:** foram aplicadas três políticas RESTRICTIVE adicionais para INSERT/UPDATE/DELETE, permitindo mudanças de arquivos apenas em draft ou limpeza de órfãos após remoção do deck. SQL/políticas instalados e inspecionados; **não houve upload real no teste**.
+12. CATALOG: `published_at` confirmado distinto de `updated_at`; advisors de segurança/performance sem lints na última consulta.
 
 ## Advisors de segurança — após cada etapa
 

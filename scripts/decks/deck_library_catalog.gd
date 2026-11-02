@@ -43,7 +43,8 @@ static func _parse_deck(id: String, info: Dictionary) -> Dictionary:
 		"tags": _strings(info.get("tags", []), 3), "age_rating": age,
 		"content_warnings": _strings(info.get("content_warnings", [])),
 		"cards": entries, "count": entries.size(), "origin": "local", "visibility": visibility,
-		"original_language": _string(info.get("original_language", ""))
+		"original_language": _string(info.get("original_language", "")),
+		"published_at": _string(remote.get("published_at", ""))
 	}
 
 static func cards(folder: String, info: Dictionary) -> Array[Dictionary]:

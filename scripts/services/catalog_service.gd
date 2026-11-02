@@ -116,6 +116,8 @@ static func _meta(row: Dictionary) -> Dictionary:
 	var result := {}
 	for key in ["name", "description"]:
 		if row.get(key) is String and not (row[key] as String).strip_edges().is_empty(): result[key] = (row[key] as String).strip_edges()
+	# T24: data real de publicação (CATALOG). Só aceita ISO 8601 válido; nunca usa updated_at.
+	if row.get("published_at") is String and PlayerContracts.iso_seconds(row.published_at) > 0.0: result.published_at = row.published_at
 	return result
 
 

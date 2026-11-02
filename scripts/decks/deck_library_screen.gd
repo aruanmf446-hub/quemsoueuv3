@@ -36,6 +36,13 @@ var _featured := 0
 var _covers := {}
 var _filter_panel: Control
 var _demo_entries: Array[Dictionary] = []
+## T24: totais de popularidade (deck_ref -> {plays_30d, players_30d, favorites, score}).
+## "idle" | "loading" | "ok" | "offline" | "error". Cliente de teste pode substituir _stats_client.
+var _stats := {}
+var _stats_state := "idle"
+var _stats_at := -1000.0
+var _stats_client: Object
+const STATS_TTL := 300.0
 const SURFACE_SHADER := """shader_type canvas_item;
 // Textura muito sutil e uma linha orgânica discreta: só estética, sem contraste extra.
 uniform float seed = 0.0;
@@ -207,7 +214,9 @@ func _entries() -> Array[Dictionary]:
 	for item in _catalog:
 		result.append({"id": str(item.id), "name": str(item.name), "origin": "official" if item.official else "community",
 			"creator": str(item.creator), "category": str(item.category), "count": int(item.count),
-			"cover": str(item.cards[0].image) if not item.cards.is_empty() else "", "item": item})
+			"cover": str(item.cards[0].image) if not item.cards.is_empty() else "", "item": item,
+			"ref": ("official:" if item.official else "creator:") + str(item.id),
+			"published": PlayerContracts.iso_seconds(str(item.get("published_at", "")))})
 	for draft: Dictionary in _store().list():
 		var cards: Array = draft.get("cards", [])
 		result.append({"id": "draft:" + str(draft.id), "name": str(draft.name) if not str(draft.name).is_empty() else tr("Sem nome"),
@@ -230,13 +239,31 @@ func _sort_options() -> Array:
 	match _tab:
 		"Favoritos": return [["recent_favorite", "Adicionados recentemente"], ["name", "Nome A–Z"]]
 		"Meus Decks": return [["edited", "Última edição"], ["name", "Nome A–Z"]]
+	if _tab == "Populares" and _stats_state == "ok": return [["popular", "Mais populares"], ["name", "Nome A–Z"]]
+	if _tab == "Recentes": return [["recent", "Publicados recentemente"], ["name", "Nome A–Z"]]
 	return [["name", "Nome A–Z"]]
+
+
+func _score(entry: Dictionary) -> float:
+	return float(_stats.get(str(entry.get("ref", "")), {}).get("score", entry.get("score", 0.0)))
 
 
 func _sorted(list: Array[Dictionary]) -> Array[Dictionary]:
 	var mode := _sort if not _sort.is_empty() else str(_sort_options()[0][0])
 	if mode == "edited":
 		list.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a.get("edited", 0)) > float(b.get("edited", 0)))
+	elif mode == "popular":
+		# Sem engajamento medido (score 0) vai para o fim, em ordem alfabética.
+		list.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+			var sa := _score(a)
+			var sb := _score(b)
+			return Catalog.search_key(a.name).naturalnocasecmp_to(Catalog.search_key(b.name)) < 0 if is_equal_approx(sa, sb) else sa > sb)
+	elif mode == "recent":
+		# Sem data real de publicação (rascunhos) vai para o fim.
+		list.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+			var pa := float(a.get("published", 0))
+			var pb := float(b.get("published", 0))
+			return Catalog.search_key(a.name).naturalnocasecmp_to(Catalog.search_key(b.name)) < 0 if is_equal_approx(pa, pb) else pa > pb)
 	elif mode == "recent_favorite":
 		var order := _store().favorites()
 		list.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return order.find(str(a.id)) > order.find(str(b.id)))
@@ -258,8 +285,16 @@ func _update_results() -> void:
 	if _tab == "Descobrir": _discover_top(all)
 	var titles := {"Descobrir": ["layers", "Resultados"], "Populares": ["bolt", "Decks populares"], "Recentes": ["clock", "Decks recentes"], "Favoritos": ["star", "Meus favoritos"], "Meus Decks": ["layers", "Meus decks"]}
 	_results_header(titles[_tab][0], "%s (%d)" % [tr(titles[_tab][1]), shown.size()])
-	if _tab == "Populares": _notice("A popularidade ainda não é medida pelo servidor. Mostrando todos os decks de A a Z.")
-	if _tab == "Recentes": _notice("As datas de publicação ainda não estão disponíveis. Mostrando todos os decks de A a Z.")
+	if _tab == "Populares":
+		match _stats_state:
+			"ok":
+				if shown.all(func(e: Dictionary) -> bool: return _score(e) <= 0.0): _notice("Ainda não há partidas nem favoritos registrados nos últimos 30 dias.")
+			"loading", "idle": _notice("Carregando popularidade…")
+			"offline": _notice("Entre na sua conta para ver a popularidade dos decks. Mostrando de A a Z.")
+			_: _notice("Não foi possível carregar a popularidade agora. Mostrando de A a Z.")
+		_load_stats.call_deferred()
+	if _tab == "Recentes" and shown.all(func(e: Dictionary) -> bool: return float(e.get("published", 0)) <= 0.0):
+		_notice("Nenhum deck com data de publicação disponível.")
 	if _tab == "Meus Decks": _remote_section.call_deferred("decks")
 	if _tab == "Favoritos": _remote_section.call_deferred("favorites")
 	if shown.is_empty():
@@ -295,20 +330,78 @@ func _results_header(icon: String, title: String) -> void:
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(spacer)
-	row.add_child(PremiumUI.plain("Ordenar por:", 12 if compact else 16, PremiumUI.MUTED))
+	if not compact: row.add_child(PremiumUI.plain("Ordenar por:", 16, PremiumUI.MUTED))
 	var options := OptionButton.new()
 	options.name = "SortBy"
 	var modes := _sort_options()
 	for mode: Array in modes: options.add_item(tr(mode[1]))
 	var current := _sort if not _sort.is_empty() else str(modes[0][0])
 	for i in range(modes.size()): if modes[i][0] == current: options.select(i)
-	options.custom_minimum_size = Vector2(140 if compact else 220, 32 if compact else 44)
+	options.custom_minimum_size = Vector2(130 if compact else 220, 32 if compact else 44)
+	options.tooltip_text = tr("Ordenar por")
+	# Texto longo não empurra a página: corta com reticências dentro do botão.
+	options.clip_text = true
+	options.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	options.add_theme_font_size_override("font_size", 13 if compact else 17)
 	PremiumUI.style_outline(options)
 	options.item_selected.connect(func(index: int) -> void:
 		_sort = str(modes[index][0])
 		_update_results())
 	row.add_child(options)
+
+
+## Fatos reais por aba: jogadores/favoritos (Populares) e "Publicado há" (Recentes). Nada inventado.
+func _tile_facts(meta: HBoxContainer, entry: Dictionary, compact: bool) -> void:
+	var size := 11 if compact else 14
+	if _tab == "Populares":
+		var stat: Dictionary = _stats.get(str(entry.get("ref", "")), entry.get("stats", {}))
+		if int(stat.get("players_30d", 0)) > 0:
+			var text := tr("%d jog.") % int(stat.players_30d) if compact else (tr("%d jogadores · 30 dias") % int(stat.players_30d) if int(stat.players_30d) != 1 else tr("1 jogador · 30 dias"))
+			var players := PremiumUI.plain(text, size, PremiumUI.GOLD, false)
+			players.tooltip_text = tr("Jogadores distintos nos últimos 30 dias")
+			players.name = "Players30d"
+			meta.add_child(players)
+		if int(stat.get("favorites", 0)) > 0:
+			var hearts := PremiumUI.plain("♥ %d" % int(stat.favorites), size, Color("#e8817a"), false)
+			hearts.name = "FavoritesCount"
+			meta.add_child(hearts)
+	elif _tab == "Recentes":
+		var when := PlayerContracts.ago(float(entry.get("published", 0)))
+		if not when.is_empty():
+			var label := PremiumUI.plain(when if compact else tr("Publicado ") + when, size, PremiumUI.MUTED, false)
+			label.name = "PublishedAgo"
+			meta.add_child(label)
+
+
+## Busca os totais uma vez por STATS_TTL (só com sessão). Os refs são os decks oficiais.
+func _load_stats() -> void:
+	if _stats_state == "loading": return
+	if _stats_state in ["ok", "error"] and Time.get_ticks_msec() / 1000.0 - _stats_at < STATS_TTL: return
+	var client: Object = _stats_client
+	var services := PlayerServices.current
+	if client == null and services != null and services.session != null and services.session.authenticated(): client = services.client
+	if client == null:
+		if _stats_state != "offline":
+			_stats_state = "offline"
+			if _view == "library" and _tab == "Populares": _update_results()
+		return
+	var refs: Array = []
+	for entry in _entries():
+		var ref := str(entry.get("ref", ""))
+		if not ref.is_empty() and not refs.has(ref): refs.append(ref)
+	_stats_state = "loading"
+	var result: Dictionary = await client.call_rpc("qse_deck_stats", {"p_refs": refs.slice(0, 100)})
+	_stats_at = Time.get_ticks_msec() / 1000.0
+	_stats.clear()
+	if result.ok and result.data is Array:
+		for row: Variant in result.data:
+			if row is Dictionary and row.get("deck_ref") is String:
+				_stats[row.deck_ref] = {"plays_30d": int(row.get("plays_30d", 0)), "players_30d": int(row.get("players_30d", 0)),
+					"favorites": int(row.get("favorites", 0)), "score": float(row.get("score", 0))}
+		_stats_state = "ok"
+	else:
+		_stats_state = "error"
+	if is_inside_tree() and _view == "library" and _tab == "Populares": _update_results()
 
 
 func _notice(text: String) -> void:
@@ -554,6 +647,7 @@ func _deck_tile(entry: Dictionary) -> Control:
 			meta.add_child(PremiumUI.plain(tr("Editado ") + edited, 11 if compact else 14, PremiumUI.MUTED, false))
 	meta.add_child(PremiumUI.icon_rect("cards", PremiumUI.MUTED, 12 if compact else 16))
 	meta.add_child(PremiumUI.plain(tr("%d cartas") % int(entry.count), 11 if compact else 14, PremiumUI.MUTED, false))
+	_tile_facts(meta, entry, compact)
 	if entry.origin == "mine":
 		var state := str(entry.draft.get("sync_state", "local"))
 		var pill_text: String = {"synced": "NA CONTA", "pending": "ENVIANDO", "error": "ERRO AO ENVIAR"}.get(state, "RASCUNHO")

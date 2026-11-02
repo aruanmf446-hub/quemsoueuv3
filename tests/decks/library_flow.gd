@@ -125,7 +125,12 @@ func run() -> void:
 		check(has_deck() == (index <= 2), "truthful_tab_" + str(index))
 		check(screen.get("_search").editable, "search_all_tabs_" + str(index))
 	await click(screen.get("_tabs")[0])
-	await click(screen.get("_results").find_child("Deck_lendas_urbanas", true, false))
+	# A capa de destaque tem mais altura: a coleção pode começar abaixo do viewport.
+	# Revele o cartão como faria o jogador, preservando o clique real e as verificações.
+	var collection: Control = screen.get("_results").find_child("Deck_lendas_urbanas", true, false)
+	(screen.get_node("Margin/Column/Scroll") as ScrollContainer).ensure_control_visible(collection)
+	await settle()
+	await click(collection)
 	check(screen.get("_view") == "deck" and screen.get("_grid").get_child_count() == 9, "real_click_opens_nine_card_gallery")
 	await capture("deck")
 	var gallery: GridContainer = screen.get("_grid")

@@ -89,3 +89,12 @@ Para reproduzir só esta revisão, acrescente `--lobby-library` ao comando de ca
 Biblioteca: 128 verificações; sessão/música: 15 verificações, ambas sem falhas.
 Os testes de captura e sessão/música ainda emitem avisos de ObjectDB ao sair; os logs
 estão incluídos. Não se trata de validação no navegador ou em aparelho físico.
+
+## Preparação da publicação aprovada
+
+O proprietário aprovou o visual da segunda rodada e autorizou a publicação na main.
+O teste de navegação real da Biblioteca passou a rolar até a coleção antes do clique:
+a capa mais alta pode colocar esse cartão abaixo da área visível. Nenhuma verificação
+foi removida ou relaxada. Resultado: 66 verificações aprovadas; o aviso de ObjectDB ao
+sair está registrado em `library_navigation.log`. As demais 12 suítes da etapa T21 do CI
+foram executadas localmente e concluíram com código zero, sem erro de script.

@@ -10,7 +10,7 @@ extends Node
 ## A sala local nunca é pública nem listada: só existe na memória deste jogo, com um único
 ## jogador humano (o próprio aparelho) e bots.
 
-const DECKS_ROOT := "res://assets/duel/decks"
+const DECKS_ROOT := "res://assets/duel/decks/oficial"
 const VALID_ID := "^[a-z0-9_]{2,32}$"
 const HUMAN := "local_player"
 const SETTING_KEYS := ["max_players", "deck_ids", "cards_per_player", "bots_allowed", "turn_seconds",

@@ -167,7 +167,7 @@ func pick(card_id: String) -> Dictionary:
 ## Imagem e nome de uma carta "<deck>/<arquivo>" (assets/duel/decks/<deck>/<arquivo>.png).
 static var _deck_info := {}
 static func card_texture(card_id: String) -> Texture2D:
-	var path := "res://assets/duel/decks/%s.png" % card_id
+	var path := "res://assets/duel/decks/oficial/%s.png" % card_id
 	return load(path) as Texture2D if ResourceLoader.exists(path) else null
 
 
@@ -175,7 +175,7 @@ static func card_name(card_id: String) -> String:
 	var deck := card_id.get_slice("/", 0)
 	var file := card_id.get_slice("/", 1)
 	if not _deck_info.has(deck):
-		var path := "res://assets/duel/decks/%s/deck.json" % deck
+		var path := "res://assets/duel/decks/oficial/%s/deck.json" % deck
 		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path)) if FileAccess.file_exists(path) else null
 		_deck_info[deck] = parsed if parsed is Dictionary else {}
 	var names: Variant = _deck_info[deck].get("cards", {})

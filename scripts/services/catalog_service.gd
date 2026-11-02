@@ -8,7 +8,7 @@ extends Node
 signal changed
 
 const TABLES := {"characters": "qse_catalog_characters", "decks": "qse_catalog_decks", "cards": "qse_catalog_cards"}
-const DECKS_ROOT := "res://assets/duel/decks"
+const DECKS_ROOT := "res://assets/duel/decks/oficial"
 ## Cache em disco: o catálogo muda raramente; dentro deste prazo nenhuma consulta é feita.
 const CACHE_PATH := "user://catalog_cache.json"
 const CACHE_TTL := 6 * 3600.0

@@ -1,6 +1,6 @@
 """Gera supabase/seed/duel_decks.sql a partir das pastas de cartas do Duelo.
 
-Cada deck é uma pasta em assets/duel/decks/<deck>/ com as cartas em PNG. O nome do arquivo
+Cada deck é uma pasta em assets/duel/decks/oficial/<deck>/ com as cartas em PNG. O nome do arquivo
 é o identificador da carta ("<deck>/<arquivo sem .png>"). Um deck.json opcional na pasta
 define o nome exibido e a ordem: {"name": "Lendas", "order": 1}.
 
@@ -12,7 +12,7 @@ import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
-DECKS = ROOT / "assets/duel/decks"
+DECKS = ROOT / "assets/duel/decks" / "oficial"
 OUTPUT = ROOT / "supabase/seed/duel_decks.sql"
 VALID = re.compile(r"^[a-z0-9_]{2,32}$")
 
@@ -55,12 +55,9 @@ def main():
         lines.append(f"insert into qse_v3.duel_decks(id,name,card_ids,sort_order) values({literal(deck['id'])},"
                      f"{literal(deck['name'])},{cards},{deck['order']}) on conflict (id) do update set "
                      "name = excluded.name, card_ids = excluded.card_ids, sort_order = excluded.sort_order;")
-    # Decks que saíram da pasta saem do servidor; com a pasta vazia, nada é apagado.
-    if decks:
-        keep = "array[" + ",".join(literal(d["id"]) for d in decks) + "]::text[]"
-        lines.append(f"delete from qse_v3.duel_decks where not (id = any({keep}));")
-    else:
-        print("AVISO: nenhum deck em assets/duel/decks; o .sql não altera o servidor.")
+    # UPSERT apenas; não apagar decks existentes por ausência de arquivos locais.
+    if not decks:
+        print("AVISO: nenhum deck válido em assets/duel/decks/oficial; o SQL não altera decks existentes.")
     lines.append("commit;")
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")

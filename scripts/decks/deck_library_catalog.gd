@@ -1,7 +1,7 @@
 extends RefCounted
 ## Read-only local catalog. Discovery lists public decks only; private content is never exposed.
-const ROOT := "res://assets/duel/decks"
-const OFFICIAL_IDS := ["lendas_urbanas"]
+const ROOT := "res://assets/duel/decks/oficial"
+const OFFICIAL_IDS := ["lendas_urbanas", "nostalgia_web", "sol_nascente", "pinturas"]
 const MIN_CARDS := 5
 const MAX_CARDS := 30
 

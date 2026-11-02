@@ -1,29 +1,15 @@
-# Decks do Duelo (cartas em PNG)
+# Decks oficiais do Duelo
 
-Cada **pasta** aqui é um deck. Cada **arquivo .png** dentro dela é uma carta.
+Os decks oficiais ficam dentro de `assets/duel/decks/oficial/<id>/`. Os decks dos jogadores ficam no Supabase GAME, não neste diretório.
 
-```
-assets/duel/decks/
-  lendas/
-    deck.json            (opcional: nome e ordem)
-    dragao_vermelho.png
-    fada_da_lua.png
-    ...
-```
+## Enviar cartas PNG
 
-- Nome da pasta e dos arquivos: só letras minúsculas, números e `_` (sem espaços e sem
-  acentos). O nome do arquivo é o identificador da carta: `lendas/dragao_vermelho`.
-- `deck.json` (opcional): `{"name": "Lendas", "order": 1, "cards": {"dragao_vermelho": "Dragão Vermelho"}}`.
-  `name` aparece na escolha de decks da sala; `order` define a posição (menor primeiro);
-  `cards` dá o nome bonito de cada carta (sem ele, o jogo usa o nome do arquivo).
-- Imagem: retrato (em pé), por exemplo 600 × 840 px. Até ~300 KB por carta.
-- Cada deck precisa de pelo menos 2 cartas e pode ter até 300.
+1. Abra a pasta correta: `oficial/lendas_urbanas`, `oficial/nostalgia_web`, `oficial/sol_nascente` ou `oficial/pinturas`.
+2. Suba as imagens `.png` com nomes em minúsculas, sem espaços nem acentos, como `meu_personagem.png`.
+3. Edite o `deck.json` no mesmo diretório e acrescente cada imagem ao objeto `cards`: `"meu_personagem": "Meu Personagem"`. Sem essa entrada, a imagem não aparece na Biblioteca.
+4. É necessário ter de 5 a 30 cartas completas para o deck aparecer na Biblioteca. Decks vazios ou incompletos ficam ocultos, sem imagens inventadas.
+5. Rode `python tools/duel/sync_decks.py` para gerar o SQL do servidor de Duelo. **O script não apaga decks ausentes**. A inclusão remota no CATALOG é uma etapa separada após todas as cartas estarem prontas.
 
-Depois de adicionar, trocar ou remover decks/cartas, rode:
+A referência lógica é `official:<id>` e a carta é `<id>/<nome_da_imagem>`. Essas referências **não** contêm a pasta física `oficial` e não devem ser renomeadas.
 
-```
-python tools/duel/sync_decks.py
-```
-
-Ele gera `supabase/seed/duel_decks.sql`, que precisa ser aplicado no Supabase para o servidor
-conhecer as cartas (o servidor só guarda os identificadores; as imagens ficam no jogo).
+O Cloudflare R2 foi descartado. Os decks pessoais utilizam GAME e seu Storage privado.

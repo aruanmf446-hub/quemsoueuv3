@@ -167,6 +167,8 @@ Erros: `unauthorized`, `invalid_reason` (1–280 caracteres após trim), `deck_n
 
 Bucket: **`qse-deck-originals` (PRIVATE)**. A policy `qse_deck_published_previews_read` autoriza SELECT para usuários autenticados apenas sobre arquivos nomeados `<card_uuid>_library.png` ou `<card_uuid>_duel.png` pertencentes a cartas de decks efetivamente `published/public`; os próprios originais continuam sob a policy owner-only preexistente. Usar downloads autenticados do Supabase Storage (ou URLs assinadas de curta duração). Não tornar o bucket público nem enviar `service_role` ao app. **Não modificar `qse_deck_favorites`.**
 
+**Integridade da moderação:** políticas RLS adicionais do tipo **RESTRICTIVE** impedem `INSERT/UPDATE` de arquivos desse bucket pelo dono enquanto o deck está `pending_review`, `published`, `rejected` ou `removed`; uploads e edições só em `draft`. Após excluir o deck, a limpeza de arquivos órfãos continua permitida ao antigo dono sob as políticas de propriedade existentes. Essas restrições impedem substituir uma imagem aprovada por upload direto ao Storage. 
+
 ## Limites de validação
 
 Banco e permissões aplicados, validação de respostas negativas e RLS inspecionados. **Não há decks comunitários cadastrados no GAME para realizar o teste positivo fim a fim de aprovação/publicação/denúncias**. Nem a emissão de URLs assinadas nem a integração Android/Web foi testada. Relatório: [T24_BIBLIOTECA_TESTES.md](T24_BIBLIOTECA_TESTES.md).

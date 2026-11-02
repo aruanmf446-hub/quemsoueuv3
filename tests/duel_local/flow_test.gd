@@ -101,13 +101,20 @@ func _run() -> void:
 	check(duel.is_local(), "modo local")
 	check(screen.get("_view") == "form", "formulário da partida local")
 	check(button("Sala pública") == null and button("Só por convite") == null, "partida local sem opção pública")
-	(screen.get("_form").cards_per_player as SpinBox).value = 2
-	(screen.get("_form").max_players as SpinBox).value = 4
+	screen.set_form_value("cards_per_player", 2)
+	screen.set_form_value("max_players", 4)
 	await shot("02_criar")
 	await press("Criar sala")
 	check(duel.in_room(), "sala local criada")
 	var room: Dictionary = duel.room.room
 	check(not bool(room.is_public) and bool(room.get("is_local", false)), "sala local nunca é pública")
+	# Editar a sala existente pelo mesmo formulário (listas suspensas) e salvar.
+	await screen._open_form()
+	await settle(4)
+	check(screen.get("_view") == "form" and int(screen.get("_form").values.max_players) == 4, "edição abre com os valores da sala")
+	screen.set_form_value("max_players", 6)
+	await press("Salvar")
+	check(int(duel.room.room.settings.max_players) == 6 and screen.get("_view") == "room", "edição salva pela lista suspensa")
 	check(screen.find_child("LocalBadge", true, false) != null, "selo PARTIDA LOCAL")
 	check(button("Código  %s" % str(room.code)) == null, "sem código de convite")
 	check(duel.is_admin(), "jogador é o ADM")

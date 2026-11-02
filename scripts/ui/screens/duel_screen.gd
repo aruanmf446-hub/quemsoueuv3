@@ -169,7 +169,12 @@ func _visible_rooms() -> Array:
 		return open and lobby and (term.is_empty() or code_key(str(item.get("code", ""))).contains(term)))
 
 
-func _header_extras(show: bool) -> void:
+## "CRIAR SALA" → "C R I A R   S A L A" (espaçamento entre letras do subtítulo do cabeçalho).
+static func spaced(text: String) -> String:
+	return "   ".join(Array(text.split(" ", false)).map(func(word: String) -> String: return " ".join(Array(word.split("")))))
+
+
+func _header_extras(show: bool, tag_text := "S E R V I D O R E S   O N L I N E") -> void:
 	var header: HBoxContainer = $Margin/Column/Header
 	var icon := header.get_node_or_null("ModeIcon") as TextureRect
 	if icon == null:
@@ -200,6 +205,7 @@ func _header_extras(show: bool) -> void:
 	icon.visible = show
 	header.get_node("ModeDivider").visible = show and not compact
 	header.get_node("ModeTag").visible = show and not compact
+	(header.get_node("ModeTag") as Label).text = tag_text if tag_text.contains("  ") else spaced(tag_text)
 	heading.add_theme_font_size_override("font_size", 26 if compact else 40)
 	# Sublinhado só sob o título (como na referência); fora da lista o título volta a ocupar a linha.
 	heading.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if show else Control.SIZE_EXPAND_FILL
@@ -364,7 +370,9 @@ func _render_browse() -> void:
 func _refresh_list() -> void:
 	var list := body.find_child("Rows", true, false) as VBoxContainer
 	if list == null: return
-	for child in list.get_children(): child.queue_free()
+	for child in list.get_children():
+		list.remove_child(child)
+		child.queue_free()
 	list.add_child(_columns())
 	if _list_state == "loading" and _rooms.is_empty():
 		list.add_child(_list_message("Carregando servidores…", ""))
@@ -625,90 +633,545 @@ func _open_form() -> void:
 	animate_in()
 
 
+## Valores oferecidos nas listas (dentro dos limites do servidor: qse_duel_create /
+## LocalDuelServer — jogadores 2–20, cartas 1–6, turno 15–180, seleção 10–120, desempate 4–12 e 1–4).
+const FORM_FIELDS := [
+	["max_players", "Jogadores máximos", [2, 4, 6, 8, 10, 12, 16, 20], "", "friends"],
+	["cards_per_player", "Cartas por jogador", [1, 2, 3, 4, 5, 6], "", "cards"],
+	["turn_seconds", "Tempo por turno (s)", [15, 30, 45, 60, 90, 120, 180], " s", "clock"],
+	["selection_seconds", "Tempo de seleção (s)", [10, 15, 20, 30, 45, 60, 90, 120], " s", "hourglass"],
+	["tiebreak_base", "Desempate: cartas com 2 jogadores", [4, 5, 6, 7, 8, 9, 10, 11, 12], " cartas", "swords"],
+	["tiebreak_per_player", "Desempate: cartas a mais por jogador", [1, 2, 3, 4], " cartas", "layers"],
+]
+const MAX_DECKS := 5
+const LibraryCatalog := preload("res://scripts/decks/deck_library_catalog.gd")
+const DECK_TABS := ["Todos", "Favoritos", "Bombando", "Meus decks", "Comprados"]
+var _deck_tab := "Todos"
+var _deck_query := ""
+var _deck_stats := {}
+
+
+## Valores da lista; um valor atual válido que não esteja nela (sala antiga) é preservado.
+static func field_options(values: Array, current: int) -> Array:
+	var result := values.duplicate()
+	if current > 0 and not result.has(current):
+		result.append(current)
+		result.sort()
+	return result
+
+
+## Define um valor do formulário (usado pela lista e pelos testes); sempre um inteiro da lista.
+func set_form_value(key: String, value: int) -> void:
+	var picker := _form.get("pickers", {}).get(key) as OptionButton
+	if picker == null: return
+	for i in picker.item_count:
+		if picker.get_item_id(i) == value:
+			picker.select(i)
+			_form.values[key] = value
+			_update_summary()
+			return
+
+
+func _panel_box(selected := false) -> StyleBoxFlat:
+	var box := PremiumUI.flat(Color("#0f1b2b"), Color(PremiumUI.GOLD, 0.9) if selected else LINE, 14, 2 if selected else 1)
+	box.set_content_margin_all(14)
+	return box
+
+
+func _section_head(icon_name: String, title: String, subtitle: String) -> HBoxContainer:
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 16)
+	var icon := PremiumUI.icon_rect(icon_name, PremiumUI.GOLD, 28)
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	head.add_child(icon)
+	var text := VBoxContainer.new()
+	text.add_theme_constant_override("separation", 0)
+	head.add_child(text)
+	text.add_child(PremiumUI.plain(title, 20, Color("#f5f6fa")))
+	if not subtitle.is_empty(): text.add_child(PremiumUI.plain(subtitle, 12, SECONDARY))
+	return head
+
+
+## Lista suspensa fechada: sem digitação e sem setas de incremento.
+func _dropdown(key: String, values: Array, suffix: String, current: int) -> OptionButton:
+	var picker := OptionButton.new()
+	picker.name = "Pick_" + key
+	picker.fit_to_longest_item = false
+	picker.custom_minimum_size = Vector2(112, 36)
+	picker.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	picker.add_theme_font_size_override("font_size", 16)
+	for value: int in field_options(values, current):
+		picker.add_item(str(value) + suffix, value)
+		if value == current: picker.select(picker.item_count - 1)
+	var box := PremiumUI.flat(Color("#152234"), LINE, 10, 1)
+	box.content_margin_left = 16
+	box.content_margin_right = 30
+	var focus := PremiumUI.flat(Color("#152234"), PremiumUI.GOLD, 10, 2)
+	focus.content_margin_left = 16
+	focus.content_margin_right = 30
+	for state in ["normal", "disabled"]: picker.add_theme_stylebox_override(state, box)
+	for state in ["hover", "pressed", "focus", "hover_pressed"]: picker.add_theme_stylebox_override(state, focus)
+	for state in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color", "font_hover_pressed_color"]:
+		picker.add_theme_color_override(state, Color("#f5f6fa"))
+	picker.add_theme_icon_override("arrow", PremiumUI.icon("chevron_down", Color.WHITE, 28))
+	var popup := picker.get_popup()
+	var list_box := PremiumUI.flat(Color("#0c1726"), Color(PremiumUI.GOLD, 0.6), 10, 1)
+	list_box.set_content_margin_all(6)
+	popup.add_theme_stylebox_override("panel", list_box)
+	var hover := PremiumUI.flat(Color(PremiumUI.GOLD, 0.22), Color.TRANSPARENT, 6, 0)
+	popup.add_theme_stylebox_override("hover", hover)
+	popup.add_theme_font_size_override("font_size", 16)
+	popup.add_theme_color_override("font_color", Color("#f5f6fa"))
+	popup.add_theme_color_override("font_hover_color", PremiumUI.GOLD_LIGHT)
+	popup.add_theme_constant_override("v_separation", 6)
+	popup.add_theme_icon_override("radio_checked", PremiumUI.icon("check", PremiumUI.GOLD, 24))
+	popup.add_theme_icon_override("radio_unchecked", ImageTexture.create_from_image(Image.create(24, 24, false, Image.FORMAT_RGBA8)))
+	picker.item_selected.connect(func(index: int) -> void:
+		_form.values[key] = picker.get_item_id(index)
+		_update_summary())
+	return picker
+
+
+func _form_row(label_text: String, control: Control, note := "") -> VBoxContainer:
+	var wrap := VBoxContainer.new()
+	wrap.add_theme_constant_override("separation", 6)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 14)
+	wrap.add_child(row)
+	var texts := VBoxContainer.new()
+	texts.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	texts.add_theme_constant_override("separation", 0)
+	texts.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(texts)
+	texts.add_child(PremiumUI.plain(label_text, 14, Color("#f5f6fa")))
+	if not note.is_empty(): texts.add_child(PremiumUI.plain(note, 12, SECONDARY))
+	control.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(control)
+	var rule := ColorRect.new()
+	rule.color = Color(LINE, 0.6)
+	rule.custom_minimum_size.y = 1
+	wrap.add_child(rule)
+	return wrap
+
+
 func _render_form() -> void:
 	var editing := duel.in_room()
 	var base: Dictionary = duel.room.room.settings if editing else duel.defaults
 	var local := duel.is_local()
-	var panel := PlayerUI.panel(body, 36)
-	var title := ("Configurações da sala" if editing else "Criar sala") if not local else \
-		("Configurações da partida local" if editing else "Criar partida local")
-	panel.add_child(PlayerUI.label(title, 28, Color.WHITE))
-	if local:
-		panel.add_child(PlayerUI.label("Só neste aparelho, contra bots. Não aparece na lista online e não recebe convites.", 17, Color("#c9d6e6")))
-	_form = {}
-	var top := PlayerUI.row(panel)
-	# Sem nome personalizado: a sala é identificada pelo código gerado no servidor. O contrato
-	# ainda exige p_name (3–32): vai um nome técnico fixo, nunca exibido na lista.
-	_form.name = str(duel.room.room.name) if editing else ("Partida local" if local else "Mata-Mata")
-	var public := PlayerUI.button("Sala pública", func() -> void: pass)
-	public.toggle_mode = true
-	public.button_pressed = bool(duel.room.room.is_public) if editing else true
-	public.toggled.connect(func(value: bool) -> void: public.text = tr("Sala pública" if value else "Só por convite"))
-	public.text = tr("Sala pública" if public.button_pressed else "Só por convite")
-	top.add_child(public)
-	public.visible = not local
-	if local: public.button_pressed = false
-	_form.public = public
+	_header_extras(true, "CONFIGURAÇÕES DA SALA" if editing else ("PARTIDA LOCAL" if local else "CRIAR SALA"))
+	_form = {"name": str(duel.room.room.name) if editing else ("Partida local" if local else "Mata-Mata"), "values": {}, "pickers": {},
+		"public": bool(duel.room.room.is_public) if editing else not local, "bots_allowed": bool(base.get("bots_allowed", true)), "decks": []}
+	for field: Array in FORM_FIELDS: _form.values[field[0]] = int(base.get(field[0], field[2][0]))
+	var chosen: Array = base.get("deck_ids", [])
+	var available := _deck_entries()
+	for deck: Dictionary in available: if chosen.has(deck.id): _form.decks.append(deck.id)
+	if _form.decks.is_empty() and not available.is_empty(): _form.decks.append(available[0].id)
+	body.add_theme_constant_override("separation", 12)
+	# Título da página.
+	var intro := PanelContainer.new()
+	intro.name = "FormIntro"
+	var intro_box := _panel_box()
+	intro_box.set_content_margin_all(12)
+	intro.add_theme_stylebox_override("panel", intro_box)
+	body.add_child(intro)
+	var intro_row := HBoxContainer.new()
+	intro_row.add_theme_constant_override("separation", 18)
+	intro.add_child(intro_row)
+	var slash := PremiumUI.icon_rect("pencil", PremiumUI.GOLD, 26)
+	slash.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	intro_row.add_child(slash)
+	var intro_text := VBoxContainer.new()
+	intro_text.add_theme_constant_override("separation", 0)
+	intro_row.add_child(intro_text)
+	var title := ("Configurações da sala" if editing else "Criar sala") if not local else ("Configurações da partida local" if editing else "Criar partida local")
+	intro_text.add_child(PremiumUI.plain(title, 26, Color.WHITE))
+	intro_text.add_child(PremiumUI.plain("Só neste aparelho, contra bots. Não aparece na lista online." if local else "Configure as regras e escolha o deck de personagens.", 18, SECONDARY))
+	# Três áreas: configuração | decks | resumo.
+	var columns := HBoxContainer.new()
+	columns.name = "FormColumns"
+	columns.add_theme_constant_override("separation", 18)
+	body.add_child(columns)
+	var main := PanelContainer.new()
+	main.name = "FormMain"
+	main.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	main.size_flags_stretch_ratio = 2.6
+	main.add_theme_stylebox_override("panel", _panel_box())
+	columns.add_child(main)
+	var split := HBoxContainer.new()
+	split.add_theme_constant_override("separation", 18)
+	main.add_child(split)
+	# Esquerda: configuração da partida.
+	var config := VBoxContainer.new()
+	config.name = "ConfigPanel"
+	config.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	config.add_theme_constant_override("separation", 8)
+	split.add_child(config)
+	config.add_child(_section_head("filter", "Configuração da partida", ""))
+	for field: Array in FORM_FIELDS:
+		var picker := _dropdown(field[0], field[2], "", int(_form.values[field[0]]))
+		_form.pickers[field[0]] = picker
+		config.add_child(_form_row(field[1], picker))
+	if not local:
+		var visibility := OptionButton.new()
+		visibility = _dropdown("public", [], "", 0)
+		visibility.clear()
+		visibility.add_item(tr("Pública"), 1)
+		visibility.add_item(tr("Só por convite"), 0)
+		visibility.select(0 if _form.public else 1)
+		visibility.item_selected.connect(func(index: int) -> void:
+			_form.public = visibility.get_item_id(index) == 1
+			_form.values.erase("public")
+			_update_summary(), CONNECT_DEFERRED)
+		_form.pickers.public = visibility
+		config.add_child(_form_row("Visibilidade", visibility))
+	var bots := CheckButton.new()
+	bots.name = "BotsToggle"
+	bots.button_pressed = bool(_form.bots_allowed)
+	bots.toggled.connect(func(value: bool) -> void:
+		_form.bots_allowed = value
+		_update_summary())
+	config.add_child(_form_row("Bots permitidos", bots, "Permite o preenchimento da sala com bots."))
+	var rule := ColorRect.new()
+	rule.color = Color(LINE, 0.6)
+	rule.custom_minimum_size.x = 1
+	split.add_child(rule)
+	# Centro: decks de personagens.
+	var decks := VBoxContainer.new()
+	decks.name = "DeckPanel"
+	decks.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	decks.size_flags_stretch_ratio = 1.35
+	decks.add_theme_constant_override("separation", 14)
+	split.add_child(decks)
+	decks.add_child(_section_head("cards", "Decks de personagens", "Escolha o conjunto de personagens da sala (até %d)." % MAX_DECKS))
+	var search_box := PanelContainer.new()
+	var field_box := PremiumUI.flat(Color("#0a1626"), LINE, 12, 1)
+	field_box.content_margin_left = 18
+	search_box.add_theme_stylebox_override("panel", field_box)
+	decks.add_child(search_box)
+	var search_row := HBoxContainer.new()
+	search_row.add_theme_constant_override("separation", 12)
+	search_box.add_child(search_row)
+	var lens := PremiumUI.icon_rect("search", Color.WHITE, 24)
+	lens.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	search_row.add_child(lens)
+	var search := LineEdit.new()
+	search.name = "DeckSearch"
+	search.placeholder_text = tr("Buscar deck...")
+	search.text = _deck_query
+	search.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	search.custom_minimum_size.y = 38
+	search.add_theme_font_size_override("font_size", 14)
+	for state in ["normal", "focus", "read_only"]: search.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	search.text_changed.connect(func(value: String) -> void:
+		_deck_query = value
+		_refresh_deck_grid())
+	search_row.add_child(search)
+	var tabs := HBoxContainer.new()
+	tabs.name = "DeckTabs"
+	tabs.add_theme_constant_override("separation", 8)
+	decks.add_child(tabs)
+	for tab: String in DECK_TABS:
+		var icon_name: String = {"Todos": "layers", "Favoritos": "star", "Bombando": "bolt", "Meus decks": "user", "Comprados": "crown"}[tab]
+		var chip := Button.new()
+		chip.name = "DeckTab_" + tab.replace(" ", "_")
+		chip.text = tr(tab)
+		chip.toggle_mode = true
+		chip.button_pressed = tab == _deck_tab
+		chip.icon = PremiumUI.icon(icon_name, PremiumUI.INK if tab == _deck_tab else PremiumUI.GOLD, 32)
+		chip.add_theme_constant_override("icon_max_width", 14)
+		chip.add_theme_font_size_override("font_size", 12)
+		chip.custom_minimum_size.y = 32
+		if tab == _deck_tab: PremiumUI.style_gold(chip)
+		else: _secondary(chip)
+		chip.pressed.connect(func() -> void:
+			_deck_tab = tab
+			for other in tabs.get_children():
+				var active: bool = other.name == "DeckTab_" + tab.replace(" ", "_")
+				(other as Button).set_pressed_no_signal(active)
+				var other_name := str(other.name).trim_prefix("DeckTab_").replace("_", " ")
+				(other as Button).icon = PremiumUI.icon({"Todos": "layers", "Favoritos": "star", "Bombando": "bolt", "Meus decks": "user", "Comprados": "crown"}[other_name], PremiumUI.INK if active else PremiumUI.GOLD, 32)
+				if active: PremiumUI.style_gold(other)
+				else: _secondary(other)
+			_refresh_deck_grid()
+			if tab == "Bombando": _load_deck_stats())
+		tabs.add_child(chip)
 	var grid := GridContainer.new()
-	grid.columns = 2
-	grid.add_theme_constant_override("h_separation", 24)
-	grid.add_theme_constant_override("v_separation", 10)
-	panel.add_child(grid)
-	for field: Array in [["max_players", "Jogadores (máximo)", 2, 20], ["cards_per_player", "Cartas por jogador", 1, 6],
-			["turn_seconds", "Tempo por turno (s)", 15, 180], ["selection_seconds", "Tempo de seleção (s)", 10, 120],
-			["tiebreak_base", "Desempate: cartas com 2 jogadores", 4, 12], ["tiebreak_per_player", "Desempate: cartas a mais por jogador", 1, 4]]:
-		grid.add_child(PlayerUI.label(field[1], 19))
-		var spin := SpinBox.new()
-		spin.min_value = field[2]
-		spin.max_value = field[3]
-		spin.value = int(base.get(field[0], field[2]))
-		spin.custom_minimum_size = Vector2(150, 44)
-		spin.alignment = HORIZONTAL_ALIGNMENT_CENTER
-		grid.add_child(spin)
-		_form[field[0]] = spin
-	var bots := PlayerUI.button("Bots permitidos", func() -> void: pass)
-	bots.toggle_mode = true
-	bots.button_pressed = bool(base.get("bots_allowed", true))
-	bots.toggled.connect(func(value: bool) -> void: bots.text = tr("Bots permitidos" if value else "Sem bots"))
-	bots.text = tr("Bots permitidos" if bots.button_pressed else "Sem bots")
-	bots.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	panel.add_child(bots)
-	_form.bots_allowed = bots
-	panel.add_child(PlayerUI.label("Decks de personagens", 19, PlayerUI.GOLD))
-	var deck_row := PlayerUI.row(panel)
-	var chosen: Array = base.get("deck_ids", ["comeco"])
-	var deck_buttons := {}
-	var deck_list: Array = duel.decks if not duel.decks.is_empty() else duel.room.get("room", {}).get("decks", [])
-	for deck: Dictionary in deck_list:
-		var toggle := PlayerUI.button("%s (%d)" % [str(deck.get("name", "")), int(deck.get("size", 0))], func() -> void: pass)
-		toggle.toggle_mode = true
-		toggle.button_pressed = chosen.has(deck.get("id"))
-		deck_row.add_child(toggle)
-		deck_buttons[str(deck.get("id"))] = toggle
-	_form.decks = deck_buttons
-	var actions := PlayerUI.row(panel)
-	var save := PlayerUI.button("Salvar" if editing else "Criar sala", _submit_form)
-	PlayerUI.style_button(save, true)
+	grid.name = "DeckChoices"
+	grid.columns = 3
+	grid.add_theme_constant_override("h_separation", 14)
+	grid.add_theme_constant_override("v_separation", 14)
+	decks.add_child(grid)
+	# Direita: resumo.
+	var summary := PanelContainer.new()
+	summary.name = "FormSummary"
+	summary.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	summary.custom_minimum_size.x = 360
+	summary.clip_contents = true
+	summary.add_theme_stylebox_override("panel", _panel_box())
+	columns.add_child(summary)
+	# Ações.
+	var actions := HBoxContainer.new()
+	actions.name = "FormActions"
+	actions.add_theme_constant_override("separation", 18)
+	body.add_child(actions)
+	var save := Button.new()
+	save.name = "SubmitRoom"
+	save.text = tr("Salvar" if editing else "Criar sala")
+	save.icon = PremiumUI.icon("play", PremiumUI.INK, 32)
+	save.add_theme_constant_override("icon_max_width", 22)
+	save.add_theme_font_size_override("font_size", 17)
+	save.custom_minimum_size = Vector2(240, 50)
+	PremiumUI.style_gold(save)
+	save.pressed.connect(_submit_form)
 	actions.add_child(save)
-	actions.add_child(PlayerUI.button("Cancelar", func() -> void:
+	var cancel := Button.new()
+	cancel.name = "CancelForm"
+	cancel.text = tr("Cancelar")
+	cancel.add_theme_font_size_override("font_size", 17)
+	cancel.custom_minimum_size = Vector2(170, 50)
+	_secondary(cancel)
+	cancel.pressed.connect(func() -> void:
 		_view = "room" if duel.in_room() else "browse"
 		if not duel.in_room(): await duel.use_online()
-		render()))
+		render())
+	actions.add_child(cancel)
+	_refresh_deck_grid()
+	_update_summary()
+
+
+## Decks jogáveis no Mata-Mata (lista do servidor), com capa, favorito e popularidade reais.
+func _deck_entries() -> Array:
+	var list: Array = duel.decks if not duel.decks.is_empty() else duel.room.get("room", {}).get("decks", [])
+	var result: Array = []
+	var store := DeckDrafts.for_current()
+	for deck: Dictionary in list:
+		var id := str(deck.get("id", ""))
+		var item := LibraryCatalog.find_deck(id)
+		result.append({"id": id, "name": str(deck.get("name", id)), "size": int(deck.get("size", 0)),
+			"cover": DeckCover.resolve_item(item) if not item.is_empty() else str(deck.get("cover", "")), "favorite": store.is_favorite(id),
+			"ref": "official:" + id})
+	return result
+
+
+func _deck_visible(entry: Dictionary) -> bool:
+	var term := LibraryCatalog.search_key(_deck_query)
+	if not term.is_empty() and not LibraryCatalog.search_key(str(entry.name)).contains(term): return false
+	match _deck_tab:
+		"Favoritos": return bool(entry.favorite)
+		"Bombando": return float(_deck_stats.get(str(entry.ref), {}).get("score", 0.0)) > 0.0
+		"Meus decks", "Comprados": return false
+	return true
+
+
+func _refresh_deck_grid() -> void:
+	var grid := body.find_child("DeckChoices", true, false) as GridContainer
+	if grid == null: return
+	for child in grid.get_children():
+		grid.remove_child(child)
+		child.queue_free()
+	var entries := _deck_entries()
+	var shown := entries.filter(_deck_visible)
+	var holder := grid.get_parent()
+	var old := holder.get_node_or_null("DeckEmpty")
+	if old != null:
+		holder.remove_child(old)
+		old.queue_free()
+	if shown.is_empty():
+		var reasons := {"Favoritos": "Nenhum deck favorito disponível para o Mata-Mata.", "Bombando": "Ainda não há partidas registradas para medir os decks em alta.",
+			"Meus decks": "Seus decks ainda não podem ser usados no Mata-Mata.", "Comprados": "A loja de decks ainda não está disponível."}
+		var empty := PremiumUI.plain(reasons.get(_deck_tab, "Nenhum deck encontrado."), 13, SECONDARY)
+		empty.name = "DeckEmpty"
+		empty.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		empty.custom_minimum_size.y = 120
+		empty.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		holder.add_child(empty)
+		return
+	for entry: Dictionary in shown: grid.add_child(_deck_choice(entry))
+
+
+func _deck_choice(entry: Dictionary) -> Control:
+	var selected: bool = (_form.decks as Array).has(entry.id)
+	var card := Button.new()
+	card.name = "DeckChoice_" + str(entry.id)
+	card.toggle_mode = true
+	card.button_pressed = selected
+	card.custom_minimum_size = Vector2(140, 112)
+	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	card.clip_contents = true
+	card.tooltip_text = "%s (%d)" % [entry.name, entry.size]
+	var normal := PremiumUI.flat(Color("#101d2d"), LINE, 12, 1, 0)
+	var chosen := PremiumUI.flat(Color("#152438"), PremiumUI.GOLD, 12, 3, 0)
+	chosen.shadow_color = Color(PremiumUI.GOLD, 0.35)
+	chosen.shadow_size = 10
+	for state in ["normal", "hover", "pressed", "hover_pressed", "focus"]:
+		var box: StyleBoxFlat = chosen if selected else normal
+		if state == "focus":
+			box = PremiumUI.flat(Color.TRANSPARENT, PremiumUI.GOLD_LIGHT, 12, 2, 0)
+			box.draw_center = false
+		card.add_theme_stylebox_override(state, box)
+	var cover := TextureRect.new()
+	cover.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cover.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	cover.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	cover.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	cover.texture = DeckCover.framed(str(entry.cover), 1.4, DeckCover.PORTRAIT_FOCUS) if DeckCover.exists(str(entry.cover)) else null
+	card.add_child(cover)
+	cover.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	for side in ["offset_left", "offset_top"]: cover.set(side, 3)
+	for side in ["offset_right", "offset_bottom"]: cover.set(side, -3)
+	var shade := ColorRect.new()
+	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	shade.color = Color(0.02, 0.03, 0.06, 0.62)
+	card.add_child(shade)
+	shade.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	shade.offset_top = -34
+	var label := PremiumUI.plain("%s (%d)" % [entry.name, entry.size], 15, Color.WHITE, false)
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.clip_text = true
+	label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	shade.add_child(label)
+	label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var star := Button.new()
+	star.name = "Favorite"
+	star.toggle_mode = true
+	star.button_pressed = bool(entry.favorite)
+	star.flat = true
+	star.icon = PremiumUI.icon("star" if entry.favorite else "star_outline", PremiumUI.GOLD if entry.favorite else Color.WHITE, 32)
+	star.tooltip_text = tr("Remover dos favoritos" if entry.favorite else "Adicionar aos favoritos")
+	star.add_theme_constant_override("icon_max_width", 20)
+	card.add_child(star)
+	star.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	star.position += Vector2(-38, 4)
+	star.toggled.connect(func(value: bool) -> void:
+		var store := DeckDrafts.for_current()
+		if store.set_favorite(str(entry.id), value):
+			var sync := CreatorSync.for_current(store)
+			if sync.available(): sync.set_remote_favorite(str(entry.id), value)
+		_refresh_deck_grid())
+	card.toggled.connect(func(value: bool) -> void:
+		var picked: Array = _form.decks
+		if value and not picked.has(entry.id):
+			if picked.size() >= MAX_DECKS:
+				card.set_pressed_no_signal(false)
+				banner.show_state("error", tr("Escolha no máximo %d decks.") % MAX_DECKS)
+				return
+			picked.append(entry.id)
+		elif not value:
+			if picked.size() <= 1:
+				card.set_pressed_no_signal(true)
+				banner.show_state("error", tr("Escolha pelo menos um deck."))
+				return
+			picked.erase(entry.id)
+		_refresh_deck_grid()
+		_update_summary())
+	return card
+
+
+func _load_deck_stats() -> void:
+	if not _deck_stats.is_empty() or not services.session.authenticated(): return
+	var refs: Array = _deck_entries().map(func(e: Dictionary) -> String: return str(e.ref))
+	var result: Dictionary = await services.client.call_rpc("qse_deck_stats", {"p_refs": refs})
+	if result.ok and result.data is Array:
+		for row: Variant in result.data:
+			if row is Dictionary: _deck_stats[str(row.get("deck_ref", ""))] = row
+		if _view == "form": _refresh_deck_grid()
+
+
+## Resumo: exatamente os valores que vão para o DuelService.
+func _update_summary() -> void:
+	var panel := body.find_child("FormSummary", true, false) as PanelContainer
+	if panel == null: return
+	for child in panel.get_children():
+		panel.remove_child(child)
+		child.queue_free()
+	var column := VBoxContainer.new()
+	column.name = "SummaryColumn"
+	column.add_theme_constant_override("separation", 8)
+	panel.add_child(column)
+	column.add_child(_section_head("inbox", "Resumo da sala", "Confira as configurações antes de criar."))
+	var entries := _deck_entries().filter(func(e: Dictionary) -> bool: return (_form.decks as Array).has(e.id))
+	var picked := PanelContainer.new()
+	picked.name = "SummaryDecks"
+	var picked_box := _panel_box(true)
+	picked_box.set_content_margin_all(8)
+	picked.add_theme_stylebox_override("panel", picked_box)
+	column.add_child(picked)
+	var picked_row := HBoxContainer.new()
+	picked_row.add_theme_constant_override("separation", 14)
+	picked.add_child(picked_row)
+	if not entries.is_empty():
+		var thumb := TextureRect.new()
+		thumb.custom_minimum_size = Vector2(84, 58)
+		thumb.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		thumb.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		thumb.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		thumb.texture = DeckCover.framed(str(entries[0].cover), 110.0 / 76.0, DeckCover.PORTRAIT_FOCUS) if DeckCover.exists(str(entries[0].cover)) else null
+		picked_row.add_child(thumb)
+	var names := VBoxContainer.new()
+	names.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	names.alignment = BoxContainer.ALIGNMENT_CENTER
+	names.add_theme_constant_override("separation", 2)
+	picked_row.add_child(names)
+	var total := 0
+	for entry: Dictionary in entries: total += int(entry.size)
+	var head_text := "%s (%d)" % [entries[0].name, entries[0].size] if entries.size() == 1 else (tr("%d decks · %d cartas") % [entries.size(), total] if not entries.is_empty() else tr("Nenhum deck"))
+	var head := PremiumUI.plain("★  " + head_text, 16, Color.WHITE, false)
+	head.name = "SummaryDeckName"
+	head.autowrap_mode = TextServer.AUTOWRAP_OFF
+	head.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.custom_minimum_size.x = 120
+	head.clip_text = true
+	head.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	names.add_child(head)
+	var detail := ", ".join(entries.map(func(e: Dictionary) -> String: return str(e.name))) if entries.size() > 1 else tr("Deck selecionado")
+	var sub := PremiumUI.plain(detail, 12, SECONDARY, false)
+	sub.autowrap_mode = TextServer.AUTOWRAP_OFF
+	sub.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sub.custom_minimum_size.x = 120
+	sub.clip_text = true
+	sub.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	names.add_child(sub)
+	var values: Dictionary = _form.values
+	var rows := [["friends", "Jogadores máximos", str(values.max_players)], ["cards", "Cartas por jogador", str(values.cards_per_player)],
+		["clock", "Tempo por turno", "%d s" % int(values.turn_seconds)], ["hourglass", "Tempo de seleção", "%d s" % int(values.selection_seconds)],
+		["swords", "Desempate (2 jogadores)", "%d cartas" % int(values.tiebreak_base)], ["layers", "Desempate (a mais por jogador)", "%d cartas" % int(values.tiebreak_per_player)]]
+	if not duel.is_local(): rows.append(["friends", "Visibilidade", tr("Pública") if _form.public else tr("Só por convite")])
+	rows.append(["user", "Bots permitidos", tr("Sim") if _form.bots_allowed else tr("Não")])
+	for item: Array in rows:
+		var line := HBoxContainer.new()
+		line.name = "Summary_" + str(item[1]).replace(" ", "_")
+		line.add_theme_constant_override("separation", 14)
+		var icon := PremiumUI.icon_rect(item[0], Color.WHITE, 20)
+		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		line.add_child(icon)
+		var label := PremiumUI.plain(item[1], 14, Color("#e6ebf2"))
+		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		label.clip_text = true
+		label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		line.add_child(label)
+		var value := PremiumUI.plain(item[2], 14, PremiumUI.GOLD if item[1] == "Bots permitidos" else Color.WHITE, false)
+		value.name = "Value"
+		line.add_child(value)
+		column.add_child(line)
+		var rule := ColorRect.new()
+		rule.color = Color(LINE, 0.5)
+		rule.custom_minimum_size.y = 1
+		column.add_child(rule)
 
 
 func _submit_form() -> void:
-	var settings := {"bots_allowed": (_form.bots_allowed as Button).button_pressed}
-	for key in ["max_players", "cards_per_player", "turn_seconds", "selection_seconds", "tiebreak_base", "tiebreak_per_player"]:
-		settings[key] = int((_form[key] as SpinBox).value)
-	var decks: Array = []
-	for id: String in _form.decks:
-		if (_form.decks[id] as Button).button_pressed: decks.append(id)
+	var settings := {"bots_allowed": bool(_form.bots_allowed)}
+	for field: Array in FORM_FIELDS: settings[field[0]] = int(_form.values[field[0]])
+	var decks: Array = (_form.decks as Array).duplicate()
 	if decks.is_empty():
 		banner.show_state("error", tr("Escolha pelo menos um deck."))
 		return
 	settings.deck_ids = decks
 	var room_name := str(_form.name)
-	var public: bool = (_form.public as Button).button_pressed and not duel.is_local()
+	var public: bool = bool(_form.public) and not duel.is_local()
 	var result := await _act(duel.configure.bind(room_name, public, settings) if duel.in_room() else duel.create.bind(room_name, public, settings))
 	if result.ok:
 		_view = "room"

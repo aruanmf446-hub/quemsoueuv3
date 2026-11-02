@@ -13,6 +13,8 @@ const INK := Color("#141006")
 const ONLINE := Color("#4cd964")
 const OFFLINE := Color("#8a94a6")
 const ICONS := {
+	"chevron_down": '<path d="M6 9l6 6 6-6"/>',
+	"star_outline": '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
 	"swords": '<path d="M4 4l9.5 9.5M4 4h4l9 9M4 4v4l9 9" fill="currentColor" fill-opacity="0.25"/><path d="M20 4l-9.5 9.5M20 4h-4l-3.2 3.2M20 4v4l-3.2 3.2"/><path d="M13.5 13.5l4 4M10.5 13.5l-4 4M16 19l3-3M8 19l-3-3M18.5 20.5l2-2M5.5 20.5l-2-2"/>',
 	"plus": '<path d="M12 5v14M5 12h14"/>',
 	"play": '<path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/>',

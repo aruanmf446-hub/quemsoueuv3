@@ -17,11 +17,18 @@ static func device_scale() -> float:
 static func logical_size() -> Vector2:
 	return Vector2(DisplayServer.window_get_size()) / device_scale()
 
-## Tela baixa (celular deitado): layout compacto com alvos de toque maiores.
-static func is_compact(limit := 600.0) -> bool:
-	return logical_size().y < limit or OS.has_feature("android") or OS.has_feature("web_android") or OS.has_feature("web_ios")
+## LAYOUT PADRÃO (decisão do dono do projeto): todas as telas usam o MESMO layout, em
+## unidades de design (viewport base 1672×941, stretch canvas_items/expand). O Godot escala o
+## conjunto inteiro por igual para qualquer janela; nada é reorganizado nem aumentado por
+## densidade de tela. Por isso o layout nunca é "compacto" e a unidade é sempre 1.
+static func is_compact(_limit := 600.0) -> bool:
+	return false
 
-## Quantas unidades do viewport equivalem a um ponto da tela. Multiplicar tamanhos por
-## esse fator mantém textos e botões com o mesmo tamanho físico em qualquer aparelho.
-static func unit_for(viewport: Viewport) -> float:
-	return viewport.get_visible_rect().size.y / maxf(logical_size().y, 1.0)
+## Aparelho de mão (celular/tablet ou tela baixa): só para DESEMPENHO e TOQUE (qualidade 3D,
+## controles de toque), nunca para mudar o layout.
+static func is_handheld() -> bool:
+	return logical_size().y < 600.0 or OS.has_feature("mobile") or OS.has_feature("android") or OS.has_feature("web_android") or OS.has_feature("web_ios")
+
+## Unidade de layout: 1 unidade de design. Mantida como função para quem multiplica tamanhos.
+static func unit_for(_viewport: Viewport) -> float:
+	return 1.0

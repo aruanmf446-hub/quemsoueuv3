@@ -128,7 +128,7 @@ func _build_environment() -> void:
 	rim.light_specular = 0.6
 	add_child(rim)
 	# Antisserrilhado: 4× no computador (incluindo Web), 2× em telas compactas.
-	get_viewport().msaa_3d = Viewport.MSAA_2X if UIScale.is_compact() else Viewport.MSAA_4X
+	get_viewport().msaa_3d = Viewport.MSAA_2X if UIScale.is_handheld() else Viewport.MSAA_4X
 ## Tempestade de areia: tela tingida, grãos voando e vento contra quem vai para a direita.
 var _in_storm := false
 func _update_storm() -> void:

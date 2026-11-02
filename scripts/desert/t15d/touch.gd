@@ -23,7 +23,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	visible = _wanted()
 func _wanted() -> bool:
-	return DisplayServer.is_touchscreen_available() or OS.has_feature("android") or OS.has_feature("web") or UIScale.is_compact() or "--touch-controls" in OS.get_cmdline_user_args()
+	return DisplayServer.is_touchscreen_available() or OS.has_feature("android") or OS.has_feature("web") or UIScale.is_handheld() or "--touch-controls" in OS.get_cmdline_user_args()
 func _layout() -> void:
 	var screen := get_viewport_rect().size
 	var unit := UIScale.unit_for(get_viewport())

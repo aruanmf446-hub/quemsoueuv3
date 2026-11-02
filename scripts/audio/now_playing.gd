@@ -145,7 +145,7 @@ func _layout() -> void:
 	var menu := get_parent() as Control
 	if menu == null: return
 	_compact = UIScale.is_compact(500.0)
-	var unit := menu.size.y / maxf(float(menu.get_window().size.y) / UIScale.device_scale(), 1.0)
+	var unit := 1.0
 	var w := (280.0 if _compact else 330.0) * unit
 	var h := 52.0 * unit
 	set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)

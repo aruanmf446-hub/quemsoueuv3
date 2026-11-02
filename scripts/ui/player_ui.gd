@@ -62,7 +62,8 @@ static func apply_theme(root: Control) -> void:
 
 
 static func unit(root: Control) -> float:
-	return root.get_viewport_rect().size.y / maxf(float(root.get_window().size.y) / UIScale.device_scale(), 1.0)
+	# Layout padrão: unidades de design em todas as telas (ver UIScale).
+	return UIScale.unit_for(root.get_viewport()) if root.is_inside_tree() else 1.0
 
 
 ## Editorial columns collapse on narrow displays instead of squeezing content off-screen.

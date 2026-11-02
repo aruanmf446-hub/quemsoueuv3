@@ -212,7 +212,7 @@ func _rect(control: Control, position: Vector2, dimensions: Vector2) -> void:
 	control.size = dimensions
 
 func _layout() -> void:
-	var unit := menu.size.y / maxf(float(menu.get_window().size.y) / UIScale.device_scale(), 1.0)
+	var unit := 1.0
 	var w := menu.size.x / unit
 	var h := menu.size.y / unit
 	var compact := h < 600.0

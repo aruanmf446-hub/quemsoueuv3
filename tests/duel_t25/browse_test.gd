@@ -110,7 +110,8 @@ func _run() -> void:
 	var compact_row := screen.find_child("Room_QSE482", true, false) as Control
 	var enter := compact_row.find_child("JoinRoom", true, false) as Control
 	check(compact_row != null and enter.get_global_rect().end.x <= screen.get_global_rect().end.x + 1, "844×390: código e Entrar visíveis sem rolagem lateral")
-	check(not screen.find_child("ModeTag", true, false).visible, "844×390: cabeçalho compacto")
+	# Layout padrão: o mesmo cabeçalho em qualquer tela (só escala por igual).
+	check(screen.find_child("ModeTag", true, false).visible and not screen._compact(), "844×390: mesmo layout do desktop (escala padrão)")
 	# Sem conta: partida local continua disponível.
 	services.session.user = {}
 	screen.render()

@@ -220,7 +220,7 @@ func _navigate_web_invite(route: String) -> void:
 
 func _layout_news_button() -> void:
 	if not is_instance_valid(_news_button): return
-	var unit := size.y / maxf(float(get_window().size.y) / UIScale.device_scale(), 1.0)
+	var unit := 1.0
 	var pad := 24.0 if UIScale.is_compact() else 40.0
 	_news_button.size = Vector2(140, 38) * unit
 	_news_button.position = Vector2(pad * unit, size.y - 54 * unit)

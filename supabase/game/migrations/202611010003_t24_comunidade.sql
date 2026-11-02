@@ -47,10 +47,14 @@ returns trigger language plpgsql security invoker set search_path=''
 as $$
 declare v_deck uuid; v_status text;
 begin
- v_deck:=case when tg_op='DELETE' then old.deck_id else new.deck_id end;
- select status into v_status from public.qse_creator_decks where id=v_deck;
- if current_user='authenticated' and v_status is distinct from 'draft' then
-    raise exception 'deck_locked' using errcode='42501';
+ if current_user='authenticated' and tg_op<>'INSERT' and exists (
+     select 1 from public.qse_creator_decks where id=old.deck_id and status<>'draft'
+   ) then raise exception 'deck_locked' using errcode='42501'; end if;
+ if tg_op<>'DELETE' then
+   select status into v_status from public.qse_creator_decks where id=new.deck_id;
+   if current_user='authenticated' and v_status is distinct from 'draft' then
+      raise exception 'deck_locked' using errcode='42501';
+   end if;
  end if;
  if tg_op='DELETE' then return old; end if;
  return new;

@@ -160,10 +160,6 @@ static func problems(draft: Dictionary) -> Array[String]:
 
 
 ## Publicação real depende do backend (contrato em docs/contracts/T21_DECKS.md).
-func publish(_draft: Dictionary) -> Dictionary:
-	return ServiceResult.failure("backend_pending")
-
-
 # --- Favoritos (por dono, neste aparelho) -------------------------------------------
 
 func favorites() -> Array[String]:

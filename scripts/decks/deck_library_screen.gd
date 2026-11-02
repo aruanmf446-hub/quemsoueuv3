@@ -208,7 +208,7 @@ func _select_tab(tab: String) -> void:
 	# "Meus Decks" mostra os próprios; nas outras abas o filtro de tipo continua o do jogador.
 	if tab == "Meus Decks": _types = {"mine": true}
 	elif _types.size() == 1 and _types.has("mine"): _types = {}
-	for i in range(_tabs.size()): _tabs[i].button_pressed = TABS[i] == tab
+	for i in range(_tabs.size()): if is_instance_valid(_tabs[i]): _tabs[i].button_pressed = TABS[i] == tab
 	_sort = ""
 	_render_library()
 	PlayerUI.cascade(_results)
@@ -234,8 +234,132 @@ func _entries() -> Array[Dictionary]:
 			"cover": cover.path, "focus": cover.focus, "cover_mode": cover.mode,
 			"images": cards.map(func(card: Dictionary) -> String: return _store().preview_path(str(draft.id), card)),
 			"edited": float(draft.get("updated_at", 0)), "draft": draft})
+	# Comunidade: decks publicados por outros jogadores (vitrine real do GAME).
+	for row: Dictionary in CommunityService.items:
+		var creator: Dictionary = row.get("creator", {}) if row.get("creator") is Dictionary else {}
+		var cover := CommunityService.cached_image(str(row.get("cover_path", "")) if row.get("cover_path") != null else "")
+		result.append({"id": str(row.id), "name": str(row.get("name", "")), "origin": "community", "community": true,
+			"creator": str(creator.get("nickname", "")) if creator.get("nickname") != null else tr("Jogador"),
+			"category": str(row.get("category", "")) if row.get("category") != null else "", "count": int(row.get("card_count", 0)), "tags": [],
+			"cover": cover, "focus": DeckCover.PORTRAIT_FOCUS, "images": [cover] if not cover.is_empty() else [],
+			"ref": "creator:" + str(row.id), "score": float(row.get("score", 0)),
+			"published": PlayerContracts.iso_seconds(str(row.get("published_at", "")) if row.get("published_at") != null else "")})
 	for demo: Dictionary in _demo_entries: result.append(demo)
 	return result
+
+
+## Busca a vitrine da Comunidade (com cache de 2 min) e baixa as capas que faltam.
+var _community_busy := false
+var _moderation_checked := false
+func _load_community() -> void:
+	if _community_busy or not _demo_entries.is_empty(): return
+	var service := CommunityService.for_current()
+	if not service.available(): return
+	if CommunityService.state == "ok" and Time.get_ticks_msec() / 1000.0 - CommunityService.loaded_at < CommunityService.LIST_TTL: return
+	_community_busy = true
+	var result: Dictionary = await service.refresh()
+	if result.ok:
+		for row: Dictionary in CommunityService.items:
+			if row.get("cover_path") != null: await service.image(str(row.cover_path))
+	_community_busy = false
+	if is_inside_tree() and _view == "library" and _tab != "Meus Decks": _update_results()
+
+
+func _open_community(deck_id: String) -> void:
+	var service := CommunityService.for_current()
+	if not service.available():
+		banner.show_state("error", CommunityService.message("unauthorized"))
+		return
+	banner.show_state("loading")
+	var result: Dictionary = await service.open_deck(deck_id)
+	if not result.ok:
+		banner.show_state("error", CommunityService.message(str(result.get("code", ""))))
+		CommunityService.loaded_at = -1000.0
+		return
+	banner.show_state("success")
+	_render_deck(result.data)
+
+
+func _report_deck(deck_id: String) -> void:
+	var dialog := ConfirmationDialog.new()
+	dialog.name = "ReportDialog"
+	dialog.title = tr("Denunciar deck")
+	dialog.ok_button_text = tr("Denunciar")
+	dialog.cancel_button_text = tr("Cancelar")
+	var reason := LineEdit.new()
+	reason.name = "ReportReason"
+	reason.max_length = 280
+	reason.placeholder_text = tr("Motivo (ex.: conteúdo impróprio)")
+	reason.custom_minimum_size = Vector2(420, 44)
+	dialog.add_child(reason)
+	add_child(dialog)
+	dialog.confirmed.connect(func() -> void:
+		var result: Dictionary = await CommunityService.for_current().report(deck_id, reason.text)
+		if result.ok: banner.show_state("success", tr("Denúncia enviada. Obrigado por ajudar a moderação."))
+		else: banner.show_state("error", CommunityService.message(str(result.get("code", "")))))
+	dialog.visibility_changed.connect(func() -> void: if not dialog.visible: dialog.queue_free())
+	dialog.popup_centered()
+
+
+## Situação de moderação de um rascunho já enviado ("" = nunca pediu publicação).
+func _moderation(draft: Dictionary) -> String:
+	return str(draft.get("server_status", "draft"))
+
+
+## Envia para a conta e pede publicação (moderação). Erros do servidor viram mensagens claras.
+func _publish_draft(draft: Dictionary) -> void:
+	var sync := _sync()
+	if not sync.available():
+		banner.show_state("error", CommunityService.message("unauthorized"))
+		return
+	banner.show_state("loading")
+	_store().save(draft)
+	var pushed: Dictionary = await sync.push(draft)
+	if not pushed.ok:
+		banner.show_state("error", tr("Não foi possível enviar o deck para a conta. Tente novamente."))
+		return
+	var result: Dictionary = await CommunityService.for_current().publish_request(str(draft.server_id))
+	if not result.ok:
+		banner.show_state("error", CommunityService.message(str(result.get("code", ""))))
+		return
+	draft.server_status = "pending_review"
+	draft.review_note = ""
+	_store().save(draft)
+	banner.show_state("success", tr("Deck enviado para revisão. Ele aparece na Comunidade quando for aprovado."))
+	if _view == "review": _render_review()
+	elif _view == "library": _update_results()
+
+
+func _unpublish_draft(draft: Dictionary) -> void:
+	banner.show_state("loading")
+	var result: Dictionary = await CommunityService.for_current().unpublish(str(draft.get("server_id", "")))
+	if not result.ok:
+		banner.show_state("error", CommunityService.message(str(result.get("code", ""))))
+		return
+	draft.server_status = "draft"
+	_store().save(draft)
+	CommunityService.loaded_at = -1000.0
+	banner.show_state("success", tr("Deck retirado da Comunidade. Agora você pode editá-lo."))
+	if _view == "editor": _render_editor()
+	elif _view == "library": _update_results()
+
+
+## Atualiza status/motivo de recusa dos decks enviados, sem baixar cartas.
+func _refresh_moderation() -> void:
+	var service := CommunityService.for_current()
+	if not service.available(): return
+	var result: Dictionary = await service.statuses()
+	if not result.ok: return
+	var changed := false
+	for draft: Dictionary in _store().list():
+		var info: Dictionary = result.data.get(str(draft.get("server_id", "")), {})
+		if info.is_empty(): continue
+		if str(draft.get("server_status", "")) != info.status or str(draft.get("review_note", "")) != info.review_note:
+			draft.server_status = info.status
+			draft.review_note = info.review_note
+			_store().save(draft)
+			changed = true
+	if changed and is_inside_tree() and _view == "library" and _tab == "Meus Decks": _update_results()
 
 
 func _matches(entry: Dictionary) -> bool:
@@ -306,7 +430,12 @@ func _update_results() -> void:
 		_load_stats.call_deferred()
 	if _tab == "Recentes" and shown.all(func(e: Dictionary) -> bool: return float(e.get("published", 0)) <= 0.0):
 		_notice("Nenhum deck com data de publicação disponível.")
-	if _tab == "Meus Decks": _remote_section.call_deferred("decks")
+	if _tab == "Meus Decks":
+		_remote_section.call_deferred("decks")
+		if not _moderation_checked:
+			_moderation_checked = true
+			_refresh_moderation.call_deferred()
+	else: _load_community.call_deferred()
 	if _tab == "Favoritos": _remote_section.call_deferred("favorites")
 	if shown.is_empty():
 		_empty_results()
@@ -638,6 +767,9 @@ func _banner(slide: Dictionary, total: int) -> Control:
 
 
 func _open_entry(entry: Dictionary) -> void:
+	if entry.get("community", false):
+		_open_community(str(entry.id))
+		return
 	if entry.has("item") and not entry.item.is_empty(): _render_deck(entry.item)
 	elif entry.has("draft"):
 		_draft = entry.draft
@@ -716,7 +848,11 @@ func _deck_tile(entry: Dictionary) -> Control:
 	if entry.origin == "mine":
 		var state := str(entry.draft.get("sync_state", "local"))
 		var pill_text: String = {"synced": "NA CONTA", "pending": "ENVIANDO", "error": "ERRO AO ENVIAR"}.get(state, "RASCUNHO")
-		var pill := PlayerUI.pill(pill_text, "equipped" if state == "synced" else "available")
+		var moderation := _moderation(entry.draft)
+		if moderation in ["pending_review", "published", "rejected", "removed"]:
+			pill_text = {"pending_review": "EM REVISÃO", "published": "PUBLICADO", "rejected": "RECUSADO", "removed": "REMOVIDO"}[moderation]
+		var pill := PlayerUI.pill(pill_text, "equipped" if state == "synced" or moderation == "published" else "available")
+		if moderation == "rejected" and not str(entry.draft.get("review_note", "")).is_empty(): pill.tooltip_text = tr("Motivo: ") + str(entry.draft.review_note)
 		pill.name = "SyncState"
 		pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		meta.add_child(pill)
@@ -756,7 +892,9 @@ func _deck_menu(entry: Dictionary) -> Control:
 	var popup := menu.get_popup()
 	popup.add_item(tr("Abrir / Editar"), 0)
 	popup.add_item(tr("Duplicar"), 1)
-	popup.add_item(tr("Revisar e publicar"), 2)
+	var moderation := _moderation(entry.draft)
+	if moderation in ["pending_review", "published"]: popup.add_item(tr("Retirar da Comunidade"), 5)
+	else: popup.add_item(tr("Revisar e publicar"), 2)
 	if str(entry.draft.get("sync_state", "")) in ["error", "pending"] and _sync().available():
 		popup.add_item(tr("Tentar novamente"), 4)
 	popup.add_separator()
@@ -775,6 +913,7 @@ func _menu_action(id: int, entry: Dictionary) -> void:
 			_render_review()
 		3: _confirm_delete(draft)
 		4: _retry_draft(draft)
+		5: _unpublish_draft(draft)
 
 
 ## Mantém o retry de rascunhos individuais, existente antes do redesign T23.
@@ -938,6 +1077,11 @@ func _render_deck(item: Dictionary) -> void:
 	metadata.name = "DeckMetadata"
 	if item.official: metadata.add_child(PlayerUI.pill("OFICIAL", "equipped"))
 	metadata.add_child(_heart(str(item.id)))
+	if item.get("community", false):
+		metadata.add_child(PlayerUI.pill("COMUNIDADE", "available"))
+		var report := _action("Denunciar", _report_deck.bind(str(item.id)))
+		report.name = "ReportDeck"
+		metadata.add_child(report)
 	metadata.add_child(_data_text(str(item.creator) if not str(item.creator).is_empty() else "Autoria não informada", 16, PlayerUI.MUTED))
 	metadata.add_child(_text("%d cartas  ·  A–Z" % item.count, 16, PlayerUI.MUTED))
 	if not str(item.category).is_empty(): metadata.add_child(_data_text(item.category, 16))
@@ -1087,7 +1231,7 @@ func _data_text(value: String, font_size := 20, color := PlayerUI.TEXT) -> Label
 
 func _image(path: String) -> TextureRect:
 	var image := TextureRect.new()
-	image.texture = load(path) as Texture2D
+	image.texture = DeckCover.load_texture(path)
 	image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	image.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -1227,6 +1371,18 @@ func _confirm_delete(draft: Dictionary) -> void:
 
 func _render_editor() -> void:
 	if _draft.is_empty(): _draft = _store().new_draft()
+	if _moderation(_draft) in ["pending_review", "published"]:
+		_page(str(_draft.name), "editor")
+		$Margin/Column/Header/Back.text = tr("‹ Meus Decks")
+		var locked := _text("Este deck está %s. Para editar, retire-o da Comunidade primeiro." % (tr("em revisão") if _moderation(_draft) == "pending_review" else tr("publicado")), 18)
+		locked.name = "EditorLocked"
+		body.add_child(locked)
+		var withdraw := _action("Retirar da Comunidade para editar", _unpublish_draft.bind(_draft))
+		withdraw.name = "UnpublishDeck"
+		withdraw.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		body.add_child(withdraw)
+		_reveal()
+		return
 	_page("Criar deck" if str(_draft.name).is_empty() else str(_draft.name), "editor")
 	var back: Button = $Margin/Column/Header/Back
 	back.text = tr("‹ Meus Decks")
@@ -1542,12 +1698,20 @@ func _render_review() -> void:
 		if FileAccess.file_exists(preview): image.texture = ImageTexture.create_from_image(Image.load_from_file(preview))
 		column.add_child(image)
 		column.add_child(_data_text(str(card.get("name", "")), 14))
-	var publish := _action("Publicar", func() -> void: status(_store().publish(_draft)))
+	var moderation := _moderation(_draft)
+	if moderation == "rejected" and not str(_draft.get("review_note", "")).is_empty():
+		body.add_child(_data_text(tr("Recusado pela moderação: ") + str(_draft.review_note), 16, Color("#ff9797")))
+	var publish := _action("Publicar na Comunidade", _publish_draft.bind(_draft))
 	publish.name = "PublishDeck"
-	publish.disabled = not problems.is_empty()
+	publish.disabled = not problems.is_empty() or moderation in ["pending_review", "published", "removed"] or not _sync().available()
 	PlayerUI.style_button(publish, true)
 	publish.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	publish.custom_minimum_size.x = 200
 	body.add_child(publish)
-	body.add_child(_text("A publicação para a comunidade ainda não está habilitada no servidor. O rascunho fica salvo neste aparelho e na sua conta.", 14, PlayerUI.MUTED))
+	var note: String = {"pending_review": "Em revisão pela moderação. Ele aparece na Comunidade quando for aprovado.",
+		"published": "Publicado na Comunidade.", "removed": "Removido pela moderação."}.get(moderation,
+		"Ao publicar, o deck vai para revisão antes de aparecer para outros jogadores." if _sync().available() else "Entre na conta para publicar na Comunidade.")
+	var note_label := _text(note, 14, PlayerUI.MUTED)
+	note_label.name = "PublishNote"
+	body.add_child(note_label)
 	_reveal()

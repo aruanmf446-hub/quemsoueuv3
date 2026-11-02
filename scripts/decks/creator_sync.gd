@@ -212,6 +212,8 @@ func pull() -> Dictionary:
 		draft.description = str(deck.get("description", "")) if deck.get("description") != null else ""
 		draft.category = str(deck.get("category", ""))
 		draft.visibility = str(deck.get(SCHEMA.deck_visibility, "private"))
+		draft.server_status = str(deck.get("status", "draft")) if deck.get("status") != null else "draft"
+		draft.review_note = str(deck.get("review_note", "")) if deck.get("review_note") != null else ""
 		var cards: Array = []
 		for row: Dictionary in (cards_result.data.data if cards_result.data.data is Array else []):
 			var card := {"id": "card_" + str(row.id).left(8), "server_id": str(row.id), "name": str(row.get("name", "")),

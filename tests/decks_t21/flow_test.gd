@@ -111,7 +111,7 @@ func _drafts_and_favorites() -> void:
 	check(a.save(draft).ok, "salva rascunho do dono A")
 	check(a.list().size() >= 1 and b.load_draft(draft.id).is_empty(), "dono B não vê rascunho do dono A")
 	check(a.original_image(draft.id, draft.cards[0]).get_size() == Vector2i(400, 560), "original preservado para reeditar")
-	check(a.publish(draft).code == "backend_pending", "publicar avisa que depende do servidor")
+	check(not a.has_method("publish") and CommunityService.message("min_cards").contains("5 cartas"), "publicação real pela Comunidade (sem stub local)")
 	check(a.set_favorite("lendas_urbanas", true) and a.is_favorite("lendas_urbanas"), "favorito do dono A")
 	check(not b.is_favorite("lendas_urbanas"), "favorito não vaza para o dono B")
 	check(a.set_favorite("lendas_urbanas", false) and not a.is_favorite("lendas_urbanas"), "desfavoritar")

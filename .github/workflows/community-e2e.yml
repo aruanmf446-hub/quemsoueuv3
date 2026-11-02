@@ -4,9 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       stage:
-        description: "publish | community | finish"
+        description: "publish | community | finish | cleanup"
         required: true
         default: publish
+      upload_order:
+        description: "files_first (como o jogo) | cards_first"
+        required: false
+        default: files_first
       deck_id:
         description: "DECK_ID (community/finish)"
         required: false
@@ -30,4 +34,5 @@ jobs:
           QSE_TEST_R1_PASSWORD: ${{ secrets.QSE_TEST_R1_PASSWORD }}
           STAGE: ${{ inputs.stage }}
           DECK_ID: ${{ inputs.deck_id }}
+          UPLOAD_ORDER: ${{ inputs.upload_order }}
         run: python3 tools/e2e/community_e2e.py "$STAGE" "$DECK_ID"

@@ -79,23 +79,26 @@ def stage_publish():
     status, data = call("POST", "/rest/v1/qse_creator_decks", token, [{"id": deck, "owner_id": uid, "name": "[E2E] Comunidade",
         "description": "Deck de teste automático (será apagado).", "category": "Outros", "requested_visibility": "public"}], extra={"Prefer": "return=minimal"})
     log(status in (200, 201, 204), f"deck criado ({status})")
-    cards, paths = [], []
+    cards = []
     for i in range(5):
         card = str(uuid.uuid4())
-        color = [(40 + i * 40) % 255, 90, 160]
-        for suffix, size in (("original.png", (120, 168)), ("library.png", (100, 140)), ("duel.png", (160, 50))):
-            path = f"{uid}/{deck}/{card}_{suffix}"
-            st, _ = upload(token, path, png(*size, color))
-            paths.append(path)
-            log(st in (200, 201), f"upload carta {i + 1} {suffix} ({st})")
         cards.append({"id": card, "deck_id": deck, "position": i, "name": f"E2E Carta {i + 1}", "description": "",
             "portrait_center_x": 0.5, "portrait_center_y": 0.5, "portrait_zoom": 0.6 if i == 0 else 1.0,
             "duel_center_x": 0.5, "duel_center_y": 0.5, "duel_zoom": 1.0, "image_original_path": f"{uid}/{deck}/{card}_original.png"})
-    st, data = call("POST", "/rest/v1/qse_creator_cards?on_conflict=id", token, cards, extra={"Prefer": "resolution=merge-duplicates,return=minimal"})
-    log(st in (200, 201, 204), f"5 cartas gravadas, uma com zoom 0.6 ({st} {data if st >= 300 else ''})")
+    order = os.environ.get("UPLOAD_ORDER", "files_first")
+    def put_cards():
+        st, data = call("POST", "/rest/v1/qse_creator_cards?on_conflict=id", token, cards, extra={"Prefer": "resolution=merge-duplicates,return=minimal"})
+        log(st in (200, 201, 204), f"5 cartas gravadas, uma com zoom 0.6 ({st} {data if st >= 300 else ''})")
+    if order == "cards_first": put_cards()
+    for i, card in enumerate(cards):
+        color = [(40 + i * 40) % 255, 90, 160]
+        for suffix, size in (("original.png", (120, 168)), ("library.png", (100, 140)), ("duel.png", (160, 50))):
+            st, body = upload(token, f"{uid}/{deck}/{card['id']}_{suffix}", png(*size, color))
+            log(st in (200, 201), f"upload carta {i + 1} {suffix} ({st} {body if st >= 300 else ''})")
+    if order != "cards_first": put_cards()
     cover = f"{uid}/{deck}/deck_cover.png"
-    st, _ = upload(token, cover, png(160, 100, [200, 150, 60]))
-    log(st in (200, 201), f"capa enviada ({st})")
+    st, body = upload(token, cover, png(160, 100, [200, 150, 60]))
+    log(st in (200, 201), f"capa enviada ({st} {body if st >= 300 else ''})")
     st, data = call("PATCH", f"/rest/v1/qse_creator_decks?id=eq.{deck}", token, {"cover_mode": "upload", "cover_image_path": cover}, extra={"Prefer": "return=minimal"})
     log(st in (200, 204), f"capa registrada no deck ({st} {data if st >= 300 else ''})")
     st, data = rpc(token, "qse_deck_publish_request", {"p_deck": deck})
@@ -155,10 +158,21 @@ def stage_finish(deck):
     log(st1 in (200, 204) and st2 in (200, 204) and st3 in (200, 204), f"limpeza: arquivos {st1}, cartas {st2}, deck {st3}")
 
 
+def stage_cleanup(deck):
+    owner, uid = login("OWNER")
+    rpc(owner, "qse_deck_unpublish", {"p_deck": deck})
+    st, cards = call("GET", f"/rest/v1/qse_creator_cards?deck_id=eq.{deck}&select=id", owner)
+    prefixes = [f"{uid}/{deck}/deck_cover.png"] + [f"{uid}/{deck}/{c['id']}_{s}" for c in (cards if isinstance(cards, list) else []) for s in ("original.png", "library.png", "duel.png")]
+    st1, _ = call("DELETE", f"/storage/v1/object/{BUCKET}", owner, {"prefixes": prefixes})
+    st2, _ = call("DELETE", f"/rest/v1/qse_creator_cards?deck_id=eq.{deck}", owner)
+    st3, _ = call("DELETE", f"/rest/v1/qse_creator_decks?id=eq.{deck}", owner)
+    log(st2 in (200, 204) and st3 in (200, 204), f"limpeza do deck {deck}: arquivos {st1}, cartas {st2}, deck {st3}")
+
+
 if __name__ == "__main__":
     stage = sys.argv[1]
     deck = sys.argv[2] if len(sys.argv) > 2 else ""
-    {"publish": lambda: stage_publish(), "community": lambda: stage_community(deck), "finish": lambda: stage_finish(deck)}[stage]()
+    {"publish": lambda: stage_publish(), "community": lambda: stage_community(deck), "finish": lambda: stage_finish(deck), "cleanup": lambda: stage_cleanup(deck)}[stage]()
     failed = [t for ok, t in RESULTS if not ok]
     summary(f"\n**{stage}: {len(RESULTS) - len(failed)}/{len(RESULTS)} PASS**" + ("".join(f"\n- FAIL {t}" for t in failed)))
     sys.exit(1 if failed else 0)

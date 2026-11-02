@@ -33,6 +33,16 @@ create or replace function public.qse_deck_record_play(p_deck_ref text)
     and (d.owner_id=v_user or d.status='published')) then
       return jsonb_build_object('error','deck_not_found');
   end if;
+  -- Janela deslizante de 60 minutos, inclusive atravessando mudança de hora UTC.
+  -- Serializa tentativas concorrentes do mesmo jogador e deck.
+  perform pg_catalog.pg_advisory_xact_lock(
+    pg_catalog.hashtextextended('qse-play:'||v_user::text||':'||p_deck_ref,0));
+  if exists(select 1 from public.qse_deck_plays
+            where user_id=v_user and deck_ref=p_deck_ref
+              and played_at>pg_catalog.now()-interval '1 hour') then
+    return jsonb_build_object('deck_ref',p_deck_ref,'recorded',false,
+       'played_at',null,'reason','duplicate_hour');
+  end if;
   insert into public.qse_deck_plays(deck_ref,user_id)
    values(p_deck_ref,v_user) on conflict (user_id,deck_ref,played_hour) do nothing
    returning id,played_at into v_new,v_at;

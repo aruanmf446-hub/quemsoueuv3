@@ -28,6 +28,8 @@ var defaults: Dictionary = {}
 var _beat: Timer
 var _beating := false
 var _received_at := -1.0
+## Partidas já contadas para a Popularidade da Biblioteca (T24): uma vez por partida.
+var _counted_match := ""
 
 
 func _ready() -> void:
@@ -231,8 +233,23 @@ func _apply(result: Dictionary) -> Dictionary:
 		_beat.wait_time = 1.0 if str(room.room.get("status", "")) == "in_match" else HEARTBEAT_SECONDS
 		# Uma resposta com a sala inteira já vale como sinal de vida: o próximo conta daqui.
 		_beat.start()
+		_count_play()
 		changed.emit()
 	return result
+
+
+## T24: ao entrar numa partida real, registra uma participação por deck oficial da sala.
+## Só com sessão do GAME; o servidor ignora repetição na mesma hora e não expõe quem jogou.
+func _count_play() -> void:
+	var match: Variant = room.get("match")
+	if not match is Dictionary or str(room.room.get("status", "")) != "in_match": return
+	var id := str(match.get("id", ""))
+	if id.is_empty() or id == _counted_match: return
+	_counted_match = id
+	if client == null or client.access_token.is_empty(): return
+	for deck: Variant in room.room.get("settings", {}).get("deck_ids", []):
+		if deck is String and (deck as String).is_valid_filename():
+			client.call_rpc("qse_deck_record_play", {"p_deck_ref": "official:" + deck})
 
 
 func _heartbeat() -> void:

@@ -17,6 +17,10 @@ const SCHEMA := {
 	"card_deck": "deck_id",
 	"card_order": "position",
 }
+## T24: escolha de capa (cover_mode, cover_card_id, cover_image_path) em qse_creator_decks.
+## Colunas confirmadas no GAME (docs/contracts/T24_BACKEND_GAME_CATALOG_RESULT.md). Enviadas num
+## PATCH depois das cartas, porque cover_card_id tem FK para qse_creator_cards.
+const COVER_COLUMNS := true
 const EXT_TYPES := {"png": "image/png", "jpg": "image/jpeg", "webp": "image/webp"}
 
 var client: SupabaseClient
@@ -124,10 +128,37 @@ func push(draft: Dictionary) -> Dictionary:
 	var filter := "?%s=eq.%s" % [SCHEMA.card_deck, deck_id] + ("&id=not.in.(%s)" % ",".join(keep) if not keep.is_empty() else "")
 	result = await client.send(_rest(SCHEMA.cards) + filter, HTTPClient.METHOD_DELETE)
 	if not result.ok: return _failed(draft, result)
+	if COVER_COLUMNS:
+		var cover := {}
+		_cover_fields(draft, cover)
+		if str(cover.cover_mode) == "upload" and str(draft.get("uploaded_cover", "")) != DeckCover.stamp(store.cover_path(str(draft.id))):
+			result = await _upload(str(cover.cover_image_path), FileAccess.get_file_as_bytes(store.cover_path(str(draft.id))), "image/png")
+			if not result.ok: return _failed(draft, result)
+			draft.uploaded_cover = DeckCover.stamp(store.cover_path(str(draft.id)))
+		result = await client.send(_rest(SCHEMA.decks) + "?id=eq." + deck_id, HTTPClient.METHOD_PATCH, cover, PackedStringArray(["Prefer: return=minimal"]))
+		if not result.ok: return _failed(draft, result)
 	draft.sync_state = "synced"
 	draft.synced_at = int(Time.get_unix_time_from_system())
 	store.save(draft)
 	return ServiceResult.success(draft)
+
+
+## Colunas de capa: modo, carta escolhida (UUID do servidor) e caminho da capa enviada.
+func _cover_fields(draft: Dictionary, deck: Dictionary) -> void:
+	var choice: Dictionary = draft.get("cover", {}) if draft.get("cover") is Dictionary else {}
+	var mode := str(choice.get("mode", "auto"))
+	deck.cover_mode = mode if mode in ["auto", "card", "upload"] else "auto"
+	deck.cover_card_id = null
+	deck.cover_image_path = null
+	if mode == "card":
+		for card: Dictionary in draft.cards:
+			if str(card.id) == str(choice.get("card_id", "")): deck.cover_card_id = str(card.server_id)
+		# Carta escolhida foi excluída: o servidor recebe a automática (como o aparelho mostra).
+		if deck.cover_card_id == null: deck.cover_mode = "auto"
+	elif mode == "upload" and FileAccess.file_exists(store.cover_path(str(draft.id))):
+		deck.cover_image_path = "%s/%s/deck_cover.png" % [user_id, str(draft.server_id)]
+	else:
+		deck.cover_mode = "auto" if mode == "upload" else deck.cover_mode
 
 
 static func card_row(deck_id: String, index: int, card: Dictionary, image_path: String) -> Dictionary:
@@ -202,6 +233,17 @@ func pull() -> Dictionary:
 						card.uploaded_crops = JSON.stringify(card.crops)
 			cards.append(card)
 		draft.cards = cards
+		if COVER_COLUMNS and deck.get("cover_mode") is String:
+			draft.cover = {"mode": str(deck.cover_mode)}
+			for card: Dictionary in cards:
+				if str(card.server_id) == str(deck.get("cover_card_id", "")): draft.cover.card_id = str(card.id)
+			var cover_path := str(deck.get("cover_image_path", "")) if deck.get("cover_image_path") != null else ""
+			if deck.cover_mode == "upload" and cover_path.begins_with(user_id + "/"):
+				var cover := await client.send("/storage/v1/object/authenticated/%s/%s" % [SCHEMA.bucket, cover_path], HTTPClient.METHOD_GET, null, PackedStringArray(), PackedByteArray(), "application/octet-stream", 60.0)
+				var image := Image.new()
+				if cover.ok and image.load_png_from_buffer(cover.data.bytes) == OK:
+					store.store_cover(str(draft.id), image, {})
+					draft.uploaded_cover = DeckCover.stamp(store.cover_path(str(draft.id)))
 		draft.sync_state = "synced"
 		store.save(draft)
 		added += 1

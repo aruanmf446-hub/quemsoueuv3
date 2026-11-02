@@ -178,10 +178,10 @@ static func action(text: String, icon_name: String, primary: bool, callback: Cal
 	button.text = TranslationServer.translate(text)
 	button.icon = icon(icon_name, INK if primary else GOLD, 36)
 	button.expand_icon = false
-	button.add_theme_constant_override("icon_max_width", 18 if compact else 26)
+	button.add_theme_constant_override("icon_max_width", 30)
 	button.add_theme_constant_override("h_separation", 10)
-	button.custom_minimum_size = Vector2(0, 40 if compact else 58)
-	button.add_theme_font_size_override("font_size", 14 if compact else 21)
+	button.custom_minimum_size = Vector2(0, PlayerUI.CONTROL_HEIGHT)
+	button.add_theme_font_size_override("font_size", PlayerUI.CONTROL_FONT)
 	button.focus_mode = Control.FOCUS_ALL
 	if primary: style_gold(button)
 	else: style_outline(button)

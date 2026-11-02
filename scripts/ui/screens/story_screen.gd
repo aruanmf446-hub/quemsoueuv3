@@ -51,9 +51,9 @@ func render() -> void:
 	heading.add_theme_color_override("font_color",Color.WHITE)
 	var back: Button = $Margin/Column/Header/Back
 	_style_slanted(back,false)
-	back.custom_minimum_size = Vector2(_px(150,76),_px(52,44))
+	back.custom_minimum_size = Vector2(152,60)
 	back.add_theme_font_override("font",_font)
-	back.add_theme_font_size_override("font_size",roundi(_px(20,14)))
+	back.add_theme_font_size_override("font_size",PlayerUI.CONTROL_FONT)
 	banner.hide()
 	var tabs := PlayerUI.row(body)
 	tabs.add_theme_constant_override("separation",roundi(_px(2,1)))
@@ -64,9 +64,9 @@ func render() -> void:
 		tab.button_pressed = realm[1] == _realm
 		tab.disabled = realm[1] != "desert"
 		if tab.disabled: tab.tooltip_text = "Reino em desenvolvimento"
-		tab.custom_minimum_size = Vector2(_px(150,78),_px(42,40))
+		tab.custom_minimum_size = Vector2(170,64)
 		tab.add_theme_font_override("font",_font)
-		tab.add_theme_font_size_override("font_size",roundi(_px(17,14)))
+		tab.add_theme_font_size_override("font_size",PlayerUI.CONTROL_FONT)
 		_style_slanted(tab,realm[1] == _realm)
 		tab.pressed.connect(_select_realm.bind(realm[1]))
 		tabs.add_child(tab)
@@ -133,9 +133,9 @@ func render() -> void:
 		start.text = action
 		start.set_meta("phase_order",order)
 		start.disabled = not available or not exists
-		start.custom_minimum_size.y = _px(50,44)
+		start.custom_minimum_size.y = 64
 		start.add_theme_font_override("font",_font)
-		start.add_theme_font_size_override("font_size",roundi(_px(18,14)))
+		start.add_theme_font_size_override("font_size",PlayerUI.CONTROL_FONT)
 		_style_slanted(start,current or (available and not done))
 		start.pressed.connect(_launch.bind(str(phase.id),path))
 		card.get_meta("footer").add_child(start)

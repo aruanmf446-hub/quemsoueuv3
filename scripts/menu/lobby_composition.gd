@@ -218,10 +218,10 @@ func _layout() -> void:
 	var compact := h < 600.0
 	var pad := 24.0 if compact else 40.0
 	_rect(brand_logo, Vector2(pad, 12) * unit, Vector2(150, 58) * unit)
-	_rect(menu.get_node("TopBar"), Vector2(w - pad - 200, 20) * unit, Vector2(200, 42) * unit)
+	_rect(menu.get_node("TopBar"), Vector2(w - pad - 200, 20) * unit, Vector2(200, 52) * unit)
 	for currency: String in ["CoinPill", "GemPill"]:
-		menu.get_node("TopBar/" + currency).custom_minimum_size = Vector2(94, 42) * unit
-		menu.get_node("TopBar/" + currency + "/Content/Value").add_theme_font_size_override("font_size", roundi(16 * unit))
+		menu.get_node("TopBar/" + currency).custom_minimum_size = Vector2(94, 52) * unit
+		menu.get_node("TopBar/" + currency + "/Content/Value").add_theme_font_size_override("font_size", roundi(22 * unit))
 	var buttons: Control = menu.get_node("MenuButtons")
 	_rect(buttons, Vector2.ZERO, menu.size)
 	var x := pad if compact else 225.0
@@ -229,42 +229,43 @@ func _layout() -> void:
 	var tabs := ["history", "duel", "skins", "deck_library", "friends", "settings"]
 	var nodes := {"history":"BtnHistory", "duel":"BtnDuel", "skins":"BtnSkins", "friends":"BtnFriends", "settings":"BtnSettings", "deck_library":"BtnLibrary"}
 	# Largura de cada aba = texto real + respiro; nada de larguras fixas que cortam rótulos.
-	var gap := 18.0 if w < 760 else 34.0
+	var gap := 24.0
 	var widths := {}
 	var total := gap * (tabs.size() - 1)
 	for id: String in tabs:
 		var title: Label = buttons.get_node(nodes[id]).get_node("ActionBody/Text/Title")
 		var font := title.get_theme_font("font")
-		widths[id] = font.get_string_size(title.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 15).x + 4.0
+		widths[id] = font.get_string_size(title.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 24).x + 16.0
 		total += float(widths[id])
-	# Na mesma linha das moedas (desktop), as abas terminam antes delas.
-	var right := w - pad if compact else w - pad - 200.0 - 16.0
-	var fit := minf(1.0, (right - x) / total)
+	# Ajusta o texto na base de design, nunca pela largura física do aparelho.
+	# Telas mais largas acrescentam espaço, sem aumentar as abas ou sua fonte.
+	var base_width := float(ProjectSettings.get_setting("display/window/size/viewport_width"))
+	var fit := minf(1.0, (base_width - pad - 200.0 - 16.0 - x) / total)
 	for id: String in tabs:
 		var button: Button = buttons.get_node(nodes[id])
 		var width: float = float(widths[id]) * fit
-		_rect(button, Vector2(x, y) * unit, Vector2(width, 44) * unit)
+		_rect(button, Vector2(x, y) * unit, Vector2(width, 64) * unit)
 		var body: Control = button.get_node("ActionBody")
 		body.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		body.offset_left = 0
 		body.offset_right = 0
 		body.get_node("Icon").hide()
 		body.get_node("Text/Subtitle").hide()
-		body.get_node("Text/Title").add_theme_font_size_override("font_size", roundi(15 * unit * fit))
+		body.get_node("Text/Title").add_theme_font_size_override("font_size", roundi(24 * unit * fit))
 		x += width + gap * fit
 	var title_y := h * 0.35 if compact else h * 0.40
-	_rect(chapter, Vector2(pad, title_y) * unit, Vector2(340, 24) * unit)
-	chapter.add_theme_font_size_override("font_size", roundi(12 * unit))
+	_rect(chapter, Vector2(pad, title_y) * unit, Vector2(340, 30) * unit)
+	chapter.add_theme_font_size_override("font_size", roundi(20 * unit))
 	_rect(chapter_title, Vector2(pad - 2, title_y + 30) * unit, Vector2(400, 150) * unit)
 	chapter_title.add_theme_font_size_override("font_size", roundi((36 if compact else 60) * unit))
 	var play: Button = buttons.get_node("BtnStory")
-	_rect(play, Vector2(pad, h - (118 if compact else 150)) * unit, Vector2(260 if compact else 320, 56 if compact else 64) * unit)
+	_rect(play, Vector2(pad, h - 264) * unit, Vector2(460, 116) * unit)
 	var action: Control = play.get_node("ActionBody")
 	action.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	action.offset_left = 20 * unit
 	action.offset_right = -20 * unit
 	action.get_node("Icon").custom_minimum_size.x = 26 * unit
-	action.get_node("Text/Title").add_theme_font_size_override("font_size", roundi(22 * unit))
+	action.get_node("Text/Title").add_theme_font_size_override("font_size", roundi(40 * unit))
 	action.get_node("Text/Subtitle").hide()
 	var area: Control = menu.get_node("LobbyArea")
 	var stage_height := h * (0.86 if compact else 0.92)
@@ -274,7 +275,7 @@ func _layout() -> void:
 	area.get_node("Stage").custom_minimum_size = Vector2.ZERO
 	area.get_node("Stage").set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var friends: Control = menu.get_node("FriendsPanel")
-	_rect(friends, Vector2(pad + 155, h - 54) * unit, Vector2(140, 38) * unit)
+	_rect(friends, Vector2(pad + 268, h - 112) * unit, Vector2(280, 88) * unit)
 	social_bg.hide()
 	var margin: MarginContainer = friends.get_node("Margin")
 	for side in ["left", "right", "top", "bottom"]: margin.add_theme_constant_override("margin_" + side, 0)
@@ -282,8 +283,8 @@ func _layout() -> void:
 	friends.get_node("Margin/Content/FriendList").hide()
 	var view_all: Button = friends.get_node("Margin/Content/ViewAllButton")
 	view_all.text = "VER AMIGOS  ›"
-	view_all.custom_minimum_size = Vector2(140, 38) * unit
-	view_all.add_theme_font_size_override("font_size", roundi(12 * unit))
+	view_all.custom_minimum_size = Vector2(280, 88) * unit
+	view_all.add_theme_font_size_override("font_size", roundi(30 * unit))
 
 func _social_size() -> void:
 	pass # The lobby shows a compact social shortcut; the full list remains in Friends.

@@ -38,8 +38,8 @@ func render() -> void:
 	heading.add_theme_font_size_override("font_size", int(34 * k))
 	heading.add_theme_color_override("font_color", Color.WHITE)
 	var back := $Margin/Column/Header/Back as Button
-	back.custom_minimum_size = Vector2(150, 50) * k
-	back.add_theme_font_size_override("font_size", int(21 * k))
+	back.custom_minimum_size = PlayerUI.BACK_SIZE * k
+	back.add_theme_font_size_override("font_size", int(PlayerUI.CONTROL_FONT * k))
 	banner.hide()
 	var music := _music()
 	if music == null:
@@ -54,8 +54,8 @@ func render() -> void:
 	top.add_child(count)
 	for spec: Array in [["Marcar todas", true], ["Desmarcar todas", false]]:
 		var bulk := PlayerUI.button(spec[0], _set_all.bind(spec[1]))
-		bulk.custom_minimum_size = Vector2(170, 46) * k
-		bulk.add_theme_font_size_override("font_size", int(17 * k))
+		bulk.custom_minimum_size = Vector2(190, PlayerUI.SMALL_CONTROL_HEIGHT) * k
+		bulk.add_theme_font_size_override("font_size", int(22 * k))
 		bulk.size_flags_horizontal = Control.SIZE_SHRINK_END
 		top.add_child(bulk)
 	var list := VBoxContainer.new()
@@ -90,15 +90,15 @@ func _genre_header(music: Node, key: String, tracks: Array, k: float) -> HBoxCon
 	name_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	name_label.size_flags_vertical = Control.SIZE_SHRINK_END
 	header.add_child(name_label)
-	var count := PlayerUI.label("%d de %d" % [on, tracks.size()], int(15 * k), Color("#c9d6e6"))
+	var count := PlayerUI.label("%d de %d" % [on, tracks.size()], int(20 * k), Color("#c9d6e6"))
 	count.autowrap_mode = TextServer.AUTOWRAP_OFF
 	count.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	count.size_flags_vertical = Control.SIZE_SHRINK_END
 	header.add_child(count)
 	var all_on := on == tracks.size()
 	var toggle := PlayerUI.button("Desmarcar gênero" if all_on else "Marcar gênero", _set_genre.bind(tracks, not all_on))
-	toggle.custom_minimum_size = Vector2(170, 38) * k
-	toggle.add_theme_font_size_override("font_size", int(15 * k))
+	toggle.custom_minimum_size = Vector2(190, PlayerUI.SMALL_CONTROL_HEIGHT) * k
+	toggle.add_theme_font_size_override("font_size", int(20 * k))
 	toggle.size_flags_horizontal = Control.SIZE_SHRINK_END
 	header.add_child(toggle)
 	return header
@@ -111,7 +111,7 @@ func _row(music: Node, track: Dictionary, k: float) -> Button:
 	row.name = "Track_" + id
 	row.toggle_mode = true
 	row.button_pressed = checked
-	row.custom_minimum_size.y = 64 * k
+	row.custom_minimum_size.y = 80 * k
 	row.focus_mode = Control.FOCUS_ALL
 	for state: String in ["normal", "hover", "pressed", "hover_pressed", "focus"]:
 		var style := StyleBoxFlat.new()
@@ -148,14 +148,14 @@ func _row(music: Node, track: Dictionary, k: float) -> Button:
 	cover.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if ResourceLoader.exists(str(track.cover), "Texture2D"): cover.texture = load(str(track.cover))
 	line.add_child(cover)
-	var title := PlayerUI.label(str(track.title), int(20 * k), Color.WHITE if checked else Color(1, 1, 1, 0.55))
+	var title := PlayerUI.label(str(track.title), int(26 * k), Color.WHITE if checked else Color(1, 1, 1, 0.55))
 	title.autowrap_mode = TextServer.AUTOWRAP_OFF
 	title.clip_text = true
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	line.add_child(title)
-	var category := PlayerUI.label(CATEGORIES.get(str(track.category), str(track.category)).to_upper(), int(14 * k), PlayerUI.GOLD if checked else Color(1, 1, 1, 0.35))
+	var category := PlayerUI.label(CATEGORIES.get(str(track.category), str(track.category)).to_upper(), int(18 * k), PlayerUI.GOLD if checked else Color(1, 1, 1, 0.35))
 	category.autowrap_mode = TextServer.AUTOWRAP_OFF
 	category.size_flags_horizontal = Control.SIZE_SHRINK_END
 	category.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -163,7 +163,7 @@ func _row(music: Node, track: Dictionary, k: float) -> Button:
 	line.add_child(category)
 	var preview := Button.new()
 	preview.name = "Preview_" + id
-	preview.custom_minimum_size = Vector2(58, 42) * k
+	preview.custom_minimum_size = Vector2(64, 56) * k
 	preview.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	preview.mouse_filter = Control.MOUSE_FILTER_STOP
 	preview.focus_mode = Control.FOCUS_ALL

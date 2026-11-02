@@ -31,8 +31,7 @@ func _ready() -> void:
 	resized.connect(_adapt_scale)
 	_adapt_scale.call_deferred()
 
-## No celular a tela inteira é desenhada maior (em pontos da tela), como nas
-## Configurações; antes o layout de computador ficava minúsculo no aparelho.
+## Medidas da base de design: a escala final pertence somente ao stretch do Godot.
 func _adapt_scale() -> void:
 	if manages_own_scale or not is_inside_tree(): return
 	var margin: MarginContainer = $Margin
@@ -47,9 +46,9 @@ func _adapt_scale() -> void:
 	margin.add_theme_constant_override("margin_bottom", 16 if compact else 28)
 
 	var back: Button = $Margin/Column/Header/Back
-	back.custom_minimum_size = Vector2(100, 44)
-	back.add_theme_font_size_override("font_size", 16)
-	heading.add_theme_font_size_override("font_size", 28 if compact else 34)
+	back.custom_minimum_size = PlayerUI.BACK_SIZE
+	back.add_theme_font_size_override("font_size", PlayerUI.CONTROL_FONT)
+	heading.add_theme_font_size_override("font_size", 28 if compact else 40)
 	$Margin/Column.add_theme_constant_override("separation", 16 if compact else 24)
 
 

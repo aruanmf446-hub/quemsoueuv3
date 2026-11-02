@@ -118,11 +118,11 @@ func _draw() -> void:
 	if is_instance_valid(_music):
 		var length: float = _music.track_length()
 		var share := clampf(_music.playback_position() / length, 0.0, 1.0) if length > 0.0 else 0.0
-		var left := _title.position.x
-		var right := _buttons[0].position.x - h * 0.12
-		var y := h - h * 0.14
-		draw_line(Vector2(left, y), Vector2(right, y), Color(1, 1, 1, 0.15), h * 0.03)
-		draw_line(Vector2(left, y), Vector2(lerpf(left, right, share), y), GOLD, h * 0.03)
+		var left := 20.0
+		var right := size.x - 20.0
+		var y := h - 8.0
+		draw_line(Vector2(left, y), Vector2(right, y), Color(1, 1, 1, 0.15), 3.0)
+		draw_line(Vector2(left, y), Vector2(lerpf(left, right, share), y), GOLD, 3.0)
 
 func _draw_icon(button: Button, index: int) -> void:
 	var c := button.size * 0.5
@@ -140,44 +140,28 @@ func _draw_icon(button: Button, index: int) -> void:
 				button.draw_rect(Rect2(c + Vector2(-r * 0.7, -r), Vector2(r * 0.5, r * 2)), color)
 				button.draw_rect(Rect2(c + Vector2(r * 0.2, -r), Vector2(r * 0.5, r * 2)), color)
 
-## Canto superior direito, abaixo das moedas e fora da área do personagem.
+## Controles em duas linhas: capa e título acima, transporte com alvos grandes abaixo.
+## Medidas da base universal; o Godot faz a única escala para a janela.
 func _layout() -> void:
 	var menu := get_parent() as Control
 	if menu == null: return
-	_compact = UIScale.is_compact(500.0)
-	var unit := 1.0
-	var w := (280.0 if _compact else 330.0) * unit
-	var h := 52.0 * unit
 	set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
-	size = Vector2(w, h)
+	size = Vector2(400, 224)
 	custom_minimum_size = size
-	position = Vector2(menu.size.x - 24.0 * unit - w, menu.size.y - h - 16.0 * unit)
-	var pad := h * 0.14
-	var skew := h * 0.22
-	_cover.position = Vector2(skew * 0.5 + h * 0.16, pad)
-	_cover.size = Vector2(h - pad * 2, h - pad * 2)
-	var text_x := _cover.position.x + _cover.size.x + h * 0.14
-	var button_size := 44.0 * unit
-	var buttons_x := w - skew * 0.5 - h * 0.1 - button_size * 3 - h * 0.08 * 2
-	_kicker.position = Vector2(text_x, pad * 0.7)
-	_kicker.add_theme_font_size_override("font_size", int(h * 0.13))
-	_kicker.size = Vector2(buttons_x - text_x, h * 0.2)
-	_title.position = Vector2(text_x, h * 0.30)
-	_title.add_theme_font_size_override("font_size", int(h * 0.2))
-	_title.size = Vector2(buttons_x - text_x - h * 0.08, h * 0.3)
-	_category.position = Vector2(text_x, h * 0.58)
-	_category.add_theme_font_size_override("font_size", int(h * 0.13))
-	_category.size = Vector2(buttons_x - text_x - h * 0.08, h * 0.2)
+	position = Vector2(menu.size.x - size.x - 24, menu.size.y - size.y - 24)
+	_cover.position = Vector2(20, 18)
+	_cover.size = Vector2(76, 76)
 	_kicker.hide()
 	_category.hide()
-	_title.position.y = h * 0.30
-	_title.size.y = 22 * unit
-	_title.add_theme_font_size_override("font_size", roundi(12 * unit))
+	_title.position = Vector2(112, 20)
+	_title.size = Vector2(268, 72)
+	_title.add_theme_font_size_override("font_size", 28)
+	_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_title.max_lines_visible = 2
 	for index in range(3):
 		var button := _buttons[index]
-		var bigger := button_size
-		button.size = Vector2(bigger, bigger)
-		button.position = Vector2(buttons_x + index * (button_size + h * 0.08) - (bigger - button_size) * 0.5, (h - bigger) * 0.5)
+		button.size = Vector2(104, 104)
+		button.position = Vector2(28 + index * 120, 104)
 	queue_redraw()
 
 func _music_surface() -> StyleBoxFlat:

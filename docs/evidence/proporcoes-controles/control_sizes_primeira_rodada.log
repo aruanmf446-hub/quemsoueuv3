@@ -1,0 +1,119 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS escala única preservada
+PASS lobby/history dentro da tela
+PASS lobby/play dentro da tela
+PASS lobby/news dentro da tela
+PASS story/back dentro da tela
+PASS deck_library/back dentro da tela
+PASS duel/back dentro da tela
+PASS friends/back dentro da tela
+PASS settings/back dentro da tela
+PASS settings/tab0 dentro da tela
+PASS settings/tab1 dentro da tela
+PASS settings/tab2 dentro da tela
+PASS settings/tab3 dentro da tela
+PASS settings/tab4 dentro da tela
+PASS skins/back dentro da tela
+PASS music/back dentro da tela
+PASS profile/back dentro da tela
+PASS lobby/history mantém tamanho de design: [131.0, 64.0, 24]
+PASS lobby/history dentro da tela
+PASS lobby/play mantém tamanho de design: [320.0, 80.0, 30]
+PASS lobby/play dentro da tela
+PASS lobby/news mantém tamanho de design: [176.0, 56.0, 20]
+PASS lobby/news dentro da tela
+PASS story/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS story/back dentro da tela
+PASS deck_library/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS deck_library/back dentro da tela
+PASS duel/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS duel/back dentro da tela
+PASS friends/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS friends/back dentro da tela
+PASS settings/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS settings/back dentro da tela
+PASS settings/tab0 mantém tamanho de design: [304.0, 76.0, 28]
+PASS settings/tab0 dentro da tela
+PASS settings/tab1 mantém tamanho de design: [304.0, 76.0, 28]
+PASS settings/tab1 dentro da tela
+PASS settings/tab2 mantém tamanho de design: [304.0, 76.0, 28]
+PASS settings/tab2 dentro da tela
+PASS settings/tab3 mantém tamanho de design: [304.0, 76.0, 28]
+PASS settings/tab3 dentro da tela
+PASS settings/tab4 mantém tamanho de design: [304.0, 76.0, 28]
+PASS settings/tab4 dentro da tela
+PASS skins/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS skins/back dentro da tela
+PASS music/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS music/back dentro da tela
+PASS profile/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS profile/back dentro da tela
+PASS lobby/history mantém tamanho de design: [131.0, 64.0, 24]
+PASS lobby/history dentro da tela
+PASS lobby/play mantém tamanho de design: [320.0, 80.0, 30]
+PASS lobby/play dentro da tela
+PASS lobby/news mantém tamanho de design: [176.0, 56.0, 20]
+PASS lobby/news dentro da tela
+PASS story/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS story/back dentro da tela
+PASS deck_library/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS deck_library/back dentro da tela
+PASS duel/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS duel/back dentro da tela
+PASS friends/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS friends/back dentro da tela
+PASS settings/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS settings/back dentro da tela
+PASS settings/tab0 mantém tamanho de design: [376.0, 76.0, 28]
+PASS settings/tab0 dentro da tela
+PASS settings/tab1 mantém tamanho de design: [377.0, 76.0, 28]
+PASS settings/tab1 dentro da tela
+PASS settings/tab2 mantém tamanho de design: [377.0, 76.0, 28]
+PASS settings/tab2 dentro da tela
+PASS settings/tab3 mantém tamanho de design: [377.0, 76.0, 28]
+PASS settings/tab3 dentro da tela
+PASS settings/tab4 mantém tamanho de design: [377.0, 76.0, 28]
+PASS settings/tab4 dentro da tela
+PASS skins/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS skins/back dentro da tela
+PASS music/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS music/back dentro da tela
+PASS profile/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS profile/back dentro da tela
+PASS lobby/history mantém tamanho de design: [131.0, 64.0, 24]
+PASS lobby/history dentro da tela
+PASS lobby/play mantém tamanho de design: [320.0, 80.0, 30]
+PASS lobby/play dentro da tela
+PASS lobby/news mantém tamanho de design: [176.0, 56.0, 20]
+PASS lobby/news dentro da tela
+PASS story/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS story/back dentro da tela
+PASS deck_library/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS deck_library/back dentro da tela
+PASS duel/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS duel/back dentro da tela
+PASS friends/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS friends/back dentro da tela
+PASS settings/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS settings/back dentro da tela
+PASS settings/tab0 mantém tamanho de design: [304.0, 76.0, 28]
+PASS settings/tab0 dentro da tela
+PASS settings/tab1 mantém tamanho de design: [304.0, 76.0, 28]
+PASS settings/tab1 dentro da tela
+PASS settings/tab2 mantém tamanho de design: [304.0, 76.0, 28]
+PASS settings/tab2 dentro da tela
+PASS settings/tab3 mantém tamanho de design: [304.0, 76.0, 28]
+PASS settings/tab3 dentro da tela
+PASS settings/tab4 mantém tamanho de design: [304.0, 76.0, 28]
+PASS settings/tab4 dentro da tela
+PASS skins/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS skins/back dentro da tela
+PASS music/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS music/back dentro da tela
+PASS profile/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS profile/back dentro da tela
+CONTROL_SIZES failures=0

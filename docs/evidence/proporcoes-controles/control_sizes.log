@@ -1,0 +1,80 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS escala única preservada
+PASS lobby/history dentro da tela
+PASS lobby/play dentro da tela
+PASS lobby/news dentro da tela
+PASS lobby/friends dentro da tela
+PASS lobby/music dentro da tela
+PASS lobby/music0 dentro da tela
+PASS lobby/music1 dentro da tela
+PASS lobby/music2 dentro da tela
+PASS deck_library/back dentro da tela
+PASS capa com altura real, sem formato de faixa fina
+PASS proporção da capa equilibrada
+PASS lobby/history mantém tamanho de design: [131.0, 64.0, 24]
+PASS lobby/history dentro da tela
+PASS lobby/play mantém tamanho de design: [460.0, 116.0, 40]
+PASS lobby/play dentro da tela
+PASS lobby/news mantém tamanho de design: [248.0, 88.0, 30]
+PASS lobby/news dentro da tela
+PASS lobby/friends mantém tamanho de design: [280.0, 88.0, 30]
+PASS lobby/friends dentro da tela
+PASS lobby/music mantém tamanho de design: [400.0, 224.0]
+PASS lobby/music dentro da tela
+PASS lobby/music0 mantém tamanho de design: [104.0, 104.0]
+PASS lobby/music0 dentro da tela
+PASS lobby/music1 mantém tamanho de design: [104.0, 104.0]
+PASS lobby/music1 dentro da tela
+PASS lobby/music2 mantém tamanho de design: [104.0, 104.0]
+PASS lobby/music2 dentro da tela
+PASS deck_library/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS deck_library/back dentro da tela
+PASS capa com altura real, sem formato de faixa fina
+PASS proporção da capa equilibrada
+PASS lobby/history mantém tamanho de design: [131.0, 64.0, 24]
+PASS lobby/history dentro da tela
+PASS lobby/play mantém tamanho de design: [460.0, 116.0, 40]
+PASS lobby/play dentro da tela
+PASS lobby/news mantém tamanho de design: [248.0, 88.0, 30]
+PASS lobby/news dentro da tela
+PASS lobby/friends mantém tamanho de design: [280.0, 88.0, 30]
+PASS lobby/friends dentro da tela
+PASS lobby/music mantém tamanho de design: [400.0, 224.0]
+PASS lobby/music dentro da tela
+PASS lobby/music0 mantém tamanho de design: [104.0, 104.0]
+PASS lobby/music0 dentro da tela
+PASS lobby/music1 mantém tamanho de design: [104.0, 104.0]
+PASS lobby/music1 dentro da tela
+PASS lobby/music2 mantém tamanho de design: [104.0, 104.0]
+PASS lobby/music2 dentro da tela
+PASS deck_library/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS deck_library/back dentro da tela
+PASS capa com altura real, sem formato de faixa fina
+PASS proporção da capa equilibrada
+PASS lobby/history mantém tamanho de design: [131.0, 64.0, 24]
+PASS lobby/history dentro da tela
+PASS lobby/play mantém tamanho de design: [460.0, 116.0, 40]
+PASS lobby/play dentro da tela
+PASS lobby/news mantém tamanho de design: [248.0, 88.0, 30]
+PASS lobby/news dentro da tela
+PASS lobby/friends mantém tamanho de design: [280.0, 88.0, 30]
+PASS lobby/friends dentro da tela
+PASS lobby/music mantém tamanho de design: [400.0, 224.0]
+PASS lobby/music dentro da tela
+PASS lobby/music0 mantém tamanho de design: [104.0, 104.0]
+PASS lobby/music0 dentro da tela
+PASS lobby/music1 mantém tamanho de design: [104.0, 104.0]
+PASS lobby/music1 dentro da tela
+PASS lobby/music2 mantém tamanho de design: [104.0, 104.0]
+PASS lobby/music2 dentro da tela
+PASS deck_library/back mantém tamanho de design: [152.0, 60.0, 26]
+PASS deck_library/back dentro da tela
+PASS capa com altura real, sem formato de faixa fina
+PASS proporção da capa equilibrada
+CONTROL_SIZES failures=0
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)

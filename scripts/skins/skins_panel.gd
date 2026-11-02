@@ -100,7 +100,7 @@ func _split_layout() -> void:
 	_search_field.placeholder_text = "Pesquisar personagem..."
 	_search_field.custom_minimum_size.y = 52
 	PlayerUI.style_field(_search_field)
-	_search_field.add_theme_font_size_override("font_size", 17)
+	_search_field.add_theme_font_size_override("font_size", 22)
 	_search_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_search_field.text_changed.connect(func(value: String) -> void:
 		_search = value
@@ -108,7 +108,7 @@ func _split_layout() -> void:
 		PlayerUI.cascade(_grid, 0, 0.02))
 	search_row.add_child(_search_field)
 	_fav_button = _button("♡ Favoritos", _toggle_favorite_only)
-	_fav_button.custom_minimum_size = Vector2(112, 42)
+	_fav_button.custom_minimum_size = Vector2(144, PlayerUI.CONTROL_HEIGHT)
 	filter_row.add_child(_fav_button)
 	_filter_button = OptionButton.new()
 	for value in ["Todos", "Disponíveis", "Bloqueados"]:
@@ -127,8 +127,8 @@ func _split_layout() -> void:
 		PlayerUI.cascade(_grid))
 	filter_row.add_child(_sort_button)
 	for option: OptionButton in [_filter_button, _sort_button]:
-		option.custom_minimum_size = Vector2(118, 52)
-		option.add_theme_font_size_override("font_size", 17)
+		option.custom_minimum_size = Vector2(130, PlayerUI.CONTROL_HEIGHT)
+		option.add_theme_font_size_override("font_size", 22)
 		PlayerUI.style_field(option)
 	_collection_sidebar = VBoxContainer.new()
 	_collection_sidebar.name = "Collections"
@@ -187,9 +187,9 @@ func _responsive_layout() -> void:
 	for edge in ["left", "right", "top", "bottom"]:
 		margin.add_theme_constant_override("margin_" + edge, inset)
 	_header.add_theme_constant_override("separation", 12 if compact else 22)
-	_back_button.custom_minimum_size = Vector2(86 if compact else 130, 38 if compact else 50)
-	_back_button.add_theme_font_size_override("font_size", 16 if compact else 21)
-	heading.add_theme_font_size_override("font_size", 23 if compact else 37)
+	_back_button.custom_minimum_size = PlayerUI.BACK_SIZE
+	_back_button.add_theme_font_size_override("font_size", PlayerUI.CONTROL_FONT)
+	heading.add_theme_font_size_override("font_size", 23 if compact else 40)
 	$Margin/Column.add_theme_constant_override("separation", 6 if compact else 12)
 	_split.add_theme_constant_override("separation", 8 if compact else 18)
 	_scroll.size_flags_stretch_ratio = 1.0
@@ -201,13 +201,13 @@ func _responsive_layout() -> void:
 	_toolbar.add_theme_constant_override("separation", 4 if compact else 8)
 	_fav_button.text = "Favoritos" if not compact else "FAV"
 	_fav_button.add_theme_color_override("font_color", ACCENT if _favorite_only else PlayerUI.TEXT)
-	_fav_button.custom_minimum_size.x = 34 if compact else 112
+	_fav_button.custom_minimum_size.x = 34 if compact else 144
 	_search_field.placeholder_text = "Pesquisar..." if compact else "Pesquisar personagem..."
 	_search_field.custom_minimum_size.x = 116 if compact else 0
-	_search_field.custom_minimum_size.y = 44 if compact else 52
-	_filter_button.custom_minimum_size.y = 44 if compact else 52
-	_sort_button.custom_minimum_size.y = 44 if compact else 52
-	_sort_button.custom_minimum_size.x = 68 if compact else 118
+	_search_field.custom_minimum_size.y = 44 if compact else PlayerUI.CONTROL_HEIGHT
+	_filter_button.custom_minimum_size.y = 44 if compact else PlayerUI.CONTROL_HEIGHT
+	_sort_button.custom_minimum_size.y = 44 if compact else PlayerUI.CONTROL_HEIGHT
+	_sort_button.custom_minimum_size.x = 68 if compact else 130
 	if _grid != null:
 		_grid.columns = _columns()
 		for item in _grid.get_children():
@@ -448,13 +448,13 @@ func _select(character_id: String) -> void:
 	var arrows := HBoxContainer.new()
 	_preview.add_child(arrows)
 	var left_arrow := _button("‹", _select_neighbor.bind(-1))
-	left_arrow.custom_minimum_size = Vector2(44, 36)
+	left_arrow.custom_minimum_size = Vector2(56, 56)
 	arrows.add_child(left_arrow)
 	var hint := Control.new()
 	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	arrows.add_child(hint)
 	var right_arrow := _button("›", _select_neighbor.bind(1))
-	right_arrow.custom_minimum_size = Vector2(44, 36)
+	right_arrow.custom_minimum_size = Vector2(56, 56)
 	arrows.add_child(right_arrow)
 	var details := PlayerUI.label(_collection_title + "  •  " + ("Equipado" if equipped else ("Disponível" if unlocked else "Bloqueado")), 15, ACCENT)
 	details.hide()
@@ -483,12 +483,13 @@ func _select(character_id: String) -> void:
 	actions.add_theme_constant_override("separation", 10)
 	_preview.add_child(actions)
 	var equip := _button("EQUIPADO" if equipped else ("EQUIPAR" if unlocked else "BLOQUEADO"), _equip.bind(character_id), true)
-	equip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	equip.custom_minimum_size.y = 36 if compact else 48
+	equip.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	equip.custom_minimum_size.x = 300
+	equip.custom_minimum_size.y = 36 if compact else PlayerUI.CONTROL_HEIGHT
 	equip.disabled = not unlocked or equipped
 	actions.add_child(equip)
 	var back := _button("VOLTAR", close)
-	back.custom_minimum_size.y = 36 if compact else 48
+	back.custom_minimum_size.y = 36 if compact else PlayerUI.CONTROL_HEIGHT
 	actions.add_child(back)
 
 
@@ -531,9 +532,9 @@ func _card_style(selected: bool) -> StyleBoxFlat:
 func _button(text: String, action: Callable, primary := false) -> Button:
 	var button := Button.new()
 	button.text = text
-	button.custom_minimum_size.y = 52
+	button.custom_minimum_size.y = PlayerUI.CONTROL_HEIGHT
 	button.focus_mode = Control.FOCUS_ALL
-	button.add_theme_font_size_override("font_size", 22)
+	button.add_theme_font_size_override("font_size", PlayerUI.CONTROL_FONT)
 	PlayerUI.style_button(button, primary)
 	button.pressed.connect(action)
 	PlayerUI.fluid(button)

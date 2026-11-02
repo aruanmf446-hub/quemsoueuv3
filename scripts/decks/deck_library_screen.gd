@@ -714,7 +714,7 @@ func _banner(slide: Dictionary, total: int) -> Control:
 	banner_panel.name = "FeaturedBanner"
 	banner_panel.set_meta("reason", slide.reason)
 	banner_panel.set_meta("deck", str(entry.get("ref", entry.id)))
-	banner_panel.custom_minimum_size.y = 138 if compact else 236
+	banner_panel.custom_minimum_size.y = 440
 	var frame := PremiumUI.flat(Color(0.03, 0.04, 0.07), Color(PremiumUI.GOLD, 0.4), 16, 1, 0)
 	banner_panel.add_theme_stylebox_override("panel", frame)
 	banner_panel.clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
@@ -739,13 +739,15 @@ func _banner(slide: Dictionary, total: int) -> Control:
 	if entry.origin == "official":
 		badges.add_child(PlayerUI.pill("OFICIAL", "equipped"))
 	text.add_child(badges)
-	var title := PremiumUI.plain(str(entry.name), 22 if compact else 42, Color.WHITE, false)
+	var title := PremiumUI.plain(str(entry.name), 50, Color.WHITE, false)
 	title.name = "FeaturedTitle"
 	text.add_child(title)
-	text.add_child(PremiumUI.plain("%s  •  %s" % [entry.creator, tr("%d cartas") % int(entry.count)], 12 if compact else 19, Color("#d6dbe4"), false))
+	text.add_child(PremiumUI.plain("%s  •  %s" % [entry.creator, tr("%d cartas") % int(entry.count)], 24, Color("#d6dbe4"), false))
 	var explore := PremiumUI.action("Explorar coleção  →", "layers", true, _open_entry.bind(entry), compact)
 	explore.name = "ExploreFeatured"
 	explore.icon = null
+	explore.custom_minimum_size.y = 80
+	explore.add_theme_font_size_override("font_size", 30)
 	explore.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	text.add_child(explore)
 	# Pontos só quando há mais de um destaque real.

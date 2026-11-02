@@ -11,9 +11,9 @@ O ajuste é de componentes, não de zoom. As medidas são unidades da base de de
 | Botão compartilhado | altura 52 / fonte 21 | altura 64 / fonte 26 |
 | Voltar padrão | 100×44 / fonte 16 | 152×60 / fonte 26 |
 | Abas do lobby | altura 44 / fonte 15 | altura 64 / fonte 24 |
-| Jogar no lobby | 320×64 / fonte 22 | 320×80 / fonte 30 |
-| Novidades | 140×38 / fonte 12 | 176×56 / fonte 20 |
-| Miniplayer | altura 52 / transporte 44 | altura 68 / transporte 56 |
+| Jogar no lobby | 320×64 / fonte 22 | 460×116 / fonte 40 |
+| Novidades | 140×38 / fonte 12 | 248×88 / fonte 30 |
+| Miniplayer | altura 52 / transporte 44 | altura 224 / transporte 104 |
 
 As abas do lobby calculam o encaixe pela largura da base, para que telas mais largas
 não alterem a fonte nem a dimensão dos controles. Botões Equipar e Entrar na conta
@@ -70,5 +70,22 @@ e pela regressão Web do smoke; as três passaram.
 
 - Smoke: 31/31 grupos aprovados.
 - Configurações: 17/17; Amizades: 23/23; Biblioteca: 128/128; sessão/música: 15/15.
-- Proporções: 113 verificações aprovadas, zero falhas nas quatro resoluções.
+- Primeira rodada: 113 verificações aprovadas; os registros anteriores estão preservados com sufixo `primeira_rodada`.
 - Design: aprovado pelo verificador técnico. Avaliação estética continua pendente.
+
+## Segunda rodada — correções após avaliação do proprietário
+
+Personagens e Configurações foram aceitos e permaneceram intactos nesta rodada.
+As alterações se restringem ao lobby, player de música e capa de destaque da Biblioteca:
+
+- Jogar: 460×116, fonte 40; Novidades: 248×88 e Ver amigos: 280×88, ambos com fonte 30.
+- Música: 400×224 em duas linhas; capa e título em cima, três controles de 104×104 abaixo.
+  O painel mantém espaço para o personagem e todas as funções de transporte.
+- Capa da Biblioteca: altura 440 (antes 236), título 50 e ação de explorar com altura 80.
+  As imagens mantêm o enquadramento do componente CinematicBanner, sem distorção.
+
+A rodada focada passou 72 verificações nas quatro resoluções e densidade simulada 3.
+Para reproduzir só esta revisão, acrescente `--lobby-library` ao comando de captura.
+Biblioteca: 128 verificações; sessão/música: 15 verificações, ambas sem falhas.
+Os testes de captura e sessão/música ainda emitem avisos de ObjectDB ao sair; os logs
+estão incluídos. Não se trata de validação no navegador ou em aparelho físico.

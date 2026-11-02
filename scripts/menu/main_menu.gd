@@ -222,9 +222,9 @@ func _layout_news_button() -> void:
 	if not is_instance_valid(_news_button): return
 	var unit := 1.0
 	var pad := 24.0 if UIScale.is_compact() else 40.0
-	_news_button.size = Vector2(176, 56) * unit
-	_news_button.position = Vector2(pad * unit, size.y - 70 * unit)
-	_news_button.add_theme_font_size_override("font_size", roundi(20 * unit))
+	_news_button.size = Vector2(248, 88) * unit
+	_news_button.position = Vector2(pad * unit, size.y - 112 * unit)
+	_news_button.add_theme_font_size_override("font_size", roundi(30 * unit))
 	for state in ["normal", "hover", "pressed"]:
 		var style := StyleBoxFlat.new()
 		style.bg_color = Color(1, 1, 1, 0.06) if state == "hover" else Color.TRANSPARENT

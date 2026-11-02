@@ -259,13 +259,13 @@ func _layout() -> void:
 	_rect(chapter_title, Vector2(pad - 2, title_y + 30) * unit, Vector2(400, 150) * unit)
 	chapter_title.add_theme_font_size_override("font_size", roundi((36 if compact else 60) * unit))
 	var play: Button = buttons.get_node("BtnStory")
-	_rect(play, Vector2(pad, h - (118 if compact else 150)) * unit, Vector2(320, 80) * unit)
+	_rect(play, Vector2(pad, h - 264) * unit, Vector2(460, 116) * unit)
 	var action: Control = play.get_node("ActionBody")
 	action.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	action.offset_left = 20 * unit
 	action.offset_right = -20 * unit
 	action.get_node("Icon").custom_minimum_size.x = 26 * unit
-	action.get_node("Text/Title").add_theme_font_size_override("font_size", roundi(30 * unit))
+	action.get_node("Text/Title").add_theme_font_size_override("font_size", roundi(40 * unit))
 	action.get_node("Text/Subtitle").hide()
 	var area: Control = menu.get_node("LobbyArea")
 	var stage_height := h * (0.86 if compact else 0.92)
@@ -275,7 +275,7 @@ func _layout() -> void:
 	area.get_node("Stage").custom_minimum_size = Vector2.ZERO
 	area.get_node("Stage").set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var friends: Control = menu.get_node("FriendsPanel")
-	_rect(friends, Vector2(pad + 185, h - 70) * unit, Vector2(180, 56) * unit)
+	_rect(friends, Vector2(pad + 268, h - 112) * unit, Vector2(280, 88) * unit)
 	social_bg.hide()
 	var margin: MarginContainer = friends.get_node("Margin")
 	for side in ["left", "right", "top", "bottom"]: margin.add_theme_constant_override("margin_" + side, 0)
@@ -283,8 +283,8 @@ func _layout() -> void:
 	friends.get_node("Margin/Content/FriendList").hide()
 	var view_all: Button = friends.get_node("Margin/Content/ViewAllButton")
 	view_all.text = "VER AMIGOS  ›"
-	view_all.custom_minimum_size = Vector2(180, 56) * unit
-	view_all.add_theme_font_size_override("font_size", roundi(20 * unit))
+	view_all.custom_minimum_size = Vector2(280, 88) * unit
+	view_all.add_theme_font_size_override("font_size", roundi(30 * unit))
 
 func _social_size() -> void:
 	pass # The lobby shows a compact social shortcut; the full list remains in Friends.

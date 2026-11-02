@@ -54,8 +54,14 @@ func _run() -> void:
 		var play := menu.get_node("MenuButtons/BtnStory") as Control
 		sample("lobby/play", play, play.get_node("ActionBody/Text/Title"))
 		sample("lobby/news", menu.get_node("NewsButton"), menu.get_node("NewsButton"))
+		var friends := menu.get_node("FriendsPanel/Margin/Content/ViewAllButton") as Control
+		sample("lobby/friends", friends, friends)
+		var dock := menu.get_node("NowPlaying") as Control
+		sample("lobby/music", dock)
+		for i in 3:
+			sample("lobby/music%d" % i, dock.get("_buttons")[i])
 		await shot("lobby")
-		for route: String in ROUTES:
+		for route: String in (["deck_library"] if "--lobby-library" in OS.get_cmdline_user_args() else ROUTES):
 			nav.open(route, {})
 			await frames(40)
 			var screen := nav.get("_screens").get(route) as Control
@@ -68,6 +74,10 @@ func _run() -> void:
 					await process_frame
 			var back := screen.get_node("Margin/Column/Header/Back") as Button
 			sample(route + "/back", back, back)
+			if route == "deck_library":
+				var cover := screen.find_child("FeaturedBanner", true, false) as Control
+				check(cover.size.y >= 440, "capa com altura real, sem formato de faixa fina")
+				check(cover.size.x / cover.size.y < 4.0, "proporção da capa equilibrada")
 			if route == "settings":
 				for category in 5:
 					screen.call("_select", category)

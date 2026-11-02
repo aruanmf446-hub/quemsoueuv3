@@ -36,7 +36,7 @@ PASS 30 imagens → 6 personagens
 PASS 30 imagens: proporção preservada e dentro do banner
 PASS 30 imagens: principal na frente
 PASS 30 imagens: fundo desfocado e gradiente
-PASS 30 imagens montadas em 30 ms
+PASS 30 imagens montadas em 35 ms
 PASS reabrir usa o cache (1 ms)
 PASS vertical 0.71: zoom mínimo mostra a imagem inteira
 PASS vertical 0.71: moldura nunca deformada

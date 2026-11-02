@@ -7,113 +7,74 @@ PASS escala única preservada
 PASS lobby/history dentro da tela
 PASS lobby/play dentro da tela
 PASS lobby/news dentro da tela
-PASS story/back dentro da tela
+PASS lobby/friends dentro da tela
+PASS lobby/music dentro da tela
+PASS lobby/music0 dentro da tela
+PASS lobby/music1 dentro da tela
+PASS lobby/music2 dentro da tela
 PASS deck_library/back dentro da tela
-PASS duel/back dentro da tela
-PASS friends/back dentro da tela
-PASS settings/back dentro da tela
-PASS settings/tab0 dentro da tela
-PASS settings/tab1 dentro da tela
-PASS settings/tab2 dentro da tela
-PASS settings/tab3 dentro da tela
-PASS settings/tab4 dentro da tela
-PASS skins/back dentro da tela
-PASS music/back dentro da tela
-PASS profile/back dentro da tela
+PASS capa com altura real, sem formato de faixa fina
+PASS proporção da capa equilibrada
 PASS lobby/history mantém tamanho de design: [131.0, 64.0, 24]
 PASS lobby/history dentro da tela
-PASS lobby/play mantém tamanho de design: [320.0, 80.0, 30]
+PASS lobby/play mantém tamanho de design: [460.0, 116.0, 40]
 PASS lobby/play dentro da tela
-PASS lobby/news mantém tamanho de design: [176.0, 56.0, 20]
+PASS lobby/news mantém tamanho de design: [248.0, 88.0, 30]
 PASS lobby/news dentro da tela
-PASS story/back mantém tamanho de design: [152.0, 60.0, 26]
-PASS story/back dentro da tela
+PASS lobby/friends mantém tamanho de design: [280.0, 88.0, 30]
+PASS lobby/friends dentro da tela
+PASS lobby/music mantém tamanho de design: [400.0, 224.0]
+PASS lobby/music dentro da tela
+PASS lobby/music0 mantém tamanho de design: [104.0, 104.0]
+PASS lobby/music0 dentro da tela
+PASS lobby/music1 mantém tamanho de design: [104.0, 104.0]
+PASS lobby/music1 dentro da tela
+PASS lobby/music2 mantém tamanho de design: [104.0, 104.0]
+PASS lobby/music2 dentro da tela
 PASS deck_library/back mantém tamanho de design: [152.0, 60.0, 26]
 PASS deck_library/back dentro da tela
-PASS duel/back mantém tamanho de design: [152.0, 60.0, 26]
-PASS duel/back dentro da tela
-PASS friends/back mantém tamanho de design: [152.0, 60.0, 26]
-PASS friends/back dentro da tela
-PASS settings/back mantém tamanho de design: [152.0, 60.0, 26]
-PASS settings/back dentro da tela
-PASS settings/tab0 mantém tamanho de design: [304.0, 76.0, 28]
-PASS settings/tab0 dentro da tela
-PASS settings/tab1 mantém tamanho de design: [304.0, 76.0, 28]
-PASS settings/tab1 dentro da tela
-PASS settings/tab2 mantém tamanho de design: [304.0, 76.0, 28]
-PASS settings/tab2 dentro da tela
-PASS settings/tab3 mantém tamanho de design: [304.0, 76.0, 28]
-PASS settings/tab3 dentro da tela
-PASS settings/tab4 mantém tamanho de design: [304.0, 76.0, 28]
-PASS settings/tab4 dentro da tela
-PASS skins/back mantém tamanho de design: [152.0, 60.0, 26]
-PASS skins/back dentro da tela
-PASS music/back mantém tamanho de design: [152.0, 60.0, 26]
-PASS music/back dentro da tela
-PASS profile/back mantém tamanho de design: [152.0, 60.0, 26]
-PASS profile/back dentro da tela
+PASS capa com altura real, sem formato de faixa fina
+PASS proporção da capa equilibrada
 PASS lobby/history mantém tamanho de design: [131.0, 64.0, 24]
 PASS lobby/history dentro da tela
-PASS lobby/play mantém tamanho de design: [320.0, 80.0, 30]
+PASS lobby/play mantém tamanho de design: [460.0, 116.0, 40]
 PASS lobby/play dentro da tela
-PASS lobby/news mantém tamanho de design: [176.0, 56.0, 20]
+PASS lobby/news mantém tamanho de design: [248.0, 88.0, 30]
 PASS lobby/news dentro da tela
-PASS story/back mantém tamanho de design: [152.0, 60.0, 26]
-PASS story/back dentro da tela
+PASS lobby/friends mantém tamanho de design: [280.0, 88.0, 30]
+PASS lobby/friends dentro da tela
+PASS lobby/music mantém tamanho de design: [400.0, 224.0]
+PASS lobby/music dentro da tela
+PASS lobby/music0 mantém tamanho de design: [104.0, 104.0]
+PASS lobby/music0 dentro da tela
+PASS lobby/music1 mantém tamanho de design: [104.0, 104.0]
+PASS lobby/music1 dentro da tela
+PASS lobby/music2 mantém tamanho de design: [104.0, 104.0]
+PASS lobby/music2 dentro da tela
 PASS deck_library/back mantém tamanho de design: [152.0, 60.0, 26]
 PASS deck_library/back dentro da tela
-PASS duel/back mantém tamanho de design: [152.0, 60.0, 26]
-PASS duel/back dentro da tela
-PASS friends/back mantém tamanho de design: [152.0, 60.0, 26]
-PASS friends/back dentro da tela
-PASS settings/back mantém tamanho de design: [152.0, 60.0, 26]
-PASS settings/back dentro da tela
-PASS settings/tab0 mantém tamanho de design: [376.0, 76.0, 28]
-PASS settings/tab0 dentro da tela
-PASS settings/tab1 mantém tamanho de design: [377.0, 76.0, 28]
-PASS settings/tab1 dentro da tela
-PASS settings/tab2 mantém tamanho de design: [377.0, 76.0, 28]
-PASS settings/tab2 dentro da tela
-PASS settings/tab3 mantém tamanho de design: [377.0, 76.0, 28]
-PASS settings/tab3 dentro da tela
-PASS settings/tab4 mantém tamanho de design: [377.0, 76.0, 28]
-PASS settings/tab4 dentro da tela
-PASS skins/back mantém tamanho de design: [152.0, 60.0, 26]
-PASS skins/back dentro da tela
-PASS music/back mantém tamanho de design: [152.0, 60.0, 26]
-PASS music/back dentro da tela
-PASS profile/back mantém tamanho de design: [152.0, 60.0, 26]
-PASS profile/back dentro da tela
+PASS capa com altura real, sem formato de faixa fina
+PASS proporção da capa equilibrada
 PASS lobby/history mantém tamanho de design: [131.0, 64.0, 24]
 PASS lobby/history dentro da tela
-PASS lobby/play mantém tamanho de design: [320.0, 80.0, 30]
+PASS lobby/play mantém tamanho de design: [460.0, 116.0, 40]
 PASS lobby/play dentro da tela
-PASS lobby/news mantém tamanho de design: [176.0, 56.0, 20]
+PASS lobby/news mantém tamanho de design: [248.0, 88.0, 30]
 PASS lobby/news dentro da tela
-PASS story/back mantém tamanho de design: [152.0, 60.0, 26]
-PASS story/back dentro da tela
+PASS lobby/friends mantém tamanho de design: [280.0, 88.0, 30]
+PASS lobby/friends dentro da tela
+PASS lobby/music mantém tamanho de design: [400.0, 224.0]
+PASS lobby/music dentro da tela
+PASS lobby/music0 mantém tamanho de design: [104.0, 104.0]
+PASS lobby/music0 dentro da tela
+PASS lobby/music1 mantém tamanho de design: [104.0, 104.0]
+PASS lobby/music1 dentro da tela
+PASS lobby/music2 mantém tamanho de design: [104.0, 104.0]
+PASS lobby/music2 dentro da tela
 PASS deck_library/back mantém tamanho de design: [152.0, 60.0, 26]
 PASS deck_library/back dentro da tela
-PASS duel/back mantém tamanho de design: [152.0, 60.0, 26]
-PASS duel/back dentro da tela
-PASS friends/back mantém tamanho de design: [152.0, 60.0, 26]
-PASS friends/back dentro da tela
-PASS settings/back mantém tamanho de design: [152.0, 60.0, 26]
-PASS settings/back dentro da tela
-PASS settings/tab0 mantém tamanho de design: [304.0, 76.0, 28]
-PASS settings/tab0 dentro da tela
-PASS settings/tab1 mantém tamanho de design: [304.0, 76.0, 28]
-PASS settings/tab1 dentro da tela
-PASS settings/tab2 mantém tamanho de design: [304.0, 76.0, 28]
-PASS settings/tab2 dentro da tela
-PASS settings/tab3 mantém tamanho de design: [304.0, 76.0, 28]
-PASS settings/tab3 dentro da tela
-PASS settings/tab4 mantém tamanho de design: [304.0, 76.0, 28]
-PASS settings/tab4 dentro da tela
-PASS skins/back mantém tamanho de design: [152.0, 60.0, 26]
-PASS skins/back dentro da tela
-PASS music/back mantém tamanho de design: [152.0, 60.0, 26]
-PASS music/back dentro da tela
-PASS profile/back mantém tamanho de design: [152.0, 60.0, 26]
-PASS profile/back dentro da tela
+PASS capa com altura real, sem formato de faixa fina
+PASS proporção da capa equilibrada
 CONTROL_SIZES failures=0
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)

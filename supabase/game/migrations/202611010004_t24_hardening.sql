@@ -1,11 +1,11 @@
--- Correção aditiva do T24: referências UUID rigorosas e bloqueio de movimentação de cartas publicadas.
+-- T24 hardening: UUID estrito e lock de cartas publicadas.
 create or replace function public.qse_deck_record_play(p_deck_ref text)
  returns jsonb language plpgsql security definer set search_path = ''
  as $$
  declare v_user uuid := auth.uid(); v_new uuid; v_at timestamptz;
  begin
   if v_user is null then return jsonb_build_object('error','unauthorized'); end if;
-  if p_deck_ref is null or (p_deck_ref !~ '^official:[a-z0-9_]{2,64}$' and p_deck_ref !~ '^creator:[0-9a-f-]{36}$') then
+  if p_deck_ref is null or (p_deck_ref !~ '^official:[a-z0-9_]{2,64}$' and p_deck_ref !~ '^creator:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$') then
     return jsonb_build_object('error','invalid_deck_ref');
   end if;
   if left(p_deck_ref,9)='official:' then

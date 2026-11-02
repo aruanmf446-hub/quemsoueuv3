@@ -24,11 +24,11 @@ Resposta com **nova** contagem (formato exato):
 ```json
 {"deck_ref":"official:lendas_urbanas","recorded":true,"played_at":"<ISO8601_SERVIDOR>","reason":null}
 ```
-Na segunda chamada pelo mesmo usuário no **mesmo intervalo horário UTC**:
+Na segunda chamada pelo mesmo usuário nos **60 minutos corridos após o último registro válido**:
 ```json
 {"deck_ref":"official:lendas_urbanas","recorded":false,"played_at":null,"reason":"duplicate_hour"}
 ```
-Não há contador de repetição; a unicidade no banco é `(user_id,deck_ref,played_hour)`. A tabela tem RLS e policy de INSERT por dono, mas **nenhum INSERT nem SELECT direto é concedido ao cliente**: registrar somente por RPC validada. O servidor aceita official ID presente em `qse_v3.duel_decks` ou creator ID existente pertencente ao usuário / publicado. **Não registrar partida de História sem uma referência real de deck.**
+O servidor usa bloqueio transacional por jogador/deck e verifica a janela móvel de 60 minutos; como proteção adicional, a unicidade no banco é `(user_id,deck_ref,played_hour)`. A tabela tem RLS e policy de INSERT por dono, mas **nenhum INSERT nem SELECT direto é concedido ao cliente**: registrar somente por RPC validada. O servidor aceita official ID presente em `qse_v3.duel_decks` ou creator ID existente pertencente ao usuário / publicado. **Não registrar partida de História sem uma referência real de deck.**
 
 Erros: `unauthorized`, `invalid_deck_ref`, `deck_not_found`.
 

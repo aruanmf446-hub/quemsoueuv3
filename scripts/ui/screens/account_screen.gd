@@ -237,6 +237,7 @@ func _field(parent: VBoxContainer, placeholder: String, secret: bool) -> LineEdi
 	field.add_theme_font_size_override("font_size", 15 if UIScale.is_compact() else 18)
 	PlayerUI.style_field(field)
 	parent.add_child(field)
+	if secret: PremiumUI.reveal_toggle(field)
 	return field
 
 

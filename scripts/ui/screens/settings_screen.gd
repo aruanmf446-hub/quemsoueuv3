@@ -471,6 +471,7 @@ func _edit_nickname(info: VBoxContainer, row: Control) -> void:
 	field.custom_minimum_size.y = 44
 	PlayerUI.style_field(field)
 	editor.add_child(field)
+	PremiumUI.reveal_toggle(field)
 	var save := _action_button("Salvar", "check", true, func() -> void:
 		banner.show_state("loading")
 		var result: Dictionary = await services.profile.update_nickname(field.text)
@@ -493,6 +494,7 @@ func _change_password() -> void:
 	field.custom_minimum_size.y = 44
 	PlayerUI.style_field(field)
 	editor.add_child(field)
+	PremiumUI.reveal_toggle(field)
 	var save := _action_button("Salvar senha", "check", true, func() -> void:
 		banner.show_state("loading")
 		status(await services.session.update_password(field.text)))

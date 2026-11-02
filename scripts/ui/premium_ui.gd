@@ -13,6 +13,8 @@ const INK := Color("#141006")
 const ONLINE := Color("#4cd964")
 const OFFLINE := Color("#8a94a6")
 const ICONS := {
+	"eye": '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+	"eye_off": '<path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6A17 17 0 0 0 2 12s3.6 7 10 7a9.6 9.6 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
 	"chevron_down": '<path d="M6 9l6 6 6-6"/>',
 	"star_outline": '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
 	"swords": '<path d="M4 4l9.5 9.5M4 4h4l9 9M4 4v4l9 9" fill="currentColor" fill-opacity="0.25"/><path d="M20 4l-9.5 9.5M20 4h-4l-3.2 3.2M20 4v4l-3.2 3.2"/><path d="M13.5 13.5l4 4M10.5 13.5l-4 4M16 19l3-3M8 19l-3-3M18.5 20.5l2-2M5.5 20.5l-2-2"/>',
@@ -244,3 +246,31 @@ void fragment() {
 	material.shader = shader
 	rect.material = material
 	return rect
+
+
+## Botão "olho" dentro de um campo de senha: mostra/oculta o que está sendo digitado.
+static func reveal_toggle(field: LineEdit) -> Button:
+	var eye := Button.new()
+	eye.name = "RevealPassword"
+	eye.flat = true
+	eye.toggle_mode = true
+	eye.focus_mode = Control.FOCUS_NONE
+	eye.custom_minimum_size = Vector2(44, 0)
+	eye.icon = icon("eye", MUTED, 40)
+	eye.add_theme_constant_override("icon_max_width", 22)
+	eye.tooltip_text = TranslationServer.translate("Mostrar senha")
+	eye.toggled.connect(func(visible_text: bool) -> void:
+		field.secret = not visible_text
+		eye.icon = icon("eye_off" if visible_text else "eye", GOLD if visible_text else MUTED, 40)
+		eye.tooltip_text = TranslationServer.translate("Ocultar senha" if visible_text else "Mostrar senha"))
+	field.add_child(eye)
+	eye.set_anchors_and_offsets_preset(Control.PRESET_RIGHT_WIDE)
+	eye.offset_left = -48
+	# O texto não passa por baixo do olho.
+	for state in ["normal", "focus", "read_only"]:
+		var box := field.get_theme_stylebox(state)
+		if box != null:
+			box = box.duplicate()
+			box.content_margin_right = maxf(box.content_margin_right, 50)
+			field.add_theme_stylebox_override(state, box)
+	return eye

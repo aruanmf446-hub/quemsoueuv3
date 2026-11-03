@@ -69,6 +69,11 @@ jobs:
           path: ${{ runner.temp }}/battle-t31/*.png
           if-no-files-found: ignore
           retention-days: 14
+      - name: T32 voice bridge and opt-in regression (offline)
+        run: |
+          node --check web/voice/bridge.js
+          node tests/voice/bridge_test.cjs
+          "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --script res://tests/voice/flow_test.gd
       - name: T17 invite state and local battle regression
         run: |
           GODOT="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"

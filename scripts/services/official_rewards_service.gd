@@ -10,6 +10,7 @@ var state := "empty"
 var campaign: Dictionary = {}
 var offers: Array[Dictionary] = []
 var seen := true
+var revealed := true
 var error: Dictionary = {}
 var _sequence := 0
 var _loading := false
@@ -24,6 +25,7 @@ func clear() -> void:
 	campaign.clear()
 	offers.clear()
 	seen = true
+	revealed = true
 	error.clear()
 	changed.emit()
 
@@ -46,6 +48,7 @@ func refresh() -> Dictionary:
 		state = "success"
 		campaign = result.data.get("campaign", {}) if result.data.get("campaign") is Dictionary else {}
 		seen = bool(result.data.get("seen", true))
+		revealed = bool(result.data.get("revealed", true))
 		offers.clear()
 		if result.data.get("offers") is Array:
 			for item: Variant in result.data.offers:
@@ -104,6 +107,25 @@ func mark_seen() -> Dictionary:
 	var result: Dictionary = await client.call_rpc("qse_rewards_mark_seen", {"p_campaign_id": campaign_id})
 	if generation != client.generation: return ServiceResult.failure("session_changed", "unauthorized")
 	if result.ok and result.data is Dictionary and result.data.get("ok", false) == true:
+		seen = true
+		changed.emit()
+	return result
+
+
+## Um toque cerimonial, após concessão automática no GAME.
+## Persistente por campanha e usuário; nunca concede novamente os mesmos itens.
+func reveal() -> Dictionary:
+	if revealed: return ServiceResult.success({"ok":true,"status":"already_revealed"})
+	if client == null or session == null or not session.authenticated():
+		return ServiceResult.failure("not_authenticated", "unauthorized")
+	var campaign_id := str(campaign.get("id", ""))
+	if campaign_id.is_empty(): return ServiceResult.failure("campaign_unavailable")
+	var generation := client.generation
+	var result: Dictionary = await client.call_rpc("qse_rewards_reveal", {"p_campaign_id":campaign_id})
+	if generation != client.generation or not session.authenticated():
+		return ServiceResult.failure("session_changed", "unauthorized")
+	if result.ok and result.data is Dictionary and result.data.get("ok", false) == true:
+		revealed = true
 		seen = true
 		changed.emit()
 	return result

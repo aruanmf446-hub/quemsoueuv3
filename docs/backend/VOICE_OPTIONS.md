@@ -18,7 +18,7 @@
 - `action=disconnect` permite revogar a própria conexão ao sair.
 - **Limitação conhecida:** em um encerramento com todos os jogadores offline, pode não haver cliente autorizado para solicitar `sync`. Antes de declarar expulsão/fechamento com revogação garantida em produção, integrar webhook confiável ou ação privilegiada do backend em mudanças de sala. Token curto não encerra conexões WebRTC existentes.
 - Os controles de voz estão disponíveis somente no Web/PWA; APK e EXE permanecem sem voz.
-- Não foram implementados nomes verificados e silenciamento por participante na UI; API JavaScript possui volume por identidade para integração futura.
+- Silenciamento por participante foi adicionado para até três participantes simultaneamente visíveis no painel compacto; falta a navegação da lista completa de 20 e identificação visual por nickname verificado. A API JavaScript suporta volume por identidade.
 - O modo local não usa LiveKit.
 - LiveKit Cloud tem limites de uso gratuitos; verificar limites vigentes no painel. A conexão só começa por ação do jogador.
 

@@ -34,21 +34,21 @@ func _ready() -> void:
 	_status.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	_status.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(_status)
-	_connect = Style.action("Entrar", _on_connect, "mic")
+	_connect = Style.action("Entrar", _on_connect)
 	_connect.name = "VoiceConnect"
 	_connect.custom_minimum_size.y = 28
 	row.add_child(_connect)
-	_mic = Style.action("Mic", _on_mic, "mic")
+	_mic = Style.action("Mic", _on_mic)
 	_mic.name = "VoiceMicrophone"
 	_mic.custom_minimum_size.y = 28
 	row.add_child(_mic)
-	_audio = Style.action("Som", _on_audio, "volume")
+	_audio = Style.action("Som", _on_audio)
 	_audio.name = "VoiceOutput"
 	_audio.custom_minimum_size.y = 28
 	row.add_child(_audio)
 	var detail := PlayerUI.row(main)
 	detail.add_theme_constant_override("separation", 4)
-	_unlock = Style.action("Liberar áudio", _on_unlock, "volume")
+	_unlock = Style.action("Liberar áudio", _on_unlock)
 	_unlock.name = "VoiceUnlockAudio"
 	detail.add_child(_unlock)
 	_selector = OptionButton.new()
@@ -56,7 +56,7 @@ func _ready() -> void:
 	_selector.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_selector.clip_text = true
 	detail.add_child(_selector)
-	_mute = Style.action("Silenciar", _on_mute, "volume")
+	_mute = Style.action("Silenciar", _on_mute)
 	_mute.name = "VoiceParticipantMute"
 	detail.add_child(_mute)
 	services.voice.changed.connect(_refresh)

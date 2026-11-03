@@ -630,7 +630,11 @@ func _best_grid_columns(count: int, usable_width: float, usable_height: float, g
 		var min_width := 92.0 if _canvas.size.x < 800.0 else 124.0
 		var legibility := clampf(width/min_width,0.62,1.0)
 		var caption_room := clampf(height/62.0,0.58,1.0)
+		# Peso extra para altura: 20 cartas em 7x3 usam imagens maiores
+		# do que 5x4. Em 640px não sacrificar a largura mínima das legendas.
 		var score := minf(width,178.0)*minf(height,190.0)*balance*legibility*caption_room
+		score *= pow(minf(height,220.0)/110.0,0.9)
+		if width < 72.0: score *= 0.60
 		if score > best_score:
 			best = columns
 			best_score = score

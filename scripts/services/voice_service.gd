@@ -50,6 +50,9 @@ func eligible() -> bool:
 func _room_changed() -> void:
 	if not eligible() or (not room_id.is_empty() and duel.room_id() != room_id):
 		disconnect_voice()
+	elif state == "connected" and not room_id.is_empty():
+		# A room revision (e.g. admin kick) triggers prompt roster reconciliation.
+		_reconcile_at = minf(_reconcile_at, Time.get_ticks_msec() / 1000.0 + 3.0)
 
 
 ## Called explicitly by a player button; no background or lobby auto-join.

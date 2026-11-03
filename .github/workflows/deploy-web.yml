@@ -14,6 +14,7 @@ on:
       - 'scripts/**'
       - 'web/**'
       - 'tools/web/**'
+      - 'tools/bots/**'
 
 permissions:
   contents: read
@@ -112,6 +113,21 @@ jobs:
           python3 tools/web/check_pwa.py build/web
           ls -la build/web/index.pck
           du -sh build/web build/web/music
+      # Painel separado da exportação Godot. Nunca grava USER/PASSWORD no artefato.
+      - name: Build QSE Command Center from repository secrets
+        if: github.ref == 'refs/heads/main'
+        shell: bash
+        env:
+          QSE_DASH_USER: ${{ secrets.USER }}
+          QSE_DASH_PASSWORD: ${{ secrets.PASSWORD }}
+        run: |
+          set -euo pipefail
+          node --check web/bots/app.js
+          mkdir -p build/web/bots
+          cp web/bots/index.html web/bots/style.css web/bots/app.js build/web/bots/
+          python3 tools/bots/generate_auth.py build/web/bots
+          test -s build/web/bots/auth.json
+          echo "QSE dashboard bundle ready at /bots/"
       - uses: actions/upload-artifact@v4
         with:
           name: quem-sou-eu-v3-web-preview

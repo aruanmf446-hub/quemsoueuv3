@@ -23,6 +23,8 @@ func _run() -> void:
 	# Sessão sintética apenas neste runner headless. Nenhuma requisição é feita.
 	services.session.user = {"id": "00000000-0000-4000-8000-000000000001"}
 	services.client.access_token = "fixture-not-a-real-token"
+	# Evita o _process() da sessão invalidar imediatamente o token sintético.
+	services.session._expires_at = Time.get_unix_time_from_system() + 3600.0
 	services.rewards.campaign = {"id": "fixture_campaign", "title": "OFICIAIS GRÁTIS", "subtitle": "4 decks",
 		"description": "Uma campanha para todos os jogadores."}
 	services.rewards.offers = [
@@ -35,13 +37,9 @@ func _run() -> void:
 	check(not services.rewards.is_deck_claimed("nostalgia_web"), "não resgatado antes de confirmar")
 	check(services.rewards.is_deck_claimed("pinturas"), "resgate de outra carta preservado")
 	check(services.rewards.pending_count() == 1, "uma oferta pendente")
-	print("T28_DEBUG before: authenticated=", services.session.authenticated(), " state=", services.rewards.state, " offers=", services.rewards.offers.size(), " campaign=", services.rewards.campaign.size(), " current=", PlayerServices.current != null)
 	var overlay := NewsOverlay.new()
 	root.add_child(overlay)
 	await process_frame
-	print("T28_DEBUG after: authenticated=", services.session.authenticated(), " state=", services.rewards.state, " offers=", services.rewards.offers.size(), " campaign=", services.rewards.campaign.size())
-	var content := overlay.find_child("RewardContent", true, false)
-	print("T28_DEBUG children=", Array(content.get_children()).map(func(node: Node) -> String: return node.name) if content != null else "NO CONTENT")
 	var claim := overlay.find_child("Claim_deck_nostalgia_web", true, false) as Button
 	var owned := overlay.find_child("Claim_deck_pinturas", true, false) as Button
 	check(claim != null and not claim.disabled and claim.text == "RESGATAR GRÁTIS", "botão gratuito ativo")

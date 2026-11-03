@@ -18,8 +18,8 @@ var _last := ""
 
 
 ## Liga o campo ao teclado nativo no iOS; devolve null nas demais plataformas.
-static func attach(line_edit: LineEdit) -> WebTextBridge:
-	if not enabled(): return null
+static func attach(line_edit: LineEdit, force := false) -> WebTextBridge:
+	if not force and not enabled(): return null
 	var bridge := WebTextBridge.new()
 	bridge.name = "WebTextBridge"
 	bridge.field = line_edit

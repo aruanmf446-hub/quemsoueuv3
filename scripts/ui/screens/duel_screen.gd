@@ -1246,6 +1246,10 @@ func _render_room() -> void:
 	if is_instance_valid(_match_view):
 		_match_view.queue_free()
 		_match_view = null
+	if not duel.is_local():
+		var voice_panel := preload("res://scripts/ui/battle/voice_panel.gd").new()
+		voice_panel.setup(services)
+		body.add_child(voice_panel)
 	var grid := GridContainer.new()
 	grid.name = "Members"
 	grid.columns = clampi(int((size.x / PlayerUI.unit(self) - 28) / 202), 1, 5)

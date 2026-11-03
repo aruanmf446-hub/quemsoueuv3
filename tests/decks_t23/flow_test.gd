@@ -69,7 +69,10 @@ func _run() -> void:
 	check(screen.find_child("FeaturedBanner", true, false) != null and screen.find_child("ExploreFeatured", true, false) != null, "banner com Explorar coleção")
 	check(screen.find_child("BannerDots", true, false) == null, "sem pontos com um único destaque real")
 	check(screen.find_child("Collection_official", true, false) != null and screen.find_child("Collection_mine", true, false) != null, "coleções em destaque")
-	check(_names().has("Deck_lendas_urbanas") and _names().size() == 9, "quatro oficiais + cinco fixtures")
+	var diva_pop_ready := not load("res://scripts/decks/deck_library_catalog.gd").find_deck("diva_pop").is_empty()
+	var official_total := 5 if diva_pop_ready else 4
+	var all_total := official_total + 5
+	check(_names().has("Deck_lendas_urbanas") and _names().size() == all_total, "todos os oficiais carregados + cinco fixtures")
 	# Busca.
 	screen._search.text = "mitologia"
 	screen._search.text_changed.emit("mitologia")
@@ -80,7 +83,7 @@ func _run() -> void:
 	# Filtros: Tipo e Temática.
 	_box("Type_official").button_pressed = true
 	await _frames()
-	check(_names().size() == 4 and _names().has("Deck_lendas_urbanas") and _names().has("Deck_nostalgia_web") and _names().has("Deck_pinturas") and _names().has("Deck_sol_nascente"), "filtro quatro Oficiais")
+	check(_names().size() == official_total and _names().has("Deck_lendas_urbanas") and _names().has("Deck_nostalgia_web") and _names().has("Deck_pinturas") and _names().has("Deck_sol_nascente") and (_names().has("Deck_diva_pop") == diva_pop_ready), "filtro inclui Diva Pop quando suas 10 imagens existem")
 	_box("Type_official").button_pressed = false
 	_box("Type_community").button_pressed = true
 	await _frames()
@@ -90,14 +93,14 @@ func _run() -> void:
 	check(_names() == ["Deck_demo_4"], "filtro Temática a partir dos metadados")
 	(screen.find_child("ClearFilters", true, false) as Button).pressed.emit()
 	await _frames()
-	check(_names().size() == 9 and not _box("Type_community").button_pressed, "Limpar filtros")
+	check(_names().size() == all_total and not _box("Type_community").button_pressed, "Limpar filtros")
 	# Ordenação A–Z.
 	check(screen.find_child("SortBy", true, false) != null, "Ordenar por")
 	# Populares/Recentes: sem métricas inventadas.
 	for tab in ["Populares", "Recentes"]:
 		screen._select_tab(tab)
 		await _frames()
-		check(screen.find_child("DataNotice", true, false) != null and _names().size() == 9, tab + " avisa que a métrica não existe")
+		check(screen.find_child("DataNotice", true, false) != null and _names().size() == all_total, tab + " avisa que a métrica não existe")
 	# Favoritos.
 	var store: DeckDrafts = screen._store()
 	store.set_favorite("lendas_urbanas", false)

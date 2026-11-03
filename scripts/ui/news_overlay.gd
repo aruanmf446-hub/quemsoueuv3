@@ -112,7 +112,7 @@ func _render() -> void:
 	hero.add_child(story)
 	story.add_child(_label("PRESENTE DA EQUIPE · POR TEMPO INDETERMINADO", 13 if compact else 17, LIME))
 	story.add_child(_label(str(rewards.campaign.get("title", "NOVOS DECKS OFICIAIS")), 25 if compact else 36, Color.WHITE))
-	story.add_child(_label("NOVOS DECKS E SKINS INICIAIS PARA TODO MUNDO", 15 if compact else 21, CYAN))
+	story.add_child(_label("DIVA POP · 10 NOVAS CARTAS OFICIAIS" if str(rewards.campaign.get("id", "")) == "diva_pop_2026" else "NOVOS DECKS E SKINS INICIAIS PARA TODO MUNDO", 15 if compact else 21, CYAN))
 	var description := _label(str(rewards.campaign.get("description", "")), 13 if compact else 17, MUTED)
 	description.max_lines_visible = 3
 	story.add_child(description)
@@ -123,7 +123,7 @@ func _render() -> void:
 		image.custom_minimum_size = Vector2(minf(view_size.x * 0.27, 400.0), 170)
 		image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-		image.texture = _cover("nostalgia_web")
+		image.texture = _cover("diva_pop" if str(rewards.campaign.get("id", "")) == "diva_pop_2026" else "nostalgia_web")
 		hero.add_child(image)
 	# O presente já pertence à conta; o botão só confirma a abertura uma única vez.
 	var owned_count := 0
@@ -292,6 +292,7 @@ func _cover(deck_id: String) -> Texture2D:
 		"sol_nascente": file = "carta_01"
 		"pinturas": file = "carta_03"
 		"lendas_urbanas": file = "loira_do_banheiro"
+		"diva_pop": file = "carta_01"
 	if file.is_empty(): return null
 	var path := "res://assets/duel/decks/oficial/%s/%s.png" % [deck_id, file]
 	return load(path) as Texture2D if ResourceLoader.exists(path, "Texture2D") else null

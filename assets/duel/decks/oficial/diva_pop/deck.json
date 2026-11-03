@@ -1,0 +1,56 @@
+{
+  "name": "Diva Pop",
+  "order": 4,
+  "visibility": "public",
+  "description": "O universo da música ganha vida em dez retratos de animação 3D, entre estrelas solo, grupos cheios de carisma, brilhos de palco e visuais inesquecíveis. Diva Pop reúne personalidades originais que brincam com as tendências e a estética da cultura pop mundial: há glamour retrô, atitude urbana, energia jovem e figurinos futuristas. Observe os cabelos, roupas, acessórios e poses de cada carta e descubra se você reconhece quem está no centro do espetáculo.",
+  "creator": "Quem Sou Eu",
+  "category": "Música pop",
+  "tags": [
+    "pop",
+    "música",
+    "artistas"
+  ],
+  "original_language": "pt-BR",
+  "cards": {
+    "carta_01": {
+      "name": "Selina Chartpenter",
+      "description": "À beira de uma estrada ensolarada no deserto, uma estrela de cachos loiros, bandana vermelha de bolinhas e camisa branca aguarda a próxima aventura com sua mala vintage. O short jeans, os saltos vermelhos e o sinal de carona dão personalidade a uma cena retrô, divertida e cheia de confiança."
+    },
+    "carta_02": {
+      "name": "Millie Eyelash",
+      "description": "Boné preto virado para trás, óculos de armação grossa e olhos verdes expressivos: esta artista prefere o estilo despojado à pose tradicional de diva. Recostada numa cadeira de escritório, mistura camiseta larga, short verde, meias esportivas e sandálias pretas com uma atitude tranquila e irreverente."
+    },
+    "carta_03": {
+      "name": "Luna Loopa",
+      "description": "Cabelos pretos curtos e desalinhados emolduram o rosto de uma estrela que encara a câmera sob luzes roxas. O casaco de paetês, as argolas prateadas e os colares sobrepostos dão brilho a uma imagem de palco marcada por elegância urbana, confiança e uma personalidade forte."
+    },
+    "carta_04": {
+      "name": "Livvy Rockdrigo",
+      "description": "Uma jovem de cabelos castanhos ondulados aparece piscando um olho, mostrando a língua e fazendo sinais com as mãos. Adesivos coloridos de flores, estrelas e borboletas, acessórios prateados e um top rosa criam uma estética pop alegre, divertida e um pouco rebelde, perfeita para uma foto cheia de energia."
+    },
+    "carta_05": {
+      "name": "BLUSHPUNK",
+      "description": "Quatro integrantes se reúnem para uma fotografia carismática, combinando cabelos lilases, castanhos e pretos, tiaras divertidas e laços coloridos. As expressões, os gestos de paz e os acessórios de sapinho e orelhinhas revelam a personalidade de cada uma, enquanto o conjunto transmite amizade e atitude pop."
+    },
+    "carta_06": {
+      "name": "BEAT7",
+      "description": "Sete jovens músicos posam juntos em um cenário aconchegante, usando cardigãs, jaquetas e suéteres em cores suaves. Os cabelos escuros, os sorrisos e os gestos afetuosos fazem cada integrante se destacar. A composição celebra a sintonia de um grupo cuja energia parece atravessar a fotografia."
+    },
+    "carta_07": {
+      "name": "Mr. Weekday",
+      "description": "De terno vermelho vibrante, camisa e gravata pretas, óculos escuros e cabelo volumoso, este astro domina a noite com um sorriso radiante. As luzes douradas refletidas nas lentes criam uma atmosfera de show sofisticado, marcada por glamour, mistério e muita presença de palco."
+    },
+    "carta_08": {
+      "name": "Benny Starz",
+      "description": "Uma faixa vermelha prende os cabelos cacheados de um cantor que veste um terno verde bordado com flores, colete combinando e camisa de gola aberta. Correntes douradas, calça de corte amplo e sapatos claros reforçam o charme retrô. Sua pose tranquila revela uma estrela cheia de ritmo e estilo."
+    },
+    "carta_09": {
+      "name": "Ariella Big",
+      "description": "Longos cabelos castanhos, tiara preta e brincos verdes em formato de flor acompanham uma roupa verde-lima com top de mangas compridas e saia curta. O sorriso confiante e a maquiagem delicada completam um visual que mistura doçura, elegância contemporânea e personalidade pop."
+    },
+    "carta_10": {
+      "name": "Lola Glow",
+      "description": "Com franja loiro-platinada reta, maquiagem marcante e figurino de paetês escuros, esta estrela encara a câmera sob luzes azuis. Uma luva metálica prateada emoldura um dos olhos, dando ao retrato uma estética futurista e ousada. Cada detalhe parece preparado para um grande espetáculo."
+    }
+  }
+}

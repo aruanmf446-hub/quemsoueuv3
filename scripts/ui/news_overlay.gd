@@ -112,7 +112,7 @@ func _render() -> void:
 	hero.add_child(story)
 	story.add_child(_label("PRESENTE DA EQUIPE · POR TEMPO INDETERMINADO", 13 if compact else 17, LIME))
 	story.add_child(_label(str(rewards.campaign.get("title", "NOVOS DECKS OFICIAIS")), 25 if compact else 36, Color.WHITE))
-	story.add_child(_label("NOVOS DECKS ADICIONADOS À COMUNIDADE OFICIAL", 15 if compact else 21, CYAN))
+	story.add_child(_label("NOVOS DECKS E SKINS INICIAIS PARA TODO MUNDO", 15 if compact else 21, CYAN))
 	var description := _label(str(rewards.campaign.get("description", "")), 13 if compact else 17, MUTED)
 	description.max_lines_visible = 3
 	story.add_child(description)
@@ -125,6 +125,28 @@ func _render() -> void:
 		image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		image.texture = _cover("nostalgia_web")
 		hero.add_child(image)
+	# O presente já pertence à conta; o botão só confirma a abertura uma única vez.
+	var owned_count := 0
+	for item: Dictionary in rewards.offers:
+		if bool(item.get("claimed", false)): owned_count += 1
+	if not rewards.revealed:
+		var reveal_box := HBoxContainer.new()
+		reveal_box.name = "FirstGiftReveal"
+		reveal_box.add_theme_constant_override("separation", 12)
+		_content.add_child(reveal_box)
+		var explanation := VBoxContainer.new()
+		explanation.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		reveal_box.add_child(explanation)
+		explanation.add_child(_label("🎁  %d PRESENTES GRÁTIS JÁ GARANTIDOS NA SUA CONTA" % owned_count, 14 if compact else 20, LIME))
+		explanation.add_child(_label("Resgate seu pacote para celebrar o recebimento. Você não precisará fazer isso novamente.", 12 if compact else 16, MUTED))
+		var redeem := _button("RESGATAR PRESENTES", true)
+		redeem.name = "RedeemGiftBundle"
+		redeem.disabled = _working or owned_count == 0
+		redeem.custom_minimum_size = Vector2(162 if compact else 250, 50)
+		redeem.pressed.connect(_reveal_gifts)
+		reveal_box.add_child(redeem)
+	else:
+		_content.add_child(_label("✓  PRESENTES RECEBIDOS · %d ITENS SALVOS NA SUA CONTA" % owned_count, 15 if compact else 20, LIME))
 	var tabs := HBoxContainer.new()
 	tabs.add_theme_constant_override("separation", 12)
 	_content.add_child(tabs)
@@ -191,13 +213,28 @@ func _add_offer(grid: GridContainer, offer: Dictionary, viewport: Vector2, compa
 	# Skins exigem o protocolo de progresso ampliado; default bloqueado.
 	# O servidor poderá liberar claim_enabled somente após integrar entitlements.
 	var can_claim := bool(offer.get("claim_enabled", _tab == "deck"))
-	var action_text := "✓  RESGATADO" if claimed else ("RESGATAR GRÁTIS" if can_claim else "EM BREVE")
+	var action_text := ("✓  RESGATADO" if _services.rewards.revealed else "INCLUSO NO PACOTE") if claimed else ("RESGATAR GRÁTIS" if can_claim else "EM BREVE")
 	var action := _button(action_text, not claimed and can_claim)
 	action.name = "Claim_" + str(offer.get("id", ""))
 	action.disabled = claimed or _working or not can_claim
 	action.custom_minimum_size.y = 40 if compact else 49
 	action.pressed.connect(_claim.bind(str(offer.get("id", ""))))
 	col.add_child(action)
+
+
+func _reveal_gifts() -> void:
+	if _working or _services == null or _services.rewards.revealed: return
+	_working = true
+	_notice = "Abrindo seus presentes…"
+	_render()
+	var result: Dictionary = await _services.rewards.reveal()
+	_working = false
+	if not is_inside_tree(): return
+	if result.ok and result.data is Dictionary and result.data.get("ok", false) == true:
+		_notice = "PRESENTES RECEBIDOS! Seus decks e skins estão guardados na conta para sempre."
+	else:
+		_notice = "Não foi possível confirmar o recebimento. Os itens continuam garantidos na conta."
+	_render()
 
 
 func _claim(offer_id: String) -> void:

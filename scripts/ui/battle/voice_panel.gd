@@ -14,7 +14,7 @@ func setup(value: PlayerServices) -> void:
     services = value
 
 func _ready() -> void:
-    name = "VoicePanel"
+    # Preserve name supplied by parent (BattleVoice) for scene identity/tests.
     add_theme_stylebox_override("panel", Style.panel(5))
     var root := VBoxContainer.new()
     root.add_theme_constant_override("separation", 3)

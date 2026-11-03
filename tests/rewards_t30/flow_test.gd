@@ -83,11 +83,15 @@ func _run() -> void:
 	check(owned != null and owned.disabled and owned.text == "RESGATADO", "skin possuída confirmada")
 	for resolution: Vector2i in [Vector2i(1920,1080), Vector2i(1672,941),
 		Vector2i(1280,720), Vector2i(844,390), Vector2i(640,360)]:
+		DisplayServer.window_set_size(resolution)
+		root.content_scale_size = resolution
 		root.size = resolution
+		await _frames()
 		overlay._layout()
 		await _frames()
 		var modal := overlay.find_child("RewardWindow", true, false) as Panel
-		var viewport := Vector2(resolution)
+		var viewport := Vector2(root.get_visible_rect().size)
+		print("T30_VIEWPORT ", resolution, " actual=", viewport, " modal=", modal.position, " ", modal.size)
 		check(modal.position.x >= 0 and modal.position.y >= 0 and
 			modal.position.x + modal.size.x <= viewport.x + 1 and
 			modal.position.y + modal.size.y <= viewport.y + 1,

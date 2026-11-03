@@ -19,18 +19,19 @@ func _process(delta: float) -> void:
 	_wait -= delta
 	if _wait > 0.0: return
 	_wait = 0.4
-	if not _enabled:
-		if not OS.has_feature("web"):
-			set_process(false)
-			return
-		_enabled = WebTextBridge.enabled()
-		if not _enabled: return
+	if not OS.has_feature("web"):
+		set_process(false)
+		return
+	# Sem depender de enabled(): basta a página ter a ponte (web/shell.html só cria no celular).
+	var has_bridge: Variant = JavaScriptBridge.eval("!!(window.qseNativeInput && window.qseNativeInput.open)", true)
 	var count := 0
-	for node in get_tree().root.find_children("*", "LineEdit", true, false):
-		var field := node as LineEdit
-		if field.has_meta("qse_native_off"): continue
-		if field.get_node_or_null("WebTextBridge") == null: WebTextBridge.attach(field)
-		count += 1
-	if count != _attached:
-		_attached = count
-		JavaScriptBridge.eval("window.qseBridgeFields = %d" % count, true)
+	var attached := 0
+	if has_bridge == true:
+		for node in get_tree().root.find_children("*", "LineEdit", true, false):
+			var field := node as LineEdit
+			if field.has_meta("qse_native_off") or not field.is_visible_in_tree(): continue
+			count += 1
+			if field.get_node_or_null("WebTextBridge") == null: WebTextBridge.attach(field, true)
+			if field.get_node_or_null("WebTextBridge") != null: attached += 1
+	# Diagnóstico: o que o jogo vê, sempre (inclusive zero).
+	JavaScriptBridge.eval("window.qseBridgeFields = '%d/%d (ponte %s)'" % [attached, count, str(has_bridge)], true)

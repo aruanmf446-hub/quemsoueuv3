@@ -1,5 +1,5 @@
 -- T30: Diva Pop como QUINTO deck e nova campanha individual.
--- Só aplicar após upload das dez imagens para não apresentar oferta sem arte.
+-- Já aplicado ao GAME; a UI Godot bloqueia anúncio/recibo antes do upload das dez imagens.
 begin;
 insert into qse_v3.duel_decks(id,name,card_ids,sort_order)
 values('diva_pop','Diva Pop',ARRAY['diva_pop/carta_01','diva_pop/carta_02','diva_pop/carta_03','diva_pop/carta_04','diva_pop/carta_05','diva_pop/carta_06','diva_pop/carta_07','diva_pop/carta_08','diva_pop/carta_09','diva_pop/carta_10']::text[],4)

@@ -246,7 +246,8 @@ func run() -> void:
 	await settle()
 	# Chat da SALA (DUEL_ROOM_CHAT_API_V1) com transporte simulado. Sem tokens nem rede.
 	var chat: Control=battle.find_child("BattleChat",true,false)
-	check(chat.find_child("ChatStatus",true,false).text.contains("partida local") and not chat.find_child("ChatInput",true,false).editable,"room_chat_unavailable_in_local_match")
+	# Decisão do dono: na partida local o chat aparece (mensagens só neste aparelho).
+	check(chat.find_child("ChatStatus",true,false).text.contains("Partida local") and chat.find_child("ChatInput",true,false).editable,"room_chat_local_only_device")
 	check(chat.find_child("ChatFriend",true,false)==null or not chat.find_child("ChatFriend",true,false).visible,"battle_chat_is_not_friend_chat")
 	services.session.user={"id":ME}
 	services.session._expires_at=Time.get_unix_time_from_system()+3600
@@ -279,12 +280,16 @@ func run() -> void:
 	await settle()
 	check(services.room_chat.messages("room-"+room_id).is_empty() and not services.room_chat.is_open(),"room_access_denied_hides_and_stops")
 	check(chat.get("_rendered").is_empty(),"room_access_denied_clears_bubbles")
-	services.duel.mode="local"
 	services.session.user={}
 	services.client.access_token=""
 	chat.call("refresh_availability")
 	await settle()
 	check(not input.editable,"logout_blocks_composer")
+	# Partida local: o chat (só no aparelho) segue disponível sem conta.
+	services.duel.mode="local"
+	chat.call("refresh_availability")
+	await settle()
+	check(input.editable,"local_chat_without_account")
 	# Presentation fixtures cover finished/winner and spectator without changing rules.
 	services.duel.room = real_data.duplicate(true)
 	services.duel.room.match.phase = "finished"

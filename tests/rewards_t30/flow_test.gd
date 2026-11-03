@@ -91,7 +91,8 @@ func _run() -> void:
 	check(overlay.find_child("RedeemGiftBundle", true, false) == null, "pacote revelado não pede resgate novamente")
 	check(overlay.find_child("GiftsReceived", true, false) != null, "estado resgatado acessível")
 	var owned := overlay.find_child("Claim_skin_cowboy", true, false) as Button
-	check(owned != null and owned.disabled and owned.text == "RESGATADO", "skin possuída confirmada")
+	# Decisão do dono: skin já resgatada (pacote aberto) sai de Novidades.
+	check(owned == null, "skin possuída confirmada some de Novidades")
 	for resolution: Vector2i in [Vector2i(1920,1080), Vector2i(1672,941),
 		Vector2i(1280,720), Vector2i(844,390), Vector2i(640,360)]:
 		DisplayServer.window_set_size(resolution)
@@ -142,23 +143,13 @@ func _run() -> void:
 	services.rewards.changed.emit()
 	await _frames()
 	container = overlay.find_child("RewardOffers", true, false) as GridContainer
-	check(container.get_child_count() == 5, "catálogo real: cinco decks, incluindo Diva Pop")
-	var past_claim := overlay.find_child("Claim_deck_lendas_urbanas", true, false) as Button
-	check(past_claim != null and past_claim.disabled and past_claim.text == "RESGATADO", "presente de campanha anterior mantém posse")
+	# Decisão do dono: Novidades mostra só o que ainda falta receber. Presentes de campanhas
+	# anteriores (já resgatados) somem; fica apenas a campanha atual (Diva Pop) a abrir.
+	check(container.get_child_count() == 1, "só a campanha atual pendente (Diva Pop)")
+	check(overlay.find_child("Claim_deck_lendas_urbanas", true, false) == null, "presente de campanha anterior não aparece mais")
 	var new_claim := overlay.find_child("Claim_deck_diva_pop", true, false) as Button
 	check(new_claim != null and new_claim.disabled and new_claim.text == "INCLUSO NO PACOTE", "campanha atual preserva ação de revelação")
-	check(container.get_child(0).name == "Offer_deck_diva_pop", "ordenação inicial por data real mais recente")
-	var sorter := overlay.find_child("RewardSort", true, false) as OptionButton
-	check(sorter != null, "ordenar somente quando datas reais disponíveis")
-	sorter.item_selected.emit(1)
-	await _frames()
-	container = overlay.find_child("RewardOffers", true, false) as GridContainer
-	check(container.get_child(0).name != "Offer_deck_diva_pop", "ordenação mais antiga funcional")
-	skin = overlay.find_child("TabSkin", true, false) as Button
-	skin.pressed.emit()
-	await _frames()
-	container = overlay.find_child("RewardOffers", true, false) as GridContainer
-	check(container.get_child_count() == 7, "sete skins iniciais presentes no inventário real")
+	check(overlay.find_child("TabSkin", true, false) == null, "aba de skins some quando não há skin pendente")
 	services.rewards.state = "loading"
 	services.rewards.changed.emit()
 	await _frames()

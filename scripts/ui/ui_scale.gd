@@ -37,7 +37,7 @@ static func is_handheld() -> bool:
 const IPHONE_BASE := Vector2i(1138, 640)
 ## Piso de legibilidade no iPhone (px de design): ~9,5 pt no 13 mini e ~11 pt no Pro Max.
 ## Só textos menores sobem; os maiores ficam como estão.
-const IPHONE_MIN_FONT := 18
+const IPHONE_MIN_FONT := 21
 static var _iphone := -1
 
 static func is_iphone() -> bool:

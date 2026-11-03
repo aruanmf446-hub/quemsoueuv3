@@ -71,7 +71,8 @@ function assemble(build) { execSync(`python3 tests/web_pwa/assemble.py ${site}/q
   check(sent === true, 'iOS detectado (ponte de teclado ativa)');
   // iPhone: jogo dentro da área segura (faixa do topo preta, canvas no tamanho útil).
   const safe = await phone.evaluate(() => { const c = document.getElementById('canvas'); const r = c.getBoundingClientRect(); return {top: r.top, h: r.height, w: r.width, px: c.width, iphone: window.qsePwa.iphone, safe: !!window.qsePwa.safe, bg: getComputedStyle(document.body).backgroundColor}; });
-  check(safe.iphone && safe.safe && safe.top >= 16 && Math.abs(safe.h - (390 - safe.top)) < 2, `iPhone: canvas abaixo da faixa do topo e na área útil ${JSON.stringify(safe)}`);
+  // Sem área segura informada (emulação), o iPhone com notch deitado usa a reserva: 62 pt nas laterais e 21 embaixo.
+  check(safe.iphone && safe.safe && safe.top >= 16 && Math.abs(safe.h - (390 - safe.top - 21)) < 2 && Math.abs(safe.w - (844 - 124)) < 2, `iPhone: canvas abaixo da faixa do topo, fora do notch e na área útil ${JSON.stringify(safe)}`);
   check(safe.bg === 'rgb(0, 0, 0)', 'iPhone: faixas fora da área segura são pretas');
   const desk = await page.evaluate(() => { const r = document.getElementById('canvas').getBoundingClientRect(); return {top: r.top, iphone: window.qsePwa.iphone}; });
   check(desk.top === 0 && desk.iphone === false, 'computador: canvas na tela inteira (nada muda)');

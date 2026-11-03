@@ -45,6 +45,20 @@ func _run() -> void:
 	await settle()
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png("%s/%s_%dj_%s.png" % [args[0], args[3], players, args[1]])
+	if args.size() > 4 and args[4] in ["reveal", "reveal_none"]:
+		# Revelação animada (FIXTURE DE TESTE): 2 perdem vida e 1 é eliminado, ou ninguém.
+		var match_players: Array = services.duel.match().players
+		var hits: Array = [] if args[4] == "reveal_none" else [
+			{"member_id": match_players[0].member_id, "eliminated": false},
+			{"member_id": match_players[1].member_id, "eliminated": false},
+			{"member_id": match_players[2].member_id, "eliminated": true}]
+		battle._show_reveal(str(pool[5].card_id), hits)
+		await create_timer(2.4).timeout
+		await RenderingServer.frame_post_draw
+		root.get_texture().get_image().save_png("%s/%s_%s_%s.png" % [args[0], args[3], args[4], args[1]])
+		print("CAPTURED")
+		quit(0)
+		return
 	if args.size() > 4 and args[4] == "zoom":
 		var first := battle.find_child("Private_*", true, false)
 		var thumbs := battle.find_children("Private_*", "", true, false)

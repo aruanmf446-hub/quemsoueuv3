@@ -293,11 +293,16 @@ const GODOT_CONFIG = $GODOT_CONFIG;
 		if (a && a.tagName === 'INPUT' && last) return;
 		const cs = getComputedStyle(probe);
 		const t = Math.max(parseFloat(cs.paddingTop) || 0, TOP_MIN);
-		const r = parseFloat(cs.paddingRight) || 0, b = parseFloat(cs.paddingBottom) || 0, l = parseFloat(cs.paddingLeft) || 0;
+		let r = parseFloat(cs.paddingRight) || 0, b = parseFloat(cs.paddingBottom) || 0, l = parseFloat(cs.paddingLeft) || 0;
+		// Reserva: se o iOS não informar a área segura (ex.: logo após girar), iPhones com notch /
+		// Dynamic Island (lado maior >= 812 pt) deitados usam 62 pt nas laterais e 21 embaixo.
+		const longSide = Math.max(screen.width, screen.height);
+		if (window.innerWidth > window.innerHeight && longSide >= 812 && l < 1 && r < 1) { l = 62; r = 62; b = Math.max(b, 21); }
 		const w = Math.max(1, window.innerWidth - l - r), h = Math.max(1, window.innerHeight - t - b);
 		const dpr = window.devicePixelRatio || 1;
 		const key = [t, r, b, l, w, h, dpr].join(',');
-		if (key === last) return;
+		// O motor pode mexer no estilo do canvas: reaplica também se o canvas saiu do lugar.
+		if (key === last && canvas.style.left === l + 'px' && canvas.style.top === t + 'px' && canvas.width === Math.round(w * dpr)) return;
 		last = key;
 		canvas.style.position = 'fixed';
 		canvas.style.left = l + 'px'; canvas.style.top = t + 'px';

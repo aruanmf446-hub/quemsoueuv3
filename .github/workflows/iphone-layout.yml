@@ -1,0 +1,44 @@
+name: iPhone layout (todos os modelos)
+# A cada mudança de interface: guarda de layout em todos os iPhones de tests/iphone/models.txt
+# e capturas reais de todas as telas por modelo (anexadas ao run). Ver docs/layout/README_IPHONE.md.
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths: ['scripts/**', 'scenes/**', 'web/**', 'assets/ui/**', 'data/ui/**', 'project.godot', 'tests/iphone/**', '.github/workflows/iphone-layout.yml']
+  push:
+    branches: [main]
+    paths: ['scripts/**', 'scenes/**', 'web/**', 'assets/ui/**', 'data/ui/**', 'project.godot', 'tests/iphone/**']
+permissions:
+  contents: read
+jobs:
+  iphone:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Godot 4.7.2 oficial
+        run: |
+          mkdir -p "$RUNNER_TEMP/godot"
+          curl --fail --location --retry 2 https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip -o "$RUNNER_TEMP/godot/engine.zip"
+          unzip -q "$RUNNER_TEMP/godot/engine.zip" -d "$RUNNER_TEMP/godot"
+          chmod +x "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+          "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --import >/dev/null 2>&1 || true
+      - name: Guarda de layout em todos os iPhones
+        run: xvfb-run -a "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --path . --script res://tests/iphone/layout_guard.gd -- --iphone 2>&1 | tee "$RUNNER_TEMP/guard.log" | grep -E "IPHONE_"; grep -q "failures=0" "$RUNNER_TEMP/guard.log"
+      - name: Capturas de todas as telas por modelo
+        if: always()
+        run: |
+          G="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+          OUT="$RUNNER_TEMP/iphone"
+          GODOT="$G" tests/iphone/capture_models.sh "$OUT"
+          grep -v '^#' tests/iphone/models.txt | awk 'NF{print $1, $NF}' | while read -r n r; do
+            xvfb-run -a "$G" --path . --script res://tests/iphone/capture_news.gd -- "$OUT/$n" "$r" --iphone >/dev/null 2>&1 || true
+            xvfb-run -a "$G" --path . --script res://tests/ios_t24/battle_capture.gd -- "$OUT/$n" "$r" 12 batalha --iphone >/dev/null 2>&1 || true
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iphone-todos-os-modelos
+          path: ${{ runner.temp }}/iphone
+          retention-days: 14

@@ -124,6 +124,10 @@ func _card(card_index: int) -> Control:
 	image.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	image.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	frame.add_child(image)
+	# Fotos editoriais remotas: a imagem original acompanha como fallback.
+	var service: EditorContentService = PlayerServices.current.editor_content if PlayerServices.current != null else null
+	if service != null:
+		service.attach_cover(image, str(data.get("cover_path", "")))
 	var tint := ColorRect.new()
 	tint.name = "Tint"
 	tint.color = Color(0.015, 0.026, 0.05, 0.27)

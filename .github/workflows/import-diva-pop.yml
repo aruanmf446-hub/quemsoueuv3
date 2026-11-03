@@ -1,0 +1,42 @@
+name: Importar pacote Diva Pop
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'assets/duel/decks/oficial/diva_pop/UPLOAD_DIVA_POP.zip'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  unpack:
+    if: github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Validar e extrair as dez cartas PNG
+        run: python3 tools/duel/import_diva_pop_zip.py
+      - name: Atualizar seed do Duelo e publicar imagens na main
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/duel/sync_decks.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- assets/duel/decks/oficial/diva_pop supabase/seed/duel_decks.sql
+          git commit -m "assets(diva-pop): importar dez cartas oficiais em PNG"
+          git push origin HEAD:main
+      - name: Solicitar validação do Godot e publicação do Pages
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run godot-smoke.yml --ref main
+          gh workflow run deploy-web.yml --ref main

@@ -405,7 +405,8 @@ func _render_players() -> void:
 		players.insert(floori(players.size()/2.0),local)
 	_roster.columns = maxi(players.size(),1) if players.size() <= 5 else ceili(players.size()/(2.0 if players.size() <= 12 else 3.0))
 	_roster.size_flags_horizontal = Control.SIZE_SHRINK_CENTER if players.size() <= 3 else Control.SIZE_EXPAND_FILL
-	_roster.custom_minimum_size.y = 57 if players.size() <= 5 else (64 if players.size() <= 12 else 91)
+	# T24 iOS: linhas um pouco mais altas para retrato/nome/vidas legíveis (largura já sobrava).
+	_roster.custom_minimum_size.y = 57 if players.size() <= 5 else (80 if players.size() <= 12 else 99)
 	var winners: Array = (_data.result if _data.get("result") is Dictionary else {}).get("winners",[])
 	for source: Dictionary in players:
 		var player := source.duplicate(true)
@@ -418,7 +419,7 @@ func _render_players() -> void:
 		var turn: bool = str(player.member_id) == str(_data.get("turn_member","")) and _data.phase in ["turns","reveal"] and not _closed() and not player.eliminated
 		var winner: bool = winners.has(player.member_id) and _data.phase == "finished"
 		var panel := Surface.new()
-		panel.padding = 3
+		panel.padding = 3 if players.size() <= 5 else 1
 		panel.variant = "player"
 		panel.active = (turn or winner) and not player.eliminated
 		panel.name = "Player_" + str(player.member_id)
@@ -431,7 +432,7 @@ func _render_players() -> void:
 		_roster.add_child(panel)
 		var row := PlayerUI.row(panel)
 		row.add_theme_constant_override("separation",3)
-		var portrait := PlayerUI.portrait(str(player.skin_id),46 if players.size() <= 3 else (32 if players.size() <= 5 else (28 if players.size() <= 12 else 22)))
+		var portrait := PlayerUI.portrait(str(player.skin_id),46 if players.size() <= 3 else (32 if players.size() <= 5 else (36 if players.size() <= 12 else 28)))
 		if players.size() <= 5:
 			# Wider upper-bust crop from the packaged 720px portrait, preserving aspect.
 			# This increases the face size inside the same top strip, without a new layout.
@@ -446,6 +447,18 @@ func _render_players() -> void:
 			portrait.pivot_offset = Vector2(width*0.5,height)
 			# O retrato "sai" do cartão; o jogador da vez se destaca mais.
 			portrait.scale = Vector2.ONE*(1.24 if turn or winner else 1.1)
+		elif portrait.texture != null:
+			# T24 iOS: 6–20 jogadores — recorte do busto (rosto maior) no mesmo espaço da linha.
+			var bust := AtlasTexture.new()
+			var full: Texture2D = portrait.texture
+			bust.atlas = full
+			bust.region = Rect2(full.get_width()*0.14,0,full.get_width()*0.72,full.get_height()*0.58)
+			portrait.texture = bust
+			var side := 36.0 if players.size() <= 12 else 28.0
+			portrait.custom_minimum_size = Vector2(side*1.15,side)
+			portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+			portrait.clip_contents = true
 		var grading := ShaderMaterial.new()
 		grading.shader = preload("res://scripts/ui/battle/battle_illustration.gdshader")
 		grading.set_shader_parameter("saturation",0.0 if player.eliminated else 1.04)
@@ -455,7 +468,7 @@ func _render_players() -> void:
 		var info := PlayerUI.column(row)
 		info.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		info.add_theme_constant_override("separation",0)
-		var nickname := Style.label(str(player.nickname),16 if players.size() <= 3 else (14 if players.size() <= 5 else (12 if players.size() <= 12 else 11)),PlayerUI.GOLD if turn else PlayerUI.TEXT)
+		var nickname := Style.label(str(player.nickname),16 if players.size() <= 3 else (14 if players.size() <= 5 else (15 if players.size() <= 12 else 13)),PlayerUI.GOLD if turn else PlayerUI.TEXT)
 		Style.strong(nickname)
 		nickname.text = str(player.nickname)
 		nickname.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
@@ -469,23 +482,27 @@ func _render_players() -> void:
 		for index in range(0 if uncertain else (int(player.lives) if players.size() <= 3 else 1)):
 			var heart := TextureRect.new()
 			heart.texture = Icons.heart(18,true)
-			heart.custom_minimum_size = Vector2(16,16) if players.size() <= 3 else Vector2(12,12)
+			heart.custom_minimum_size = Vector2(16,16) if players.size() <= 3 else (Vector2(12,12) if players.size() <= 5 else (Vector2(16,16) if players.size() <= 12 else Vector2(14,14)))
 			heart.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			heart.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			hearts.add_child(heart)
-		if players.size() > 3 and not uncertain: hearts.add_child(Style.label(str(player.lives),12))
+		if players.size() > 3 and not uncertain:
+			var count := Style.label(str(player.lives),12 if players.size() <= 5 else (16 if players.size() <= 12 else 14),Color("#ff9a8f") if int(player.lives) <= 1 else PlayerUI.TEXT)
+			count.name = "Lives"
+			Style.strong(count)
+			hearts.add_child(count)
 		if uncertain: info.add_child(Style.label("REVELANDO…",9,PlayerUI.MUTED))
 		elif player.eliminated:
 			nickname.add_theme_color_override("font_color",PlayerUI.MUTED)
 			portrait.modulate = Color("#555967")
-			info.add_child(Style.label("ELIMINADO",9,PlayerUI.MUTED))
+			info.add_child(Style.label("ELIMINADO",9 if players.size() <= 5 else 11,PlayerUI.MUTED))
 		elif winner: info.add_child(Style.label("VITÓRIA",10,PlayerUI.GOLD))
 		elif turn and players.size() <= 5:
 			var badge := PlayerUI.pill("NA VEZ","equipped")
 			badge.name = "TurnBadge"
 			badge.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 			info.add_child(badge)
-		elif _data.phase == "selection" and player.confirmed: info.add_child(Style.label("PRONTO",9,PlayerUI.GOLD))
+		elif _data.phase == "selection" and player.confirmed: info.add_child(Style.label("PRONTO",9 if players.size() <= 5 else 11,PlayerUI.GOLD))
 		var previous := int(_last_lives.get(player.member_id,player.lives))
 		if int(player.lives) < previous:
 			portrait.modulate = Color("#ff766b")

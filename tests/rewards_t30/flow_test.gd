@@ -109,6 +109,45 @@ func _run() -> void:
 	await _frames()
 	check(overlay.find_child("OtherNews", true, false) == null and overlay.find_child("RewardWindow", true, false) != null,
 		"ao fechar notícias, os presentes permanecem")
+	# T30 leitura histórica: 4 decks + 7 skins da T29, somados ao Diva Pop atual.
+	services.rewards.offers.clear()
+	for item_id: String in ["lendas_urbanas", "nostalgia_web", "sol_nascente", "pinturas", "diva_pop"]:
+		var record := _make_offer("deck_" + item_id, "deck", item_id, true)
+		record["campaign_id"] = "diva_pop_2026" if item_id == "diva_pop" else "decks_oficiais_2026"
+		record["created_at"] = "2026-11-03T10:00:00Z" if item_id == "diva_pop" else "2026-10-20T10:00:00Z"
+		record["revealed"] = false
+		services.rewards.offers.append(record)
+	for skin_id: String in ["cowboy", "michelly", "rodrigo", "lorena", "gus", "lana", "halloween"]:
+		var record := _make_offer("skin_" + skin_id, "skin", skin_id, true)
+		record["campaign_id"] = "decks_oficiais_2026"
+		record["created_at"] = "2026-10-20T10:00:00Z"
+		record["revealed"] = false
+		services.rewards.offers.append(record)
+	services.rewards.campaign = {"id": "diva_pop_2026", "title": "Diva Pop", "subtitle":"Oficial"}
+	services.rewards.revealed = false
+	services.rewards.inventory_state = "success"
+	services.rewards.state = "success"
+	overlay._tab = "deck"
+	services.rewards.changed.emit()
+	await _frames()
+	container = overlay.find_child("RewardOffers", true, false) as GridContainer
+	check(container.get_child_count() == 5, "catálogo real: cinco decks, incluindo Diva Pop")
+	var past_claim := overlay.find_child("Claim_deck_lendas_urbanas", true, false) as Button
+	check(past_claim != null and past_claim.disabled and past_claim.text == "RESGATADO", "presente de campanha anterior mantém posse")
+	var new_claim := overlay.find_child("Claim_deck_diva_pop", true, false) as Button
+	check(new_claim != null and new_claim.disabled and new_claim.text == "INCLUSO NO PACOTE", "campanha atual preserva ação de revelação")
+	check(container.get_child(0).name == "Offer_deck_diva_pop", "ordenação inicial por data real mais recente")
+	var sorter := overlay.find_child("RewardSort", true, false) as OptionButton
+	check(sorter != null, "ordenar somente quando datas reais disponíveis")
+	sorter.item_selected.emit(1)
+	await _frames()
+	container = overlay.find_child("RewardOffers", true, false) as GridContainer
+	check(container.get_child(0).name != "Offer_deck_diva_pop", "ordenação mais antiga funcional")
+	skin = overlay.find_child("TabSkin", true, false) as Button
+	skin.pressed.emit()
+	await _frames()
+	container = overlay.find_child("RewardOffers", true, false) as GridContainer
+	check(container.get_child_count() == 7, "sete skins iniciais presentes no inventário real")
 	services.rewards.state = "loading"
 	services.rewards.changed.emit()
 	await _frames()

@@ -17,6 +17,12 @@ var image: TextureRect
 var caption: Label
 var caption_area: Control
 var _source: Texture2D
+
+## O GridContainer define as dimensões de cada carta conforme o viewport.
+## Não permitir que o nome completo ou a imagem imponham largura mínima própria:
+## era isso que congelava a antiga largura ao mudar de 844 para 640 px.
+func _get_minimum_size() -> Vector2:
+	return Vector2.ZERO
 func setup(card_id: String, chosen: bool, out: bool, usable: bool) -> void:
 	id = card_id
 	selected = chosen

@@ -46,6 +46,20 @@ func _run() -> void:
 	var owned := overlay.find_child("Claim_deck_pinturas", true, false) as Button
 	check(claim != null and not claim.disabled and claim.text == "RESGATAR GRÁTIS", "botão gratuito ativo")
 	check(owned != null and owned.disabled and owned.text.contains("RESGATADO"), "resgatado sem novo clique")
+	# T29: presentes já garantidos e uma única abertura cerimonial.
+	services.rewards.revealed = false
+	services.rewards.changed.emit()
+	await process_frame
+	var gift_button := overlay.find_child("RedeemGiftBundle", true, false) as Button
+	check(gift_button != null and not gift_button.disabled, "primeira entrada permite resgatar o pacote uma vez")
+	owned = overlay.find_child("Claim_deck_pinturas", true, false) as Button
+	check(owned != null and owned.disabled and owned.text == "INCLUSO NO PACOTE", "item já pertence à conta antes de abrir")
+	services.rewards.revealed = true
+	services.rewards.changed.emit()
+	await process_frame
+	check(overlay.find_child("RedeemGiftBundle", true, false) == null, "nunca pedir resgate de novo após abrir")
+	owned = overlay.find_child("Claim_deck_pinturas", true, false) as Button
+	check(owned != null and owned.disabled and owned.text.contains("RESGATADO"), "reabertura mostra posse permanente")
 	check(overlay.find_child("CloseNews", true, false) != null, "botão fechar acessível")
 	var skin := overlay.find_child("TabSkin", true, false) as Button
 	check(skin != null, "aba skins preparada")

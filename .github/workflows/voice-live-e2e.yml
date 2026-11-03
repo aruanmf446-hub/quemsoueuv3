@@ -1,0 +1,56 @@
+name: T32 LiveKit real-account E2E
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "tools/e2e/voice_livekit_e2e.py"
+      - "tools/e2e/voice_browser_e2e.cjs"
+      - ".github/workflows/voice-live-e2e.yml"
+      - "supabase/game/functions/qse-voice-token/index.ts"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: t32-voice-live-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  voice-e2e:
+    # Never expose production account secrets to forked pull requests.
+    if: >-
+      ${{ github.event.pull_request.head.repo.full_name == github.repository
+          && github.head_ref == 'work/livekit-voice-t32' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Prepare pinned local WebRTC test dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix tools/e2e --no-save --no-package-lock --ignore-scripts --no-audit --no-fund \
+            livekit-client@2.15.6 esbuild@0.25.12 playwright-core@1.56.0
+          mkdir -p "$RUNNER_TEMP/voice-e2e"
+          tools/e2e/node_modules/.bin/esbuild web/voice/livekit_adapter.js \
+            --bundle --minify --format=iife --outfile="$RUNNER_TEMP/voice-e2e/livekit.js"
+          node --check "$RUNNER_TEMP/voice-e2e/livekit.js"
+          command -v google-chrome || command -v google-chrome-stable
+      - name: Three-account GAME authorization and LiveKit WebRTC Chrome E2E
+        shell: bash
+        env:
+          QSE_TEST_OWNER_EMAIL: ${{ secrets.QSE_TEST_OWNER_EMAIL }}
+          QSE_TEST_OWNER_PASSWORD: ${{ secrets.QSE_TEST_OWNER_PASSWORD }}
+          QSE_TEST_R1_EMAIL: ${{ secrets.QSE_TEST_R1_EMAIL }}
+          QSE_TEST_R1_PASSWORD: ${{ secrets.QSE_TEST_R1_PASSWORD }}
+          QSE_TEST_READER_EMAIL: ${{ secrets.QSE_TEST_READER_EMAIL }}
+          QSE_TEST_READER_PASSWORD: ${{ secrets.QSE_TEST_READER_PASSWORD }}
+          QSE_VOICE_BUNDLE: ${{ runner.temp }}/voice-e2e/livekit.js
+          QSE_RUN_VOICE_BROWSER: "1"
+        run: |
+          set -euo pipefail
+          python3 tools/e2e/voice_livekit_e2e.py

@@ -26,7 +26,7 @@ func _process(delta: float) -> void:
 	var has_bridge: Variant = JavaScriptBridge.eval("!!(window.qseNativeInput && window.qseNativeInput.open)", true)
 	var count := 0
 	var attached := 0
-	if has_bridge == true:
+	if UIScale.js_true(has_bridge):
 		for node in get_tree().root.find_children("*", "LineEdit", true, false):
 			var field := node as LineEdit
 			if field.has_meta("qse_native_off") or not field.is_visible_in_tree(): continue

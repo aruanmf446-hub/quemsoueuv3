@@ -159,7 +159,7 @@ func _auth_redirect_ready() -> void:
 	# O convite nao pode ser descartado por uma volta antecipada ao lobby.
 	if OS.has_feature("web"):
 		var has_invite: Variant = JavaScriptBridge.eval("new URLSearchParams(window.location.search).has('invite')")
-		_web_invite_intent.capture(has_invite == true)
+		_web_invite_intent.capture(UIScale.js_true(has_invite))
 	_resume_web_invite()
 	if _services.session.authenticated() and not _web_invite_intent.pending:
 		_finish_startup_login.call_deferred()

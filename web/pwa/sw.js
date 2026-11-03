@@ -69,6 +69,8 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;               // Supabase, OAuth, CDNs: rede
   const scope = new URL(self.registration.scope);
   if (!url.pathname.startsWith(scope.pathname)) return;
+  // /bots é outro aplicativo: não devolver index.html do Godot nas navegações do painel.
+  if (url.pathname.slice(scope.pathname.length).startsWith("bots/")) return;
   if (url.search && request.mode !== "navigate") return;           // respostas com parâmetros: rede
   const path = url.pathname.slice(scope.pathname.length) || "index.html";
   if (request.mode === "navigate") {

@@ -172,6 +172,14 @@ func _add_offer(grid: GridContainer, offer: Dictionary, viewport: Vector2, compa
 		art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		art.custom_minimum_size.y = 78 if compact else 160
 		col.add_child(art)
+	elif _tab == "skin":
+		# Prévia futura: a skin só aparece na loja quando tiver oferta oficial ativa.
+		# Falta integrar o desbloqueio ao snapshot GAME; nunca declarar posse local.
+		var portrait := PlayerUI.portrait(item_id, 78 if compact else 160)
+		portrait.name = "RewardSkinPreview"
+		portrait.custom_minimum_size.y = 78 if compact else 160
+		portrait.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		col.add_child(portrait)
 	col.add_child(_label("GRÁTIS   ·   OFICIAL", 12 if compact else 14, LIME))
 	var name := _label(str(offer.get("title", "Coleção")), 16 if compact else 22, Color.WHITE)
 	name.max_lines_visible = 2
@@ -180,9 +188,13 @@ func _add_offer(grid: GridContainer, offer: Dictionary, viewport: Vector2, compa
 	info.max_lines_visible = 2 if compact else 3
 	col.add_child(info)
 	var claimed := bool(offer.get("claimed", false))
-	var action := _button("✓  RESGATADO" if claimed else "RESGATAR GRÁTIS", not claimed)
+	# Skins exigem o protocolo de progresso ampliado; default bloqueado.
+	# O servidor poderá liberar claim_enabled somente após integrar entitlements.
+	var can_claim := bool(offer.get("claim_enabled", _tab == "deck"))
+	var action_text := "✓  RESGATADO" if claimed else ("RESGATAR GRÁTIS" if can_claim else "EM BREVE")
+	var action := _button(action_text, not claimed and can_claim)
 	action.name = "Claim_" + str(offer.get("id", ""))
-	action.disabled = claimed or _working
+	action.disabled = claimed or _working or not can_claim
 	action.custom_minimum_size.y = 40 if compact else 49
 	action.pressed.connect(_claim.bind(str(offer.get("id", ""))))
 	col.add_child(action)

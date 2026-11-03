@@ -1,5 +1,6 @@
 class_name NewsOverlay
 extends CanvasLayer
+const DeckCatalog = preload("res://scripts/decks/deck_library_catalog.gd")
 ## Central de novidades e resgates gratuitos. A campanha é lida do GAME e a
 ## leitura é registrada por conta; nunca apresenta o mesmo anúncio a cada login.
 const BLUE := Color("#0b1022")
@@ -54,6 +55,8 @@ func _load() -> void:
 	if not is_inside_tree(): return
 	_render()
 	if _services.rewards.state == "success" and not _services.rewards.seen:
+		# Antes do upload das artes, manter a notícia pendente para a primeira abertura real.
+		if str(_services.rewards.campaign.get("id", "")) == "diva_pop_2026" and DeckCatalog.find_deck("diva_pop").is_empty(): return
 		_services.rewards.mark_seen.call_deferred()
 
 
@@ -100,6 +103,10 @@ func _render() -> void:
 		return
 	if rewards.campaign.is_empty():
 		_content.add_child(_label("Nenhuma campanha ativa por enquanto. Quando houver novidades, elas aparecerão aqui.", 20, MUTED))
+		_add_other_news()
+		return
+	if str(rewards.campaign.get("id", "")) == "diva_pop_2026" and DeckCatalog.find_deck("diva_pop").is_empty():
+		_content.add_child(_label("O lançamento Diva Pop está em preparação. Seus presentes já estão garantidos, mas as dez cartas serão exibidas após a publicação das imagens.", 18, MUTED))
 		_add_other_news()
 		return
 	var hero := HBoxContainer.new()

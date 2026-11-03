@@ -66,6 +66,22 @@ func _ready() -> void:
 	_callbacks = [JavaScriptBridge.create_callback(_on_input), JavaScriptBridge.create_callback(_on_submit), JavaScriptBridge.create_callback(_on_close)]
 	_bridge.bind(_id, _callbacks[0], _callbacks[1], _callbacks[2])
 	field.text_changed.connect(func(text: String) -> void: if _bridge != null: _bridge.setText(_id, text))
+	# Toque/foco no campo do jogo abre a caixa de digitação nativa (web/shell.html).
+	field.focus_entered.connect(_open_native)
+	field.gui_input.connect(func(event: InputEvent) -> void:
+		if (event is InputEventScreenTouch and not event.pressed) or (event is InputEventMouseButton and not event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
+			_open_native())
+
+
+func _open_native() -> void:
+	if _bridge == null or not field.editable or not field.is_visible_in_tree(): return
+	_publish(true)
+	_bridge.open(_id)
+
+
+func _publish(force: bool) -> void:
+	if force: _last = ""
+	_process(0.0)
 
 
 func _process(_delta: float) -> void:

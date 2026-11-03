@@ -4,9 +4,16 @@ on:
   workflow_dispatch:
     inputs:
       stage:
-        description: "publish | community | finish | cleanup | voice"
+        description: "Etapa: para testar o LiveKit selecione VOICE"
         required: true
-        default: publish
+        type: choice
+        options:
+          - voice
+          - publish
+          - community
+          - finish
+          - cleanup
+        default: voice
       upload_order:
         description: "files_first (como o jogo) | cards_first"
         required: false
@@ -24,6 +31,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Validar etapa solicitada
+        shell: bash
+        env:
+          STAGE: ${{ inputs.stage }}
+        run: |
+          case "$STAGE" in
+            voice|publish|community|finish|cleanup) echo "Etapa selecionada: $STAGE" ;;
+            *) echo "::error::Etapa invalida. Selecione voice para testar o LiveKit." ; exit 1 ;;
+          esac
       - name: Etapa ${{ inputs.stage }}
         if: ${{ inputs.stage != 'voice' }}
         env:

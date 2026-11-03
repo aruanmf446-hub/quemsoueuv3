@@ -619,6 +619,14 @@ func _layout() -> void:
 	var side_width := _utility_width(width)
 	_main.position = Vector2.ZERO
 	_main.size = Vector2(width-side_width-20,_canvas.size.y)
+	# O roster de até três jogadores não pode manter larguras mínimas do
+	# viewport anterior (causa recorte lateral ao reduzir para 640×360).
+	var player_count := _roster.get_child_count()
+	if player_count > 0 and player_count <= 3:
+		var roster_gap := float(_roster.get_theme_constant("h_separation"))
+		var slot_width := maxf(48.0,floorf((_main.size.x-(player_count-1)*roster_gap)/player_count)-2.0)
+		for panel: Control in _roster.get_children():
+			panel.custom_minimum_size.x = slot_width
 	_side.position = Vector2(width-side_width,0)
 	_side.size = Vector2(side_width,_canvas.size.y)
 	if is_instance_valid(_notice):

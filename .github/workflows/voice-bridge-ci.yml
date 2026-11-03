@@ -1,0 +1,33 @@
+name: T32 LiveKit Web bridge checks
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'web/voice/**'
+      - '.github/workflows/voice-bridge-ci.yml'
+      - '.github/workflows/deploy-web.yml'
+      - 'web/shell.html'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  voice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Bundle local LiveKit client
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix web/voice --no-save --no-package-lock --ignore-scripts --no-audit --no-fund livekit-client@2.15.6 esbuild@0.25.12
+          mkdir -p build/web/voice
+          web/voice/node_modules/.bin/esbuild web/voice/livekit_adapter.js --bundle --minify --format=iife --outfile=build/web/voice/livekit.js
+          node --check build/web/voice/livekit.js
+          test -s build/web/voice/livekit.js
+          grep -q 'src="voice/livekit.js"' web/shell.html

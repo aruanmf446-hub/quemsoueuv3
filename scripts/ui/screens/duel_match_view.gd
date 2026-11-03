@@ -405,7 +405,8 @@ func _render_players() -> void:
 		players.insert(floori(players.size()/2.0),local)
 	_roster.columns = maxi(players.size(),1) if players.size() <= 5 else ceili(players.size()/(2.0 if players.size() <= 12 else 3.0))
 	_roster.size_flags_horizontal = Control.SIZE_SHRINK_CENTER if players.size() <= 3 else Control.SIZE_EXPAND_FILL
-	_roster.custom_minimum_size.y = 57 if players.size() <= 5 else (64 if players.size() <= 12 else 91)
+	# T24 iOS: linhas um pouco mais altas para retrato/nome/vidas legíveis (largura já sobrava).
+	_roster.custom_minimum_size.y = 57 if players.size() <= 5 else (80 if players.size() <= 12 else 99)
 	var winners: Array = (_data.result if _data.get("result") is Dictionary else {}).get("winners",[])
 	for source: Dictionary in players:
 		var player := source.duplicate(true)
@@ -418,7 +419,7 @@ func _render_players() -> void:
 		var turn: bool = str(player.member_id) == str(_data.get("turn_member","")) and _data.phase in ["turns","reveal"] and not _closed() and not player.eliminated
 		var winner: bool = winners.has(player.member_id) and _data.phase == "finished"
 		var panel := Surface.new()
-		panel.padding = 3
+		panel.padding = 3 if players.size() <= 5 else 1
 		panel.variant = "player"
 		panel.active = (turn or winner) and not player.eliminated
 		panel.name = "Player_" + str(player.member_id)
@@ -431,7 +432,7 @@ func _render_players() -> void:
 		_roster.add_child(panel)
 		var row := PlayerUI.row(panel)
 		row.add_theme_constant_override("separation",3)
-		var portrait := PlayerUI.portrait(str(player.skin_id),46 if players.size() <= 3 else (32 if players.size() <= 5 else (28 if players.size() <= 12 else 22)))
+		var portrait := PlayerUI.portrait(str(player.skin_id),46 if players.size() <= 3 else (32 if players.size() <= 5 else (36 if players.size() <= 12 else 28)))
 		if players.size() <= 5:
 			# Wider upper-bust crop from the packaged 720px portrait, preserving aspect.
 			# This increases the face size inside the same top strip, without a new layout.
@@ -446,6 +447,18 @@ func _render_players() -> void:
 			portrait.pivot_offset = Vector2(width*0.5,height)
 			# O retrato "sai" do cartão; o jogador da vez se destaca mais.
 			portrait.scale = Vector2.ONE*(1.24 if turn or winner else 1.1)
+		elif portrait.texture != null:
+			# T24 iOS: 6–20 jogadores — recorte do busto (rosto maior) no mesmo espaço da linha.
+			var bust := AtlasTexture.new()
+			var full: Texture2D = portrait.texture
+			bust.atlas = full
+			bust.region = Rect2(full.get_width()*0.14,0,full.get_width()*0.72,full.get_height()*0.58)
+			portrait.texture = bust
+			var side := 36.0 if players.size() <= 12 else 28.0
+			portrait.custom_minimum_size = Vector2(side*1.15,side)
+			portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+			portrait.clip_contents = true
 		var grading := ShaderMaterial.new()
 		grading.shader = preload("res://scripts/ui/battle/battle_illustration.gdshader")
 		grading.set_shader_parameter("saturation",0.0 if player.eliminated else 1.04)
@@ -455,7 +468,7 @@ func _render_players() -> void:
 		var info := PlayerUI.column(row)
 		info.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		info.add_theme_constant_override("separation",0)
-		var nickname := Style.label(str(player.nickname),16 if players.size() <= 3 else (14 if players.size() <= 5 else (12 if players.size() <= 12 else 11)),PlayerUI.GOLD if turn else PlayerUI.TEXT)
+		var nickname := Style.label(str(player.nickname),16 if players.size() <= 3 else (14 if players.size() <= 5 else (15 if players.size() <= 12 else 13)),PlayerUI.GOLD if turn else PlayerUI.TEXT)
 		Style.strong(nickname)
 		nickname.text = str(player.nickname)
 		nickname.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
@@ -469,23 +482,27 @@ func _render_players() -> void:
 		for index in range(0 if uncertain else (int(player.lives) if players.size() <= 3 else 1)):
 			var heart := TextureRect.new()
 			heart.texture = Icons.heart(18,true)
-			heart.custom_minimum_size = Vector2(16,16) if players.size() <= 3 else Vector2(12,12)
+			heart.custom_minimum_size = Vector2(16,16) if players.size() <= 3 else (Vector2(12,12) if players.size() <= 5 else (Vector2(16,16) if players.size() <= 12 else Vector2(14,14)))
 			heart.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			heart.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			hearts.add_child(heart)
-		if players.size() > 3 and not uncertain: hearts.add_child(Style.label(str(player.lives),12))
+		if players.size() > 3 and not uncertain:
+			var count := Style.label(str(player.lives),12 if players.size() <= 5 else (16 if players.size() <= 12 else 14),Color("#ff9a8f") if int(player.lives) <= 1 else PlayerUI.TEXT)
+			count.name = "Lives"
+			Style.strong(count)
+			hearts.add_child(count)
 		if uncertain: info.add_child(Style.label("REVELANDO…",9,PlayerUI.MUTED))
 		elif player.eliminated:
 			nickname.add_theme_color_override("font_color",PlayerUI.MUTED)
 			portrait.modulate = Color("#555967")
-			info.add_child(Style.label("ELIMINADO",9,PlayerUI.MUTED))
+			info.add_child(Style.label("ELIMINADO",9 if players.size() <= 5 else 11,PlayerUI.MUTED))
 		elif winner: info.add_child(Style.label("VITÓRIA",10,PlayerUI.GOLD))
 		elif turn and players.size() <= 5:
 			var badge := PlayerUI.pill("NA VEZ","equipped")
 			badge.name = "TurnBadge"
 			badge.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 			info.add_child(badge)
-		elif _data.phase == "selection" and player.confirmed: info.add_child(Style.label("PRONTO",9,PlayerUI.GOLD))
+		elif _data.phase == "selection" and player.confirmed: info.add_child(Style.label("PRONTO",9 if players.size() <= 5 else 11,PlayerUI.GOLD))
 		var previous := int(_last_lives.get(player.member_id,player.lives))
 		if int(player.lives) < previous:
 			portrait.modulate = Color("#ff766b")
@@ -565,9 +582,20 @@ func _render_hand() -> void:
 			image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			image.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 			image.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			image.custom_minimum_size.y = (60 if _canvas.size.y >= 360 else 44) if entries.size() <= 3 else 25
+			# T24 iOS: altura pela largura real da coluna (proporção da carta), não um valor fixo.
+			var column_width := (_hand.size.x - 12.0 - (grid.columns - 1) * 4.0) / maxf(grid.columns, 1)
+			image.custom_minimum_size.y = clampf(column_width * 1.42, 44.0, 120.0) if entries.size() <= 3 else 34.0
 			if entry.get("lost",false): image.modulate = Color("#555967")
+			# Toque/clique amplia temporariamente (só nesta tela; ninguém mais vê).
+			image.mouse_filter = Control.MOUSE_FILTER_STOP
+			image.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+			image.set_meta("card_id",str(entry.card_id))
+			image.tooltip_text = _name(str(entry.card_id)) + " — toque para ampliar"
+			image.gui_input.connect(func(event: InputEvent) -> void:
+				if (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or (event is InputEventScreenTouch and event.pressed):
+					_preview_private(str(entry.card_id)))
 			grid.add_child(image)
+
 	else:
 		if entries.is_empty():
 			var hidden := Style.label("Seleção em andamento",11,PlayerUI.MUTED)
@@ -711,7 +739,80 @@ func _back() -> void:
 func _focus_card(card: Control) -> void:
 	if is_instance_valid(card) and card.is_inside_tree() and card.is_visible_in_tree() and card.focus_mode != Control.FOCUS_NONE: card.grab_focus()
 
+## Ampliação temporária das cartas privadas: sobreposição local, fecha com toque, Esc ou Voltar.
+## Não muda o turno, não envia nada ao servidor e some se a janela perder o foco.
+func _preview_private(card_id: String) -> void:
+	_close_private_preview()
+	var entries: Array = _data.get("my_cards",[])
+	if entries.is_empty(): return
+	var layer := Control.new()
+	layer.name = "PrivatePreview"
+	layer.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(layer)
+	layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var shade := ColorRect.new()
+	shade.color = Color(0.01,0.02,0.04,0.82)
+	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(shade)
+	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var column := VBoxContainer.new()
+	column.alignment = BoxContainer.ALIGNMENT_CENTER
+	column.add_theme_constant_override("separation",10)
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(column)
+	column.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var title := Style.label("SUAS CARTAS · só você vê",16,PlayerUI.GOLD)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(title)
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation",18)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.add_child(row)
+	var height := clampf(size.y*0.58,140.0,560.0)
+	for entry: Dictionary in entries:
+		var card := VBoxContainer.new()
+		card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(card)
+		var image := TextureRect.new()
+		image.name = "PreviewCard"
+		image.texture = DuelService.card_texture(str(entry.card_id))
+		image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		image.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		image.custom_minimum_size = Vector2(height/1.42,height)
+		image.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		if str(entry.card_id) != card_id: image.modulate = Color(0.78,0.78,0.82)
+		if entry.get("lost",false): image.modulate = Color("#555967")
+		card.add_child(image)
+		var name_label := Style.label(_name(str(entry.card_id)),15,PlayerUI.GOLD if str(entry.card_id) == card_id else PlayerUI.TEXT)
+		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		name_label.custom_minimum_size.x = height/1.42
+		name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		card.add_child(name_label)
+	var close := Style.label("Toque em qualquer lugar para fechar",12,PlayerUI.MUTED)
+	close.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(close)
+	layer.gui_input.connect(func(event: InputEvent) -> void:
+		if (event is InputEventMouseButton and event.pressed) or (event is InputEventScreenTouch and event.pressed):
+			_close_private_preview())
+
+
+func _close_private_preview() -> void:
+	var layer := get_node_or_null("PrivatePreview")
+	if layer != null:
+		remove_child(layer)
+		layer.queue_free()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if get_node_or_null("PrivatePreview") != null and event.is_action_pressed("ui_cancel"):
+		_close_private_preview()
+		get_viewport().set_input_as_handled()
+
+
 func _conceal_hand() -> void:
+	_close_private_preview()
 	_private_shown = false
 	_private_signature = ""
 	if _built and is_inside_tree() and not _data.is_empty(): _render_hand()

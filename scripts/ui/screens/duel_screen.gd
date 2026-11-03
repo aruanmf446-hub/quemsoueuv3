@@ -898,6 +898,9 @@ func _render_form() -> void:
 	var grid := GridContainer.new()
 	grid.name = "DeckChoices"
 	grid.columns = 3
+	grid.resized.connect(func() -> void:
+		# Colunas pela largura disponível (cards de ~132 + espaço), sem esmagar as capas.
+		grid.columns = clampi(floori((grid.size.x + 14.0) / 146.0), 2, 5))
 	grid.add_theme_constant_override("h_separation", 14)
 	grid.add_theme_constant_override("v_separation", 14)
 	decks.add_child(grid)
@@ -996,7 +999,8 @@ func _deck_choice(entry: Dictionary) -> Control:
 	card.name = "DeckChoice_" + str(entry.id)
 	card.toggle_mode = true
 	card.button_pressed = selected
-	card.custom_minimum_size = Vector2(140, 112)
+	# T24 iOS: capa mais alta e arte inteira (antes, uma faixa panorâmica cortava os personagens).
+	card.custom_minimum_size = Vector2(132, 176)
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	card.clip_contents = true
 	card.tooltip_text = "%s (%d)" % [entry.name, entry.size]
@@ -1010,23 +1014,28 @@ func _deck_choice(entry: Dictionary) -> Control:
 			box = PremiumUI.flat(Color.TRANSPARENT, PremiumUI.GOLD_LIGHT, 12, 2, 0)
 			box.draw_center = false
 		card.add_theme_stylebox_override(state, box)
+	# Capa INTEIRA sobre o fundo escuro do card, sem distorção nem corte.
+	var has_cover := DeckCover.exists(str(entry.cover))
 	var cover := TextureRect.new()
+	cover.name = "Cover"
 	cover.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	cover.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	cover.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	cover.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	cover.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	cover.texture = DeckCover.framed(str(entry.cover), 1.4, DeckCover.PORTRAIT_FOCUS) if DeckCover.exists(str(entry.cover)) else null
+	cover.texture = DeckCover.load_texture(str(entry.cover)) if has_cover else null
 	card.add_child(cover)
 	cover.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	for side in ["offset_left", "offset_top"]: cover.set(side, 3)
-	for side in ["offset_right", "offset_bottom"]: cover.set(side, -3)
+	cover.offset_left = 6
+	cover.offset_top = 6
+	cover.offset_right = -6
+	cover.offset_bottom = -36
 	var shade := ColorRect.new()
 	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	shade.color = Color(0.02, 0.03, 0.06, 0.62)
 	card.add_child(shade)
 	shade.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	shade.offset_top = -34
-	var label := PremiumUI.plain("%s (%d)" % [entry.name, entry.size], 15, Color.WHITE, false)
+	var label := PremiumUI.plain("%s (%d)" % [entry.name, entry.size], 13, Color.WHITE, false)
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER

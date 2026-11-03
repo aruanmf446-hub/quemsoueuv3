@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1220"><meta name="robots" content="noindex,nofollow">
+<title>Editor de Conteúdo · QSE Studio</title>
+<link rel="stylesheet" href="../style.css"><link rel="stylesheet" href="./editor.css">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script type="module" src="./editor.js"></script>
+</head>
+<body>
+<div class="editor-shell">
+<aside class="editor-sidebar">
+ <a href="../" class="editor-logo"><span class="editor-logo-mark">Q<span>✦</span></span><span>QUEM SOU EU<small>STUDIO / CMS</small></span></a>
+ <div class="editor-nav-heading">ADMINISTRAÇÃO</div>
+ <button class="editor-nav active" data-view="news"><span>◈</span> Novidades <small id="count-news">—</small></button>
+ <button class="editor-nav" data-view="deck"><span>▤</span> Decks oficiais <small id="count-deck">—</small></button>
+ <div class="editor-nav-heading side-gap">NAVEGAÇÃO</div>
+ <a class="editor-nav" href="../"><span>◇</span> Painel dos agentes ↗</a>
+ <a class="editor-nav" href="../../" target="_blank" rel="noopener noreferrer"><span>▷</span> Abrir o game ↗</a>
+ <div class="editor-side-footer"><span class="side-online"><i></i> GAME SUPABASE</span><div><small id="session-label">Acesso restrito</small><button id="sign-out" class="signout" hidden>Sair ↗</button></div></div>
+</aside>
+<main class="editor-main">
+ <div class="editor-topbar"><div class="crumb">QSE COMMAND CENTER <span>/</span> <b>EDITOR</b></div><div class="editor-actions"><span class="editor-live-dot"></span> CONTEÚDO EM PRODUÇÃO <button id="refresh-content" class="small-button" disabled>↻ Atualizar</button></div></div>
+ <div class="editor-scroll">
+  <div class="editor-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> CONTENT MANAGEMENT / V1</div><h1>Editor de conteúdo<span>.</span></h1><p>Controle o que aparece no jogo, sem alterar os arquivos ou reexportar o Godot.</p></div><div class="editor-heading-meta">FONTE DE VERDADE<strong>Supabase GAME</strong><small>GitHub mantém o código</small></div></div>
+  <div id="editor-alert" class="editor-alert hidden" role="status"></div>
+  <section id="login-panel" class="editor-login-panel">
+   <div class="login-ornament">✦</div>
+   <div class="eyebrow">IDENTIDADE VERIFICADA DO JOGO</div>
+   <h2>Entre como administrador.</h2>
+   <p>O PIN do Command Center não autoriza mudanças no jogo. Use a conta Google vinculada ao GAME ou seu e-mail e senha de jogo.</p>
+   <div id="google-login" class="google-login"></div>
+   <div class="login-divider"><span>ou use sua conta do GAME</span></div>
+   <form id="login-form"><label>E-mail</label><input id="login-email" type="email" autocomplete="username" placeholder="seu@email.com" required><label>Senha</label><input id="login-password" type="password" autocomplete="current-password" placeholder="Senha da conta" required><button class="editor-primary" type="submit">Acessar editor ↗</button></form>
+   <p class="editor-login-foot">Permissão confirmada no Supabase com políticas RLS. Somente contas de administrador podem publicar.</p>
+  </section>
+  <section id="editor-panel" class="hidden">
+   <div class="editor-kpis"><div class="kpi"><span>ITENS EDITORIAIS</span><strong id="kpi-all">—</strong><small>Notícias + decks</small></div><div class="kpi"><span>ATIVOS</span><strong id="kpi-live">—</strong><small>Visíveis no jogo</small></div><div class="kpi"><span>MODIFICAÇÃO RECENTE</span><strong id="kpi-date">—</strong><small>Horário da última publicação</small></div></div>
+   <div class="editor-workspace">
+    <section class="editor-index">
+      <div class="index-heading"><div><span class="section-kicker">CONTEÚDO</span><h2 id="list-title">Novidades</h2></div><button id="new-news" class="small-button">+ Nova</button></div>
+      <label class="index-search-label" for="index-search">Pesquisar</label><input id="index-search" class="index-search" type="search" placeholder="Buscar título ou ID">
+      <div id="item-list" class="item-list"><p class="list-loading">Carregando registros…</p></div>
+      <div class="index-footer">Conteúdo desativado permanece salvo para revisão.</div>
+    </section>
+    <section class="editor-form-card">
+      <div class="edit-form-title"><div><span class="section-kicker">EDIÇÃO</span><h2 id="editing-name">Selecione um item</h2><small id="editing-id">Selecione na coluna à esquerda</small></div><span id="editing-status" class="status-chip">—</span></div>
+      <form id="content-form">
+       <label class="field-title">Título</label><input name="title" id="field-title" maxlength="120" placeholder="Título apresentado ao jogador" required>
+       <label class="field-title">Subtítulo / categoria</label><input name="subtitle" id="field-subtitle" maxlength="200" placeholder="Uma frase de destaque">
+       <label class="field-title">Descrição</label><textarea name="description" id="field-description" maxlength="2000" rows="5" placeholder="Texto exibido no jogo"></textarea>
+       <div class="form-row"><div><label class="field-title">Prioridade</label><input type="number" name="priority" id="field-priority" min="-1000" max="1000" value="0"></div><div class="schedule-fields"><label class="field-title">Início (opcional)</label><input type="datetime-local" id="field-start"></div><div class="schedule-fields"><label class="field-title">Fim (opcional)</label><input type="datetime-local" id="field-end"></div></div>
+       <label class="field-title">Capa da publicação</label>
+       <div class="upload-zone"><div id="upload-indicator" class="upload-indicator">▣</div><div><strong>Imagem JPG, PNG ou WebP</strong><small>Até 8 MB. Armazenada com segurança no Supabase.</small></div><label class="upload-label" for="field-cover">Trocar capa<input id="field-cover" type="file" accept="image/png,image/jpeg,image/webp" hidden></label></div>
+       <div id="cover-file-name" class="cover-file-name">Sem capa personalizada. O jogo usa a arte padrão.</div>
+       <div class="publish-row"><div><strong>Publicar este conteúdo</strong><small id="publish-explain">Ativar faz a novidade aparecer no jogo.</small></div><label class="switch"><input type="checkbox" id="field-active" aria-label="Publicar conteúdo"><span class="switch-track"></span></label></div>
+       <div class="submit-row"><span id="save-feedback" role="status">Nenhuma edição pendente.</span><button id="save-content" class="editor-primary" type="submit" disabled><span>Salvar e publicar</span> ↗</button></div>
+      </form>
+    </section>
+    <aside class="editor-preview">
+      <div class="preview-head"><span class="section-kicker">PRÉ-VISUALIZAÇÃO</span><span class="preview-mode">LIVE PREVIEW</span></div>
+      <div class="preview-device"><div id="preview-art" class="preview-art"><span class="preview-default">Q<span>✦</span></span></div><div class="preview-overlay"><span id="preview-eyebrow">QUEM SOU EU</span><h3 id="preview-title">Prévia do título</h3><p id="preview-description">Edite o conteúdo para visualizar como ficará a publicação.</p></div></div>
+      <div class="preview-notes"><span>◎</span> A prévia mostra textos e imagem selecionados; confirme no jogo após publicar.</div>
+      <div class="preview-info"><strong>Como funciona?</strong><p>Novidades ativas entram no carrossel do jogo. Capas e descrições de decks oficiais são substituídas quando a versão editorial estiver ativa. O jogo mantém seus arquivos locais como fallback.</p><p>As atualizações aparecem ao abrir novamente a tela correspondente, com conexão à internet.</p></div>
+    </aside>
+   </div>
+  </section>
+ </div>
+</main>
+</div>
+</body>
+</html>

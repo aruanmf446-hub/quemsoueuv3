@@ -4,6 +4,7 @@ import { Room, RoomEvent, Track } from "livekit-client";
 (() => {
   let room = null;
   let generation = 0;
+  let roster = new Map();
   const state = { status: "idle", mic: false, muted: false, error: "", participants: [], audioBlocked: false };
   const audioRoot = document.createElement("div");
   audioRoot.id = "qse-voice-audio";
@@ -29,6 +30,7 @@ import { Room, RoomEvent, Track } from "livekit-client";
     state.participants = room
       ? [...room.remoteParticipants.values()].map(p => ({
           id: p.identity,
+          name: roster.get(p.identity) || "Jogador",
           speaking: !!p.isSpeaking,
           mic: !!p.isMicrophoneEnabled,
         }))
@@ -45,14 +47,22 @@ import { Room, RoomEvent, Track } from "livekit-client";
     room = null;
     if (old) await old.disconnect(true);
     audioRoot.replaceChildren();
+    roster.clear();
     playbackButton.style.display = "none";
     Object.assign(state, { status: "idle", mic: false, muted: false, error: "", participants: [], audioBlocked: false });
   };
 
   window.QSEVoice = {
     status: () => ({ ...state, participants: state.participants.map(p => ({ ...p })) }),
-    async connect(url, token) {
+    setRoster(members) {
+      if (!Array.isArray(members)) return;
+      roster = new Map(members.filter(m => m && typeof m.tag === "string" && /^[a-f0-9]{64}$/.test(m.tag))
+        .map(m => [m.tag, String(m.nickname || "Jogador").slice(0, 80)]));
+      update();
+    },
+    async connect(url, token, members = []) {
       await disconnect();
+      this.setRoster(members);
       const myGeneration = generation;
       if (typeof url !== "string" || !url.startsWith("wss://") || typeof token !== "string") {
         state.error = "invalid_connection"; state.status = "error"; return;

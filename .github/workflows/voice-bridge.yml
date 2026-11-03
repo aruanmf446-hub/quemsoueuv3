@@ -1,0 +1,26 @@
+name: T32 LiveKit Web bridge checks
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'web/voice/**'
+      - 'tests/voice/**'
+      - '.github/workflows/voice-bridge.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bridge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax and contract (no LiveKit credentials required)
+        run: |
+          node --check web/voice/bridge.js
+          node tests/voice/bridge_test.cjs

@@ -5,7 +5,7 @@ extends Control
 ## 2) "Jogadores atingidos": cada nome entra um a um com ✕ (perdeu uma vida) ou caveira
 ##    (eliminado), com som de atingido/eliminado;
 ## 3) rodapé "N jogadores eliminados" ou "Ninguém foi atingido".
-## Some sozinha ou com um toque. Só apresenta o que o servidor já revelou (event.hits).
+## Some sozinha (não bloqueia toques na partida). Só apresenta o que o servidor já revelou (event.hits).
 const Style = preload("res://scripts/ui/battle/battle_style.gd")
 const SFX_PICK := preload("res://assets/audio/sfx/battle_pick.wav")
 const SFX_HIT := preload("res://assets/audio/sfx/battle_hit.wav")
@@ -20,7 +20,8 @@ var _closing := false
 ## hits: [{name, eliminated}] na ordem do servidor.
 func present(card_id: String, card_name: String, hits: Array) -> void:
 	name = "RevealOverlay"
-	mouse_filter = Control.MOUSE_FILTER_STOP
+	# Não segura toques: a partida continua (o turno corre); o painel some sozinho.
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	z_index = 20
 	_audio = AudioStreamPlayer.new()

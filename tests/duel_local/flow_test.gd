@@ -148,8 +148,8 @@ func _run() -> void:
 	root.size = original_size
 	await settle(8)
 	var pool: Array = data.pool
-	var real_cards := pool.all(func(c: Dictionary) -> bool: return ResourceLoader.exists("res://assets/duel/decks/%s.png" % c.card_id))
-	check(pool.size() >= 9 and real_cards, "cartas reais de assets/duel/decks")
+	var real_cards := pool.all(func(c: Dictionary) -> bool: return ResourceLoader.exists("res://assets/duel/decks/oficial/%s.png" % c.card_id))
+	check(pool.size() >= 9 and real_cards, "cartas reais de assets/duel/decks/oficial")
 	await shot("04_selecao")
 	var grid: Control = match_view().find_child("Cards", true, false)
 	await click(grid.get_child(0))

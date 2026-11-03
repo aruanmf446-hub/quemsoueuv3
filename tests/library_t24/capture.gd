@@ -2,7 +2,7 @@ extends SceneTree
 ## Capturas T24 (Biblioteca premium). FIXTURES DE TESTE: decks [DEMO], uma campanha de
 ## demonstração e um rascunho [DEMO] montado com artes oficiais já distribuídas no jogo.
 ## Uso: --script res://tests/library_t24/capture.gd -- <pasta> <LxA>
-const ART := "res://assets/duel/decks/lendas_urbanas/%s.png"
+const ART := "res://assets/duel/decks/oficial/lendas_urbanas/%s.png"
 const NAMES := ["momo", "slender_man", "dama_de_branco", "cobra_grande", "homem_sorridente", "loira_do_banheiro"]
 
 

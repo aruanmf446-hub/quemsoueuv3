@@ -1,6 +1,6 @@
 extends "res://tests/duel_t25/fake_rooms.gd"
 ## FIXTURE DE TESTE (T26): qse_duel_decks/qse_duel_create sem rede. Decks [DEMO] só aqui.
-const ART := "res://assets/duel/decks/lendas_urbanas/%s.png"
+const ART := "res://assets/duel/decks/oficial/lendas_urbanas/%s.png"
 var created: Dictionary = {}
 
 

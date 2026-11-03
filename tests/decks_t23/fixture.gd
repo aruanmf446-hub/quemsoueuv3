@@ -1,7 +1,7 @@
 extends RefCounted
 ## FIXTURE DE TESTE (T23): decks de demonstração com os títulos das referências.
 ## Só entra em _demo_entries de testes/capturas; nunca aparece no jogo distribuído.
-const ART := "res://assets/duel/decks/lendas_urbanas/%s.png"
+const ART := "res://assets/duel/decks/oficial/lendas_urbanas/%s.png"
 
 
 static func entries() -> Array[Dictionary]:

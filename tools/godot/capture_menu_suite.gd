@@ -100,7 +100,7 @@ func duel_states(services: PlayerServices) -> void:
 	screen.call("_render_room")
 	await save("duel-room-fixture")
 	var pool: Array = []
-	var files := DirAccess.get_files_at("res://assets/duel/decks/lendas_urbanas")
+	var files := DirAccess.get_files_at("res://assets/duel/decks/oficial/lendas_urbanas")
 	for file in files:
 		if file.ends_with(".png") and pool.size() < 8: pool.append({"card_id": "lendas_urbanas/" + file.get_basename(), "removed": false})
 	var data := {"phase": "selection", "players": members, "pool": pool, "my_cards": [], "events": [], "cards_per_player": 2, "turn_member": "p1", "result": {"winners": ["p1"]}, "server_now": "2026-10-30T15:00:00+00:00", "deadline": "2026-10-30T15:00:30+00:00"}

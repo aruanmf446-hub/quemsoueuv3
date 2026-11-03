@@ -36,7 +36,7 @@ func _run() -> void:
 	screen._select_tab("Meus Decks")
 	await _shot(folder, "meus_decks_" + tag)
 	(screen.find_child("CreateDeck", true, false) as Button).pressed.emit()
-	var art := (load("res://assets/duel/decks/lendas_urbanas/momo.png") as Texture2D).get_image()
+	var art := (load("res://assets/duel/decks/oficial/lendas_urbanas/momo.png") as Texture2D).get_image()
 	screen._pending_card = -1
 	screen._image_picked(art, art.save_png_to_buffer(), "png")
 	await _shot(folder, "enquadrar_biblioteca_" + tag)

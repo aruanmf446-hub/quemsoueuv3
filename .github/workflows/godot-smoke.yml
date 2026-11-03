@@ -25,6 +25,9 @@ jobs:
           "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --version | grep -E '^4[.]7[.]2[.]stable[.]official'
       - name: Import and open actual scenes
         run: python3 tools/godot/run_smoke.py --godot "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --output "$RUNNER_TEMP/results"
+      - name: T32 voice lifecycle regression (offline)
+        run: |
+          "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --script res://tests/voice/flow_test.gd
       - name: Live content editor regression (offline)
         run: |
           "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --script res://tests/editor_content/verify.gd

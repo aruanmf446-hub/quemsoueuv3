@@ -63,20 +63,40 @@ const handler = withSupabase({ auth: "user" }, async (request, context) => {
   const allowed = new Set(roster.map((m: { tag: string }) => m.tag));
   if (!allowed.has(identity)) return response({ code: "room_access_denied" }, 403);
 
-  // Disconnect banned/departed users on room changes, including revoking their
-  // current Cloud tokens. Called by active clients on a bounded cadence.
+  // LiveKit auto-creates a room on the FIRST participant connection. Calling
+  // listParticipants on a non-existent room produces an API error and must not
+  // block the very first authorized player from receiving a joining token.
+  // Room listing is also an authenticated service call: fail closed on outages.
   if (action === "sync" || action === "token") {
     try {
-      const present = await admin.listParticipants(roomName);
-      for (const participant of present) {
-        if (participant.identity && !allowed.has(participant.identity)) {
-          await admin.removeParticipant(roomName, participant.identity);
+      const rooms = await admin.listRooms([roomName]);
+      if (rooms.some((room) => room.name === roomName)) {
+        try {
+          const present = await admin.listParticipants(roomName);
+          for (const participant of present) {
+            if (participant.identity && !allowed.has(participant.identity)) {
+              await admin.removeParticipant(roomName, participant.identity);
+            }
+          }
+        } catch (e) {
+          // A room can disappear between listRooms and listParticipants when its
+          // last participant leaves. Only the structured not_found code is safe.
+          const code = typeof e === "object" && e !== null && "code" in e
+            ? String(e.code) : "";
+          if (code !== "not_found" && code !== "404") throw e;
         }
       }
     } catch (e) {
-      // A not-yet-created LiveKit room has no participants to clean up.
-      const message = String(e);
-      if (!/not[\s_-]*found|does not exist|404|room[_-]?not[_-]?found/i.test(message)) return response({ code: "voice_reconciliation_unavailable" }, 503);
+      const code = typeof e === "object" && e !== null && "code" in e
+        ? String(e.code).slice(0, 32) : "unknown";
+      const status = typeof e === "object" && e !== null && "status" in e
+        ? Number(e.status) : 0;
+      // No message, URL, key or token in logs.
+      console.error("qse-voice LiveKit maintenance error", {
+        code: /^[a-z0-9_]{1,32}$/i.test(code) ? code : "unknown",
+        status: Number.isInteger(status) && status >= 100 && status <= 599 ? status : 0,
+      });
+      return response({ code: "voice_reconciliation_unavailable" }, 503);
     }
   }
   if (action === "sync") return response({ ok: true, participants: roster });

@@ -41,3 +41,14 @@ Responderá `server_url`, `room`, `participant_token` e lista de nicknames/tags 
 6. Testar orçamento Build com 10 e 20 participantes; monitorar custo.
 
 **Não fazer merge automático.** CI headless testa importação/GDScript, não valida transmissão de voz de verdade.
+
+## T32 — E2E real de autenticação e WebRTC (contas de teste)
+
+O repositório já possui seis GitHub Actions Secrets (OWNER, READER e R1) usados pela CI de Comunidade. **Não copiar seus valores para arquivos, logs ou Supabase**. O teste de voz usa os nomes dos Secrets diretamente nas Actions e limpa as salas temporárias ao final.
+
+- Script seguro: `tools/e2e/voice_livekit_e2e.py`: login das três contas no GAME, sala privada, autorização de participantes, bloqueio de não membros, dois `room_id` isolados, JWTs LiveKit somente microfone, `sync`, revogação após saída e limpeza de sala.
+- Navegador: `tools/e2e/voice_browser_e2e.cjs`: dois contextos Chrome independentes, **microfone sintético** (sem gravação) e verificação de publicação/assinatura das trilhas WebRTC.
+- CI: `.github/workflows/voice-live-e2e.yml` restringe a execução à branch `work/livekit-voice-t32` do próprio repositório (sem forks).
+- Execução manual também disponível no workflow existente `Comunidade E2E (contas de teste)`: **Run workflow → Branch `work/livekit-voice-t32` → stage `voice`** (deixar `deck_id` vazio). Uma execução consome poucos minutos de participante do LiveKit Cloud Build.
+
+**Estado:** os testes acima foram implementados e estão prontos para disparo; não declarar que foram executados ou que áudio real foi validado antes de ler o resultado do GitHub Actions. Um teste de Chrome com microfone sintético não substitui validação de aparelhos reais.

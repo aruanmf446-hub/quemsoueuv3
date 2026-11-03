@@ -155,6 +155,8 @@ func _header() -> void:
 	header.add_child(gift)
 	var title := _label("Resgatar Presentes", 19 if _compact else 32, WHITE)
 	title.name = "HeaderTitle"
+	title.custom_minimum_size.x = 190 if _compact else 310
+	title.autowrap_mode = TextServer.AUTOWRAP_OFF
 	title.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	header.add_child(title)
@@ -174,6 +176,7 @@ func _header() -> void:
 	close.custom_minimum_size = Vector2(43 if _compact else 54, 40 if _compact else 52)
 	close.add_theme_font_size_override("font_size", 28 if _compact else 36)
 	close.pressed.connect(queue_free)
+	close.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	header.add_child(close)
 
 
@@ -227,6 +230,7 @@ func _banner(rewards: OfficialRewardsService) -> void:
 	banner.add_child(copy)
 	var title_text := "Você tem recompensas para conhecer!" if not rewards.revealed else "Seus presentes estão na sua conta!"
 	var title := _label(title_text, 16 if _compact else 27, WHITE)
+	title.autowrap_mode = TextServer.AUTOWRAP_OFF
 	title.name = "CampaignHeadline"
 	title.max_lines_visible = 1
 	title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -234,6 +238,7 @@ func _banner(rewards: OfficialRewardsService) -> void:
 	var desc_text := "Confira os presentes oficiais da equipe Quem Sou Eu." if not rewards.revealed else "Tudo salvo no seu perfil. Aproveite suas recompensas!"
 	var description := _label(desc_text, 11 if _compact else 17, MUTED)
 	description.name = "CampaignSubtitle"
+	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	description.max_lines_visible = 2
 	copy.add_child(description)
 	var context := _label(str(rewards.campaign.get("title", "")), 10 if _compact else 15, GOLD_SOFT)
@@ -379,6 +384,7 @@ func _add_offer(grid: GridContainer, offer: Dictionary, rewards: OfficialRewards
 			name_row.add_child(count_label)
 	var desc := _label(str(offer.get("description", "")), 11 if _compact else 14, MUTED)
 	desc.name = "RewardDescription"
+	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	desc.max_lines_visible = 2
 	desc.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	content.add_child(desc)
@@ -567,7 +573,7 @@ func _label(caption: String, font_size: int, color: Color) -> Label:
 	label.text = caption
 	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", color)
-	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	# Label com clip_text=true + ellipsis pode declarar largura/altura mínima zero
 	# nos Containers do Godot 4.7.2 e simplesmente desaparecer.
 	label.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING

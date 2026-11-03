@@ -108,7 +108,7 @@ jobs:
           mkdir -p build/web/pwa
           cp web/pwa/icon-*.png build/web/pwa/
           cp web/pwa/manifest.webmanifest build/web/manifest.webmanifest
-          sed "s/__BUILD__/${GITHUB_SHA::12}/" web/pwa/sw.js > build/web/sw.js
+          python3 tools/web/stamp_sw.py build/web "${GITHUB_SHA::12}"
           python3 tools/web/check_pwa.py build/web
           ls -la build/web/index.pck
           du -sh build/web build/web/music

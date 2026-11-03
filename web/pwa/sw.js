@@ -1,26 +1,30 @@
-/* Quem Sou Eu — service worker único do PWA (T24 iOS).
- * - Cache versionado por build (__BUILD__ é trocado no deploy): nunca mistura versões.
+/* Quem Sou Eu — service worker único do PWA.
+ * - Cache por CONTEÚDO (tools/web/stamp_sw.py grava o hash de cada arquivo no deploy): numa versão
+ *   nova só é baixado o que mudou; o motor (index.wasm) fica guardado entre versões.
+ * - Página e motor de uma versão nunca se misturam: cada service worker usa só os hashes dele.
  * - Só arquivos do próprio jogo, na mesma origem e dentro do escopo; Supabase, OAuth e
  *   qualquer outro domínio passam direto pela rede (nada privado entra no cache).
- * - Uma versão nova é baixada inteira em segundo plano e só assume quando a página pede
+ * - Uma versão nova é preparada em segundo plano e só assume quando a página pede
  *   (botão "Reiniciar para atualizar", oferecido só no lobby) — nunca no meio da partida.
  */
 const BUILD = "__BUILD__";
-const CACHE = "qse-game-" + BUILD;
-const CORE = ["./", "index.html", "index.js", "index.wasm", "index.pck", "index.audio.worklet.js",
-  "index.audio.position.worklet.js", "manifest.webmanifest", "pwa/icon-180.png", "pwa/icon-192.png", "pwa/icon-512.png"];
+const FILES = "__FILES__";            // { "index.wasm": "<hash>", ... } — preenchido no deploy
+const CACHE = "qse-files";
+const REQUIRED = ["index.html", "index.js", "index.wasm", "index.pck"];
+
+function key(path) { return new URL(path + "?v=" + FILES[path], self.registration.scope).href; }
 
 self.addEventListener("install", (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE);
-    // Arquivos opcionais (worklets de áudio podem não existir em todas as versões).
-    await Promise.all(CORE.map(async (path) => {
+    await Promise.all(Object.keys(FILES).map(async (path) => {
+      if (await cache.match(key(path))) return;                  // mesmo conteúdo: já guardado
       try {
         const response = await fetch(path, {cache: "no-cache"});
-        if (response.ok) await cache.put(path, response);
-        else if (["index.wasm", "index.pck", "index.js"].includes(path)) throw new Error(path + " " + response.status);
+        if (response.ok) await cache.put(key(path), response);
+        else if (REQUIRED.includes(path)) throw new Error(path + " " + response.status);
       } catch (error) {
-        if (["index.wasm", "index.pck", "index.js"].includes(path)) throw error;
+        if (REQUIRED.includes(path)) throw error;
       }
     }));
   })());
@@ -33,12 +37,30 @@ self.addEventListener("message", (event) => {
 
 self.addEventListener("activate", (event) => {
   event.waitUntil((async () => {
-    for (const key of await caches.keys()) {
-      if (key.startsWith("qse-game-") && key !== CACHE) await caches.delete(key);
+    for (const name of await caches.keys()) {
+      if (name.startsWith("qse-game-")) await caches.delete(name);   // formato antigo (por build)
+    }
+    const cache = await caches.open(CACHE);
+    const keep = new Set(Object.keys(FILES).map(key));
+    for (const request of await cache.keys()) {
+      if (!keep.has(request.url)) await cache.delete(request);
     }
     await self.clients.claim();
   })());
 });
+
+function cached(path, request) {
+  return (async () => {
+    const cache = await caches.open(CACHE);
+    const hit = await cache.match(key(path));
+    if (hit) return hit;
+    const response = await fetch(request);
+    if (response.ok) {
+      try { await cache.put(key(path), response.clone()); } catch (error) { /* sem espaço: segue */ }
+    }
+    return response;
+  })();
+}
 
 self.addEventListener("fetch", (event) => {
   const request = event.request;
@@ -48,25 +70,12 @@ self.addEventListener("fetch", (event) => {
   const scope = new URL(self.registration.scope);
   if (!url.pathname.startsWith(scope.pathname)) return;
   if (url.search && request.mode !== "navigate") return;           // respostas com parâmetros: rede
-  const path = url.pathname.slice(scope.pathname.length) || "./";
+  const path = url.pathname.slice(scope.pathname.length) || "index.html";
   if (request.mode === "navigate") {
-    // Página da MESMA versão do cache (HTML e motor sempre juntos); a URL com ?code= do
-    // OAuth continua intacta para o jogo ler. Sem cópia guardada, vai à rede.
-    event.respondWith((async () => {
-      const cache = await caches.open(CACHE);
-      return (await cache.match("index.html")) || fetch(request);
-    })());
+    // Página da MESMA versão do motor; a URL com ?code= do OAuth continua intacta.
+    if (FILES["index.html"]) event.respondWith(cached("index.html", "index.html"));
     return;
   }
-  if (!CORE.includes(path)) return;                                // música, slides etc.: rede/HTTP cache
-  event.respondWith((async () => {
-    const cache = await caches.open(CACHE);
-    const hit = await cache.match(path);
-    if (hit) return hit;
-    const response = await fetch(request);
-    if (response.ok) {
-      try { await cache.put(path, response.clone()); } catch (error) { /* sem espaço: segue sem cache */ }
-    }
-    return response;
-  })());
+  if (!FILES[path]) return;                                        // música, slides etc.: rede/HTTP cache
+  event.respondWith(cached(path, request));
 });

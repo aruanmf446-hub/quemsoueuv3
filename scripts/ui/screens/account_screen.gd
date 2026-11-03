@@ -211,6 +211,7 @@ func _build_email_form(column: VBoxContainer) -> void:
 		_password = _field(column, "Senha (mínimo 6 caracteres)" if _mode != "login" else "Sua senha", true)
 	if _mode in ["signup","reset"]:
 		_confirm = _field(column, "Confirmar senha", true)
+		_confirm.set_meta("qse_kind", "confirm")
 	if _mode == "login":
 		_add_button(column,"Entrar",_authenticate.bind(false),Color("#93521f"),WHITE,true)
 		_add_button(column,"Criar conta",_switch.bind("signup"),Color("#403128"),WHITE)
@@ -236,6 +237,9 @@ func _field(parent: VBoxContainer, placeholder: String, secret: bool) -> LineEdi
 	field.custom_minimum_size.y = 38 if UIScale.is_compact() else 51
 	field.add_theme_font_size_override("font_size", 15 if UIScale.is_compact() else 18)
 	PlayerUI.style_field(field)
+	# Dica para o gerenciador de senhas do aparelho (Web: WebTextBridge).
+	field.set_meta("qse_kind", "password" if secret else "email")
+	if secret and _mode != "login": field.set_meta("qse_autocomplete", "new-password")
 	parent.add_child(field)
 	if secret: PremiumUI.reveal_toggle(field)
 	return field
@@ -350,6 +354,7 @@ func _authenticate(create_account: bool) -> void:
 	password = ""
 	_busy(false)
 	if result.ok:
+		WebTextBridge.remember_login()
 		if services.session.authenticated():
 			_notice = "Conta conectada."
 			_mode = "connected"

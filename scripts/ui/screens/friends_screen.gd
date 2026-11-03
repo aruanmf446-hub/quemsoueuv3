@@ -987,6 +987,7 @@ func _render_chat() -> void:
 	PlayerUI.style_field(_chat_input)
 	_chat_input.text_submitted.connect(func(_value: String) -> void: _send_chat())
 	composer.add_child(_chat_input)
+	WebTextBridge.attach(_chat_input)
 	_chat_send = PlayerUI.button("Enviar", _send_chat)
 	_chat_send.name = "ChatSend"
 	PlayerUI.style_button(_chat_send, true)

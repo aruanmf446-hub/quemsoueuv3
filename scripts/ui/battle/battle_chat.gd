@@ -85,6 +85,8 @@ func _ready() -> void:
 	PlayerUI.style_field(_input)
 	_input.text_submitted.connect(func(_text: String) -> void: _send_text())
 	composer.add_child(_input)
+	# iPhone: teclado nativo pelo shell Web (o foco precisa acontecer dentro do toque).
+	WebTextBridge.attach(_input)
 	_send = Style.action("",_send_text,"send")
 	_send.name = "ChatSend"
 	_send.tooltip_text = "Enviar para a sala"

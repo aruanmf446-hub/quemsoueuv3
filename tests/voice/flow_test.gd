@@ -24,7 +24,7 @@ func _run() -> void:
 	services.duel.room = {"room": {"id": "00000000-0000-4000-8000-000000000032", "status": "lobby"}}
 	services.duel.changed.emit()
 	check(not services.voice.eligible(), "local practice does not contact LiveKit")
-	var widget := load("res://scripts/ui/battle/battle_voice.gd").new()
+	var widget: Control = load("res://scripts/ui/battle/battle_voice.gd").new()
 	widget.setup(services)
 	root.add_child(widget)
 	for i in 3: await process_frame

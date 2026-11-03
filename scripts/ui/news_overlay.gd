@@ -139,6 +139,14 @@ func _render() -> void:
 		_message("Diva Pop está em preparação. As cartas aparecerão quando as dez imagens estiverem publicadas.", false)
 		_footer()
 		return
+	# Decisão do dono: o que já foi resgatado some de Novidades; só fica o que ainda está
+	# para receber (ex.: a campanha de Natal enquanto não for resgatada).
+	if rewards.offers.filter(func(o: Dictionary) -> bool: return _pending(o, rewards)).is_empty():
+		_message("Nenhuma novidade no momento. Quando houver uma campanha (ex.: Natal), ela aparece aqui.", false)
+		_footer()
+		return
+	if rewards.offers.filter(func(o: Dictionary) -> bool: return str(o.get("kind", "")) == _tab and _pending(o, rewards)).is_empty():
+		_tab = "skin" if _tab == "deck" else "deck"
 	_banner(rewards)
 	_categories(rewards)
 	if rewards.inventory_state == "error":
@@ -162,7 +170,7 @@ func _header() -> void:
 	_stack.add_child(header)
 	var gift := _icon(ICON_GIFT, 27 if _compact else 40)
 	header.add_child(gift)
-	var title := _label("Resgatar Presentes", 19 if _compact else 32, WHITE)
+	var title := _label("Resgatar Presentes", 19 if _compact else (36 if _iphone else 32), WHITE)
 	title.name = "HeaderTitle"
 	title.custom_minimum_size.x = 190 if _compact else 310
 	title.autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -174,7 +182,7 @@ func _header() -> void:
 	line.custom_minimum_size = Vector2(1, 25 if _compact else 35)
 	line.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	header.add_child(line)
-	var eyebrow := _label("NOVIDADES DO JOGO", 9 if _compact else 17, Color("#e0e5ee"))
+	var eyebrow := _label("NOVIDADES DO JOGO", 9 if _compact else (20 if _iphone else 17), Color("#e0e5ee"))
 	eyebrow.name = "HeaderEyebrow"
 	eyebrow.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	eyebrow.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -238,20 +246,21 @@ func _banner(rewards: OfficialRewardsService) -> void:
 	copy.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	banner.add_child(copy)
 	var title_text := "Você tem recompensas para conhecer!" if not rewards.revealed else "Seus presentes estão na sua conta!"
-	var title := _label(title_text, 16 if _compact else 27, WHITE)
+	var title := _label(title_text, 16 if _compact else (31 if _iphone else 27), WHITE)
 	title.autowrap_mode = TextServer.AUTOWRAP_OFF
 	title.name = "CampaignHeadline"
 	title.max_lines_visible = 1
 	title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	copy.add_child(title)
 	var desc_text := "Confira os presentes oficiais da equipe Quem Sou Eu." if not rewards.revealed else "Tudo salvo no seu perfil. Aproveite suas recompensas!"
-	var description := _label(desc_text, 11 if _compact else 17, MUTED)
+	var description := _label(desc_text, 11 if _compact else (21 if _iphone else 17), MUTED)
 	description.name = "CampaignSubtitle"
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	description.max_lines_visible = 1 if _iphone else 2
 	copy.add_child(description)
 	var context := _label(str(rewards.campaign.get("title", "")), 10 if _compact else (16 if _iphone else 15), GOLD_SOFT)
 	context.max_lines_visible = 1
+	context.visible = not _iphone
 	context.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	copy.add_child(context)
 
@@ -266,7 +275,8 @@ func _categories(rewards: OfficialRewardsService) -> void:
 		var kind := str(info[0])
 		var count := 0
 		for offer: Dictionary in rewards.offers:
-			if str(offer.get("kind", "")) == kind: count += 1
+			if str(offer.get("kind", "")) == kind and _pending(offer, rewards): count += 1
+		if count == 0: continue
 		var tab := _button("%s (%d)" % [str(info[1]), count], _tab == kind)
 		tab.name = "Tab" + kind.capitalize()
 		tab.icon = info[2]
@@ -297,6 +307,14 @@ func _categories(rewards: OfficialRewardsService) -> void:
 		bar.add_child(sort)
 
 
+## Ainda para receber: não resgatado, ou incluso num pacote que ainda não foi aberto.
+func _pending(offer: Dictionary, rewards: OfficialRewardsService) -> bool:
+	if not bool(offer.get("claimed", false)): return true
+	var historical := offer.has("campaign_id") and str(offer.get("campaign_id", "")) != str(rewards.campaign.get("id", ""))
+	var confirmed := bool(offer.get("revealed", rewards.revealed)) or historical
+	return not confirmed
+
+
 func _rewards_grid(rewards: OfficialRewardsService) -> void:
 	var scroll := ScrollContainer.new()
 	scroll.name = "RewardScroll"
@@ -313,7 +331,7 @@ func _rewards_grid(rewards: OfficialRewardsService) -> void:
 	scroll.add_child(rows)
 	var list: Array[Dictionary] = []
 	for offer: Dictionary in rewards.offers:
-		if str(offer.get("kind", "")) == _tab:
+		if str(offer.get("kind", "")) == _tab and _pending(offer, rewards):
 			list.append(offer)
 	if list.size() > 1 and list.all(func(o: Dictionary) -> bool: return not str(o.get("created_at", "")).is_empty()):
 		list.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
@@ -330,6 +348,8 @@ func _rewards_grid(rewards: OfficialRewardsService) -> void:
 	grid.add_theme_constant_override("h_separation", 12)
 	grid.add_theme_constant_override("v_separation", 12)
 	grid.columns = 4 if _content_width >= 1420 else (3 if _content_width >= 1000 else (2 if _content_width >= 690 else 1))
+	# iPhone: no máximo 3 cartões por linha, maiores e legíveis.
+	if _iphone: grid.columns = mini(grid.columns, 3)
 	rows.add_child(grid)
 	var card_width := floorf((_content_width - (grid.columns - 1) * 12 - 4) / grid.columns)
 	for offer: Dictionary in list:
@@ -342,7 +362,7 @@ func _add_offer(grid: GridContainer, offer: Dictionary, rewards: OfficialRewards
 	var id := str(offer.get("item_id", ""))
 	var card := PanelContainer.new()
 	card.name = "Offer_" + str(offer.get("id", ""))
-	card.custom_minimum_size = Vector2(card_width, 255 if _compact else (280 if _iphone else 322))
+	card.custom_minimum_size = Vector2(card_width, 255 if _compact else (286 if _iphone else 322))
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	card.add_theme_stylebox_override("panel", _style(CARD, Color(GOLD_SOFT, 0.54) if claimed else Color("#4d5967"), 12, 1))
 	grid.add_child(card)
@@ -355,7 +375,7 @@ func _add_offer(grid: GridContainer, offer: Dictionary, rewards: OfficialRewards
 	margin.add_child(content)
 	var art_slot := Panel.new()
 	art_slot.name = "RewardArtSlot"
-	art_slot.custom_minimum_size.y = 100 if _compact else (96 if _iphone else 164)
+	art_slot.custom_minimum_size.y = 100 if _compact else (76 if _iphone else 164)
 	art_slot.clip_contents = true
 	art_slot.add_theme_stylebox_override("panel", _style(Color("#263449"), Color("#334356"), 7, 0))
 	content.add_child(art_slot)
@@ -372,13 +392,13 @@ func _add_offer(grid: GridContainer, offer: Dictionary, rewards: OfficialRewards
 	tag.position = Vector2(8, 8)
 	tag.add_theme_stylebox_override("panel", _style(Color("#f2c85d") if kind == "deck" else Color("#d4a8e3"), Color(0, 0, 0, 0), 6, 0))
 	art_slot.add_child(tag)
-	var label := _label("DECK" if kind == "deck" else "SKIN", 11 if _compact else (15 if _iphone else 13), NAVY)
+	var label := _label("DECK" if kind == "deck" else "SKIN", 11 if _compact else (18 if _iphone else 13), NAVY)
 	label.add_theme_constant_override("outline_size", 0)
 	tag.add_child(label)
 	var name_row := HBoxContainer.new()
 	name_row.add_theme_constant_override("separation", 5)
 	content.add_child(name_row)
-	var name := _label(str(offer.get("title", "Recompensa")), 17 if _compact else (24 if _iphone else 22), WHITE)
+	var name := _label(str(offer.get("title", "Recompensa")), 17 if _compact else (30 if _iphone else 22), WHITE)
 	name.name = "RewardTitle"
 	name.max_lines_visible = 1
 	name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -387,11 +407,11 @@ func _add_offer(grid: GridContainer, offer: Dictionary, rewards: OfficialRewards
 		var found: Dictionary = DeckCatalog.find_deck(id)
 		var count := int(found.get("count", 0))
 		if count > 0:
-			var count_label := _label("%d cartas" % count, 10 if _compact else (16 if _iphone else 13), MUTED)
+			var count_label := _label("%d cartas" % count, 10 if _compact else (20 if _iphone else 13), MUTED)
 			count_label.name = "CardCount"
 			count_label.size_flags_horizontal = Control.SIZE_SHRINK_END
 			name_row.add_child(count_label)
-	var desc := _label(str(offer.get("description", "")), 11 if _compact else (17 if _iphone else 14), MUTED)
+	var desc := _label(str(offer.get("description", "")), 11 if _compact else (21 if _iphone else 14), MUTED)
 	desc.name = "RewardDescription"
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	desc.max_lines_visible = 2
@@ -455,7 +475,8 @@ func _message(message: String, warn: bool) -> void:
 	box.name = "NewsMessage"
 	box.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	box.add_theme_stylebox_override("panel", _style(Color("#192534"), Color(GOLD_SOFT, 0.24), 12, 1))
-	var label := _label(message, 14 if _compact else 20, GOLD_SOFT if warn else MUTED)
+	var label := _label(message, 14 if _compact else (26 if _iphone else 20), GOLD_SOFT if warn else MUTED)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(label)
 	_stack.add_child(box)
 
@@ -551,7 +572,7 @@ func _button(caption: String, primary: bool) -> Button:
 	button.text = caption
 	button.focus_mode = Control.FOCUS_ALL
 	button.custom_minimum_size = Vector2(116, 40)
-	button.add_theme_font_size_override("font_size", 12 if _compact else (21 if _iphone else 17))
+	button.add_theme_font_size_override("font_size", 12 if _compact else (24 if _iphone else 17))
 	button.add_theme_color_override("font_color", NAVY if primary else WHITE)
 	button.add_theme_color_override("font_hover_color", NAVY if primary else WHITE)
 	button.add_theme_color_override("font_pressed_color", NAVY if primary else WHITE)

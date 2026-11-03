@@ -78,6 +78,8 @@ func _build() -> void:
 	header.add_theme_constant_override("separation",12)
 	var back := Style.action("Voltar",func() -> void: _back(),"back")
 	back.name = "BattleBack"
+	# Mesmo "Voltar" das outras telas (cor, seta, estilo); tamanho no espaço da batalha.
+	PlayerUI.standard_back(back, "Voltar")
 	back.custom_minimum_size = Vector2(108,40)
 	back.add_theme_font_size_override("font_size",17)
 	header.add_child(back)
@@ -412,9 +414,22 @@ func _render_event() -> void:
 				_notice.text = "Ninguém foi atingido." if hits.is_empty() else "%d jogador(es) atingido(s)." % hits.size()
 				_notice_ttl = 3.5
 				_last_event = str(event.seq)
+				_show_reveal(str(event.card_id), hits)
 	else:
 		_instruction.text = "Tempo esgotado" if event.kind == "timeout" else "Jogador eliminado"
 		_detail.text = str(_player(_data,str(event.actor)).get("nickname","Jogador"))
+## Revelação animada no meio da tela: carta escolhida + jogadores atingidos (✕ / caveira).
+func _show_reveal(card_id: String, hits: Array) -> void:
+	var old := get_node_or_null("RevealOverlay")
+	if old != null: old.queue_free()
+	var rows: Array = []
+	for hit: Dictionary in hits:
+		rows.append({"name": str(_player(_data,str(hit.get("member_id",""))).get("nickname","Jogador")), "eliminated": bool(hit.get("eliminated",false))})
+	var overlay := RevealOverlay.new()
+	add_child(overlay)
+	overlay.present(card_id, _name(card_id), rows)
+
+
 func _render_players() -> void:
 	PlayerUI.clear(_roster)
 	var players: Array = _data.get("players",[]).duplicate()

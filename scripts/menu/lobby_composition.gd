@@ -219,6 +219,8 @@ func _layout() -> void:
 	var pad := 24.0 if compact else 40.0
 	_rect(brand_logo, Vector2(pad, 12) * unit, Vector2(150, 58) * unit)
 	_rect(menu.get_node("TopBar"), Vector2(w - pad - 200, 20) * unit, Vector2(200, 52) * unit)
+	# Decisão do dono: moedas e gemas ocultas por enquanto (todas as plataformas).
+	menu.get_node("TopBar").visible = false
 	for currency: String in ["CoinPill", "GemPill"]:
 		menu.get_node("TopBar/" + currency).custom_minimum_size = Vector2(94, 52) * unit
 		menu.get_node("TopBar/" + currency + "/Content/Value").add_theme_font_size_override("font_size", roundi(22 * unit))
@@ -242,7 +244,7 @@ func _layout() -> void:
 	var base_width := float(ProjectSettings.get_setting("display/window/size/viewport_width"))
 	# iPhone: a base é a largura útil real (o perfil do iPhone tem base menor que 1672).
 	if UIScale.is_iphone(): base_width = w
-	var fit := minf(1.0, (base_width - pad - 200.0 - 16.0 - x) / total)
+	var fit := minf(1.0, (base_width - pad - 16.0 - x) / total)
 	for id: String in tabs:
 		var button: Button = buttons.get_node(nodes[id])
 		var width: float = float(widths[id]) * fit

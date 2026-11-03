@@ -46,6 +46,9 @@ func setup(p_duel: DuelService, p_inventory: InventoryService, p_parent: Control
 func _ready() -> void:
 	_build()
 	resized.connect(_layout)
+	# Mesmo que os Containers mantenham o tamanho mínimo anterior ao resize,
+	# reavaliar o tabuleiro quando o viewport real mudar (Web/Android).
+	get_viewport().size_changed.connect(func() -> void: _layout.call_deferred())
 	get_window().focus_exited.connect(_conceal_hand)
 	visibility_changed.connect(func() -> void:
 		if not is_visible_in_tree():
@@ -601,13 +604,21 @@ func _layout() -> void:
 	if not _built or size.x <= 0 or size.y <= 0: return
 	## Escalar a interface contra uma altura virtual maior deixa mais área para a arte.
 	## Antes, em tela alta, roster/sidebar consumiam espaço ampliados 1.8×.
-	var factor := clampf(size.y/555.0,1.0,1.55)
+	var viewport_size := Vector2(get_viewport().get_visible_rect().size)
+	var global_position := get_global_rect().position
+	var global_scale := get_global_transform().get_scale()
+	# Não permitir que o mínimo antigo do GridContainer desenhe além da tela
+	# depois de um resize. Preservar 12px laterais e 8px inferiores.
+	var allowed_width := maxf(1.0,(viewport_size.x-maxf(global_position.x,0.0)-12.0)/maxf(global_scale.x,0.01))
+	var allowed_height := maxf(1.0,(viewport_size.y-maxf(global_position.y,0.0)-8.0)/maxf(global_scale.y,0.01))
+	var available := Vector2(minf(size.x,allowed_width),minf(size.y,allowed_height))
+	var factor := clampf(available.y/555.0,1.0,1.55)
 	_canvas.scale = Vector2.ONE * factor
-	_canvas.size = size/factor
+	_canvas.size = available/factor
 	var width := _canvas.size.x
 	var side_width := _utility_width(width)
 	_main.position = Vector2.ZERO
-	_main.size = Vector2(width-side_width-10,_canvas.size.y)
+	_main.size = Vector2(width-side_width-20,_canvas.size.y)
 	_side.position = Vector2(width-side_width,0)
 	_side.size = Vector2(side_width,_canvas.size.y)
 	if is_instance_valid(_notice):
@@ -646,7 +657,7 @@ func _fit_cards() -> void:
 	var count := _grid.get_child_count()
 	if count == 0: return
 	var side_width := _utility_width(_canvas.size.x)
-	var main_width := _canvas.size.x-side_width-10
+	var main_width := _canvas.size.x-side_width-20
 	var instruction_row := _board_content.get_child(0) as Control
 	var gap := float(_grid.get_theme_constant("h_separation"))
 	var frame := float(_board.padding*2)

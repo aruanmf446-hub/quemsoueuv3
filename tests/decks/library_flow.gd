@@ -62,17 +62,17 @@ func run() -> void:
 		capture_dir = ProjectSettings.globalize_path(args[1])
 		DirAccess.make_dir_recursive_absolute(capture_dir)
 	var decks := Catalog.decks()
-	check(decks.size() == 1 and decks[0].id == "lendas_urbanas", "only_real_public_deck")
+	check(decks.size() == 4 and decks.map(func(d: Dictionary) -> String: return str(d.id)) == ["lendas_urbanas", "nostalgia_web", "pinturas", "sol_nascente"], "four_real_public_decks")
 	if decks.is_empty(): quit(1); return
 	var deck: Dictionary = decks[0]
 	check(deck.official and deck.creator == "Quem Sou Eu" and deck.count == 9, "official_creator_nine_cards")
-	check(deck.category.is_empty() and deck.tags.is_empty() and deck.age_rating.is_empty() and deck.description.is_empty(), "missing_metadata_not_invented")
+	check(not deck.category.is_empty() and not deck.tags.is_empty() and deck.age_rating.is_empty() and deck.description.length() > 200, "enriched_official_metadata")
 	check(Catalog.find_deck("../lendas_urbanas").is_empty(), "reject_path_traversal")
 	var names: Array[String] = []
 	for entry: Dictionary in deck.cards:
 		names.append(entry.name)
 		var texture := load(entry.image) as Texture2D
-		check(texture != null and texture.get_size() == Vector2(600, 840) and entry.description.is_empty(), "original_image_" + entry.id.get_file())
+		check(texture != null and texture.get_size() == Vector2(600, 840) and entry.description.length() > 180, "image_and_description_" + entry.id.get_file())
 	check(names == ["Bruxa do Pântano", "Cobra Grande", "Dama de Branco", "Homem do Saco", "Homem Sorridente", "Jeff the Killer", "Loira do Banheiro", "Momo", "Slender Man"], "alphabetical_order")
 	var raw: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(Catalog.ROOT + "/lendas_urbanas/deck.json"))
 	var sample := raw.duplicate(true)

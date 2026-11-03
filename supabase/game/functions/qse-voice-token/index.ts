@@ -107,18 +107,33 @@ const handler = withSupabase({ auth: "user" }, async (req, ctx) => {
     const allowedTags = new Set(members.map((member) => member.tag));
     let removed = 0;
     try {
-      const connected = await api.listParticipants(roomName);
-      for (const participant of connected) {
-        if (!allowedTags.has(participant.identity)) {
-          await api.removeParticipant(roomName, participant.identity);
-          removed++;
+      // LiveKit creates a room when the first participant connects. A room
+      // without connected participants is not an error or a reason to deny
+      // membership in the GAME room.
+      const liveRooms = await api.listRooms([roomName]);
+      if (liveRooms.some((liveRoom) => liveRoom.name === roomName)) {
+        const connected = await api.listParticipants(roomName);
+        for (const participant of connected) {
+          if (!allowedTags.has(participant.identity)) {
+            await api.removeParticipant(roomName, participant.identity);
+            removed++;
+          }
         }
       }
-    } catch {
-      // No room currently connected, or remote service temporarily unavailable.
+    } catch (e) {
+      // Do not expose credentials, token, room IDs, or external error messages.
+      const code = typeof e === "object" && e !== null && "code" in e
+        ? String(e.code) : "unknown";
+      console.warn("qse-voice-token: LIVEKIT_RECONCILE_ERROR", {
+        code: /^[A-Za-z0-9_-]{1,32}$/.test(code) ? code : "unknown",
+      });
       return response({ code: "voice_unavailable" }, 503);
     }
-    return response({ ok: true, removed, participants: members.map((member) => ({ tag: member.tag, nickname: member.nickname })) });
+    return response({
+      ok: true,
+      removed,
+      participants: members.map((member) => ({ tag: member.tag, nickname: member.nickname })),
+    });
   }
 
   // A short-lived, microphone-only token. Token TTL is *not* active-session

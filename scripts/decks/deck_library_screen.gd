@@ -66,6 +66,7 @@ void fragment() {
 func _ready() -> void:
 	super._ready()
 	_catalog = Catalog.decks()
+	if services.rewards != null: services.rewards.changed.connect(_rewards_updated)
 	_search = LineEdit.new()
 	_search.name = "DeckSearch"
 	_search.placeholder_text = tr("Pesquisar deck ou criador")
@@ -225,7 +226,8 @@ func _entries() -> Array[Dictionary]:
 			"creator": str(item.creator), "category": str(item.category), "count": int(item.count), "tags": item.get("tags", []),
 			"cover": DeckCover.resolve_item(item), "focus": DeckCover.PORTRAIT_FOCUS, "images": images, "item": item,
 			"ref": ("official:" if item.official else "creator:") + str(item.id),
-			"published": PlayerContracts.iso_seconds(str(item.get("published_at", "")))})
+			"published": PlayerContracts.iso_seconds(str(item.get("published_at", ""))),
+			"owned": bool(item.official and services.rewards != null and services.rewards.is_deck_claimed(str(item.id)))})
 	for draft: Dictionary in _store().list():
 		var cards: Array = draft.get("cards", [])
 		var cover := DeckCover.resolve_draft(_store(), draft)
@@ -363,7 +365,8 @@ func _refresh_moderation() -> void:
 
 
 func _matches(entry: Dictionary) -> bool:
-	if not _types.is_empty() and not _types.has(str(entry.origin)): return false
+	if not _types.is_empty() and not _types.has(str(entry.origin)):
+		if not (_types.has("mine") and str(entry.origin) == "official" and bool(entry.get("owned", false))): return false
 	if not _themes.is_empty() and not _themes.has(str(entry.category)): return false
 	var term := Catalog.search_key(_query)
 	return term.is_empty() or Catalog.search_key("%s %s" % [entry.name, entry.creator]).contains(term)
@@ -414,7 +417,7 @@ func _update_results() -> void:
 	var shown: Array[Dictionary] = []
 	for entry in all:
 		if _tab == "Favoritos" and not _store().is_favorite(str(entry.id)): continue
-		if _tab == "Meus Decks" and entry.origin != "mine": continue
+		if _tab == "Meus Decks" and entry.origin != "mine" and not bool(entry.get("owned", false)): continue
 		if _matches(entry): shown.append(entry)
 	shown = _sorted(shown)
 	if _tab == "Descobrir": _discover_top(all)
@@ -847,6 +850,8 @@ func _deck_tile(entry: Dictionary) -> Control:
 	meta.add_child(PremiumUI.icon_rect("cards", PremiumUI.MUTED, 12 if compact else 16))
 	meta.add_child(PremiumUI.plain(tr("%d cartas") % int(entry.count), 11 if compact else 14, PremiumUI.MUTED, false))
 	_tile_facts(meta, entry, compact)
+	if entry.origin == "official" and bool(entry.get("owned", false)):
+		meta.add_child(PlayerUI.pill("RESGATADO", "equipped"))
 	if entry.origin == "mine":
 		var state := str(entry.draft.get("sync_state", "local"))
 		var pill_text: String = {"synced": "NA CONTA", "pending": "ENVIANDO", "error": "ERRO AO ENVIAR"}.get(state, "RASCUNHO")
@@ -1077,7 +1082,14 @@ func _render_deck(item: Dictionary) -> void:
 	_page(str(item.name), "deck")
 	var metadata := PlayerUI.flow(body)
 	metadata.name = "DeckMetadata"
-	if item.official: metadata.add_child(PlayerUI.pill("OFICIAL", "equipped"))
+	if item.official:
+		metadata.add_child(PlayerUI.pill("OFICIAL", "equipped"))
+		if services.rewards != null and services.rewards.is_deck_claimed(str(item.id)):
+			metadata.add_child(PlayerUI.pill("NA SUA CONTA", "equipped"))
+		elif services.session.authenticated():
+			var redeem := _action("RESGATAR GRÁTIS", _open_rewards)
+			redeem.name = "RedeemOfficialDeck"
+			metadata.add_child(redeem)
 	metadata.add_child(_heart(str(item.id)))
 	if item.get("community", false):
 		metadata.add_child(PlayerUI.pill("COMUNIDADE", "available"))
@@ -1717,3 +1729,17 @@ func _render_review() -> void:
 	note_label.name = "PublishNote"
 	body.add_child(note_label)
 	_reveal()
+
+
+## A posse oficial pertence à conta GAME, não aos favoritos ou ao cache local.
+func _rewards_updated() -> void:
+	if not is_visible_in_tree(): return
+	if _view == "library" and is_instance_valid(_results): _update_results()
+	elif _view == "deck" and bool(_deck.get("official", false)) and not _deck.is_empty(): _render_deck(_deck)
+
+
+func _open_rewards() -> void:
+	if get_node_or_null("OfficialRewardsOverlay") != null: return
+	var overlay := NewsOverlay.new()
+	overlay.name = "OfficialRewardsOverlay"
+	add_child(overlay)

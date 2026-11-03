@@ -6,6 +6,7 @@ signal option_selected(option_id: StringName)
 @onready var _services: PlayerServices = $Services
 var _mode_label: Label
 var _news_button: Button
+var _news_auto_shown := {}
 var _web_invite_intent := WebInviteIntent.new()
 var _web_invite_navigating := false
 var _initial_login_pending := true
@@ -41,6 +42,7 @@ func _ready() -> void:
 	_services.friends.changed.connect(_refresh_friends)
 	_services.session.changed.connect(_refresh_profile)
 	_services.session.changed.connect(_auth_redirect_ready)
+	_services.rewards.changed.connect(_rewards_changed)
 	_services.preferences.changed.connect(_refresh_wallet)
 	_navigation.route_changed.connect(_route_changed)
 	_refresh_profile()
@@ -63,6 +65,7 @@ func _ready() -> void:
 	add_child(_news_button)
 	resized.connect(_layout_news_button)
 	_layout_news_button.call_deferred()
+	_rewards_changed()
 	# Nao mostrar o login quando um refresh token valido ja existe.
 	# A arte cobre o lobby durante a validacao (sem permitir cliques).
 	_check_web_invite.call_deferred()
@@ -102,6 +105,7 @@ func _initial_auth_resolved() -> void:
 	_startup_cover = null
 	_resume_web_invite()
 	_nickname_profile_changed.call_deferred()
+	_maybe_show_news.call_deferred()
 
 
 ## Perfil sem nickname precisa da confirmação do próprio jogador.
@@ -122,6 +126,7 @@ func _nickname_offer() -> void:
 		if is_instance_valid(_nickname_modal):
 			_nickname_modal.queue_free()
 			_nickname_modal = null
+		_maybe_show_news.call_deferred()
 		return
 	if not ready or is_instance_valid(_nickname_modal):
 		return
@@ -230,6 +235,29 @@ func _layout_news_button() -> void:
 		style.bg_color = Color(1, 1, 1, 0.06) if state == "hover" else Color.TRANSPARENT
 		_news_button.add_theme_stylebox_override(state, style)
 
+## Oferta automática no máximo uma vez por campanha e por conta; recibo é do GAME.
+func _rewards_changed() -> void:
+	if not is_instance_valid(_news_button): return
+	var reward := _services.rewards
+	_news_button.text = "NOVIDADES  •  NOVO" if reward.state == "success" and not reward.seen else "NOVIDADES"
+	_news_button.tooltip_text = "Presentes gratuitos e novidades oficiais"
+	_maybe_show_news.call_deferred()
+
+
+func _maybe_show_news() -> void:
+	if not is_inside_tree() or _initial_login_pending or OS.get_cmdline_args().has("--script"): return
+	if not _services.session.authenticated() or _services.session.needs_password_reset: return
+	if _web_invite_intent.pending or _navigation.get("_active") != null: return
+	if is_instance_valid(_nickname_modal) or _services.profile.state != "success": return
+	if str(_services.profile.data.get("nickname", "")).strip_edges().is_empty(): return
+	var reward := _services.rewards
+	if reward.state != "success" or reward.seen or reward.campaign.is_empty(): return
+	var key := str(_services.session.user.get("id", "")) + ":" + str(reward.campaign.get("id", ""))
+	if _news_auto_shown.has(key): return
+	_news_auto_shown[key] = true
+	_open_news()
+
+
 func _open_news() -> void:
 	if get_node_or_null("NewsOverlay") != null: return
 	var overlay := NewsOverlay.new()
@@ -322,6 +350,7 @@ func _route_changed(route: String) -> void:
 	# O mini player é do lobby: nas telas internas ele cobria títulos e conteúdo.
 	var now_playing := get_node_or_null("NowPlaying")
 	if now_playing != null: now_playing.set_suppressed(not route.is_empty())
+	if route.is_empty(): _maybe_show_news.call_deferred()
 
 
 func _notification(what: int) -> void:

@@ -69,7 +69,7 @@ func _run() -> void:
 	check(screen.find_child("FeaturedBanner", true, false) != null and screen.find_child("ExploreFeatured", true, false) != null, "banner com Explorar coleção")
 	check(screen.find_child("BannerDots", true, false) == null, "sem pontos com um único destaque real")
 	check(screen.find_child("Collection_official", true, false) != null and screen.find_child("Collection_mine", true, false) != null, "coleções em destaque")
-	var diva_pop_ready := not load("res://scripts/decks/deck_library_catalog.gd").find_deck("diva_pop").is_empty()
+	var diva_pop_ready: bool = not load("res://scripts/decks/deck_library_catalog.gd").find_deck("diva_pop").is_empty()
 	var official_total := 5 if diva_pop_ready else 4
 	var all_total := official_total + 5
 	check(_names().has("Deck_lendas_urbanas") and _names().size() == all_total, "todos os oficiais carregados + cinco fixtures")

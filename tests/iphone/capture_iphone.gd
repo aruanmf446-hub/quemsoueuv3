@@ -47,6 +47,15 @@ func _run() -> void:
 					break
 			overlay.queue_free()
 			for i in 10: await process_frame
+	if only.has("account_login"):
+		# Tela de e-mail/senha (onde o teclado é usado).
+		nav.open("account", {})
+		for i in 30: await process_frame
+		var account: Node = nav.get("_active")
+		if account != null and account.has_method("_switch"): account.call("_switch", "login")
+		await _shot(args[0], "account_login_" + tag)
+		nav.back()
+		for i in 20: await process_frame
 	for route: String in ROUTES:
 		if not only.is_empty() and not only.has(route): continue
 		nav.open(route, {})

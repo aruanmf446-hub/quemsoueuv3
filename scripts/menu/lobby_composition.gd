@@ -240,6 +240,8 @@ func _layout() -> void:
 	# Ajusta o texto na base de design, nunca pela largura física do aparelho.
 	# Telas mais largas acrescentam espaço, sem aumentar as abas ou sua fonte.
 	var base_width := float(ProjectSettings.get_setting("display/window/size/viewport_width"))
+	# iPhone: a base é a largura útil real (o perfil do iPhone tem base menor que 1672).
+	if UIScale.is_iphone(): base_width = w
 	var fit := minf(1.0, (base_width - pad - 200.0 - 16.0 - x) / total)
 	for id: String in tabs:
 		var button: Button = buttons.get_node(nodes[id])
@@ -253,11 +255,12 @@ func _layout() -> void:
 		body.get_node("Text/Subtitle").hide()
 		body.get_node("Text/Title").add_theme_font_size_override("font_size", roundi(24 * unit * fit))
 		x += width + gap * fit
-	var title_y := h * 0.35 if compact else h * 0.40
+	var iphone := UIScale.is_iphone()
+	var title_y := h * 0.35 if compact else (h * 0.27 if iphone else h * 0.40)
 	_rect(chapter, Vector2(pad, title_y) * unit, Vector2(340, 30) * unit)
 	chapter.add_theme_font_size_override("font_size", roundi(20 * unit))
 	_rect(chapter_title, Vector2(pad - 2, title_y + 30) * unit, Vector2(400, 150) * unit)
-	chapter_title.add_theme_font_size_override("font_size", roundi((36 if compact else 60) * unit))
+	chapter_title.add_theme_font_size_override("font_size", roundi((36 if compact else (54 if iphone else 60)) * unit))
 	var play: Button = buttons.get_node("BtnStory")
 	_rect(play, Vector2(pad, h - 264) * unit, Vector2(460, 116) * unit)
 	var action: Control = play.get_node("ActionBody")

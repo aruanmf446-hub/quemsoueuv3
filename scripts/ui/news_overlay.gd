@@ -63,12 +63,21 @@ func _ready() -> void:
 	_load.call_deferred()
 
 
+var _iphone := false
+
+
 func _layout() -> void:
 	if not is_instance_valid(_modal): return
 	var viewport := Vector2(get_viewport().get_visible_rect().size)
 	_compact = viewport.y < 600
 	var fraction_x := 0.965 if _compact else 0.94
 	var fraction_y := 0.88 if _compact else 0.82
+	# iPhone (perfil próprio, já dentro da área segura): a janela ocupa quase tudo para que
+	# banner, abas, cartões inteiros (arte, nome, descrição e botão) e rodapé caibam sem corte.
+	_iphone = UIScale.is_iphone()
+	if _iphone:
+		fraction_x = 0.985
+		fraction_y = 0.975
 	_modal_width = floorf(viewport.x * fraction_x)
 	var modal_height := floorf(viewport.y * fraction_y)
 	_modal.position = (viewport - Vector2(_modal_width, modal_height)) * 0.5
@@ -148,7 +157,7 @@ func _render() -> void:
 func _header() -> void:
 	var header := HBoxContainer.new()
 	header.name = "RewardHeader"
-	header.custom_minimum_size.y = 42 if _compact else 64
+	header.custom_minimum_size.y = 42 if _compact else (54 if _iphone else 64)
 	header.add_theme_constant_override("separation", 11 if _compact else 18)
 	_stack.add_child(header)
 	var gift := _icon(ICON_GIFT, 27 if _compact else 40)
@@ -183,7 +192,7 @@ func _header() -> void:
 func _banner(rewards: OfficialRewardsService) -> void:
 	var banner := Panel.new()
 	banner.name = "RewardBanner"
-	banner.custom_minimum_size.y = 84 if _compact else 142
+	banner.custom_minimum_size.y = 84 if _compact else (92 if _iphone else 142)
 	banner.clip_contents = true
 	banner.add_theme_stylebox_override("panel", _style(Color("#172331"), Color("#6b6255"), 12, 1))
 	_stack.add_child(banner)
@@ -217,15 +226,15 @@ func _banner(rewards: OfficialRewardsService) -> void:
 	banner.add_child(shade)
 	var accent := ColorRect.new()
 	accent.color = GOLD
-	accent.position = Vector2(16 if _compact else 24, 17 if _compact else 28)
-	accent.size = Vector2(4 if _compact else 6, 50 if _compact else 79)
+	accent.position = Vector2(16 if _compact else 24, 17 if _compact else (14 if _iphone else 28))
+	accent.size = Vector2(4 if _compact else 6, 50 if _compact else (72 if _iphone else 79))
 	accent.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	banner.add_child(accent)
 	var copy := VBoxContainer.new()
 	copy.name = "CampaignCopy"
-	copy.position = Vector2(29 if _compact else 49, 13 if _compact else 23)
-	copy.size = Vector2(_content_width * 0.66 - 40, 66 if _compact else 104)
-	copy.add_theme_constant_override("separation", 2 if _compact else 10)
+	copy.position = Vector2(29 if _compact else 49, 13 if _compact else (10 if _iphone else 23))
+	copy.size = Vector2(_content_width * 0.66 - 40, 66 if _compact else (80 if _iphone else 104))
+	copy.add_theme_constant_override("separation", 2 if _compact else (3 if _iphone else 10))
 	copy.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	banner.add_child(copy)
 	var title_text := "Você tem recompensas para conhecer!" if not rewards.revealed else "Seus presentes estão na sua conta!"
@@ -239,9 +248,9 @@ func _banner(rewards: OfficialRewardsService) -> void:
 	var description := _label(desc_text, 11 if _compact else 17, MUTED)
 	description.name = "CampaignSubtitle"
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	description.max_lines_visible = 2
+	description.max_lines_visible = 1 if _iphone else 2
 	copy.add_child(description)
-	var context := _label(str(rewards.campaign.get("title", "")), 10 if _compact else 15, GOLD_SOFT)
+	var context := _label(str(rewards.campaign.get("title", "")), 10 if _compact else (16 if _iphone else 15), GOLD_SOFT)
 	context.max_lines_visible = 1
 	context.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	copy.add_child(context)
@@ -263,7 +272,7 @@ func _categories(rewards: OfficialRewardsService) -> void:
 		tab.icon = info[2]
 		tab.expand_icon = true
 		tab.add_theme_constant_override("icon_max_width", 18 if _compact else 23)
-		tab.custom_minimum_size = Vector2(148 if _compact else 220, 36 if _compact else 48)
+		tab.custom_minimum_size = Vector2(148 if _compact else (250 if _iphone else 220), 36 if _compact else 48)
 		tab.pressed.connect(_switch.bind(kind))
 		bar.add_child(tab)
 	# A leitura histórica do GAME inclui a data real da oferta.
@@ -333,7 +342,7 @@ func _add_offer(grid: GridContainer, offer: Dictionary, rewards: OfficialRewards
 	var id := str(offer.get("item_id", ""))
 	var card := PanelContainer.new()
 	card.name = "Offer_" + str(offer.get("id", ""))
-	card.custom_minimum_size = Vector2(card_width, 255 if _compact else 322)
+	card.custom_minimum_size = Vector2(card_width, 255 if _compact else (280 if _iphone else 322))
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	card.add_theme_stylebox_override("panel", _style(CARD, Color(GOLD_SOFT, 0.54) if claimed else Color("#4d5967"), 12, 1))
 	grid.add_child(card)
@@ -346,7 +355,7 @@ func _add_offer(grid: GridContainer, offer: Dictionary, rewards: OfficialRewards
 	margin.add_child(content)
 	var art_slot := Panel.new()
 	art_slot.name = "RewardArtSlot"
-	art_slot.custom_minimum_size.y = 100 if _compact else 164
+	art_slot.custom_minimum_size.y = 100 if _compact else (96 if _iphone else 164)
 	art_slot.clip_contents = true
 	art_slot.add_theme_stylebox_override("panel", _style(Color("#263449"), Color("#334356"), 7, 0))
 	content.add_child(art_slot)
@@ -363,13 +372,13 @@ func _add_offer(grid: GridContainer, offer: Dictionary, rewards: OfficialRewards
 	tag.position = Vector2(8, 8)
 	tag.add_theme_stylebox_override("panel", _style(Color("#f2c85d") if kind == "deck" else Color("#d4a8e3"), Color(0, 0, 0, 0), 6, 0))
 	art_slot.add_child(tag)
-	var label := _label("DECK" if kind == "deck" else "SKIN", 11 if _compact else 13, NAVY)
+	var label := _label("DECK" if kind == "deck" else "SKIN", 11 if _compact else (15 if _iphone else 13), NAVY)
 	label.add_theme_constant_override("outline_size", 0)
 	tag.add_child(label)
 	var name_row := HBoxContainer.new()
 	name_row.add_theme_constant_override("separation", 5)
 	content.add_child(name_row)
-	var name := _label(str(offer.get("title", "Recompensa")), 17 if _compact else 22, WHITE)
+	var name := _label(str(offer.get("title", "Recompensa")), 17 if _compact else (24 if _iphone else 22), WHITE)
 	name.name = "RewardTitle"
 	name.max_lines_visible = 1
 	name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -378,11 +387,11 @@ func _add_offer(grid: GridContainer, offer: Dictionary, rewards: OfficialRewards
 		var found: Dictionary = DeckCatalog.find_deck(id)
 		var count := int(found.get("count", 0))
 		if count > 0:
-			var count_label := _label("%d cartas" % count, 10 if _compact else 13, MUTED)
+			var count_label := _label("%d cartas" % count, 10 if _compact else (16 if _iphone else 13), MUTED)
 			count_label.name = "CardCount"
 			count_label.size_flags_horizontal = Control.SIZE_SHRINK_END
 			name_row.add_child(count_label)
-	var desc := _label(str(offer.get("description", "")), 11 if _compact else 14, MUTED)
+	var desc := _label(str(offer.get("description", "")), 11 if _compact else (17 if _iphone else 14), MUTED)
 	desc.name = "RewardDescription"
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	desc.max_lines_visible = 2
@@ -419,7 +428,7 @@ func _footer(rewards: OfficialRewardsService = null) -> void:
 	var news := _button("Outras notícias" if _compact else "Ver outras notícias do jogo", false)
 	news.name = "MoreNews"
 	news.tooltip_text = "Ver outras notícias do jogo"
-	news.custom_minimum_size = Vector2(142 if _compact else 242, 38 if _compact else 49)
+	news.custom_minimum_size = Vector2(142 if _compact else (300 if _iphone else 242), 38 if _compact else 49)
 	news.pressed.connect(_legacy_news)
 	footer.add_child(news)
 	var spacer := Control.new()
@@ -429,12 +438,12 @@ func _footer(rewards: OfficialRewardsService = null) -> void:
 	if not rewards.revealed:
 		var redeem := _button("RESGATAR PRESENTES", true)
 		redeem.name = "RedeemGiftBundle"
-		redeem.custom_minimum_size = Vector2(158 if _compact else 270, 39 if _compact else 49)
+		redeem.custom_minimum_size = Vector2(158 if _compact else (320 if _iphone else 270), 39 if _compact else 49)
 		redeem.disabled = _working or rewards.offers.is_empty() or rewards.offers.all(func(o: Dictionary) -> bool: return not bool(o.get("claimed", false)))
 		redeem.pressed.connect(_reveal_gifts)
 		footer.add_child(redeem)
 	else:
-		var received := _label("✓  PRESENTES RECEBIDOS", 11 if _compact else 16, GOLD_SOFT)
+		var received := _label("✓  PRESENTES RECEBIDOS", 11 if _compact else (20 if _iphone else 16), GOLD_SOFT)
 		received.name = "GiftsReceived"
 		received.size_flags_horizontal = Control.SIZE_SHRINK_END
 		received.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -542,7 +551,7 @@ func _button(caption: String, primary: bool) -> Button:
 	button.text = caption
 	button.focus_mode = Control.FOCUS_ALL
 	button.custom_minimum_size = Vector2(116, 40)
-	button.add_theme_font_size_override("font_size", 12 if _compact else 17)
+	button.add_theme_font_size_override("font_size", 12 if _compact else (21 if _iphone else 17))
 	button.add_theme_color_override("font_color", NAVY if primary else WHITE)
 	button.add_theme_color_override("font_hover_color", NAVY if primary else WHITE)
 	button.add_theme_color_override("font_pressed_color", NAVY if primary else WHITE)

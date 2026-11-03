@@ -1,4 +1,4 @@
-name: T32 Godot voice resource leak diagnostic
+name: T32 Godot voice resource leak regression
 on:
   pull_request:
     branches: [main]
@@ -40,17 +40,25 @@ jobs:
           code=$?
           grep -E -A 12 -B 8 'DUEL_LOCAL|resources still in use|ObjectDB instances|Leaked|leaked|SCRIPT ERROR|ERROR:' "$RUNNER_TEMP/report/duel_local_verbose.log" | tail -100 || true
           if [ "$code" -ne 0 ]; then exit "$code"; fi
-          # O smoke oficial não usa --verbose: executar o mesmo comando aqui
-          # para comprovar que não ocultamos o erro dependente de temporização.
-          "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --script res://tests/duel_local/flow_test.gd > "$RUNNER_TEMP/report/duel_local_normal.log" 2>&1
-          cat "$RUNNER_TEMP/report/duel_local_normal.log"
-          if grep -E 'ERROR:|SCRIPT ERROR:|Parse Error:' "$RUNNER_TEMP/report/duel_local_verbose.log" "$RUNNER_TEMP/report/duel_local_normal.log"; then
-            echo "Godot resource leak/error persists"
+          # Verificar três encerramentos normais, pois a falha original era
+          # intermitente e só aparecia sem --verbose.
+          for attempt in 1 2 3; do
+            log="$RUNNER_TEMP/report/duel_local_normal_${attempt}.log"
+            "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --script res://tests/duel_local/flow_test.gd > "$log" 2>&1
+            cat "$log"
+            if grep -E 'ERROR:|SCRIPT ERROR:|Parse Error:|ObjectDB instances were leaked|resources still in use' "$log"; then
+              echo "Godot resource leak/error in normal run ${attempt}"
+              exit 1
+            fi
+            grep -q 'DUEL_LOCAL_PASS' "$log"
+          done
+          if grep -E 'ERROR:|SCRIPT ERROR:|Parse Error:|ObjectDB instances were leaked|resources still in use' "$RUNNER_TEMP/report/duel_local_verbose.log"; then
+            echo "Godot resource leak/error in verbose run"
             exit 1
           fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: t32-voice-leak-diagnostic
+          name: t32-voice-leak-regression
           path: ${{ runner.temp }}/report
           retention-days: 5

@@ -60,6 +60,11 @@ func _run() -> void:
 	check(overlay.find_child("RewardBanner", true, false) != null, "banner da campanha existe")
 	var header_title := overlay.find_child("HeaderTitle", true, false) as Label
 	check(header_title != null and header_title.size.x > 150 and header_title.size.y > 18, "texto do cabeçalho legível e com dimensões reais")
+	var heading_row := overlay.find_child("RewardHeader", true, false) as HBoxContainer
+	check(heading_row != null and heading_row.size.y < 100, "cabeçalho não pode ocupar a janela inteira")
+	check(header_title.size.y < 80, "título horizontal sem letras empilhadas")
+	var banner_frame := overlay.find_child("RewardBanner", true, false) as Panel
+	check(banner_frame != null and banner_frame.get_global_rect().end.y < 430, "banner situado acima dos cards em desktop")
 	var headline := overlay.find_child("CampaignHeadline", true, false) as Label
 	check(headline != null and headline.size.x > 100 and headline.size.y > 16, "texto do banner com área visível")
 	var first_title := overlay.find_child("RewardTitle", true, false) as Label

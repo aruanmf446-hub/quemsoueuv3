@@ -99,7 +99,10 @@ func _refresh() -> void:
             var row := HBoxContainer.new()
             row.add_theme_constant_override("separation", 4)
             _users.add_child(row)
-            var label := Style.label(("● Falando" if bool(p.get("speaking", false)) else "● Jogador") + " %d" % index, 11, PlayerUI.MUTED)
+            var display_name := str(p.get("name", "Jogador")).strip_edges()
+            if display_name.is_empty(): display_name = "Jogador %d" % index
+            if display_name.length() > 17: display_name = display_name.substr(0, 17) + "…"
+            var label := Style.label(("● " if bool(p.get("speaking", false)) else "○ ") + display_name, 11, PlayerUI.GOLD if bool(p.get("speaking", false)) else PlayerUI.MUTED)
             label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
             row.add_child(label)
             var mute := Style.action("Reativar" if _muted_people.has(identity) else "Silenciar", func() -> void:

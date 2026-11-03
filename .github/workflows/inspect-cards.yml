@@ -1,0 +1,40 @@
+name: Review card images (temporary)
+on:
+  push:
+    branches: [work/inspect-card-images-20261102]
+    paths: ['.github/workflows/inspect-cards.yml']
+permissions:
+  contents: read
+jobs:
+  contact-sheets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build compact contact sheets for visual inspection
+        run: |
+          python -m pip -q install pillow==11.3.0
+          python - <<'PY'
+          import base64,io,pathlib
+          from PIL import Image,ImageDraw,ImageFont,ImageOps
+          root=pathlib.Path('assets/duel/decks/oficial')
+          font=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',22)
+          for deck in ('nostalgia_web','sol_nascente','pinturas'):
+              files=sorted((root/deck).glob('*.png'))
+              cols=3; cw=300; ch=390
+              rows=(len(files)+cols-1)//cols
+              board=Image.new('RGB',(cw*cols,ch*rows),'#eeeeee')
+              draw=ImageDraw.Draw(board)
+              for i,p in enumerate(files):
+                  x=(i%cols)*cw;y=(i//cols)*ch
+                  im=Image.open(p).convert('RGB')
+                  thumb=ImageOps.contain(im,(cw-16,ch-60),Image.Resampling.LANCZOS)
+                  board.paste(thumb,(x+(cw-thumb.width)//2,y+10))
+                  draw.text((x+12,y+ch-40),p.stem,fill='#111111',font=font)
+              out=io.BytesIO()
+              board.save(out,format='JPEG',quality=56,optimize=True)
+              encoded=base64.b64encode(out.getvalue()).decode()
+              print('QSE_SHEET_BEGIN|'+deck+'|'+str(len(files))+'|'+str(len(encoded)),flush=True)
+              for k in range(0,len(encoded),2800):
+                  print('QSE_SHEET_PART|'+deck+'|'+encoded[k:k+2800],flush=True)
+              print('QSE_SHEET_END|'+deck,flush=True)
+          PY

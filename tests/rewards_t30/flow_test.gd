@@ -58,6 +58,12 @@ func _run() -> void:
 	check(overlay.find_child("CloseNews", true, false) != null, "fechar tem botão X")
 	check(overlay.find_child("BackNews", true, false) == null, "sem botão Voltar visível")
 	check(overlay.find_child("RewardBanner", true, false) != null, "banner da campanha existe")
+	var header_title := overlay.find_child("HeaderTitle", true, false) as Label
+	check(header_title != null and header_title.size.x > 150 and header_title.size.y > 18, "texto do cabeçalho legível e com dimensões reais")
+	var headline := overlay.find_child("CampaignHeadline", true, false) as Label
+	check(headline != null and headline.size.x > 100 and headline.size.y > 16, "texto do banner com área visível")
+	var first_title := overlay.find_child("RewardTitle", true, false) as Label
+	check(first_title != null and first_title.size.x > 75 and first_title.size.y > 13, "nome da recompensa renderizável")
 	check(overlay.find_child("RewardOffers", true, false) != null, "grade nativa existe")
 	var container := overlay.find_child("RewardOffers", true, false) as GridContainer
 	check(container.get_child_count() == 4, "somente os quatro decks reais do fixture")

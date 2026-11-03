@@ -54,7 +54,13 @@ const handler = withSupabase({ auth: "user" }, async (request, context) => {
   if (error) return response({ code: "game_unavailable" }, 503);
   if (!data || data.allowed !== true) return response({ code: "room_access_denied" }, 403);
   const members = Array.isArray(data.participants) ? data.participants : [];
-  const allowed = new Set(members.map((m: { tag?: unknown }) => m.tag).filter((tag: unknown) => typeof tag === "string"));
+  const roster = members
+    .filter((m: { tag?: unknown }) => m && typeof m.tag === "string" && /^[a-f0-9]{64}$/.test(m.tag))
+    .map((m: { tag: string; nickname?: unknown }) => ({
+      tag: m.tag,
+      nickname: typeof m.nickname === "string" ? m.nickname.slice(0, 80) : "Jogador",
+    }));
+  const allowed = new Set(roster.map((m: { tag: string }) => m.tag));
   if (!allowed.has(identity)) return response({ code: "room_access_denied" }, 403);
 
   // Disconnect banned/departed users on room changes, including revoking their
@@ -73,7 +79,7 @@ const handler = withSupabase({ auth: "user" }, async (request, context) => {
       if (!/not[\\s_-]?found|does not exist|404/i.test(message)) return response({ code: "voice_reconciliation_unavailable" }, 503);
     }
   }
-  if (action === "sync") return response({ ok: true });
+  if (action === "sync") return response({ ok: true, participants: roster });
 
   const token = new AccessToken(key, secret, {
     identity,
@@ -92,6 +98,7 @@ const handler = withSupabase({ auth: "user" }, async (request, context) => {
     room: roomName,
     server_url: endpoint.replace(/\/$/, ""),
     participant_token: await token.toJwt(),
+    participants: roster,
   });
 });
 

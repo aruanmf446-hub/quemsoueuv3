@@ -8,7 +8,7 @@ O cache do service worker é guardado por conteúdo: um arquivo que não mudou e
 import hashlib, json, os, sys
 
 CORE = ["index.html", "index.js", "index.wasm", "index.pck", "index.audio.worklet.js",
-        "index.audio.position.worklet.js", "manifest.webmanifest", "pwa/icon-180.png",
+        "index.audio.position.worklet.js", "voice/bridge.js", "manifest.webmanifest", "pwa/icon-180.png",
         "pwa/icon-192.png", "pwa/icon-512.png"]
 
 out, build = sys.argv[1], sys.argv[2]

@@ -109,6 +109,11 @@ jobs:
           mkdir -p build/web/pwa
           cp web/pwa/icon-*.png build/web/pwa/
           cp web/pwa/manifest.webmanifest build/web/manifest.webmanifest
+          # T32: ship browser bridge inside the same versioned PWA build.
+          node --check web/voice/bridge.js
+          mkdir -p build/web/voice
+          cp web/voice/bridge.js build/web/voice/bridge.js
+          python3 -c 'from pathlib import Path; p=Path("build/web/index.html"); s=p.read_text(); assert "</head>" in s; p.write_text(s.replace("</head>", "<script src=\"voice/bridge.js\" defer></script></head>", 1))'
           python3 tools/web/stamp_sw.py build/web "${GITHUB_SHA::12}"
           python3 tools/web/check_pwa.py build/web
           ls -la build/web/index.pck

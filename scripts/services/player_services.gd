@@ -26,6 +26,8 @@ var editor_content: EditorContentService
 var chat: ChatService
 ## Chat da sala do Duelo (outra instância: não mistura com o chat privado de amigos).
 var room_chat: ChatService
+## Optional GAME-authorized online voice transport.
+var voice: VoiceService
 
 
 func _enter_tree() -> void:
@@ -107,6 +109,11 @@ func _ready() -> void:
 		return str(profile.data.get("nickname", "")) if session.authenticated() else "Jogador local"
 	duel.add_child(duel.local_server)
 	add_child(duel)
+	voice = VoiceService.new()
+	voice.client = client
+	voice.session = session
+	voice.duel = duel
+	add_child(voice)
 	session.changed.connect(_session_changed)
 	var poller := Timer.new()
 	poller.wait_time = 30.0

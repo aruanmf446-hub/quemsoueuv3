@@ -147,7 +147,15 @@ func add_bot() -> Dictionary:
 
 
 func kick(member_id: String) -> Dictionary:
-	return _apply(await _rpc("qse_duel_kick", {"p_room": room_id(), "p_member": member_id}))
+	var previous_room := room_id()
+	var result := _apply(await _rpc("qse_duel_kick", {"p_room": previous_room, "p_member": member_id}))
+	# After the authoritative GAME kick succeeds, revoke LiveKit access even
+	# when the admin is not personally connected to the optional voice chat.
+	if result.ok and not is_local() and room_id() == previous_room \
+			and client != null and client.configured() and session != null and session.authenticated():
+		client.request("/functions/v1/qse-voice-token", HTTPClient.METHOD_POST,
+			{"action": "reconcile", "room_id": previous_room})
+	return result
 
 
 func start() -> Dictionary:

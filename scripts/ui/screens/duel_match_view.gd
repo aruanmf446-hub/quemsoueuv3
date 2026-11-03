@@ -235,30 +235,11 @@ func _build_sidebar() -> void:
 	else:
 		room_text.add_child(Style.label("Partida local",16,PlayerUI.GOLD))
 		room_text.add_child(Style.label("Só neste aparelho · sem convite",12,PlayerUI.MUTED))
-	var voice := PanelContainer.new()
-	voice.name = "VoiceUnavailable"
-	# Partida local: sem voz; o espaço fica para o chat e a mão.
+	var voice := preload("res://scripts/ui/battle/battle_voice.gd").new()
+	voice.name = "BattleVoice"
+	voice.setup(overlay_parent.get("services") as PlayerServices)
 	voice.visible = not duel.is_local()
-	voice.add_theme_stylebox_override("panel",Style.panel(5))
 	_side.add_child(voice)
-	var voice_row := PlayerUI.row(voice)
-	voice_row.add_theme_constant_override("separation",6)
-	var mic := TextureRect.new()
-	mic.texture = load("res://assets/ui/battle/voice_off.svg")
-	mic.modulate = PlayerUI.MUTED
-	mic.custom_minimum_size = Vector2(26,26)
-	mic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	mic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	voice_row.add_child(mic)
-	var voice_text := PlayerUI.column(voice_row)
-	voice_text.add_theme_constant_override("separation",0)
-	var voice_title := Style.label("Chat de voz",16)
-	Style.strong(voice_title)
-	voice_text.add_child(voice_title)
-	var unavailable := PlayerUI.pill("INDISPONÍVEL","locked")
-	unavailable.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	unavailable.modulate = Color(1,1,1,0.85)
-	voice_text.add_child(unavailable)
 	var chat := ChatPanel.new()
 	chat.name = "BattleChat"
 	chat.setup(overlay_parent.get("services") as PlayerServices)

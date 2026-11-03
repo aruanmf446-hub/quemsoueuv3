@@ -1230,6 +1230,12 @@ func _render_room() -> void:
 		code.tooltip_text = tr("Copiar código de convite")
 		code.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		header.add_child(code)
+	# Lobby audio is opt-in; reuse the same service when transitioning to battle.
+	if not duel.is_local() and str(data.status) == "lobby":
+		var lobby_voice := preload("res://scripts/ui/battle/battle_voice.gd").new()
+		lobby_voice.name = "LobbyVoice"
+		lobby_voice.setup(services)
+		body.add_child(lobby_voice)
 	if str(data.status) == "closed" and duel.match().is_empty():
 		_render_closed()
 		return

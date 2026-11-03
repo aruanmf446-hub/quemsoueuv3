@@ -59,7 +59,9 @@ func _load() -> void:
 
 func _render() -> void:
 	if not is_instance_valid(_content): return
-	for child in _content.get_children(): child.queue_free()
+	for child in _content.get_children():
+		_content.remove_child(child)
+		child.queue_free()
 	var view_size := Vector2(get_viewport().get_visible_rect().size)
 	var compact := view_size.y < 600
 	var header := HBoxContainer.new()

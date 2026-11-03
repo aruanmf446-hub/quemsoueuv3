@@ -29,6 +29,27 @@ jobs:
         run: |
           GODOT="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
           "$GODOT" --headless --path . --script res://tests/rewards_t28/flow_test.gd
+      - name: T30 premium news and gifts UI regression
+        run: |
+          GODOT="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+          "$GODOT" --headless --path . --script res://tests/rewards_t30/flow_test.gd
+      - name: T30 real Godot render captures at approved resolutions
+        env:
+          T30_CAPTURE_DIR: ${{ runner.temp }}/news-t30
+        run: |
+          mkdir -p "$T30_CAPTURE_DIR"
+          xvfb-run -a "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --path . --script res://tests/rewards_t30/capture.gd
+          for file in home_1920x1080 decks_1672x941 skins_1280x720 android_844x390 android_640x360 received_1920x1080 error_1920x1080 loading_1280x720; do
+            test -s "$T30_CAPTURE_DIR/$file.png"
+          done
+      - name: T30 screenshots artifact (real renderer, fixture only)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: news-t30-godot-real-screens
+          path: ${{ runner.temp }}/news-t30/*.png
+          if-no-files-found: ignore
+          retention-days: 14
       - name: T17 invite state and local battle regression
         run: |
           GODOT="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"

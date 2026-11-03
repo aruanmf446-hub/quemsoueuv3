@@ -7,6 +7,7 @@ signal changed
 var client: SupabaseClient
 var session: SessionService
 var state := "empty"
+var inventory_state := "empty"
 var campaign: Dictionary = {}
 var offers: Array[Dictionary] = []
 var seen := true
@@ -22,6 +23,7 @@ func clear() -> void:
 	_loading = false
 	_claiming = false
 	state = "empty"
+	inventory_state = "empty"
 	campaign.clear()
 	offers.clear()
 	seen = true
@@ -39,28 +41,54 @@ func refresh() -> Dictionary:
 	var sequence := _sequence
 	var generation := client.generation
 	state = "loading"
+	inventory_state = "loading"
 	changed.emit()
 	var result: Dictionary = await client.call_rpc("qse_rewards_feed")
 	if sequence != _sequence or generation != client.generation:
 		return ServiceResult.failure("session_changed", "unauthorized")
-	_loading = false
-	if result.ok and result.data is Dictionary and result.data.get("ok", false) == true:
-		state = "success"
-		campaign = result.data.get("campaign", {}) if result.data.get("campaign") is Dictionary else {}
-		seen = bool(result.data.get("seen", true))
-		revealed = bool(result.data.get("revealed", true))
-		offers.clear()
-		if result.data.get("offers") is Array:
-			for item: Variant in result.data.offers:
-				if item is Dictionary and item.get("id") is String and item.get("kind") in ["deck", "skin"]:
-					offers.append(item)
-		error.clear()
-	else:
+	if not result.ok or not result.data is Dictionary or result.data.get("ok", false) != true:
+		_loading = false
+		inventory_state = "error"
 		state = "error"
 		error = result
+		changed.emit()
+		return result
+	campaign = result.data.get("campaign", {}) if result.data.get("campaign") is Dictionary else {}
+	seen = bool(result.data.get("seen", true))
+	revealed = bool(result.data.get("revealed", true))
+	offers.clear()
+	if result.data.get("offers") is Array:
+		for item: Variant in result.data.offers:
+			if item is Dictionary and item.get("id") is String and item.get("kind") in ["deck", "skin"]:
+				offers.append(item)
+	# RPC T30 somente leitura. Lê os presentes já associados à conta, incluindo
+	# campanhas anteriores, sem alterar o recibo da campanha atual.
+	var history: Dictionary = await client.call_rpc("qse_rewards_inventory")
+	if sequence != _sequence or generation != client.generation:
+		return ServiceResult.failure("session_changed", "unauthorized")
+	inventory_state = "error"
+	if history.ok and history.data is Dictionary and history.data.get("ok", false) == true and history.data.get("offers") is Array:
+		inventory_state = "success"
+		var known := {}
+		for index in offers.size():
+			known[str(offers[index].get("id", ""))] = index
+		for record: Variant in history.data.offers:
+			if not record is Dictionary or not record.get("id") is String:
+				continue
+			if not record.get("kind") in ["deck", "skin"]:
+				continue
+			var id := str(record.get("id", ""))
+			if known.has(id):
+				var at := int(known[id])
+				for key: String in ["claimed", "claimed_at", "created_at", "campaign_id", "revealed"]:
+					offers[at][key] = record.get(key)
+			else:
+				offers.append(record)
+	_loading = false
+	state = "success"
+	error.clear()
 	changed.emit()
 	return result
-
 
 func is_deck_claimed(deck_id: String) -> bool:
 	if state != "success": return false
@@ -127,6 +155,9 @@ func reveal() -> Dictionary:
 	if result.ok and result.data is Dictionary and result.data.get("ok", false) == true:
 		revealed = true
 		seen = true
+		for index in offers.size():
+			if str(offers[index].get("campaign_id", "")) == campaign_id:
+				offers[index]["revealed"] = true
 		changed.emit()
 	return result
 

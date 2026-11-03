@@ -39,7 +39,15 @@ jobs:
           "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --verbose --headless --path . --script res://tests/duel_local/flow_test.gd > "$RUNNER_TEMP/report/duel_local_verbose.log" 2>&1
           code=$?
           grep -E -A 12 -B 8 'DUEL_LOCAL|resources still in use|ObjectDB instances|Leaked|leaked|SCRIPT ERROR|ERROR:' "$RUNNER_TEMP/report/duel_local_verbose.log" | tail -100 || true
-          exit "$code"
+          if [ "$code" -ne 0 ]; then exit "$code"; fi
+          # O smoke oficial não usa --verbose: executar o mesmo comando aqui
+          # para comprovar que não ocultamos o erro dependente de temporização.
+          "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --script res://tests/duel_local/flow_test.gd > "$RUNNER_TEMP/report/duel_local_normal.log" 2>&1
+          cat "$RUNNER_TEMP/report/duel_local_normal.log"
+          if grep -E 'ERROR:|SCRIPT ERROR:|Parse Error:' "$RUNNER_TEMP/report/duel_local_verbose.log" "$RUNNER_TEMP/report/duel_local_normal.log"; then
+            echo "Godot resource leak/error persists"
+            exit 1
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:

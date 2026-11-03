@@ -4,7 +4,7 @@
   "publishable_key": "sb_publishable_ZrugXVdGCXztHbMZiIX8Mw_K6Bg-uhW",
   "configuration_status": "connected_to_game_project",
   "persist_session": true,
-  "google_client_id": "",
+  "google_client_id": "174761608559-dsc1s4m7t013p5680etjb3q3rci3a33l.apps.googleusercontent.com",
   "google_client_id_comment": "ID do cliente Web do Google (público). Com ele, 'Entrar com Google' vai direto ao Google e volta ao jogo (id_token -> /auth/v1/token?grant_type=id_token), sem passar pelo endereço do Supabase. Vazio: fluxo antigo.",
   "connections": {
     "game": {

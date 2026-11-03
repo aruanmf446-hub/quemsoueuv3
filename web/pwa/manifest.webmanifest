@@ -1,0 +1,17 @@
+{
+  "name": "Quem Sou Eu",
+  "short_name": "Quem Sou Eu",
+  "description": "Jogo de cartas e aventura Quem Sou Eu.",
+  "lang": "pt-BR",
+  "start_url": "/quemsoueuv3/",
+  "scope": "/quemsoueuv3/",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#060b16",
+  "theme_color": "#060b16",
+  "icons": [
+    {"src": "pwa/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "pwa/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "pwa/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

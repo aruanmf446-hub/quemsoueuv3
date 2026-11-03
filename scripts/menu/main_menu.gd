@@ -355,6 +355,15 @@ func _route_changed(route: String) -> void:
 	var now_playing := get_node_or_null("NowPlaying")
 	if now_playing != null: now_playing.set_suppressed(not route.is_empty())
 	if route.is_empty(): _maybe_show_news.call_deferred()
+	_publish_update_safety(route)
+
+
+## PWA (T24 iOS): o shell só oferece "Reiniciar para atualizar" no lobby, fora de sala/partida.
+func _publish_update_safety(route: String) -> void:
+	if not OS.has_feature("web"): return
+	var services := PlayerServices.current
+	var safe := route.is_empty() and not (services != null and services.duel != null and services.duel.in_room())
+	JavaScriptBridge.eval("window.qseSafeToUpdate = %s;" % ("true" if safe else "false"), true)
 
 
 func _notification(what: int) -> void:

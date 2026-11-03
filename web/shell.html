@@ -241,7 +241,7 @@ $GODOT_HEAD_INCLUDE
 					"safe=" + JSON.stringify(p.safe || null),
 					"janela=" + innerWidth + "x" + innerHeight + " dpr=" + devicePixelRatio,
 					"canvas css=" + Math.round(r.left) + "," + Math.round(r.top) + " " + Math.round(r.width) + "x" + Math.round(r.height) + " px=" + c.width + "x" + c.height,
-					"ponte=" + (n ? n.enabled() : "ausente"),
+					"ponte=" + (n ? n.enabled() : "ausente") + " ligados=" + (window.qseBridgeFields === undefined ? "?" : window.qseBridgeFields),
 					"campos: " + (n && n.debug ? (n.debug().join(" | ") || "nenhum") : "—"),
 					"foco=" + (a ? a.tagName + (a.id ? "#" + a.id : "") : "—"),
 					"toque=" + lastTouch].join("\n");

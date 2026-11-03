@@ -61,6 +61,20 @@ class DashboardTest(unittest.TestCase):
         for asset in ("building.css", "building.js"):
             self.assertIn(asset, workflow)
 
+    def test_editor_route_with_admin_auth_and_deploy(self):
+        editor = ROOT / "web/bots/editor"
+        html = (editor / "index.html").read_text()
+        js = (editor / "editor.js").read_text()
+        workflow = (ROOT / ".github/workflows/deploy-web.yml").read_text()
+        for name in ("index.html", "editor.js", "editor.css"):
+            self.assertTrue((editor / name).exists())
+            self.assertIn(name, workflow)
+        for term in ("qse_editor_admins", "qse_editor_content", "signInWithIdToken", "signInWithPassword", "qse-editor-media", "upsert"):
+            self.assertIn(term, js)
+        self.assertIn("editor.js", html)
+        self.assertNotIn("service_role", js)
+        self.assertNotIn("sb_secret_", js)
+
     def test_has_live_github_endpoints_and_no_embedded_credentials(self):
         js = (ROOT / "web/bots/app.js").read_text()
         for endpoint in ("/pulls?", "/actions/runs?", "/commits?", "/issues?"):

@@ -92,6 +92,9 @@ func _layout() -> void:
 
 func _load() -> void:
 	if _services == null or not _services.session.authenticated(): return
+	if _services.editor_content != null:
+		await _services.editor_content.refresh()
+	if not is_inside_tree(): return
 	if _services.rewards.state != "success":
 		await _services.rewards.refresh()
 	if not is_inside_tree(): return
@@ -209,6 +212,9 @@ func _banner(rewards: OfficialRewardsService) -> void:
 	picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	picture.texture = _feature_cover(rewards)
+	var live: Dictionary = _services.editor_content.news_item(str(rewards.campaign.get("id", ""))) if _services.editor_content != null else {}
+	if _services.editor_content != null:
+		_services.editor_content.attach_cover(picture, str(live.get("cover_path", "")))
 	picture.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	picture.anchor_left = 0.63
 	picture.anchor_right = 1.0
@@ -245,14 +251,14 @@ func _banner(rewards: OfficialRewardsService) -> void:
 	copy.add_theme_constant_override("separation", 2 if _compact else (3 if _iphone else 10))
 	copy.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	banner.add_child(copy)
-	var title_text := "Você tem recompensas para conhecer!" if not rewards.revealed else "Seus presentes estão na sua conta!"
+	var title_text := str(live.get("title", "")) if not str(live.get("title", "")).is_empty() else ("Você tem recompensas para conhecer!" if not rewards.revealed else "Seus presentes estão na sua conta!")
 	var title := _label(title_text, 16 if _compact else (31 if _iphone else 27), WHITE)
 	title.autowrap_mode = TextServer.AUTOWRAP_OFF
 	title.name = "CampaignHeadline"
 	title.max_lines_visible = 1
 	title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	copy.add_child(title)
-	var desc_text := "Confira os presentes oficiais da equipe Quem Sou Eu." if not rewards.revealed else "Tudo salvo no seu perfil. Aproveite suas recompensas!"
+	var desc_text := str(live.get("description", "")) if not str(live.get("description", "")).is_empty() else ("Confira os presentes oficiais da equipe Quem Sou Eu." if not rewards.revealed else "Tudo salvo no seu perfil. Aproveite suas recompensas!")
 	var description := _label(desc_text, 11 if _compact else (21 if _iphone else 17), MUTED)
 	description.name = "CampaignSubtitle"
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -537,7 +543,16 @@ func _legacy_news() -> void:
 	if _shade.get_node_or_null("OtherNews") != null: return
 	var carousel := PresentationCarousel.new()
 	carousel.name = "OtherNews"
-	carousel.set_cards("news")
+	# Novidades ativas vêm do editor. Off-line: manter apresentações locais.
+	if _services != null and _services.editor_content != null and _services.editor_content.state == "remote":
+		var entries := _services.editor_content.news_cards()
+		if entries.is_empty():
+			_notice = "Não há novidades ativas neste momento."
+			_render()
+			return
+		carousel.set_cards_data(entries)
+	else:
+		carousel.set_cards("news")
 	carousel.show_close = true
 	carousel.allow_skip = false
 	carousel.dwell_seconds = 5.0

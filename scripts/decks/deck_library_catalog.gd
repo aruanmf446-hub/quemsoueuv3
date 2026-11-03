@@ -36,10 +36,13 @@ static func _parse_deck(id: String, info: Dictionary) -> Dictionary:
 	if not age in ["L", "10", "12", "14", "16", "18"]: age = ""
 	# Nome/descrição do CATALOG remoto, quando houver; as cartas continuam sendo os assets locais.
 	var remote: Dictionary = PlayerServices.current.catalog.deck(id) if PlayerServices.current != null and PlayerServices.current.catalog != null else {}
+	var live: Dictionary = PlayerServices.current.editor_content.deck(id) if PlayerServices.current != null and PlayerServices.current.editor_content != null else {}
 	return {
-		"id": id, "name": _string(remote.get("name", info.get("name", "")), id.replace("_", " ").capitalize()),
+		"id": id, "name": _string(live.get("title", ""), _string(remote.get("name", info.get("name", "")), id.replace("_", " ").capitalize())),
 		"official": official, "creator": "Quem Sou Eu" if official else _string(info.get("creator", "")),
-		"category": _string(info.get("category", "")), "description": _string(remote.get("description", info.get("description", ""))),
+		"category": _string(live.get("subtitle", ""), _string(info.get("category", ""))),
+		"description": _string(live.get("description", ""), _string(remote.get("description", info.get("description", "")))),
+		"cover_path": _string(live.get("cover_path", "")),
 		"tags": _strings(info.get("tags", []), 3), "age_rating": age,
 		"content_warnings": _strings(info.get("content_warnings", [])),
 		"cards": entries, "count": entries.size(), "origin": "local", "visibility": visibility,

@@ -124,8 +124,11 @@ jobs:
           set -euo pipefail
           node --check web/bots/app.js
           node --check web/bots/building.js
+          node --check web/bots/editor/editor.js
           mkdir -p build/web/bots
           cp web/bots/index.html web/bots/style.css web/bots/app.js web/bots/building.js web/bots/building.css build/web/bots/
+          mkdir -p build/web/bots/editor
+          cp web/bots/editor/index.html web/bots/editor/editor.css web/bots/editor/editor.js build/web/bots/editor/
           python3 tools/bots/generate_auth.py build/web/bots
           test -s build/web/bots/auth.json
           echo "QSE dashboard bundle ready at /bots/"

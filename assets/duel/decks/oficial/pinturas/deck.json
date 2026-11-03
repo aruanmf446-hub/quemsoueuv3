@@ -2,5 +2,47 @@
   "name": "Pinturas",
   "order": 3,
   "visibility": "public",
-  "cards": {}
+  "cards": {
+    "carta_01": {
+      "name": "Pintura 01",
+      "description": "Imagem da coleção Pinturas; título da obra e autoria pendentes de revisão visual."
+    },
+    "carta_02": {
+      "name": "Pintura 02",
+      "description": "Imagem da coleção Pinturas; título da obra e autoria pendentes de revisão visual."
+    },
+    "carta_03": {
+      "name": "Pintura 03",
+      "description": "Imagem da coleção Pinturas; título da obra e autoria pendentes de revisão visual."
+    },
+    "carta_04": {
+      "name": "Pintura 04",
+      "description": "Imagem da coleção Pinturas; título da obra e autoria pendentes de revisão visual."
+    },
+    "carta_05": {
+      "name": "Pintura 05",
+      "description": "Imagem da coleção Pinturas; título da obra e autoria pendentes de revisão visual."
+    },
+    "carta_06": {
+      "name": "Pintura 06",
+      "description": "Imagem da coleção Pinturas; título da obra e autoria pendentes de revisão visual."
+    },
+    "carta_07": {
+      "name": "Pintura 07",
+      "description": "Imagem da coleção Pinturas; título da obra e autoria pendentes de revisão visual."
+    },
+    "carta_08": {
+      "name": "Pintura 08",
+      "description": "Imagem da coleção Pinturas; título da obra e autoria pendentes de revisão visual."
+    }
+  },
+  "description": "Explore a arte em imagens. Um deck dedicado ao reconhecimento de pinturas e referências visuais.",
+  "creator": "Quem Sou Eu",
+  "category": "Arte",
+  "tags": [
+    "arte",
+    "quadros",
+    "cultura"
+  ],
+  "original_language": "pt-BR"
 }

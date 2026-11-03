@@ -2,5 +2,55 @@
   "name": "Nostalgia Web",
   "order": 1,
   "visibility": "public",
-  "cards": {}
+  "cards": {
+    "carta_01": {
+      "name": "Nostalgia Web 01",
+      "description": "Imagem da coleção Nostalgia Web; identificação específica pendente de revisão visual."
+    },
+    "carta_02": {
+      "name": "Nostalgia Web 02",
+      "description": "Imagem da coleção Nostalgia Web; identificação específica pendente de revisão visual."
+    },
+    "carta_03": {
+      "name": "Nostalgia Web 03",
+      "description": "Imagem da coleção Nostalgia Web; identificação específica pendente de revisão visual."
+    },
+    "carta_04": {
+      "name": "Nostalgia Web 04",
+      "description": "Imagem da coleção Nostalgia Web; identificação específica pendente de revisão visual."
+    },
+    "carta_05": {
+      "name": "Nostalgia Web 05",
+      "description": "Imagem da coleção Nostalgia Web; identificação específica pendente de revisão visual."
+    },
+    "carta_06": {
+      "name": "Nostalgia Web 06",
+      "description": "Imagem da coleção Nostalgia Web; identificação específica pendente de revisão visual."
+    },
+    "carta_07": {
+      "name": "Nostalgia Web 07",
+      "description": "Imagem da coleção Nostalgia Web; identificação específica pendente de revisão visual."
+    },
+    "carta_08": {
+      "name": "Nostalgia Web 08",
+      "description": "Imagem da coleção Nostalgia Web; identificação específica pendente de revisão visual."
+    },
+    "carta_09": {
+      "name": "Nostalgia Web 09",
+      "description": "Imagem da coleção Nostalgia Web; identificação específica pendente de revisão visual."
+    },
+    "carta_10": {
+      "name": "Nostalgia Web 10",
+      "description": "Imagem da coleção Nostalgia Web; identificação específica pendente de revisão visual."
+    }
+  },
+  "description": "Uma viagem pela memória da internet: referências, personagens e momentos que marcaram a cultura online.",
+  "creator": "Quem Sou Eu",
+  "category": "Internet",
+  "tags": [
+    "internet",
+    "memes",
+    "nostalgia"
+  ],
+  "original_language": "pt-BR"
 }

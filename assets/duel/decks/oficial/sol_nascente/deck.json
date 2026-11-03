@@ -2,5 +2,55 @@
   "name": "Sol Nascente",
   "order": 2,
   "visibility": "public",
-  "cards": {}
+  "cards": {
+    "carta_01": {
+      "name": "Sol Nascente 01",
+      "description": "Imagem da coleção Sol Nascente; identificação específica pendente de revisão visual."
+    },
+    "carta_02": {
+      "name": "Sol Nascente 02",
+      "description": "Imagem da coleção Sol Nascente; identificação específica pendente de revisão visual."
+    },
+    "carta_03": {
+      "name": "Sol Nascente 03",
+      "description": "Imagem da coleção Sol Nascente; identificação específica pendente de revisão visual."
+    },
+    "carta_04": {
+      "name": "Sol Nascente 04",
+      "description": "Imagem da coleção Sol Nascente; identificação específica pendente de revisão visual."
+    },
+    "carta_05": {
+      "name": "Sol Nascente 05",
+      "description": "Imagem da coleção Sol Nascente; identificação específica pendente de revisão visual."
+    },
+    "carta_06": {
+      "name": "Sol Nascente 06",
+      "description": "Imagem da coleção Sol Nascente; identificação específica pendente de revisão visual."
+    },
+    "carta_07": {
+      "name": "Sol Nascente 07",
+      "description": "Imagem da coleção Sol Nascente; identificação específica pendente de revisão visual."
+    },
+    "carta_08": {
+      "name": "Sol Nascente 08",
+      "description": "Imagem da coleção Sol Nascente; identificação específica pendente de revisão visual."
+    },
+    "carta_09": {
+      "name": "Sol Nascente 09",
+      "description": "Imagem da coleção Sol Nascente; identificação específica pendente de revisão visual."
+    },
+    "carta_10": {
+      "name": "Sol Nascente 10",
+      "description": "Imagem da coleção Sol Nascente; identificação específica pendente de revisão visual."
+    }
+  },
+  "description": "Referências e personagens ligados ao universo cultural do Japão. Um desafio para quem conhece esse imaginário.",
+  "creator": "Quem Sou Eu",
+  "category": "Cultura japonesa",
+  "tags": [
+    "Japão",
+    "cultura pop",
+    "nostalgia"
+  ],
+  "original_language": "pt-BR"
 }

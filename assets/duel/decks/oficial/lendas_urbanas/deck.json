@@ -2,14 +2,51 @@
   "name": "Lendas Urbanas",
   "order": 0,
   "cards": {
-    "loira_do_banheiro": "Loira do Banheiro",
-    "momo": "Momo",
-    "cobra_grande": "Cobra Grande",
-    "jeff_the_killer": "Jeff the Killer",
-    "bruxa_do_pantano": "Bruxa do Pântano",
-    "slender_man": "Slender Man",
-    "dama_de_branco": "Dama de Branco",
-    "homem_do_saco": "Homem do Saco",
-    "homem_sorridente": "Homem Sorridente"
-  }
+    "loira_do_banheiro": {
+      "name": "Loira do Banheiro",
+      "description": "A aparição misteriosa que assombra banheiros e corredores de escolas."
+    },
+    "momo": {
+      "name": "Momo",
+      "description": "Uma figura inquietante que se espalhou pelas histórias de terror da internet."
+    },
+    "cobra_grande": {
+      "name": "Cobra Grande",
+      "description": "A serpente gigantesca das narrativas populares da Amazônia."
+    },
+    "jeff_the_killer": {
+      "name": "Jeff the Killer",
+      "description": "Um rosto perturbador das histórias de terror compartilhadas na web."
+    },
+    "bruxa_do_pantano": {
+      "name": "Bruxa do Pântano",
+      "description": "Uma bruxa sombria associada a mistérios de águas paradas e pântanos."
+    },
+    "slender_man": {
+      "name": "Slender Man",
+      "description": "A figura alta e sem rosto das histórias assustadoras da internet."
+    },
+    "dama_de_branco": {
+      "name": "Dama de Branco",
+      "description": "Uma aparição de vestido branco presente em narrativas de assombração."
+    },
+    "homem_do_saco": {
+      "name": "Homem do Saco",
+      "description": "O personagem sombrio das histórias contadas para assustar crianças."
+    },
+    "homem_sorridente": {
+      "name": "Homem Sorridente",
+      "description": "Um personagem reconhecido pelo sorriso inquietante e presença ameaçadora."
+    }
+  },
+  "visibility": "public",
+  "description": "Lendas que atravessam gerações, dos corredores de escolas aos becos escuros. Reconheça as figuras mais assustadoras do imaginário popular.",
+  "creator": "Quem Sou Eu",
+  "category": "Mistério",
+  "tags": [
+    "terror",
+    "folclore",
+    "lendas"
+  ],
+  "original_language": "pt-BR"
 }

@@ -101,6 +101,7 @@ jobs:
           "$GODOT" --headless --path . --script res://tests/duel_t25/browse_test.gd
           "$GODOT" --headless --path . --script res://tests/duel_t26/form_test.gd
           "$GODOT" --headless --path . --script res://tests/community_t27/flow_test.gd
+          "$GODOT" --headless --path . --script res://tests/ios_t24/duel_ios_test.gd
           "$GODOT" --headless --path . --script res://tests/settings_t22/flow_test.gd
           "$GODOT" --headless --path . --script res://tests/friends_t22/flow_test.gd
       - name: Verify authentication appears before lobby (T18A startup)

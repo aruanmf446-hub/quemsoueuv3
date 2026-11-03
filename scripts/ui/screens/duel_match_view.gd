@@ -582,9 +582,20 @@ func _render_hand() -> void:
 			image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			image.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 			image.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			image.custom_minimum_size.y = (60 if _canvas.size.y >= 360 else 44) if entries.size() <= 3 else 25
+			# T24 iOS: altura pela largura real da coluna (proporção da carta), não um valor fixo.
+			var column_width := (_hand.size.x - 12.0 - (grid.columns - 1) * 4.0) / maxf(grid.columns, 1)
+			image.custom_minimum_size.y = clampf(column_width * 1.42, 44.0, 120.0) if entries.size() <= 3 else 34.0
 			if entry.get("lost",false): image.modulate = Color("#555967")
+			# Toque/clique amplia temporariamente (só nesta tela; ninguém mais vê).
+			image.mouse_filter = Control.MOUSE_FILTER_STOP
+			image.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+			image.set_meta("card_id",str(entry.card_id))
+			image.tooltip_text = _name(str(entry.card_id)) + " — toque para ampliar"
+			image.gui_input.connect(func(event: InputEvent) -> void:
+				if (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or (event is InputEventScreenTouch and event.pressed):
+					_preview_private(str(entry.card_id)))
 			grid.add_child(image)
+
 	else:
 		if entries.is_empty():
 			var hidden := Style.label("Seleção em andamento",11,PlayerUI.MUTED)
@@ -728,7 +739,80 @@ func _back() -> void:
 func _focus_card(card: Control) -> void:
 	if is_instance_valid(card) and card.is_inside_tree() and card.is_visible_in_tree() and card.focus_mode != Control.FOCUS_NONE: card.grab_focus()
 
+## Ampliação temporária das cartas privadas: sobreposição local, fecha com toque, Esc ou Voltar.
+## Não muda o turno, não envia nada ao servidor e some se a janela perder o foco.
+func _preview_private(card_id: String) -> void:
+	_close_private_preview()
+	var entries: Array = _data.get("my_cards",[])
+	if entries.is_empty(): return
+	var layer := Control.new()
+	layer.name = "PrivatePreview"
+	layer.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(layer)
+	layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var shade := ColorRect.new()
+	shade.color = Color(0.01,0.02,0.04,0.82)
+	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(shade)
+	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var column := VBoxContainer.new()
+	column.alignment = BoxContainer.ALIGNMENT_CENTER
+	column.add_theme_constant_override("separation",10)
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(column)
+	column.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var title := Style.label("SUAS CARTAS · só você vê",16,PlayerUI.GOLD)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(title)
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation",18)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.add_child(row)
+	var height := clampf(size.y*0.58,140.0,560.0)
+	for entry: Dictionary in entries:
+		var card := VBoxContainer.new()
+		card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(card)
+		var image := TextureRect.new()
+		image.name = "PreviewCard"
+		image.texture = DuelService.card_texture(str(entry.card_id))
+		image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		image.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		image.custom_minimum_size = Vector2(height/1.42,height)
+		image.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		if str(entry.card_id) != card_id: image.modulate = Color(0.78,0.78,0.82)
+		if entry.get("lost",false): image.modulate = Color("#555967")
+		card.add_child(image)
+		var name_label := Style.label(_name(str(entry.card_id)),15,PlayerUI.GOLD if str(entry.card_id) == card_id else PlayerUI.TEXT)
+		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		name_label.custom_minimum_size.x = height/1.42
+		name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		card.add_child(name_label)
+	var close := Style.label("Toque em qualquer lugar para fechar",12,PlayerUI.MUTED)
+	close.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(close)
+	layer.gui_input.connect(func(event: InputEvent) -> void:
+		if (event is InputEventMouseButton and event.pressed) or (event is InputEventScreenTouch and event.pressed):
+			_close_private_preview())
+
+
+func _close_private_preview() -> void:
+	var layer := get_node_or_null("PrivatePreview")
+	if layer != null:
+		remove_child(layer)
+		layer.queue_free()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if get_node_or_null("PrivatePreview") != null and event.is_action_pressed("ui_cancel"):
+		_close_private_preview()
+		get_viewport().set_input_as_handled()
+
+
 func _conceal_hand() -> void:
+	_close_private_preview()
 	_private_shown = false
 	_private_signature = ""
 	if _built and is_inside_tree() and not _data.is_empty(): _render_hand()

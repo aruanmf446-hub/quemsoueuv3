@@ -1,0 +1,29 @@
+name: QSE Command Center checks
+on:
+  pull_request:
+    paths:
+      - 'web/bots/**'
+      - 'web/pwa/sw.js'
+      - 'tools/bots/**'
+      - '.github/workflows/bots-ci.yml'
+      - '.github/workflows/deploy-web.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'web/bots/**'
+      - 'web/pwa/sw.js'
+      - 'tools/bots/**'
+      - '.github/workflows/bots-ci.yml'
+      - '.github/workflows/deploy-web.yml'
+permissions:
+  contents: read
+jobs:
+  dashboard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate JavaScript syntax
+        run: node --check web/bots/app.js
+      - name: Verify login derivation and route isolation
+        run: python3 tools/bots/test_dashboard.py

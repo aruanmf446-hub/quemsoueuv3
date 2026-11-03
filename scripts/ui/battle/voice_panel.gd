@@ -49,7 +49,7 @@ func _ready() -> void:
 func _toggle_connection() -> void:
     if services == null or services.voice == null: return
     if services.voice.state in ["connected", "connecting", "reconnecting"]:
-        services.voice.disconnect()
+        services.voice.leave_voice()
     else:
         services.voice.connect_voice()
 

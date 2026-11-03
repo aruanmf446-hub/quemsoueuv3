@@ -238,7 +238,12 @@ func _run() -> void:
 	screen.queue_free()
 	await settle()
 	services.queue_free()
-	await settle()
+	# A T32 cria painéis e timers adicionais. queue_free() é adiado e a liberação
+	# dos recursos de UI/importação pode terminar após o último frame imediato.
+	# Aguardar o ciclo de descarte, SEM ignorar logs de vazamento no smoke real.
+	await settle(12)
+	await create_timer(0.35).timeout
+	await settle(4)
 	print("DUEL_LOCAL_PASS ", checks, " verificações")
 	quit(0)
 

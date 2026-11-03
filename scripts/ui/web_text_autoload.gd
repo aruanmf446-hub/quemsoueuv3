@@ -4,4 +4,6 @@ extends Node
 
 
 func _ready() -> void:
+	# Perfil iPhone (área segura + base de design própria); demais aparelhos: nada muda.
+	UIScale.apply_device_profile(get_tree().root)
 	WebTextBridge.install(get_tree())

@@ -84,7 +84,8 @@ $GODOT_HEAD_INCLUDE
 	const ua = navigator.userAgent || "";
 	const ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 	const standalone = navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches;
-	window.qsePwa = {ios: ios, standalone: standalone, updateReady: false};
+	const iphone = /iPhone|iPod/.test(ua);
+	window.qsePwa = {ios: ios, iphone: iphone, standalone: standalone, updateReady: false};
 	// O jogo informa quando é seguro reiniciar (lobby, fora de partida): window.qseSafeToUpdate.
 	window.qseSafeToUpdate = false;
 	const installButton = document.getElementById("qse-install");
@@ -269,6 +270,46 @@ $GODOT_HEAD_INCLUDE
 	});
 })();
 const GODOT_CONFIG = $GODOT_CONFIG;
+// --- iPhone: jogo só dentro da área segura --------------------------------------------------
+// Notch/Dynamic Island (laterais, com o aparelho deitado), barrinha de início (embaixo) e a
+// faixa de toque do sistema no topo ficam PRETAS: nenhum botão, texto ou campo fica embaixo
+// delas. O canvas é dimensionado aqui (política 0 = o motor segue o tamanho do canvas).
+// Demais aparelhos: nada muda (política do export).
+(function(){
+	if (!window.qsePwa || !window.qsePwa.iphone) return;
+	GODOT_CONFIG.canvasResizePolicy = 0;
+	const TOP_MIN = 16;            // faixa do topo que o iOS usa para gestos/barra de status
+	const probe = document.createElement('div');
+	probe.style.cssText = 'position:fixed;visibility:hidden;pointer-events:none;top:0;left:0;' +
+		'padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)';
+	document.body.appendChild(probe);
+	const canvas = document.getElementById('canvas');
+	document.documentElement.style.background = '#000';
+	document.body.style.background = '#000';
+	let last = '';
+	function fit(){
+		// Teclado aberto: não redimensionar o jogo (evita o layout pular enquanto digita).
+		const a = document.activeElement;
+		if (a && a.tagName === 'INPUT' && last) return;
+		const cs = getComputedStyle(probe);
+		const t = Math.max(parseFloat(cs.paddingTop) || 0, TOP_MIN);
+		const r = parseFloat(cs.paddingRight) || 0, b = parseFloat(cs.paddingBottom) || 0, l = parseFloat(cs.paddingLeft) || 0;
+		const w = Math.max(1, window.innerWidth - l - r), h = Math.max(1, window.innerHeight - t - b);
+		const dpr = window.devicePixelRatio || 1;
+		const key = [t, r, b, l, w, h, dpr].join(',');
+		if (key === last) return;
+		last = key;
+		canvas.style.position = 'fixed';
+		canvas.style.left = l + 'px'; canvas.style.top = t + 'px';
+		canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+		canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+		window.qsePwa.safe = {top: t, right: r, bottom: b, left: l, width: w, height: h};
+	}
+	fit();
+	window.addEventListener('resize', fit);
+	window.addEventListener('orientationchange', function(){ setTimeout(fit, 250); });
+	setInterval(fit, 1000);
+})();
 const GODOT_THREADS_ENABLED = $GODOT_THREADS_ENABLED;
 const engine = new Engine(GODOT_CONFIG);
 const boot = document.getElementById('boot');

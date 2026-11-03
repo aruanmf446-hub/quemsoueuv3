@@ -1,5 +1,6 @@
 /* T32 — Browser-only bridge for Godot 4.7.2 JavaScriptBridge.
  * Voice starts ONLY on player action. Neither token nor mic audio is persisted.
+ * T32 field test: GAME v8 endpoint accepts join / leave / reconcile.
  * LiveKit SDK is pinned to a version; only downloaded when voice is requested.
  */
 (() => {

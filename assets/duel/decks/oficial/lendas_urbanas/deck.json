@@ -4,43 +4,43 @@
   "cards": {
     "loira_do_banheiro": {
       "name": "Loira do Banheiro",
-      "description": "A aparição misteriosa que assombra banheiros e corredores de escolas."
+      "description": "Dizem que, quando a escola fica silenciosa, alguns banheiros deixam de estar vazios. A Loira do Banheiro é uma das assombrações mais famosas das histórias contadas entre estudantes, cercada por rituais, espelhos e versões diferentes de uma mesma lenda. Será apenas uma história para assustar os colegas?"
     },
     "momo": {
       "name": "Momo",
-      "description": "Uma figura inquietante que se espalhou pelas histórias de terror da internet."
+      "description": "Olhos arregalados, um sorriso perturbador e uma aparência difícil de esquecer. A figura conhecida como Momo ganhou notoriedade nas redes sociais e passou a circular em histórias assustadoras da internet. Sua imagem se tornou um símbolo de como o medo e os boatos podem viajar rapidamente pelo mundo digital."
     },
     "cobra_grande": {
       "name": "Cobra Grande",
-      "description": "A serpente gigantesca das narrativas populares da Amazônia."
+      "description": "Nas narrativas populares da Amazônia, a Cobra Grande é uma serpente colossal ligada aos mistérios dos rios e das águas profundas. Algumas versões contam que sua passagem agita as correntezas e surpreende quem navega à noite. Uma lenda que mistura a imensidão da floresta ao respeito pelas forças da natureza."
     },
     "jeff_the_killer": {
       "name": "Jeff the Killer",
-      "description": "Um rosto perturbador das histórias de terror compartilhadas na web."
+      "description": "Com o rosto pálido e um sorriso inquietante, Jeff the Killer tornou-se uma figura conhecida das creepypastas, histórias de terror compartilhadas na internet. O personagem costuma aparecer em narrativas sobre encontros noturnos e ameaças inesperadas. Seu olhar é suficiente para transformar uma cena comum em pesadelo."
     },
     "bruxa_do_pantano": {
       "name": "Bruxa do Pântano",
-      "description": "Uma bruxa sombria associada a mistérios de águas paradas e pântanos."
+      "description": "Entre árvores retorcidas, névoa e águas escuras, uma bruxa parece conhecer todos os segredos do pântano. Sua presença evoca poções misteriosas, caminhos escondidos e histórias sussurradas ao redor da fogueira. Nesta carta, a fantasia sombria cria uma figura que parece fazer parte do próprio ambiente."
     },
     "slender_man": {
       "name": "Slender Man",
-      "description": "A figura alta e sem rosto das histórias assustadoras da internet."
+      "description": "Alto demais para parecer humano, vestido de escuro e com o rosto completamente sem feições, Slender Man surgiu como personagem de terror na internet. Suas histórias costumam explorar florestas silenciosas, fotografias estranhas e a sensação de estar sendo observado. Um ícone das lendas digitais modernas."
     },
     "dama_de_branco": {
       "name": "Dama de Branco",
-      "description": "Uma aparição de vestido branco presente em narrativas de assombração."
+      "description": "Uma figura de vestido branco surge à distância, silenciosa e envolta em mistério. A Dama de Branco aparece em diferentes tradições de assombração, associada a caminhos desertos, construções antigas e encontros inesperados. Cada região conta sua própria versão, mas a imagem da aparição permanece inesquecível."
     },
     "homem_do_saco": {
       "name": "Homem do Saco",
-      "description": "O personagem sombrio das histórias contadas para assustar crianças."
+      "description": "Por gerações, adultos contaram às crianças a história de um homem misterioso que carregava um grande saco pelas ruas. O Homem do Saco se tornou uma figura marcante do imaginário popular, especialmente nas histórias usadas para alertar ou assustar os pequenos. Basta vê-lo surgir no fim de um beco para reconhecer a lenda."
     },
     "homem_sorridente": {
       "name": "Homem Sorridente",
-      "description": "Um personagem reconhecido pelo sorriso inquietante e presença ameaçadora."
+      "description": "Seu sorriso exagerado contrasta com uma presença que parece calma demais para ser confiável. O Homem Sorridente representa aquele tipo de terror em que nada precisa acontecer para provocar desconforto: um olhar demorado, uma rua vazia e a sensação de que há algo errado. Uma figura construída para inquietar."
     }
   },
   "visibility": "public",
-  "description": "Lendas que atravessam gerações, dos corredores de escolas aos becos escuros. Reconheça as figuras mais assustadoras do imaginário popular.",
+  "description": "Toda cidade guarda histórias que alguém jura serem verdadeiras. Nos corredores vazios de uma escola, nas águas profundas dos rios ou em um beco silencioso, as lendas ganham vida e transformam o cotidiano em mistério. Este deck reúne assombrações do folclore brasileiro e figuras que ficaram famosas nas histórias de terror da internet. Você consegue reconhecer cada uma antes que o medo tome conta?",
   "creator": "Quem Sou Eu",
   "category": "Mistério",
   "tags": [

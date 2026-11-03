@@ -5,38 +5,38 @@
   "cards": {
     "carta_01": {
       "name": "O Nascimento de Vênus",
-      "description": "Releitura de O Nascimento de Vênus, pintura de Sandro Botticelli, com a deusa sobre uma concha."
+      "description": "Vênus surge sobre uma grande concha à beira-mar, cercada por figuras mitológicas, flores e uma paisagem luminosa. A cena é uma releitura de O Nascimento de Vênus, de Sandro Botticelli, obra emblemática do Renascimento italiano. A animação acentua a delicadeza dos tecidos, o movimento dos cabelos e a atmosfera poética da composição."
     },
     "carta_02": {
       "name": "A Liberdade Guiando o Povo",
-      "description": "Releitura da pintura de Eugène Delacroix: figura alegórica ergue a bandeira francesa entre revolucionários."
+      "description": "No alto de uma barricada, uma figura feminina ergue a bandeira da França e conduz uma multidão em meio à agitação revolucionária. A imagem recria A Liberdade Guiando o Povo, de Eugène Delacroix, pintura que representa a liberdade como uma personagem alegórica. A cena combina movimento, coragem e o impacto visual de um momento histórico."
     },
     "carta_03": {
       "name": "A Noite Estrelada",
-      "description": "Releitura de A Noite Estrelada, de Vincent van Gogh, com céu noturno de espirais luminosas."
+      "description": "Estrelas douradas brilham sobre uma vila adormecida, enquanto grandes espirais de luz parecem colocar o céu inteiro em movimento. A imagem homenageia A Noite Estrelada, de Vincent van Gogh, uma das obras mais célebres do pós-impressionismo. As curvas intensas e o contraste entre azul e amarelo tornam a paisagem imediatamente reconhecível."
     },
     "carta_04": {
       "name": "O Grito",
-      "description": "Releitura de O Grito, de Edvard Munch, com figura aflita diante de um céu de cores intensas."
+      "description": "Uma figura de expressão desesperada leva as mãos ao rosto diante de uma paisagem de linhas ondulantes e cores ardentes. Trata-se de uma releitura de O Grito, de Edvard Munch, obra conhecida por transformar angústia e tensão emocional em imagem. O céu dramático intensifica a sensação de que o próprio cenário participa do grito."
     },
     "carta_05": {
       "name": "A Criação de Adão",
-      "description": "Releitura do afresco de Michelangelo, com as mãos de Adão e Deus prestes a se tocar."
+      "description": "Duas mãos se aproximam no centro de uma cena celestial, separadas por uma distância mínima que concentra toda a atenção do observador. A composição recria A Criação de Adão, afresco de Michelangelo no teto da Capela Sistina. O gesto quase concluído tornou-se um dos símbolos visuais mais conhecidos da arte ocidental."
     },
     "carta_06": {
       "name": "Mona Lisa",
-      "description": "Releitura de Mona Lisa, pintura de Leonardo da Vinci, com retrato de mulher de sorriso enigmático."
+      "description": "Uma mulher de olhar sereno e sorriso enigmático posa diante de uma paisagem distante, com montanhas e caminhos sinuosos. A imagem reinterpreta a Mona Lisa, de Leonardo da Vinci, retrato célebre pela expressão ambígua e pelo tratamento delicado do rosto. A versão animada mantém a pose e o mistério que fizeram a obra atravessar gerações."
     },
     "carta_07": {
       "name": "Moça com Brinco de Pérola",
-      "description": "Releitura da pintura de Johannes Vermeer, mostrando jovem de turbante azul e brinco de pérola."
+      "description": "Uma jovem com turbante azul e tecido dourado olha por cima do ombro, destacando um brinco luminoso que contrasta com seu rosto. A cena é uma releitura de Moça com Brinco de Pérola, de Johannes Vermeer. O olhar direto, a iluminação suave e a simplicidade da composição transformaram esse retrato em um ícone artístico."
     },
     "carta_08": {
       "name": "O Pensador",
-      "description": "Releitura da escultura O Pensador, de Auguste Rodin: homem sentado com o queixo apoiado na mão."
+      "description": "Sentado sobre uma rocha, um homem inclina o corpo para a frente e apoia o queixo na mão, mergulhado em profunda reflexão. A imagem recria O Pensador, escultura de Auguste Rodin, conhecida pela combinação de tensão física e introspecção. Embora seja uma escultura, integra o deck como homenagem a uma obra fundamental das artes visuais."
     }
   },
-  "description": "Releituras ilustradas de obras-primas da arte, de pinturas famosas a uma escultura icônica. Reconheça as obras e seus criadores.",
+  "description": "Algumas imagens são tão poderosas que atravessam séculos e continuam sendo reconhecidas à primeira vista. Pinturas reúne releituras em animação de grandes obras da história da arte, explorando mitologia, revolução, emoção, retratos e criatividade. De Botticelli a Van Gogh, de Leonardo da Vinci a Rodin, cada carta convida você a observar os detalhes e descobrir a obra original por trás da nova interpretação.",
   "creator": "Quem Sou Eu",
   "category": "Artes visuais",
   "tags": [

@@ -5,46 +5,46 @@
   "cards": {
     "carta_01": {
       "name": "Kitsune de Nove Caudas",
-      "description": "Raposa mística de várias caudas em cenário de templos japoneses sob folhas vermelhas."
+      "description": "Cercada por folhas vermelhas e templos iluminados, uma raposa sobrenatural exibe nove caudas volumosas e uma presença majestosa. Nas tradições japonesas, as kitsune são associadas à inteligência, à magia e, em muitas histórias, à capacidade de mudar de forma. Quanto mais caudas possuem, maior costuma ser seu poder nas narrativas."
     },
     "carta_02": {
       "name": "Maneki-neko",
-      "description": "Gato da sorte japonês com a pata levantada, decorado em vermelho e dourado, cercado por cerejeiras."
+      "description": "Com uma pata erguida em gesto de convite, este gato ornamentado em vermelho e dourado é conhecido como maneki-neko. Muito presente em estabelecimentos japoneses, ele é tradicionalmente associado à boa sorte e à prosperidade. Sinos dourados, flores e lanternas reforçam o clima festivo da imagem."
     },
     "carta_03": {
       "name": "Gueixa com Sombrinha",
-      "description": "Mulher de quimono vermelho ornamentado segura uma sombrinha japonesa sob flores de cerejeira."
+      "description": "Vestida com um quimono vermelho ricamente decorado, uma mulher de penteado elaborado segura uma sombrinha diante de lanternas e flores de cerejeira. A cena evoca a elegância das artes tradicionais japonesas e a atenção aos detalhes do vestuário. Tecidos, acessórios e postura transformam o retrato em uma composição refinada."
     },
     "carta_04": {
       "name": "Ator de Kabuki",
-      "description": "Artista de teatro kabuki com maquiagem facial dramática e figurino tradicional."
+      "description": "Maquiagem marcante, olhar intenso e figurino ornamentado revelam um artista do kabuki, forma tradicional de teatro japonês conhecida por suas apresentações dramáticas. Os traços coloridos do rosto ajudam a construir personagens de grande força expressiva. Nesta carta, o gesto teatral parece interrompido no auge de uma cena."
     },
     "carta_05": {
       "name": "Samurai",
-      "description": "Guerreiro japonês em armadura tradicional, com elmo de chifres dourados e espada."
+      "description": "Um guerreiro de armadura pesada e elmo ornamentado observa o horizonte com a mão próxima à espada. Os samurais fizeram parte da história militar do Japão e se tornaram símbolos recorrentes de disciplina, estratégia e lealdade nas representações culturais. O castelo e as cerejeiras completam a atmosfera épica."
     },
     "carta_06": {
       "name": "Dama do Leque",
-      "description": "Mulher com quimono floral e penteado elaborado segura um leque diante das cerejeiras."
+      "description": "Entre pétalas rosadas e lanternas acolhedoras, uma dama de quimono bordado segura um delicado leque. O penteado detalhado, os acessórios dourados e o movimento suave das mãos destacam a sofisticação da indumentária tradicional japonesa. É uma cena construída em torno de elegância, gestos e harmonia visual."
     },
     "carta_07": {
       "name": "Kunoichi",
-      "description": "Guerreira ninja de roupa avermelhada com rosto parcialmente coberto e espada."
+      "description": "Ajoelhada sobre os telhados, uma guerreira de roupas vermelhas mantém o rosto parcialmente oculto e a espada preparada. A kunoichi é frequentemente representada na ficção como uma ninja feminina, habilidosa em discrição e movimentos rápidos. A noite iluminada pela lua torna a cena ainda mais cinematográfica."
     },
     "carta_08": {
       "name": "Ninja",
-      "description": "Guerreiro de roupas escuras e máscara empunha lâmina em cenário japonês noturno."
+      "description": "Vestido de preto, com capuz e máscara, um ninja se move pelas sombras enquanto segura sua arma. Essas figuras ocupam um lugar importante no imaginário sobre espionagem e técnicas de combate do Japão histórico, especialmente nas histórias de ficção. A composição destaca silêncio, agilidade e a tensão de uma missão noturna."
     },
     "carta_09": {
       "name": "Lutador de Sumô",
-      "description": "Lutador robusto em posição de combate, usando o mawashi tradicional."
+      "description": "Com os pés firmes no chão e o corpo inclinado para a frente, um lutador de sumô assume uma postura de confronto. O sumô é uma modalidade tradicional japonesa que combina força, técnica e rituais próprios. A musculatura exagerada da animação torna ainda mais impressionante o instante anterior ao combate."
     },
     "carta_10": {
       "name": "Dragão Japonês",
-      "description": "Dragão oriental comprido e serpentino sobre templos, montanhas e cachoeiras sob a lua."
+      "description": "Um enorme dragão de corpo serpentino atravessa um céu noturno, cercado por montanhas, templos e cachoeiras. Na tradição japonesa, dragões aparecem frequentemente ligados à água, à natureza e a forças extraordinárias. A imagem reúne escamas detalhadas, movimento sinuoso e uma atmosfera de fantasia oriental."
     }
   },
-  "description": "Mitos, tradições e figuras da cultura japonesa: do kitsune e do gato da sorte aos samurais e ninjas.",
+  "description": "Entre portais de templos, lanternas iluminadas e pétalas de cerejeira, descubra figuras que atravessam a história, os mitos e as tradições do Japão. Sol Nascente reúne criaturas lendárias, símbolos de sorte, artistas tradicionais e guerreiros que marcaram o imaginário japonês. Cada carta traz um cenário rico em detalhes e convida você a reconhecer os personagens e os elementos dessa cultura fascinante.",
   "creator": "Quem Sou Eu",
   "category": "Cultura japonesa",
   "tags": [

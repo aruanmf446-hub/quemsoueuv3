@@ -4,7 +4,7 @@
   const API = "https://api.github.com/repos/" + REPO;
   const REFRESH_MS = 300000;
   const $ = id => document.getElementById(id);
-  const state = { prs: [], runs: [], commits: [], issues: [], selected: "claude", tab: "overview", loaded: false, busy: false, fileCache: new Map() };
+  const state = { prs: [], history: [], runs: [], commits: [], issues: [], selected: "claude", tab: "overview", loaded: false, busy: false, fileCache: new Map() };
   const agents = [
     {id:"claude",name:"Claude Code",short:"C",role:"Godot, gameplay e implementação local",color:"#dba77e",place:"Branches claude/ e commits identificados como Claude Code",summary:"Implementação local via VS Code / Godot. O GitHub mostra apenas o trabalho publicado."},
     {id:"codex",name:"Codex",short:"⌘",role:"Código, integrações e revisão técnica",color:"#9ea7ff",place:"Branches codex/ e commits identificados como Codex",summary:"Alterações de código e verificações técnicas associadas a commits e PRs publicados."},
@@ -106,7 +106,7 @@
     if(!isValidSession() || state.busy)return;
     state.busy=true; $("refresh").disabled=true;
     const jobs=[
-      ["prs","/pulls?state=open&sort=updated&direction=desc&per_page=50",x=>Array.isArray(x)?x:[]],
+      ["history","/pulls?state=all&sort=updated&direction=desc&per_page=100",x=>Array.isArray(x)?x:[]],
       ["runs","/actions/runs?per_page=30",x=>x.workflow_runs||[]],
       ["commits","/commits?sha=main&per_page=25",x=>Array.isArray(x)?x:[]],
       ["issues","/issues?state=open&sort=updated&per_page=30",x=>(Array.isArray(x)?x:[]).filter(i=>!i.pull_request)]
@@ -117,6 +117,7 @@
       if(out.status==="fulfilled"){state[jobs[i][0]]=jobs[i][2](out.value);successes++;}
       else problems.push(out.reason?.message || "Erro de consulta");
     });
+    if(results[0].status==="fulfilled")state.prs=state.history.filter(p=>p.state==="open");
     state.loaded=successes>0||state.loaded;
     $("api-health").className="connection "+(successes===jobs.length?"ok":successes?"ok":"fail");
     $("api-health").innerHTML='<span class="dot"></span> '+(successes===jobs.length?"DADOS ATUALIZADOS":successes?"DADOS PARCIAIS":"SEM CONEXÃO");
@@ -129,16 +130,17 @@
     state.busy=false;$("refresh").disabled=false;
   }
   function recentAgentItems(id){
-    const prs=state.prs.filter(p=>prAgent(p)===id);
+    const history=state.history.filter(p=>prAgent(p)===id);
+    const prs=history.filter(p=>p.state==="open");
     const commits=state.commits.filter(c=>commitAgent(c)===id);
-    return {prs,commits,latest:[
-      ...prs.map(p=>p.updated_at),
+    return {prs,history,commits,latest:[
+      ...history.map(p=>p.updated_at),
       ...commits.map(c=>c.commit?.committer?.date || c.commit?.author?.date)
     ].filter(Boolean).sort((a,b)=>new Date(b)-new Date(a))[0]};
   }
   function agentCard(a){
     const item=recentAgentItems(a.id);
-    const title=item.prs[0]?.title || item.commits[0]?.commit?.message?.split("\n")[0] || "Nenhum trabalho recente identificado";
+    const title=item.prs[0]?.title || item.history[0]?.title || item.commits[0]?.commit?.message?.split("\n")[0] || "Nenhum trabalho recente identificado";
     const badge=item.prs.length?item.prs.length+" PR ABERTA"+(item.prs.length>1?"S":""):"SEM PR ABERTA";
     return '<button type="button" class="agent-card '+(state.selected===a.id&&state.tab==="agents"?"selected":"")+'" data-agent="'+a.id+'" style="--agent-color:'+a.color+'">'+
        '<div class="agent-top"><span class="agent-icon">'+a.short+'</span><span class="agent-state '+(item.prs.length?"active":"")+'">'+badge+'</span></div>'+
@@ -152,7 +154,7 @@
       date:c.commit?.committer?.date||c.commit?.author?.date,url:c.html_url,
       detail:"main · "+String(c.sha||"").slice(0,8)
     }));
-    const prs=state.prs.map(p=>({id:"pr-"+p.number,kind:"Pull request",agent:prAgent(p),title:p.title,date:p.updated_at,url:p.html_url,detail:"#"+p.number+" · "+(p.head?.ref||"branch não informada")}));
+    const prs=state.history.map(p=>({id:"pr-"+p.number,kind:p.state==="open"?"Pull request aberta":p.merged_at?"PR integrada":"PR encerrada",agent:prAgent(p),title:p.title,date:p.updated_at,url:p.html_url,detail:"#"+p.number+" · "+(p.head?.ref||"branch não informada")}));
     const runs=state.runs.filter(r=>r.status!=="completed"||r.conclusion==="failure").map(r=>({
       id:"run-"+r.id,kind:"Pipeline",agent:"other",title:r.name||"Pipeline",date:r.updated_at||r.created_at,url:r.html_url,
       detail:"GitHub Actions · "+runState(r).text
@@ -199,11 +201,17 @@
        '<button type="button" class="file-button" data-files="'+Number(p.number)+'">Ver arquivos alterados ↗</button>'+
        '<div id="files-'+Number(p.number)+'" class="files-output hidden"></div></div>').join("");
     }else html+=empty("Nenhuma PR aberta atribuível a este agente. Isso não significa que ele esteja offline.");
+    const previous=data.history.filter(p=>p.state!=="open");
+    if(previous.length)html+='<div class="section-kicker detail-latest">HISTÓRICO DE ENTREGAS · '+previous.length+' PRs</div>'+
+      previous.map(p=>'<div class="detail-pr"><a href="'+safeLink(p.html_url)+'" target="_blank" rel="noopener noreferrer"><strong>#'+Number(p.number)+' · '+escapeHtml(p.title)+'</strong></a>'+
+       '<small>'+escapeHtml(p.merged_at?"Integrada na main":"Encerrada sem integração")+' · '+escapeHtml(p.head?.ref||"—")+' · '+escapeHtml(timeAgo(p.updated_at))+'</small>'+
+       '<button type="button" class="file-button" data-files="'+Number(p.number)+'">Ver arquivos alterados ↗</button>'+
+       '<div class="files-output hidden"></div></div>').join("");
     if(data.commits.length) html+='<div class="section-kicker detail-latest">COMMITS IDENTIFICADOS NA MAIN</div>'+data.commits.slice(0,4).map(c=>'<div class="mini-commit"><a href="'+safeLink(c.html_url)+'" target="_blank" rel="noopener noreferrer">'+escapeHtml(c.commit?.message?.split("\n")[0]||"Commit")+'</a><small>'+escapeHtml(timeAgo(c.commit?.committer?.date||c.commit?.author?.date))+'</small></div>').join("");
     setHtml("agent-detail",html);
   }
   async function loadFiles(num,button){
-    const box=$("files-"+num);
+    const box=button?.parentElement?.querySelector(".files-output") || $("files-"+num);
     if(!box)return;
     if(!box.classList.contains("hidden")){box.classList.add("hidden");return;}
     box.classList.remove("hidden");
@@ -236,6 +244,7 @@
     setHtml("all-prs",state.prs.length?state.prs.map(prRow).join(""):empty("Não existem pull requests abertas na amostra consultada."));
     setHtml("all-issues",state.issues.length?state.issues.map(issueRow).join(""):empty("Nenhuma issue aberta na amostra consultada."));
     renderDetail();
+    if(window.QSEBuilding)window.QSEBuilding.render({history:state.history,prs:state.prs,commits:state.commits,runs:state.runs,issues:state.issues});
   }
   const pageData={
     overview:["Visão geral","Acompanhe as entregas, a operação dos agentes e o estado do projeto."],
@@ -263,6 +272,7 @@
       $("toggle-pin").setAttribute("aria-label",input.type==="password"?"Mostrar PIN":"Ocultar PIN");
     });
     $("logout").addEventListener("click",logout);
+    window.addEventListener("qse-select-agent",event=>{if(["claude","codex","work"].includes(event.detail?.id)){state.selected=event.detail.id;openTab("agents");}});
     $("refresh").addEventListener("click",refresh);
     $("activity-filter").addEventListener("change",render);
     document.addEventListener("click",event=>{

@@ -12,3 +12,7 @@ Requisitos:
 - Na importação: ZIP validado, Godot smoke, publish Web e verificação de dez cartas.
 
 **Separação importante:** a criação de tabelas e seeds não substitui os bytes PNG. O usuário deve enviar o único ZIP pela interface GitHub, pois o conector de texto não transfere arquivos binários desta conversa para GitHub.
+
+## Implantação de backend confirmada
+
+No GAME: 9 contas, 108 concessões (11 anteriores + Diva Pop por conta), uma nova campanha independente ativa; novo cadastro recebe 12 concessões. Teste transacional (rollback) validou feed, confirmação única e idempotência. No CATALOG: `diva_pop`, 10 cartas públicas. A UI não mostra a novidade enquanto faltarem PNGs locais. A importação do ZIP continua a única pendência de assets.

@@ -689,6 +689,12 @@ func _section_head(icon_name: String, title: String, subtitle: String) -> HBoxCo
 	head.add_child(text)
 	text.add_child(PremiumUI.plain(title, 20, Color("#f5f6fa")))
 	if not subtitle.is_empty(): text.add_child(PremiumUI.plain(subtitle, 12, SECONDARY))
+	if UIScale.is_iphone():
+		# iPhone: o subtítulo quebra linha em vez de alargar a coluna.
+		text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		for line: Label in text.get_children():
+			line.autowrap_mode = TextServer.AUTOWRAP_WORD
+			line.custom_minimum_size.x = 160
 	return head
 
 
@@ -745,6 +751,11 @@ func _form_row(label_text: String, control: Control, note := "") -> VBoxContaine
 	row.add_child(texts)
 	texts.add_child(PremiumUI.plain(label_text, 14, Color("#f5f6fa")))
 	if not note.is_empty(): texts.add_child(PremiumUI.plain(note, 12, SECONDARY))
+	# iPhone: rótulos longos quebram linha em vez de empurrar a tela para fora.
+	if UIScale.is_iphone():
+		for text_label: Label in texts.get_children():
+			text_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			text_label.custom_minimum_size.x = 140
 	control.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(control)
 	var rule := ColorRect.new()
@@ -866,9 +877,11 @@ func _render_form() -> void:
 		_deck_query = value
 		_refresh_deck_grid())
 	search_row.add_child(search)
-	var tabs := HBoxContainer.new()
+	# Quebra de linha só quando não cabe (no PC fica igual; no iPhone as abas descem).
+	var tabs := HFlowContainer.new()
 	tabs.name = "DeckTabs"
-	tabs.add_theme_constant_override("separation", 8)
+	tabs.add_theme_constant_override("h_separation", 8)
+	tabs.add_theme_constant_override("v_separation", 8)
 	decks.add_child(tabs)
 	for tab: String in DECK_TABS:
 		var icon_name: String = {"Todos": "layers", "Favoritos": "star", "Bombando": "bolt", "Meus decks": "user", "Comprados": "crown"}[tab]
@@ -897,7 +910,7 @@ func _render_form() -> void:
 		tabs.add_child(chip)
 	var grid := GridContainer.new()
 	grid.name = "DeckChoices"
-	grid.columns = 3
+	grid.columns = 2 if UIScale.is_iphone() else 3
 	grid.resized.connect(func() -> void:
 		# Colunas pela largura disponível (cards de ~132 + espaço), sem esmagar as capas.
 		grid.columns = clampi(floori((grid.size.x + 14.0) / 146.0), 2, 5))
@@ -908,7 +921,7 @@ func _render_form() -> void:
 	var summary := PanelContainer.new()
 	summary.name = "FormSummary"
 	summary.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	summary.custom_minimum_size.x = 360
+	summary.custom_minimum_size.x = 270 if UIScale.is_iphone() else 360
 	summary.clip_contents = true
 	summary.add_theme_stylebox_override("panel", _panel_box())
 	columns.add_child(summary)

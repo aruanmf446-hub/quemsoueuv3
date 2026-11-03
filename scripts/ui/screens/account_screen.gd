@@ -68,7 +68,8 @@ func show_screen(params: Dictionary = {}) -> void:
 	parameters = params.duplicate(true)
 	var back_button := _root.get_node_or_null("AuthBack") as Button
 	if back_button != null:
-		back_button.text = "Jogar sem conta" if bool(params.get("startup", false)) else "‹ Voltar"
+		back_button.custom_minimum_size.x = 0
+		PlayerUI.standard_back(back_button, "Jogar sem conta" if bool(params.get("startup", false)) else "Voltar")
 	show()
 	if services.session.needs_password_reset:
 		_mode = "reset"
@@ -289,6 +290,13 @@ func _layout_auth() -> void:
 	var panel_x := clampf(mid_x - panel_width * 0.5, 8.0, logical.x - panel_width - 8.0)
 	var logo_h := 98.0 if very_small else (113.0 if compact else 260.0)
 	var logo_y := 0.0 if very_small else (0.0 if compact else logical.y * 0.24)
+	# iPhone (base 1138x640, já na área segura): logo menor no topo e painel largo e alto,
+	# para os botões de login ficarem grandes e nada cortar embaixo.
+	if UIScale.is_iphone():
+		panel_width = 470.0
+		panel_x = clampf(logical.x * 0.70 - panel_width * 0.5, 8.0, logical.x - panel_width - 12.0)
+		logo_h = 150.0
+		logo_y = 6.0
 	var logo_w := panel_width * (1.04 if very_small else 1.2)
 	_logo.position = Vector2(panel_x - (logo_w - panel_width)*0.5, logo_y) * factor
 	_logo.size = Vector2(logo_w, logo_h) * factor
@@ -303,8 +311,9 @@ func _layout_auth() -> void:
 	if back != null:
 		back.position = Vector2(12,8) * factor
 		back.scale = Vector2.ONE * factor
-		back.custom_minimum_size = Vector2(112 if compact else 162, 34 if compact else 45)
-		back.add_theme_font_size_override("font_size", 12 if compact else 17)
+		# Mesmo "Voltar" das outras telas (a tela de login escala pelo próprio fator).
+		PlayerUI.standard_back(back)
+		back.size = Vector2.ZERO
 
 
 func _switch(mode: String) -> void:

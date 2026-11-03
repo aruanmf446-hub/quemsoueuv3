@@ -18,6 +18,7 @@ func _run() -> void:
 	root.mode = Window.MODE_WINDOWED
 	DisplayServer.window_set_size(resolution)
 	root.size = resolution
+	UIScale.apply_device_profile(root)
 	var services := PlayerServices.new()
 	root.add_child(services)
 	await settle()

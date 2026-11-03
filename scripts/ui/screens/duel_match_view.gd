@@ -58,6 +58,7 @@ func _ready() -> void:
 func _build() -> void:
 	if _built: return
 	_built = true
+	set_meta("qse_no_font_floor", true)
 	PlayerUI.apply_theme(self)
 	var background := Surface.new()
 	background.name = "BattleAtmosphere"
@@ -221,6 +222,8 @@ func _build_sidebar() -> void:
 		room_text.add_child(Style.label("Só neste aparelho · sem convite",12,PlayerUI.MUTED))
 	var voice := PanelContainer.new()
 	voice.name = "VoiceUnavailable"
+	# Partida local: sem voz; o espaço fica para o chat e a mão.
+	voice.visible = not duel.is_local()
 	voice.add_theme_stylebox_override("panel",Style.panel(5))
 	_side.add_child(voice)
 	var voice_row := PlayerUI.row(voice)
@@ -246,8 +249,8 @@ func _build_sidebar() -> void:
 	chat.setup(overlay_parent.get("services") as PlayerServices)
 	chat.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_side.add_child(chat)
-	# Bots da partida local não conversam: não reservar uma coluna vazia.
-	chat.visible = not duel.is_local()
+	# Decisão do dono: o chat aparece também na partida local.
+	chat.visible = true
 	var private_panel := PanelContainer.new()
 	private_panel.name = "PrivatePanel"
 	private_panel.add_theme_stylebox_override("panel",Style.panel(6))
@@ -653,10 +656,8 @@ func _touch_top_inset() -> float:
 	if OS.has_environment("QSE_TEST_TOP_INSET"):
 		_top_inset = float(OS.get_environment("QSE_TEST_TOP_INSET"))
 		return _top_inset
-	if OS.has_feature("web"):
-		var css: Variant = JavaScriptBridge.eval("(window.qsePwa && window.qsePwa.ios) ? window.innerHeight : 0", true)
-		if css != null and float(css) > 0.0:
-			_top_inset = 22.0 * get_viewport().get_visible_rect().size.y / float(css)
+	# No iPhone a página (web/shell.html) já coloca o jogo dentro da área segura, com faixas
+	# pretas no notch, no topo e na barrinha: a batalha não precisa de recuo próprio.
 	return _top_inset
 
 

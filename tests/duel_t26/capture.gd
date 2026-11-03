@@ -19,6 +19,7 @@ func _run() -> void:
 	var dims := args[1].split("x")
 	root.mode = Window.MODE_WINDOWED
 	root.size = Vector2i(int(dims[0]), int(dims[1]))
+	UIScale.apply_device_profile(root)  # só com --iphone
 	var services := PlayerServices.new()
 	root.add_child(services)
 	for i in 3: await process_frame

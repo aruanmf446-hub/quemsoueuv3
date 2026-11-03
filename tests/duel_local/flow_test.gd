@@ -134,7 +134,8 @@ func _run() -> void:
 	check((data.players as Array).filter(func(p: Dictionary) -> bool: return p.is_bot and p.confirmed).size() == 2, "bots prontos na hora")
 	check(match_view() != null, "tela da partida")
 	var local_chat := match_view().find_child("BattleChat", true, false) as Control
-	check(local_chat != null and not local_chat.visible, "chat vazio oculto na partida local")
+	# Decisão do dono: o chat aparece também na partida local (recolhido, mensagens só no aparelho).
+	check(local_chat != null and local_chat.visible, "chat visível (recolhido) na partida local")
 	check(match_view().find_child("PrivatePanel", true, false) != null, "mao privada mantida")
 	check(match_view().find_child("RoundTimer", true, false) != null, "cronometro mantido")
 	var original_size := root.size
@@ -142,7 +143,7 @@ func _run() -> void:
 		root.size = dimensions
 		await settle(8)
 		var active := match_view() as Control
-		check(active != null and not local_chat.is_visible_in_tree(), "chat local oculto em %s" % str(dimensions))
+		check(active != null and local_chat.is_visible_in_tree(), "chat local visível em %s" % str(dimensions))
 		var cards: Control = active.find_child("Cards", true, false)
 		check(cards != null and cards.get_child_count() > 0, "tabuleiro presente em %s" % str(dimensions))
 	root.size = original_size

@@ -187,8 +187,7 @@ func _responsive_layout() -> void:
 	for edge in ["left", "right", "top", "bottom"]:
 		margin.add_theme_constant_override("margin_" + edge, inset)
 	_header.add_theme_constant_override("separation", 12 if compact else 22)
-	_back_button.custom_minimum_size = PlayerUI.BACK_SIZE
-	_back_button.add_theme_font_size_override("font_size", PlayerUI.CONTROL_FONT)
+	PlayerUI.standard_back(_back_button)
 	heading.add_theme_font_size_override("font_size", 23 if compact else 40)
 	$Margin/Column.add_theme_constant_override("separation", 6 if compact else 12)
 	_split.add_theme_constant_override("separation", 8 if compact else 18)

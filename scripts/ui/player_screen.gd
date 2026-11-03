@@ -22,7 +22,7 @@ func _ready() -> void:
 	# Telas internas têm fundo sólido opaco; o cenário ilustrado fica no lobby.
 	$Backdrop.hide()
 	($Backdrop as TextureRect).texture = null
-	PlayerUI.style_back($Margin/Column/Header/Back)
+	PlayerUI.standard_back($Margin/Column/Header/Back)
 	heading.add_theme_color_override("font_color", Color.WHITE)
 	heading.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	$Margin.grow_horizontal = Control.GROW_DIRECTION_END
@@ -45,9 +45,7 @@ func _adapt_scale() -> void:
 	margin.add_theme_constant_override("margin_top", 16 if compact else 28)
 	margin.add_theme_constant_override("margin_bottom", 16 if compact else 28)
 
-	var back: Button = $Margin/Column/Header/Back
-	back.custom_minimum_size = PlayerUI.BACK_SIZE
-	back.add_theme_font_size_override("font_size", PlayerUI.CONTROL_FONT)
+	PlayerUI.standard_back($Margin/Column/Header/Back)
 	heading.add_theme_font_size_override("font_size", 28 if compact else 40)
 	$Margin/Column.add_theme_constant_override("separation", 16 if compact else 24)
 

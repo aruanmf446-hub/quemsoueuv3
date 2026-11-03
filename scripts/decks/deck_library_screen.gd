@@ -147,8 +147,8 @@ func _page(title: String, view: String) -> void:
 	$Margin/Column/Scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED if view == "reader" else ScrollContainer.SCROLL_MODE_AUTO
 	_search.visible = view == "library"
 	var back: Button = $Margin/Column/Header/Back
-	back.text = tr("‹ Voltar" if view == "library" else ("‹ Biblioteca" if view == "deck" else "‹ Galeria"))
-	back.custom_minimum_size.x = 152 if view == "library" else 180
+	back.custom_minimum_size.x = 0
+	PlayerUI.standard_back(back, "Voltar" if view == "library" else ("Biblioteca" if view == "deck" else "Galeria"))
 	_layout_changed()
 	_refit_margin.call_deferred()
 

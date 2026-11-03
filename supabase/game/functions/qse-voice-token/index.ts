@@ -76,7 +76,7 @@ const handler = withSupabase({ auth: "user" }, async (request, context) => {
     } catch (e) {
       // A not-yet-created LiveKit room has no participants to clean up.
       const message = String(e);
-      if (!/not[\\s_-]?found|does not exist|404/i.test(message)) return response({ code: "voice_reconciliation_unavailable" }, 503);
+      if (!/not[\s_-]*found|does not exist|404|room[_-]?not[_-]?found/i.test(message)) return response({ code: "voice_reconciliation_unavailable" }, 503);
     }
   }
   if (action === "sync") return response({ ok: true, participants: roster });

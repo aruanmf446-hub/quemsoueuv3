@@ -26,8 +26,8 @@ func _ready() -> void:
     add_child(_poll)
     _poll.start()
     duel.changed.connect(_room_changed)
-    duel.removed.connect(func(_reason: String) -> void: disconnect())
-    session.changed.connect(disconnect)
+    duel.removed.connect(func(_reason: String) -> void: leave_voice())
+    session.changed.connect(leave_voice)
 
 func supported() -> bool:
     if not OS.has_feature("web") or OS.get_cmdline_args().has("--script"):
@@ -69,7 +69,7 @@ func connect_voice() -> void:
     JavaScriptBridge.eval("window.QSEVoice.connect(%s,%s)" % [url, token], true)
     changed.emit()
 
-func disconnect() -> void:
+func leave_voice() -> void:
     var old_room := _room_id
     _generation += 1
     _room_id = ""

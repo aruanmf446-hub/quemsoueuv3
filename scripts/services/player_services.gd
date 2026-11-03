@@ -18,6 +18,8 @@ var wallet: WalletService
 var friends: FriendsService
 var presence: FriendPresence
 var duel: DuelService
+## Voz opcional (LiveKit Web) independente do chat de texto.
+var voice: VoiceService
 ## Catálogo público (conexão catalog, sem sessão); o local continua como fallback.
 var catalog: CatalogService
 ## Atualizações editoriais públicas (novidades e personalização dos decks oficiais).
@@ -107,6 +109,11 @@ func _ready() -> void:
 		return str(profile.data.get("nickname", "")) if session.authenticated() else "Jogador local"
 	duel.add_child(duel.local_server)
 	add_child(duel)
+	voice = VoiceService.new()
+	voice.client = client
+	voice.session = session
+	voice.duel = duel
+	add_child(voice)
 	session.changed.connect(_session_changed)
 	var poller := Timer.new()
 	poller.wait_time = 30.0

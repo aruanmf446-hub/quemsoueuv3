@@ -428,7 +428,7 @@ func _render_players() -> void:
 		_roster.add_child(panel)
 		var row := PlayerUI.row(panel)
 		row.add_theme_constant_override("separation",3)
-		var portrait := PlayerUI.portrait(str(player.skin_id),46 if players.size() <= 3 else (32 if players.size() <= 5 else 20))
+		var portrait := PlayerUI.portrait(str(player.skin_id),46 if players.size() <= 3 else (32 if players.size() <= 5 else (28 if players.size() <= 12 else 22)))
 		if players.size() <= 5:
 			# Wider upper-bust crop from the packaged 720px portrait, preserving aspect.
 			# This increases the face size inside the same top strip, without a new layout.
@@ -452,7 +452,7 @@ func _render_players() -> void:
 		var info := PlayerUI.column(row)
 		info.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		info.add_theme_constant_override("separation",0)
-		var nickname := Style.label(str(player.nickname),16 if players.size() <= 3 else (14 if players.size() <= 5 else 10),PlayerUI.GOLD if turn else PlayerUI.TEXT)
+		var nickname := Style.label(str(player.nickname),16 if players.size() <= 3 else (14 if players.size() <= 5 else (12 if players.size() <= 12 else 11)),PlayerUI.GOLD if turn else PlayerUI.TEXT)
 		Style.strong(nickname)
 		nickname.text = str(player.nickname)
 		nickname.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
@@ -466,11 +466,11 @@ func _render_players() -> void:
 		for index in range(0 if uncertain else (int(player.lives) if players.size() <= 3 else 1)):
 			var heart := TextureRect.new()
 			heart.texture = Icons.heart(18,true)
-			heart.custom_minimum_size = Vector2(16,16) if players.size() <= 3 else Vector2(10,10)
+			heart.custom_minimum_size = Vector2(16,16) if players.size() <= 3 else Vector2(12,12)
 			heart.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			heart.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			hearts.add_child(heart)
-		if players.size() > 3 and not uncertain: hearts.add_child(Style.label(str(player.lives),10))
+		if players.size() > 3 and not uncertain: hearts.add_child(Style.label(str(player.lives),12))
 		if uncertain: info.add_child(Style.label("REVELANDO…",9,PlayerUI.MUTED))
 		elif player.eliminated:
 			nickname.add_theme_color_override("font_color",PlayerUI.MUTED)

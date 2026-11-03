@@ -128,6 +128,9 @@ func _layout_changed() -> void:
 	if not is_instance_valid(_search): return
 	var width := _physical_size().x
 	_search.custom_minimum_size.x = 360 if width >= 1100 else (240 if width >= 800 else 190)
+	# iPhone: a busca divide o cabeçalho com o título; nunca passa da borda.
+	if UIScale.is_iphone(): _search.custom_minimum_size.x = 160
+	_search.size_flags_horizontal = Control.SIZE_SHRINK_END
 	heading.add_theme_font_size_override("font_size", 24 if width < 900 else 40)
 	$Margin/Column/Header.add_theme_constant_override("separation", 16 if width < 900 else 28)
 	if not is_equal_approx(_refresh_width, width):

@@ -118,7 +118,7 @@ const handler = withSupabase({ auth: "user" }, async (req, ctx) => {
       // No room currently connected, or remote service temporarily unavailable.
       return response({ code: "voice_unavailable" }, 503);
     }
-    return response({ ok: true, removed });
+    return response({ ok: true, removed, participants: members.map((member) => ({ tag: member.tag, nickname: member.nickname })) });
   }
 
   // A short-lived, microphone-only token. Token TTL is *not* active-session
@@ -141,6 +141,7 @@ const handler = withSupabase({ auth: "user" }, async (req, ctx) => {
     server_url: config.url,
     participant_token: await token.toJwt(),
     room: roomName,
+    participants: members.map((member) => ({ tag: member.tag, nickname: member.nickname })),
     expires_in: 120,
   });
 });

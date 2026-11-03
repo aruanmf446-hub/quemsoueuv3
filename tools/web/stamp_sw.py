@@ -12,6 +12,11 @@ CORE = ["index.html", "index.js", "index.wasm", "index.pck", "index.audio.workle
         "pwa/icon-192.png", "pwa/icon-512.png"]
 
 out, build = sys.argv[1], sys.argv[2]
+# Versão da página (mostrada no diagnóstico): gravada ANTES de calcular os hashes.
+page = os.path.join(out, "index.html")
+if os.path.isfile(page):
+    html = open(page, encoding="utf-8").read()
+    open(page, "w", encoding="utf-8").write(html.replace("__PAGE_BUILD__", build))
 files = {}
 for path in CORE:
     full = os.path.join(out, path)

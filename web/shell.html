@@ -108,7 +108,26 @@ $GODOT_HEAD_INCLUDE
 	// Service worker único; atualização só quando o jogo diz que é seguro (lobby).
 	const updateButton = document.getElementById("qse-update");
 	if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+		const bootAt = Date.now();
 		navigator.serviceWorker.register("sw.js").then(function(registration){
+			// Ao ABRIR o app (primeiros segundos, antes de qualquer partida): se uma versão nova
+			// já foi baixada, ativa e recarrega na hora. Fechar/abrir o app basta para atualizar.
+			function applyAtStartup(){
+				if (Date.now() - bootAt > 15000 || !navigator.serviceWorker.controller) return false;
+				if (registration.waiting) {
+					window.qsePwa.updateReady = true;
+					registration.waiting.postMessage("qse-activate-update");
+					return true;
+				}
+				return false;
+			}
+			if (!applyAtStartup()) {
+				registration.update().then(function(){
+					const w = registration.installing || registration.waiting;
+					if (w) w.addEventListener("statechange", function(){ if (w.state === "installed") applyAtStartup(); });
+					else applyAtStartup();
+				}).catch(function(){});
+			}
 			function watch(worker){
 				if (!worker) return;
 				worker.addEventListener("statechange", function(){
@@ -236,7 +255,7 @@ $GODOT_HEAD_INCLUDE
 				if (!panel) return;
 				const c = document.getElementById("canvas"), r = c.getBoundingClientRect(), p = window.qsePwa || {}, n = window.qseNativeInput;
 				const a = document.activeElement;
-				panel.textContent = ["QSE diag " + new Date().toLocaleTimeString(),
+				panel.textContent = ["QSE diag " + new Date().toLocaleTimeString() + " versão " + (window.qseBuild || "?"),
 					"iphone=" + p.iphone + " ios=" + p.ios + " standalone=" + p.standalone,
 					"safe=" + JSON.stringify(p.safe || null),
 					"janela=" + innerWidth + "x" + innerHeight + " dpr=" + devicePixelRatio,
@@ -249,6 +268,7 @@ $GODOT_HEAD_INCLUDE
 			})();
 		}
 		if (/[?&]diag=1/.test(location.search)) setTimeout(toggle, 1500);
+		window.qseBuild = "__PAGE_BUILD__";
 	})();
 })();
 const GODOT_CONFIG = $GODOT_CONFIG;

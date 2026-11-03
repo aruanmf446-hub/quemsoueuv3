@@ -67,6 +67,11 @@ func _run() -> void:
 		for route: String in ROUTES:
 			nav.open(route, {})
 			for i in 30: await process_frame
+			# Tela que não carrega (erro de script) não pode passar em branco.
+			var active: Variant = nav.get("_active")
+			if active == null or not (active as Control).is_visible_in_tree() or nav.get("_history").is_empty() or nav.get("_history").back().route != route:
+				failures += 1
+				print("IPHONE_FAIL %s %s: tela não abriu" % [model[0], route])
 			_audit("%s %s" % [model[0], route])
 			nav.back()
 			for i in 15: await process_frame

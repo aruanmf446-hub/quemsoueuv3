@@ -1002,7 +1002,7 @@ func _fit_tiles() -> void:
 	var panel := _filter_panel.custom_minimum_size.x + 18.0 if is_instance_valid(_filter_panel) and _filter_panel.visible else 0.0
 	# iPhone: margens reais da página (laterais + espaçamento do painel) para a grade nunca
 	# alargar a tela e empurrar a busca para fora.
-	var width := _physical_size().x - panel - (120.0 if UIScale.is_iphone() else (60 if compact else 130))
+	var width: float = _physical_size().x - panel - (120.0 if UIScale.is_iphone() else (60.0 if compact else 130.0))
 	var gap := 10.0 if compact else 18.0
 	var minimum := 200.0 if compact else 320.0
 	_grid.columns = clampi(floori((width + gap) / (minimum + gap)), 1, 5)

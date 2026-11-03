@@ -58,7 +58,6 @@ func _ready() -> void:
 func _build() -> void:
 	if _built: return
 	_built = true
-	set_meta("qse_no_font_floor", true)
 	PlayerUI.apply_theme(self)
 	var background := Surface.new()
 	background.name = "BattleAtmosphere"
@@ -148,7 +147,21 @@ func _build() -> void:
 	_grid.add_theme_constant_override("h_separation",5)
 	_grid.add_theme_constant_override("v_separation",5)
 	_grid.resized.connect(_fit_cards)
-	_board_content.add_child(_grid)
+	if UIScale.is_iphone():
+		# iPhone: cartas em retrato e grandes (arte quase inteira, nome legível); o tabuleiro
+		# rola na vertical em vez de espremer todas as cartas numa tela de ~350 pt.
+		_board_scroll = ScrollContainer.new()
+		_board_scroll.name = "BoardScroll"
+		_board_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		_board_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_board_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		_board_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+		_board_content.add_child(_board_scroll)
+		_grid.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		_board_scroll.add_child(_grid)
+		_board_scroll.resized.connect(_fit_cards)
+	else:
+		_board_content.add_child(_grid)
 	_side = VBoxContainer.new()
 	_side.name = "UtilityRail"
 	_side.add_theme_constant_override("separation",5)
@@ -410,6 +423,10 @@ func _render_players() -> void:
 		var local: Dictionary = players.pop_at(mine)
 		players.insert(floori(players.size()/2.0),local)
 	_roster.columns = maxi(players.size(),1) if players.size() <= 5 else ceili(players.size()/(2.0 if players.size() <= 12 else 3.0))
+	# iPhone: no máximo 4 jogadores por linha (5 acima de 12) para os nomes caberem inteiros;
+	# o tabuleiro rola, então as linhas extras não espremem as cartas.
+	if UIScale.is_iphone() and players.size() > 4:
+		_roster.columns = 4 if players.size() <= 12 else 5
 	_roster.size_flags_horizontal = Control.SIZE_SHRINK_CENTER if players.size() <= 3 else Control.SIZE_EXPAND_FILL
 	# T24 iOS: linhas um pouco mais altas para retrato/nome/vidas legíveis (largura já sobrava).
 	_roster.custom_minimum_size.y = 57 if players.size() <= 5 else (80 if players.size() <= 12 else 99)
@@ -590,7 +607,7 @@ func _render_hand() -> void:
 			image.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			# T24 iOS: altura pela largura real da coluna (proporção da carta), não um valor fixo.
 			var column_width := (_hand.size.x - 12.0 - (grid.columns - 1) * 4.0) / maxf(grid.columns, 1)
-			image.custom_minimum_size.y = clampf(column_width * 1.42, 44.0, 120.0) if entries.size() <= 3 else 34.0
+			image.custom_minimum_size.y = clampf(column_width * 1.42, 44.0, 150.0 if UIScale.is_iphone() else 120.0) if entries.size() <= 3 else 34.0
 			if entry.get("lost",false): image.modulate = Color("#555967")
 			# Toque/clique amplia temporariamente (só nesta tela; ninguém mais vê).
 			image.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -630,6 +647,8 @@ func _render_hand() -> void:
 				hidden.add_child(back)
 			grid.add_child(hidden)
 func _utility_width(width: float) -> float:
+	# iPhone: coluna lateral mais larga para as cartas escolhidas e o chat ficarem legíveis.
+	if UIScale.is_iphone(): return 250.0
 	if duel.is_local():
 		return 176.0 if width >= 760 else 160.0
 	return 200.0 if width >= 760 else 176.0
@@ -729,7 +748,27 @@ func _best_grid_columns(count: int, usable_width: float, usable_height: float, g
 	return best
 
 
+var _board_scroll: ScrollContainer
+
+
+## iPhone: colunas pela largura (cartas ~150 px de design), altura em retrato.
+func _fit_cards_iphone() -> void:
+	var width := _board_scroll.size.x - 10.0
+	if width <= 0: return
+	var gap := float(_grid.get_theme_constant("h_separation"))
+	var columns := clampi(floori((width + gap) / (150.0 + gap)), 3, 8)
+	_grid.columns = columns
+	var cell_width := floorf((width - (columns - 1) * gap) / columns)
+	for card: Control in _grid.get_children():
+		card.custom_minimum_size = Vector2(cell_width, floorf(cell_width * 1.3))
+		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		card.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+
+
 func _fit_cards() -> void:
+	if is_instance_valid(_board_scroll):
+		_fit_cards_iphone()
+		return
 	if not is_instance_valid(_grid) or _grid.size.x <= 0 or _grid.size.y <= 0: return
 	var count := _grid.get_child_count()
 	if count == 0: return

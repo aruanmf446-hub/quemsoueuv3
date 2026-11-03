@@ -112,10 +112,15 @@ func refresh_availability() -> void:
 		# cabeçalho) para não tirar espaço das cartas; um toque abre.
 		if not _local_started:
 			_local_started = true
-			if not _collapsed: _toggle()
+			# iPhone: a coluna lateral é larga e alta o bastante; o chat fica aberto.
+			if not _collapsed and not UIScale.is_iphone(): _toggle()
 		if _owned: _stop()
 		_state()
 		return
+	if _local_started:
+		# Saiu da partida local: o chat volta aberto como nas salas online.
+		_local_started = false
+		if _collapsed: _toggle()
 	var room := "" if duel.is_local() or not duel.in_room() else duel.room_id()
 	var allowed: bool = services.session.authenticated() and not room.is_empty() and str(duel.room.get("room",{}).get("status","")) in ["lobby","in_match"]
 	if not allowed:

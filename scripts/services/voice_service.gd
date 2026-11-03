@@ -18,6 +18,7 @@ var _requesting := false
 var _generation := 0
 var _poll: Timer
 var _sync_elapsed := 0.0
+var _syncing := false
 
 func _ready() -> void:
     _poll = Timer.new()
@@ -25,7 +26,7 @@ func _ready() -> void:
     _poll.timeout.connect(_tick)
     add_child(_poll)
     _poll.start()
-    duel.changed.connect(_room_changed)
+    duel.changed.connect(_room_updated)
     duel.removed.connect(func(_reason: String) -> void: leave_voice())
     session.changed.connect(leave_voice)
 
@@ -66,7 +67,8 @@ func connect_voice() -> void:
     # JSON.stringify escapa strings recebidas antes de enviá-las à ponte JavaScript.
     var url := JSON.stringify(str(payload.get("server_url", "")))
     var token := JSON.stringify(str(payload.get("participant_token", "")))
-    JavaScriptBridge.eval("window.QSEVoice.connect(%s,%s)" % [url, token], true)
+    var roster := JSON.stringify(payload.get("participants", []))
+    JavaScriptBridge.eval("window.QSEVoice.connect(%s,%s,%s)" % [url, token, roster], true)
     changed.emit()
 
 func leave_voice() -> void:
@@ -75,6 +77,7 @@ func leave_voice() -> void:
     _room_id = ""
     _requesting = false
     _sync_elapsed = 0.0
+    _syncing = false
     state = "idle"
     error_code = ""
     microphone_on = false
@@ -89,6 +92,34 @@ func leave_voice() -> void:
 func _room_changed() -> void:
     if not _room_id.is_empty() and (not eligible() or duel.room_id() != _room_id):
         leave_voice()
+
+func _room_updated() -> void:
+    _room_changed()
+    # Mudanca real da sala: conciliar mais rapidamente quem foi expulso/saiu.
+    if not _room_id.is_empty() and state == "connected":
+        _sync_elapsed = 19.0
+
+func _sync_room() -> void:
+    if _syncing or _room_id.is_empty() or state != "connected": return
+    _syncing = true
+    var attempt := _generation
+    var id := _room_id
+    var result := await client.send("/functions/v1/qse-voice-token", HTTPClient.METHOD_POST, {"room_id": id, "action": "sync"})
+    if attempt != _generation or id != _room_id: return
+    _syncing = false
+    if not result.ok:
+        # Falha fechada: sem autorizacao atualizada, nao manter escuta ativa.
+        leave_voice()
+        state = "error"
+        error_code = "voice_access_lost"
+        changed.emit()
+        return
+    if result.data is Dictionary:
+        var payload: Variant = result.data.get("data", {})
+        if payload is Dictionary:
+            var roster: Variant = payload.get("participants", [])
+            if roster is Array and supported():
+                JavaScriptBridge.eval("window.QSEVoice.setRoster(%s)" % JSON.stringify(roster), true)
 
 func _tick() -> void:
     _room_changed()
@@ -114,7 +145,7 @@ func _tick() -> void:
         _sync_elapsed += 1.0
         if _sync_elapsed >= 20.0:
             _sync_elapsed = 0.0
-            client.send("/functions/v1/qse-voice-token", HTTPClient.METHOD_POST, {"room_id": _room_id, "action": "sync"})
+            _sync_room()
 
 func microphone(enabled: bool) -> void:
     if supported() and state == "connected":

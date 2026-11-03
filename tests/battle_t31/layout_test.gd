@@ -51,6 +51,9 @@ func _verify(battle: Control, screen: Control, label: String, count: int) -> voi
 			label + " pure display name " + str(card.name))
 	print("T31_GEOMETRY ", label, " cols=", grid.columns, " rows=", ceili(float(count)/grid.columns),
 		" first=", first.size," screen=", screen.size, " board=",board.get_global_rect()," rail=",side.get_global_rect()," grid=",grid.get_global_rect())
+	print("T31_MINIMUM ", label, " card_custom=", first.custom_minimum_size,
+		" card_combined=", first.get_combined_minimum_size(), " grid_min=",grid.get_combined_minimum_size(),
+		" board_min=",board.get_combined_minimum_size(), " canvas=", (battle.get("_canvas") as Control).size)
 
 func _run() -> void:
 	var args := OS.get_cmdline_user_args()

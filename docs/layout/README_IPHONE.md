@@ -29,7 +29,7 @@ Só quando o navegador é um iPhone (`window.qsePwa.iphone`):
 
 - Stretch continua `canvas_items` / `expand`: telas mais largas só mostram mais espaço.
 - `UIScale.is_iphone()` identifica o perfil; testes simulam com `--iphone`.
-- **Piso de legibilidade** (`IPHONE_MIN_FONT = 21` px de design ≈ 11 pt no 13 mini e ≈ 13 pt no
+- **Piso de legibilidade** (`IPHONE_MIN_FONT = 20` px de design ≈ 11 pt no 13 mini e ≈ 13 pt no
   Pro Max): só textos menores sobem; os grandes ficam como estão. Telas com escala própria
   (batalha) marcam `qse_no_font_floor` e ficam fora do piso.
 - Ajustes por tela usam `UIScale.is_iphone()` só onde o espaço exigiu (lista abaixo). Não há
@@ -88,7 +88,7 @@ Folhas de contato por modelo: `docs/evidence/iphone/<grupo>.jpg`.
 ## 7. Para validar outros aparelhos depois (APK, EXE, navegador)
 
 1. Medir a **área útil real** (Android: recortes de câmera e barra de gestos; PC: janela).
-2. Decidir a base de design do perfil (iPhone usa 1138×640) e o piso de fonte.
+2. Decidir a base de design do perfil (iPhone usa 1080×608) e o piso de fonte.
 3. Rodar as mesmas capturas com o perfil e conferir: nada cortado, nada sob recortes, botões
    com toque confortável (≥ ~40 pt), textos ≥ ~9,5 pt.
 4. Registrar aqui a tabela de tamanhos e os ajustes por tela.

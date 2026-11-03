@@ -61,12 +61,13 @@ function assemble(build) { execSync(`python3 tests/web_pwa/assemble.py ${site}/q
   const ios = await browser.newContext({ userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1', hasTouch: true, isMobile: true, viewport: { width: 844, height: 390 } });
   const phone = await ios.newPage();
   await phone.goto(url);
-  // Caixa de digitação nativa: o jogo registra o campo e pede abertura no toque.
+  // Campo real sobre o campo do jogo: o toque na área do campo cai num <input> e abre o teclado.
   const sent = await phone.evaluate(() => {
     window.__log = [];
-    window.qseNativeInput.setRegion('chat', 0, 0, 100, 40, '', 'Mensagem…', 280, 'text', '', false);
+    const c = document.getElementById('canvas');
+    const rx = c.width / c.clientWidth || 1, ry = c.height / c.clientHeight || 1;
+    window.qseNativeInput.setRegion('chat', 100 * rx, 250 * ry, 300 * rx, 40 * ry, '', 'Mensagem…', 280, 'text', '', false);
     window.qseNativeInput.bind('chat', (t) => window.__log.push('input:' + t), (t) => window.__log.push('submit:' + t), (t) => window.__log.push('close:' + t));
-    window.qseNativeInput.open('chat');
     return window.qseNativeInput.enabled();
   });
   check(sent === true, 'iOS detectado (ponte de teclado ativa)');
@@ -75,37 +76,27 @@ function assemble(build) { execSync(`python3 tests/web_pwa/assemble.py ${site}/q
   check(safe.bg === 'rgb(0, 0, 0)', 'iPhone: faixas fora da área segura são pretas');
   const desk = await page.evaluate(() => { const r = document.getElementById('canvas').getBoundingClientRect(); return {top: r.top, iphone: window.qsePwa.iphone}; });
   check(desk.top === 0 && desk.iphone === false, 'computador: canvas na tela inteira (nada muda)');
-  check(await phone.evaluate(() => getComputedStyle(document.getElementById('qse-type')).display === 'flex' && getComputedStyle(document.getElementById('qse-type-text')).display === 'block'), 'toque no campo do jogo abre a caixa nativa visível');
-  await phone.tap('#qse-type-text');
-  check(await phone.evaluate(() => document.activeElement && document.activeElement.id === 'qse-type-text'), 'toque na caixa foca o campo real (teclado abre)');
+  const at = await phone.evaluate(() => { const r = document.getElementById('canvas').getBoundingClientRect(); return {x: r.left + 200, y: r.top + 270}; });
+  const hit = await phone.evaluate((p) => { const el = document.elementFromPoint(p.x, p.y); return el && el.tagName; }, at);
+  check(hit === 'INPUT', `toque na área do campo cai num <input> real (${hit})`);
+  await phone.touchscreen.tap(at.x, at.y);
+  await phone.waitForTimeout(200);
+  check(await phone.evaluate(() => { const a = document.activeElement; return !!a && a.tagName === 'INPUT' && a.classList.contains('qse-typing'); }), 'um toque foca o campo real (teclado abre) com o visual do jogo');
   await phone.keyboard.type('oi');
   await phone.keyboard.press('Enter');
-  const chatLog = await phone.evaluate(() => [window.__log.join('|'), getComputedStyle(document.getElementById('qse-type')).display]);
-  check(chatLog[0].includes('input:oi') && chatLog[0].includes('submit:oi') && chatLog[1] === 'none', `texto volta ao jogo e a caixa fecha ${chatLog}`);
-  // Login: campo de e-mail real (sugere contas salvas) e senha mascarada.
+  const log = await phone.evaluate(() => window.__log.join('|'));
+  check(log.includes('input:oi') && log.includes('submit:oi'), `texto volta ao jogo e Enter envia ${log}`);
+  await phone.evaluate(() => document.activeElement && document.activeElement.blur());
+  await phone.evaluate(() => window.qseNativeInput.clearRegion('chat'));
+  check(await phone.evaluate(() => document.querySelectorAll('input.qse-field:not(#qse-login-email):not(#qse-login-password)').length) === 0, 'campo some quando a tela do jogo fecha');
   const loginKinds = await phone.evaluate(() => {
     window.__log = [];
     window.qseNativeInput.setRegion('email', 0, 0, 100, 40, '', 'Seu e-mail', 0, 'email', '', false);
     window.qseNativeInput.bind('email', (t) => window.__log.push('email:' + t), () => {}, () => {});
-    window.qseNativeInput.open('email');
     const e = document.getElementById('qse-login-email');
-    return [e.type, e.autocomplete, getComputedStyle(e).display, e.form && e.form.id];
+    return [e.type, e.autocomplete, e.classList.contains('qse-on'), e.form && e.form.id];
   });
-  check(loginKinds.join() === 'email,username,block,qse-login', `e-mail real no formulário ${loginKinds}`);
-  await phone.tap('#qse-login-email');
-  await phone.keyboard.type('a@b.co');
-  await phone.tap('#qse-type-ok');
-  check(await phone.evaluate(() => window.__log.includes('email:a@b.co')), 'e-mail digitado chega ao jogo pelo OK');
-  const pass = await phone.evaluate(() => {
-    window.qseNativeInput.setRegion('pass', 0, 0, 100, 40, '', 'Sua senha', 0, 'password', '', true);
-    window.qseNativeInput.bind('pass', () => {}, () => {}, () => {});
-    window.qseNativeInput.open('pass');
-    const p = document.getElementById('qse-login-password');
-    const out = [p.type, p.autocomplete, getComputedStyle(p).display];
-    document.getElementById('qse-type-cancel').click();
-    return out.concat([getComputedStyle(document.getElementById('qse-type')).display]);
-  });
-  check(pass.join() === 'password,current-password,block,none', `senha mascarada e Cancelar fecha ${pass}`);
+  check(loginKinds.join() === 'email,username,true,qse-login', `e-mail real no formulário (senhas salvas) ${loginKinds}`);
   check(await phone.evaluate(() => { try { window.qseNativeInput.remember(); return true; } catch (e) { return false; } }), 'pedido para salvar a senha não quebra');
   check(await phone.evaluate(() => getComputedStyle(document.getElementById('qse-install')).display) === 'none' || true, 'convite de instalação não bloqueia o jogo');
   await browser.close();

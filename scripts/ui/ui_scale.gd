@@ -40,6 +40,15 @@ const IPHONE_BASE := Vector2i(960, 540)
 const IPHONE_MIN_FONT := 22
 static var _iphone := -1
 
+## Resultado "verdadeiro" vindo de JavaScriptBridge.eval: no navegador o booleano chega como
+## número (1/0). Comparar com `== true` dá erro no GDScript e parava a função em silêncio.
+static func js_true(value: Variant) -> bool:
+	if value is bool: return value
+	if value is int or value is float: return value != 0
+	if value is String: return value == "true" or value == "1"
+	return false
+
+
 static func is_iphone() -> bool:
 	if _iphone < 0:
 		_iphone = 0
@@ -47,7 +56,7 @@ static func is_iphone() -> bool:
 			_iphone = 1
 		elif OS.has_feature("web"):
 			var value: Variant = JavaScriptBridge.eval("!!(window.qsePwa && window.qsePwa.iphone)", true)
-			_iphone = 1 if value == true else 0
+			_iphone = 1 if js_true(value) else 0
 	return _iphone == 1
 
 ## Aplica a base do iPhone na janela principal (chamado por um autoload na abertura).

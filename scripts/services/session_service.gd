@@ -176,7 +176,7 @@ func _google_direct() -> Dictionary:
 		});
 		return true;
 	})(%s, %s)""" % [JSON.stringify(google_client_id()), JSON.stringify(GOOGLE_NONCE_KEY)]
-	if JavaScriptBridge.eval(script, true) != true:
+	if not UIScale.js_true(JavaScriptBridge.eval(script, true)):
 		return ServiceResult.failure("provider_unavailable")
 	return ServiceResult.success(null)
 

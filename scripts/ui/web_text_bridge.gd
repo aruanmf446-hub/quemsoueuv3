@@ -52,7 +52,7 @@ static func kind_of(line_edit: LineEdit) -> String:
 static func enabled() -> bool:
 	if not OS.has_feature("web"): return false
 	var value: Variant = JavaScriptBridge.eval("!!(window.qseNativeInput && window.qseNativeInput.enabled())", true)
-	return value == true
+	return UIScale.js_true(value)
 
 
 func _ready() -> void:

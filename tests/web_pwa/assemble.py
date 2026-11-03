@@ -11,10 +11,12 @@ for key, value in {"$GODOT_PROJECT_NAME": "Quem Sou Eu", "$GODOT_HEAD_INCLUDE": 
 open(os.path.join(out, "index.html"), "w", encoding="utf-8").write(shell)
 # Motor falso: só o suficiente para o shell não quebrar.
 open(os.path.join(out, "index.js"), "w").write("window.Engine=function(){};Engine.getMissingFeatures=function(){return ['motor de teste']};Engine.prototype.startGame=function(){return new Promise(function(){})};")
-for name, size in (("index.wasm", 4096), ("index.pck", 8192)):
-    open(os.path.join(out, name), "wb").write(os.urandom(size))
+# Motor (wasm) igual entre versões, como no jogo real; o pacote (pck) muda a cada versão.
+open(os.path.join(out, "index.wasm"), "wb").write(bytes(range(256)) * 16)
+open(os.path.join(out, "index.pck"), "wb").write(os.urandom(8192))
 for name in os.listdir("web/pwa"):
     if name.startswith("icon-"): shutil.copy(os.path.join("web/pwa", name), os.path.join(out, "pwa", name))
 shutil.copy("web/pwa/manifest.webmanifest", os.path.join(out, "manifest.webmanifest"))
-open(os.path.join(out, "sw.js"), "w").write(open("web/pwa/sw.js").read().replace("__BUILD__", build))
+import subprocess
+subprocess.run([sys.executable, "tools/web/stamp_sw.py", out, build], check=True, stdout=subprocess.DEVNULL)
 print("montado", out, build)

@@ -13,6 +13,7 @@ for icon in manifest.get("icons", []):
 if not os.path.exists(os.path.join(root, "pwa/icon-180.png")): errors.append("apple-touch-icon ausente")
 sw = open(os.path.join(root, "sw.js"), encoding="utf-8").read()
 if "__BUILD__" in sw: errors.append("sw.js sem versão do build")
+if "__FILES__" in sw or '"index.wasm"' not in sw: errors.append("sw.js sem hashes dos arquivos")
 if "supabase" in sw.lower() and "Supabase" not in sw: errors.append("sw.js referencia supabase")
 workers = [f for f in os.listdir(root) if f.endswith(".service.worker.js") or f == "index.service.worker.js"]
 if workers: errors.append("service worker extra do Godot: " + ", ".join(workers))

@@ -1,4 +1,5 @@
 extends Control
+const DeckCatalog = preload("res://scripts/decks/deck_library_catalog.gd")
 
 signal option_selected(option_id: StringName)
 @onready var _menu_buttons: Control = $MenuButtons
@@ -239,7 +240,8 @@ func _layout_news_button() -> void:
 func _rewards_changed() -> void:
 	if not is_instance_valid(_news_button): return
 	var reward := _services.rewards
-	_news_button.text = "NOVIDADES  •  NOVO" if reward.state == "success" and not reward.seen else "NOVIDADES"
+	var ready := reward.state == "success" and not (str(reward.campaign.get("id", "")) == "diva_pop_2026" and DeckCatalog.find_deck("diva_pop").is_empty())
+	_news_button.text = "NOVIDADES  •  NOVO" if ready and not reward.seen else "NOVIDADES"
 	_news_button.tooltip_text = "Presentes gratuitos e novidades oficiais"
 	_maybe_show_news.call_deferred()
 
@@ -252,6 +254,8 @@ func _maybe_show_news() -> void:
 	if str(_services.profile.data.get("nickname", "")).strip_edges().is_empty(): return
 	var reward := _services.rewards
 	if reward.state != "success" or reward.seen or reward.campaign.is_empty(): return
+	# T30: não anunciar deck até as dez imagens existirem no export do jogo.
+	if str(reward.campaign.get("id", "")) == "diva_pop_2026" and DeckCatalog.find_deck("diva_pop").is_empty(): return
 	var key := str(_services.session.user.get("id", "")) + ":" + str(reward.campaign.get("id", ""))
 	if _news_auto_shown.has(key): return
 	_news_auto_shown[key] = true

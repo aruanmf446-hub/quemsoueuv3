@@ -41,9 +41,13 @@ html,body{margin:0;padding:0;height:100%;background:#060b16;overflow:hidden;touc
  padding:18px 20px;font:15px/1.45 system-ui,-apple-system,sans-serif}
 #qse-sheet b{color:#f4cf7a}#qse-sheet ol{padding-left:20px;margin:10px 0}
 #qse-sheet button{margin:8px 8px 0 0}
-#qse-native,#qse-login input{position:fixed;z-index:40;display:none;box-sizing:border-box;height:44px;padding:0 14px;border-radius:10px;
- border:2px solid #f4b83f;background:#0c1726;color:#f5f6fa;font:16px system-ui,-apple-system,sans-serif;outline:none}
-#qse-login input.qse-parked{display:block;left:-4000px;top:0;width:200px;opacity:0;pointer-events:none}
+/* Campos reais por cima dos campos do jogo (iPhone/Android): o toque cai num <input> de verdade. */
+.qse-field{position:fixed;z-index:40;display:none;box-sizing:border-box;margin:0;padding:0 14px;border:0;border-radius:10px;
+ background:transparent;color:transparent;caret-color:transparent;opacity:.011;font:16px system-ui,-apple-system,sans-serif;
+ outline:none;-webkit-appearance:none;appearance:none}
+.qse-field.qse-over{display:block}
+.qse-field.qse-parked{display:block;left:-4000px;top:0;width:200px;height:30px;pointer-events:none}
+.qse-field.qse-typing{display:block;opacity:1;height:44px;color:#f5f6fa;caret-color:#f4b83f;background:#0c1726;border:2px solid #f4b83f}
 </style>
 $GODOT_HEAD_INCLUDE
 </head>
@@ -60,12 +64,11 @@ $GODOT_HEAD_INCLUDE
  <div style="border:0;padding:0;background:none"><button class="qse-chip" id="qse-sheet-ok" type="button">ENTENDI</button>
  <button class="qse-chip" id="qse-sheet-never" type="button" style="background:#2a3a52;color:#f5f6fa">NÃO MOSTRAR DE NOVO</button></div>
 </div></div>
-<input id="qse-native" type="text" enterkeyhint="send" autocomplete="off" autocorrect="on" spellcheck="true">
 <!-- Login: campos reais num formulário para o iPhone/Android sugerirem e salvarem as contas. -->
 <iframe name="qse-login-sink" title="" hidden></iframe>
 <form id="qse-login" action="about:blank" method="post" target="qse-login-sink" autocomplete="on">
- <input id="qse-login-email" class="qse-parked" name="email" type="email" autocomplete="username" inputmode="email" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="next">
- <input id="qse-login-password" class="qse-parked" name="password" type="password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go">
+ <input id="qse-login-email" class="qse-field qse-parked" name="email" type="email" autocomplete="username" inputmode="email" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="next">
+ <input id="qse-login-password" class="qse-field qse-parked" name="password" type="password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go">
 </form>
 <div id="boot">
  <div id="slides"></div>
@@ -129,56 +132,122 @@ $GODOT_HEAD_INCLUDE
 	// o toque depois (no quadro seguinte), então aqui um <input> real recebe o foco no próprio
 	// toque sobre a área que o jogo registrou, e o texto volta para o LineEdit do Godot.
 	const android = /Android/i.test(ua);
-	const textInput = document.getElementById("qse-native");
+	// --- Campos de texto nativos (iPhone e Android) ----------------------------------------
+	// O teclado do celular só abre quando o toque cai num campo HTML de verdade. O jogo informa
+	// onde estão seus campos; aqui um <input> real, quase invisível, fica exatamente por cima de
+	// cada um. Ao tocar, ele vira uma barra de digitação visível acima do teclado, e o texto
+	// volta para o campo do jogo. E-mail e senha usam os campos do formulário de login, para o
+	// aparelho sugerir e salvar as contas.
 	const emailInput = document.getElementById("qse-login-email");
 	const passwordInput = document.getElementById("qse-login-password");
 	const loginForm = document.getElementById("qse-login");
 	const regions = {};
 	let active = null;
-	let input = textInput;
-	function inputFor(kind){ return kind === "email" ? emailInput : (kind === "password" ? passwordInput : textInput); }
-	function place(){
+	function place(el){
 		const vv = window.visualViewport;
 		const width = Math.min((vv ? vv.width : innerWidth) - 16, 640);
 		const left = (vv ? vv.offsetLeft + vv.width / 2 : innerWidth / 2) - width / 2;
 		const top = vv ? vv.offsetTop + vv.height - 52 : innerHeight - 52;
-		input.style.width = width + "px"; input.style.left = left + "px"; input.style.top = Math.max(top, 4) + "px";
+		el.style.width = width + "px"; el.style.height = ""; el.style.left = left + "px"; el.style.top = Math.max(top, 4) + "px";
 	}
 	if (window.visualViewport) {
-		visualViewport.addEventListener("resize", function(){ if (active) place(); });
-		visualViewport.addEventListener("scroll", function(){ if (active) place(); });
+		visualViewport.addEventListener("resize", function(){ if (active && regions[active]) place(regions[active].el); });
+		visualViewport.addEventListener("scroll", function(){ if (active && regions[active]) place(regions[active].el); });
 	}
-	function inside(region, x, y){ return x >= region.x && y >= region.y && x <= region.x + region.w && y <= region.y + region.h; }
-	function regionOf(kind){ for (const id in regions) if (regions[id].kind === kind && regions[id].w > 0) return id; return null; }
+	function cover(region){
+		const el = region.el;
+		if (!el || active === region.id) return;
+		el.classList.remove("qse-parked", "qse-typing");
+		el.classList.add("qse-over");
+		el.style.left = region.x + "px"; el.style.top = region.y + "px";
+		el.style.width = Math.max(region.w, 1) + "px"; el.style.height = Math.max(region.h, 1) + "px";
+	}
+	function release(region){
+		const el = region.el;
+		if (!el) return;
+		el.classList.remove("qse-over", "qse-typing");
+		el.style.cssText = "";
+		if (el === emailInput || el === passwordInput) el.classList.add("qse-parked");
+		else el.remove();
+		region.el = null;
+	}
+	function regionOf(kind){ for (const id in regions) if (regions[id].kind === kind && regions[id].w > 0) return regions[id]; return null; }
+	function elementFor(region){
+		if (region.kind === "email") return emailInput;
+		if (region.kind === "password") return passwordInput;
+		const el = document.createElement("input");
+		el.className = "qse-field";
+		el.autocapitalize = "sentences";
+		el.setAttribute("autocorrect", "on");
+		document.body.appendChild(el);
+		return el;
+	}
+	function attach(region){
+		const el = elementFor(region);
+		region.el = el;
+		el.onfocus = function(){
+			active = region.id;
+			el.classList.remove("qse-over", "qse-parked");
+			el.classList.add("qse-typing");
+			el.placeholder = region.placeholder || "";
+			if (region.kind === "password") el.type = region.secret ? "password" : "text";
+			place(el);
+		};
+		el.oninput = function(){ if (region.onInput) region.onInput(el.value); };
+		el.onchange = el.oninput;
+		el.onkeydown = function(event){
+			if (event.key !== "Enter") return;
+			event.preventDefault();
+			if (region.kind === "email") { const next = regionOf("password"); if (next && next.el) { next.el.focus(); return; } }
+			if (region.onSubmit) region.onSubmit(el.value);
+		};
+		el.onblur = function(){
+			if (active === region.id) active = null;
+			el.classList.remove("qse-typing");
+			el.placeholder = "";
+			window.scrollTo(0, 0);
+			if (region.onClose) region.onClose(el.value);
+			if (regions[region.id] === region) cover(region); else release(region);
+		};
+	}
 	window.qseNativeInput = {
 		enabled: function(){ return ios || android; },
 		// x, y, w, h em pixels do canvas (o jogo informa); convertidos aqui para CSS.
-		// kind: "text", "email" ou "password"; autocomplete: dica para o gerenciador de senhas.
+		// kind: "text", "confirm", "email" ou "password"; autocomplete: dica para o gerenciador de senhas.
 		setRegion: function(id, x, y, w, h, text, placeholder, maxLength, kind, autocomplete, secret){
 			const canvas = document.getElementById("canvas");
 			const dpr = window.devicePixelRatio || 1;
 			const rx = canvas.clientWidth > 0 ? canvas.width / canvas.clientWidth : dpr;
 			const ry = canvas.clientHeight > 0 ? canvas.height / canvas.clientHeight : dpr;
 			const rect = canvas.getBoundingClientRect();
-			const region = regions[id] || {};
+			const region = regions[id] || (regions[id] = {id: id});
+			region.id = id;
 			region.x = rect.left + x / rx; region.y = rect.top + y / ry; region.w = w / rx; region.h = h / ry;
-			region.text = text; region.placeholder = placeholder; region.maxLength = maxLength;
-			region.kind = kind || "text"; region.autocomplete = autocomplete || ""; region.secret = secret !== false;
-			regions[id] = region;
-			// Campos de login ficam sempre no formulário (escondidos fora da tela) para o
-			// preenchimento automático funcionar; o texto do jogo é espelhado neles.
-			if ((region.kind === "email" || region.kind === "password") && active !== id) {
-				const field = inputFor(region.kind);
-				if (field.value !== (text || "")) field.value = text || "";
-				if (region.kind === "password") field.autocomplete = region.autocomplete || "current-password";
-			}
+			region.placeholder = placeholder; region.secret = secret !== false;
+			const nextKind = kind || "text";
+			if (region.el && region.kind !== nextKind) release(region);
+			region.kind = nextKind;
+			if (!region.el) attach(region);
+			const el = region.el;
+			el.maxLength = maxLength > 0 ? maxLength : 500;
+			if (region.kind === "password") el.autocomplete = autocomplete || "current-password";
+			else if (region.kind === "confirm") { el.type = region.secret ? "password" : "text"; el.autocomplete = "new-password"; }
+			else if (region.kind === "text") el.autocomplete = "off";
+			el.enterKeyHint = region.kind === "email" ? "next" : (region.kind === "text" ? "send" : "go");
+			if (active !== id && el.value !== (text || "")) el.value = text || "";
+			cover(region);
 		},
-		clearRegion: function(id){ delete regions[id]; if (active === id) input.blur(); },
+		clearRegion: function(id){
+			const region = regions[id];
+			if (!region) return;
+			delete regions[id];
+			if (active === id && region.el) region.el.blur(); else release(region);
+		},
 		bind: function(id, onInput, onSubmit, onClose){
-			const region = regions[id] || (regions[id] = {x: -1, y: -1, w: 0, h: 0});
+			const region = regions[id] || (regions[id] = {id: id, x: -1, y: -1, w: 0, h: 0});
 			region.onInput = onInput; region.onSubmit = onSubmit; region.onClose = onClose;
 		},
-		setText: function(id, text){ if (active === id) input.value = text; },
+		setText: function(id, text){ const r = regions[id]; if (r && r.el && active === id) r.el.value = text; },
 		isActive: function(id){ return active === id; },
 		// Login aceito: pede ao navegador para salvar e-mail e senha (Chaves do iCloud / Google).
 		remember: function(){
@@ -191,73 +260,11 @@ $GODOT_HEAD_INCLUDE
 			setTimeout(function(){ passwordInput.value = ""; }, 1500);
 		}
 	};
-	loginForm.addEventListener("submit", function(){ /* vai para o iframe oculto; nada sai do aparelho */ });
-	function openRegion(id){
-		const region = regions[id];
-		if (input === textInput) input.style.display = "none";
-		else { input.classList.add("qse-parked"); input.style.cssText = ""; }
-		active = id;
-		input = inputFor(region.kind);
-		input.classList.remove("qse-parked");
-		input.value = region.text || "";
-		input.placeholder = region.placeholder || "";
-		input.maxLength = region.maxLength > 0 ? region.maxLength : 500;
-		if (region.kind === "password") input.type = region.secret ? "password" : "text";
-		if (input === textInput) {
-			// "confirm": confirmação de senha no campo comum, mascarada e sem misturar com o login.
-			input.type = region.kind === "confirm" && region.secret ? "password" : "text";
-			input.autocomplete = region.kind === "confirm" ? "new-password" : "off";
-			input.enterKeyHint = region.kind === "confirm" ? "go" : "send";
-		}
-		place();
-		input.style.display = "block";
-		input.focus({preventScroll: true});
-	}
-	document.addEventListener("touchend", function(event){
-		if (!(ios || android) || !event.changedTouches.length) return;
-		const touch = event.changedTouches[0];
-		for (const id in regions) {
-			if (regions[id].w > 0 && inside(regions[id], touch.clientX, touch.clientY)) {
-				// Sem o clique sintético: ele focaria o canvas e fecharia o teclado na hora.
-				event.preventDefault();
-				openRegion(id);
-				return;
-			}
-		}
-	}, {capture: true, passive: false});
-	[textInput, emailInput, passwordInput].forEach(function(field){
-		field.addEventListener("input", function(){
-			// O preenchimento automático pode completar e-mail e senha de uma vez.
-			if (field !== input || !active) {
-				const id = regionOf(field === emailInput ? "email" : (field === passwordInput ? "password" : ""));
-				if (id && regions[id].onInput) regions[id].onInput(field.value);
-				return;
-			}
-			const r = regions[active]; if (r && r.onInput) r.onInput(field.value);
-		});
-		field.addEventListener("change", function(){
-			if (field === input && active) return;
-			const id = regionOf(field === emailInput ? "email" : (field === passwordInput ? "password" : ""));
-			if (id && regions[id].onInput) regions[id].onInput(field.value);
-		});
-		field.addEventListener("keydown", function(event){
-			if (event.key !== "Enter" || field !== input) return;
-			event.preventDefault();
-			const r = regions[active];
-			if (field === emailInput) { const next = regionOf("password"); if (next) { openRegion(next); return; } }
-			if (r && r.onSubmit) r.onSubmit(field.value);
-		});
-		field.addEventListener("blur", function(){
-			if (field !== input) return;
-			setTimeout(function(){
-				if (document.activeElement === field || input !== field) return;
-				const r = regions[active];
-				if (field === textInput) field.style.display = "none";
-				else { field.classList.add("qse-parked"); field.style.cssText = ""; }
-				active = null;
-				window.scrollTo(0, 0);
-				if (r && r.onClose) r.onClose(field.value);
-			}, 0);
+	// Preenchimento automático pode completar e-mail e senha mesmo com o campo fora de foco.
+	[emailInput, passwordInput].forEach(function(el){
+		el.addEventListener("input", function(){
+			const region = regionOf(el === emailInput ? "email" : "password");
+			if (region && region.el !== el && region.onInput) region.onInput(el.value);
 		});
 	});
 })();

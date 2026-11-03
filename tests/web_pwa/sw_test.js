@@ -72,11 +72,13 @@ function assemble(build) { execSync(`python3 tests/web_pwa/assemble.py ${site}/q
   const box = await phone.evaluate(() => { const c = document.getElementById('canvas'); const r = c.getBoundingClientRect(); const rx = c.width / c.clientWidth || 1, ry = c.height / c.clientHeight || 1; return { x: r.left + 120 / rx, y: r.top + (c.height * 0.8) / ry }; });
   await phone.touchscreen.tap(box.x, box.y);
   await phone.waitForTimeout(200);
-  check(await phone.evaluate(() => document.activeElement && document.activeElement.id === 'qse-native'), 'toque na área do chat foca o campo nativo no mesmo gesto');
+  check(await phone.evaluate(() => { const a = document.activeElement; return !!a && a.tagName === 'INPUT' && a.classList.contains('qse-typing'); }), 'toque no campo do chat cai num <input> real (teclado abre) e vira barra visível');
   await phone.keyboard.type('oi');
   await phone.keyboard.press('Enter');
-  await phone.evaluate(() => document.getElementById('qse-native').blur());
-  check(await phone.evaluate(() => getComputedStyle(document.getElementById('qse-native')).display) === 'none', 'campo nativo some ao fechar o teclado');
+  const chatLog = await phone.evaluate(() => { const a = document.activeElement; a.blur(); return [a.classList.contains('qse-over'), getComputedStyle(a).opacity]; });
+  check(chatLog[0] === true && Number(chatLog[1]) < 0.05, 'ao fechar o teclado o campo volta, invisível, para cima do campo do jogo');
+  await phone.evaluate(() => window.qseNativeInput.clearRegion('chat'));
+  check(await phone.evaluate(() => document.querySelectorAll('input.qse-field:not(#qse-login-email):not(#qse-login-password)').length) === 0, 'campo some quando a tela do jogo fecha');
   // Login: e-mail e senha em campos reais de formulário (preenchimento automático do aparelho).
   const loginLog = await phone.evaluate(() => {
     const log = [];
@@ -87,9 +89,9 @@ function assemble(build) { execSync(`python3 tests/web_pwa/assemble.py ${site}/q
     window.qseNativeInput.bind('pass', (t) => log.push('pass:' + t), (t) => log.push('submit:' + t), () => {});
     window.__log = log;
     const e = document.getElementById('qse-login-email'), p = document.getElementById('qse-login-password');
-    return [e.type, e.autocomplete, p.type, p.autocomplete, e.form && e.form.id, getComputedStyle(e).display];
+    return [e.type, e.autocomplete, p.type, p.autocomplete, e.form && e.form.id, e.classList.contains('qse-over')];
   });
-  check(loginLog.join() === 'email,username,password,current-password,qse-login,block', `campos de login reais no formulário ${loginLog}`);
+  check(loginLog.join() === 'email,username,password,current-password,qse-login,true', `campos de login reais no formulário ${loginLog}`);
   const emailBox = await phone.evaluate(() => { const c = document.getElementById('canvas'); const r = c.getBoundingClientRect(); return { x: r.left + 150 / (c.width / c.clientWidth || 1), y: r.top + (c.height * 0.15) / (c.height / c.clientHeight || 1) }; });
   await phone.touchscreen.tap(emailBox.x, emailBox.y);
   await phone.waitForTimeout(200);

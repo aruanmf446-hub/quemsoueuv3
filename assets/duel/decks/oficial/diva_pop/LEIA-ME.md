@@ -37,6 +37,6 @@ O ZIP deve conter dez PNGs de 512 a 4096 px de largura, de 768 a 8192 px de altu
 - `CATALOG`: `supabase/catalog/seeds/20261103_t30_diva_pop.sql`
 - `GAME`: `supabase/game/migrations/20261103043000_t30_diva_pop_official_reward.sql`
 - Nova campanha `diva_pop_2026` independente do pacote anterior, com anúncio único por conta e resgate gratuito associado ao usuário.
-- **Ativar a campanha somente depois que as imagens estiverem na main e a versão Web estiver publicada**, para não anunciar cartas com arte ausente.
+- **CATALOG e GAME já atualizados:** 9 contas receberam a 12ª recompensa, e a campanha Diva Pop tem seu próprio recibo. O jogo mantém o anúncio oculto até os dez PNGs entrarem na versão publicada, então não exibe uma coleção sem arte.
 
 A Biblioteca exige dez imagens válidas. Antes do upload, mantém os quatro decks anteriores sem mostrar cartões quebrados.

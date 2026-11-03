@@ -39,6 +39,10 @@ func _verify(battle: Control, screen: Control, label: String, count: int) -> voi
 		check(not node is ScrollContainer,label + " no grid scrolling")
 		node = node.get_parent()
 	var first: Control = grid.get_child(0)
+	var side := battle.find_child("UtilityRail",true,false) as Control
+	var board := battle.find_child("BattleBoard",true,false) as Control
+	check(inside(side,screen),label+" rail inside viewport")
+	check(board.get_global_rect().end.x <= side.get_global_rect().position.x + 2.0,label+" rail does not cover board")
 	check(first.size.x >= 38 and first.size.y >= 32, label + " nonzero card area")
 	for card: Control in grid.get_children():
 		check(inside(card,grid) and inside(card,screen),label + " visible " + str(card.name))
@@ -46,7 +50,7 @@ func _verify(battle: Control, screen: Control, label: String, count: int) -> voi
 		check(title != null and not title.text.contains("{") and not title.text.contains('"name"'),
 			label + " pure display name " + str(card.name))
 	print("T31_GEOMETRY ", label, " cols=", grid.columns, " rows=", ceili(float(count)/grid.columns),
-		" first=", first.size," screen=", screen.size)
+		" first=", first.size," screen=", screen.size, " board=",board.get_global_rect()," rail=",side.get_global_rect()," grid=",grid.get_global_rect())
 
 func _run() -> void:
 	var args := OS.get_cmdline_user_args()

@@ -76,7 +76,8 @@ func setup(card_id: String, chosen: bool, out: bool, usable: bool) -> void:
 	caption.add_theme_color_override("font_outline_color",Color(0,0,0,0.8))
 	caption.add_theme_stylebox_override("normal",strip)
 	caption_area = Control.new()
-	caption_area.custom_minimum_size.y = 20
+	# iPhone: espaço para o nome em duas linhas inteiras (sem cortar a segunda linha).
+	caption_area.custom_minimum_size.y = 52 if UIScale.is_iphone() else 20
 	caption_area.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	# Nome sobre a parte de baixo da arte (como na referência), não numa faixa abaixo dela:
 	# a ilustração ocupa a carta inteira.

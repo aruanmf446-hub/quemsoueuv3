@@ -250,6 +250,7 @@ $GODOT_HEAD_INCLUDE
 		},
 		setText: function(id, text){ const r = regions[id]; if (r && r.el && active === id) r.el.value = text; },
 		isActive: function(id){ return active === id; },
+		debug: function(){ return Object.keys(regions).map(function(id){ const r = regions[id]; return id + ":" + r.kind + "@" + Math.round(r.x) + "," + Math.round(r.y) + " " + Math.round(r.w) + "x" + Math.round(r.h) + (r.el ? "" : " SEM_INPUT"); }); },
 		// Login aceito: pede ao navegador para salvar e-mail e senha (Chaves do iCloud / Google).
 		remember: function(){
 			const email = emailInput.value, password = passwordInput.value;
@@ -268,6 +269,43 @@ $GODOT_HEAD_INCLUDE
 			if (region && region.el !== el && region.onInput) region.onInput(el.value);
 		});
 	});
+	// --- Diagnóstico (iPhone): 5 toques rápidos na faixa preta do topo, ou ?diag=1 -------
+	// Mostra o que a página enxerga (área segura, campos registrados, onde o toque caiu) para
+	// descobrir num aparelho real por que o teclado não abre. Não envia nada para fora.
+	(function(){
+		let taps = [], panel = null, lastTouch = "—";
+		document.addEventListener("touchstart", function(e){
+			const t = e.touches[0]; if (!t) return;
+			const el = document.elementFromPoint(t.clientX, t.clientY);
+			lastTouch = Math.round(t.clientX) + "," + Math.round(t.clientY) + " → " + (el ? el.tagName + (el.id ? "#" + el.id : "") + (el.className ? "." + String(el.className).split(" ").join(".") : "") : "nada");
+			if (t.clientY < 16) {
+				const now = Date.now(); taps = taps.filter(function(x){ return now - x < 2500; }); taps.push(now);
+				if (taps.length >= 5) { taps = []; toggle(); }
+			}
+		}, {capture: true, passive: true});
+		function toggle(){
+			if (panel) { panel.remove(); panel = null; return; }
+			panel = document.createElement("pre");
+			panel.style.cssText = "position:fixed;left:4px;bottom:4px;z-index:99;max-width:70vw;max-height:60vh;overflow:auto;margin:0;padding:8px;background:rgba(0,0,0,.85);color:#9f9;font:11px/1.3 monospace;border:1px solid #9f9;pointer-events:none;white-space:pre-wrap";
+			document.body.appendChild(panel);
+			(function tick(){
+				if (!panel) return;
+				const c = document.getElementById("canvas"), r = c.getBoundingClientRect(), p = window.qsePwa || {}, n = window.qseNativeInput;
+				const a = document.activeElement;
+				panel.textContent = ["QSE diag " + new Date().toLocaleTimeString(),
+					"iphone=" + p.iphone + " ios=" + p.ios + " standalone=" + p.standalone,
+					"safe=" + JSON.stringify(p.safe || null),
+					"janela=" + innerWidth + "x" + innerHeight + " dpr=" + devicePixelRatio,
+					"canvas css=" + Math.round(r.left) + "," + Math.round(r.top) + " " + Math.round(r.width) + "x" + Math.round(r.height) + " px=" + c.width + "x" + c.height,
+					"ponte=" + (n ? n.enabled() : "ausente"),
+					"campos: " + (n && n.debug ? (n.debug().join(" | ") || "nenhum") : "—"),
+					"foco=" + (a ? a.tagName + (a.id ? "#" + a.id : "") : "—"),
+					"toque=" + lastTouch].join("\n");
+				setTimeout(tick, 500);
+			})();
+		}
+		if (/[?&]diag=1/.test(location.search)) setTimeout(toggle, 1500);
+	})();
 })();
 const GODOT_CONFIG = $GODOT_CONFIG;
 // --- iPhone: jogo só dentro da área segura --------------------------------------------------

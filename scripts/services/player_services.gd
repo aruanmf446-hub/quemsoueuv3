@@ -20,6 +20,8 @@ var presence: FriendPresence
 var duel: DuelService
 ## Catálogo público (conexão catalog, sem sessão); o local continua como fallback.
 var catalog: CatalogService
+## Atualizações editoriais públicas (novidades e personalização dos decks oficiais).
+var editor_content: EditorContentService
 ## CHAT preparado e desativado até a identidade GAME→CHAT ser verificada no servidor.
 var chat: ChatService
 ## Chat da sala do Duelo (outra instância: não mistura com o chat privado de amigos).
@@ -44,6 +46,9 @@ func _ready() -> void:
 	catalog = CatalogService.new()
 	catalog.client = catalog_client
 	add_child(catalog)
+	editor_content = EditorContentService.new()
+	editor_content.client = client
+	add_child(editor_content)
 	chat = ChatService.new()
 	chat.client = chat_client
 	add_child(chat)
@@ -58,7 +63,9 @@ func _ready() -> void:
 	room_chat.transport = chat.transport
 	add_child(room_chat)
 	# Testes headless (--script) chamam refresh() quando precisam; o jogo lê ao iniciar.
-	if not OS.get_cmdline_args().has("--script"): catalog.refresh.call_deferred()
+	if not OS.get_cmdline_args().has("--script"):
+		catalog.refresh.call_deferred()
+		editor_content.refresh.call_deferred()
 	session = SessionService.new()
 	session.client = client
 	add_child(session)

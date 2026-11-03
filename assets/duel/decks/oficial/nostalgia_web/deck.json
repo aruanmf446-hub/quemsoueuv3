@@ -4,47 +4,47 @@
   "visibility": "public",
   "cards": {
     "carta_01": {
-      "name": "Nostalgia Web 01",
-      "description": "Imagem da coleção Nostalgia Web; identificação específica pendente de revisão visual."
+      "name": "Jovem Paraense",
+      "description": "Jovem de camiseta vermelha com faixa branca e estrela azul, em pose firme numa rua histórica de paralelepípedos."
     },
     "carta_02": {
-      "name": "Nostalgia Web 02",
-      "description": "Imagem da coleção Nostalgia Web; identificação específica pendente de revisão visual."
+      "name": "Meme da Ideia Genial (Roll Safe)",
+      "description": "Rapaz sorridente aponta o dedo para a têmpora, gesto do famoso meme da ideia aparentemente esperta."
     },
     "carta_03": {
-      "name": "Nostalgia Web 03",
-      "description": "Imagem da coleção Nostalgia Web; identificação específica pendente de revisão visual."
+      "name": "Grito na Montanha-Russa",
+      "description": "Mulher reage com um grito de susto durante um passeio de montanha-russa."
     },
     "carta_04": {
-      "name": "Nostalgia Web 04",
-      "description": "Imagem da coleção Nostalgia Web; identificação específica pendente de revisão visual."
+      "name": "Macaco Desconfiado",
+      "description": "Macaco de olhar lateral desconfortável, referência ao meme de reação desconfiada."
     },
     "carta_05": {
-      "name": "Nostalgia Web 05",
-      "description": "Imagem da coleção Nostalgia Web; identificação específica pendente de revisão visual."
+      "name": "Disaster Girl",
+      "description": "Menina lança um sorriso travesso para a câmera enquanto uma casa arde em chamas ao fundo; releitura do meme."
     },
     "carta_06": {
-      "name": "Nostalgia Web 06",
-      "description": "Imagem da coleção Nostalgia Web; identificação específica pendente de revisão visual."
+      "name": "Rapaz do Violão",
+      "description": "Jovem sorridente sentado num sofá vermelho segura um violão acústico preto."
     },
     "carta_07": {
-      "name": "Nostalgia Web 07",
-      "description": "Imagem da coleção Nostalgia Web; identificação específica pendente de revisão visual."
+      "name": "Meme das Equações",
+      "description": "Montagem de uma mulher confusa acompanhada de fórmulas e símbolos matemáticos."
     },
     "carta_08": {
-      "name": "Nostalgia Web 08",
-      "description": "Imagem da coleção Nostalgia Web; identificação específica pendente de revisão visual."
+      "name": "Menino Contrariado",
+      "description": "Menino de camiseta listrada e colorida faz uma careta de irritação e revira os olhos."
     },
     "carta_09": {
-      "name": "Nostalgia Web 09",
-      "description": "Imagem da coleção Nostalgia Web; identificação específica pendente de revisão visual."
+      "name": "Menina na Discussão",
+      "description": "Menina de casaco rosa protesta com expressão indignada diante de outras crianças."
     },
     "carta_10": {
-      "name": "Nostalgia Web 10",
-      "description": "Imagem da coleção Nostalgia Web; identificação específica pendente de revisão visual."
+      "name": "Menina Desconfiada",
+      "description": "Garotinha loira sentada numa cadeirinha de carro olha de lado com expressão de estranhamento."
     }
   },
-  "description": "Uma viagem pela memória da internet: referências, personagens e momentos que marcaram a cultura online.",
+  "description": "Memes, expressões e cenas marcantes da cultura digital, recriados como personagens de animação 3D.",
   "creator": "Quem Sou Eu",
   "category": "Internet",
   "tags": [

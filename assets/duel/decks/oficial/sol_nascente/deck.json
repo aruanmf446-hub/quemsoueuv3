@@ -4,47 +4,47 @@
   "visibility": "public",
   "cards": {
     "carta_01": {
-      "name": "Sol Nascente 01",
-      "description": "Imagem da coleção Sol Nascente; identificação específica pendente de revisão visual."
+      "name": "Kitsune de Nove Caudas",
+      "description": "Raposa mística de várias caudas em cenário de templos japoneses sob folhas vermelhas."
     },
     "carta_02": {
-      "name": "Sol Nascente 02",
-      "description": "Imagem da coleção Sol Nascente; identificação específica pendente de revisão visual."
+      "name": "Maneki-neko",
+      "description": "Gato da sorte japonês com a pata levantada, decorado em vermelho e dourado, cercado por cerejeiras."
     },
     "carta_03": {
-      "name": "Sol Nascente 03",
-      "description": "Imagem da coleção Sol Nascente; identificação específica pendente de revisão visual."
+      "name": "Gueixa com Sombrinha",
+      "description": "Mulher de quimono vermelho ornamentado segura uma sombrinha japonesa sob flores de cerejeira."
     },
     "carta_04": {
-      "name": "Sol Nascente 04",
-      "description": "Imagem da coleção Sol Nascente; identificação específica pendente de revisão visual."
+      "name": "Ator de Kabuki",
+      "description": "Artista de teatro kabuki com maquiagem facial dramática e figurino tradicional."
     },
     "carta_05": {
-      "name": "Sol Nascente 05",
-      "description": "Imagem da coleção Sol Nascente; identificação específica pendente de revisão visual."
+      "name": "Samurai",
+      "description": "Guerreiro japonês em armadura tradicional, com elmo de chifres dourados e espada."
     },
     "carta_06": {
-      "name": "Sol Nascente 06",
-      "description": "Imagem da coleção Sol Nascente; identificação específica pendente de revisão visual."
+      "name": "Dama do Leque",
+      "description": "Mulher com quimono floral e penteado elaborado segura um leque diante das cerejeiras."
     },
     "carta_07": {
-      "name": "Sol Nascente 07",
-      "description": "Imagem da coleção Sol Nascente; identificação específica pendente de revisão visual."
+      "name": "Kunoichi",
+      "description": "Guerreira ninja de roupa avermelhada com rosto parcialmente coberto e espada."
     },
     "carta_08": {
-      "name": "Sol Nascente 08",
-      "description": "Imagem da coleção Sol Nascente; identificação específica pendente de revisão visual."
+      "name": "Ninja",
+      "description": "Guerreiro de roupas escuras e máscara empunha lâmina em cenário japonês noturno."
     },
     "carta_09": {
-      "name": "Sol Nascente 09",
-      "description": "Imagem da coleção Sol Nascente; identificação específica pendente de revisão visual."
+      "name": "Lutador de Sumô",
+      "description": "Lutador robusto em posição de combate, usando o mawashi tradicional."
     },
     "carta_10": {
-      "name": "Sol Nascente 10",
-      "description": "Imagem da coleção Sol Nascente; identificação específica pendente de revisão visual."
+      "name": "Dragão Japonês",
+      "description": "Dragão oriental comprido e serpentino sobre templos, montanhas e cachoeiras sob a lua."
     }
   },
-  "description": "Referências e personagens ligados ao universo cultural do Japão. Um desafio para quem conhece esse imaginário.",
+  "description": "Mitos, tradições e figuras da cultura japonesa: do kitsune e do gato da sorte aos samurais e ninjas.",
   "creator": "Quem Sou Eu",
   "category": "Cultura japonesa",
   "tags": [

@@ -4,45 +4,45 @@
   "visibility": "public",
   "cards": {
     "carta_01": {
-      "name": "Pintura 01",
-      "description": "Imagem da coleção Pinturas; título da obra e autoria pendentes de revisão visual."
+      "name": "O Nascimento de Vênus",
+      "description": "Releitura de O Nascimento de Vênus, pintura de Sandro Botticelli, com a deusa sobre uma concha."
     },
     "carta_02": {
-      "name": "Pintura 02",
-      "description": "Imagem da coleção Pinturas; título da obra e autoria pendentes de revisão visual."
+      "name": "A Liberdade Guiando o Povo",
+      "description": "Releitura da pintura de Eugène Delacroix: figura alegórica ergue a bandeira francesa entre revolucionários."
     },
     "carta_03": {
-      "name": "Pintura 03",
-      "description": "Imagem da coleção Pinturas; título da obra e autoria pendentes de revisão visual."
+      "name": "A Noite Estrelada",
+      "description": "Releitura de A Noite Estrelada, de Vincent van Gogh, com céu noturno de espirais luminosas."
     },
     "carta_04": {
-      "name": "Pintura 04",
-      "description": "Imagem da coleção Pinturas; título da obra e autoria pendentes de revisão visual."
+      "name": "O Grito",
+      "description": "Releitura de O Grito, de Edvard Munch, com figura aflita diante de um céu de cores intensas."
     },
     "carta_05": {
-      "name": "Pintura 05",
-      "description": "Imagem da coleção Pinturas; título da obra e autoria pendentes de revisão visual."
+      "name": "A Criação de Adão",
+      "description": "Releitura do afresco de Michelangelo, com as mãos de Adão e Deus prestes a se tocar."
     },
     "carta_06": {
-      "name": "Pintura 06",
-      "description": "Imagem da coleção Pinturas; título da obra e autoria pendentes de revisão visual."
+      "name": "Mona Lisa",
+      "description": "Releitura de Mona Lisa, pintura de Leonardo da Vinci, com retrato de mulher de sorriso enigmático."
     },
     "carta_07": {
-      "name": "Pintura 07",
-      "description": "Imagem da coleção Pinturas; título da obra e autoria pendentes de revisão visual."
+      "name": "Moça com Brinco de Pérola",
+      "description": "Releitura da pintura de Johannes Vermeer, mostrando jovem de turbante azul e brinco de pérola."
     },
     "carta_08": {
-      "name": "Pintura 08",
-      "description": "Imagem da coleção Pinturas; título da obra e autoria pendentes de revisão visual."
+      "name": "O Pensador",
+      "description": "Releitura da escultura O Pensador, de Auguste Rodin: homem sentado com o queixo apoiado na mão."
     }
   },
-  "description": "Explore a arte em imagens. Um deck dedicado ao reconhecimento de pinturas e referências visuais.",
+  "description": "Releituras ilustradas de obras-primas da arte, de pinturas famosas a uma escultura icônica. Reconheça as obras e seus criadores.",
   "creator": "Quem Sou Eu",
-  "category": "Arte",
+  "category": "Artes visuais",
   "tags": [
     "arte",
-    "quadros",
-    "cultura"
+    "pinturas",
+    "escultura"
   ],
   "original_language": "pt-BR"
 }

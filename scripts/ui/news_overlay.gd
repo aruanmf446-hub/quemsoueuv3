@@ -22,6 +22,7 @@ var _modal: Panel
 var _margin: MarginContainer
 var _stack: VBoxContainer
 var _tab := "deck"
+var _sort_mode := "recent"
 var _notice := ""
 var _working := false
 var _compact := false
@@ -131,6 +132,10 @@ func _render() -> void:
 		return
 	_banner(rewards)
 	_categories(rewards)
+	if rewards.inventory_state == "error":
+		var history_warning := _label("Presentes anteriores temporariamente indisponíveis. Tente reabrir Novidades.", 11 if _compact else 14, MUTED)
+		history_warning.name = "InventoryWarning"
+		_stack.add_child(history_warning)
 	if not _notice.is_empty():
 		var status := _label(_notice, 12 if _compact else 16, GOLD_SOFT)
 		status.name = "NewsStatus"
@@ -254,7 +259,26 @@ func _categories(rewards: OfficialRewardsService) -> void:
 		tab.custom_minimum_size = Vector2(148 if _compact else 220, 36 if _compact else 48)
 		tab.pressed.connect(_switch.bind(kind))
 		bar.add_child(tab)
-	# Sem data de publicação por oferta no feed: não simular uma ordenação.
+	# A leitura histórica do GAME inclui a data real da oferta.
+	var can_sort := not rewards.offers.is_empty()
+	for offer: Dictionary in rewards.offers:
+		if str(offer.get("created_at", "")).is_empty(): can_sort = false
+	if can_sort:
+		var gap := Control.new()
+		gap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		bar.add_child(gap)
+		var sort := OptionButton.new()
+		sort.name = "RewardSort"
+		sort.add_item("Mais recentes")
+		sort.add_item("Mais antigos")
+		sort.selected = 0 if _sort_mode == "recent" else 1
+		sort.custom_minimum_size = Vector2(129 if _compact else 190, 36 if _compact else 48)
+		sort.add_theme_font_size_override("font_size", 10 if _compact else 15)
+		sort.add_theme_color_override("font_color", WHITE)
+		for mode in ["normal", "hover", "pressed"]:
+			sort.add_theme_stylebox_override(mode, _style(SURFACE, Color("#516070"), 9, 1))
+		sort.item_selected.connect(_set_sort)
+		bar.add_child(sort)
 
 
 func _rewards_grid(rewards: OfficialRewardsService) -> void:
@@ -275,6 +299,11 @@ func _rewards_grid(rewards: OfficialRewardsService) -> void:
 	for offer: Dictionary in rewards.offers:
 		if str(offer.get("kind", "")) == _tab:
 			list.append(offer)
+	if list.size() > 1 and list.all(func(o: Dictionary) -> bool: return not str(o.get("created_at", "")).is_empty()):
+		list.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+			var left := str(a.get("created_at", ""))
+			var right := str(b.get("created_at", ""))
+			return (left > right if _sort_mode == "recent" else left < right) if left != right else str(a.get("id", "")) < str(b.get("id", "")))
 	if list.is_empty():
 		var empty := _label("Nenhuma oferta de skins nesta campanha." if _tab == "skin" else "Nenhum deck disponível nesta campanha.", 16 if _compact else 20, MUTED)
 		empty.name = "EmptyOffers"
@@ -356,7 +385,10 @@ func _add_offer(grid: GridContainer, offer: Dictionary, rewards: OfficialRewards
 	filler.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	content.add_child(filler)
 	var claim_allowed := bool(offer.get("claim_enabled", kind == "deck"))
-	var caption := ("RESGATADO" if rewards.revealed else "INCLUSO NO PACOTE") if claimed else ("RESGATAR GRÁTIS" if claim_allowed else "EM BREVE")
+	var current_campaign := str(rewards.campaign.get("id", ""))
+	var historical := offer.has("campaign_id") and str(offer.get("campaign_id", "")) != current_campaign
+	var confirmed := bool(offer.get("revealed", rewards.revealed)) or historical
+	var caption := ("RESGATADO" if confirmed else "INCLUSO NO PACOTE") if claimed else ("RESGATAR GRÁTIS" if claim_allowed else "EM BREVE")
 	var action := _button(caption, not claimed and claim_allowed)
 	action.name = "Claim_" + str(offer.get("id", ""))
 	action.custom_minimum_size.y = 40 if _compact else 50
@@ -438,6 +470,11 @@ func _claim(offer_id: String) -> void:
 		_notice = "Resgate confirmado! Item salvo na sua conta."
 	else:
 		_notice = "O resgate não foi confirmado. Confira sua conexão e tente novamente."
+	_render()
+
+
+func _set_sort(selected: int) -> void:
+	_sort_mode = "recent" if selected == 0 else "old"
 	_render()
 
 

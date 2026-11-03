@@ -491,6 +491,7 @@ func _change_password() -> void:
 	_side.move_child(editor, _side.get_node("ChangePassword").get_index() + 1)
 	var field := LineEdit.new()
 	field.secret = true
+	field.set_meta("qse_autocomplete", "new-password")
 	field.placeholder_text = tr("Nova senha")
 	field.custom_minimum_size.y = 44
 	PlayerUI.style_field(field)

@@ -4,7 +4,11 @@ extends Node
 ## DENTRO do toque, e o Godot processa o toque no quadro seguinte. Este nó publica a área do
 ## LineEdit para o shell (web/shell.html → window.qseNativeInput); o toque nessa área foca um
 ## <input> real logo acima do teclado, e o texto volta para o LineEdit (mesmo envio do jogo).
-## Fora do iOS Web não faz nada: Android, Windows e desktop continuam com o LineEdit normal.
+## Vale para iPhone e Android no navegador/PWA; Windows e desktop continuam com o LineEdit normal.
+## Campos de e-mail/senha usam <input> de um formulário real (type email/password + autocomplete)
+## para o Chaves do iCloud e o Google sugerirem e salvarem as contas.
+## Todo LineEdit do jogo é ligado sozinho (install()); meta "qse_autocomplete" ajusta a dica
+## (ex.: "new-password" no cadastro) e meta "qse_native_off" desliga a ponte num campo.
 
 var field: LineEdit
 var _id := ""
@@ -21,6 +25,28 @@ static func attach(line_edit: LineEdit) -> WebTextBridge:
 	bridge.field = line_edit
 	line_edit.add_child(bridge)
 	return bridge
+
+
+## Liga automaticamente todo LineEdit que entrar na árvore (chamado por um autoload).
+static func install(tree: SceneTree) -> void:
+	if not enabled(): return
+	tree.node_added.connect(func(node: Node) -> void:
+		if node is LineEdit and not node.has_meta("qse_native_off"):
+			(func() -> void:
+				if is_instance_valid(node) and node.get_node_or_null("WebTextBridge") == null: attach(node)).call_deferred())
+
+
+## Login aceito: o navegador oferece salvar e-mail e senha.
+static func remember_login() -> void:
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("window.qseNativeInput && window.qseNativeInput.remember && window.qseNativeInput.remember()", true)
+
+
+static func kind_of(line_edit: LineEdit) -> String:
+	if line_edit.has_meta("qse_kind"): return str(line_edit.get_meta("qse_kind"))
+	if line_edit.secret or line_edit.get_node_or_null("RevealPassword") != null: return "password"
+	if line_edit.virtual_keyboard_type == LineEdit.KEYBOARD_TYPE_EMAIL_ADDRESS: return "email"
+	return "text"
 
 
 static func enabled() -> bool:
@@ -54,10 +80,16 @@ func _process(_delta: float) -> void:
 	var to_window := field.get_viewport().get_final_transform() * field.get_canvas_transform()
 	var top_left := to_window * rect.position
 	var bottom_right := to_window * rect.end
-	var key := "%d,%d,%d,%d,%s" % [top_left.x, top_left.y, bottom_right.x, bottom_right.y, field.text]
+	# O botão de mostrar senha fica de fora: o toque nele continua sendo do jogo.
+	var eye := field.get_node_or_null("RevealPassword") as Control
+	if eye != null and eye.visible:
+		bottom_right.x = minf(bottom_right.x, (to_window * eye.get_global_rect().position).x)
+	var kind := kind_of(field)
+	var key := "%d,%d,%d,%d,%s,%s,%s" % [top_left.x, top_left.y, bottom_right.x, bottom_right.y, field.text, kind, field.secret]
 	if key == _last: return
 	_last = key
-	_bridge.setRegion(_id, top_left.x, top_left.y, bottom_right.x - top_left.x, bottom_right.y - top_left.y, field.text, field.placeholder_text, field.max_length)
+	_bridge.setRegion(_id, top_left.x, top_left.y, bottom_right.x - top_left.x, bottom_right.y - top_left.y, field.text, field.placeholder_text, field.max_length,
+		kind, str(field.get_meta("qse_autocomplete", "")), field.secret)
 
 
 func _on_input(args: Array) -> void:

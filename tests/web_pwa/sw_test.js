@@ -26,12 +26,14 @@ function assemble(build) { execSync(`python3 tests/web_pwa/assemble.py ${site}/q
   const regs = await page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length);
   check(regs === 1, `um único service worker registrado (${regs})`);
   const keys = await page.evaluate(async () => caches.keys());
-  check(keys.length === 1 && keys[0] === 'qse-game-build-a', `cache versionado ${JSON.stringify(keys)}`);
-  const cached = await page.evaluate(async () => (await (await caches.open('qse-game-build-a')).keys()).map(r => new URL(r.url).pathname));
+  check(keys.length === 1 && keys[0] === 'qse-files', `cache único por conteúdo ${JSON.stringify(keys)}`);
+  const entries = async () => page.evaluate(async () => (await (await caches.open('qse-files')).keys()).map(r => r.url));
+  const before = await entries();
+  const cached = before.map(u => new URL(u).pathname);
   for (const f of ['index.html', 'index.js', 'index.wasm', 'index.pck', 'manifest.webmanifest']) check(cached.some(p => p.endsWith('/' + f)), `em cache: ${f}`);
   // Chamada a outro domínio (como o Supabase) não pode ser interceptada nem guardada.
   await page.evaluate(async () => { try { await fetch('https://example.invalid/rest/v1/rpc/x'); } catch (e) {} });
-  const thirdParty = await page.evaluate(async () => (await (await caches.open('qse-game-build-a')).keys()).filter(r => !r.url.startsWith(location.origin)).length);
+  const thirdParty = await page.evaluate(async () => (await (await caches.open('qse-files')).keys()).filter(r => !r.url.startsWith(location.origin)).length);
   check(thirdParty === 0, 'nenhuma resposta de terceiros (Supabase/OAuth) no cache');
   const manifest = await page.evaluate(async () => (await fetch('manifest.webmanifest')).json());
   check(manifest.display === 'standalone' && manifest.orientation === 'landscape' && manifest.scope === '/quemsoueuv3/', 'manifest standalone/landscape/escopo');
@@ -42,16 +44,19 @@ function assemble(build) { execSync(`python3 tests/web_pwa/assemble.py ${site}/q
   check(true, 'versão nova detectada e preparada');
   await page.waitForTimeout(1800);
   check(await page.evaluate(() => getComputedStyle(document.getElementById('qse-update')).display) === 'none', 'em partida/telas internas o aviso fica oculto');
-  const stillOld = await page.evaluate(async () => caches.keys());
-  check(stillOld.includes('qse-game-build-a'), 'versão em uso continua intacta até o jogador aceitar');
+  const during = await entries();
+  check(before.every(u => during.includes(u)), 'versão em uso continua intacta até o jogador aceitar');
   await page.evaluate(() => { window.qseSafeToUpdate = true; });
   await page.waitForTimeout(1800);
   check(await page.evaluate(() => getComputedStyle(document.getElementById('qse-update')).display) === 'block', 'no lobby aparece "Reiniciar para atualizar"');
   await Promise.all([page.waitForNavigation({ timeout: 15000 }), page.click('#qse-update')]);
   await page.waitForFunction(() => !!navigator.serviceWorker.controller, null, { timeout: 15000 });
   await page.waitForTimeout(500);
-  const after = await page.evaluate(async () => caches.keys());
-  check(after.length === 1 && after[0] === 'qse-game-build-b', `após reiniciar só a versão nova ${JSON.stringify(after)}`);
+  const after = await entries();
+  const wasmBefore = before.find(u => u.includes('/index.wasm?')), pckBefore = before.find(u => u.includes('/index.pck?'));
+  check(after.includes(wasmBefore), 'motor (index.wasm) igual NÃO é baixado de novo na versão nova');
+  check(!after.includes(pckBefore) && after.filter(u => u.includes('/index.pck?')).length === 1, 'pacote antigo removido; só o novo fica');
+  check(after.filter(u => u.includes('/index.wasm?')).length === 1, 'sem cópias duplicadas no cache');
   // Campo nativo do iPhone: com iOS simulado, toque na área registrada foca o <input> real.
   const ios = await browser.newContext({ userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1', hasTouch: true, isMobile: true, viewport: { width: 844, height: 390 } });
   const phone = await ios.newPage();
@@ -72,6 +77,41 @@ function assemble(build) { execSync(`python3 tests/web_pwa/assemble.py ${site}/q
   await phone.keyboard.press('Enter');
   await phone.evaluate(() => document.getElementById('qse-native').blur());
   check(await phone.evaluate(() => getComputedStyle(document.getElementById('qse-native')).display) === 'none', 'campo nativo some ao fechar o teclado');
+  // Login: e-mail e senha em campos reais de formulário (preenchimento automático do aparelho).
+  const loginLog = await phone.evaluate(() => {
+    const log = [];
+    const c = document.getElementById('canvas');
+    window.qseNativeInput.setRegion('email', 100, Math.round(c.height * 0.1), 300, Math.round(c.height * 0.1), '', 'Seu e-mail', 0, 'email', '', false);
+    window.qseNativeInput.setRegion('pass', 100, Math.round(c.height * 0.3), 300, Math.round(c.height * 0.1), '', 'Sua senha', 0, 'password', '', true);
+    window.qseNativeInput.bind('email', (t) => log.push('email:' + t), () => {}, () => {});
+    window.qseNativeInput.bind('pass', (t) => log.push('pass:' + t), (t) => log.push('submit:' + t), () => {});
+    window.__log = log;
+    const e = document.getElementById('qse-login-email'), p = document.getElementById('qse-login-password');
+    return [e.type, e.autocomplete, p.type, p.autocomplete, e.form && e.form.id, getComputedStyle(e).display];
+  });
+  check(loginLog.join() === 'email,username,password,current-password,qse-login,block', `campos de login reais no formulário ${loginLog}`);
+  const emailBox = await phone.evaluate(() => { const c = document.getElementById('canvas'); const r = c.getBoundingClientRect(); return { x: r.left + 150 / (c.width / c.clientWidth || 1), y: r.top + (c.height * 0.15) / (c.height / c.clientHeight || 1) }; });
+  await phone.touchscreen.tap(emailBox.x, emailBox.y);
+  await phone.waitForTimeout(200);
+  check(await phone.evaluate(() => document.activeElement && document.activeElement.id === 'qse-login-email'), 'toque no e-mail foca o campo de e-mail (sugere contas salvas)');
+  await phone.keyboard.type('a@b.co');
+  await phone.keyboard.press('Enter');
+  await phone.waitForTimeout(200);
+  check(await phone.evaluate(() => document.activeElement && document.activeElement.id === 'qse-login-password'), 'Enter no e-mail passa para a senha');
+  await phone.keyboard.type('segredo1');
+  await phone.keyboard.press('Enter');
+  const log2 = await phone.evaluate(() => window.__log.join('|'));
+  check(log2.includes('email:a@b.co') && log2.includes('pass:segredo1') && log2.includes('submit:segredo1'), `texto volta ao jogo ${log2}`);
+  // Preenchimento automático: o aparelho completa os dois campos de uma vez.
+  await phone.evaluate(() => { document.activeElement.blur(); });
+  await phone.waitForTimeout(100);
+  const auto = await phone.evaluate(() => {
+    window.__log.length = 0;
+    for (const [id, v] of [['qse-login-email', 'salvo@x.com'], ['qse-login-password', 'senha123']]) { const f = document.getElementById(id); f.value = v; f.dispatchEvent(new Event('input')); }
+    return window.__log.join('|');
+  });
+  check(auto === 'email:salvo@x.com|pass:senha123', `conta salva preenchida chega ao jogo ${auto}`);
+  check(await phone.evaluate(() => { try { window.qseNativeInput.remember(); return true; } catch (e) { return false; } }), 'pedido para salvar a senha não quebra');
   check(await phone.evaluate(() => getComputedStyle(document.getElementById('qse-install')).display) === 'none' || true, 'convite de instalação não bloqueia o jogo');
   await browser.close();
   server.kill();

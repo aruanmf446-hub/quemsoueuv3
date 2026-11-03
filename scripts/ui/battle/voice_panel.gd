@@ -7,6 +7,7 @@ var _join: Button
 var _mic: Button
 var _hear: Button
 var _users: VBoxContainer
+var _muted_people := {}
 
 func setup(value: PlayerServices) -> void:
     services = value
@@ -87,7 +88,26 @@ func _refresh() -> void:
     if v.state == "connected":
         _users.add_child(Style.label("Outros conectados: %d" % v.participants.size(), 11, PlayerUI.MUTED))
         # Identidades pseudônimas; não apresentar IDs como nomes reais.
-        for p in v.participants.slice(0, 20):
+        var index := 0
+        for p in v.participants.slice(0, 3):
             if not p is Dictionary: continue
-            var label := Style.label("● Falando" if bool(p.get("speaking", false)) else "● Participante", 11, PlayerUI.MUTED)
-            _users.add_child(label)
+            index += 1
+            var identity := str(p.get("id", ""))
+            var row := HBoxContainer.new()
+            row.add_theme_constant_override("separation", 4)
+            _users.add_child(row)
+            var label := Style.label(("● Falando" if bool(p.get("speaking", false)) else "● Jogador") + " %d" % index, 11, PlayerUI.MUTED)
+            label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+            row.add_child(label)
+            var mute := Style.action("Reativar" if _muted_people.has(identity) else "Silenciar", func() -> void:
+                if _muted_people.has(identity):
+                    _muted_people.erase(identity)
+                    v.volume(identity, 1.0)
+                else:
+                    _muted_people[identity] = true
+                    v.volume(identity, 0.0)
+                _refresh())
+            mute.custom_minimum_size.y = 24
+            row.add_child(mute)
+        if v.participants.size() > 3:
+            _users.add_child(Style.label("+%d conectados" % (v.participants.size() - 3), 11, PlayerUI.MUTED))

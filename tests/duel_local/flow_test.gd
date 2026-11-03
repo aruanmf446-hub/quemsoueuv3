@@ -238,7 +238,13 @@ func _run() -> void:
 	screen.queue_free()
 	await settle()
 	services.queue_free()
-	await settle()
+	# O Godot 4.7.2 libera recursos de UI e importação após queue_free().
+	# Sem deixar o frame de descarte finalizar, o processo pode registrar um
+	# recurso vivo na saída, apesar das regras do jogo terem passado.
+	# Não suprimir avisos: a CI continua falhando se houver vazamento real.
+	await settle(12)
+	await create_timer(0.35).timeout
+	await settle(4)
 	print("DUEL_LOCAL_PASS ", checks, " verificações")
 	quit(0)
 

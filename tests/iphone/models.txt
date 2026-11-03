@@ -1,0 +1,12 @@
+# Área útil (pt) com o iPhone deitado, dentro do PWA, já sem notch/Dynamic Island (laterais),
+# barrinha de início (21 pt embaixo) e a faixa de 16 pt do topo. Usada pelas capturas.
+# grupo           modelos                                   LxA
+pro_max   16/17/18 Pro Max                                  832x403
+pro       16/17/18 Pro, 17                                  750x365
+air       iPhone Air                                        788x383
+plus      16 Plus, 15 Plus, 15 Pro Max                      838x393
+plus14    14 Plus                                           832x391
+std61     16, 15, 15 Pro                                    734x356
+notch61   16e, 17e, 14, 13, 12                              750x353
+mini      13 mini                                           712x338
+se        SE 3a geracao                                     667x359

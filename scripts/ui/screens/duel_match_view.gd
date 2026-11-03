@@ -237,6 +237,7 @@ func _build_sidebar() -> void:
 		room_text.add_child(Style.label("Só neste aparelho · sem convite",12,PlayerUI.MUTED))
 	var voice := preload("res://scripts/ui/battle/voice_panel.gd").new()
 	voice.name = "BattleVoice"
+	voice.compact = true
 	voice.setup(overlay_parent.get("services") as PlayerServices)
 	voice.visible = not duel.is_local()
 	_side.add_child(voice)

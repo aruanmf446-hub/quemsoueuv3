@@ -193,7 +193,9 @@
           volume: volumes.get(participant.identity) ?? 1,
         }))
       : [];
-    return { ...state, participants };
+    // Fala real do próprio jogador (detecção de voz do LiveKit), sem inventar participantes.
+    const selfSpeaking = !!(room && state.connected && room.localParticipant && room.localParticipant.isSpeaking);
+    return { ...state, participants, selfSpeaking };
   }
 
   window.QSEVoice = Object.freeze({

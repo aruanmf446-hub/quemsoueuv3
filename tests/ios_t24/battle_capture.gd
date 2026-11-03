@@ -45,6 +45,26 @@ func _run() -> void:
 	await settle()
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png("%s/%s_%dj_%s.png" % [args[0], args[3], players, args[1]])
+	if args.size() > 4 and args[4].begins_with("voice"):
+		# FIXTURE DE TESTE (T33): batalha vista como sala ONLINE para o widget de voz aparecer;
+		# estados simulados sem rede/microfone: off | connected (com falas) | error.
+		services.duel.mode = "online"
+		services.duel.changed.emit()
+		var voice: VoiceService = services.voice
+		if args[4] == "voice_connected":
+			voice.state = "connected"
+			voice.mic_enabled = true
+			voice.self_speaking = true
+			voice.participants = [{"id": "a".repeat(64), "name": "Lucas", "speaking": true}, {"id": "b".repeat(64), "name": "Bruno", "speaking": false}]
+		elif args[4] == "voice_error":
+			voice.state = "error"
+		voice.changed.emit()
+		await settle()
+		await RenderingServer.frame_post_draw
+		root.get_texture().get_image().save_png("%s/%s_%s_%s.png" % [args[0], args[3], args[4], args[1]])
+		print("CAPTURED")
+		quit(0)
+		return
 	if args.size() > 4 and args[4] in ["reveal", "reveal_none"]:
 		# Revelação animada (FIXTURE DE TESTE): 2 perdem vida e 1 é eliminado, ou ninguém.
 		var match_players: Array = services.duel.match().players

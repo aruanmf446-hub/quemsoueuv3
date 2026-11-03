@@ -39,6 +39,8 @@ const ICONS := {
 	"user_plus": '<circle cx="9" cy="8" r="4"/><path d="M2 21v-1a7 7 0 0 1 14 0v1M19.5 8.5v5M17 11h5"/>',
 	"user": '<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/>',
 	"x": '<path d="M6 6l12 12M18 6 6 18"/>',
+	"mic": '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M8 21h8"/>',
+	"mic_off": '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M8 21h8M4 4l16 16"/>',
 	"skull": '<path d="M12 3a8 8 0 0 0-8 8c0 2.7 1.3 4.6 3 5.8V20a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-3.2c1.7-1.2 3-3.1 3-5.8a8 8 0 0 0-8-8z" fill="currentColor" fill-opacity="0.18"/><circle cx="9" cy="11.5" r="1.8" fill="currentColor"/><circle cx="15" cy="11.5" r="1.8" fill="currentColor"/><path d="M12 14.5l-1 2h2zM10 21v-2.5M14 21v-2.5"/>',
 	"check": '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
 	"clock": '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',

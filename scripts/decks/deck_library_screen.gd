@@ -66,6 +66,7 @@ void fragment() {
 func _ready() -> void:
 	super._ready()
 	_catalog = Catalog.decks()
+	if services.editor_content != null: services.editor_content.changed.connect(_editor_content_changed)
 	if services.rewards != null: services.rewards.changed.connect(_rewards_updated)
 	_search = LineEdit.new()
 	_search.name = "DeckSearch"
@@ -95,7 +96,15 @@ func _ready() -> void:
 			_draft = {}
 			_render_library())
 
+func _editor_content_changed() -> void:
+	_catalog = Catalog.decks()
+	if is_visible_in_tree() and _view == "library" and is_instance_valid(_results):
+		_update_results()
+
+
 func render() -> void:
+	if services != null and services.editor_content != null:
+		services.editor_content.refresh.call_deferred()
 	var requested := str(parameters.get("deck_id", ""))
 	if not requested.is_empty():
 		var item := Catalog.find_deck(requested)
@@ -224,7 +233,8 @@ func _entries() -> Array[Dictionary]:
 		var images: Array = (item.cards as Array).map(func(card: Dictionary) -> String: return str(card.image))
 		result.append({"id": str(item.id), "name": str(item.name), "origin": "official" if item.official else "community",
 			"creator": str(item.creator), "category": str(item.category), "count": int(item.count), "tags": item.get("tags", []),
-			"cover": DeckCover.resolve_item(item), "focus": DeckCover.PORTRAIT_FOCUS, "images": images, "item": item,
+			"cover": DeckCover.resolve_item(item), "live_cover_path": str(item.get("cover_path", "")),
+			"focus": DeckCover.PORTRAIT_FOCUS, "images": images, "item": item,
 			"ref": ("official:" if item.official else "creator:") + str(item.id),
 			"published": PlayerContracts.iso_seconds(str(item.get("published_at", ""))),
 			"owned": bool(item.official and services.rewards != null and services.rewards.is_deck_claimed(str(item.id)))})
@@ -725,6 +735,16 @@ func _banner(slide: Dictionary, total: int) -> Control:
 	art.name = "Cinematic"
 	art.setup(_banner_images(entry))
 	banner_panel.add_child(art)
+	# Capa personalizada do editor: substitui a arte somente se um asset remoto existir.
+	if entry.origin == "official" and services.editor_content != null and not str(entry.get("live_cover_path", "")).is_empty():
+		var custom_art := TextureRect.new()
+		custom_art.name = "EditorFeaturedCover"
+		custom_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		custom_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		custom_art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		banner_panel.add_child(custom_art)
+		custom_art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		services.editor_content.attach_cover(custom_art, str(entry.live_cover_path))
 	var margin := MarginContainer.new()
 	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	for side in ["left", "right"]: margin.add_theme_constant_override("margin_" + side, 16 if compact else 44)
@@ -817,6 +837,8 @@ func _deck_tile(entry: Dictionary) -> Control:
 	cover.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	cover.clip_contents = true
 	column.add_child(cover)
+	if entry.origin == "official" and services.editor_content != null:
+		services.editor_content.attach_cover(cover, str(entry.get("live_cover_path", "")))
 	if entry.origin == "official":
 		var seal := PlayerUI.pill("OFICIAL", "equipped")
 		seal.mouse_filter = Control.MOUSE_FILTER_IGNORE

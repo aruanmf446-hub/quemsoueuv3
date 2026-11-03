@@ -105,6 +105,11 @@ jobs:
           cat build/web/loading/list.json
           mkdir -p build/web/music
           (cd assets/music && find . -name '*.mp3' -exec cp --parents {} ../../build/web/music/ \;)
+          # T32 Web/PWA: criar bundle LiveKit local ao jogo, sem chaves nem CDN em runtime.
+          npm install --prefix web/voice --no-save --no-package-lock --ignore-scripts --no-audit --no-fund livekit-client@2.15.6 esbuild@0.25.12
+          mkdir -p build/web/voice
+          web/voice/node_modules/.bin/esbuild web/voice/livekit_adapter.js --bundle --minify --format=iife --outfile=build/web/voice/livekit.js
+          node --check build/web/voice/livekit.js
           # PWA (T24 iOS): manifest, ícones e um único service worker versionado por build.
           mkdir -p build/web/pwa
           cp web/pwa/icon-*.png build/web/pwa/

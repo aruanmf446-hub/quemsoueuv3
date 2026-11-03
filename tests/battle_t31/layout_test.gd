@@ -91,7 +91,6 @@ func _run() -> void:
 		root.content_scale_size = resolution
 		root.size = resolution
 		screen.size = Vector2(resolution)
-		battle.size = Vector2(resolution)
 		await settle()
 		services.duel.room.match.pool = pool.duplicate(true)
 		battle.refresh()

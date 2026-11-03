@@ -9,6 +9,7 @@ var client: SupabaseClient
 var chat_client: SupabaseClient
 var catalog_client: SupabaseClient
 var session: SessionService
+var rewards: OfficialRewardsService
 var preferences: DevicePreferences
 var profile: ProfileService
 var progression: ProgressionService
@@ -61,6 +62,10 @@ func _ready() -> void:
 	session = SessionService.new()
 	session.client = client
 	add_child(session)
+	rewards = OfficialRewardsService.new()
+	rewards.client = client
+	rewards.session = session
+	add_child(rewards)
 	profile = ProfileService.new()
 	profile.client = client
 	profile.session = session
@@ -123,6 +128,7 @@ func _exit_tree() -> void:
 
 
 func _session_changed() -> void:
+	rewards.clear()
 	presence.stop()
 	profile.clear()
 	progression.clear()
@@ -143,6 +149,7 @@ func _session_changed() -> void:
 		_last_heartbeat = -INF
 		refresh_all()
 		_heartbeat()
+		rewards.refresh.call_deferred()
 
 
 func refresh_all() -> void:

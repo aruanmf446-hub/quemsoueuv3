@@ -162,8 +162,11 @@ func _on_gui_input(event: InputEvent) -> void:
 func _crop() -> void:
 	if is_instance_valid(caption_area):
 		var dense := size.x < 112
-		caption.add_theme_font_size_override("font_size",12 if dense else (14 if size.x < 165 else 16))
-		caption_area.custom_minimum_size.y = 28 if dense else (29 if size.x < 165 else 32)
+		var short_row := size.y < 68
+		# Em grade 7x3, permitir duas linhas de nome legíveis; em 640x360
+		# preservar a imagem usando legenda compacta, sem esconder opções.
+		caption.add_theme_font_size_override("font_size",10 if short_row else (11 if dense else (13 if size.x < 165 else 16)))
+		caption_area.custom_minimum_size.y = 20 if short_row else (34 if dense else (38 if size.x < 165 else 32))
 	if _source == null or image.size.y <= 0: return
 	var source_size := _source.get_size()
 	var ratio := image.size.x / maxf(image.size.y,1)

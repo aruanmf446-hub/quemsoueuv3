@@ -17,6 +17,8 @@ var error_code := ""
 var mic_enabled := false
 var audio_muted := false
 var participants: Array = []
+## Fala do próprio jogador (evento real do LiveKit).
+var self_speaking := false
 var room_id := ""
 var _epoch := 0
 var _reconciling := false
@@ -110,6 +112,7 @@ func disconnect_voice() -> void:
 	mic_enabled = false
 	audio_muted = false
 	participants = []
+	self_speaking = false
 	changed.emit()
 	# Revoke OUR LiveKit token even if GAME has already removed our membership.
 	if not prior_room.is_empty() and session.authenticated() and not duel.is_local():
@@ -153,7 +156,9 @@ func _poll() -> void:
 	var next_mic := bool(parsed.get("mic", false))
 	var next_audio := bool(parsed.get("audioMuted", false))
 	var next_players: Array = parsed.get("participants", []) if parsed.get("participants", []) is Array else []
-	if state != updated or error_code != next_error or mic_enabled != next_mic or audio_muted != next_audio or participants != next_players:
+	var next_self := bool(parsed.get("selfSpeaking", false))
+	if state != updated or error_code != next_error or mic_enabled != next_mic or audio_muted != next_audio or participants != next_players or self_speaking != next_self:
+		self_speaking = next_self
 		state = updated
 		error_code = next_error
 		mic_enabled = next_mic

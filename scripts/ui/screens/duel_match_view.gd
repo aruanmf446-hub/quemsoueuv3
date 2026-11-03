@@ -167,7 +167,17 @@ func _build() -> void:
 	_side = VBoxContainer.new()
 	_side.name = "UtilityRail"
 	_side.add_theme_constant_override("separation",5)
-	_canvas.add_child(_side)
+	if UIScale.is_iphone():
+		# iPhone: a coluna da direita rola (tela baixa); nada fica escondido embaixo.
+		_side_scroll = ScrollContainer.new()
+		_side_scroll.name = "UtilityRailScroll"
+		_side_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		_side_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+		_canvas.add_child(_side_scroll)
+		_side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_side_scroll.add_child(_side)
+	else:
+		_canvas.add_child(_side)
 	_build_sidebar()
 func _build_sidebar() -> void:
 	var controls := PlayerUI.row(_side)
@@ -291,7 +301,14 @@ func _build_sidebar() -> void:
 	leave.name = "LeaveBattle"
 	leave.custom_minimum_size.y = 38
 	leave.add_theme_font_size_override("font_size",15)
-	_side.add_child(leave)
+	if UIScale.is_iphone():
+		# iPhone: a coluna é baixa; "Sair" vai para a linha do tempo/ajustes e libera espaço
+		# para voz, chat e "Suas cartas" caberem inteiros.
+		leave.text = "Sair"
+		leave.custom_minimum_size = Vector2(0, 40)
+		_side.get_node("RoomControls").add_child(leave)
+	else:
+		_side.add_child(leave)
 ## Gera um convite (60 min) e copia. Sem rota oficial de link configurada, copia o
 ## convite para colar em Duelo → Código do convite; nunca inclui o UUID da sala.
 func _share_invite() -> void:
@@ -431,11 +448,28 @@ func _show_reveal(card_id: String, hits: Array) -> void:
 	var old := get_node_or_null("RevealOverlay")
 	if old != null: old.queue_free()
 	var rows: Array = []
+	var hit_ids := {}
 	for hit: Dictionary in hits:
-		rows.append({"name": str(_player(_data,str(hit.get("member_id",""))).get("nickname","Jogador")), "eliminated": bool(hit.get("eliminated",false))})
+		var member := str(hit.get("member_id",""))
+		hit_ids[member] = true
+		var player := _player(_data,member)
+		rows.append({"name": str(player.get("nickname","Jogador")), "skin": str(player.get("skin_id","")), "eliminated": bool(hit.get("eliminated",false))})
+	# Não atingidos: participantes ainda na partida que não foram atingidos (dados reais).
+	var spared: Array = []
+	for player: Dictionary in _data.get("players",[]):
+		if not hit_ids.has(str(player.member_id)) and not bool(player.get("eliminated",false)):
+			spared.append(str(player.get("nickname","Jogador")))
+	var events: Array = _data.get("events",[])
+	var actor := str(_player(_data,str(events.back().get("actor","")) if not events.is_empty() else "").get("nickname","Jogador"))
+	# Camada própria sobre a tela inteira (fora do tabuleiro escalado): o painel mede a tela real.
+	var layer := CanvasLayer.new()
+	layer.name = "RevealOverlay"
+	layer.layer = 50
+	add_child(layer)
 	var overlay := RevealOverlay.new()
-	add_child(overlay)
-	overlay.present(card_id, _name(card_id), rows)
+	layer.add_child(overlay)
+	overlay.tree_exited.connect(func() -> void: if is_instance_valid(layer): layer.queue_free())
+	overlay.present(card_id, _name(card_id), actor, rows, spared)
 
 
 func _render_players() -> void:
@@ -630,7 +664,7 @@ func _render_hand() -> void:
 			image.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			# T24 iOS: altura pela largura real da coluna (proporção da carta), não um valor fixo.
 			var column_width := (_hand.size.x - 12.0 - (grid.columns - 1) * 4.0) / maxf(grid.columns, 1)
-			image.custom_minimum_size.y = clampf(column_width * 1.42, 44.0, 150.0 if UIScale.is_iphone() else 120.0) if entries.size() <= 3 else 34.0
+			image.custom_minimum_size.y = clampf(column_width * 1.42, 44.0, 96.0 if UIScale.is_iphone() else 120.0) if entries.size() <= 3 else 34.0
 			if entry.get("lost",false): image.modulate = Color("#555967")
 			# Toque/clique amplia temporariamente (só nesta tela; ninguém mais vê).
 			image.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -741,8 +775,9 @@ func _layout() -> void:
 		for panel: Control in _roster.get_children():
 			panel.custom_minimum_size.x = slot_width
 	_main.size = Vector2(target_main_width,_usable_height())
-	_side.position = Vector2(width-side_width,inset)
-	_side.size = Vector2(side_width,_usable_height())
+	var rail: Control = _side_scroll if is_instance_valid(_side_scroll) else _side
+	rail.position = Vector2(width-side_width,inset)
+	rail.size = Vector2(side_width,_usable_height())
 	if is_instance_valid(_notice):
 		_notice.reset_size()
 		_notice.position = Vector2(_main.size.x-_notice.size.x-14,_canvas.size.y-_bottom_inset-_notice.size.y-10)
@@ -775,6 +810,7 @@ func _best_grid_columns(count: int, usable_width: float, usable_height: float, g
 
 
 var _board_scroll: ScrollContainer
+var _side_scroll: ScrollContainer
 
 
 ## iPhone: colunas pela largura (cartas ~150 px de design), altura em retrato.

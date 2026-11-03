@@ -24,6 +24,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Validate JavaScript syntax
-        run: node --check web/bots/app.js
+        run: |
+          node --check web/bots/app.js
+          node --check web/bots/building.js
       - name: Verify login derivation and route isolation
         run: python3 tools/bots/test_dashboard.py

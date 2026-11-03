@@ -7,6 +7,8 @@
 <meta name="robots" content="noindex,nofollow">
 <title>QSE Command Center · Agentes</title>
 <link rel="stylesheet" href="./style.css">
+<link rel="stylesheet" href="./building.css">
+<script defer src="./building.js"></script>
 <script defer src="./app.js"></script>
 </head>
 <body>
@@ -55,6 +57,34 @@
       <div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> PAINEL DE OPERAÇÕES <span class="version">/ 01</span></div><h1 id="page-title">Visão geral <span class="title-accent">.</span></h1><p id="page-subtitle">Acompanhe as entregas, a operação dos agentes e o estado do projeto.</p></div><div class="updated"><span>ÚLTIMA CONSULTA</span><strong id="last-updated">—</strong><small>Atualização automática a cada 5 min</small></div></div>
       <div id="notice" class="notice hidden"></div>
       <section id="view-overview" class="view">
+        <section class="building-section" id="building-stage" aria-label="Prédio animado dos operadores">
+          <div class="building-intro">
+            <div><span class="section-kicker">QSE // STUDIO OPERATIONS</span>
+              <h2>Seu estúdio, andar por andar.</h2>
+              <p>Clique em qualquer andar para abrir o histórico daquele agente.</p>
+            </div>
+            <div class="tower-live-note"><span class="signal-point"></span> Indicadores do GitHub, não presença em tempo real</div>
+          </div>
+          <div class="building-layout">
+            <div class="building-visual">
+              <div class="city-stars" aria-hidden="true"></div>
+              <div class="city-backdrop" aria-hidden="true"></div>
+              <div class="city-backdrop secondary" aria-hidden="true"></div>
+              <div class="city-grid" aria-hidden="true"></div>
+              <div class="tower-shell">
+                <div class="tower-antenna" aria-hidden="true"></div>
+                <div class="tower-roof"><strong>QUEM SOU EU · HQ</strong><span>OPERATIONS CENTER <span aria-hidden="true">✦</span></span></div>
+                <div id="building-floors" class="building-floors"><div class="empty">Consultando a atividade dos agentes…</div></div>
+                <div class="tower-ground"><span>QSE · ESTÚDIO DE DESENVOLVIMENTO</span><i></i></div>
+              </div>
+              <div class="tower-base-caption">SELECIONE UM ANDAR PARA EXPLORAR ↗</div>
+            </div>
+            <aside class="building-report" id="building-report" aria-label="Telemetria dos agentes">
+              <div class="empty">Carregando telemetria pública…</div>
+            </aside>
+          </div>
+          <div class="building-bar"><span>VISÃO EXTERNA / EDIFÍCIO DOS AGENTES</span><span id="building-last-sync">Aguardando atualização do GitHub</span></div>
+        </section>
         <div class="metric-grid">
           <article class="metric"><div class="metric-head"><span>PULL REQUESTS ABERTAS</span><i>↗</i></div><div class="metric-value" id="metric-prs">—</div><div class="metric-foot">Branches aguardando integração</div></article>
           <article class="metric"><div class="metric-head"><span>JOBS EM EXECUÇÃO</span><i>↻</i></div><div class="metric-value" id="metric-running">—</div><div class="metric-foot">GitHub Actions neste momento</div></article>

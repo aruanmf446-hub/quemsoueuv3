@@ -42,8 +42,24 @@ class DashboardTest(unittest.TestCase):
     def test_bots_not_replaced_by_game_service_worker(self):
         worker = (ROOT / "web/pwa/sw.js").read_text()
         self.assertIn('startsWith("bots/")', worker)
-        for asset in ("index.html", "app.js", "style.css"):
+        for asset in ("index.html", "app.js", "style.css", "building.js", "building.css"):
             self.assertTrue((ROOT / "web/bots" / asset).exists())
+
+    def test_architectural_tower_is_connected_to_real_activity(self):
+        html = (ROOT / "web/bots/index.html").read_text()
+        app = (ROOT / "web/bots/app.js").read_text()
+        building = (ROOT / "web/bots/building.js").read_text()
+        workflow = (ROOT / ".github/workflows/deploy-web.yml").read_text()
+        for selector in ('id="building-floors"', 'id="building-report"', 'building.js', 'building.css'):
+            self.assertIn(selector, html)
+        self.assertIn('window.QSEBuilding.render', app)
+        self.assertIn('qse-select-agent', app)
+        self.assertIn('state=all&sort=updated', app)
+        self.assertIn('PR integrada', app)
+        self.assertIn('status==="in_progress"', building)
+        self.assertIn("GitHub", building)
+        for asset in ("building.css", "building.js"):
+            self.assertIn(asset, workflow)
 
     def test_has_live_github_endpoints_and_no_embedded_credentials(self):
         js = (ROOT / "web/bots/app.js").read_text()

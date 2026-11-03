@@ -1,0 +1,70 @@
+
+/* QSE Operations Tower — clickable architectural overview */
+.building-section{position:relative;overflow:hidden;border:1px solid #33465f;border-radius:17px;background:linear-gradient(125deg,#111c2d 0%,#10192a 60%,#172131 100%);margin:0 0 26px;box-shadow:0 18px 60px #03060b40}
+.building-intro{padding:25px 29px 16px;position:relative;z-index:2;display:flex;align-items:start;justify-content:space-between;gap:16px}
+.building-intro h2{font:700 25px 'Space Grotesk';letter-spacing:-.05em;margin:6px 0 4px}
+.building-intro p{font-size:11px;color:#9cadc0;margin:0;line-height:1.6}
+.tower-live-note{font-size:9px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.06em;color:#b4c3d7;border:1px solid #485875;border-radius:999px;padding:9px 12px;max-width:310px;text-align:right}
+.tower-live-note .signal-point{background:#d9bd7e;box-shadow:0 0 0 4px #d9bd7e12}
+.building-layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(230px,0.74fr);gap:0;position:relative;min-height:436px}
+.building-visual{position:relative;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:25px 32px 0;overflow:hidden;isolation:isolate}
+.building-visual:before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 28%,#39527277,transparent 78%),linear-gradient(180deg,transparent 30%,#162437bb 80%,#101a29);z-index:-5}
+.city-stars{position:absolute;inset:0;z-index:-4;background-image:radial-gradient(circle,#bfcae469 .8px,transparent 1px),radial-gradient(circle,#bfcae445 1px,transparent 1.2px);background-size:69px 71px,111px 103px;background-position:9px 11px,41px 52px;opacity:.7}
+.city-backdrop{position:absolute;bottom:24px;width:120%;height:65%;z-index:-3;opacity:.45;background:linear-gradient(to top,#152439 0%,#20304988 70%,transparent 100%);clip-path:polygon(0 100%,0 55%,6% 55%,6% 41%,10% 41%,10% 68%,15% 68%,15% 32%,22% 32%,22% 61%,27% 61%,27% 22%,34% 22%,34% 59%,39% 59%,39% 36%,47% 36%,47% 65%,55% 65%,55% 22%,62% 22%,62% 51%,68% 51%,68% 39%,76% 39%,76% 58%,82% 58%,82% 26%,90% 26%,90% 49%,95% 49%,95% 32%,100% 32%,100% 100%)}
+.city-backdrop.secondary{bottom:16px;height:53%;transform:translateX(-25px);opacity:.35;filter:blur(3px)}
+.city-grid{position:absolute;bottom:0;left:0;right:0;height:62px;background:linear-gradient(180deg,transparent,#101b2c 61%),repeating-linear-gradient(90deg,#97b1d622 0px,#97b1d622 1px,transparent 1px,transparent 48px);transform:perspective(95px) rotateX(35deg) scale(1.6);z-index:-2}
+.tower-shell{position:relative;width:min(100%,610px);margin:0 auto;z-index:1;filter:drop-shadow(0 22px 19px #030713b3);transform:translateZ(0)}
+.tower-antenna{height:21px;position:absolute;top:-24px;left:50%;width:2px;background:#8697b0;box-shadow:0 0 6px #a9c0dc}.tower-antenna:before{content:'';position:absolute;top:-5px;left:-3px;width:8px;height:8px;border-radius:100%;background:#f0c785;box-shadow:0 0 17px #e9bd77aa;animation:antenna 2.6s ease-in-out infinite}
+.tower-roof{height:44px;position:relative;display:flex;align-items:center;justify-content:space-between;padding:0 21px;background:linear-gradient(180deg,#455c76,#233449);border:1px solid #7b91a8;border-bottom:3px solid #0a1321;box-shadow:inset 0 4px #ffffff11;border-radius:8px 8px 0 0}
+.tower-roof:before{content:'';height:9px;position:absolute;inset:-9px 8px auto;background:linear-gradient(#7f92a8,#4c627a);border:1px solid #a0b1c0;border-radius:4px 4px 0 0;transform:skew(-7deg)}
+.tower-roof strong{letter-spacing:.21em;color:#e7d7ba;font:800 11px 'Space Grotesk';text-shadow:0 0 15px #c7ac77a0}.tower-roof span{font-size:9px;letter-spacing:.1em;color:#b5c8d8;font-weight:800}
+.tower-floor{height:104px;width:100%;position:relative;display:flex;align-items:center;gap:15px;text-align:left;color:#eef1f8;padding:13px 18px;border:1px solid #5c759052;border-top:0;border-radius:0;background:linear-gradient(120deg,#23384e,#1b2e44 49%,#17273c);transition:background .3s,border-color .3s,transform .3s;overflow:hidden}
+.tower-floor:nth-child(even){background:linear-gradient(120deg,#273b52,#21354b 48%,#172a3e)}
+.tower-floor:after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent 35%,#ffffff0a 50%,transparent 70%);transform:translateX(-140%);transition:transform .55s}
+.tower-floor:hover{border-color:var(--floor-accent);background:linear-gradient(110deg,#334b63,#21364f 70%,#1f3349)}
+.tower-floor:hover:after,.tower-floor:focus-visible:after{transform:translateX(145%)}
+.tower-floor.lit{box-shadow:inset 4px 0 0 var(--floor-accent)}
+.tower-floor-id{font:700 13px 'Space Grotesk';color:#91a6bb;align-self:flex-start;width:24px;flex:0 0 24px}
+.tower-interior{display:flex;align-items:center;gap:5px;flex:0 0 122px;height:64px;position:relative;z-index:0}
+.tower-window{height:59px;width:27px;position:relative;overflow:hidden;border:2px solid #526984;border-top-color:#8ca4bc;border-bottom:4px solid #526a81;border-radius:4px 4px 1px 1px;background:linear-gradient(160deg,#0b1727,#26374b);box-shadow:inset -3px 0 #050a1399}
+.tower-window.illuminated{background:radial-gradient(circle at 50% 18%,#f0d09e80,transparent 75%),linear-gradient(150deg,#3a4d5b,#16273a);border-color:#a89370;box-shadow:inset -3px 0 #162537aa,0 0 13px #edb77a20}
+.tower-window:before{content:'';position:absolute;height:3px;width:100%;top:27px;background:#4b6178;z-index:3}
+.tower-window:after{content:'';position:absolute;height:100%;width:2px;left:50%;top:0;background:#48617a;z-index:3}
+.tower-lamp{position:absolute;top:6px;left:10px;height:3px;width:6px;background:#577088;border-radius:50%}
+.illuminated .tower-lamp{background:#ffe0a7;box-shadow:0 0 12px 5px #f7cc7b88}
+.tower-desk{position:absolute;bottom:6px;left:4px;right:3px;height:5px;background:#0d1725;border-radius:1px}
+.tower-monitor{position:absolute;bottom:12px;left:6px;height:11px;width:10px;background:#18273a;border:2px solid #455d70;border-radius:1px}
+.illuminated .tower-monitor{background:#9bbad099;border-color:#a6bcd0;box-shadow:0 0 7px #96b9e76b}
+.tower-profile{position:relative;z-index:1;display:flex;align-items:center;gap:11px;flex:1;min-width:110px;max-width:185px}
+.tower-symbol{display:grid;place-items:center;flex:0 0 37px;height:37px;width:37px;color:var(--floor-accent);background:color-mix(in srgb,var(--floor-accent) 15%,transparent);border:1px solid color-mix(in srgb,var(--floor-accent) 38%,transparent);border-radius:9px;font:700 19px 'Space Grotesk'}
+.tower-profile-text{display:flex;flex-direction:column;gap:5px;min-width:0}.tower-profile-text strong{font:700 13px 'Space Grotesk';letter-spacing:.03em;white-space:nowrap}.tower-profile-text small{font-size:9px;color:#9fb3c7;line-height:1.5}
+.tower-floor-meta{position:relative;z-index:1;display:flex;flex-direction:column;align-items:flex-start;gap:5px;flex:1;min-width:0}
+.tower-signal{display:inline-flex;gap:8px;align-items:center;font-size:10px;color:#aebdcf;font-weight:800;white-space:nowrap}
+.tower-signal.pipeline{color:#9ceac7}.tower-signal.recent{color:#ead29c}.tower-signal.quiet{color:#a1aec1}
+.signal-point{display:inline-block;flex:0 0 7px;width:7px;height:7px;border-radius:50%;background:#7d8ba2}
+.tower-signal.pipeline .signal-point{background:#86e6b3;box-shadow:0 0 10px #86e6b3;animation:antenna 1.5s ease-in-out infinite}.tower-signal.recent .signal-point{background:#e5bb7e;box-shadow:0 0 9px #e5bb7e44}
+.tower-summary{font-size:10px;line-height:1.35;color:#d2ddeb;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.tower-branch{font-size:9px;color:#7c94b0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.tower-chevron{color:#d8bb82;font-size:17px;align-self:flex-start}
+.tower-ground{height:25px;display:flex;justify-content:space-between;align-items:center;padding:0 23px;border-top:4px solid #7790a5;background:linear-gradient(0deg,#111e2c,#26394d);border-radius:0 0 8px 8px;font-size:9px;color:#8d9db1;font-weight:800;letter-spacing:.11em}
+.tower-ground i{width:34px;height:5px;background:#d6ad72;box-shadow:0 0 11px #e2b57b88;border-radius:2px}
+.tower-base-caption{text-align:center;color:#8da0b6;margin:10px 0 16px;letter-spacing:.18em;font:800 9px 'Space Grotesk';position:relative;z-index:1}
+.building-report{position:relative;padding:26px 25px 23px;background:linear-gradient(152deg,#172437,#111b2b);border-left:1px solid #334359;min-width:0;display:flex;flex-direction:column}
+.building-report-header{display:flex;justify-content:space-between;align-items:center}
+.report-pulse{width:8px;height:8px;background:#e3c387;border-radius:50%;box-shadow:0 0 0 5px #d7ba8430}
+.building-report h3{font:700 27px/1.15 'Space Grotesk';letter-spacing:-.045em;margin:15px 0 20px}.building-report h3 em{color:#e5c58b;font-style:normal}
+.building-report-stat{border-top:1px solid #35465b;padding:13px 0;display:flex;align-items:center;gap:16px}
+.building-report-stat strong{font:700 30px 'Space Grotesk';letter-spacing:-.06em;min-width:50px}
+.building-report-stat strong small{color:#7b8eaa;font-size:13px}
+.building-report-stat span{font-size:11px;color:#b5c5d6;line-height:1.6}
+.building-report-stat span small{color:#7c90a9;font-size:9px}
+.report-rule{border-top:1px solid #35465b;margin-top:3px}
+.report-last{margin-top:18px;display:flex;flex-direction:column;gap:6px}.report-last span{font-size:9px;letter-spacing:.1em;color:#7c8ea5;font-weight:800}.report-last strong{font-size:13px;color:#e1c58a}
+.report-key{display:flex;flex-direction:column;gap:10px;margin-top:22px}.report-key span{display:flex;gap:10px;align-items:center;font-size:10px;color:#a4b5c9}.key-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#7e90a7}.key-dot.pipeline{background:#8be2ba;box-shadow:0 0 8px #8be2ba}.key-dot.recent{background:#e8c18c}.key-dot.quiet{background:#6b7c92}
+.report-disclaimer{font-size:10px;color:#889bb1;line-height:1.7;margin-top:auto;padding-top:15px}.report-disclaimer b{color:#c8d6e3;font-weight:700}
+.building-bar{height:31px;padding:0 29px;display:flex;align-items:center;justify-content:space-between;gap:10px;color:#758ba3;font-size:9px;letter-spacing:.07em;border-top:1px solid #314259;background:#101a29}
+@keyframes antenna{0%,100%{opacity:1}50%{opacity:.36}}
+@media(max-width:1330px){.building-layout{grid-template-columns:minmax(0,1fr) 270px}.building-visual{padding-left:20px;padding-right:20px}.tower-interior{flex-basis:90px}.tower-window:nth-child(4){display:none}.tower-profile{max-width:145px}.tower-floor{gap:9px;padding:12px}.tower-floor-id{flex-basis:17px;width:17px}.tower-profile-text strong{font-size:11px}.tower-profile-text small{font-size:8px}}
+@media(max-width:1050px){.building-layout{grid-template-columns:1fr}.building-report{border-left:0;border-top:1px solid #35465b;display:block}.building-report h3{font-size:22px}.building-report-stat{display:inline-flex;width:48%;vertical-align:middle;min-height:90px}.report-key{flex-direction:row;flex-wrap:wrap}.report-disclaimer{margin:13px 0 0}.tower-interior{flex-basis:122px}.tower-window:nth-child(4){display:block}.tower-profile{max-width:190px}}
+@media(max-width:660px){.building-intro{padding:20px 17px 13px;display:block}.building-intro h2{font-size:22px}.tower-live-note{margin-top:14px;padding:7px 10px;width:fit-content}.building-visual{padding:23px 8px 0}.tower-shell{width:100%}.tower-floor{height:106px;gap:7px;padding:10px 8px}.tower-roof{height:36px;padding:0 10px}.tower-roof strong{font-size:10px}.tower-roof span{font-size:7px}.tower-floor-id{font-size:10px;flex-basis:12px;width:12px}.tower-interior{flex-basis:58px;gap:3px}.tower-window{width:18px;height:51px}.tower-window:nth-child(n+4){display:none}.tower-window:before{top:22px}.tower-window .tower-lamp{left:5px}.tower-profile{flex:0 0 100px;max-width:100px;gap:5px}.tower-symbol{width:27px;height:27px;flex-basis:27px;font-size:14px}.tower-profile-text strong{font-size:9px;letter-spacing:0}.tower-profile-text small{font-size:8px;line-height:1.2}.tower-floor-meta{gap:4px}.tower-signal{font-size:8px;gap:5px;white-space:normal}.signal-point{width:6px;height:6px;flex-basis:6px}.tower-summary{font-size:9px;-webkit-line-clamp:2}.tower-branch{font-size:8px}.tower-chevron{font-size:12px}.tower-base-caption{font-size:8px}.building-report{padding:20px 18px}.building-report-stat{width:100%;min-height:0}.building-bar{padding:0 13px;font-size:8px}.building-bar span:last-child{display:none}}
+@media(prefers-reduced-motion:reduce){.tower-antenna:before,.tower-signal.pipeline .signal-point{animation:none}}

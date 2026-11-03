@@ -65,13 +65,14 @@ func _run() -> void:
 		print("CAPTURED")
 		quit(0)
 		return
-	if args.size() > 4 and args[4] in ["reveal", "reveal_none"]:
-		# Revelação animada (FIXTURE DE TESTE): 2 perdem vida e 1 é eliminado, ou ninguém.
+	if args.size() > 4 and args[4].begins_with("reveal"):
+		# Resultado da rodada (FIXTURE DE TESTE, só para capturas): reveal_none (ninguém),
+		# reveal_hit (2 atingidos), reveal (3 atingidos, 1 eliminado), reveal_double (2 eliminados).
 		var match_players: Array = services.duel.match().players
-		var hits: Array = [] if args[4] == "reveal_none" else [
-			{"member_id": match_players[0].member_id, "eliminated": false},
-			{"member_id": match_players[1].member_id, "eliminated": false},
-			{"member_id": match_players[2].member_id, "eliminated": true}]
+		var plan: Array = {"reveal_none": [], "reveal_hit": [false, false], "reveal": [false, false, true], "reveal_double": [true, true]}.get(args[4], [])
+		var hits: Array = []
+		for index in plan.size():
+			hits.append({"member_id": match_players[index].member_id, "eliminated": plan[index]})
 		battle._show_reveal(str(pool[5].card_id), hits)
 		await create_timer(2.4).timeout
 		await RenderingServer.frame_post_draw

@@ -448,11 +448,28 @@ func _show_reveal(card_id: String, hits: Array) -> void:
 	var old := get_node_or_null("RevealOverlay")
 	if old != null: old.queue_free()
 	var rows: Array = []
+	var hit_ids := {}
 	for hit: Dictionary in hits:
-		rows.append({"name": str(_player(_data,str(hit.get("member_id",""))).get("nickname","Jogador")), "eliminated": bool(hit.get("eliminated",false))})
+		var member := str(hit.get("member_id",""))
+		hit_ids[member] = true
+		var player := _player(_data,member)
+		rows.append({"name": str(player.get("nickname","Jogador")), "skin": str(player.get("skin_id","")), "eliminated": bool(hit.get("eliminated",false))})
+	# Não atingidos: participantes ainda na partida que não foram atingidos (dados reais).
+	var spared: Array = []
+	for player: Dictionary in _data.get("players",[]):
+		if not hit_ids.has(str(player.member_id)) and not bool(player.get("eliminated",false)):
+			spared.append(str(player.get("nickname","Jogador")))
+	var events: Array = _data.get("events",[])
+	var actor := str(_player(_data,str(events.back().get("actor","")) if not events.is_empty() else "").get("nickname","Jogador"))
+	# Camada própria sobre a tela inteira (fora do tabuleiro escalado): o painel mede a tela real.
+	var layer := CanvasLayer.new()
+	layer.name = "RevealOverlay"
+	layer.layer = 50
+	add_child(layer)
 	var overlay := RevealOverlay.new()
-	add_child(overlay)
-	overlay.present(card_id, _name(card_id), rows)
+	layer.add_child(overlay)
+	overlay.tree_exited.connect(func() -> void: if is_instance_valid(layer): layer.queue_free())
+	overlay.present(card_id, _name(card_id), actor, rows, spared)
 
 
 func _render_players() -> void:

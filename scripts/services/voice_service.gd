@@ -85,7 +85,7 @@ func join_voice() -> void:
 		_fail("bridge_unavailable")
 		return
 	_bridge_started = true
-	JavaScriptBridge.eval("window.QSEVoice.join(" + JSON.stringify(url) + "," + JSON.stringify(token) + ")")
+	JavaScriptBridge.eval("window.QSEVoice.join(" + JSON.stringify(url) + "," + JSON.stringify(token) + "," + JSON.stringify(data.get("participants", [])) + ")")
 	_reconcile_at = Time.get_ticks_msec() / 1000.0 + RECONCILE_SECONDS
 
 
@@ -170,6 +170,8 @@ func _reconcile() -> void:
 		HTTPClient.METHOD_POST, {"action": "reconcile", "room_id": target})
 	_reconciling = false
 	if target != room_id: return
+	if result.ok and result.data is Dictionary:
+		JavaScriptBridge.eval("window.QSEVoice && window.QSEVoice.setRoster(" + JSON.stringify(result.data.get("participants", [])) + ")")
 	if not result.ok:
 		# Fail closed for loss of GAME room authorization. A 503 does not interrupt
 		# gameplay but voice is dropped until the player explicitly rejoins.

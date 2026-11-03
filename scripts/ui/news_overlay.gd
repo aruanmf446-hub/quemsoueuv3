@@ -154,6 +154,7 @@ func _header() -> void:
 	var gift := _icon(ICON_GIFT, 27 if _compact else 40)
 	header.add_child(gift)
 	var title := _label("Resgatar Presentes", 19 if _compact else 32, WHITE)
+	title.name = "HeaderTitle"
 	title.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	header.add_child(title)
@@ -163,6 +164,7 @@ func _header() -> void:
 	line.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	header.add_child(line)
 	var eyebrow := _label("NOVIDADES DO JOGO", 9 if _compact else 17, Color("#e0e5ee"))
+	eyebrow.name = "HeaderEyebrow"
 	eyebrow.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	eyebrow.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(eyebrow)

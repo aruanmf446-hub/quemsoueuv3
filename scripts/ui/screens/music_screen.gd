@@ -38,8 +38,7 @@ func render() -> void:
 	heading.add_theme_font_size_override("font_size", int(34 * k))
 	heading.add_theme_color_override("font_color", Color.WHITE)
 	var back := $Margin/Column/Header/Back as Button
-	back.custom_minimum_size = PlayerUI.BACK_SIZE * k
-	back.add_theme_font_size_override("font_size", int(PlayerUI.CONTROL_FONT * k))
+	PlayerUI.standard_back(back)
 	banner.hide()
 	var music := _music()
 	if music == null:

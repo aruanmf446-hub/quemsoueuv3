@@ -91,6 +91,22 @@ static func flow(parent: Control) -> HFlowContainer:
 	return box
 
 
+## "Voltar" PADRÃO de todas as telas: mesmo texto/seta, tamanho, fonte e estilo (secundário).
+## No iPhone (perfil próprio, base 1280x720) fica um pouco mais alto para o toque.
+## label vazio mantém o texto atual (ex.: "Biblioteca", "Galeria"), sem o "‹" antigo.
+static func standard_back(button: Button, label := "") -> void:
+	if button == null: return
+	var text := label if not label.is_empty() else button.text.replace("‹", "").replace("←", "").strip_edges()
+	button.text = TranslationServer.translate(text if not text.is_empty() else "Voltar")
+	button.icon = PremiumUI.icon("back", TEXT, 48)
+	button.add_theme_constant_override("icon_max_width", 22)
+	button.add_theme_constant_override("h_separation", 8)
+	button.custom_minimum_size = Vector2(maxf(BACK_SIZE.x, button.custom_minimum_size.x if button.text.length() > 7 else 0.0), BACK_SIZE.y + (8.0 if UIScale.is_iphone() else 0.0))
+	button.add_theme_font_size_override("font_size", CONTROL_FONT)
+	button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	style_button(button, false)
+
+
 static func style_back(button: Button) -> void:
 	style_row(button)
 	button.add_theme_color_override("font_color", MUTED)

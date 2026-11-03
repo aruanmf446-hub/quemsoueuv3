@@ -50,10 +50,7 @@ func render() -> void:
 	heading.add_theme_font_size_override("font_size",roundi(_px(40,24)))
 	heading.add_theme_color_override("font_color",Color.WHITE)
 	var back: Button = $Margin/Column/Header/Back
-	_style_slanted(back,false)
-	back.custom_minimum_size = Vector2(152,60)
-	back.add_theme_font_override("font",_font)
-	back.add_theme_font_size_override("font_size",PlayerUI.CONTROL_FONT)
+	PlayerUI.standard_back(back)
 	banner.hide()
 	var tabs := PlayerUI.row(body)
 	tabs.add_theme_constant_override("separation",roundi(_px(2,1)))
@@ -106,6 +103,8 @@ func render() -> void:
 	# Os cartões ocupam a altura que sobrar: tudo cabe numa tela, sem rolar para baixo
 	# (no iPhone a barra do navegador deixa só ~320 pontos de altura).
 	_rail.custom_minimum_size.y = _px(360,150)
+	# iPhone (base 1138x640): cartões mais baixos para o botão JOGAR caber na tela.
+	if UIScale.is_iphone(): _rail.custom_minimum_size.y = 250
 	var page: ScrollContainer = $Margin/Column/Scroll
 	page.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -133,13 +132,23 @@ func render() -> void:
 		start.text = action
 		start.set_meta("phase_order",order)
 		start.disabled = not available or not exists
-		start.custom_minimum_size.y = 64
+		start.custom_minimum_size.y = 56 if UIScale.is_iphone() else 64
 		start.add_theme_font_override("font",_font)
 		start.add_theme_font_size_override("font_size",PlayerUI.CONTROL_FONT)
 		_style_slanted(start,current or (available and not done))
 		start.pressed.connect(_launch.bind(str(phase.id),path))
 		card.get_meta("footer").add_child(start)
 	call_deferred("_reveal_next")
+	# A margem nunca passa da tela (um mínimo antigo maior a deixava mais alta que a janela,
+	# empurrando os botões dos cartões para fora).
+	_fit_margin.call_deferred()
+
+
+func _fit_margin() -> void:
+	if not is_inside_tree(): return
+	var margin: MarginContainer = $Margin
+	margin.position = Vector2.ZERO
+	margin.size = Vector2(size.x, maxf(size.y, margin.get_combined_minimum_size().y))
 
 func _unit_or_one() -> float:
 	return _unit if _compact else 1.0
@@ -164,7 +173,7 @@ func _phase_card(parent: Control, order: int, title: String, description: String
 	art.texture = ART[(order-1)%ART.size()]
 	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	art.custom_minimum_size.y = _px(150,46)
+	art.custom_minimum_size.y = 80.0 if UIScale.is_iphone() else _px(150,46)
 	art.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	art.size_flags_stretch_ratio = 1.1
 	art.modulate = Color.WHITE if available else Color(0.32,0.34,0.4)

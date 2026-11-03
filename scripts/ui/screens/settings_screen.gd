@@ -143,8 +143,6 @@ void fragment() {
 	if has_node("Tint"): $Tint.hide()
 	var header: HBoxContainer = $Margin/Column/Header
 	var back: Button = $Margin/Column/Header/Back
-	back.icon = _icon("back", ACCENT, 22)
-	back.add_theme_constant_override("h_separation", 10)
 	_divider = ColorRect.new()
 	_divider.color = Color(1, 1, 1, 0.16)
 	_divider.custom_minimum_size = Vector2(1, 44)
@@ -190,8 +188,7 @@ func render() -> void:
 	heading.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	banner.hide()
 	var back: Button = $Margin/Column/Header/Back
-	back.text = tr("Voltar")
-	_style_outline(back)
+	PlayerUI.standard_back(back, "Voltar")
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_nav = HBoxContainer.new()
 	_nav.name = "CategoryNav"
@@ -279,9 +276,7 @@ func _adapt() -> void:
 	margin.add_theme_constant_override("margin_top", 10 if compact else 26)
 	margin.add_theme_constant_override("margin_bottom", 10 if compact else 30)
 	$Margin/Column.add_theme_constant_override("separation", 8 if compact else 22)
-	var back: Button = $Margin/Column/Header/Back
-	back.custom_minimum_size = PlayerUI.BACK_SIZE
-	back.add_theme_font_size_override("font_size", PlayerUI.CONTROL_FONT)
+	PlayerUI.standard_back($Margin/Column/Header/Back)
 	heading.add_theme_font_size_override("font_size", 26 if compact else 46)
 	_gear.custom_minimum_size = Vector2.ONE * (28 if compact else 48)
 	_divider.custom_minimum_size.y = 28 if compact else 52
@@ -299,6 +294,8 @@ func _adapt() -> void:
 	_layout.add_theme_constant_override("separation", 10 if compact else 24)
 	_side_panel.size_flags_stretch_ratio = 1.0
 	_main_panel.size_flags_stretch_ratio = 1.5 if compact else 1.85
+	# iPhone: o painel principal ganha espaço para os valores (nickname, e-mail) não cortarem.
+	if UIScale.is_iphone(): _main_panel.size_flags_stretch_ratio = 2.6
 	_panel_title.add_theme_font_size_override("font_size", 20 if compact else 34)
 	_panel_subtitle.add_theme_font_size_override("font_size", 12 if compact else 17)
 	_panel_subtitle.visible = not (compact and narrow)
@@ -1106,7 +1103,7 @@ func _info_row(parent: Control, icon: String, title: String, value: String) -> P
 	card.add_child(line)
 	line.add_child(_icon_rect(icon, MUTED, 20 if compact else 30))
 	var label := _plain(title, 13 if compact else 18, MUTED)
-	label.custom_minimum_size.x = 70 if compact else 130
+	label.custom_minimum_size.x = 70 if compact else (104 if UIScale.is_iphone() else 130)
 	label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	line.add_child(label)
 	var shown := PlayerUI.label(value, 14 if compact else 22, Color.WHITE)

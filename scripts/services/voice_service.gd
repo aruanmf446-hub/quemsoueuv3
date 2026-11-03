@@ -18,6 +18,7 @@ var _requesting := false
 var _generation := 0
 var _poll: Timer
 var _sync_elapsed := 0.0
+var _last_sync_at := -INF
 var _syncing := false
 
 func _ready() -> void:
@@ -27,7 +28,7 @@ func _ready() -> void:
     add_child(_poll)
     _poll.start()
     duel.changed.connect(_room_updated)
-    duel.removed.connect(func(_reason: String) -> void: leave_voice())
+    duel.removed.connect(_on_removed)
     session.changed.connect(leave_voice)
 
 func supported() -> bool:
@@ -77,6 +78,7 @@ func leave_voice() -> void:
     _room_id = ""
     _requesting = false
     _sync_elapsed = 0.0
+    _last_sync_at = -INF
     _syncing = false
     state = "idle"
     error_code = ""
@@ -89,6 +91,9 @@ func leave_voice() -> void:
     if not old_room.is_empty() and session.authenticated() and client != null:
         client.send("/functions/v1/qse-voice-token", HTTPClient.METHOD_POST, {"room_id": old_room, "action": "disconnect"})
 
+func _on_removed(_reason: String) -> void:
+    leave_voice()
+
 func _room_changed() -> void:
     if not _room_id.is_empty() and (not eligible() or duel.room_id() != _room_id):
         leave_voice()
@@ -96,12 +101,13 @@ func _room_changed() -> void:
 func _room_updated() -> void:
     _room_changed()
     # Mudanca real da sala: conciliar mais rapidamente quem foi expulso/saiu.
-    if not _room_id.is_empty() and state == "connected":
+    if not _room_id.is_empty() and state == "connected" and Time.get_ticks_msec() / 1000.0 - _last_sync_at >= 10.0:
         _sync_elapsed = 19.0
 
 func _sync_room() -> void:
     if _syncing or _room_id.is_empty() or state != "connected": return
     _syncing = true
+    _last_sync_at = Time.get_ticks_msec() / 1000.0
     var attempt := _generation
     var id := _room_id
     var result := await client.send("/functions/v1/qse-voice-token", HTTPClient.METHOD_POST, {"room_id": id, "action": "sync"})

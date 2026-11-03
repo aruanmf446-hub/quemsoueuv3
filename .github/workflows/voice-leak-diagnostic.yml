@@ -1,0 +1,48 @@
+name: T32 Godot voice resource leak diagnostic
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/services/voice_service.gd'
+      - 'scripts/ui/battle/voice_panel.gd'
+      - 'scripts/ui/screens/duel_match_view.gd'
+      - 'scripts/services/player_services.gd'
+      - '.github/workflows/voice-leak-diagnostic.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  leak:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download Godot 4.7.2 official
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          curl -fsSL --retry 3 https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip -o "$RUNNER_TEMP/godot/engine.zip"
+          unzip -q "$RUNNER_TEMP/godot/engine.zip" -d "$RUNNER_TEMP/godot"
+          chmod +x "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+      - name: Import project
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/report"
+          "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --editor --import --quit > "$RUNNER_TEMP/report/import.log" 2>&1
+          ! grep -E 'SCRIPT ERROR:|Parse Error:' "$RUNNER_TEMP/report/import.log"
+      - name: Run duel local with verbose leak report
+        shell: bash
+        run: |
+          set +e
+          "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --verbose --headless --path . --script res://tests/duel_local/flow_test.gd > "$RUNNER_TEMP/report/duel_local_verbose.log" 2>&1
+          code=$?
+          grep -E -A 12 -B 8 'DUEL_LOCAL|resources still in use|ObjectDB instances|Leaked|leaked|SCRIPT ERROR|ERROR:' "$RUNNER_TEMP/report/duel_local_verbose.log" | tail -100 || true
+          exit "$code"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t32-voice-leak-diagnostic
+          path: ${{ runner.temp }}/report
+          retention-days: 5

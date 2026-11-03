@@ -103,11 +103,19 @@ func refresh_availability() -> void:
 	var duel := services.duel
 	# A visibilidade acompanha o modo, inclusive se a sala mudar enquanto a UI existe.
 	# Alterar visible só quando necessário evita recursão do visibility_changed.
-	if duel.is_local() and visible:
-		hide()
-	elif not duel.is_local() and not visible:
+	# Decisão do dono: o chat aparece também na partida local (mensagens só neste aparelho).
+	if not visible:
 		show()
 	_selector.hide()
+	if duel.is_local():
+		# Local: sem servidor; as mensagens desta tela continuam. Começa recolhido (só o
+		# cabeçalho) para não tirar espaço das cartas; um toque abre.
+		if not _local_started:
+			_local_started = true
+			if not _collapsed: _toggle()
+		if _owned: _stop()
+		_state()
+		return
 	var room := "" if duel.is_local() or not duel.in_room() else duel.room_id()
 	var allowed: bool = services.session.authenticated() and not room.is_empty() and str(duel.room.get("room",{}).get("status","")) in ["lobby","in_match"]
 	if not allowed:
@@ -131,7 +139,7 @@ func _state() -> void:
 		_clear_messages()
 		_input.clear()
 	var text := ""
-	if services.duel.is_local(): text = "Chat da sala só em salas online. Na partida local não há conversa."
+	if services.duel.is_local(): text = "" if _local_count > 0 else "Partida local: as mensagens ficam só neste aparelho."
 	elif not services.session.authenticated(): text = "Entre na conta para conversar na sala."
 	elif not _owned: text = "Chat da sala indisponível."
 	elif chat.state == "loading": text = "Abrindo conversa…"
@@ -140,7 +148,7 @@ func _state() -> void:
 	elif chat.messages().is_empty(): text = "Nenhuma mensagem ainda."
 	_status.text = text
 	_status.visible = not text.is_empty()
-	_input.editable = _owned and chat.is_open()
+	_input.editable = services.duel.is_local() or (_owned and chat.is_open())
 	_send.disabled = not _input.editable or chat.sending
 func _append(id: String) -> void:
 	if not _owned or not is_inside_tree() or id != _chat.conversation_id: return
@@ -176,7 +184,35 @@ func _append(id: String) -> void:
 	if added > 0 and bottom:
 		await get_tree().process_frame
 		if is_instance_valid(_scroll): _scroll.scroll_vertical = int(_scroll.get_v_scroll_bar().max_value)
+var _local_count := 0
+var _local_started := false
+
+
+## Partida local: não há servidor de conversa; a mensagem aparece só nesta tela.
+func _send_local() -> void:
+	var message := _input.text.strip_edges()
+	if message.is_empty(): return
+	var bubble := PanelContainer.new()
+	bubble.add_theme_stylebox_override("panel",Style.panel(5,true))
+	var column := PlayerUI.column(bubble)
+	column.add_theme_constant_override("separation",2)
+	var now := Time.get_datetime_dict_from_system()
+	column.add_child(Style.label("Você · %02d:%02d" % [now.hour,now.minute],10,PlayerUI.GOLD))
+	var text := Style.label(message,12)
+	text.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	column.add_child(text)
+	_messages.add_child(bubble)
+	_local_count += 1
+	_input.clear()
+	_state()
+	await get_tree().process_frame
+	if is_instance_valid(_scroll): _scroll.scroll_vertical = int(_scroll.get_v_scroll_bar().max_value)
+
+
 func _send_text() -> void:
+	if services.duel.is_local():
+		_send_local()
+		return
 	if not _owned or _input.text.strip_edges().is_empty(): return
 	var result := await _chat.send(_input.text)
 	if is_instance_valid(_input) and result.ok: _input.clear()
@@ -201,6 +237,7 @@ func _exit_tree() -> void: _stop()
 
 func _clear_messages() -> void:
 	_unread = 0
+	_local_count = 0
 	if is_instance_valid(_badge): _badge.hide()
 	_rendered.clear()
 	for child in _messages.get_children():

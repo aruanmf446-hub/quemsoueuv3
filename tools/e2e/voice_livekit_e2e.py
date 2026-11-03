@@ -85,8 +85,7 @@ def expect_token(status, payload, label, room_name=None):
     # Log only HTTP status and allowlisted error code. No tokens or PII.
     if status != 200:
         raw_code = payload.get("code", "") if isinstance(payload, dict) else ""
-        safe_code = raw_code if isinstance(raw_code, str) and
-            len(raw_code) <= 48 and all(ch.islower() or ch.isdigit() or ch == "_" for ch in raw_code) else "unknown"
+        safe_code = raw_code if (isinstance(raw_code, str) and len(raw_code) <= 48 and all(ch.islower() or ch.isdigit() or ch == "_" for ch in raw_code)) else "unknown"
         check(False, f"{label}: HTTP {status}, code={safe_code}")
     check(status == 200 and isinstance(payload, dict) and
           isinstance(payload.get("participant_token"), str) and

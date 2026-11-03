@@ -566,8 +566,11 @@ func _label(caption: String, font_size: int, color: Color) -> Label:
 	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", color)
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	label.clip_text = true
+	# Label com clip_text=true + ellipsis pode declarar largura/altura mínima zero
+	# nos Containers do Godot 4.7.2 e simplesmente desaparecer.
+	label.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
+	label.clip_text = false
+	label.custom_minimum_size.y = font_size + 6
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return label

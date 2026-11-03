@@ -2,6 +2,7 @@ extends PanelContainer
 ## Painel de voz compacto. A conexão é voluntária para preservar minutos Build.
 const Style = preload("res://scripts/ui/battle/battle_style.gd")
 var services: PlayerServices
+var compact := false
 var _status: Label
 var _join: Button
 var _mic: Button
@@ -18,7 +19,7 @@ func _ready() -> void:
     var root := VBoxContainer.new()
     root.add_theme_constant_override("separation", 3)
     add_child(root)
-    var heading := Style.label("CHAT DE VOZ", 14, PlayerUI.GOLD)
+    var heading := Style.label("VOZ", 12 if compact else 14, PlayerUI.GOLD)
     Style.strong(heading)
     root.add_child(heading)
     _status = Style.label("", 11, PlayerUI.MUTED)
@@ -40,6 +41,7 @@ func _ready() -> void:
     controls.add_child(_hear)
     _users = VBoxContainer.new()
     _users.name = "VoiceParticipants"
+    _users.visible = not compact
     root.add_child(_users)
     if services != null and services.voice != null:
         services.voice.changed.connect(_refresh)
@@ -79,12 +81,13 @@ func _refresh() -> void:
             _: _status.text = "Toque em Entrar para ouvir a sala"
     _join.visible = available
     _join.disabled = v.state == "connecting"
-    _join.text = "Sair da voz" if v.state in ["connected", "reconnecting"] else "Entrar na voz"
+    _join.text = ("Sair" if v.state in ["connected", "reconnecting"] else "Entrar") if compact else ("Sair da voz" if v.state in ["connected", "reconnecting"] else "Entrar na voz")
     _mic.visible = v.state == "connected"
-    _mic.text = "Mic ligado" if v.microphone_on else "Mic desligado"
-    _hear.visible = v.state == "connected"
+    _mic.text = ("Mic ON" if v.microphone_on else "Mic OFF") if compact else ("Mic ligado" if v.microphone_on else "Mic desligado")
+    _hear.visible = v.state == "connected" and not compact
     _hear.text = "Som desligado" if v.received_muted else "Ouvir"
     for item in _users.get_children(): item.queue_free()
+    if compact: return
     if v.state == "connected":
         _users.add_child(Style.label("Outros conectados: %d" % v.participants.size(), 11, PlayerUI.MUTED))
         # Identidades pseudônimas; não apresentar IDs como nomes reais.

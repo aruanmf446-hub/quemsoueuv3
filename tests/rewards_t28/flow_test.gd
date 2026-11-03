@@ -45,7 +45,8 @@ func _run() -> void:
 	var claim := overlay.find_child("Claim_deck_nostalgia_web", true, false) as Button
 	var owned := overlay.find_child("Claim_deck_pinturas", true, false) as Button
 	check(claim != null and not claim.disabled and claim.text == "RESGATAR GRÁTIS", "botão gratuito ativo")
-	check(owned != null and owned.disabled and owned.text.contains("RESGATADO"), "resgatado sem novo clique")
+	# Decisão do dono: o que já foi resgatado (pacote aberto) some de Novidades.
+	check((owned == null) if services.rewards.revealed else (owned != null and owned.disabled), "resgatado sem novo clique (some se já aberto)")
 	# T29: presentes já garantidos e uma única abertura cerimonial.
 	services.rewards.revealed = false
 	services.rewards.changed.emit()
@@ -59,7 +60,7 @@ func _run() -> void:
 	await process_frame
 	check(overlay.find_child("RedeemGiftBundle", true, false) == null, "nunca pedir resgate de novo após abrir")
 	owned = overlay.find_child("Claim_deck_pinturas", true, false) as Button
-	check(owned != null and owned.disabled and owned.text.contains("RESGATADO"), "reabertura mostra posse permanente")
+	check(owned == null, "reabertura: item resgatado não aparece mais em Novidades")
 	check(overlay.find_child("CloseNews", true, false) != null, "botão fechar acessível")
 	var skin := overlay.find_child("TabSkin", true, false) as Button
 	check(skin != null, "aba skins preparada")
@@ -78,7 +79,8 @@ func _run() -> void:
 	services.rewards.changed.emit()
 	await process_frame
 	claim = overlay.find_child("Claim_deck_nostalgia_web", true, false) as Button
-	check(claim != null and claim.disabled and services.rewards.is_deck_claimed("nostalgia_web"), "posse confirmada altera visual")
+	# Resgatado com o pacote já aberto: sai de Novidades.
+	check(claim == null and services.rewards.is_deck_claimed("nostalgia_web"), "posse confirmada some de Novidades")
 	services.rewards.clear()
 	check(not services.rewards.is_deck_claimed("nostalgia_web"), "troca de conta limpa a posse em memória")
 	overlay.queue_free()

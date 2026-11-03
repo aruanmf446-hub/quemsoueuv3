@@ -88,7 +88,7 @@ func leave_voice() -> void:
 
 func _room_changed() -> void:
     if not _room_id.is_empty() and (not eligible() or duel.room_id() != _room_id):
-        disconnect()
+        leave_voice()
 
 func _tick() -> void:
     _room_changed()

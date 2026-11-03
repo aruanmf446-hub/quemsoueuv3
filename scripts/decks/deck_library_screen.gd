@@ -1000,7 +1000,9 @@ func _fit_tiles() -> void:
 	if not is_instance_valid(_grid) or _grid.name != "DeckGrid": return
 	var compact := _compact()
 	var panel := _filter_panel.custom_minimum_size.x + 18.0 if is_instance_valid(_filter_panel) and _filter_panel.visible else 0.0
-	var width := _physical_size().x - panel - (60 if compact else 130)
+	# iPhone: margens reais da página (laterais + espaçamento do painel) para a grade nunca
+	# alargar a tela e empurrar a busca para fora.
+	var width := _physical_size().x - panel - (120.0 if UIScale.is_iphone() else (60 if compact else 130))
 	var gap := 10.0 if compact else 18.0
 	var minimum := 200.0 if compact else 320.0
 	_grid.columns = clampi(floori((width + gap) / (minimum + gap)), 1, 5)
@@ -1015,6 +1017,7 @@ func _filters() -> Control:
 	var compact := _compact()
 	var panel := PremiumUI.panel("FilterPanel", 10 if compact else 20)
 	panel.custom_minimum_size.x = 170 if compact else 300
+	if UIScale.is_iphone(): panel.custom_minimum_size.x = 220
 	panel.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 4 if compact else 8)

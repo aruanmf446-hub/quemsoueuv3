@@ -74,13 +74,14 @@ func _build() -> void:
 	_canvas.add_child(_main)
 	var header := PlayerUI.row(_main)
 	header.name = "BattleHeader"
-	header.custom_minimum_size.y = 27
-	header.add_theme_constant_override("separation",10)
+	header.custom_minimum_size.y = 40
+	header.add_theme_constant_override("separation",12)
 	var back := Style.action("Voltar",func() -> void: _back(),"back")
 	back.name = "BattleBack"
-	back.custom_minimum_size.x = 72
+	back.custom_minimum_size = Vector2(108,40)
+	back.add_theme_font_size_override("font_size",17)
 	header.add_child(back)
-	var title := Style.label("Batalha · Partida local" if duel.is_local() else "Batalha",18)
+	var title := Style.label("Batalha · Partida local" if duel.is_local() else "Batalha",22)
 	title.name = "BattleTitle"
 	Style.strong(title)
 	title.autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -158,7 +159,7 @@ func _build_sidebar() -> void:
 	controls.add_theme_constant_override("separation",4)
 	var timer_box := PanelContainer.new()
 	timer_box.add_theme_stylebox_override("panel",Style.panel(4))
-	timer_box.custom_minimum_size = Vector2(68,30)
+	timer_box.custom_minimum_size = Vector2(68,40)
 	timer_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	controls.add_child(timer_box)
 	var timer_row := PlayerUI.row(timer_box)
@@ -166,11 +167,11 @@ func _build_sidebar() -> void:
 	var hourglass := TextureRect.new()
 	hourglass.texture = load("res://assets/ui/battle/time.svg")
 	hourglass.modulate = PlayerUI.GOLD
-	hourglass.custom_minimum_size = Vector2(20,20)
+	hourglass.custom_minimum_size = Vector2(24,24)
 	hourglass.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	hourglass.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	timer_row.add_child(hourglass)
-	_timer = Style.label("",15)
+	_timer = Style.label("",19)
 	_timer.name = "RoundTimer"
 	Style.strong(_timer)
 	_timer.autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -179,7 +180,7 @@ func _build_sidebar() -> void:
 	settings.name = "BattleSettings"
 	settings.icon = load("res://assets/ui/battle/settings.svg")
 	settings.tooltip_text = "Configurações · a rodada continua"
-	settings.custom_minimum_size = Vector2(30,30)
+	settings.custom_minimum_size = Vector2(40,40)
 	controls.add_child(settings)
 	# Sala e convite agrupados num painel próprio (antes disputavam espaço com tempo/ajustes).
 	var room_panel := PanelContainer.new()
@@ -193,8 +194,8 @@ func _build_sidebar() -> void:
 	room_text.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var code := str(duel.room.get("room",{}).get("code",""))
 	if not duel.is_local() and not code.is_empty():
-		room_text.add_child(Style.label("Código da sala",10,PlayerUI.MUTED))
-		var code_label := Style.label(code,16)
+		room_text.add_child(Style.label("Código da sala",13,PlayerUI.MUTED))
+		var code_label := Style.label(code,20)
 		Style.strong(code_label)
 		code_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 		room_text.add_child(code_label)
@@ -204,7 +205,7 @@ func _build_sidebar() -> void:
 			_notice_ttl = 3.5,"copy")
 		copy.name = "CopyRoomCode"
 		copy.tooltip_text = "Copiar código da sala"
-		copy.custom_minimum_size = Vector2(30,30)
+		copy.custom_minimum_size = Vector2(40,40)
 		copy.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		room_row.add_child(copy)
 		# Convite por link: só o ADM gera (o servidor recusa os outros).
@@ -212,12 +213,12 @@ func _build_sidebar() -> void:
 			var share := Style.action("",_share_invite,"share")
 			share.name = "ShareInvite"
 			share.tooltip_text = "Compartilhar convite"
-			share.custom_minimum_size = Vector2(30,30)
+			share.custom_minimum_size = Vector2(40,40)
 			share.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			room_row.add_child(share)
 	else:
-		room_text.add_child(Style.label("Partida local",13,PlayerUI.GOLD))
-		room_text.add_child(Style.label("Só neste aparelho · sem convite",10,PlayerUI.MUTED))
+		room_text.add_child(Style.label("Partida local",16,PlayerUI.GOLD))
+		room_text.add_child(Style.label("Só neste aparelho · sem convite",12,PlayerUI.MUTED))
 	var voice := PanelContainer.new()
 	voice.name = "VoiceUnavailable"
 	voice.add_theme_stylebox_override("panel",Style.panel(5))
@@ -233,7 +234,7 @@ func _build_sidebar() -> void:
 	voice_row.add_child(mic)
 	var voice_text := PlayerUI.column(voice_row)
 	voice_text.add_theme_constant_override("separation",0)
-	var voice_title := Style.label("Chat de voz",13)
+	var voice_title := Style.label("Chat de voz",16)
 	Style.strong(voice_title)
 	voice_text.add_child(voice_title)
 	var unavailable := PlayerUI.pill("INDISPONÍVEL","locked")
@@ -261,7 +262,7 @@ func _build_sidebar() -> void:
 	lock.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	lock.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	hand_header.add_child(lock)
-	var hand_title := Style.label("Suas cartas",14,PlayerUI.TITLE_GOLD)
+	var hand_title := Style.label("Suas cartas",17,PlayerUI.TITLE_GOLD)
 	Style.strong(hand_title)
 	hand_header.add_child(hand_title)
 	var private_body := GridContainer.new()
@@ -275,6 +276,8 @@ func _build_sidebar() -> void:
 		_private_signature = ""
 		_render_hand(),"eye")
 	_hand_toggle.name = "TogglePrivateCards"
+	_hand_toggle.custom_minimum_size.y = 40
+	_hand_toggle.add_theme_font_size_override("font_size",16)
 	_hand.add_child(_hand_toggle)
 	_notice = Style.label("",11,PlayerUI.GOLD)
 	_notice.name = "BattleNotice"
@@ -287,8 +290,8 @@ func _build_sidebar() -> void:
 	_canvas.add_child(_notice)
 	var leave := Style.action("Sair da sala",func() -> void: overlay_parent.call("_leave_room"))
 	leave.name = "LeaveBattle"
-	leave.custom_minimum_size.y = 24
-	leave.add_theme_font_size_override("font_size",11)
+	leave.custom_minimum_size.y = 38
+	leave.add_theme_font_size_override("font_size",15)
 	_side.add_child(leave)
 ## Gera um convite (60 min) e copia. Sem rota oficial de link configurada, copia o
 ## convite para colar em Duelo → Código do convite; nunca inclui o UUID da sala.
@@ -468,7 +471,7 @@ func _render_players() -> void:
 		var info := PlayerUI.column(row)
 		info.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		info.add_theme_constant_override("separation",0)
-		var nickname := Style.label(str(player.nickname),16 if players.size() <= 3 else (14 if players.size() <= 5 else (15 if players.size() <= 12 else 13)),PlayerUI.GOLD if turn else PlayerUI.TEXT)
+		var nickname := Style.label(str(player.nickname),19 if players.size() <= 3 else (17 if players.size() <= 5 else (15 if players.size() <= 12 else 13)),PlayerUI.GOLD if turn else PlayerUI.TEXT)
 		Style.strong(nickname)
 		nickname.text = str(player.nickname)
 		nickname.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
@@ -482,12 +485,12 @@ func _render_players() -> void:
 		for index in range(0 if uncertain else (int(player.lives) if players.size() <= 3 else 1)):
 			var heart := TextureRect.new()
 			heart.texture = Icons.heart(18,true)
-			heart.custom_minimum_size = Vector2(16,16) if players.size() <= 3 else (Vector2(12,12) if players.size() <= 5 else (Vector2(16,16) if players.size() <= 12 else Vector2(14,14)))
+			heart.custom_minimum_size = Vector2(18,18) if players.size() <= 3 else (Vector2(15,15) if players.size() <= 5 else (Vector2(16,16) if players.size() <= 12 else Vector2(14,14)))
 			heart.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			heart.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			hearts.add_child(heart)
 		if players.size() > 3 and not uncertain:
-			var count := Style.label(str(player.lives),12 if players.size() <= 5 else (16 if players.size() <= 12 else 14),Color("#ff9a8f") if int(player.lives) <= 1 else PlayerUI.TEXT)
+			var count := Style.label(str(player.lives),15 if players.size() <= 5 else (16 if players.size() <= 12 else 14),Color("#ff9a8f") if int(player.lives) <= 1 else PlayerUI.TEXT)
 			count.name = "Lives"
 			Style.strong(count)
 			hearts.add_child(count)
@@ -625,8 +628,22 @@ func _render_hand() -> void:
 			grid.add_child(hidden)
 func _utility_width(width: float) -> float:
 	if duel.is_local():
-		return 154.0 if width >= 760 else 142.0
-	return 176.0 if width >= 760 else 156.0
+		return 176.0 if width >= 760 else 160.0
+	return 200.0 if width >= 760 else 176.0
+
+var _top_inset := -1.0
+
+
+## Altura (px do viewport) da faixa de toque reservada pelo iOS no topo; 0 fora do iPhone Web.
+func _touch_top_inset() -> float:
+	if _top_inset >= 0.0: return _top_inset
+	_top_inset = 0.0
+	if OS.has_feature("web"):
+		var css: Variant = JavaScriptBridge.eval("(window.qsePwa && window.qsePwa.ios) ? window.innerHeight : 0", true)
+		if css != null and float(css) > 0.0:
+			_top_inset = 22.0 * get_viewport().get_visible_rect().size.y / float(css)
+	return _top_inset
+
 
 func _layout() -> void:
 	if not _built or size.x <= 0 or size.y <= 0: return
@@ -645,7 +662,11 @@ func _layout() -> void:
 	_canvas.size = available/factor
 	var width := _canvas.size.x
 	var side_width := _utility_width(width)
-	_main.position = Vector2.ZERO
+	# iPhone: a faixa de cima da tela é do sistema (barra de status do app instalado / barra do
+	# Safari em paisagem) e engole o toque; o topo da batalha começa logo abaixo dela.
+	var inset := _touch_top_inset() / (factor * maxf(global_scale.y,0.01))
+	_canvas.position.y = 0.0
+	_main.position = Vector2(0,inset)
 	var target_main_width := width-side_width-20
 	# Reduzir mínimos dos avatares ANTES de definir o novo tamanho do painel.
 	# Caso contrário o próprio Container impede a janela de encolher.
@@ -655,9 +676,9 @@ func _layout() -> void:
 		var slot_width := maxf(48.0,floorf((target_main_width-(player_count-1)*roster_gap)/player_count)-2.0)
 		for panel: Control in _roster.get_children():
 			panel.custom_minimum_size.x = slot_width
-	_main.size = Vector2(target_main_width,_canvas.size.y)
-	_side.position = Vector2(width-side_width,0)
-	_side.size = Vector2(side_width,_canvas.size.y)
+	_main.size = Vector2(target_main_width,_canvas.size.y-inset)
+	_side.position = Vector2(width-side_width,inset)
+	_side.size = Vector2(side_width,_canvas.size.y-inset)
 	if is_instance_valid(_notice):
 		_notice.reset_size()
 		_notice.position = Vector2(_main.size.x-_notice.size.x-14,_canvas.size.y-_notice.size.y-10)

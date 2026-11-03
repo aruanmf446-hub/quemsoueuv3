@@ -348,8 +348,8 @@ func _rewards_grid(rewards: OfficialRewardsService) -> void:
 	grid.add_theme_constant_override("h_separation", 12)
 	grid.add_theme_constant_override("v_separation", 12)
 	grid.columns = 4 if _content_width >= 1420 else (3 if _content_width >= 1000 else (2 if _content_width >= 690 else 1))
-	# iPhone: no máximo 3 cartões por linha, maiores e legíveis.
-	if _iphone: grid.columns = mini(grid.columns, 3)
+	# iPhone: 2 cartões por linha (capa inteira + texto + botão), sem estourar a largura.
+	if _iphone: grid.columns = 2
 	rows.add_child(grid)
 	var card_width := floorf((_content_width - (grid.columns - 1) * 12 - 4) / grid.columns)
 	for offer: Dictionary in list:
@@ -362,7 +362,7 @@ func _add_offer(grid: GridContainer, offer: Dictionary, rewards: OfficialRewards
 	var id := str(offer.get("item_id", ""))
 	var card := PanelContainer.new()
 	card.name = "Offer_" + str(offer.get("id", ""))
-	card.custom_minimum_size = Vector2(card_width, 255 if _compact else (286 if _iphone else 322))
+	card.custom_minimum_size = Vector2(card_width, 255 if _compact else (232 if _iphone else 322))
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	card.add_theme_stylebox_override("panel", _style(CARD, Color(GOLD_SOFT, 0.54) if claimed else Color("#4d5967"), 12, 1))
 	grid.add_child(card)
@@ -372,18 +372,29 @@ func _add_offer(grid: GridContainer, offer: Dictionary, rewards: OfficialRewards
 	card.add_child(margin)
 	var content := VBoxContainer.new()
 	content.add_theme_constant_override("separation", 5 if _compact else 9)
-	margin.add_child(content)
 	var art_slot := Panel.new()
 	art_slot.name = "RewardArtSlot"
-	art_slot.custom_minimum_size.y = 100 if _compact else (76 if _iphone else 164)
+	art_slot.custom_minimum_size.y = 100 if _compact else 164
 	art_slot.clip_contents = true
 	art_slot.add_theme_stylebox_override("panel", _style(Color("#263449"), Color("#334356"), 7, 0))
-	content.add_child(art_slot)
+	if _iphone:
+		# iPhone: capa INTEIRA em pé à esquerda (sem corte) e texto + botão à direita.
+		var side := HBoxContainer.new()
+		side.add_theme_constant_override("separation", 12)
+		margin.add_child(side)
+		art_slot.custom_minimum_size = Vector2(floorf(card_width * 0.34), 0)
+		art_slot.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		side.add_child(art_slot)
+		content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		side.add_child(content)
+	else:
+		margin.add_child(content)
+		content.add_child(art_slot)
 	var art := TextureRect.new()
 	art.name = "RewardCover" if kind == "deck" else "RewardSkinPreview"
 	art.texture = _cover(id) if kind == "deck" else PlayerUI.portrait_texture(id)
 	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED if kind == "deck" else TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED if _iphone or kind != "deck" else TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	art_slot.add_child(art)

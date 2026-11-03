@@ -106,7 +106,9 @@ def expect_token(status, payload, label, room_name=None):
 
 def safe_leave(token, room_id):
     try:
-        rpc(token, "qse_duel_leave", {"p_room": room_id})
+        status, data = rpc(token, "qse_duel_leave", {"p_room": room_id})
+        if status != 200 or not isinstance(data, dict) or data.get("left") is not True:
+            print("WARN limpeza nao confirmada para uma conta de teste", flush=True)
     except Exception:
         print("WARN limpeza da sala indisponivel (verificar sala de teste)", flush=True)
 
@@ -191,7 +193,9 @@ def main():
 
         # Actual LiveKit WebRTC in Chrome with fake mic. No audio is recorded.
         if os.environ.get("QSE_RUN_VOICE_BROWSER", "") == "1":
-            env = os.environ.copy()
+            # Never expose email/password secrets to the browser test subprocess.
+            env = {key: os.environ[key] for key in ("PATH", "HOME", "NODE_PATH", "TMPDIR", "QSE_VOICE_BUNDLE")
+                   if key in os.environ}
             env.update({
                 "QSE_VOICE_URL": owner_voice["server_url"],
                 "QSE_VOICE_OWNER_TOKEN": owner_voice["participant_token"],

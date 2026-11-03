@@ -116,7 +116,7 @@ func run() -> void:
 			check(art.texture is AtlasTexture and art.texture.region.has_point(landmarks[key]),"subject_landmark_visible_"+key)
 	check(not screen.get_node("Margin/Column/Header").visible,"single_battle_header")
 	check(battle.find_child("CopyRoomCode",true,false)==null,"offline_no_fake_invite")
-	check(battle.find_child("VoiceUnavailable",true,false)!=null,"voice_truthful_unavailable")
+	check(battle.find_child("BattleVoice",true,false)!=null and not battle.find_child("BattleVoice",true,false).visible,"offline_voice_hidden_in_local_match")
 	await capture("selection")
 	var grid: GridContainer = battle.find_child("Cards",true,false)
 	var first_bounds: Rect2 = grid.get_child(0).get_global_rect()

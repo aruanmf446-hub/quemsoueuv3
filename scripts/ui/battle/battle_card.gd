@@ -17,6 +17,12 @@ var image: TextureRect
 var caption: Label
 var caption_area: Control
 var _source: Texture2D
+
+## O GridContainer define as dimensões de cada carta conforme o viewport.
+## Não permitir que o nome completo ou a imagem imponham largura mínima própria:
+## era isso que congelava a antiga largura ao mudar de 844 para 640 px.
+func _get_minimum_size() -> Vector2:
+	return Vector2.ZERO
 func setup(card_id: String, chosen: bool, out: bool, usable: bool) -> void:
 	id = card_id
 	selected = chosen
@@ -54,6 +60,8 @@ func setup(card_id: String, chosen: bool, out: bool, usable: bool) -> void:
 	caption.custom_minimum_size.y = 20
 	caption.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	caption.max_lines_visible = 2
+	caption.clip_text = true
+	caption.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	var strip := StyleBoxFlat.new()
 	strip.bg_color = Color(0.02,0.03,0.05,0.78)
 	strip.set_content_margin_all(1)
@@ -159,10 +167,12 @@ func _on_gui_input(event: InputEvent) -> void:
 		accept_event()
 func _crop() -> void:
 	if is_instance_valid(caption_area):
-		var dense := size.x < 115
-		caption_area.custom_minimum_size.y = 26 if dense else 20
-		caption.add_theme_font_size_override("font_size",11 if dense else (13 if size.x < 165 else 15))
-		caption_area.custom_minimum_size.y = 26 if dense else (22 if size.x < 165 else 26)
+		var dense := size.x < 112
+		var short_row := size.y < 68
+		# Em grade 7x3, permitir duas linhas de nome legíveis; em 640x360
+		# preservar a imagem usando legenda compacta, sem esconder opções.
+		caption.add_theme_font_size_override("font_size",10 if short_row else (11 if dense else (13 if size.x < 165 else 16)))
+		caption_area.custom_minimum_size.y = 20 if short_row else (34 if dense else (38 if size.x < 165 else 32))
 	if _source == null or image.size.y <= 0: return
 	var source_size := _source.get_size()
 	var ratio := image.size.x / maxf(image.size.y,1)

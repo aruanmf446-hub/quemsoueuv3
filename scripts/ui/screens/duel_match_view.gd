@@ -46,6 +46,9 @@ func setup(p_duel: DuelService, p_inventory: InventoryService, p_parent: Control
 func _ready() -> void:
 	_build()
 	resized.connect(_layout)
+	# Mesmo que os Containers mantenham o tamanho mínimo anterior ao resize,
+	# reavaliar o tabuleiro quando o viewport real mudar (Web/Android).
+	get_viewport().size_changed.connect(func() -> void: _layout.call_deferred())
 	get_window().focus_exited.connect(_conceal_hand)
 	visibility_changed.connect(func() -> void:
 		if not is_visible_in_tree():
@@ -71,7 +74,7 @@ func _build() -> void:
 	_canvas.add_child(_main)
 	var header := PlayerUI.row(_main)
 	header.name = "BattleHeader"
-	header.custom_minimum_size.y = 30
+	header.custom_minimum_size.y = 27
 	header.add_theme_constant_override("separation",10)
 	var back := Style.action("Voltar",func() -> void: _back(),"back")
 	back.name = "BattleBack"
@@ -93,7 +96,7 @@ func _build() -> void:
 	_board = Surface.new()
 	_board.name = "BattleBoard"
 	_board.variant = "board"
-	_board.padding = 10
+	_board.padding = 7
 	_board.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_board.mouse_filter = Control.MOUSE_FILTER_PASS
 	_main.add_child(_board)
@@ -103,7 +106,7 @@ func _build() -> void:
 	instruction_row.add_theme_constant_override("separation",5)
 	var message := PlayerUI.column(instruction_row)
 	message.add_theme_constant_override("separation",0)
-	_instruction = Style.label("",22,PlayerUI.GOLD)
+	_instruction = Style.label("",20,PlayerUI.GOLD)
 	Style.strong(_instruction)
 	_instruction.add_theme_constant_override("shadow_offset_y",1)
 	_instruction.add_theme_color_override("font_shadow_color",Color(0,0,0,0.8))
@@ -140,8 +143,8 @@ func _build() -> void:
 	_grid.name = "Cards"
 	_grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_grid.add_theme_constant_override("h_separation",8)
-	_grid.add_theme_constant_override("v_separation",8)
+	_grid.add_theme_constant_override("h_separation",5)
+	_grid.add_theme_constant_override("v_separation",5)
 	_grid.resized.connect(_fit_cards)
 	_board_content.add_child(_grid)
 	_side = VBoxContainer.new()
@@ -402,7 +405,7 @@ func _render_players() -> void:
 		players.insert(floori(players.size()/2.0),local)
 	_roster.columns = maxi(players.size(),1) if players.size() <= 5 else ceili(players.size()/(2.0 if players.size() <= 12 else 3.0))
 	_roster.size_flags_horizontal = Control.SIZE_SHRINK_CENTER if players.size() <= 3 else Control.SIZE_EXPAND_FILL
-	_roster.custom_minimum_size.y = 64 if players.size() <= 5 else (76 if players.size() <= 12 else 114)
+	_roster.custom_minimum_size.y = 57 if players.size() <= 5 else (64 if players.size() <= 12 else 91)
 	var winners: Array = (_data.result if _data.get("result") is Dictionary else {}).get("winners",[])
 	for source: Dictionary in players:
 		var player := source.duplicate(true)
@@ -428,7 +431,7 @@ func _render_players() -> void:
 		_roster.add_child(panel)
 		var row := PlayerUI.row(panel)
 		row.add_theme_constant_override("separation",3)
-		var portrait := PlayerUI.portrait(str(player.skin_id),46 if players.size() <= 3 else (32 if players.size() <= 5 else 20))
+		var portrait := PlayerUI.portrait(str(player.skin_id),46 if players.size() <= 3 else (32 if players.size() <= 5 else (28 if players.size() <= 12 else 22)))
 		if players.size() <= 5:
 			# Wider upper-bust crop from the packaged 720px portrait, preserving aspect.
 			# This increases the face size inside the same top strip, without a new layout.
@@ -452,7 +455,7 @@ func _render_players() -> void:
 		var info := PlayerUI.column(row)
 		info.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		info.add_theme_constant_override("separation",0)
-		var nickname := Style.label(str(player.nickname),16 if players.size() <= 3 else (14 if players.size() <= 5 else 10),PlayerUI.GOLD if turn else PlayerUI.TEXT)
+		var nickname := Style.label(str(player.nickname),16 if players.size() <= 3 else (14 if players.size() <= 5 else (12 if players.size() <= 12 else 11)),PlayerUI.GOLD if turn else PlayerUI.TEXT)
 		Style.strong(nickname)
 		nickname.text = str(player.nickname)
 		nickname.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
@@ -466,11 +469,11 @@ func _render_players() -> void:
 		for index in range(0 if uncertain else (int(player.lives) if players.size() <= 3 else 1)):
 			var heart := TextureRect.new()
 			heart.texture = Icons.heart(18,true)
-			heart.custom_minimum_size = Vector2(16,16) if players.size() <= 3 else Vector2(10,10)
+			heart.custom_minimum_size = Vector2(16,16) if players.size() <= 3 else Vector2(12,12)
 			heart.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			heart.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			hearts.add_child(heart)
-		if players.size() > 3 and not uncertain: hearts.add_child(Style.label(str(player.lives),10))
+		if players.size() > 3 and not uncertain: hearts.add_child(Style.label(str(player.lives),12))
 		if uncertain: info.add_child(Style.label("REVELANDO…",9,PlayerUI.MUTED))
 		elif player.eliminated:
 			nickname.add_theme_color_override("font_color",PlayerUI.MUTED)
@@ -594,42 +597,90 @@ func _render_hand() -> void:
 			grid.add_child(hidden)
 func _utility_width(width: float) -> float:
 	if duel.is_local():
-		return 164.0 if width >= 760 else 150.0
-	return 186.0 if width >= 760 else 166.0
+		return 154.0 if width >= 760 else 142.0
+	return 176.0 if width >= 760 else 156.0
 
 func _layout() -> void:
 	if not _built or size.x <= 0 or size.y <= 0: return
-	var factor := clampf(size.y/440.0,1,1.8)
+	## Escalar a interface contra uma altura virtual maior deixa mais área para a arte.
+	## Antes, em tela alta, roster/sidebar consumiam espaço ampliados 1.8×.
+	var viewport_size := Vector2(get_viewport().get_visible_rect().size)
+	var global_position := get_global_rect().position
+	var global_scale := get_global_transform().get_scale()
+	# Não permitir que o mínimo antigo do GridContainer desenhe além da tela
+	# depois de um resize. Preservar 12px laterais e 8px inferiores.
+	var allowed_width := maxf(1.0,(viewport_size.x-maxf(global_position.x,0.0)-12.0)/maxf(global_scale.x,0.01))
+	var allowed_height := maxf(1.0,(viewport_size.y-maxf(global_position.y,0.0)-8.0)/maxf(global_scale.y,0.01))
+	var available := Vector2(minf(size.x,allowed_width),minf(size.y,allowed_height))
+	var factor := clampf(available.y/555.0,1.0,1.55)
 	_canvas.scale = Vector2.ONE * factor
-	_canvas.size = size/factor
+	_canvas.size = available/factor
 	var width := _canvas.size.x
 	var side_width := _utility_width(width)
 	_main.position = Vector2.ZERO
-	_main.size = Vector2(width-side_width-10,_canvas.size.y)
+	var target_main_width := width-side_width-20
+	# Reduzir mínimos dos avatares ANTES de definir o novo tamanho do painel.
+	# Caso contrário o próprio Container impede a janela de encolher.
+	var player_count := _roster.get_child_count()
+	if player_count > 0 and player_count <= 3:
+		var roster_gap := float(_roster.get_theme_constant("h_separation"))
+		var slot_width := maxf(48.0,floorf((target_main_width-(player_count-1)*roster_gap)/player_count)-2.0)
+		for panel: Control in _roster.get_children():
+			panel.custom_minimum_size.x = slot_width
+	_main.size = Vector2(target_main_width,_canvas.size.y)
 	_side.position = Vector2(width-side_width,0)
 	_side.size = Vector2(side_width,_canvas.size.y)
 	if is_instance_valid(_notice):
 		_notice.reset_size()
 		_notice.position = Vector2(_main.size.x-_notice.size.x-14,_canvas.size.y-_notice.size.y-10)
 	_fit_cards.call_deferred()
+## Distribui todas as cartas sem ScrollContainer e sem ocultar opções.
+## Busca linhas/colunas pela área visual útil, em vez de impor 3 colunas
+## ou sqrt(count): 20 cartas podem usar 7x3, com arte mais alta que 5x4.
+func _best_grid_columns(count: int, usable_width: float, usable_height: float, gap: float) -> int:
+	var best := mini(count,3)
+	var best_score := -1.0
+	for columns in range(1, mini(count,10)+1):
+		var rows := ceili(float(count)/columns)
+		var width := (usable_width - (columns-1)*gap)/columns
+		var height := (usable_height - (rows-1)*gap)/rows
+		if width <= 0 or height <= 0: continue
+		# Não favorecer cards ultralargos e achatados: o retrato precisa aparecer.
+		var balance := clampf(1.0-absf(log(maxf(width/height,0.01)/1.35))*0.25,0.48,1.0)
+		var min_width := 92.0 if _canvas.size.x < 800.0 else 124.0
+		var legibility := clampf(width/min_width,0.62,1.0)
+		var caption_room := clampf(height/62.0,0.58,1.0)
+		# Peso extra para altura: 20 cartas em 7x3 usam imagens maiores
+		# do que 5x4. Em 640px não sacrificar a largura mínima das legendas.
+		var score := minf(width,178.0)*minf(height,190.0)*balance*legibility*caption_room
+		score *= pow(minf(height,220.0)/110.0,0.9)
+		if width < 72.0: score *= 0.60
+		if score > best_score:
+			best = columns
+			best_score = score
+	return best
+
+
 func _fit_cards() -> void:
 	if not is_instance_valid(_grid) or _grid.size.x <= 0 or _grid.size.y <= 0: return
 	var count := _grid.get_child_count()
 	if count == 0: return
-	var columns := 3 if count <= 9 else ceili(sqrt(count*1.2))
-	_grid.columns = mini(columns,count)
-	var rows := ceili(float(count)/_grid.columns)
 	var side_width := _utility_width(_canvas.size.x)
-	var main_width := _canvas.size.x-side_width-10
+	var main_width := _canvas.size.x-side_width-20
 	var instruction_row := _board_content.get_child(0) as Control
-	# Folgas reais do tabuleiro (padding da moldura e espaço entre cartas), não constantes soltas.
 	var gap := float(_grid.get_theme_constant("h_separation"))
 	var frame := float(_board.padding*2)
-	var available_height := _canvas.size.y - 30 - _roster.get_combined_minimum_size().y - 6 - frame - instruction_row.get_combined_minimum_size().y - 5
-	var width := floorf((main_width-frame-(_grid.columns-1)*gap)/_grid.columns)
-	var height := floorf((available_height-(rows-1)*gap)/rows)
+	var header := _main.get_node("BattleHeader") as Control
+	var header_height := maxf(header.custom_minimum_size.y,header.get_combined_minimum_size().y)
+	var roster_height := _roster.get_combined_minimum_size().y
+	var available_height := maxf(1.0,_canvas.size.y-header_height-roster_height-6-frame-instruction_row.get_combined_minimum_size().y-5)
+	var available_width := maxf(1.0,main_width-frame)
+	_grid.columns = _best_grid_columns(count,available_width,available_height,gap)
+	var rows := ceili(float(count)/_grid.columns)
+	var cell_width := floorf((available_width-(_grid.columns-1)*gap)/_grid.columns)
+	var cell_height := floorf((available_height-(rows-1)*gap)/rows)
 	for card: Control in _grid.get_children():
-		card.custom_minimum_size = Vector2(maxf(width,1),maxf(height,1))
+		card.custom_minimum_size = Vector2(maxf(cell_width,1),maxf(cell_height,1))
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		card.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_main.set_deferred("size",Vector2(main_width,_canvas.size.y))

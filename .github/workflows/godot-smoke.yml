@@ -50,6 +50,22 @@ jobs:
           path: ${{ runner.temp }}/news-t30/*.png
           if-no-files-found: ignore
           retention-days: 14
+      - name: T31 full-art battle layout and real Godot captures
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/battle-t31"
+          xvfb-run -a "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --path . --script res://tests/battle_t31/layout_test.gd -- "$RUNNER_TEMP/battle-t31"
+          for resolution in 1920x1080 1280x720 844x390 640x360; do
+            test -s "$RUNNER_TEMP/battle-t31/${resolution}_20cards.png"
+          done
+      - name: T31 battle screenshot artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: battle-t31-expanded-cards
+          path: ${{ runner.temp }}/battle-t31/*.png
+          if-no-files-found: ignore
+          retention-days: 14
       - name: T17 invite state and local battle regression
         run: |
           GODOT="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"

@@ -179,7 +179,15 @@ static func card_name(card_id: String) -> String:
 		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path)) if FileAccess.file_exists(path) else null
 		_deck_info[deck] = parsed if parsed is Dictionary else {}
 	var names: Variant = _deck_info[deck].get("cards", {})
-	if names is Dictionary and names.has(file): return str(names[file])
+	if names is Dictionary and names.has(file):
+		var entry: Variant = names[file]
+		# deck.json oficial suporta {"name": "...", "description": "..."}.
+		# Converter o Dictionary inteiro em String mostrava JSON sobre as cartas.
+		if entry is Dictionary:
+			var display_name := str(entry.get("name", "")).strip_edges()
+			if not display_name.is_empty(): return display_name
+		elif entry is String and not entry.strip_edges().is_empty():
+			return entry
 	return file.replace("_", " ").capitalize()
 
 

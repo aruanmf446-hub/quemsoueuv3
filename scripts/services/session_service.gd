@@ -14,6 +14,7 @@ var _refreshing := false
 var _persist_web := false
 var initial_restore_complete := false
 const WEB_REFRESH_KEY := "qse-v3:game:refresh"
+const GOOGLE_NONCE_KEY := "qse-v3:google:nonce"
 
 
 func _ready() -> void:
@@ -143,10 +144,68 @@ func social_authorize(provider: String) -> Dictionary:
 	var destination := _web_redirect_url()
 	if destination.is_empty():
 		return ServiceResult.failure("provider_unavailable")
+	if provider == "google" and not google_client_id().is_empty():
+		return _google_direct()
 	var url := client.endpoint + "/auth/v1/authorize?provider=" + provider.uri_encode() + "&redirect_to=" + destination.uri_encode()
 	# A autorizacao acontece no navegador. Nenhum client_secret fica no Godot.
 	JavaScriptBridge.eval("window.location.assign(" + JSON.stringify(url) + ")")
 	return ServiceResult.success(null)
+
+
+static func google_client_id() -> String:
+	var value := str(PlayerContracts.read_json("res://data/backend/client.json").get("google_client_id", "")).strip_edges()
+	return value if value.ends_with(".apps.googleusercontent.com") else ""
+
+
+## Login Google direto (OpenID, response_type=id_token): a janela do Google mostra o nome do app
+## e o endereço do site, nunca o do Supabase. O nonce bruto fica neste aparelho; o Google recebe
+## só o hash, e o Supabase confere os dois ao trocar o id_token por uma sessão.
+func _google_direct() -> Dictionary:
+	var script := """(function(clientId, nonceKey){
+		var u = new URL(window.location.href);
+		var invite = u.searchParams.get('invite') || '';
+		var bytes = new Uint8Array(32); crypto.getRandomValues(bytes);
+		var raw = Array.from(bytes, function(b){ return b.toString(16).padStart(2, '0'); }).join('');
+		try { localStorage.setItem(nonceKey, raw); } catch (e) { return false; }
+		crypto.subtle.digest('SHA-256', new TextEncoder().encode(raw)).then(function(hash){
+			var hashed = Array.from(new Uint8Array(hash), function(b){ return b.toString(16).padStart(2, '0'); }).join('');
+			var q = new URLSearchParams({client_id: clientId, redirect_uri: u.origin + u.pathname, response_type: 'id_token',
+				scope: 'openid email profile', nonce: hashed, prompt: 'select_account',
+				state: /^[A-Za-z0-9_-]{32,256}$/.test(invite) ? invite : '-'});
+			window.location.assign('https://accounts.google.com/o/oauth2/v2/auth?' + q.toString());
+		});
+		return true;
+	})(%s, %s)""" % [JSON.stringify(google_client_id()), JSON.stringify(GOOGLE_NONCE_KEY)]
+	if JavaScriptBridge.eval(script, true) != true:
+		return ServiceResult.failure("provider_unavailable")
+	return ServiceResult.success(null)
+
+
+## Volta do Google: troca o id_token por uma sessão GAME e limpa o endereço.
+func _restore_google_return() -> bool:
+	var json: Variant = JavaScriptBridge.eval("""(function(nonceKey){
+		var h = new URLSearchParams(window.location.hash.slice(1));
+		if (!h.has('id_token') && !(h.has('error') && h.has('state'))) return '';
+		var raw = ''; try { raw = localStorage.getItem(nonceKey) || ''; localStorage.removeItem(nonceKey); } catch (e) {}
+		var state = h.get('state') || '';
+		var u = new URL(window.location.href); u.hash = '';
+		if (/^[A-Za-z0-9_-]{32,256}$/.test(state)) u.searchParams.set('invite', state);
+		history.replaceState({}, document.title, u.pathname + u.search);
+		return JSON.stringify({id_token: h.get('id_token') || '', nonce: raw, error: h.get('error') || ''});
+	})(%s)""" % JSON.stringify(GOOGLE_NONCE_KEY), true)
+	if json == null or str(json).is_empty():
+		return false
+	var payload: Variant = JSON.parse_string(str(json))
+	if not payload is Dictionary or str(payload.get("id_token", "")).is_empty() or str(payload.get("nonce", "")).is_empty():
+		return true
+	var result := await client.request("/auth/v1/token?grant_type=id_token", HTTPClient.METHOD_POST,
+		{"provider": "google", "id_token": str(payload.id_token), "nonce": str(payload.nonce)}, false)
+	payload = null
+	if result.ok and result.data is Dictionary:
+		_accept(result.data)
+	else:
+		push_warning("Login Google direto recusado: %s" % str(result.get("error", "")))
+	return true
 
 
 func _web_redirect_url() -> String:
@@ -159,6 +218,8 @@ func _web_redirect_url() -> String:
 
 func _restore_web_redirect() -> void:
 	if not OS.has_feature("web") or not client.configured():
+		return
+	if await _restore_google_return():
 		return
 	# Le token do fragmento (retorno do GoTrue), remove-o da barra/historico
 	# imediatamente e valida identidade no endpoint GAME antes de aceitar a sessao.

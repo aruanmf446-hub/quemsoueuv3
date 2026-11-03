@@ -62,9 +62,10 @@ func run() -> void:
 		capture_dir = ProjectSettings.globalize_path(args[1])
 		DirAccess.make_dir_recursive_absolute(capture_dir)
 	var decks := Catalog.decks()
-	check(decks.size() == 4 and decks.map(func(d: Dictionary) -> String: return str(d.id)) == ["lendas_urbanas", "nostalgia_web", "pinturas", "sol_nascente"], "four_real_public_decks")
+	check(decks.size() == 5 and decks.map(func(d: Dictionary) -> String: return str(d.id)) == ["diva_pop", "lendas_urbanas", "nostalgia_web", "pinturas", "sol_nascente"], "five_real_public_decks")
 	if decks.is_empty(): quit(1); return
-	var deck: Dictionary = decks[0]
+	var deck: Dictionary = Catalog.find_deck("lendas_urbanas")
+	# A chegada do Diva Pop muda a ordem A-Z; as nove cartas abaixo são Lendas Urbanas.
 	check(deck.official and deck.creator == "Quem Sou Eu" and deck.count == 9, "official_creator_nine_cards")
 	check(not deck.category.is_empty() and not deck.tags.is_empty() and deck.age_rating.is_empty() and deck.description.length() > 200, "enriched_official_metadata")
 	check(Catalog.find_deck("../lendas_urbanas").is_empty(), "reject_path_traversal")

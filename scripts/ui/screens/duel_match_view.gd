@@ -440,8 +440,8 @@ func _render_players() -> void:
 	_roster.columns = maxi(players.size(),1) if players.size() <= 5 else ceili(players.size()/(2.0 if players.size() <= 12 else 3.0))
 	# iPhone: no máximo 4 jogadores por linha (5 acima de 12) para os nomes caberem inteiros;
 	# o tabuleiro rola, então as linhas extras não espremem as cartas.
-	if UIScale.is_iphone() and players.size() > 4:
-		_roster.columns = 4 if players.size() <= 12 else 5
+	if UIScale.is_iphone() and players.size() > 3:
+		_roster.columns = 3
 	_roster.size_flags_horizontal = Control.SIZE_SHRINK_CENTER if players.size() <= 3 else Control.SIZE_EXPAND_FILL
 	# T24 iOS: linhas um pouco mais altas para retrato/nome/vidas legíveis (largura já sobrava).
 	_roster.custom_minimum_size.y = 57 if players.size() <= 5 else (80 if players.size() <= 12 else 99)
@@ -663,7 +663,7 @@ func _render_hand() -> void:
 			grid.add_child(hidden)
 func _utility_width(width: float) -> float:
 	# iPhone: coluna lateral mais larga para as cartas escolhidas e o chat ficarem legíveis.
-	if UIScale.is_iphone(): return 250.0
+	if UIScale.is_iphone(): return 210.0
 	if duel.is_local():
 		return 176.0 if width >= 760 else 160.0
 	return 200.0 if width >= 760 else 176.0
@@ -708,6 +708,9 @@ func _layout() -> void:
 	var allowed_height := maxf(1.0,(viewport_size.y-maxf(global_position.y,0.0)-8.0)/maxf(global_scale.y,0.01))
 	var available := Vector2(minf(size.x,allowed_width),minf(size.y,allowed_height))
 	var factor := clampf(available.y/555.0,1.0,1.55)
+	# iPhone: a batalha é desenhada numa altura virtual menor (370), então botões, cartas e
+	# textos crescem ~50% e ficam perto de 44 pt — o dedo acerta uma função por vez.
+	if UIScale.is_iphone(): factor = maxf(available.y / 370.0, 1.0)
 	_canvas.scale = Vector2.ONE * factor
 	_canvas.size = available/factor
 	var width := _canvas.size.x
@@ -771,7 +774,7 @@ func _fit_cards_iphone() -> void:
 	var width := _board_scroll.size.x - 10.0
 	if width <= 0: return
 	var gap := float(_grid.get_theme_constant("h_separation"))
-	var columns := clampi(floori((width + gap) / (150.0 + gap)), 3, 8)
+	var columns := clampi(floori((width + gap) / (130.0 + gap)), 2, 8)
 	_grid.columns = columns
 	var cell_width := floorf((width - (columns - 1) * gap) / columns)
 	for card: Control in _grid.get_children():

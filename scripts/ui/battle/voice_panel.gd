@@ -117,3 +117,15 @@ func _refresh() -> void:
             row.add_child(mute)
         if v.participants.size() > 3:
             _users.add_child(Style.label("+%d conectados" % (v.participants.size() - 3), 11, PlayerUI.MUTED))
+
+func _exit_tree() -> void:
+    # Desliga explicitamente as assinaturas de longa duração antes de liberar
+    # o painel temporário (partida -> lobby -> outra partida).
+    if services != null and is_instance_valid(services):
+        if services.voice != null and is_instance_valid(services.voice):
+            if services.voice.changed.is_connected(_refresh):
+                services.voice.changed.disconnect(_refresh)
+        if services.duel != null and is_instance_valid(services.duel):
+            if services.duel.changed.is_connected(_refresh):
+                services.duel.changed.disconnect(_refresh)
+    _muted_people.clear()

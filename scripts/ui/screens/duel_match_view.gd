@@ -357,6 +357,33 @@ func _process(_delta: float) -> void:
 	_timer.add_theme_color_override("font_color",Color("#ff8f86") if seconds <= 10 else PlayerUI.TEXT)
 	if _data.get("phase","") == "countdown":
 		_instruction.text = "Começa em %d" % maxi(seconds,1)
+	_poll_reveal(_delta)
+var _reveal_wait := 0.0
+var _reveal_seq := ""
+var _reveal_polling := false
+
+
+## Durante o suspense a carta ainda não foi revelada nos dados guardados; ninguém avisa quando
+## o servidor revela. Depois de ~2,5 s (e a cada 0,5 s) pede os dados de novo para a revelação
+## animada (carta + atingidos + sons) disparar na hora certa.
+func _poll_reveal(delta: float) -> void:
+	if not _suspense():
+		_reveal_seq = ""
+		return
+	var events: Array = _data.get("events",[])
+	var seq := str(events.back().get("seq",""))
+	if seq != _reveal_seq:
+		_reveal_seq = seq
+		_reveal_wait = 0.0
+	_reveal_wait += delta
+	if _reveal_wait < 2.3 or _reveal_polling: return
+	_reveal_wait = 1.8
+	_reveal_polling = true
+	await duel.refresh()
+	_reveal_polling = false
+	if is_inside_tree(): refresh()
+
+
 func _render_instruction(me: Dictionary) -> void:
 	_confirm.hide()
 	_cancel.hide()

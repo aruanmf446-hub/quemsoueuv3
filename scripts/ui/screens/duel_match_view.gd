@@ -632,12 +632,27 @@ func _utility_width(width: float) -> float:
 	return 200.0 if width >= 760 else 176.0
 
 var _top_inset := -1.0
+var _top_offset := 0.0
+var _bottom_inset := 0.0
+
+
+func _usable_height() -> float:
+	return maxf(1.0,_canvas.size.y-_top_offset-_bottom_inset)
+
+
+func _touch_bottom_inset() -> float:
+	var top := _touch_top_inset()
+	return top * 14.0 / 22.0
 
 
 ## Altura (px do viewport) da faixa de toque reservada pelo iOS no topo; 0 fora do iPhone Web.
 func _touch_top_inset() -> float:
 	if _top_inset >= 0.0: return _top_inset
 	_top_inset = 0.0
+	# Teste/captura: simula a faixa do iPhone fora do navegador (px do viewport).
+	if OS.has_environment("QSE_TEST_TOP_INSET"):
+		_top_inset = float(OS.get_environment("QSE_TEST_TOP_INSET"))
+		return _top_inset
 	if OS.has_feature("web"):
 		var css: Variant = JavaScriptBridge.eval("(window.qsePwa && window.qsePwa.ios) ? window.innerHeight : 0", true)
 		if css != null and float(css) > 0.0:
@@ -664,8 +679,11 @@ func _layout() -> void:
 	var side_width := _utility_width(width)
 	# iPhone: a faixa de cima da tela é do sistema (barra de status do app instalado / barra do
 	# Safari em paisagem) e engole o toque; o topo da batalha começa logo abaixo dela.
-	var inset := _touch_top_inset() / (factor * maxf(global_scale.y,0.01))
-	_canvas.position.y = 0.0
+	var unit := factor * maxf(global_scale.y,0.01)
+	var inset := _touch_top_inset() / unit
+	# Embaixo, a barrinha de início do iPhone cobre o conteúdo: mesma folga.
+	_bottom_inset = _touch_bottom_inset() / unit
+	_top_offset = inset
 	_main.position = Vector2(0,inset)
 	var target_main_width := width-side_width-20
 	# Reduzir mínimos dos avatares ANTES de definir o novo tamanho do painel.
@@ -676,12 +694,12 @@ func _layout() -> void:
 		var slot_width := maxf(48.0,floorf((target_main_width-(player_count-1)*roster_gap)/player_count)-2.0)
 		for panel: Control in _roster.get_children():
 			panel.custom_minimum_size.x = slot_width
-	_main.size = Vector2(target_main_width,_canvas.size.y-inset)
+	_main.size = Vector2(target_main_width,_usable_height())
 	_side.position = Vector2(width-side_width,inset)
-	_side.size = Vector2(side_width,_canvas.size.y-inset)
+	_side.size = Vector2(side_width,_usable_height())
 	if is_instance_valid(_notice):
 		_notice.reset_size()
-		_notice.position = Vector2(_main.size.x-_notice.size.x-14,_canvas.size.y-_notice.size.y-10)
+		_notice.position = Vector2(_main.size.x-_notice.size.x-14,_canvas.size.y-_bottom_inset-_notice.size.y-10)
 	_fit_cards.call_deferred()
 ## Distribui todas as cartas sem ScrollContainer e sem ocultar opções.
 ## Busca linhas/colunas pela área visual útil, em vez de impor 3 colunas
@@ -722,7 +740,7 @@ func _fit_cards() -> void:
 	var header := _main.get_node("BattleHeader") as Control
 	var header_height := maxf(header.custom_minimum_size.y,header.get_combined_minimum_size().y)
 	var roster_height := _roster.get_combined_minimum_size().y
-	var available_height := maxf(1.0,_canvas.size.y-header_height-roster_height-6-frame-instruction_row.get_combined_minimum_size().y-5)
+	var available_height := maxf(1.0,_usable_height()-header_height-roster_height-6-frame-instruction_row.get_combined_minimum_size().y-5)
 	var available_width := maxf(1.0,main_width-frame)
 	_grid.columns = _best_grid_columns(count,available_width,available_height,gap)
 	var rows := ceili(float(count)/_grid.columns)
@@ -732,7 +750,7 @@ func _fit_cards() -> void:
 		card.custom_minimum_size = Vector2(maxf(cell_width,1),maxf(cell_height,1))
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		card.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_main.set_deferred("size",Vector2(main_width,_canvas.size.y))
+	_main.set_deferred("size",Vector2(main_width,_usable_height()))
 func _is_my_turn() -> bool:
 	var me := _me(_data)
 	return not _closed() and _data.get("phase","") == "turns" and not me.is_empty() and not me.get("eliminated",false) and str(_data.get("turn_member","")) == str(me.member_id)

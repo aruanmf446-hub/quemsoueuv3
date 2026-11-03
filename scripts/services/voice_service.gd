@@ -168,5 +168,21 @@ func volume(identity: String, amount: float) -> void:
         JavaScriptBridge.eval("window.QSEVoice.volume(%s,%s)" % [JSON.stringify(identity), str(clampf(amount, 0.0, 1.0))], true)
 
 func _exit_tree() -> void:
+    # Não permitir que timers ou sinais de sala mantenham referências ao serviço
+    # quando PlayerServices for destruído ou houver troca de cena.
+    _generation += 1
+    if _poll != null and is_instance_valid(_poll):
+        _poll.stop()
+        if _poll.timeout.is_connected(_tick):
+            _poll.timeout.disconnect(_tick)
+    if duel != null and is_instance_valid(duel):
+        if duel.changed.is_connected(_room_updated):
+            duel.changed.disconnect(_room_updated)
+        if duel.removed.is_connected(_on_removed):
+            duel.removed.disconnect(_on_removed)
+    if session != null and is_instance_valid(session):
+        if session.changed.is_connected(leave_voice):
+            session.changed.disconnect(leave_voice)
     if supported():
         JavaScriptBridge.eval("window.QSEVoice.disconnect()", true)
+    participants.clear()

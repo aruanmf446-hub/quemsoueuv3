@@ -282,7 +282,7 @@ func _layout_auth() -> void:
 		return
 	var factor := PlayerUI.unit(self)
 	var logical := size / maxf(factor,0.01)
-	var compact := logical.y < 620.0
+	var compact := logical.y < 600.0
 	var very_small := logical.x < 760.0
 	var panel_width := minf(logical.x * (0.39 if very_small else 0.26), 375 if not compact else 280)
 	panel_width = maxf(panel_width, 202.0 if very_small else 260.0)

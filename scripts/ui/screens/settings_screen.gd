@@ -265,7 +265,7 @@ func _adapt() -> void:
 	# (nada é cortado nem quebra letra por letra).
 	var factor := minf(PlayerUI.unit(self), size.x / MIN_LOGICAL_WIDTH)
 	var logical := size / factor
-	var compact := logical.y < 620.0
+	var compact := logical.y < 600.0
 	var narrow := logical.x < 1100.0
 	var margin: MarginContainer = $Margin
 	margin.set_anchors_preset(Control.PRESET_TOP_LEFT)
@@ -336,7 +336,7 @@ func _show_category() -> void:
 
 
 func _compact() -> bool:
-	return size.y / minf(PlayerUI.unit(self), size.x / MIN_LOGICAL_WIDTH) < 620.0
+	return size.y / minf(PlayerUI.unit(self), size.x / MIN_LOGICAL_WIDTH) < 600.0
 
 
 # --- 01 Meu Perfil ---------------------------------------------------------------------

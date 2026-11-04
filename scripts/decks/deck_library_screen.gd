@@ -127,7 +127,7 @@ func _physical_size() -> Vector2:
 	return size / PlayerUI.unit(self)
 
 func _compact() -> bool:
-	return _physical_size().y < 620
+	return _physical_size().y < 600
 
 func _adapt_scale() -> void:
 	super._adapt_scale()

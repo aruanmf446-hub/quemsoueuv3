@@ -18,14 +18,14 @@ ROOT = Path(__file__).resolve().parents[2]
 DEST = ROOT / "assets" / "story"
 
 EXPECTED = {
-    "fase01_01.webp": "daaf4a22aee7",
-    "fase01_02.webp": "862e4c68b3d3",
-    "fase01_03.webp": "19d99b762be2",
-    "fase01_04.webp": "20e34bd5c9c1",
-    "fase01_05.webp": "fbadb6cbc974",
-    "fase01_06.webp": "be486ebdc1b3",
-    "fase01_07.webp": "a5b336da8455",
-    "fase01_08.webp": "df53dd28dc54",
+    "fase01_01.webp": "daaf4a22aee7736c0e9b9e0973f30644ce9fa721e289d75c7952cc1674aef8d7",
+    "fase01_02.webp": "862e4c68b3d302ca2ad9146c76feb9b89206fd09c546de4fdd88e541f504a3aa",
+    "fase01_03.webp": "19d99b762be20ef72eb652aba8ac4f2df0db37de83b3c1b63a718bcfc10f93f5",
+    "fase01_04.webp": "20e34bd5c9c1984f29f056818f258b70b97c162f3735435e6edaa478129905d7",
+    "fase01_05.webp": "fbadb6cbc97443e8522ba603469e9cf21379593265dbeaf7804319d97cbdf40d",
+    "fase01_06.webp": "be486ebdc1b368f1a6270049ce9b5853558c1de0195d45c852453c9fdfed4cf4",
+    "fase01_07.webp": "a5b336da84558bd2e03a8c1125ceb209c1f1dea1afdf7373d43e4a7958b3837d",
+    "fase01_08.webp": "df53dd28dc54939f58f2b0efd65b76e3c45f04baa50fe54d3fa0cc2e8ebee4e8",
 }
 
 
@@ -36,7 +36,7 @@ def checksum(data: bytes) -> str:
 def verify(name: str, data: bytes) -> None:
     if len(data) < 16 or data[:4] != b"RIFF" or data[8:12] != b"WEBP":
         raise ValueError(f"{name}: não é WebP válido")
-    if not checksum(data).startswith(EXPECTED[name]):
+    if not checksum(data) != EXPECTED[name]:
         raise ValueError(f"{name}: SHA-256 não confere com as imagens aprovadas")
 
 

@@ -1,0 +1,491 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "native_guard": {
+    "checks": 511,
+    "failures": 0
+  },
+  "form_and_room_models": {
+    "checks": 252,
+    "failures": 0
+  },
+  "pwa": {
+    "checks": 28,
+    "failures": 0
+  },
+  "models": [
+    {
+      "model": "air",
+      "captures": 12
+    },
+    {
+      "model": "mini",
+      "captures": 12
+    },
+    {
+      "model": "notch61",
+      "captures": 12
+    },
+    {
+      "model": "plus",
+      "captures": 12
+    },
+    {
+      "model": "plus14",
+      "captures": 12
+    },
+    {
+      "model": "pro",
+      "captures": 12
+    },
+    {
+      "model": "pro_max",
+      "captures": 12
+    },
+    {
+      "model": "se",
+      "captures": 12
+    },
+    {
+      "model": "std61",
+      "captures": 12
+    }
+  ],
+  "total_native_captures": 108,
+  "regressions": [
+    {
+      "target": "tests/duel_t26/form_test.gd",
+      "exit": 0,
+      "passed": true,
+      "functional_passed": true,
+      "known_shutdown_diagnostics": [
+        "ERROR: 1 RID allocations of type 'N16RendererViewport8ViewportE' were leaked at exit.",
+        "ERROR: 12 RID allocations of type 'PN13RendererDummy14TextureStorage12DummyTextureE' were leaked at exit.",
+        "ERROR: 3 RID allocations of type 'PN18TextServerAdvanced22ShapedTextDataAdvancedE' were leaked at exit.",
+        "ERROR: 1 RID allocations of type 'PN18TextServerAdvanced12FontAdvancedE' were leaked at exit."
+      ],
+      "summaries": [
+        "T26_CRIAR_SALA checks=24 failures=0"
+      ]
+    },
+    {
+      "target": "tests/duel_local/flow_test.gd",
+      "exit": 0,
+      "passed": true,
+      "functional_passed": true,
+      "known_shutdown_diagnostics": [],
+      "summaries": [
+        "DUEL_LOCAL_RESULT closed { \"reason\": \"only_bots\", \"winners\": [] }"
+      ]
+    },
+    {
+      "target": "tests/battle_reveal/flow.gd",
+      "exit": 0,
+      "passed": true,
+      "functional_passed": true,
+      "known_shutdown_diagnostics": [],
+      "summaries": [
+        "BATTLE_REVEAL shown=3"
+      ]
+    },
+    {
+      "target": "tests/ios_t24/duel_ios_test.gd",
+      "exit": 0,
+      "passed": true,
+      "functional_passed": true,
+      "known_shutdown_diagnostics": [],
+      "summaries": [
+        "T24_IOS_DUEL checks=11 failures=0"
+      ]
+    },
+    {
+      "target": "tests/ui_session_music/flow_test.gd",
+      "exit": 0,
+      "passed": true,
+      "functional_passed": true,
+      "known_shutdown_diagnostics": [],
+      "summaries": [
+        "UI_SESSION_MUSIC_RESULT checks=15 failures=0"
+      ]
+    }
+  ],
+  "web": [
+    {
+      "state": "form",
+      "canvas": {
+        "width": 2160,
+        "height": 1059,
+        "css": [
+          62,
+          16,
+          720,
+          353
+        ],
+        "inline": "position: fixed; left: 62px; top: 16px; width: 720px; height: 353px;",
+        "computed": {
+          "position": "fixed",
+          "margin": "0px",
+          "transform": "none"
+        },
+        "safe": {
+          "top": 16,
+          "right": 62,
+          "bottom": 21,
+          "left": 62,
+          "width": 720,
+          "height": 353
+        }
+      },
+      "mini_player_overlaps": [],
+      "scrolls": [
+        {
+          "height": 527,
+          "overflow": 0,
+          "path": "/root/MainMenu/Navigation/Duel/Margin/Column/Scroll"
+        }
+      ],
+      "outside_buttons": []
+    },
+    {
+      "state": "room",
+      "canvas": {
+        "width": 2160,
+        "height": 1059,
+        "css": [
+          62,
+          16,
+          720,
+          353
+        ],
+        "inline": "position: fixed; left: 62px; top: 16px; width: 720px; height: 353px;",
+        "computed": {
+          "position": "fixed",
+          "margin": "0px",
+          "transform": "none"
+        },
+        "safe": {
+          "top": 16,
+          "right": 62,
+          "bottom": 21,
+          "left": 62,
+          "width": 720,
+          "height": 353
+        }
+      },
+      "mini_player_overlaps": [],
+      "scrolls": [
+        {
+          "height": 439,
+          "overflow": 0,
+          "path": "/root/MainMenu/Navigation/Duel/Margin/Column/Scroll"
+        }
+      ],
+      "outside_buttons": []
+    },
+    {
+      "state": "selection",
+      "canvas": {
+        "width": 2160,
+        "height": 1059,
+        "css": [
+          62,
+          16,
+          720,
+          353
+        ],
+        "inline": "position: fixed; left: 62px; top: 16px; width: 720px; height: 353px;",
+        "computed": {
+          "position": "fixed",
+          "margin": "0px",
+          "transform": "none"
+        },
+        "safe": {
+          "top": 16,
+          "right": 62,
+          "bottom": 21,
+          "left": 62,
+          "width": 720,
+          "height": 353
+        }
+      },
+      "mini_player_overlaps": [],
+      "scrolls": [
+        {
+          "height": 659,
+          "overflow": 0,
+          "path": "/root/MainMenu/Navigation/Duel/Margin/Column/Scroll"
+        },
+        {
+          "height": 260,
+          "overflow": 519,
+          "path": "/root/MainMenu/Navigation/Duel/Margin/Column/Scroll/Body/Match/Composition/PublicArea/BattleBoard/@VBoxContainer@136/BoardScroll"
+        },
+        {
+          "height": 480,
+          "overflow": 0,
+          "path": "/root/MainMenu/Navigation/Duel/Margin/Column/Scroll/Body/Match/Composition/UtilityRailScroll"
+        }
+      ],
+      "outside_buttons": []
+    },
+    {
+      "state": "skins",
+      "canvas": {
+        "width": 2160,
+        "height": 1059,
+        "css": [
+          62,
+          16,
+          720,
+          353
+        ],
+        "inline": "position: fixed; left: 62px; top: 16px; width: 720px; height: 353px;",
+        "computed": {
+          "position": "fixed",
+          "margin": "0px",
+          "transform": "none"
+        },
+        "safe": {
+          "top": 16,
+          "right": 62,
+          "bottom": 21,
+          "left": 62,
+          "width": 720,
+          "height": 353
+        }
+      },
+      "mini_player_overlaps": [],
+      "scrolls": [
+        {
+          "height": 395,
+          "overflow": 0,
+          "path": "/root/MainMenu/SkinsPanel/Margin/Column/SkinsShowcase/Catalog/Scroll"
+        }
+      ],
+      "outside_buttons": []
+    },
+    {
+      "state": "friends",
+      "canvas": {
+        "width": 2160,
+        "height": 1059,
+        "css": [
+          62,
+          16,
+          720,
+          353
+        ],
+        "inline": "position: fixed; left: 62px; top: 16px; width: 720px; height: 353px;",
+        "computed": {
+          "position": "fixed",
+          "margin": "0px",
+          "transform": "none"
+        },
+        "safe": {
+          "top": 16,
+          "right": 62,
+          "bottom": 21,
+          "left": 62,
+          "width": 720,
+          "height": 353
+        }
+      },
+      "mini_player_overlaps": [],
+      "scrolls": [
+        {
+          "height": 509,
+          "overflow": 0,
+          "path": "/root/MainMenu/Navigation/Friends/Margin/Column/Scroll"
+        }
+      ],
+      "outside_buttons": []
+    },
+    {
+      "state": "profile",
+      "canvas": {
+        "width": 2160,
+        "height": 1059,
+        "css": [
+          62,
+          16,
+          720,
+          353
+        ],
+        "inline": "position: fixed; left: 62px; top: 16px; width: 720px; height: 353px;",
+        "computed": {
+          "position": "fixed",
+          "margin": "0px",
+          "transform": "none"
+        },
+        "safe": {
+          "top": 16,
+          "right": 62,
+          "bottom": 21,
+          "left": 62,
+          "width": 720,
+          "height": 353
+        }
+      },
+      "mini_player_overlaps": [],
+      "scrolls": [
+        {
+          "height": 479,
+          "overflow": 62,
+          "path": "/root/MainMenu/Navigation/Profile/Margin/Column/Scroll"
+        }
+      ],
+      "outside_buttons": [
+        "Trocar skin"
+      ]
+    },
+    {
+      "state": "wallet",
+      "canvas": {
+        "width": 2160,
+        "height": 1059,
+        "css": [
+          62,
+          16,
+          720,
+          353
+        ],
+        "inline": "position: fixed; left: 62px; top: 16px; width: 720px; height: 353px;",
+        "computed": {
+          "position": "fixed",
+          "margin": "0px",
+          "transform": "none"
+        },
+        "safe": {
+          "top": 16,
+          "right": 62,
+          "bottom": 21,
+          "left": 62,
+          "width": 720,
+          "height": 353
+        }
+      },
+      "mini_player_overlaps": [],
+      "scrolls": [
+        {
+          "height": 479,
+          "overflow": 0,
+          "path": "/root/MainMenu/Navigation/Wallet/Margin/Column/Scroll"
+        }
+      ],
+      "outside_buttons": []
+    },
+    {
+      "state": "story",
+      "canvas": {
+        "width": 2160,
+        "height": 1059,
+        "css": [
+          62,
+          16,
+          720,
+          353
+        ],
+        "inline": "position: fixed; left: 62px; top: 16px; width: 720px; height: 353px;",
+        "computed": {
+          "position": "fixed",
+          "margin": "0px",
+          "transform": "none"
+        },
+        "safe": {
+          "top": 16,
+          "right": 62,
+          "bottom": 21,
+          "left": 62,
+          "width": 720,
+          "height": 353
+        }
+      },
+      "mini_player_overlaps": [],
+      "scrolls": [
+        {
+          "height": 515,
+          "overflow": 0,
+          "path": "/root/MainMenu/Navigation/Story/Margin/Column/Scroll"
+        },
+        {
+          "height": 364,
+          "overflow": 0,
+          "path": "/root/MainMenu/Navigation/Story/Margin/Column/Scroll/Body/PhaseRail"
+        }
+      ],
+      "outside_buttons": [
+        "BLOQUEADA",
+        "BLOQUEADA",
+        "BLOQUEADA",
+        "BLOQUEADA",
+        "BLOQUEADA",
+        "BLOQUEADA",
+        "BLOQUEADA"
+      ]
+    },
+    {
+      "state": "music",
+      "canvas": {
+        "width": 2160,
+        "height": 1059,
+        "css": [
+          62,
+          16,
+          720,
+          353
+        ],
+        "inline": "position: fixed; left: 62px; top: 16px; width: 720px; height: 353px;",
+        "computed": {
+          "position": "fixed",
+          "margin": "0px",
+          "transform": "none"
+        },
+        "safe": {
+          "top": 16,
+          "right": 62,
+          "bottom": 21,
+          "left": 62,
+          "width": 720,
+          "height": 353
+        }
+      },
+      "mini_player_overlaps": [],
+      "scrolls": [
+        {
+          "height": 527,
+          "overflow": 1055,
+          "path": "/root/MainMenu/Navigation/Music/Margin/Column/Scroll"
+        }
+      ],
+      "outside_buttons": [
+        "Desmarcar gênero",
+        "",
+        "▶",
+        "",
+        "▶",
+        "",
+        "▶",
+        "Desmarcar gênero",
+        "",
+        "▶",
+        "",
+        "▶",
+        "",
+        "▶",
+        "Desmarcar gênero",
+        "",
+        "▶",
+        "",
+        "▶",
+        "",
+        "▶",
+        "",
+        "▶"
+      ]
+    }
+  ],
+  "note": "Only loopback requests permitted by browser probe. Supabase not accessed. Online-looking room/selection are identified local fixtures. Physical Safari/iPhone not tested. Card board scrolling is intentional; room/form/skins have no unwanted vertical overflow.",
+  "pwa_installed_simulation": {
+    "selection": true,
+    "production": true
+  }
+}

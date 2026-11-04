@@ -1,0 +1,14 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS 10 jogadores em 2 linhas de 5
+PASS retrato com recorte do busto ((41.4, 36.0))
+PASS vidas em destaque
+PASS 3 cartas privadas tocáveis
+PASS toque amplia as 3 cartas
+PASS ampliação grande
+PASS Esc/Voltar fecha a ampliação
+PASS toque fora fecha a ampliação
+PASS perder o foco esconde a ampliação e as cartas
+PASS ampliar não muda a partida
+PASS fora do iOS Web o chat não muda
+T24_IOS_DUEL checks=11 failures=0

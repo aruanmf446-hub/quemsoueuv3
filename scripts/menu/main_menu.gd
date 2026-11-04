@@ -351,9 +351,13 @@ func _route_changed(route: String) -> void:
 	# A hidden viewport stops drawing, but its skeleton/idle animations otherwise keep ticking.
 	$LobbyArea/Stage/Viewport/World.process_mode = Node.PROCESS_MODE_INHERIT if route.is_empty() else Node.PROCESS_MODE_DISABLED
 	if is_instance_valid(_news_button): _news_button.visible = route.is_empty()
-	# O mini player é do lobby: nas telas internas ele cobria títulos e conteúdo.
+	# Lobby: player normal. Telas internas: versão mini no canto (some em sala/partida).
 	var now_playing := get_node_or_null("NowPlaying")
-	if now_playing != null: now_playing.set_suppressed(not route.is_empty())
+	# Mini só onde o canto superior direito está livre (não cobre busca, filtros nem botões).
+	const MINI_ROUTES := ["duel", "friends", "profile", "wallet", "story", "music"]
+	if now_playing != null:
+		now_playing.set_suppressed(not route.is_empty() and not MINI_ROUTES.has(route))
+		now_playing.set_mini(not route.is_empty())
 	if route.is_empty(): _maybe_show_news.call_deferred()
 	_publish_update_safety(route)
 

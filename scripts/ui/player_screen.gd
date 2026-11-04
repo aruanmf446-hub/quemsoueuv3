@@ -36,7 +36,7 @@ func _adapt_scale() -> void:
 	if manages_own_scale or not is_inside_tree(): return
 	var margin: MarginContainer = $Margin
 	var factor := PlayerUI.unit(self)
-	var compact := size.y / factor < 600.0
+	var compact := size.y / factor < 620.0
 	margin.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	margin.scale = Vector2.ONE * factor
 	margin.position = Vector2.ZERO

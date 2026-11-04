@@ -25,12 +25,12 @@ Detalhes: [ReinoV3](docs/desert/REINO_V3.md),[Intro](docs/presentation/STORY_V3.
 - Nove travessias completas sem morte/respawn passaram, **antes** do último refinamento da distribuição de itens/partição do chão e controles. Não declarar validadas no commit final sem repetir.
 - WebAssembly de staging passou8quadros por toque,leitura sem timer,dash e reload sem repetir. **Anterior** aos últimos refinamentos. A nova asserção de persistência das habilidades no reload ainda não foi rodada.
 - PWA28/28 e designchecker passaram. Regressões de layout,legado10,progresso,variedade,parkour,checkpoints,mouse/toque passaram em rodadas anteriores; repetir as pertinentes ao estado final.
-- O novo `tests/desert_night/action_controls.gd` testa mouse,Enter e Espaço. A primeira versão do teste usava push_input para teclado,que não atualiza Input global; foi corrigida para parse_input_event. **Conferir resultado da última execução; se não finalizado, rerodar.**
+- O novo `tests/desert_night/action_controls.gd` testa mouse,Enter e Espaço. A primeira versão do teste usava push_input para teclado,que não atualiza Input global; foi corrigida para parse_input_event. **Última execução:5verificações,0falhas**, incluindo clique,Enter e pulo após clique.
 - Nenhum teste representa aparelho físico ou Safari real. Os fundos do ZIP são artes provisórias; a galeria desktop antiga não representa o último HUD.
 
 ## Pendências para a próxima IA
 
-1. Conferir/rodar `action_controls.gd`; corrigir eventuais falhas antes de afirmar suporte mouse/teclado completo.
+1. Preservar a regressão de `action_controls.gd` (5/5aprovada); repeti-la se houver novos ajustes no HUD/foco.
 2. Reexecutar73testes de mecânica e toda a campanha01–09 sobre o estado final,incluindo progressão/retorno/checkpoints e fase10. Integrar os testes novos ao runner se conveniente.
 3. Gerar galeria **final** de todas as fases em desktop1672×941,iPhone844×390 e padrão640×360. `reino_v3_gallery.gd` já gera spawn+meio da fase por fixture explicitamente teleportada. Inspecionar arte/personagens,controles circulares,legibilidade e enquadramento. Não apresentar fotos antigas como finais.
 4. Fazer export Web final e executar `web_desert_probe.cjs` incluindo a nova asserção de habilidades descobertas após reload. Avaliar necessidade de backup localStorage dos desbloqueios se IndexedDB não sincronizar imediatamente; não há prova dessa falha ainda. Validar safe area e botões sem cortes.

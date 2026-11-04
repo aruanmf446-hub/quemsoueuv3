@@ -7,6 +7,6 @@
 - `web_before_final_refinements/`: WebAssembly real,iPhoneUA844×390,DPR3, oito quadros por toque, leitura longa sem avanço automático,dash e releitura após reload, destinos externos bloqueados. Export anterior aos últimos refinamentos de HUD/desbloqueios/recargas; repetir no estado final. O teste agora também exige persistência das habilidades após reload; essa exigência adicional ainda precisa ser executada.
 - `preliminary_desktop/`: nove imagens reais do motor ANTERIORES ao HUD circular final. Não usar como aprovação visual final.
 - `pwa28.log`:28verificações,zero falhas.
-- `desktop_actions.log`: log da última execução; conferir seu resultado antes de afirmar aprovação.
+- `desktop_actions.log`:5verificações,zero falhas; mouse,Enter e pulo após clique no HUD.
 
 Picos de tempo de quadro estão nos JSONs. O benchmark passou a medir p95 dos quadros e a registrar separadamente os intervalos físicos que incluem o hit-stop intencional; não promete ausência de engasgos. Sem validação em Safari,aparelho físico,Windows ou Android real.

@@ -66,6 +66,9 @@ func _build() -> void:
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_canvas = Control.new()
 	_canvas.name = "Composition"
+	# This canvas already scales against the iPhone's virtual height (480).
+	# Applying the global font floor here would enlarge those fonts a second time.
+	if UIScale.is_iphone(): _canvas.set_meta("qse_no_font_floor", true)
 	_canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_canvas)
 	_main = VBoxContainer.new()
@@ -138,6 +141,9 @@ func _build() -> void:
 	actions.add_theme_constant_override("separation",2)
 	_confirm = Style.action("Confirmar cartas",_commit_selection,"",true)
 	_confirm.name = "ConfirmSelection"
+	if UIScale.is_iphone():
+		_confirm.add_theme_font_size_override("font_size", 16)
+		_confirm.custom_minimum_size.y = 36
 	actions.add_child(_confirm)
 	_cancel = Style.action("Cancelar",_close_overlay)
 	_cancel.name = "CancelPick"

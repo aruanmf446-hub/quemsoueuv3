@@ -11,7 +11,7 @@ func _initialize() -> void:
 
 
 func _shot(folder: String, name: String) -> void:
-	for i in 30: await process_frame
+	for i in 3: await process_frame
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(folder + "/" + name + ".png")
 	print("CAPTURED ", name)
@@ -28,11 +28,12 @@ func _run() -> void:
 	var menu := load("res://scenes/menu/main_menu.tscn").instantiate() as Control
 	root.add_child(menu)
 	current_scene = menu
-	for i in 40: await process_frame
+	for i in 4: await process_frame
 	var nav: Node = menu.get_node("Navigation")
 	if not nav.get("_history").is_empty() and nav.get("_history").back().route == "account":
 		nav.back()
-		for i in 30: await process_frame
+		await _settle(nav, "")
+		for i in 3: await process_frame
 	var tag := args[1]
 	if only.is_empty() or only.has("lobby"): await _shot(args[0], "lobby_" + tag)
 	if only.is_empty() or only.has("news"):
@@ -50,16 +51,31 @@ func _run() -> void:
 	if only.has("account_login"):
 		# Tela de e-mail/senha (onde o teclado é usado).
 		nav.open("account", {})
-		for i in 30: await process_frame
+		for i in 3: await process_frame
 		var account: Node = nav.get("_active")
 		if account != null and account.has_method("_switch"): account.call("_switch", "login")
 		await _shot(args[0], "account_login_" + tag)
 		nav.back()
-		for i in 20: await process_frame
+		await _settle(nav, "")
+		for i in 3: await process_frame
 	for route: String in ROUTES:
 		if not only.is_empty() and not only.has(route): continue
 		nav.open(route, {})
+		await _settle(nav, route)
 		await _shot(args[0], route + "_" + tag)
 		nav.back()
-		for i in 20: await process_frame
+		await _settle(nav, "")
+		for i in 3: await process_frame
 	quit(0)
+
+
+## Wait for navigation readiness, rather than rendering dozens of redundant frames.
+func _settle(navigation: Node, expected: String) -> void:
+	var deadline := Time.get_ticks_msec() + 30000
+	while Time.get_ticks_msec() < deadline:
+		var history: Array = navigation.get("_history")
+		var route := "" if history.is_empty() else str(history.back().route)
+		if route == expected and not bool(navigation.get("_busy")): return
+		await process_frame
+	push_error("CAPTURE_ROUTE_TIMEOUT " + expected)
+	quit(1)

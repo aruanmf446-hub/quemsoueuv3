@@ -36,7 +36,7 @@ func _ready() -> void:
 	_category = _make_label(Color("#9fb3cc"))
 	for index in range(3):
 		var button := Button.new()
-		button.focus_mode = Control.FOCUS_NONE
+		button.focus_mode = Control.FOCUS_ALL
 		button.tooltip_text = ["Faixa anterior", "Pausar ou tocar", "Próxima faixa"][index]
 		for state in ["normal", "hover", "pressed", "disabled"]:
 			var style := StyleBoxFlat.new()
@@ -47,6 +47,7 @@ func _ready() -> void:
 			style.anti_aliasing = true
 			button.add_theme_stylebox_override(state, style)
 		button.pressed.connect(_pressed.bind(index))
+		button.gui_input.connect(_transport_key.bind(button, index))
 		button.draw.connect(_draw_icon.bind(button, index))
 		add_child(button)
 		_buttons.append(button)
@@ -77,6 +78,12 @@ func _pressed(index: int) -> void:
 			if _music.paused: _music.resume()
 			else: _music.pause()
 		2: _music.next_track()
+
+func _transport_key(event: InputEvent, button: Button, index: int) -> void:
+	if event is InputEventKey and event.keycode in [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE]:
+		# Consume both edges so the native release cannot activate a second time.
+		button.accept_event()
+		if event.pressed and not event.echo: _pressed(index)
 
 func set_suppressed(value: bool) -> void:
 	_suppressed = value

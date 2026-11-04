@@ -1,0 +1,71 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+LAYOUT_PASS title separated from description 0
+LAYOUT_PASS description separated from reward 0
+LAYOUT_PASS reward separated from CTA 0
+LAYOUT_PASS bounds 0 Title
+LAYOUT_PASS bounds 0 Description
+LAYOUT_PASS bounds 0 Reward
+LAYOUT_PASS bounds 0 Play
+LAYOUT_PASS bounds 0 PreviousSlide
+LAYOUT_PASS bounds 0 NextSlide
+LAYOUT_PASS bounds 0 OfficialLogo
+LAYOUT_PASS bounds 0 Tab0
+LAYOUT_PASS bounds 0 Tab1
+LAYOUT_PASS bounds 0 Tab2
+LAYOUT_PASS bounds 0 Tab3
+LAYOUT_PASS bounds 0 Tab4
+LAYOUT_PASS bounds 0 Tab5
+LAYOUT_PASS bounds 0 Indicator0
+LAYOUT_PASS bounds 0 Indicator1
+LAYOUT_PASS bounds 0 Indicator2
+LAYOUT_PASS actual requested resolution
+LAYOUT_PASS capture slide 0
+LAYOUT_PASS title separated from description 1
+LAYOUT_PASS description separated from reward 1
+LAYOUT_PASS reward separated from CTA 1
+LAYOUT_PASS bounds 1 Title
+LAYOUT_PASS bounds 1 Description
+LAYOUT_PASS bounds 1 Reward
+LAYOUT_PASS bounds 1 Play
+LAYOUT_PASS bounds 1 PreviousSlide
+LAYOUT_PASS bounds 1 NextSlide
+LAYOUT_PASS bounds 1 OfficialLogo
+LAYOUT_PASS bounds 1 Tab0
+LAYOUT_PASS bounds 1 Tab1
+LAYOUT_PASS bounds 1 Tab2
+LAYOUT_PASS bounds 1 Tab3
+LAYOUT_PASS bounds 1 Tab4
+LAYOUT_PASS bounds 1 Tab5
+LAYOUT_PASS bounds 1 Indicator0
+LAYOUT_PASS bounds 1 Indicator1
+LAYOUT_PASS bounds 1 Indicator2
+LAYOUT_PASS actual requested resolution
+LAYOUT_PASS capture slide 1
+LAYOUT_PASS title separated from description 2
+LAYOUT_PASS description separated from reward 2
+LAYOUT_PASS reward separated from CTA 2
+LAYOUT_PASS bounds 2 Title
+LAYOUT_PASS bounds 2 Description
+LAYOUT_PASS bounds 2 Reward
+LAYOUT_PASS bounds 2 Play
+LAYOUT_PASS bounds 2 PreviousSlide
+LAYOUT_PASS bounds 2 NextSlide
+LAYOUT_PASS bounds 2 OfficialLogo
+LAYOUT_PASS bounds 2 Tab0
+LAYOUT_PASS bounds 2 Tab1
+LAYOUT_PASS bounds 2 Tab2
+LAYOUT_PASS bounds 2 Tab3
+LAYOUT_PASS bounds 2 Tab4
+LAYOUT_PASS bounds 2 Tab5
+LAYOUT_PASS bounds 2 Indicator0
+LAYOUT_PASS bounds 2 Indicator1
+LAYOUT_PASS bounds 2 Indicator2
+LAYOUT_PASS actual requested resolution
+LAYOUT_PASS capture slide 2
+HERO_CAPTURE_RESULT failures=0 resolution=(712, 338) logical=(1421.0, 675.0)
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)

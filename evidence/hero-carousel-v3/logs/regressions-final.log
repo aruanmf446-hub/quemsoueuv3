@@ -1,0 +1,7 @@
+{"target": "tests/t18_auth/flow_test.gd", "exit_code": 0, "passed": true, "summary": ["T18_AUTH_RESULT checks=20 failures=0 HTTP=fixture somente"]}
+{"target": "tests/persistence/flow_test.gd", "exit_code": 0, "passed": true, "summary": ["PERSISTENCE_RESULT checks=11 failures=0"]}
+{"target": "tests/ui_session_music/flow_test.gd", "exit_code": 0, "passed": true, "summary": ["UI_SESSION_MUSIC_RESULT checks=15 failures=0"]}
+{"target": "tests/t17_web_invites/flow_test.gd", "exit_code": 0, "passed": true, "summary": ["T17_WEB_INVITE_OK checks=12 (sem teste HTTP/browser)"]}
+{"target": "tests/decks/library_flow.gd", "exit_code": 0, "passed": true, "summary": []}
+{"target": "tests/duel_local/flow_test.gd", "exit_code": 0, "passed": true, "summary": ["DUEL_LOCAL_RESULT closed { \"reason\": \"only_bots\", \"winners\": [] }"]}
+{"target": "tests/t18a_startup/flow_test.gd", "exit_code": 0, "passed": true, "summary": ["T18A_STARTUP_RESULT checks=12 failures=0"]}

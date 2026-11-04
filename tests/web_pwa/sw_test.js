@@ -15,7 +15,7 @@ function assemble(build) { execSync(`python3 tests/web_pwa/assemble.py ${site}/q
   const server = spawn('python3', ['-m', 'http.server', '8765', '--bind', '127.0.0.1'], { cwd: site, stdio: 'ignore' });
   await new Promise(r => setTimeout(r, 800));
   const url = 'http://localhost:8765/quemsoueuv3/';
-  const browser = await chromium.launch();
+  const browser = await chromium.launch({ executablePath: process.env.QSE_CHROMIUM_EXECUTABLE || undefined });
   const context = await browser.newContext();
   const page = await context.newPage();
   await page.goto(url);
@@ -37,6 +37,9 @@ function assemble(build) { execSync(`python3 tests/web_pwa/assemble.py ${site}/q
   check(thirdParty === 0, 'nenhuma resposta de terceiros (Supabase/OAuth) no cache');
   const manifest = await page.evaluate(async () => (await fetch('manifest.webmanifest')).json());
   check(manifest.display === 'standalone' && manifest.orientation === 'landscape' && manifest.scope === '/quemsoueuv3/', 'manifest standalone/landscape/escopo');
+  // Depois da janela de boot, a atualização aguarda o jogador. O shell permite
+  // ativação automática só nos primeiros 15 s; não testar o fluxo manual nela.
+  await page.waitForTimeout(16000);
   // Nova versão publicada: baixa em segundo plano, NÃO assume sozinha.
   assemble('build-b');
   await page.evaluate(async () => (await navigator.serviceWorker.getRegistration()).update());
@@ -74,6 +77,14 @@ function assemble(build) { execSync(`python3 tests/web_pwa/assemble.py ${site}/q
   const safe = await phone.evaluate(() => { const c = document.getElementById('canvas'); const r = c.getBoundingClientRect(); return {top: r.top, h: r.height, w: r.width, iphone: window.qsePwa.iphone, safe: !!window.qsePwa.safe, bg: getComputedStyle(document.body).backgroundColor}; });
   check(safe.iphone && safe.safe && safe.top >= 16 && Math.abs(safe.h - (390 - safe.top - 21)) < 2 && Math.abs(safe.w - (844 - 124)) < 2, `iPhone: canvas fora do notch e na área útil ${JSON.stringify(safe)}`);
   check(safe.bg === 'rgb(0, 0, 0)', 'iPhone: faixas fora da área segura são pretas');
+	const repaired = await phone.evaluate(async () => {
+		const c = document.getElementById('canvas');
+		c.style.width = innerWidth + 'px'; c.style.height = innerHeight + 'px';
+		await new Promise(requestAnimationFrame);
+		const r = c.getBoundingClientRect(), expected = window.qsePwa.safe;
+		return Math.abs(r.width - expected.width) < 1 && Math.abs(r.height - expected.height) < 1 && r.top >= 16;
+	});
+	check(repaired, 'iPhone: área segura restaurada após o motor substituir o CSS do canvas');
   const desk = await page.evaluate(() => { const r = document.getElementById('canvas').getBoundingClientRect(); return {top: r.top, iphone: window.qsePwa.iphone}; });
   check(desk.top === 0 && desk.iphone === false, 'computador: canvas na tela inteira (nada muda)');
   const at = await phone.evaluate(() => { const r = document.getElementById('canvas').getBoundingClientRect(); return {x: r.left + 200, y: r.top + 270}; });

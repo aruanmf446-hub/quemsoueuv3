@@ -62,15 +62,21 @@ static func is_iphone() -> bool:
 ## Aplica a base do iPhone na janela principal (chamado por um autoload na abertura).
 static func apply_device_profile(root: Window) -> void:
 	if not is_iphone(): return
+	if OS.has_feature("web"): root.mode = Window.MODE_WINDOWED
 	root.content_scale_size = IPHONE_BASE
 	var tree := root.get_tree()
 	if tree != null and not tree.node_added.is_connected(_on_node_added):
 		tree.node_added.connect(_on_node_added)
-	for node in root.find_children("*", "Control", true, false): _lift_font.call_deferred(node)
+	for node in root.find_children("*", "Control", true, false): _lift_font_weak.call_deferred(weakref(node))
 
 
 static func _on_node_added(node: Node) -> void:
-	if node is Control: _lift_font.call_deferred(node)
+	if node is Control: _lift_font_weak.call_deferred(weakref(node))
+
+static func _lift_font_weak(reference: WeakRef) -> void:
+	# Battle rebuilds temporary controls before the deferred font pass runs.
+	# A WeakRef resolves to null, avoiding a typed call with a freed Object.
+	_lift_font(reference.get_ref())
 
 
 ## Sobe textos abaixo do piso (Label, Button, LineEdit, OptionButton, RichTextLabel...).

@@ -49,6 +49,14 @@ func _audit(where: String) -> void:
 			failures += 1
 			print("IPHONE_FAIL %s toque pequeno (%dx%d): %s" % [where, rect.size.x, rect.size.y, control.get_path()])
 
+func _settle(navigation: Node, expected: String) -> void:
+	var deadline := Time.get_ticks_msec() + 30000
+	while Time.get_ticks_msec() < deadline:
+		var history: Array = navigation.get("_history")
+		var route := "" if history.is_empty() else str(history.back().route)
+		if route == expected and not bool(navigation.get("_busy")): return
+		await process_frame
+
 
 func _run() -> void:
 	root.mode = Window.MODE_WINDOWED
@@ -58,15 +66,16 @@ func _run() -> void:
 		await process_frame
 		var menu := load("res://scenes/menu/main_menu.tscn").instantiate() as Control
 		root.add_child(menu)
-		for i in 40: await process_frame
+		for i in 4: await process_frame
 		var nav: Node = menu.get_node("Navigation")
 		if not nav.get("_history").is_empty() and nav.get("_history").back().route == "account":
 			nav.back()
-			for i in 25: await process_frame
+			for i in 3: await process_frame
 		_audit("%s lobby" % model[0])
 		for route: String in ROUTES:
 			nav.open(route, {})
-			for i in 30: await process_frame
+			await _settle(nav, route)
+			for i in 3: await process_frame
 			# Tela que não carrega (erro de script) não pode passar em branco.
 			var active: Variant = nav.get("_active")
 			if active == null or not (active as Control).is_visible_in_tree() or nav.get("_history").is_empty() or nav.get("_history").back().route != route:
@@ -74,8 +83,10 @@ func _run() -> void:
 				print("IPHONE_FAIL %s %s: tela não abriu" % [model[0], route])
 			_audit("%s %s" % [model[0], route])
 			nav.back()
-			for i in 15: await process_frame
+			await _settle(nav, "")
+			for i in 3: await process_frame
 		menu.queue_free()
-		for i in 5: await process_frame
+		print("IPHONE_MODEL_DONE ", model[0])
+		for i in 2: await process_frame
 	print("IPHONE_LAYOUT checks=%d failures=%d" % [checks, failures])
 	quit(1 if failures > 0 else 0)

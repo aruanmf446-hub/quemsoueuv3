@@ -1,0 +1,14 @@
+PASS um único service worker registrado (1)
+PASS cache único por conteúdo ["qse-files"]
+PASS em cache: index.html
+PASS em cache: index.js
+PASS em cache: index.wasm
+PASS em cache: index.pck
+PASS em cache: manifest.webmanifest
+PASS nenhuma resposta de terceiros (Supabase/OAuth) no cache
+PASS manifest standalone/landscape/escopo
+page.waitForFunction: Timeout 15000ms exceeded.
+    at /workspace/quemsoueuv3/tests/web_pwa/sw_test.js:43:14 {
+  log: [],
+  name: 'TimeoutError'
+}

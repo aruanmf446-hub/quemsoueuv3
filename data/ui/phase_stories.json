@@ -17,49 +17,49 @@
     ],
     "01": [
       {
-        "image": "res://assets/story/fase01_01.webp",
+        "image": "res://assets/desert/night_city/outskirts.png",
         "eyebrow": "PRÓLOGO · NAS MINAS",
         "title": "O peso da mineração",
         "message": "Sob a vigilância dos Cactus, o jovem El Fuego é obrigado a transportar cristais nas profundezas do deserto."
       },
       {
-        "image": "res://assets/story/fase01_02.webp",
+        "image": "res://assets/desert/night_city/bazaar.png",
         "eyebrow": "PRÓLOGO · O CRISTAL",
         "title": "Uma energia desconhecida",
         "message": "Ao tocar uma pedra extraordinária, El Fuego sente uma energia dourada despertar em suas mãos."
       },
       {
-        "image": "res://assets/story/fase01_03.webp",
+        "image": "res://assets/desert/night_city/citadel.png",
         "eyebrow": "PRÓLOGO · O CERCO",
         "title": "Proteção a qualquer custo",
         "message": "Quando os guardas cercam o garoto, sua família tenta protegê-lo."
       },
       {
-        "image": "res://assets/story/fase01_04.webp",
+        "image": "res://assets/desert/night_city/outskirts.png",
         "eyebrow": "PRÓLOGO · A FUGA",
         "title": "Além das muralhas",
         "message": "Exausto, El Fuego alcança o deserto. O cristal brilha em seu peito."
       },
       {
-        "image": "res://assets/story/fase01_05.webp",
+        "image": "res://assets/desert/night_city/bazaar.png",
         "eyebrow": "PRÓLOGO · O ENCONTRO",
         "title": "Uma ajuda inesperada",
         "message": "Um viajante Cactus montado num feneco oferece ajuda ao garoto no deserto."
       },
       {
-        "image": "res://assets/story/fase01_06.webp",
+        "image": "res://assets/desert/night_city/citadel.png",
         "eyebrow": "PRÓLOGO · A LEMBRANÇA",
         "title": "Antes de tudo mudar",
         "message": "Na memória de El Fuego, ainda existe o calor de uma padaria e a alegria de sua família."
       },
       {
-        "image": "res://assets/story/fase01_07.webp",
+        "image": "res://assets/desert/night_city/outskirts.png",
         "eyebrow": "PRÓLOGO · A TRANSFORMAÇÃO",
         "title": "Nasce El Fuego",
         "message": "Sob a lua, El Fuego assume uma nova identidade e aprende a controlar o poder do cristal."
       },
       {
-        "image": "res://assets/story/fase01_08.webp",
+        "image": "res://assets/desert/night_city/bazaar.png",
         "eyebrow": "PRÓLOGO · A PERSEGUIÇÃO",
         "title": "A corrida pela liberdade",
         "message": "El Fuego corre sozinho pelas ruas da cidade, perseguido pelos guardas Cactus."

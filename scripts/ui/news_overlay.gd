@@ -69,7 +69,7 @@ var _iphone := false
 func _layout() -> void:
 	if not is_instance_valid(_modal): return
 	var viewport := Vector2(get_viewport().get_visible_rect().size)
-	_compact = viewport.y < 620
+	_compact = viewport.y < 600
 	var fraction_x := 0.965 if _compact else 0.94
 	var fraction_y := 0.88 if _compact else 0.82
 	# iPhone (perfil próprio, já dentro da área segura): a janela ocupa quase tudo para que

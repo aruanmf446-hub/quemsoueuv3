@@ -43,6 +43,7 @@ html,body{margin:0;padding:0;height:100%;background:#060b16;overflow:hidden;touc
 #qse-sheet button{margin:8px 8px 0 0}
 /* Caixa de digitação nativa (celular). */
 /* Campos reais sobre os campos do jogo (celular): mesmo visual do jogo; o toque abre o teclado. */
+html,body{overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 #qse-login{margin:0}
 .qse-field{position:fixed;z-index:40;display:none;box-sizing:border-box;margin:0;padding:0 12px;border:0;border-radius:8px;
  background:transparent;color:transparent;caret-color:transparent;font:16px system-ui,-apple-system,sans-serif;outline:none;-webkit-appearance:none;appearance:none}
@@ -177,11 +178,14 @@ $GODOT_HEAD_INCLUDE
 		const viewBottom = vv ? vv.offsetTop + vv.height : innerHeight;
 		const h = Math.max(region.h, 40);
 		let top = region.y + (region.h - h) / 2, left = region.x, width = Math.max(region.w, 60);
-		const docked = active === region.id && top + h > viewBottom - 6;
+		// Teclado aberto (iPhone): o campo SEMPRE sobe e fica logo acima do teclado/barra do iOS,
+		// assim nunca fica escondido atrás da barra de setas nem fora da tela.
+		const kbOpen = vv ? vv.height < window.innerHeight - 80 : false;
+		const docked = active === region.id && (kbOpen || top + h > viewBottom - 6);
 		if (docked) {
 			// Teclado cobriria o campo: barra acima do teclado, largura da área do jogo.
 			const r = canvasRect();
-			left = r.left + 8; width = r.width - 16; top = viewBottom - h - 8;
+			left = r.left + 8; width = r.width - 16; top = viewBottom - h - 10;
 		}
 		el.classList.toggle("qse-docked", docked);
 		el.style.left = left + "px"; el.style.top = top + "px";
@@ -192,6 +196,8 @@ $GODOT_HEAD_INCLUDE
 		const follow = function(){ if (active && regions[active]) place(regions[active]); };
 		visualViewport.addEventListener("resize", follow);
 		visualViewport.addEventListener("scroll", follow);
+		// O iOS rola/“dá zoom” na página ao focar um campo: mantém tudo no lugar.
+		window.addEventListener("scroll", function(){ if (window.scrollY || window.scrollX) window.scrollTo(0, 0); }, {passive: true});
 	}
 	function attach(region){
 		const el = elementFor(region);

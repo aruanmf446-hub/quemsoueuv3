@@ -70,7 +70,8 @@ func _ready() -> void:
 	# Hero cinematografico: apenas se as tres artes locais estiverem presentes.
 	_hero_carousel = preload("res://scripts/menu/hero_carousel.gd").new()
 	add_child(_hero_carousel)
-	move_child(_hero_carousel, $Navigation.get_index())
+	# Keep the actual interactive music player painted ABOVE the hero artwork.
+	move_child(_hero_carousel, get_node("NowPlaying").get_index())
 	_hero_carousel.connect("route_requested", _hero_route_selected)
 	_hero_carousel.connect("news_requested", _open_news)
 	_rewards_changed()

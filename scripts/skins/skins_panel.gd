@@ -34,6 +34,7 @@ var _thumbnails: ThumbnailCache
 var _paths: Dictionary = {}
 var _selected := ""
 var _generating := false
+var _gallery_page := 0
 var _grid: GridContainer
 var _preview: VBoxContainer
 var _side: PanelContainer
@@ -255,6 +256,7 @@ func _rebuild_gallery() -> void:
 	entries.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return str(a.get("name", "")).nocasecmp_to(str(b.get("name", ""))) > 0 if _reverse_sort else str(a.get("name", "")).nocasecmp_to(str(b.get("name", ""))) < 0)
 	var count := 0
+	var matching: Array = []
 	var in_collection := _collection_ids(_collections[_collection])
 	for entry: Dictionary in entries:
 		var id: String = str(entry.id)
@@ -268,8 +270,30 @@ func _rebuild_gallery() -> void:
 			continue
 		if _status_filter == 2 and unlocked:
 			continue
-		_grid.add_child(_gallery_card(entry))
-		count += 1
+		matching.append(entry)
+	count = matching.size()
+	if UIScale.is_iphone():
+		var pages := maxi(1, ceili(count / 3.0))
+		_gallery_page = clampi(_gallery_page, 0, pages - 1)
+		matching = matching.slice(_gallery_page * 3, (_gallery_page + 1) * 3)
+		if pages > 1:
+			var pager := HBoxContainer.new()
+			pager.name = "GalleryPager"
+			pager.add_theme_constant_override("separation", 12)
+			body.add_child(pager)
+			for direction: int in [-1, 1]:
+				var button := PlayerUI.button("Anterior" if direction < 0 else "Próxima", func() -> void:
+					_gallery_page += direction
+					_rebuild_gallery())
+				button.custom_minimum_size = Vector2(128, 48)
+				button.disabled = _gallery_page + direction < 0 or _gallery_page + direction >= pages
+				pager.add_child(button)
+			var page := PlayerUI.label("%d / %d" % [_gallery_page + 1, pages], 20)
+			page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			page.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			pager.add_child(page)
+			pager.move_child(page, 1)
+	for entry: Dictionary in matching: _grid.add_child(_gallery_card(entry))
 	if count == 0:
 		body.add_child(PlayerUI.label("Nenhum personagem encontrado.", 19))
 	if _fav_button != null:
@@ -358,7 +382,7 @@ func _gallery_card(entry: Dictionary) -> PanelContainer:
 
 
 func _columns() -> int:
-	return 2 if UIScale.is_compact() or size.x < 1250 else 3
+	return 3 if UIScale.is_iphone() else (2 if UIScale.is_compact() or size.x < 1250 else 3)
 
 
 func _style_card_height(card: Control, compact: bool) -> void:

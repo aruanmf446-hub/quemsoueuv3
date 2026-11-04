@@ -334,6 +334,9 @@ const GODOT_CONFIG = $GODOT_CONFIG;
 (function(){
 	if (!window.qsePwa || !window.qsePwa.iphone) return;
 	GODOT_CONFIG.canvasResizePolicy = 0;
+	// Project fullscreen mode stretches the canvas beyond its safe-area rectangle.
+	// The iPhone PWA already fills the display; Godot must stay windowed inside it.
+	GODOT_CONFIG.args = (GODOT_CONFIG.args || []).concat(['--windowed']);
 	const TOP_MIN = 16;            // faixa do topo que o iOS usa para gestos/barra de status
 	const probe = document.createElement('div');
 	probe.style.cssText = 'position:fixed;visibility:hidden;pointer-events:none;top:0;left:0;' +
@@ -347,6 +350,9 @@ const GODOT_CONFIG = $GODOT_CONFIG;
 		// Teclado aberto: não redimensionar o jogo (evita o layout pular enquanto digita).
 		const a = document.activeElement;
 		if (a && a.tagName === 'INPUT' && last) return;
+		// UA fullscreen geometry cannot be repaired by inline CSS. Let the
+		// fullscreenchange handler exit first instead of rewriting identical styles.
+		if (document.fullscreenElement === canvas) return;
 		const cs = getComputedStyle(probe);
 		const t = Math.max(parseFloat(cs.paddingTop) || 0, TOP_MIN);
 		let r = parseFloat(cs.paddingRight) || 0, b = parseFloat(cs.paddingBottom) || 0, l = parseFloat(cs.paddingLeft) || 0;
@@ -358,15 +364,28 @@ const GODOT_CONFIG = $GODOT_CONFIG;
 		const dpr = window.devicePixelRatio || 1;
 		const key = [t, r, b, l, w, h, dpr].join(',');
 		// O motor pode mexer no estilo do canvas: reaplica também se o canvas saiu do lugar.
-		if (key === last && canvas.style.left === l + 'px' && canvas.style.top === t + 'px' && canvas.width === Math.round(w * dpr)) return;
+		const rect = canvas.getBoundingClientRect();
+		if (key === last && canvas.style.position === 'fixed' &&
+			Math.abs(rect.left - l) < 0.5 && Math.abs(rect.top - t) < 0.5 &&
+			Math.abs(rect.width - w) < 0.5 && Math.abs(rect.height - h) < 0.5 &&
+			canvas.width === Math.round(w * dpr) && canvas.height === Math.round(h * dpr)) return;
 		last = key;
 		canvas.style.position = 'fixed';
 		canvas.style.left = l + 'px'; canvas.style.top = t + 'px';
 		canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
-		canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+		if (canvas.width !== Math.round(w * dpr)) canvas.width = Math.round(w * dpr);
+		if (canvas.height !== Math.round(h * dpr)) canvas.height = Math.round(h * dpr);
 		window.qsePwa.safe = {top: t, right: r, bottom: b, left: l, width: w, height: h};
 	}
 	fit();
+	// Godot may replace canvas CSS while starting or changing window mode. Repair
+	// the iPhone rectangle before the next paint, not up to a second later.
+	new MutationObserver(fit).observe(canvas, {attributes: true, attributeFilter: ['style', 'width', 'height']});
+	document.addEventListener('fullscreenchange', function(){
+		if (document.fullscreenElement === canvas && document.exitFullscreen) {
+			document.exitFullscreen().then(fit).catch(function(){});
+		} else fit();
+	});
 	window.addEventListener('resize', fit);
 	window.addEventListener('orientationchange', function(){ setTimeout(fit, 250); });
 	setInterval(fit, 1000);

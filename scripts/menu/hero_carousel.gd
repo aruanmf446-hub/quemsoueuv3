@@ -86,25 +86,10 @@ func _button(text: String, node_name: String, parent: Node = null) -> Button:
 	button.text = text
 	button.focus_mode = Control.FOCUS_ALL
 	(parent if parent != null else self).add_child(button)
-	_style(button)
+	PlayerUI.style_hero_button(button)
 	button.button_down.connect(func() -> void: _elapsed = 0.0)
 	return button
 
-func _style(button: Button, primary := false, selected := false) -> void:
-	for state: String in ["normal", "hover", "pressed", "disabled", "focus"]:
-		var box := StyleBoxFlat.new()
-		box.set_corner_radius_all(8)
-		box.anti_aliasing = true
-		box.bg_color = GOLD if primary else Color(0.02, 0.025, 0.05, 0.12)
-		if state == "hover": box.bg_color = Color("ffdb82") if primary else Color(1, 0.8, 0.4, 0.12)
-		if state == "pressed": box.bg_color = Color("dba645") if primary else Color(1, 0.8, 0.4, 0.2)
-		if selected or primary or state == "focus":
-			box.set_border_width_all(2)
-			box.border_color = PAPER if state == "focus" else GOLD
-		if state == "focus": box.bg_color = Color.TRANSPARENT
-		button.add_theme_stylebox_override(state, box)
-	for state: String in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
-		button.add_theme_color_override(state, Color("1c160e") if primary else (GOLD if selected else PAPER))
 
 func _label(parent: Node, text: String, node_name: String, color := PAPER) -> Label:
 	var label := Label.new()
@@ -148,7 +133,7 @@ func _build_slide(index: int) -> void:
 	var reward := _label(layer, str(spec.reward), "Reward", GOLD)
 	reward.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var action := _button(str(spec.action), "Play", layer)
-	_style(action, true)
+	PlayerUI.style_hero_button(action, true)
 	action.pressed.connect(_activate_slide.bind(index))
 	_actions.append(action)
 
@@ -250,7 +235,7 @@ func _tab_selected(index: int) -> void:
 		5: route_requested.emit("settings")
 
 func _update_selection() -> void:
-	for index in range(_tabs.size()): _style(_tabs[index], false, index == [0, 1, 3][_slide])
+	for index in range(_tabs.size()): PlayerUI.style_hero_button(_tabs[index], false, index == [0, 1, 3][_slide])
 	for index in range(_dots.size()):
 		_dots[index].add_theme_color_override("font_color", GOLD if index == _slide else Color("87878c"))
 	for index in range(_actions.size()): _actions[index].disabled = _changing or index != _slide

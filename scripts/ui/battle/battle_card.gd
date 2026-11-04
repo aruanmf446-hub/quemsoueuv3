@@ -174,6 +174,11 @@ func _crop() -> void:
 		# preservar a imagem usando legenda compacta, sem esconder opções.
 		caption.add_theme_font_size_override("font_size",10 if short_row else (11 if dense else (13 if size.x < 165 else 16)))
 		caption_area.custom_minimum_size.y = 20 if short_row else (34 if dense else (38 if size.x < 165 else 32))
+		if UIScale.is_iphone():
+			# This canvas is exempt from the global floor because it has its own
+			# scale. Keep card names legible and reserve both complete lines.
+			caption.add_theme_font_size_override("font_size", 16)
+			caption_area.custom_minimum_size.y = 52
 	if _source == null or image.size.y <= 0: return
 	var source_size := _source.get_size()
 	var ratio := image.size.x / maxf(image.size.y,1)

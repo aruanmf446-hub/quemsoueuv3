@@ -1,4 +1,5 @@
 extends PlayerScreen
+var _iphone_room_actions: Control
 ## Duelo (multiplayer), etapa 1: salas online. Três vistas na mesma tela:
 ## - "browse": salas públicas (no lobby), filtros e entrada por código de convite;
 ## - "form": criar sala ou (ADM) editar as configurações da sala;
@@ -77,6 +78,10 @@ func _online() -> bool:
 
 
 func render() -> void:
+	if is_instance_valid(_iphone_room_actions):
+		_iphone_room_actions.get_parent().remove_child(_iphone_room_actions)
+		_iphone_room_actions.queue_free()
+		_iphone_room_actions = null
 	var in_battle := duel.in_room() and str(duel.room.get("room",{}).get("status","")) in ["in_match","closed"] and not duel.match().is_empty()
 	_set_battle_layout(in_battle)
 	if in_battle and is_instance_valid(_match_view) and _match_view.get_parent() == body:
@@ -648,6 +653,7 @@ const LibraryCatalog := preload("res://scripts/decks/deck_library_catalog.gd")
 const DECK_TABS := ["Todos", "Favoritos", "Bombando", "Meus decks", "Comprados"]
 var _deck_tab := "Todos"
 var _deck_query := ""
+var _iphone_deck_page := 0
 var _deck_stats := {}
 
 
@@ -679,6 +685,9 @@ func _panel_box(selected := false) -> StyleBoxFlat:
 
 
 func _section_head(icon_name: String, title: String, subtitle: String) -> HBoxContainer:
+	if UIScale.is_iphone():
+		title = {"Configuração da partida": "Regras", "Decks de personagens": "Decks", "Resumo da sala": "Resumo"}.get(title, title)
+		subtitle = ""
 	var head := HBoxContainer.new()
 	head.add_theme_constant_override("separation", 16)
 	var icon := PremiumUI.icon_rect(icon_name, PremiumUI.GOLD, 28)
@@ -693,8 +702,7 @@ func _section_head(icon_name: String, title: String, subtitle: String) -> HBoxCo
 		# iPhone: o subtítulo quebra linha em vez de alargar a coluna.
 		text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		for line: Label in text.get_children():
-			line.autowrap_mode = TextServer.AUTOWRAP_WORD
-			line.custom_minimum_size.x = 160
+			line.autowrap_mode = TextServer.AUTOWRAP_OFF
 	return head
 
 
@@ -735,12 +743,20 @@ func _dropdown(key: String, values: Array, suffix: String, current: int) -> Opti
 	picker.item_selected.connect(func(index: int) -> void:
 		_form.values[key] = picker.get_item_id(index)
 		_update_summary())
+	if UIScale.is_iphone(): PlayerUI.style_phone_picker(picker)
 	return picker
 
 
+func _iphone_rule_label(text: String) -> String:
+	return {"Jogadores máximos": "Jogadores", "Cartas por jogador": "Cartas/jogador", "Tempo por turno (s)": "Turno (s)", "Tempo de seleção (s)": "Escolha (s)", "Tempo por turno": "Turno", "Tempo de seleção": "Escolha", "Desempate: cartas com 2 jogadores": "Desempate", "Desempate: cartas a mais por jogador": "Extra/jogador", "Desempate (2 jogadores)": "Desempate", "Desempate (a mais por jogador)": "Extra/jogador", "Bots permitidos": "Bots"}.get(text, text)
+
 func _form_row(label_text: String, control: Control, note := "") -> VBoxContainer:
+	if UIScale.is_iphone():
+		label_text = _iphone_rule_label(label_text)
+		note = ""
 	var wrap := VBoxContainer.new()
 	wrap.add_theme_constant_override("separation", 6)
+	if UIScale.is_iphone(): wrap.add_theme_constant_override("separation", 2)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 14)
 	wrap.add_child(row)
@@ -751,11 +767,10 @@ func _form_row(label_text: String, control: Control, note := "") -> VBoxContaine
 	row.add_child(texts)
 	texts.add_child(PremiumUI.plain(label_text, 14, Color("#f5f6fa")))
 	if not note.is_empty(): texts.add_child(PremiumUI.plain(note, 12, SECONDARY))
-	# iPhone: rótulos longos quebram linha em vez de empurrar a tela para fora.
+	# iPhone: nomes curtos em uma linha; não reduzir o piso de fonte.
 	if UIScale.is_iphone():
 		for text_label: Label in texts.get_children():
-			text_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			text_label.custom_minimum_size.x = 140
+			text_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	control.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(control)
 	var rule := ColorRect.new()
@@ -778,6 +793,7 @@ func _render_form() -> void:
 	for deck: Dictionary in available: if chosen.has(deck.id): _form.decks.append(deck.id)
 	if _form.decks.is_empty() and not available.is_empty(): _form.decks.append(available[0].id)
 	body.add_theme_constant_override("separation", 12)
+	if UIScale.is_iphone(): body.add_theme_constant_override("separation", 10)
 	# Título da página.
 	var intro := PanelContainer.new()
 	intro.name = "FormIntro"
@@ -785,6 +801,7 @@ func _render_form() -> void:
 	intro_box.set_content_margin_all(12)
 	intro.add_theme_stylebox_override("panel", intro_box)
 	body.add_child(intro)
+	if UIScale.is_iphone(): intro.hide() # O header já identifica Criar sala.
 	var intro_row := HBoxContainer.new()
 	intro_row.add_theme_constant_override("separation", 18)
 	intro.add_child(intro_row)
@@ -816,6 +833,7 @@ func _render_form() -> void:
 	config.name = "ConfigPanel"
 	config.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	config.add_theme_constant_override("separation", 8)
+	if UIScale.is_iphone(): config.add_theme_constant_override("separation", 4)
 	split.add_child(config)
 	config.add_child(_section_head("filter", "Configuração da partida", ""))
 	for field: Array in FORM_FIELDS:
@@ -837,6 +855,7 @@ func _render_form() -> void:
 		config.add_child(_form_row("Visibilidade", visibility))
 	var bots := CheckButton.new()
 	bots.name = "BotsToggle"
+	if UIScale.is_iphone(): bots.custom_minimum_size = Vector2(64, 36)
 	bots.button_pressed = bool(_form.bots_allowed)
 	bots.toggled.connect(func(value: bool) -> void:
 		_form.bots_allowed = value
@@ -852,6 +871,7 @@ func _render_form() -> void:
 	decks.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	decks.size_flags_stretch_ratio = 1.35
 	decks.add_theme_constant_override("separation", 14)
+	if UIScale.is_iphone(): decks.add_theme_constant_override("separation", 6)
 	split.add_child(decks)
 	decks.add_child(_section_head("cards", "Decks de personagens", "Escolha o conjunto de personagens da sala (até %d)." % MAX_DECKS))
 	var search_box := PanelContainer.new()
@@ -916,6 +936,9 @@ func _render_form() -> void:
 		grid.columns = clampi(floori((grid.size.x + 14.0) / 146.0), 2, 5))
 	grid.add_theme_constant_override("h_separation", 14)
 	grid.add_theme_constant_override("v_separation", 14)
+	if UIScale.is_iphone():
+		grid.add_theme_constant_override("h_separation", 8)
+		grid.add_theme_constant_override("v_separation", 8)
 	decks.add_child(grid)
 	# Direita: resumo.
 	var summary := PanelContainer.new()
@@ -992,6 +1015,10 @@ func _refresh_deck_grid() -> void:
 	if old != null:
 		holder.remove_child(old)
 		old.queue_free()
+	var pager := holder.get_node_or_null("DeckPager")
+	if pager != null:
+		holder.remove_child(pager)
+		pager.queue_free()
 	if shown.is_empty():
 		var reasons := {"Favoritos": "Nenhum deck favorito disponível para o Mata-Mata.", "Bombando": "Ainda não há partidas registradas para medir os decks em alta.",
 			"Meus decks": "Seus decks ainda não podem ser usados no Mata-Mata.", "Comprados": "A loja de decks ainda não está disponível."}
@@ -1003,6 +1030,27 @@ func _refresh_deck_grid() -> void:
 		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		holder.add_child(empty)
 		return
+	if UIScale.is_iphone():
+		var pages := maxi(1, ceili(shown.size() / 4.0))
+		_iphone_deck_page = clampi(_iphone_deck_page, 0, pages - 1)
+		shown = shown.slice(_iphone_deck_page * 4, (_iphone_deck_page + 1) * 4)
+		if pages > 1:
+			var navigation := HBoxContainer.new()
+			navigation.name = "DeckPager"
+			navigation.add_theme_constant_override("separation", 8)
+			holder.add_child(navigation)
+			for direction: int in [-1, 1]:
+				var button := PlayerUI.button("‹" if direction < 0 else "›", func() -> void:
+					_iphone_deck_page += direction
+					_refresh_deck_grid())
+				button.custom_minimum_size = Vector2(64, 44)
+				button.disabled = _iphone_deck_page + direction < 0 or _iphone_deck_page + direction >= pages
+				navigation.add_child(button)
+			var page := PlayerUI.label("%d / %d" % [_iphone_deck_page + 1, pages], 20)
+			page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			page.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			navigation.add_child(page)
+			navigation.move_child(page, 1)
 	for entry: Dictionary in shown: grid.add_child(_deck_choice(entry))
 
 
@@ -1014,6 +1062,7 @@ func _deck_choice(entry: Dictionary) -> Control:
 	card.button_pressed = selected
 	# T24 iOS: capa mais alta e arte inteira (antes, uma faixa panorâmica cortava os personagens).
 	card.custom_minimum_size = Vector2(132, 176)
+	if UIScale.is_iphone(): card.custom_minimum_size = Vector2(110, 88)
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	card.clip_contents = true
 	card.tooltip_text = "%s (%d)" % [entry.name, entry.size]
@@ -1169,7 +1218,7 @@ func _update_summary() -> void:
 		var icon := PremiumUI.icon_rect(item[0], Color.WHITE, 20)
 		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		line.add_child(icon)
-		var label := PremiumUI.plain(item[1], 14, Color("#e6ebf2"))
+		var label := PremiumUI.plain(_iphone_rule_label(item[1]) if UIScale.is_iphone() else str(item[1]), 14, Color("#e6ebf2"))
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		label.clip_text = true
 		label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -1205,6 +1254,7 @@ func _submit_form() -> void:
 func _render_room() -> void:
 	var data: Dictionary = duel.room.room
 	var settings: Dictionary = data.settings
+	if UIScale.is_iphone(): body.add_theme_constant_override("separation", 10)
 	var me := duel.me()
 	var admin := duel.is_admin()
 	var header := PlayerUI.row(body)
@@ -1265,6 +1315,10 @@ func _render_room() -> void:
 		", ".join((data.get("decks", []) as Array).map(func(d: Dictionary) -> String: return str(d.get("name", ""))))]
 	body.add_child(PlayerUI.label(summary, 17, Color("#c9d6e6")))
 	var actions := PlayerUI.flow(body)
+	if UIScale.is_iphone():
+		actions.reparent($Margin/Column)
+		actions.name = "RoomActions"
+		_iphone_room_actions = actions
 	actions.add_theme_constant_override("separation", 10)
 	if admin and str(data.status) == "lobby":
 		var start := PlayerUI.button("Iniciar partida", func() -> void: _act(duel.start))
@@ -1317,11 +1371,14 @@ func _member_card(member: Dictionary, admin: bool, status: String) -> Control:
 	var plate := PlayerUI.plate(bool(member.get("is_you", false)))
 	plate.content_margin_top = 14
 	plate.content_margin_bottom = 18
+	if UIScale.is_iphone():
+		plate.content_margin_top = 8
+		plate.content_margin_bottom = 8
 	card.add_theme_stylebox_override("panel", plate)
 	var column := PlayerUI.column(card)
 	column.add_theme_constant_override("separation", 4)
 	column.alignment = BoxContainer.ALIGNMENT_CENTER
-	var portrait := PlayerUI.portrait(str(member.get("character_id", "")), SKIN_SIZE)
+	var portrait := PlayerUI.portrait(str(member.get("character_id", "")), 112 if UIScale.is_iphone() else SKIN_SIZE)
 	portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	if not bool(member.get("online", true)) or member.get("role") == "spectator": portrait.modulate = Color(0.55, 0.58, 0.65)
 	column.add_child(portrait)

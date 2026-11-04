@@ -97,6 +97,8 @@ func _ready() -> void:
 	services.session.changed.connect(refresh_availability)
 	services.duel.changed.connect(refresh_availability)
 	visibility_changed.connect(_visibility)
+	# iPhone: chat começa recolhido (um toque abre) para "Suas cartas" caber na coluna.
+	if UIScale.is_iphone() and not _collapsed: _toggle()
 	refresh_availability()
 func refresh_availability() -> void:
 	if not is_inside_tree(): return
@@ -113,14 +115,14 @@ func refresh_availability() -> void:
 		if not _local_started:
 			_local_started = true
 			# iPhone: a coluna lateral é larga e alta o bastante; o chat fica aberto.
-			if not _collapsed and not UIScale.is_iphone(): _toggle()
+			if not _collapsed: _toggle()
 		if _owned: _stop()
 		_state()
 		return
 	if _local_started:
 		# Saiu da partida local: o chat volta aberto como nas salas online.
 		_local_started = false
-		if _collapsed: _toggle()
+		if _collapsed and not UIScale.is_iphone(): _toggle()
 	var room := "" if duel.is_local() or not duel.in_room() else duel.room_id()
 	var allowed: bool = services.session.authenticated() and not room.is_empty() and str(duel.room.get("room",{}).get("status","")) in ["lobby","in_match"]
 	if not allowed:

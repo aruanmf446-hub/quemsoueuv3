@@ -366,7 +366,7 @@ func _my_profile() -> void:
 	hero.add_child(frame)
 	var portrait := TextureRect.new()
 	portrait.name = "Portrait"
-	var side := 96 if compact else 190
+	var side := 96 if compact else (120 if UIScale.is_iphone() else 190)
 	portrait.custom_minimum_size = Vector2(side, side)
 	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED

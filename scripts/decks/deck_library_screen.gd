@@ -138,9 +138,16 @@ func _layout_changed() -> void:
 	var width := _physical_size().x
 	_search.custom_minimum_size.x = 360 if width >= 1100 else (240 if width >= 800 else 190)
 	# iPhone: a busca divide o cabeçalho com o título; nunca passa da borda.
-	if UIScale.is_iphone(): _search.custom_minimum_size.x = 160
+	if UIScale.is_iphone(): _search.custom_minimum_size.x = 230
 	_search.size_flags_horizontal = Control.SIZE_SHRINK_END
 	heading.add_theme_font_size_override("font_size", 24 if width < 900 else 40)
+	if UIScale.is_iphone():
+		# iPhone: título cede espaço (corta com reticências) para a busca caber na tela.
+		heading.add_theme_font_size_override("font_size", 30)
+		heading.clip_text = true
+		heading.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		heading.custom_minimum_size = Vector2(0, 44)
+		heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	$Margin/Column/Header.add_theme_constant_override("separation", 16 if width < 900 else 28)
 	if not is_equal_approx(_refresh_width, width):
 		_refresh_width = width
@@ -1024,7 +1031,7 @@ func _fit_tiles() -> void:
 	var panel := _filter_panel.custom_minimum_size.x + 18.0 if is_instance_valid(_filter_panel) and _filter_panel.visible else 0.0
 	# iPhone: margens reais da página (laterais + espaçamento do painel) para a grade nunca
 	# alargar a tela e empurrar a busca para fora.
-	var width: float = _physical_size().x - panel - (120.0 if UIScale.is_iphone() else (60.0 if compact else 130.0))
+	var width: float = _physical_size().x - panel - (170.0 if UIScale.is_iphone() else (60.0 if compact else 130.0))
 	var gap := 10.0 if compact else 18.0
 	var minimum := 200.0 if compact else 320.0
 	_grid.columns = clampi(floori((width + gap) / (minimum + gap)), 1, 5)

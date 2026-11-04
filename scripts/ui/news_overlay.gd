@@ -494,6 +494,9 @@ func _message(message: String, warn: bool) -> void:
 	box.add_theme_stylebox_override("panel", _style(Color("#192534"), Color(GOLD_SOFT, 0.24), 12, 1))
 	var label := _label(message, 14 if _compact else (26 if _iphone else 20), GOLD_SOFT if warn else MUTED)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.custom_minimum_size = Vector2(10, 0)
 	box.add_child(label)
 	_stack.add_child(box)
 

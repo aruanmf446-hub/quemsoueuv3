@@ -29,6 +29,7 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	clip_contents = true
+	PlayerUI.apply_theme(self)
 	_font = preload("res://assets/desert/phase01/interface.ttf").duplicate() as FontFile
 	_font.multichannel_signed_distance_field = true
 	_timer = Timer.new()
@@ -108,7 +109,9 @@ func _slide(direction: int) -> void:
 	_start_timer()
 
 func _start_timer() -> void:
-	if _timer != null and not manual_story and cards.size() > 1:
+	if _timer == null: return
+	_timer.stop()
+	if not manual_story and cards.size() > 1:
 		_timer.start(dwell_seconds)
 
 func _card(card_index: int) -> Control:
@@ -119,6 +122,14 @@ func _card(card_index: int) -> Control:
 	var image := TextureRect.new()
 	image.name = "Image"
 	image.texture = load(str(data.get("image", ""))) as Texture2D
+	if data.has("atlas_region") and image.texture != null:
+		var tile: Array = data.atlas_region
+		var atlas := AtlasTexture.new()
+		atlas.atlas = image.texture
+		var cell := Vector2(image.texture.get_width()/float(tile[2]),image.texture.get_height()/float(tile[3]))
+		atlas.region = Rect2(Vector2(float(tile[0]),float(tile[1]))*cell,cell)
+		atlas.filter_clip = true
+		image.texture = atlas
 	image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	image.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -137,86 +148,70 @@ func _card(card_index: int) -> Control:
 	var caption := Panel.new()
 	caption.name = "Caption"
 	caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.025, 0.047, 0.08, 0.90)
-	style.border_color = Color("#c79a56")
-	style.border_width_top = 3
-	caption.add_theme_stylebox_override("panel", style)
+	caption.add_theme_stylebox_override("panel",PlayerUI.plate())
 	frame.add_child(caption)
 	for field in ["eyebrow", "title", "message"]:
 		var label := Label.new()
 		label.name = field.capitalize()
-		label.text = str(data.get(field, ""))
+		label.text = str(data.get(field, "")).replace("\n\n","\n")
 		label.add_theme_font_override("font", _font)
 		label.add_theme_color_override("font_color", Color("#e4bc78") if field == "eyebrow" else Color.WHITE)
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		label.clip_text = true
+		label.clip_text = false
+		if field == "message": label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		caption.add_child(label)
 	_layout_card(frame)
 	return frame
 
 func _layout_card(frame: Control) -> void:
 	frame.size = size
-	var compact := UIScale.is_compact()
 	var panel := frame.get_node("Caption") as Panel
-	var side := size.x * (0.04 if compact else 0.075)
-	var height := size.y * (0.38 if compact else 0.28)
-	panel.position = Vector2(side, size.y - height - size.y * 0.045)
-	panel.size = Vector2(size.x - side * 2, height)
-	var unit := UIScale.unit_for(get_viewport()) if compact else clampf(size.y / 720.0, 0.80, 1.5)
-	var pad := 20.0 * unit if compact else 32.0
-	for row: Array in [["Eyebrow", 0.08, 16], ["Title", 0.30, 36], ["Message", 0.66, 19]]:
+	var side := 32.0
+	var height := 370.0 if manual_story else 260.0
+	panel.position = Vector2(side,size.y-height-24.0)
+	panel.size = Vector2(maxf(1.0,size.x-side*2),height)
+	for row: Array in [["Eyebrow",16.0,18,28.0],["Title",50.0,34,48.0],["Message",108.0,24,height-190.0 if manual_story else height-124.0]]:
 		var label := panel.get_node(row[0]) as Label
-		label.position = Vector2(pad, panel.size.y * float(row[1]))
-		var controls_space := 155.0 * unit if manual_story and row[0] == "Message" else 0.0
-		label.size = Vector2(panel.size.x - pad * 2 - controls_space, panel.size.y * (0.3 if row[0] == "Title" else 0.22))
-		var font_size := 16 if compact and manual_story and row[0] == "Message" else int(row[2])
-		label.add_theme_font_size_override("font_size", roundi(float(font_size) * unit))
-
+		label.position = Vector2(24,float(row[1]))
+		label.size = Vector2(maxf(1.0,panel.size.x-48),float(row[3]))
+		label.add_theme_font_size_override("font_size",int(row[2]))
 func _layout() -> void:
 	if _front != null: _layout_card(_front)
 	if _skip == null: return
-	var compact := UIScale.is_compact()
-	var unit := UIScale.unit_for(get_viewport()) if compact else clampf(size.y / 720.0, 0.80, 1.5)
 	_skip.visible = allow_skip and not show_close
 	_skip.text = "Pular história" if manual_story else "Pular abertura"
 	_close.visible = show_close
 	_back.visible = show_close or (manual_story and index > 0)
 	_forward.visible = show_close
 	_story_next.visible = manual_story
-	_story_next.text = "Começar fase" if manual_story and index == cards.size() - 1 else "Próximo"
-	for button: Button in [_skip, _close, _back, _forward, _story_next]:
+	_story_next.text = "Começar fase" if manual_story and index == cards.size()-1 else "Próximo"
+	var touch_height := 88.0 if UIScale.is_iphone() else 64.0
+	for button: Button in [_skip,_close,_back,_forward,_story_next]:
 		var navigation := button == _back or button == _forward
-		button.custom_minimum_size = Vector2(48 * unit, 48 * unit) if navigation else Vector2(124 * unit, 44 * unit)
+		button.custom_minimum_size = Vector2(touch_height,touch_height) if navigation else Vector2(224,touch_height)
 		button.size = button.custom_minimum_size
-		button.add_theme_font_size_override("font_size", roundi((27 if navigation else 17) * unit))
-	_skip.position = Vector2(size.x - _skip.size.x - 25 * unit, 22 * unit)
-	_story_next.position = Vector2(size.x - _story_next.size.x - 25 * unit, size.y - _story_next.size.y - 22 * unit)
-	_close.position = Vector2(size.x - _close.size.x - 25 * unit, 22 * unit)
-	_back.position = Vector2(24 * unit, size.y * 0.46)
-	_forward.position = Vector2(size.x - _forward.size.x - 24 * unit, size.y * 0.46)
-	_dots.text = "  ".join(PackedStringArray(Array(range(cards.size())).map(func(i: int) -> String: return "●" if i == index else "○")))
-	_dots.position = Vector2(size.x * 0.43, 12 * unit)
-	_dots.size = Vector2(size.x * 0.14, 40 * unit)
-	_dots.add_theme_font_size_override("font_size", roundi(15 * unit))
-	_dots.visible = not compact or show_close
+		button.add_theme_font_size_override("font_size",30 if navigation else 24)
+	_skip.position = Vector2(size.x-_skip.size.x-32,24)
+	_story_next.position = Vector2(size.x-_story_next.size.x-56,size.y-_story_next.size.y-40)
+	_close.position = Vector2(size.x-_close.size.x-32,24)
+	var arrow_y := size.y*0.34
+	if UIScale.is_iphone() and manual_story:
+		# Fora do bloco de legenda mesmo na menor altura útil; alvo de88unidades.
+		arrow_y = maxf(120.0,(size.y-394.0-touch_height)*0.5)
+	_back.position = Vector2(32,arrow_y)
+	_forward.position = Vector2(size.x-_forward.size.x-32,arrow_y)
+	_dots.text = "%02d / %02d" % [index+1,cards.size()]
+	_dots.position = Vector2(size.x*0.43,24)
+	_dots.size = Vector2(size.x*0.14,40)
+	_dots.add_theme_font_size_override("font_size",22)
+	_dots.visible = not cards.is_empty()
 
 func _button(caption: String, action: Callable) -> Button:
 	var button := Button.new()
 	button.text = caption
 	button.focus_mode = Control.FOCUS_ALL
 	button.add_theme_font_override("font", _font)
-	button.add_theme_color_override("font_color", Color("#fff0d3"))
-	for state in ["normal", "hover", "pressed", "focus"]:
-		var style := StyleBoxFlat.new()
-		style.bg_color = Color(0.025, 0.045, 0.075, 0.78)
-		style.border_color = Color("#b99055")
-		style.set_border_width_all(1)
-		style.set_corner_radius_all(4)
-		if state == "hover": style.bg_color = style.bg_color.lightened(0.10)
-		if state == "pressed": style.bg_color = style.bg_color.darkened(0.10)
-		if state == "focus": style.set_border_width_all(2)
-		button.add_theme_stylebox_override(state, style)
+	PlayerUI.style_button(button,false)
 	button.pressed.connect(action)
 	add_child(button)
 	return button

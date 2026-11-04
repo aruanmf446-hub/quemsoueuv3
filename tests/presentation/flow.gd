@@ -43,6 +43,10 @@ func run() -> void:
 	check(current_scene != boot and current_scene != null, "abertura entra no menu automaticamente")
 	if current_scene == boot or current_scene == null: quit(1); return
 	var menu := current_scene as Control
+	var navigation: NavigationManager = menu.get_node("Navigation")
+	if navigation._active != null and navigation._history.back().route == "account":
+		navigation._active.get_node("Margin/Column/Header/Back").pressed.emit()
+		await frames(15)
 	var news := menu.get_node_or_null("NewsButton") as Button
 	check(news != null and news.visible, "notícias acessíveis pelo lobby")
 	if news == null: quit(1); return
@@ -77,23 +81,17 @@ func run() -> void:
 	loading = root.get_node_or_null("CampaignLoading") as CampaignLoading
 	check(loading != null, "transição da fase mostra cartão de abertura")
 	await snap("entrando_fase")
-	deadline = Time.get_ticks_msec() + 10000
-	while Time.get_ticks_msec() < deadline:
-		if root.get_node_or_null("PhaseStory") != null: break
-		await process_frame
-	var phase_story := root.get_node_or_null("PhaseStory") as PhaseStory
-	check(phase_story != null, "história da fase aparece antes do gameplay")
-	if phase_story == null: quit(1); return
-	check(phase_story._carousel.manual_story and phase_story._carousel.cards.size() == 2, "fase 01 tem duas imagens sob controle do jogador")
+	check(loading != null and loading._story_mode and loading._carousel.manual_story,"história da fase já aparece enquanto carrega")
+	check(loading._carousel.cards.size() == 8,"fase01 apresenta oito quadros de origem")
 	await snap("historia_fase01_01")
-	phase_story._carousel.next()
-	deadline = Time.get_ticks_msec() + 3000
-	while phase_story._carousel.index != 1 and Time.get_ticks_msec() < deadline:
-		await process_frame
-	check(phase_story._carousel.index == 1, "Próximo apresenta segunda imagem")
+	loading._carousel.next()
+	deadline = Time.get_ticks_msec()+3000
+	while loading._carousel.index != 1 and Time.get_ticks_msec()<deadline: await process_frame
+	check(loading._carousel.index == 1,"Próximo apresenta segunda imagem")
 	await snap("historia_fase01_02")
-	phase_story._carousel.skip_requested.emit()
-	await frames(8)
-	check(root.get_node_or_null("StoryPrototypeSession") != null, "cena da fase abre após carregar recursos")
+	loading._carousel.skip_requested.emit()
+	deadline = Time.get_ticks_msec()+45000
+	while root.get_node_or_null("StoryPrototypeSession") == null and Time.get_ticks_msec()<deadline: await process_frame
+	check(root.get_node_or_null("StoryPrototypeSession") != null,"cena da fase abre após carregar recursos")
 	print("PRESENTATION_RESULT checks=", checks, " failures=", failures)
 	quit(1 if failures else 0)

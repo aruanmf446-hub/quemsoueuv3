@@ -1,46 +1,181 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "phases": {
     "01": [
-      {"image": "res://assets/desert/night_city/outskirts.png", "eyebrow": "CAPÍTULO 01 · ENTRADA DO DESERTO", "title": "Os portões estão abertos", "message": "El Fuego chega à cidade no meio do deserto, sob a luz da lua."},
-      {"image": "res://assets/desert/night_city/bazaar.png", "eyebrow": "CAPÍTULO 01 · A PRIMEIRA ROTA", "title": "Patrulhas na noite", "message": "Cactus bloqueiam as ruas que levam ao interior. É hora de encontrar uma passagem."},
-      {"image": "res://assets/desert/night_city/citadel.png", "eyebrow": "CAPÍTULO 01 · A JORNADA COMEÇA", "title": "Rumo ao interior", "message": "El Fuego avança pelas ruas iluminadas, pronto para o que vier."}
+      {
+        "image": "res://assets/story/origin_atlas.webp",
+        "atlas_region": [
+          0,
+          0,
+          2,
+          4
+        ],
+        "eyebrow": "EL FUEGO · ORIGENS · 01/08",
+        "title": "O MENINO DAS MINAS",
+        "message": "Cresci no subsolo, nas minas do tirano Pimento. Tudo o que eu conhecia era a escuridão, o trabalho forçado e a esperança de um dia ser livre."
+      },
+      {
+        "image": "res://assets/story/origin_atlas.webp",
+        "atlas_region": [
+          1,
+          0,
+          2,
+          4
+        ],
+        "eyebrow": "EL FUEGO · ORIGENS · 02/08",
+        "title": "O DIAMANTE LARANJA",
+        "message": "Até que um dia encontrei um diamante laranja. Quando o toquei, algo despertou dentro de mim. Meu corpo começou a se transformar em areia, e descobri que podia controlar a terra e gerar raios."
+      },
+      {
+        "image": "res://assets/story/origin_atlas.webp",
+        "atlas_region": [
+          0,
+          1,
+          2,
+          4
+        ],
+        "eyebrow": "EL FUEGO · ORIGENS · 03/08",
+        "title": "O SACRIFÍCIO DOS PAIS",
+        "message": "Meus pais perceberam o que estava acontecendo. Sem pensar duas vezes, distraíram os guardas para me dar uma chance de escapar. Eu não sabia o que fazer. Só senti meu corpo se desfazendo, até me tornar parte daquela terra seca."
+      },
+      {
+        "image": "res://assets/story/origin_atlas.webp",
+        "atlas_region": [
+          1,
+          1,
+          2,
+          4
+        ],
+        "eyebrow": "EL FUEGO · ORIGENS · 04/08",
+        "title": "A PRIMEIRA VEZ NA SUPERFÍCIE",
+        "message": "Uma semana depois, reapareci na superfície. Pela primeira vez, senti o calor do sol na pele. Lá embaixo, o ar era úmido e abafado. Aqui em cima, tudo era seco e escaldante. Era um mundo que eu nunca tinha conhecido."
+      },
+      {
+        "image": "res://assets/story/origin_atlas.webp",
+        "atlas_region": [
+          0,
+          2,
+          2,
+          4
+        ],
+        "eyebrow": "EL FUEGO · ORIGENS · 05/08",
+        "title": "O HOMEM MISTERIOSO",
+        "message": "Foi quando uma sombra se aproximou. Um desconhecido me entregou uma garrafa de água e disse:\n\n‘Com essa roupa de escravo, você não vai durar muito aqui em cima, garoto.’\n\nEu não sabia quem ele era, mas foi a primeira pessoa a me ajudar desde que deixei as minas."
+      },
+      {
+        "image": "res://assets/story/origin_atlas.webp",
+        "atlas_region": [
+          1,
+          2,
+          2,
+          4
+        ],
+        "eyebrow": "EL FUEGO · ORIGENS · 06/08",
+        "title": "UMA NOVA VIDA",
+        "message": "Aquele homem me levou até sua amiga Guanita, dona de uma padaria, e sua neta, Flora. Elas me acolheram como se eu fosse da família. Hoje, durante o dia, ajudo as duas na padaria, tentando levar uma vida normal."
+      },
+      {
+        "image": "res://assets/story/origin_atlas.webp",
+        "atlas_region": [
+          0,
+          3,
+          2,
+          4
+        ],
+        "eyebrow": "EL FUEGO · ORIGENS · 07/08",
+        "title": "O JUSTICEIRO DO DESERTO",
+        "message": "Mas, quando a noite cai, minha verdadeira missão começa. Uso meus poderes para proteger os inocentes dos reinos e enfrentar aqueles que abusam dos mais fracos. E, em cada jornada, continuo procurando meus pais."
+      },
+      {
+        "image": "res://assets/story/origin_atlas.webp",
+        "atlas_region": [
+          1,
+          3,
+          2,
+          4
+        ],
+        "eyebrow": "EL FUEGO · ORIGENS · 08/08",
+        "title": "A PERSEGUIÇÃO DOS CACTOS",
+        "message": "Agora, os soldados de Pimento estão atrás de mim. Mas não vou fugir para sempre. Enquanto houver inocentes sofrendo, vou continuar lutando. Vou encontrar meus pais e fazer de tudo para acabar com a tirania de Pimento."
+      }
     ],
     "02": [
-      {"image": "res://assets/desert/night_city/outskirts.png", "eyebrow": "CAPÍTULO 02 · DUNAS PERDIDAS", "title": "A areia cobre as trilhas", "message": "As ruas desaparecem entre dunas e muros antigos."},
-      {"image": "res://assets/desert/night_city/citadel.png", "eyebrow": "CAPÍTULO 02 · MARCOS ANTIGOS", "title": "Siga os sinais", "message": "El Fuego procura os marcos que podem levá-lo de volta à rota."}
+      {
+        "image": "res://assets/story/covers/phase_02.jpg",
+        "eyebrow": "CAPÍTULO 02 · BAZAR DA MEIA-NOITE",
+        "title": "As tendas escondem uma passagem",
+        "message": "Os soldados de Pimento vasculham o bazar. Preciso cruzar as ruas comerciais e encontrar a subida para os telhados."
+      }
     ],
     "03": [
-      {"image": "res://assets/desert/night_city/bazaar.png", "eyebrow": "CAPÍTULO 03 · OÁSIS DA MEIA-NOITE", "title": "Luzes além do oásis", "message": "A travessia chega a um bairro que ainda brilha no meio da noite."},
-      {"image": "res://assets/desert/night_city/citadel.png", "eyebrow": "CAPÍTULO 03 · UM INDÍCIO", "title": "Ordens da fortaleza", "message": "El Fuego encontra pistas sobre quem comanda as patrulhas Cactus."}
+      {
+        "image": "res://assets/story/covers/phase_03.jpg",
+        "eyebrow": "CAPÍTULO 03 · TELHADOS DA CIDADE",
+        "title": "Acima das patrulhas",
+        "message": "Os telhados ligam os pátios e as torres da cidade. Vou seguir por cima para alcançar as muralhas do palácio."
+      }
     ],
     "04": [
-      {"image": "res://assets/desert/night_city/outskirts.png", "eyebrow": "CAPÍTULO 04 · RUÍNAS ESQUECIDAS", "title": "Pedra e silêncio", "message": "Pátios e arcos antigos escondem a passagem para o próximo distrito."},
-      {"image": "res://assets/desert/night_city/bazaar.png", "eyebrow": "CAPÍTULO 04 · INSCRIÇÕES", "title": "Uma rota de abastecimento", "message": "As ruínas revelam um caminho usado para abastecer os Cactus."}
+      {
+        "image": "res://assets/story/covers/phase_04.jpg",
+        "eyebrow": "CAPÍTULO 04 · MURALHAS DO PALÁCIO",
+        "title": "À sombra das cúpulas vermelhas",
+        "message": "As torres de guarda protegem o palácio. Se atravessar suas pontes e corredores, encontrarei a saída para os aquedutos."
+      }
     ],
     "05": [
-      {"image": "res://assets/desert/night_city/citadel.png", "eyebrow": "CAPÍTULO 05 · PONTES DO ABISMO", "title": "A cidade se divide", "message": "Um desfiladeiro separa as ruínas dos acessos à fortaleza."},
-      {"image": "res://assets/desert/night_city/outskirts.png", "eyebrow": "CAPÍTULO 05 · TRAVESSIA", "title": "Um passo de cada vez", "message": "El Fuego precisa cruzar pontes e vãos para seguir adiante."}
+      {
+        "image": "res://assets/story/covers/phase_05.jpg",
+        "eyebrow": "CAPÍTULO 05 · AQUEDUTOS DO REINO",
+        "title": "O caminho da água",
+        "message": "Os arcos antigos levam além do palácio. Preciso cruzar os canais e as passarelas para chegar aos jardins."
+      }
     ],
     "06": [
-      {"image": "res://assets/desert/night_city/outskirts.png", "eyebrow": "CAPÍTULO 06 · TEMPESTADE DE AREIA", "title": "O horizonte desaparece", "message": "A areia encobre a aproximação da fortaleza."},
-      {"image": "res://assets/desert/night_city/bazaar.png", "eyebrow": "CAPÍTULO 06 · ORIENTAÇÃO", "title": "Entre abrigos e marcos", "message": "Só os sinais nas ruas podem guiar El Fuego pela tempestade."}
+      {
+        "image": "res://assets/story/covers/phase_06.jpg",
+        "eyebrow": "CAPÍTULO 06 · JARDINS DO OÁSIS",
+        "title": "Um respiro entre as palmeiras",
+        "message": "A água corta o silêncio do oásis, mas as patrulhas continuam por perto. Vou atravessar os jardins rumo à fronteira."
+      }
     ],
     "07": [
-      {"image": "res://assets/desert/night_city/citadel.png", "eyebrow": "CAPÍTULO 07 · FORTALEZA DOS CACTUS", "title": "Os portões da fortaleza", "message": "El Fuego entra no território protegido pelas patrulhas Cactus."},
-      {"image": "res://assets/desert/night_city/bazaar.png", "eyebrow": "CAPÍTULO 07 · REVELAÇÃO", "title": "O laboratório de Malagueta", "message": "Além das galerias subterrâneas, Malagueta mantém um laboratório."}
+      {
+        "image": "res://assets/story/covers/phase_07.jpg",
+        "eyebrow": "CAPÍTULO 07 · RUÍNAS DA FRONTEIRA",
+        "title": "Além dos muros da capital",
+        "message": "As colunas partidas guardam a antiga saída da cidade. Entre escadarias e pátios soterrados, sigo procurando o caminho das minas."
+      }
     ],
     "08": [
-      {"image": "res://assets/desert/night_city/bazaar.png", "eyebrow": "CAPÍTULO 08 · CAVERNAS DE CRISTAL", "title": "A rota sob a fortaleza", "message": "Uma passagem de cristais conduz El Fuego para baixo da cidade."},
-      {"image": "res://assets/desert/night_city/citadel.png", "eyebrow": "CAPÍTULO 08 · ENERGIA", "title": "A origem do laboratório", "message": "Os cristais apontam para a energia usada no laboratório de Malagueta."}
+      {
+        "image": "res://assets/story/covers/phase_08.jpg",
+        "eyebrow": "CAPÍTULO 08 · ESTRADA DA MINERAÇÃO",
+        "title": "A rota das cargas",
+        "message": "Guindastes e depósitos marcam a estrada da mineração. Cada carga que passa me aproxima das minas onde meus pais ficaram."
+      }
     ],
     "09": [
-      {"image": "res://assets/desert/night_city/citadel.png", "eyebrow": "CAPÍTULO 09 · LABORATÓRIO PROIBIDO", "title": "O coração da cidade", "message": "El Fuego chega ao distrito proibido e à entrada do laboratório."},
-      {"image": "res://assets/desert/night_city/outskirts.png", "eyebrow": "CAPÍTULO 09 · ÚLTIMA PASSAGEM", "title": "A rota está interrompida", "message": "Com o abastecimento dos Cactus cortado, o refúgio de Malagueta fica ao alcance."}
+      {
+        "image": "res://assets/story/covers/phase_09.jpg",
+        "eyebrow": "CAPÍTULO 09 · ENTRADA DA MINERADORA",
+        "title": "O pátio diante das minas",
+        "message": "Cheguei ao cercamento da mineradora. Ainda não é hora de entrar: primeiro preciso alcançar o portão e descobrir quem protege esse lugar."
+      }
     ],
     "10": [
-      {"image": "res://assets/desert/night_city/citadel.png", "eyebrow": "CAPÍTULO 10 · CONFRONTO FINAL", "title": "Malagueta espera", "message": "A jornada pelo Reino do Deserto chega ao seu confronto final."},
-      {"image": "res://assets/desert/night_city/bazaar.png", "eyebrow": "CAPÍTULO 10 · EL FUEGO", "title": "Encerre a campanha", "message": "Derrote Malagueta para concluir a história do deserto."}
+      {
+        "image": "res://assets/desert/night_city/citadel.png",
+        "eyebrow": "CAPÍTULO 10 · CONFRONTO FINAL",
+        "title": "Malagueta espera",
+        "message": "A jornada pelo Reino do Deserto chega ao seu confronto final."
+      },
+      {
+        "image": "res://assets/desert/night_city/bazaar.png",
+        "eyebrow": "CAPÍTULO 10 · EL FUEGO",
+        "title": "Encerre a campanha",
+        "message": "Derrote Malagueta para concluir a história do deserto."
+      }
     ]
   }
 }

@@ -1,16 +1,15 @@
-# Imagens da história antes de cada fase
+# Artes e roteiro do Modo História
 
-Coloque aqui as imagens dos cartões de história (os que aparecem com "Próximo" e
-"Pular história" antes de cada fase do Modo História).
+A origem de El Fuego tem oito quadros em `origin_atlas.webp` (2colunas ×4linhas),
+com títulos e falas em `data/ui/phase_stories.json`. O atlas não contém texto.
+Para substituir um quadro por arte individual de maior resolução, acrescente
+`origin_01.webp` até `origin_08.webp` (PNG/JPG também aceitos). A imagem individual
+substitui apenas o quadro correspondente, mantendo os controles e as legendas.
 
-Nome do arquivo: `faseNN_MM.webp` (ou .png / .jpg)
-- NN = número da fase (01 a 09)
-- MM = número do cartão dentro da fase (01, 02…)
+As capas das nove fases ficam em `covers/phase_01.jpg` até `phase_09.jpg`.
+As cenas das fases2..10 aceitam `faseNN_MM.webp` (ou PNG/JPG), como antes.
+As artes antigas `fase01_01..03.webp` continuam preservadas como referências e
+não sobrescrevem o novo roteiro automaticamente.
 
-Exemplos: `fase01_01.webp` = fase 01, primeiro cartão; `fase01_02.webp` = fase 01, segundo cartão.
-
-Tamanho: 1920 × 1080 (16:9, deitada). Deixe o mais importante no centro e no alto:
-a faixa de texto cobre a parte de baixo. Até ~400 KB por imagem.
-
-Sem imagem com o nome certo, o cartão usa a imagem padrão. Os textos ficam em
-data/ui/phase_stories.json.
+Use16:9 e mantenha rostos e ação na parte superior: a faixa inferior é reservada
+à legenda nativa. Consulte ART_PROVENANCE.md para a origem das artes.

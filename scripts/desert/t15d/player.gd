@@ -103,6 +103,7 @@ func _physics_process(delta: float) -> void:
 	if _defend_buffer > 0.0 and defense_charges > 0 and is_on_floor() and _attack_timer <= 0.0:
 		_defend_buffer = 0.0
 		defense_charges -= 1
+		cancel_dash()
 		_shield_timer = 1.2
 		inventory_changed.emit()
 	is_defending = _shield_timer > 0.0 and is_on_floor() and _knockback_timer <= 0.0 and _attack_timer <= 0.0
@@ -300,6 +301,8 @@ func use_ability(kind: String) -> bool:
 
 func cancel_dash() -> void:
 	_dash_left = 0.0
+	velocity.x = clampf(velocity.x,-SPEED,SPEED)
+	if is_instance_valid(_dash_fx): _dash_fx.hide()
 
 func _build_dash_fx() -> void:
 	_dash_fx = Node3D.new()

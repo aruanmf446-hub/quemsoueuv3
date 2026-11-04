@@ -33,6 +33,34 @@ func run() -> void:
 	var player: Node3D = phase._player
 	player._invulnerable = 999
 	for index in range(3): player.restore_charge("amber")
+	var defense: Button = phase._hud._action_buttons.defense
+	mouse(defense,true)
+	await frames(3)
+	mouse(defense,false)
+	await frames(3)
+	check(player.defense_charges == 0 and player.is_defending,"clique real ativa Defesa pelo action defend")
+	player._shield_timer = 0
+	player.is_defending = false
+	player.restore_charge("defense")
+	phase._touch_pad.visible = true
+	phase._touch_pad._layout()
+	var touch := InputEventScreenTouch.new()
+	touch.index = 7
+	touch.position = phase._touch_pad._buttons.defend[0]
+	touch.pressed = true
+	root.push_input(touch,true)
+	await frames(3)
+	touch = touch.duplicate()
+	touch.pressed = false
+	root.push_input(touch,true)
+	await frames(3)
+	check(player.defense_charges == 0 and player.is_defending,"toque real ativa Defesa e consome sua carga")
+	phase._touch_pad.visible = false
+	player._shield_timer = 0
+	player.is_defending = false
+	await frames(2)
+	await process_frame
+	await process_frame
 	var amber: Button = phase._hud._action_buttons.amber
 	check(amber.is_visible_in_tree(),"ação circular nativa fica visível no desktop")
 	mouse(amber,true)
@@ -53,6 +81,28 @@ func run() -> void:
 	await frames(3)
 	check(player.charges("amber") == 1,"Enter ativa o botão focado uma única vez")
 	get_root().gui_release_focus()
+	player.restore_charge("dash")
+	var dash: Button = phase._hud._action_buttons.dash
+	mouse(dash,true)
+	await frames(3)
+	mouse(dash,false)
+	await frames(20)
+	check(player._dash_left > 0 and absf(player.velocity.x) > player.SPEED,"clique real aciona Relâmpago antes da pausa")
+	var pause_touch := InputEventScreenTouch.new()
+	pause_touch.index = 8
+	pause_touch.position = Vector2(phase._hud._root.size.x-118,8)
+	pause_touch.pressed = true
+	root.push_input(pause_touch,true)
+	await process_frame
+	check(paused and phase._session.opened,"área ampliada de toque abre pausa sem atingir outro controle")
+	var frozen := player.position
+	await process_frame
+	await process_frame
+	check(player._dash_left == 0 and absf(player.velocity.x) <= player.SPEED and player.position.is_equal_approx(frozen),"pausa cancela impulso e congela posição sem velocidade residual extra")
+	phase._resume()
+	pause_touch = pause_touch.duplicate()
+	pause_touch.pressed = false
+	root.push_input(pause_touch,true)
 	for action in ["jump","amber"]: Input.action_release(action)
 	root.remove_child(phase)
 	phase.queue_free()

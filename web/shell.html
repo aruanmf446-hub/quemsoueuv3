@@ -95,7 +95,11 @@ $GODOT_HEAD_INCLUDE
 	const DISMISS = "qse_pwa_install_dismissed";
 	function dismissed(){ try { return localStorage.getItem(DISMISS) === "1"; } catch (e) { return false; } }
 	window.qseShowInstall = function(){
-		if (ios && !standalone && !dismissed()) installButton.style.display = "block";
+		installButton.style.display = ios && !standalone && !dismissed() && !window.qseStoryPlaying ? "block" : "none";
+	};
+	window.qseSetStoryPlaying = function(active){
+		window.qseStoryPlaying = !!active;
+		window.qseShowInstall();
 	};
 	installButton.addEventListener("click", function(){ sheet.style.display = "flex"; });
 	document.getElementById("qse-sheet-ok").addEventListener("click", function(){ sheet.style.display = "none"; });

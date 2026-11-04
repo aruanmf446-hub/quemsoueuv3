@@ -14,6 +14,7 @@ const out=process.env.QSE_DESERT_WEB_OUT||'/tmp/reino-web';fs.mkdirSync(out,{rec
  async function tap(rect,s){const c=await page.locator('#canvas').boundingBox();await page.touchscreen.tap(c.x+(rect[0]+rect[2]/2)*c.width/s.size[0],c.y+(rect[1]+rect[3]/2)*c.height/s.size[1]);}
  await page.waitForTimeout(2300);
  const first=await state();if(first.index!==0)throw new Error("Story advanced automatically while reading");
+ if(await page.locator('#qse-install').isVisible())throw new Error('Install invitation covers story controls');
  const states=[];
  for(let index=0;index<8;index++){
   await page.waitForTimeout(500);const s=await state();states.push(s);
@@ -25,6 +26,7 @@ const out=process.env.QSE_DESERT_WEB_OUT||'/tmp/reino-web';fs.mkdirSync(out,{rec
  await page.waitForFunction(()=>{window.qseDesertProbe('state');return window.qseDesertState.stage==='play';},null,{timeout:120000});
  await page.waitForTimeout(500);let game=await state();if(!game.read||!game.iphone)throw new Error('Read flag or iPhone profile missing');
  await page.evaluate(()=>window.qseDesertProbe('powers'));await page.waitForTimeout(200);game=await state();
+ if(await page.locator('#qse-install').isVisible())throw new Error('Install invitation covers gameplay');
  await page.screenshot({path:out+'/powers.png',scale:'css'});
  const b=game.buttons.dash;if(!b)throw new Error('Dash touch button missing');
  const c=await page.locator('#canvas').boundingBox();await page.touchscreen.tap(c.x+b[0]*c.width/game.size[0],c.y+b[1]*c.height/game.size[1]);

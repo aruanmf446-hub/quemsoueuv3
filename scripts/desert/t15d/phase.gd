@@ -50,6 +50,7 @@ var _environment: Environment
 var _announced_place := false
 var _key_light: OmniLight3D
 func _ready() -> void:
+	_set_web_story_playing(true)
 	_previous_go_back = bool(get_meta("previous_go_back",get_tree().quit_on_go_back))
 	get_tree().quit_on_go_back = false
 	_order = clampi(int(phase_path.get_file().get_basename().trim_prefix("phase_")),1,9)
@@ -266,7 +267,7 @@ func _load_chunk(index: int, immediate := true) -> void:
 			tasks.append(_build_terrain_piece.bind(chunk,platform))
 		var props := preload("res://scripts/desert/t15d/city_props.gd").new()
 		chunk.add_child(props)
-		for job: Callable in props.prepare_build(solid,_order):
+		for job: Callable in props.prepare_build(solid,_order,float(_phase.length),float(_phase.player_spawn[0])):
 			tasks.append(_build_props_piece.bind(chunk,job))
 	for spawn: Dictionary in _phase.enemies:
 		if _in_chunk(float(spawn.pos[0]),index) and not _defeated_ids.has(str(spawn.id)):
@@ -688,6 +689,7 @@ func _release_input() -> void:
 func _pause() -> void:
 	if completed or _paused or _respawning: return
 	_release_input()
+	_player.cancel_dash()
 	_touch_pad.hide()
 	_paused = true
 	_session.show_pause()
@@ -855,6 +857,7 @@ func _return_to_story() -> void:
 	if return_requested.get_connections().is_empty(): get_tree().change_scene_to_file("res://scenes/menu/main_menu.tscn")
 	else: return_requested.emit()
 func _exit_tree() -> void:
+	_set_web_story_playing(false)
 	if _hit_stopping: Engine.time_scale = 1.0
 	if _paused: get_tree().paused = false
 	if not _handoff: get_tree().quit_on_go_back = _previous_go_back
@@ -1002,3 +1005,8 @@ func _set_floor_broken(id: String, broken: bool) -> void:
 				node.position.y = 0
 				node.visible = true
 				node.set_meta("rupture_state","INTACT")
+
+## O convite HTML de instalação não pode cobrir a pausa da campanha.
+func _set_web_story_playing(active: bool) -> void:
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("if (window.qseSetStoryPlaying) window.qseSetStoryPlaying(%s);" % ("true" if active else "false"))

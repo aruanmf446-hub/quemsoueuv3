@@ -1,5 +1,6 @@
 extends SceneTree
 ## Fixtures físicas locais; não chama serviços externos nem concede progresso online.
+const Props = preload("res://scripts/desert/t15d/city_props.gd")
 const Layout = preload("res://scripts/desert/t15d/campaign_layout.gd")
 var checks := 0
 var failures := 0
@@ -16,6 +17,8 @@ func run() -> void:
 		check(stage.districts.size() == 8,"fase %d: oito distritos" % order)
 		check(float(stage.minimum_traversal_seconds) >= 180 and (float(stage.length)-1-float(stage.transport_allowance))/7.4 >= 180,"fase %d: piso180s com dash" % order)
 		check(stage.platforms.any(func(p: Dictionary) -> bool: return p.get("breakable",false)),"fase %d: piso rompível sinalizado" % order)
+		var runs := Props._ground_runs(stage.platforms)
+		check(runs.size() == stage.holes.size()+1,"fase %d: arquitetura contínua preserva todos os abismos" % order)
 		var distinct_pickups := true
 		for pickup: Dictionary in stage.pickups:
 			if pickup.kind not in ["rupture","amber","dash"]: continue
@@ -188,8 +191,19 @@ func run() -> void:
 	check(phase._troops.get_child_count() == 0 and phase._ruptured.is_empty(),"reset limpa tropas e ruptura")
 	player.setup(phase._find_protagonist())
 	check(player.discovered.has("rupture") and player.discovered.has("amber") and player.discovered.has("dash") and player.abilities.values().all(func(value: int) -> bool: return value == 0),"replay conserva descobertas e reinicia cargas novas")
+	player.restore_charge("dash")
+	player.use_ability("dash")
+	player._invulnerable = 0
+	player.take_damage(1,player.position.x-2)
+	check(player._dash_left == 0 and player.health == 2 and absf(player.velocity.x) <= player.SPEED,"dano real interrompe Relâmpago")
+	player.setup(phase._find_protagonist())
+	player.restore_charge("dash")
+	player.use_ability("dash")
+	player.fall_out()
+	check(player.is_dead and player._dash_left == 0 and player.velocity == Vector3.ZERO,"morte real interrompe Relâmpago e velocidade")
+	phase._restart_level()
 	root.remove_child(phase)
 	phase.queue_free()
-	await frames(2)
+	for frame in range(4): await process_frame
 	print("REINO_V3_RESULT checks=",checks," failures=",failures)
 	quit(1 if failures else 0)

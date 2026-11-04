@@ -23,6 +23,7 @@ var _phase_order := 0
 var _status: Label
 var _inflight := ""
 var _cancelling := false
+var _web_story_handoff := false
 
 func _ready() -> void:
 	layer = 100
@@ -49,6 +50,9 @@ func begin(path: String, callback: Callable, is_opening := false) -> void:
 	_path = path
 	_ready_callback = callback
 	_phase_order = int(path.get_file().get_basename().trim_prefix("phase_")) if path.begins_with("res://scenes/desert/phase_") else 0
+	_web_story_handoff = false
+	if _phase_order >= 1 and _phase_order <= 9 and OS.has_feature("web"):
+		JavaScriptBridge.eval("if (window.qseSetStoryPlaying) window.qseSetStoryPlaying(true);")
 	_story_mode = not opening and _phase_order >= 1 and _phase_order <= 9 and not PhaseStory.was_read(_phase_order)
 	_story_done = not _story_mode
 	_min_advances = 2 if opening else (0 if _phase_order >= 1 and _phase_order <= 9 else 1)
@@ -144,7 +148,9 @@ func _finish_after_card(ticket: int) -> void:
 func _finish(ticket: int) -> void:
 	if ticket != _ticket or _packed == null: return
 	_ticket += 1
-	if _ready_callback.is_valid(): _ready_callback.call(_packed)
+	if _ready_callback.is_valid():
+		_web_story_handoff = _phase_order >= 1 and _phase_order <= 9
+		_ready_callback.call(_packed)
 	queue_free()
 
 func _story_completed() -> void:
@@ -235,3 +241,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if _phase_order >= 1 and event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 		_cancel()
+
+func _exit_tree() -> void:
+	if not _web_story_handoff and _phase_order >= 1 and _phase_order <= 9 and OS.has_feature("web"):
+		JavaScriptBridge.eval("if (window.qseSetStoryPlaying) window.qseSetStoryPlaying(false);")

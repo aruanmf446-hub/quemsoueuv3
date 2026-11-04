@@ -70,12 +70,13 @@ func _draw() -> void:
 			var s := radius*0.42
 			draw_colored_polygon(PackedVector2Array([point+Vector2(0, -s*1.05), point+Vector2(s, s*0.15), point+Vector2(s*0.38, s*0.15), point+Vector2(s*0.38, s*0.9), point+Vector2(-s*0.38, s*0.9), point+Vector2(-s*0.38, s*0.15), point+Vector2(-s, s*0.15)]), Color("#f5e4bd"))
 		else:
-			var full: bool = not is_instance_valid(actor) or actor.charges(action) > 0
+			var resource_kind: String = "defense" if action == "defend" else action
+			var full: bool = not is_instance_valid(actor) or actor.charges(resource_kind) > 0
 			var size := radius*2.0*(0.9 if down else 1.0)
-			draw_texture_rect(Icons.medallion(action, roundi(radius*2.0), full), Rect2(point-Vector2.ONE*size*0.5, Vector2.ONE*size), false)
+			draw_texture_rect(Icons.medallion(resource_kind, roundi(radius*2.0), full), Rect2(point-Vector2.ONE*size*0.5, Vector2.ONE*size), false)
 			if is_instance_valid(actor):
 				var font := get_theme_font("font","Label")
-				draw_string(font,point+Vector2(radius*0.45,radius*0.95),str(actor.charges(action)),HORIZONTAL_ALIGNMENT_LEFT,-1,20,Color.WHITE)
+				draw_string(font,point+Vector2(radius*0.45,radius*0.95),str(actor.charges(resource_kind)),HORIZONTAL_ALIGNMENT_LEFT,-1,20,Color.WHITE)
 func _process(delta: float) -> void:
 	var pixels := get_window().size
 	if pixels != _last_pixels:

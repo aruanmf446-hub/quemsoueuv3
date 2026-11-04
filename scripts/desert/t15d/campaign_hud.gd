@@ -75,6 +75,7 @@ func _ready() -> void:
 	_icons.draw.connect(_draw_resources)
 	resources.add_child(_icons)
 	_status = PanelContainer.new()
+	_status.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	_status.add_theme_stylebox_override("panel",box())
 	_root.add_child(_status)
 	var progress_column := VBoxContainer.new()
@@ -94,7 +95,7 @@ func _ready() -> void:
 	_pause.tooltip_text = "Pausar (Esc)"
 	_pause.focus_mode = Control.FOCUS_ALL
 	_pause.add_theme_font_size_override("font_size",22)
-	PlayerUI.style_button(_pause,false)
+	PlayerUI.style_story_action(_pause)
 	_pause.pressed.connect(pause_requested.emit)
 	_root.add_child(_pause)
 	_toast = label("",22,Color("#f1dfb4"))
@@ -130,11 +131,12 @@ func _layout() -> void:
 	_identity.position = Vector2(14,14)
 	_identity.size = _identity.get_combined_minimum_size()
 	_identity.call_deferred("reset_size")
-	_status.position = Vector2(screen.x-242,14)
 	_status.custom_minimum_size = Vector2(174,76)
 	_status.size = _status.get_combined_minimum_size()
-	_pause.position = Vector2(screen.x-58,14)
-	_pause.size = Vector2(44,48)
+	_status.position = Vector2(screen.x-140-_status.size.x,14)
+	var pause_size := 88.0 if UIScale.is_iphone() else 64.0
+	_pause.size = Vector2.ONE*pause_size
+	_pause.position = Vector2(screen.x-64-pause_size*0.5,64-pause_size*0.5)
 	_actions.position = Vector2(maxf(14,screen.x-_actions.get_combined_minimum_size().x-24),screen.y-104)
 	_toast.position = Vector2(maxf(14,(screen.x-760)*0.5),92 if compact else 128)
 	_toast.size = Vector2(minf(screen.x-28,760),76)
@@ -178,8 +180,9 @@ func update_resources(player: Node) -> void:
 					button.add_child(caption)
 				button.gui_input.connect(func(event: InputEvent) -> void:
 					if event is InputEventMouseButton and not event.pressed: button.release_focus())
-				button.button_down.connect(func() -> void: Input.action_press(kind))
-				button.button_up.connect(func() -> void: Input.action_release(kind))
+				var action: String = "defend" if kind == "defense" else kind
+				button.button_down.connect(func() -> void: Input.action_press(action))
+				button.button_up.connect(func() -> void: Input.action_release(action))
 				_actions.add_child(button)
 				_action_buttons[kind] = button
 			var node: Button = _action_buttons[kind]
@@ -309,3 +312,11 @@ func _process(delta: float) -> void:
 		_toast_left -= delta
 		_toast.modulate.a = minf(_toast_left*4.0,1.0)
 		if _toast_left <= 0: _toast.hide()
+
+## O alvo de toque é maior que o ícone; a composição padrão não muda por densidade.
+func _input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch and event.pressed and is_instance_valid(_pause) and _pause.is_visible_in_tree():
+		var target := Rect2(Vector2(_root.size.x-128,0),Vector2(128,128))
+		if target.has_point(event.position):
+			get_viewport().set_input_as_handled()
+			pause_requested.emit()

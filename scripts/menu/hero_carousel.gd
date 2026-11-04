@@ -58,7 +58,7 @@ func _ready() -> void:
 	_hide_original_lobby()
 	var navigation := get_parent().get_node_or_null("Navigation")
 	if navigation != null:
-		navigation.route_changed.connect(_route_changed)
+		navigation.connect("route_changed", _route_changed)
 
 func _hide_original_lobby() -> void:
 	var root := get_parent()

@@ -81,7 +81,7 @@ func _build_header() -> void:
 
 
 func _compact() -> bool:
-	return size.y / _factor() < 600.0
+	return size.y / _factor() < 620.0
 
 
 func _factor() -> float:

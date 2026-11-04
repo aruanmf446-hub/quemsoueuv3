@@ -215,7 +215,7 @@ func _layout() -> void:
 	var unit := 1.0
 	var w := menu.size.x / unit
 	var h := menu.size.y / unit
-	var compact := h < 600.0
+	var compact := h < 620.0
 	var pad := 24.0 if compact else 40.0
 	_rect(brand_logo, Vector2(pad, 12) * unit, Vector2(150, 58) * unit)
 	_rect(menu.get_node("TopBar"), Vector2(w - pad - 200, 20) * unit, Vector2(200, 52) * unit)

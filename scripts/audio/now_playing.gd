@@ -17,6 +17,8 @@ var _compact := false
 var _font: FontFile
 var _shown_id := ""
 var _suppressed := false
+## Telas internas: versão mini (só título e controles) no canto, acima do conteúdo.
+var _mini := false
 
 func _ready() -> void:
 	name = "NowPlaying"
@@ -80,9 +82,19 @@ func set_suppressed(value: bool) -> void:
 	_suppressed = value
 	_refresh()
 
+## Fora do lobby o player continua disponível em tamanho mini (some só em sala/partida).
+func set_mini(value: bool) -> void:
+	_mini = value
+	_layout()
+	_refresh()
+
+func _in_room() -> bool:
+	var services := PlayerServices.current
+	return services != null and services.duel != null and services.duel.in_room()
+
 func _refresh() -> void:
 	var available: bool = is_instance_valid(_music) and not _music.available_tracks().is_empty()
-	visible = available and not _suppressed
+	visible = available and not _suppressed and not (_mini and _in_room())
 	if not available: return
 	var track: Dictionary = _music.current_track()
 	_title.text = str(track.get("title", "Carregando música..."))
@@ -106,6 +118,8 @@ func _refresh() -> void:
 	queue_redraw()
 
 func _process(delta: float) -> void:
+	if _mini and not _suppressed and _in_room() == visible:
+		_refresh()
 	if not visible: return
 	_time += delta
 	queue_redraw()
@@ -146,22 +160,36 @@ func _layout() -> void:
 	var menu := get_parent() as Control
 	if menu == null: return
 	set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
-	size = Vector2(400, 224)
-	custom_minimum_size = size
-	position = Vector2(menu.size.x - size.x - 24, menu.size.y - size.y - 24)
-	_cover.position = Vector2(20, 18)
-	_cover.size = Vector2(76, 76)
+	z_index = 20 if _mini else 0
 	_kicker.hide()
 	_category.hide()
-	_title.position = Vector2(112, 20)
-	_title.size = Vector2(268, 72)
-	_title.add_theme_font_size_override("font_size", 28)
 	_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_title.max_lines_visible = 2
-	for index in range(3):
-		var button := _buttons[index]
-		button.size = Vector2(104, 104)
-		button.position = Vector2(28 + index * 120, 104)
+	if _mini:
+		# Mini: título + 3 botões numa linha, canto inferior direito.
+		size = Vector2(420, 76)
+		_cover.hide()
+		_title.position = Vector2(14, 6)
+		_title.size = Vector2(190, 64)
+		_title.add_theme_font_size_override("font_size", 22)
+		for index in range(3):
+			_buttons[index].size = Vector2(64, 64)
+			_buttons[index].position = Vector2(212 + index * 68, 6)
+	else:
+		# Lobby: uma linha só (capa, título, controles) — bem menor que antes.
+		size = Vector2(440, 100)
+		_cover.show()
+		_cover.position = Vector2(14, 14)
+		_cover.size = Vector2(64, 64)
+		_title.position = Vector2(88, 12)
+		_title.size = Vector2(140, 70)
+		_title.add_theme_font_size_override("font_size", 20)
+		for index in range(3):
+			_buttons[index].size = Vector2(62, 62)
+			_buttons[index].position = Vector2(236 + index * 66, 16)
+	custom_minimum_size = size
+	# Mini: no canto superior direito, na altura do cabeçalho das telas.
+	position = Vector2(menu.size.x - size.x - 24, 16) if _mini else Vector2(menu.size.x - size.x - 24, menu.size.y - size.y - 24)
 	queue_redraw()
 
 func _music_surface() -> StyleBoxFlat:

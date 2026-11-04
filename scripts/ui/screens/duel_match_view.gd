@@ -750,9 +750,9 @@ func _layout() -> void:
 	var allowed_height := maxf(1.0,(viewport_size.y-maxf(global_position.y,0.0)-8.0)/maxf(global_scale.y,0.01))
 	var available := Vector2(minf(size.x,allowed_width),minf(size.y,allowed_height))
 	var factor := clampf(available.y/555.0,1.0,1.55)
-	# iPhone: a batalha é desenhada numa altura virtual menor (370), então botões, cartas e
-	# textos crescem ~50% e ficam perto de 44 pt — o dedo acerta uma função por vez.
-	if UIScale.is_iphone(): factor = maxf(available.y / 370.0, 1.0)
+	# iPhone: altura virtual 480 — botões e textos maiores para o dedo, sem estourar a tela
+	# (370 deixava nomes, cartas e o painel lateral cortados).
+	if UIScale.is_iphone(): factor = maxf(available.y / 480.0, 1.0)
 	_canvas.scale = Vector2.ONE * factor
 	_canvas.size = available/factor
 	var width := _canvas.size.x

@@ -1,0 +1,105 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "hero_rendered": {
+    "checks": 69,
+    "failures": 0,
+    "resolution": [
+      1672,
+      941
+    ]
+  },
+  "hero_headless": {
+    "checks": 66,
+    "failures": 0
+  },
+  "iphone_interactions": {
+    "checks": 64,
+    "failures": 0,
+    "resolution": [
+      712,
+      338
+    ],
+    "note": "Before additional music keyboard checks; same carousel interaction implementation"
+  },
+  "all_registered_routes": 11,
+  "capture_layouts": {
+    "iphone_712x338": 0,
+    "standard_640x360": 0
+  },
+  "responsive_suite": {
+    "resolution": [
+      844,
+      390
+    ],
+    "ui_scale": 3,
+    "captures": 6
+  },
+  "regressions": [
+    {
+      "target": "tests/t18_auth/flow_test.gd",
+      "exit_code": 0,
+      "passed": true,
+      "summary": [
+        "T18_AUTH_RESULT checks=20 failures=0 HTTP=fixture somente"
+      ]
+    },
+    {
+      "target": "tests/persistence/flow_test.gd",
+      "exit_code": 0,
+      "passed": true,
+      "summary": [
+        "PERSISTENCE_RESULT checks=11 failures=0"
+      ]
+    },
+    {
+      "target": "tests/ui_session_music/flow_test.gd",
+      "exit_code": 0,
+      "passed": true,
+      "summary": [
+        "UI_SESSION_MUSIC_RESULT checks=15 failures=0"
+      ]
+    },
+    {
+      "target": "tests/t17_web_invites/flow_test.gd",
+      "exit_code": 0,
+      "passed": true,
+      "summary": [
+        "T17_WEB_INVITE_OK checks=12 (sem teste HTTP/browser)"
+      ]
+    },
+    {
+      "target": "tests/decks/library_flow.gd",
+      "exit_code": 0,
+      "passed": true,
+      "summary": []
+    },
+    {
+      "target": "tests/duel_local/flow_test.gd",
+      "exit_code": 0,
+      "passed": true,
+      "summary": [
+        "DUEL_LOCAL_RESULT closed { \"reason\": \"only_bots\", \"winners\": [] }"
+      ]
+    },
+    {
+      "target": "tests/t18a_startup/flow_test.gd",
+      "exit_code": 0,
+      "passed": true,
+      "summary": [
+        "T18A_STARTUP_RESULT checks=12 failures=0"
+      ]
+    }
+  ],
+  "pwa": {
+    "passed": false,
+    "reason": "Existing fixture expects registration.waiting; current shell autoactivates updates during first 15 seconds. Initial cache and landscape checks passed."
+  },
+  "not_validated": [
+    "Real Google/Discord OAuth",
+    "iPhone/Safari physical device",
+    "Android device",
+    "Windows executable",
+    "Exported Web game"
+  ],
+  "online_blocker": "CONNECT 403 for configured Supabase host; three host additions saved in environment draft, not applied or published"
+}

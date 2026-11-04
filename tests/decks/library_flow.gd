@@ -105,7 +105,13 @@ func run() -> void:
 	if not nav.get("_history").is_empty() and nav.get("_history").back().route == "account":
 		nav.back()
 		await settle()
-	await click(menu.get_node("MenuButtons/BtnLibrary"))
+	var hero := menu.get_node_or_null("HeroCarousel")
+	if hero != null and bool(hero.get("using_art")):
+		await click(hero.get_node("Tab3"))
+		await create_timer(0.5).timeout
+		await click(hero.get_node("HeroSlide2/Play"))
+	else:
+		await click(menu.get_node("MenuButtons/BtnLibrary"))
 	check(route() == "deck_library", "real_lobby_button_opens_separate_route")
 	screen = nav.get("_active")
 	if screen == null or route() != "deck_library": quit(1); return

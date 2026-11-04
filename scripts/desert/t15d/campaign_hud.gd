@@ -31,6 +31,8 @@ var _flash_time := 0.0
 var _flash_length := 1.0
 var _flash_peak := 0.0
 var _last_health := 3
+var _actions: HBoxContainer
+var _action_buttons := {}
 var _stage: Dictionary
 func configure(stage: Dictionary) -> void:
 	_stage = stage
@@ -55,20 +57,20 @@ func _ready() -> void:
 	_identity.add_child(column)
 	_kicker = label("CIDADE DO DESERTO  /  %02d" % int(_stage.order),11,Color("#c7b48f"))
 	column.add_child(_kicker)
-	_title = label(str(_stage.name),20,Color("#f5eee0"))
+	_title = label(str(_stage.name),26,Color("#f5eee0"))
 	column.add_child(_title)
 	var resources := HBoxContainer.new()
 	resources.add_theme_constant_override("separation",12)
 	column.add_child(resources)
 	_health = label("VIDA  3/3",14,Color("#f1c5b7"))
-	_attack = label("ATAQUE  1/1",14,Color("#e9c478"))
-	_defense = label("DEFESA  1/1",14,Color("#91cee9"))
+	_attack = label("FOGO  1/3",14,Color("#e9c478"))
+	_defense = label("DEFESA  1/3",14,Color("#91cee9"))
 	# Os rótulos ficam para leitores de tela/testes; o jogador vê os ícones desenhados.
 	for item in [_health,_attack,_defense]:
 		item.hide()
 		resources.add_child(item)
 	_icons = Control.new()
-	_icons.custom_minimum_size = Vector2(240,40)
+	_icons.custom_minimum_size = Vector2(115,40)
 	_icons.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_icons.draw.connect(_draw_resources)
 	resources.add_child(_icons)
@@ -85,34 +87,26 @@ func _ready() -> void:
 	_bar = ProgressBar.new()
 	_bar.show_percentage = false
 	_bar.custom_minimum_size = Vector2(150,6)
-	var fill := StyleBoxFlat.new()
-	fill.bg_color = Color("#c5a96a")
-	_bar.add_theme_stylebox_override("fill",fill)
-	var background := StyleBoxFlat.new()
-	background.bg_color = Color("#294254")
-	_bar.add_theme_stylebox_override("background",background)
+	PlayerUI.style_campaign_progress(_bar)
 	progress_column.add_child(_bar)
 	_pause = Button.new()
 	_pause.text = "Ⅱ"
 	_pause.tooltip_text = "Pausar (Esc)"
-	_pause.focus_mode = Control.FOCUS_NONE
+	_pause.focus_mode = Control.FOCUS_ALL
 	_pause.add_theme_font_size_override("font_size",22)
-	var round := box()
-	round.skew = Vector2.ZERO
-	round.border_width_left = 0
-	round.set_border_width_all(1)
-	round.set_corner_radius_all(24)
-	_pause.add_theme_stylebox_override("normal",round)
-	var hover := round.duplicate() as StyleBoxFlat
-	hover.bg_color = Color("#294459")
-	_pause.add_theme_stylebox_override("hover",hover)
+	PlayerUI.style_button(_pause,false)
 	_pause.pressed.connect(pause_requested.emit)
 	_root.add_child(_pause)
-	_toast = label("",17,Color("#f1dfb4"))
+	_toast = label("",22,Color("#f1dfb4"))
+	_toast.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_toast.add_theme_stylebox_override("normal",box())
 	_toast.hide()
 	_root.add_child(_toast)
+	_actions = HBoxContainer.new()
+	_actions.add_theme_constant_override("separation",8)
+	_root.add_child(_actions)
+	_actions.visible = not (DisplayServer.is_touchscreen_available() or OS.has_feature("android") or OS.has_feature("web") or UIScale.is_handheld() or "--touch-controls" in OS.get_cmdline_user_args())
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 func label(text: String, size: int, color: Color) -> Label:
@@ -123,23 +117,12 @@ func label(text: String, size: int, color: Color) -> Label:
 	node.add_theme_color_override("font_color",color)
 	return node
 func box() -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.035,0.06,0.11,0.88)
-	style.border_color = Color("#f2c76e")
-	style.set_corner_radius_all(3)
-	style.border_width_left = 4
-	style.skew = Vector2(0.12,0)
-	style.anti_aliasing = true
-	style.content_margin_left = 12
-	style.content_margin_right = 12
-	style.content_margin_top = 9
-	style.content_margin_bottom = 9
-	return style
+	return PlayerUI.plate()
 func _layout() -> void:
 	var viewport_size := get_viewport().get_visible_rect().size
-	var compact := UIScale.is_compact()
+	var compact := UIScale.is_iphone()
 	# Em telas baixas os painéis encolhem e perdem a linha secundária: a ação ocupa o quadro.
-	var factor := UIScale.unit_for(get_viewport())*0.8 if compact else 1.0
+	var factor := 1.0
 	_root.scale = Vector2.ONE*factor
 	_kicker.visible = not compact
 	var screen := viewport_size/factor
@@ -152,8 +135,9 @@ func _layout() -> void:
 	_status.size = _status.get_combined_minimum_size()
 	_pause.position = Vector2(screen.x-58,14)
 	_pause.size = Vector2(44,48)
-	_toast.position = Vector2(maxf(14,(screen.x-430)*0.5),92 if compact else 128)
-	_toast.size = Vector2(minf(screen.x-28,430),32)
+	_actions.position = Vector2(maxf(14,screen.x-_actions.get_combined_minimum_size().x-24),screen.y-104)
+	_toast.position = Vector2(maxf(14,(screen.x-760)*0.5),92 if compact else 128)
+	_toast.size = Vector2(minf(screen.x-28,760),76)
 ## Corações para a vida e dois medalhões (espada em chamas = ataque, escudo = defesa), os
 ## mesmos dos itens no mapa. Sem carga, o medalhão fica cinza.
 func _draw_resources() -> void:
@@ -170,20 +154,28 @@ func _draw_resources() -> void:
 			_icon(Icons.heart(roundi(heart_size*px),true),center,heart_size*(1.0+0.45*(1.0-pop)),pop)
 		_icon(Icons.heart(roundi(heart_size*px),full),center,heart_size*(1.0+0.28*sin(pop*PI) if full else 1.0))
 		x += heart_size*1.08
-	x += h*0.3
-	for slot: Array in [["attack",_atk > 0,_atk_glow],["defense",_def > 0,_def_glow]]:
-		var center := Vector2(x+h*0.5,h*0.5)
-		var glow: float = slot[2]
-		if slot[1]:
-			# Brilho suave atrás do medalhão; acende mais logo depois de recarregar.
-			var tint := Color("#ff9a3c") if slot[0] == "attack" else Color("#5ec4ef")
-			for step in range(4):
-				_icons.draw_circle(center,h*(0.62-step*0.05),Color(tint,(0.06+glow*0.2)*(1.0-step*0.2)))
-		_icon(Icons.medallion(slot[0],roundi(h*px),slot[1]),center,h*(1.0+0.12*sin(glow*PI)))
-		x += h*1.15
 func _icon(texture: Texture2D, center: Vector2, size: float, alpha := 1.0) -> void:
 	_icons.draw_texture_rect(texture,Rect2(center-Vector2.ONE*size*0.5,Vector2.ONE*size),false,Color(1,1,1,alpha))
 func update_resources(player: Node) -> void:
+	if is_instance_valid(_actions):
+		var action_index := 0
+		for kind in ["attack","rupture","amber","dash","defense","jump"]:
+			if kind != "jump" and not player.discovered.has(kind): continue
+			if not _action_buttons.has(kind):
+				var button := Button.new()
+				button.custom_minimum_size = Vector2(92,76)
+				PlayerUI.style_button(button,false)
+				button.tooltip_text = {"attack":"Fogo (J)","defense":"Defesa (Shift)","jump":"Pulo (Espaço)","rupture":"Ruptura (Q)","amber":"Âmbar (E)","dash":"Relâmpago (R)"}[kind]
+				button.button_down.connect(func() -> void: Input.action_press(kind))
+				button.button_up.connect(func() -> void: Input.action_release(kind))
+				_actions.add_child(button)
+				_action_buttons[kind] = button
+			var node: Button = _action_buttons[kind]
+			_actions.move_child(node,action_index)
+			action_index += 1
+			node.text = "↑" if kind == "jump" else "%s %d" % [{"attack":"J","defense":"Shift","rupture":"Q","amber":"E","dash":"R"}[kind],player.charges(kind)]
+			if kind != "jump": node.icon = Icons.medallion(kind,36,player.charges(kind)>0)
+		_layout()
 	for index in range(3):
 		if (index < player.health) != (index < _hp): _heart_pop[index] = 1.0
 	_hp = player.health
@@ -196,8 +188,8 @@ func update_resources(player: Node) -> void:
 	_last_health = player.health
 	_health.text = "VIDA  %d/3" % player.health
 	_health.modulate = Color(1.0,0.55,0.5) if player.health == 1 else Color.WHITE
-	_attack.text = "ATAQUE  %d/1" % player.attack_charges
-	_defense.text = "DEFESA  %d/1" % player.defense_charges
+	_attack.text = "FOGO  %d/3" % player.attack_charges
+	_defense.text = "DEFESA  %d/3" % player.defense_charges
 	_attack.modulate = Color.WHITE if player.attack_charges > 0 else Color(0.58,0.58,0.58)
 	_defense.modulate = Color.WHITE if player.defense_charges > 0 else Color(0.58,0.58,0.58)
 func update_progress(share: float, seconds: float, district: String) -> void:
@@ -285,6 +277,9 @@ func set_completed(value: bool) -> void:
 	_pause.visible = not value
 	_toast.hide()
 func _process(delta: float) -> void:
+	for child in get_children():
+		if child is Control and child.has_method("_button_at"):
+			_actions.visible = not child.visible
 	if _heart_pop.any(func(value: float) -> bool: return value > 0.0):
 		for index in range(3): _heart_pop[index] = maxf(_heart_pop[index]-delta*2.6,0.0)
 		_icons.queue_redraw()

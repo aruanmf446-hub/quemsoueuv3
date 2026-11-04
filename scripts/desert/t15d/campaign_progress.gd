@@ -45,7 +45,7 @@ static func complete(order: int) -> Error:
 static func _write_web_backup(order: int) -> bool:
 	if not OS.has_feature("web"): return false
 	var success: Variant = JavaScriptBridge.eval("(function(){try{var k=" + JSON.stringify(WEB_BACKUP) + ";var n=Number(localStorage.getItem(k)||0);localStorage.setItem(k,String(Math.max(n," + str(order) + ")));return true;}catch(e){return false;}})()")
-	return success == true
+	return UIScale.js_true(success)
 
 
 static func _highest_completed() -> int:

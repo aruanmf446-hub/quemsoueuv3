@@ -43,6 +43,7 @@ func _build_slot(slot: int, left: float, right: float, top: float) -> void:
 	var width := rng.randf_range(3.8,5.1)
 	if x-width*0.5 < left+0.15 or x+width*0.5 > right-0.15: return
 	_building(Vector3(x,top,rng.randf_range(-6.2,-5.3)),width,rng)
+	_signature(Vector3(x,top,-5.0),slot)
 	building_count += 1
 
 func _building(origin: Vector3, width: float, rng: RandomNumberGenerator) -> void:
@@ -228,7 +229,7 @@ func _flush() -> void:
 func _material(key: String) -> StandardMaterial3D:
 	if _materials.has(key): return _materials[key]
 	var mat := StandardMaterial3D.new()
-	var colors := {"stone":"#927e74","trim":"#ae9480","recess":"#354051","dome":"#586883","metal":"#344054","cloth":"#446e76","cloth_alt":"#745c68","window":"#d5a667"}
+	var colors := {"stone":"#927e74","trim":"#ae9480","recess":"#354051","dome":"#9d292e","metal":"#344054","cloth":"#a52c30","cloth_alt":"#7e252b","window":"#d5a667","leaf":"#396d50"}
 	mat.albedo_color = Color(colors.get(key,"#72849a")).srgb_to_linear()
 	mat.roughness = 0.92
 	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
@@ -243,3 +244,35 @@ func _material(key: String) -> StandardMaterial3D:
 		mat.emission_energy_multiplier = 0.18
 	_materials[key] = mat
 	return mat
+
+## Marcos próximos específicos de cada rota, agrupados nas malhas já existentes.
+func _signature(origin: Vector3, slot: int) -> void:
+	var district := posmod(slot,8)
+	match _order:
+		1,4:
+			if district%2 == 0:
+				_arch_frame(origin,3.3,4.5,0.25)
+				_box(origin+Vector3(-1.8,2.4,0),Vector3(0.8,4.8,0.8),"stone")
+		2:
+			_awning(origin+Vector3(0,2.7,0.5),4.8,"cloth")
+			for side in [-1,1]: _box(origin+Vector3(side*1.6,0.4,0.7),Vector3(0.9,0.8,0.9),"metal")
+		3:
+			_box(origin+Vector3(0,3.8,0),Vector3(5.4,0.25,1.5),"trim")
+			_awning(origin+Vector3(0,3.6,0.7),3.0,"cloth")
+		5:
+			_arch_frame(origin,4.6,4.7,0.3)
+			_box(origin+Vector3(0,4.8,0),Vector3(5.0,0.35,0.8),"stone")
+		6:
+			for side in [-1,1]:
+				_box(origin+Vector3(side*2,1.5,0),Vector3(0.25,3.0,0.25),"metal")
+				_awning(origin+Vector3(side*2,3.0,0),2.3,"leaf")
+		7:
+			_box(origin+Vector3(0,0.65,0),Vector3(2.8,1.3,1.2),"stone")
+			_arch_frame(origin+Vector3(1,0,0),1.8,2.8,0.16)
+		8,9:
+			for side in [-1.0,1.0]:
+				_box(origin+Vector3(0,0.05,side*0.6),Vector3(18,0.06,0.06),"metal")
+			_box(origin+Vector3(-2,2.5,0),Vector3(0.22,5,0.25),"metal")
+			_box(origin+Vector3(0,5,0),Vector3(5,0.22,0.25),"metal")
+			_box(origin+Vector3(1,3.5,0),Vector3(0.06,3,0.06),"metal")
+			_box(origin+Vector3(1,1.8,0),Vector3(1.0,0.7,0.9),"stone")

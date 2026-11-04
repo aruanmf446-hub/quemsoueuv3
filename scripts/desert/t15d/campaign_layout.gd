@@ -1,29 +1,23 @@
 extends RefCounted
 ## Campanha noturna 01–09. Dados determinísticos separados do controlador e da Fase 10.
 ## O percurso mínimo vem da distância real: não há bloqueio por relógio nem espera na saída.
-const MAX_HORIZONTAL_SPEED := 6.0
-const DEFAULT_DISTANCE := 1200.0
+const MAX_HORIZONTAL_SPEED := 7.4
+const DEFAULT_DISTANCE := 1452.0
 const CHUNK_LENGTH := 24.0
-const NAMES := [
-	"Entrada do Deserto", "Dunas Perdidas", "Oásis da Meia-Noite",
-	"Ruínas Esquecidas", "Pontes do Abismo", "Tempestade de Areia",
-	"Fortaleza dos Cactus", "Cavernas de Cristal", "Laboratório Proibido",
-]
-const THEMES := [
-	"gates", "dunes_streets", "oasis_quarter", "ruined_quarter", "bridges",
-	"sand_lanes", "cactus_fortress", "crystal_galleries", "forbidden_district",
-]
+const NAMES := ["Portões da Capital", "Bazar da Meia-Noite", "Telhados da Cidade", "Muralhas do Palácio", "Aquedutos do Reino", "Jardins do Oásis", "Ruínas da Fronteira", "Estrada da Mineração", "Entrada da Mineradora"]
+const THEMES := ["city_gates", "bazaar", "rooftops", "ramparts", "aqueduct", "oasis", "ruins", "mining_road", "mine_entrance"]
 const DESCRIPTIONS := [
-	"Atravesse os portões e as primeiras ruas da cidade no deserto, sob a luz da lua.",
-	"Siga pelas ruas cobertas de areia entre muros antigos e passagens abertas no chão.",
-	"Atravesse o bairro do oásis à meia-noite e encontre a passagem para o centro da cidade.",
-	"Percorra o bairro das ruínas, entre pátios de pedra e arcos iluminados pela noite.",
-	"Atravesse as pontes e os vãos que dividem os distritos da cidade adormecida.",
-	"Avance pelas vielas tomadas pela areia e atravesse os desníveis do distrito noturno.",
-	"Cruze os pátios da fortaleza e enfrente os Cactus que guardam a rota urbana.",
-	"Percorra as galerias da cidade e suas passagens de pedra até o distrito seguinte.",
-	"Alcance o distrito proibido e a entrada do laboratório, no coração da cidade noturna.",
+ "Atravesse os portões da capital sob a luz da lua.",
+ "Escape das tropas entre tendas e passagens do bazar.",
+ "Siga pelos telhados da cidade e seus pátios iluminados.",
+ "Contorne as muralhas do palácio de cúpulas vermelhas.",
+ "Cruze os aquedutos que abastecem o reino.",
+ "Atravesse os jardins e as águas do oásis.",
+ "Deixe a capital pelas antigas ruínas da fronteira.",
+ "Siga a rota dos guindastes e das cargas da mineração.",
+ "Alcance o pátio da mineradora; a entrada é seu destino.",
 ]
+const STAGE_DISTRICTS := [["Portão externo", "praça vigiada", "estrada de arenito", "pátio", "muro baixo", "arcadas", "praça de lanternas", "saída pelo bazar"], ["Barracas", "rua estreita", "armazém", "pátio de caixas", "rua comercial", "ponte de serviço", "corredor murado", "escada para telhados"], ["Acesso ao telhado", "casario baixo", "varanda", "passarelas", "cúpulas baixas", "torres", "cobertura quebradiça", "terraço de saída"], ["Base da muralha", "torres laterais", "corredor de guarda", "ponte lateral", "patio militar", "plataforma superior", "ponte murada", "saída aqueduto"], ["Ponte baixa", "arco externo", "canal de areia", "coluna", "ponte antiga", "passarela quebrável", "canal elevado", "saída jardim"], ["Entrada do jardim", "área das palmeiras", "margem", "passagem de pedras", "pátio", "ponte baixa", "corredor de água", "saída do jardim"], ["Portão arruinado", "colunas", "escadarias", "pátio soterrado", "ruínas altas", "muralha caída", "passagem estreita", "saída planalto"], ["Porto de carga", "estrada", "depósitos", "pátios logísticos", "guindaste", "trilhos externos", "posto militar", "ponte de minério"], ["Primeiro cercamento", "estrada de minério", "rampa externa", "containers", "ponte de ferro", "portão de controle", "pátio de guindastes", "entrada da mina"]]
 const DISTRICT_LABELS := ["Portões", "Ruas da Areia", "Pátio Antigo", "Passagens", "Mercado", "Muralhas", "Galerias", "Saída"]
 
 static func metadata(order: int) -> Dictionary:
@@ -113,6 +107,8 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 			pickups.append({"id":"%s.health.%02d" % [prefix,index],"kind":"health","pos":[span_left+span_width*0.58,0.55,0.0]})
 		if defense_slots.has(index):
 			pickups.append({"id":"%s.defense.%02d" % [prefix,index],"kind":"defense","pos":[enemy_x-9.0,0.55,0.0]})
+		if index%2 == 0 and span_width > 45:
+			_ledge(platforms,prefix,index,9,span_left+span_width*0.63,1.1,0.55)
 		# Os degraus ficam fora do espaço de duelo/reposição e a pelo menos 8m do vão.
 		# Módulos alternam pátio aberto, degrau baixo, degrau largo e salto duplo.
 		var pattern := (index+order*3)%7
@@ -140,18 +136,56 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 	for index in range(8):
 		var start := spawn_x+distance*float(index)/8.0
 		var end := spawn_x+distance*float(index+1)/8.0
-		var district_theme: String = THEMES[(order-1+index)%THEMES.size()]
-		districts.append({"id":"%s.district.%02d" % [prefix,index],"index":index,"name":DISTRICT_LABELS[index],"start":start,"end":end,"theme":district_theme})
+		var district_theme: String = THEMES[order-1]
+		districts.append({"id":"%s.district.%02d" % [prefix,index],"index":index,"name":STAGE_DISTRICTS[order-1][index],"start":start,"end":end,"theme":district_theme})
 		var landmark_x := _safe_floor_x(start+12.0,pits)
 		landmarks.append({"id":"%s.landmark.%02d" % [prefix,index],"kind":"district_gate","pos":[landmark_x,0.0,-4.5],"theme":district_theme})
 		# Checkpoint no começo de cada distrito (menos o primeiro, que é o spawn), em chão
 		# firme: fora de vãos e degraus e longe da patrulha dos Cactus.
 		if index > 0:
 			checkpoints.append({"id":"%s.checkpoint.%02d" % [prefix,index],"district":index,"pos":[_checkpoint_x(start+4.0,pits,platforms,enemies),0.0,0.0]})
+	# Poderes são apresentados em piso seguro, com identidade persistente por item.
+	for kind in ["rupture", "amber", "dash"]:
+		var unlock_order: int = {"rupture":2,"amber":4,"dash":6}[kind]
+		if order < unlock_order: continue
+		for slot in range(6):
+			var x := _checkpoint_x(spawn_x+24.0+slot*distance/7.0,pits,platforms,enemies)
+			pickups.append({"id":"%s.%s.%d" % [prefix,kind,slot],"kind":kind,"pos":[x,0.55,0.0]})
+	# Somente peças explícitas de piso podem romper; nunca as que sustentam itens/checkpoints.
+	for platform: Dictionary in platforms:
+		if platform.kind != "ground": continue
+		var x := float(platform.pos[0])
+		var protected := false
+		for item: Dictionary in pickups+checkpoints:
+			if absf(float(item.pos[0])-x) < float(platform.size[0])*0.5+2.0: protected = true
+		platform.breakable = not protected and x > spawn_x+30 and x < goal_x-30
+	# Rupturas são peças curtas independentes, não um chunk inteiro de 24m.
+	var partitioned: Array = []
+	for platform: Dictionary in platforms:
+		if not platform.get("breakable",false):
+			partitioned.append(platform)
+			continue
+		var center := float(platform.pos[0])
+		for piece in range(3):
+			var part := platform.duplicate(true)
+			var segment_left: float = [float(platform.span_start),center-1.5,center+1.5][piece]
+			var segment_right: float = [center-1.5,center+1.5,float(platform.span_end)][piece]
+			part.id = str(platform.id)+".segment%d" % piece
+			part.pos[0] = (segment_left+segment_right)*0.5
+			part.size[0] = segment_right-segment_left
+			part.span_start = segment_left
+			part.span_end = segment_right
+			part.breakable = piece == 1
+			partitioned.append(part)
+	platforms = partitioned
+	var carried_distance := 0.0
+	for hole: Dictionary in pits:
+		if hole.get("ferry",false): carried_distance += float(hole.width)+2.0
 	stage.merge({
 		"protagonist":"el_fuego","player_spawn":[spawn_x,1.0,0.0],
 		"length":distance,"total_length":distance,"minimum_seconds":requested_seconds,
-		"minimum_traversal_seconds":(distance-1.0)/MAX_HORIZONTAL_SPEED,
+		"minimum_traversal_seconds":(distance-1.0-carried_distance)/MAX_HORIZONTAL_SPEED,
+		"transport_allowance":carried_distance,
 		"maximum_horizontal_speed":MAX_HORIZONTAL_SPEED,
 		"platforms":platforms,"enemies":enemies,"pickups":pickups,"holes":pits,
 		"signs":signs,"districts":districts,"landmarks":landmarks,

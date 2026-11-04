@@ -479,3 +479,13 @@ static func style_hero_button(button: Button, primary := false, selected := fals
 		button.add_theme_stylebox_override(state, box)
 	for state: String in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
 		button.add_theme_color_override(state, Color("1c160e") if primary else (Color("f5c45f") if selected else Color("fff8e7")))
+
+
+## Avanço da campanha: usa a mesma paleta do restante da interface.
+static func style_campaign_progress(bar: ProgressBar) -> void:
+	var fill := StyleBoxFlat.new()
+	fill.bg_color = GOLD
+	bar.add_theme_stylebox_override("fill",fill)
+	var background := StyleBoxFlat.new()
+	background.bg_color = SURFACE
+	bar.add_theme_stylebox_override("background",background)

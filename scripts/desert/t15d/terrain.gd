@@ -10,6 +10,14 @@ func build(platforms: Array) -> void:
 		var top := float(p[1]) + float(s[1]) * 0.5
 		var bottom := -5.5 if platform.kind == "ground" else 0.0
 		_shelf(float(p[0]), float(s[0]), top, bottom, float(s[2]),bool(platform.get("cap_left",true)),bool(platform.get("cap_right",true)))
+		if platform.get("breakable",false):
+			var mark := MeshInstance3D.new()
+			var strip := BoxMesh.new()
+			strip.size = Vector3(minf(float(s[0]),3.0),0.035,0.08)
+			mark.mesh = strip
+			mark.material_override = stone_material(Color("#e9a33f"))
+			mark.position = Vector3(float(p[0]),top+0.025,0.6)
+			add_child(mark)
 		if platform.kind == "ground":
 			for i in range(int(float(s[0]) / 1.8)):
 				var rock := MeshInstance3D.new()

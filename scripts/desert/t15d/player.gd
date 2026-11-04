@@ -1,4 +1,5 @@
 extends SidePlayer
+signal ability_used(kind: String)
 signal strike_landed(point: Vector3)
 signal inventory_changed
 signal action_empty(kind: String)
@@ -10,6 +11,12 @@ signal hurt
 const ActorSlot = preload("res://scripts/desert/t15d/actor_slot.gd")
 const SandFx = preload("res://scripts/desert/t15d/sand_fx.gd")
 const RUN_MAX_HEALTH := 3
+const CHARGE_CAP := 3
+const UNLOCK_FILE := "user://desert_abilities_v3.cfg"
+var abilities := {"rupture":0,"amber":0,"dash":0}
+var discovered := {"attack":true,"defense":true}
+var _dash_fx: Node3D
+var _dash_left := 0.0
 var attack_charges := 1
 var defense_charges := 1
 var _shield_timer := 0.0
@@ -36,6 +43,7 @@ func _ready() -> void:
 	floor_snap_length = 0.18
 	floor_max_angle = deg_to_rad(48)
 	health = RUN_MAX_HEALTH
+	_build_dash_fx()
 func setup(entry: Dictionary) -> void:
 	super.setup(entry)
 	_hit_delivered = false
@@ -43,6 +51,12 @@ func setup(entry: Dictionary) -> void:
 	_defend_buffer = 0.0
 	attack_charges = 1
 	defense_charges = 1
+	_dash_left = 0.0
+	for kind in abilities: abilities[kind] = 0
+	var saved := ConfigFile.new()
+	if saved.load(UNLOCK_FILE) == OK:
+		for kind in abilities:
+			if saved.get_value("discovered",kind,false): discovered[kind] = true
 	_shield_timer = 0.0
 	_hurt_timer = 0.0
 	_yaw = PI*0.5*facing
@@ -51,7 +65,11 @@ func setup(entry: Dictionary) -> void:
 	inventory_changed.emit()
 	_actor.play_animation("pronto", true)
 func _physics_process(delta: float) -> void:
+	if is_instance_valid(_dash_fx):
+		_dash_fx.visible = _dash_left > 0.0 and not is_dead
+		_dash_fx.scale.x = facing
 	if is_dead:
+		_dash_left = 0.0
 		velocity.y = maxf(velocity.y - GRAVITY * delta, MAX_FALL_SPEED)
 		move_and_slide()
 		return
@@ -66,7 +84,11 @@ func _physics_process(delta: float) -> void:
 	_defend_buffer = maxf(_defend_buffer - delta, 0.0)
 	_shield_timer = maxf(_shield_timer-delta,0.0)
 	_hurt_timer = maxf(_hurt_timer-delta,0.0)
+	_dash_left = maxf(0.0,_dash_left-delta)
+	for kind in abilities:
+		if Input.is_action_just_pressed(kind): use_ability(kind)
 	var direction := Input.get_axis("move_left", "move_right")
+	if _dash_left > 0.0 and direction == 0.0: direction = facing
 	if direction != 0.0 and _attack_timer <= 0.0:
 		facing = signf(direction)
 	velocity.y = maxf(velocity.y - GRAVITY * delta, MAX_FALL_SPEED)
@@ -99,7 +121,7 @@ func _physics_process(delta: float) -> void:
 		_deliver_hit()
 	if _knockback_timer <= 0.0:
 		# Vento só freia quem anda (parado, o personagem não escorrega).
-		var target := direction * SPEED + (wind if direction != 0.0 else 0.0)
+		var target := direction * (7.4 if _dash_left > 0.0 else SPEED) + (wind if direction != 0.0 else 0.0)
 		if is_defending or is_crouching: target = 0.0
 		if _attack_timer > 0.0: target *= 0.0 if is_on_floor() else 0.7
 		velocity.x = move_toward(velocity.x, target, (48.0 if is_on_floor() else 24.0) * delta)
@@ -170,10 +192,16 @@ func restore_charge(kind: String) -> bool:
 	if kind == "health" and health < RUN_MAX_HEALTH:
 		health += 1
 		health_changed.emit(health,RUN_MAX_HEALTH)
-	elif kind == "attack" and attack_charges < 1:
-		attack_charges = 1
-	elif kind == "defense" and defense_charges < 1:
-		defense_charges = 1
+	elif kind == "attack" and attack_charges < CHARGE_CAP:
+		attack_charges += 1
+	elif kind == "defense" and defense_charges < CHARGE_CAP:
+		defense_charges += 1
+	elif abilities.has(kind) and int(abilities[kind]) < CHARGE_CAP:
+		abilities[kind] += 1
+		discovered[kind] = true
+		var saved := ConfigFile.new()
+		for ability in abilities: saved.set_value("discovered",ability,discovered.has(ability))
+		saved.save(UNLOCK_FILE)
 	else: return false
 	inventory_changed.emit()
 	return true
@@ -189,6 +217,7 @@ func take_damage(amount: int, from_x: float) -> void:
 		blocked.emit()
 		_model.flash(Color("#8ccfff"))
 		return
+	_dash_left = 0.0
 	health = maxi(health-amount,0)
 	_invulnerable = HIT_INVULNERABLE
 	_knockback_timer = 0.18
@@ -248,3 +277,47 @@ func _separate_actors() -> void:
 		if not test_move(global_transform,correction):
 			global_position += correction
 			if velocity.x*side < 0: velocity.x = 0.0
+
+func charges(kind: String) -> int:
+	if kind == "attack": return attack_charges
+	if kind == "defense": return defense_charges
+	return int(abilities.get(kind,0))
+
+func use_ability(kind: String) -> bool:
+	if is_dead or is_defending or is_crouching or _hurt_timer > 0.0 or _attack_timer > 0.0 or not abilities.has(kind): return false
+	if int(abilities[kind]) <= 0:
+		action_empty.emit(kind)
+		return false
+	abilities[kind] -= 1
+	if kind == "dash": _dash_left = 1.15
+	if kind == "amber":
+		for enemy in get_tree().get_nodes_in_group("enemies"):
+			if global_position.distance_to(enemy.global_position) <= 8.0 and enemy.has_method("crystallize"):
+				enemy.crystallize(3.5)
+	ability_used.emit(kind)
+	inventory_changed.emit()
+	return true
+
+func cancel_dash() -> void:
+	_dash_left = 0.0
+
+func _build_dash_fx() -> void:
+	_dash_fx = Node3D.new()
+	add_child(_dash_fx)
+	_dash_fx.visible = false
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.albedo_color = Color("#ffe277")
+	for index in range(4):
+		var mesh := MeshInstance3D.new()
+		var line := BoxMesh.new()
+		line.size = Vector3(0.65,0.025,0.025)
+		mesh.mesh = line
+		mesh.material_override = mat
+		mesh.position = Vector3(-0.5+index*0.27,0.08+index*0.16,0.45)
+		mesh.rotation.z = -0.3 if index%2 == 0 else 0.3
+		_dash_fx.add_child(mesh)
+
+func _die() -> void:
+	cancel_dash()
+	super._die()

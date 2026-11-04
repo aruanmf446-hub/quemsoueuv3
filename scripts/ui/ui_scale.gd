@@ -34,7 +34,7 @@ static func is_handheld() -> bool:
 ## design passa de 1672×941 para IPHONE_BASE: com a altura útil de ~350 pt de um iPhone deitado,
 ## a interface fica ~30% maior. Android, Windows, iPad e navegador de computador não mudam.
 ## Testes simulam com o argumento de usuário --iphone (ou QSE_TEST_IPHONE=1).
-const IPHONE_BASE := Vector2i(1080, 608)
+const IPHONE_BASE := Vector2i(1200, 675)
 ## Piso de legibilidade no iPhone (px de design): ~9,5 pt no 13 mini e ~11 pt no Pro Max.
 ## Só textos menores sobem; os maiores ficam como estão.
 const IPHONE_MIN_FONT := 20

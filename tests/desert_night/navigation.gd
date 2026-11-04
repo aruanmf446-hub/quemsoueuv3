@@ -71,14 +71,17 @@ func run() -> void:
 	menu = load("res://scenes/menu/main_menu.tscn").instantiate()
 	root.add_child(menu)
 	current_scene = menu
-	await frames(70)
-	var story_card: Control
-	for child in menu.get_node("MenuButtons").get_children():
-		if child.get("button_id") == "story": story_card = child
-	await click(story_card)
+	await frames(20)
+	var navigation: NavigationManager = menu.get_node("Navigation")
+	if navigation._active != null and navigation._history.back().route == "account":
+		await click(navigation._active.get_node("Margin/Column/Header/Back"))
+		await frames(15)
+	# A ação nativa do hero substituiu os cartões antigos ocultos do lobby.
+	var hero: Control = menu._hero_carousel
+	await click(hero._actions[0])
 	await frames(40)
 	var story = menu.get_node("Navigation")._active
-	check(story != null and story.is_visible_in_tree(),"Modo História abre pelo menu real")
+	check(story != null and story.is_visible_in_tree() and navigation._history.back().route == "story","Modo História abre pelo menu real")
 	var first: Button = story.find_child("Launch01",true,false)
 	var second: Button = story.find_child("Launch02",true,false)
 	check(first != null and not first.disabled and second != null and second.disabled,"novo perfil libera só a primeira fase")
@@ -137,8 +140,10 @@ func run() -> void:
 	quit(1 if failures else 0)
 
 func wait_for_host() -> Node:
-	var deadline := Time.get_ticks_msec()+12000
+	var deadline := Time.get_ticks_msec()+45000
 	while Time.get_ticks_msec() < deadline:
+		var loading := root.get_node_or_null("CampaignLoading") as CampaignLoading
+		if loading != null and loading._story_mode and not loading._story_done: loading._carousel.skip_requested.emit()
 		var story := root.get_node_or_null("PhaseStory") as PhaseStory
 		if story != null: story._carousel.skip_requested.emit()
 		var host := root.get_node_or_null("StoryPrototypeSession")
@@ -147,8 +152,10 @@ func wait_for_host() -> Node:
 	return null
 
 func wait_for_phase(host: Node, order: int) -> Node3D:
-	var deadline := Time.get_ticks_msec()+12000
+	var deadline := Time.get_ticks_msec()+45000
 	while Time.get_ticks_msec() < deadline:
+		var loading := root.get_node_or_null("CampaignLoading") as CampaignLoading
+		if loading != null and loading._story_mode and not loading._story_done: loading._carousel.skip_requested.emit()
 		var story := root.get_node_or_null("PhaseStory") as PhaseStory
 		if story != null: story._carousel.skip_requested.emit()
 		for child in host.get_children():

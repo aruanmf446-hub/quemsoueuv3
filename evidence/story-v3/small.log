@@ -1,0 +1,73 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS origem ainda não lida no perfil de teste isolado
+PASS roteiro tem oito quadros
+PASS roteiro começa nas minas de Pimento
+PASS roteiro preserva a missão final
+PASS leitura não avança sozinha
+PASS navegação manual quadro 1
+PASS legenda completa quadro 1 (58px <= 180px)
+PASS legenda não cobre Próximo quadro 1
+PASS ação dentro da tela quadro 1
+PASS arte por região de atlas quadro 1
+PASS captura quadro_01
+PASS navegação manual quadro 2
+PASS legenda completa quadro 2 (58px <= 180px)
+PASS legenda não cobre Próximo quadro 2
+PASS ação dentro da tela quadro 2
+PASS arte por região de atlas quadro 2
+PASS captura quadro_02
+PASS navegação manual quadro 3
+PASS legenda completa quadro 3 (58px <= 180px)
+PASS legenda não cobre Próximo quadro 3
+PASS ação dentro da tela quadro 3
+PASS arte por região de atlas quadro 3
+PASS captura quadro_03
+PASS navegação manual quadro 4
+PASS legenda completa quadro 4 (58px <= 180px)
+PASS legenda não cobre Próximo quadro 4
+PASS ação dentro da tela quadro 4
+PASS arte por região de atlas quadro 4
+PASS captura quadro_04
+PASS navegação manual quadro 5
+PASS legenda completa quadro 5 (87px <= 180px)
+PASS legenda não cobre Próximo quadro 5
+PASS ação dentro da tela quadro 5
+PASS arte por região de atlas quadro 5
+PASS captura quadro_05
+PASS navegação manual quadro 6
+PASS legenda completa quadro 6 (58px <= 180px)
+PASS legenda não cobre Próximo quadro 6
+PASS ação dentro da tela quadro 6
+PASS arte por região de atlas quadro 6
+PASS captura quadro_06
+PASS navegação manual quadro 7
+PASS legenda completa quadro 7 (58px <= 180px)
+PASS legenda não cobre Próximo quadro 7
+PASS ação dentro da tela quadro 7
+PASS arte por região de atlas quadro 7
+PASS captura quadro_07
+PASS navegação manual quadro 8
+PASS legenda completa quadro 8 (58px <= 180px)
+PASS legenda não cobre Próximo quadro 8
+PASS ação dentro da tela quadro 8
+PASS arte por região de atlas quadro 8
+PASS captura quadro_08
+PASS cancelar leitura incompleta não marca como lida
+PASS história aparece durante o carregamento da fase
+PASS não abre gameplay antes da leitura
+PASS temporizador da abertura anterior é cancelado ao entrar na história
+PASS quadro1 permanece durante leitura longa e carregamento
+PASS cena e recursos ficam prontos enquanto leitor permanece no quadro1
+PASS fim do carregamento respeita o ritmo de leitura
+PASS captura leitura_com_fase_pronta
+PASS pular abre somente uma cena já preparada
+PASS pular explicitamente persiste a preferência de não repetir
+PASS segunda visita pula história automaticamente
+PASS Rever história reabre mesmo após leitura
+PASS repetição mostra só capa de carga
+PASS fase relida entra assim que recursos ficam prontos, sem espera artificial
+STORY_V3_RESULT checks=67 failures=0

@@ -1,0 +1,74 @@
+[
+  {
+    "profile": "desktop",
+    "resolution": "1920x1080",
+    "checks": 67,
+    "failures": 0,
+    "engine": "4.7.2.stable.official.ed1daf0bf",
+    "physical_device": false,
+    "browser": false
+  },
+  {
+    "profile": "iphone",
+    "resolution": "844x390 --iphone",
+    "checks": 67,
+    "failures": 0,
+    "engine": "4.7.2.stable.official.ed1daf0bf",
+    "physical_device": false,
+    "browser": false
+  },
+  {
+    "profile": "small",
+    "resolution": "640x360",
+    "checks": 67,
+    "failures": 0,
+    "engine": "4.7.2.stable.official.ed1daf0bf",
+    "physical_device": false,
+    "browser": false
+  },
+  {
+    "test": "navigation-desktop",
+    "checks": 20,
+    "failures": 0
+  },
+  {
+    "test": "navigation-mobile",
+    "checks": 20,
+    "failures": 0
+  },
+  {
+    "test": "story-lifecycle",
+    "checks": 4,
+    "failures": 0
+  },
+  {
+    "test": "loading-failure-retry",
+    "failures": 0,
+    "expected_resource_errors": true
+  },
+  {
+    "test": "story-touch-iphone",
+    "checks": 15,
+    "failures": 0,
+    "models": [
+      "750x353",
+      "712x338",
+      "667x359"
+    ],
+    "button_design_height": 88
+  },
+  {
+    "test": "story-touch-standard",
+    "checks": 5,
+    "failures": 0,
+    "resolution": "640x360",
+    "button_design_height": 64
+  },
+  {
+    "test": "presentation-flow",
+    "checks": 10,
+    "failures": 0,
+    "mode": "headless",
+    "remote_services": false
+  }
+]

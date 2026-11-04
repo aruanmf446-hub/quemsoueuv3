@@ -1,0 +1,27 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS Modo História abre pelo menu real
+PASS novo perfil libera só a primeira fase
+PASS captura real 01_historia
+PASS Jogar inicia a sessão e recolhe o menu
+PASS Fase01 assume Voltar sem fechar aplicativo
+PASS retorno legado não se sobrepõe ao HUD
+PASS captura real 02_gameplay
+PASS Esc abre pausa em vez de sair da fase
+PASS Continuar volta à partida
+NAVIGATION_FIXTURE calling goal callback; NOT a traversal test
+PASS vitória salva desbloqueio local da próxima fase
+PASS vitória de01 não libera fase03
+PASS Próxima fase carrega02 com controlador novo
+PASS troca01→02 preserva controle do botão Voltar
+PASS troca mantém wrapper legado recolhido
+PASS retornar de02 limpa sessão e reabre os reinos
+PASS retorno02→menu restaura política original Voltar
+PASS lista atualiza fase02 liberada sem reabrir o jogo
+PASS captura real 03_fase02_liberada
+PASS fase02 liberada pode ser aberta pelo botão real
+PASS relançamento mantém identidade02
+NIGHT_NAVIGATION_RESULT checks=20 failures=0 mobile=false
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)

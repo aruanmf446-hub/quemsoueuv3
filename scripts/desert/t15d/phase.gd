@@ -10,6 +10,7 @@ const Pickup = preload("res://scripts/desert/t15d/charge_pickup.gd")
 const CHUNK_SIZE := 64.0
 const AHEAD := 2
 signal return_requested
+var _new_ability := ""
 var _order := 1
 var _scenery: Node3D
 var _session: CanvasLayer
@@ -94,7 +95,7 @@ func _ready() -> void:
 	_stream_world(_player.position.x,true)
 	_build_camera()
 	_build_hud()
-	_hud.notify("Vida 3/3 • guarde até três cargas de cada poder")
+	_hud.notify({"rupture":"Ruptura descoberta • Q ou botão: rompa o piso marcado atrás de você", "amber":"Âmbar descoberto • E ou botão: imobilize as tropas próximas", "dash":"Relâmpago descoberto • R ou botão: avance com mais velocidade"}.get(_new_ability,"Vida 3/3 • guarde até três cargas de cada poder"))
 func _physics_process(delta: float) -> void:
 	if not is_instance_valid(_player): return
 	if not completed and not _respawning:
@@ -208,6 +209,11 @@ func _build_player() -> void:
 	_player.blocked.connect(func() -> void: _impact(_player.position+Vector3(_player.facing*0.45,0.9,0),Color("#9cdeff")))
 	_player.ability_used.connect(_on_ability_used)
 	_player.setup(_find_protagonist())
+	# Desbloqueio garantido ao alcançar o capítulo; recargas do mapa são opcionais.
+	var unlock: String = {2:"rupture",4:"amber",6:"dash"}.get(_order,"")
+	if not unlock.is_empty() and not _player.discovered.has(unlock):
+		_player.restore_charge(unlock)
+		_new_ability = unlock
 	# Luz de recorte que acompanha o protagonista: o traje escuro não some na muralha.
 	_key_light = OmniLight3D.new()
 	_key_light.name = "PlayerKeyLight"

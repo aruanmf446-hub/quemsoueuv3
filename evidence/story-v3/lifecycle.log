@@ -1,0 +1,7 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS briefing da fase3 corresponde à nova rota
+PASS Começar fase registra leitura concluída
+PASS Esc cancela carregamento e fecha história
+PASS Esc não marca como lida a cena cancelada
+STORY_LIFECYCLE_RESULT checks=4 failures=0

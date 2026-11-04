@@ -1,0 +1,117 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS cena carrega o mapa correto 05
+PASS vida e recursos iniciais 3/3, 1/1 e 1/1
+PASS sete checkpoints de distrito
+PASS distância obrigatória garante três minutos mesmo sem combate
+ROUTE_TICK phase=5 seconds=0.0 x=-8.0 hp=3 attack=1 loaded=3
+ROUTE_SLOW step=254 ms=86.975 x=13.732647895813 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=369 ms=38.982 x=25.2326908111572 time_scale=1.0 active=0 queue=0
+ROUTE_TICK phase=5 seconds=10.0 x=46.0739974975586 hp=3 attack=1 loaded=4
+ROUTE_SLOW step=859 ms=52.157 x=71.973518371582 time_scale=1.0 active=1 queue=0
+ROUTE_TICK phase=5 seconds=20.0 x=102.735282897949 hp=3 attack=1 loaded=5
+ROUTE_SLOW step=1289 ms=59.843 x=111.634757995605 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=1325 ms=74.167 x=115.23511505127 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=1511 ms=107.588 x=133.835601806641 time_scale=1.0 active=1 queue=0
+ROUTE_TICK phase=5 seconds=30.0 x=159.395034790039 hp=3 attack=0 loaded=5
+ROUTE_SLOW step=1943 ms=37.756 x=173.695388793945 time_scale=1.0 active=0 queue=0
+ROUTE_TICK phase=5 seconds=40.0 x=218.420059204102 hp=3 attack=1 loaded=5
+ROUTE_TICK phase=5 seconds=50.0 x=275.077056884766 hp=3 attack=1 loaded=5
+ROUTE_TICK phase=5 seconds=60.0 x=331.724273681641 hp=3 attack=2 loaded=5
+ROUTE_SLOW step=3894 ms=47.711 x=355.194702148438 time_scale=1.0 active=0 queue=0
+ROUTE_TICK phase=5 seconds=70.0 x=379.187957763672 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=5 seconds=80.0 x=434.997650146484 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=5 seconds=90.0 x=491.644653320312 hp=3 attack=2 loaded=5
+ROUTE_SLOW step=5614 ms=65.458 x=512.138977050781 time_scale=1.0 active=0 queue=17
+ROUTE_SLOW step=5838 ms=766.084 x=534.533752441406 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=5839 ms=38.006 x=534.633728027344 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=5905 ms=144.285 x=541.232116699219 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=5914 ms=92.998 x=542.131896972656 time_scale=1.0 active=1 queue=0
+ROUTE_TICK phase=5 seconds=100.0 x=550.436950683594 hp=3 attack=2 loaded=5
+ROUTE_SLOW step=6066 ms=827.842 x=553.410400390625 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=6067 ms=40.551 x=553.450439453125 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=6303 ms=502.265 x=573.843872070312 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=6506 ms=606.198 x=591.438049316406 time_scale=1.0 active=5 queue=0
+ROUTE_SLOW step=6507 ms=48.867 x=591.524719238281 time_scale=1.0 active=5 queue=0
+ROUTE_SLOW step=6551 ms=67.813 x=595.338195800781 time_scale=1.0 active=5 queue=0
+ROUTE_SLOW step=6554 ms=86.179 x=595.598205566406 time_scale=1.0 active=5 queue=0
+ROUTE_SLOW step=6555 ms=455.046 x=595.684875488281 time_scale=1.0 active=5 queue=0
+ROUTE_SLOW step=6564 ms=60.351 x=596.464904785156 time_scale=1.0 active=5 queue=0
+ROUTE_SLOW step=6571 ms=115.691 x=597.071594238281 time_scale=1.0 active=5 queue=0
+ROUTE_TICK phase=5 seconds=110.0 x=599.5849609375 hp=3 attack=2 loaded=5
+ROUTE_SLOW step=6688 ms=103.203 x=607.211975097656 time_scale=1.0 active=6 queue=0
+ROUTE_SLOW step=6722 ms=656.754 x=610.158874511719 time_scale=1.0 active=6 queue=0
+ROUTE_SLOW step=7038 ms=95.951 x=638.447448730469 time_scale=1.0 active=6 queue=0
+ROUTE_SLOW step=7123 ms=92.508 x=645.619201660156 time_scale=1.0 active=6 queue=0
+ROUTE_SLOW step=7124 ms=41.968 x=645.719177246094 time_scale=1.0 active=6 queue=0
+ROUTE_SLOW step=7149 ms=51.345 x=648.218566894531 time_scale=1.0 active=5 queue=0
+ROUTE_SLOW step=7150 ms=43.463 x=648.318542480469 time_scale=1.0 active=5 queue=0
+ROUTE_TICK phase=5 seconds=120.0 x=653.317321777344 hp=3 attack=2 loaded=5
+ROUTE_SLOW step=7254 ms=93.552 x=658.716064453125 time_scale=1.0 active=5 queue=0
+ROUTE_SLOW step=7365 ms=41.61 x=668.802551269531 time_scale=1.0 active=5 queue=0
+ROUTE_SLOW step=7459 ms=35.814 x=678.20068359375 time_scale=1.0 active=6 queue=0
+ROUTE_SLOW step=7528 ms=53.615 x=685.099060058594 time_scale=1.0 active=6 queue=0
+ROUTE_SLOW step=7537 ms=279.603 x=685.998840332031 time_scale=1.0 active=6 queue=0
+ROUTE_SLOW step=7538 ms=63.932 x=686.098815917969 time_scale=1.0 active=6 queue=0
+ROUTE_SLOW step=7540 ms=185.452 x=686.298889160156 time_scale=1.0 active=6 queue=0
+ROUTE_SLOW step=7541 ms=88.655 x=686.398864746094 time_scale=1.0 active=6 queue=0
+ROUTE_SLOW step=7607 ms=745.886 x=692.997253417969 time_scale=1.0 active=6 queue=0
+ROUTE_SLOW step=7608 ms=59.831 x=693.097229003906 time_scale=1.0 active=6 queue=0
+ROUTE_SLOW step=7655 ms=1248.923 x=697.795593261719 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=7675 ms=40.628 x=699.795104980469 time_scale=1.0 active=1 queue=0
+ROUTE_TICK phase=5 seconds=130.0 x=712.290954589844 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=7807 ms=1454.554 x=712.990783691406 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=7835 ms=35.338 x=715.790100097656 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=7851 ms=122.777 x=717.389709472656 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=8043 ms=287.612 x=733.245971679688 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=8044 ms=63.447 x=733.345947265625 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=8100 ms=46.224 x=738.944580078125 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=8183 ms=33.778 x=746.281494140625 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=8184 ms=35.307 x=746.381469726562 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=8251 ms=146.81 x=753.080444335938 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=8254 ms=103.458 x=753.380187988281 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=8316 ms=258.849 x=759.578491210938 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=8317 ms=499.813 x=759.678466796875 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=8355 ms=52.153 x=763.4775390625 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=8356 ms=62.424 x=763.577514648438 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=8362 ms=47.078 x=764.177429199219 time_scale=1.0 active=2 queue=0
+ROUTE_TICK phase=5 seconds=140.0 x=767.976501464844 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=8409 ms=46.033 x=768.876281738281 time_scale=1.0 active=6 queue=2
+ROUTE_SLOW step=8885 ms=627.795 x=813.1240234375 time_scale=1.0 active=5 queue=0
+ROUTE_SLOW step=8891 ms=36.417 x=813.723937988281 time_scale=1.0 active=5 queue=0
+ROUTE_SLOW step=8976 ms=52.174 x=819.160766601562 time_scale=1.0 active=5 queue=0
+ROUTE_TICK phase=5 seconds=150.0 x=820.501220703125 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=9092 ms=901.806 x=829.26025390625 time_scale=1.0 active=5 queue=0
+ROUTE_SLOW step=9106 ms=51.036 x=830.659912109375 time_scale=1.0 active=5 queue=0
+ROUTE_SLOW step=9309 ms=48.923 x=846.55322265625 time_scale=1.0 active=6 queue=0
+ROUTE_SLOW step=9347 ms=133.958 x=850.352294921875 time_scale=1.0 active=6 queue=0
+ROUTE_TICK phase=5 seconds=160.0 x=875.645690917969 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=9694 ms=33.904 x=881.704406738281 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=9874 ms=52.722 x=899.699401855469 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=9907 ms=85.135 x=901.924865722656 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=9920 ms=36.644 x=902.303100585938 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=10176 ms=104.419 x=927.835266113281 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=10179 ms=40.893 x=928.135192871094 time_scale=1.0 active=1 queue=0
+ROUTE_TICK phase=5 seconds=170.0 x=930.234802246094 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=10372 ms=73.369 x=947.430603027344 time_scale=1.0 active=6 queue=0
+ROUTE_TICK phase=5 seconds=180.0 x=986.101135253906 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=11346 ms=60.628 x=1037.34716796875 time_scale=1.0 active=1 queue=0
+ROUTE_TICK phase=5 seconds=190.0 x=1042.74536132812 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=5 seconds=200.0 x=1102.73083496094 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=5 seconds=210.0 x=1157.10424804688 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=12734 ms=68.34 x=1170.50109863281 time_scale=1.0 active=1 queue=0
+ROUTE_TICK phase=5 seconds=220.0 x=1212.82373046875 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=13708 ms=36.317 x=1262.60327148438 time_scale=1.0 active=1 queue=0
+ROUTE_TICK phase=5 seconds=230.0 x=1268.46862792969 hp=3 attack=2 loaded=5
+ROUTE_SLOW step=13867 ms=39.915 x=1275.16027832031 time_scale=1.0 active=1 queue=0
+ROUTE_TICK phase=5 seconds=240.0 x=1314.29125976562 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=5 seconds=250.0 x=1359.91162109375 hp=3 attack=3 loaded=4
+ROUTE_TICK phase=5 seconds=260.0 x=1419.89392089844 hp=3 attack=3 loaded=3
+PASS travessia completa sem morte ou respawn
+PASS saída alcançada exclusivamente por ações reais
+PASS tempo físico da fase >=180s (263.51)
+PASS relógio independente confirma >=180s (263.88)
+PASS streaming mantém quantidade limitada de distritos carregados
+PASS percurso ativa os sete checkpoints
+PASS 95% dos quadros ficam no orçamento de 33ms (p95 6.1ms, pico 1415.6ms)
+NIGHT_ROUTE_RESULT {"captured":false,"checks":11,"collected":28,"completed":true,"cpu_step":{"max_ms":1454.554,"p95_ms":6.219},"deaths":0,"defeated":18,"failures":0,"health":3,"measurement":"wall-clock; physics intervals include intentional 0.05x hit-stop; all maxima retained","order":5,"phase_seconds":263.511666666756,"physics_seconds":263.883333333333,"position":[1443.18786621094,0.000883786007761955,0.0],"render_frame_wall":{"max_ms":1415.638,"p95_ms":6.084},"swings":18}

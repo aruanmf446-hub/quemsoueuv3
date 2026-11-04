@@ -31,7 +31,9 @@ func _run() -> void:
 	for i in 4: await process_frame
 	var nav: Node = menu.get_node("Navigation")
 	if not nav.get("_history").is_empty() and nav.get("_history").back().route == "account":
-		nav.back()
+		var startup_back := (nav.get("_active") as Control).get_node_or_null("Margin/Column/Header/Back") as Button
+		if startup_back != null: startup_back.pressed.emit()
+		else: nav.back()
 		await _settle(nav, "")
 		for i in 3: await process_frame
 	var tag := args[1]

@@ -42,7 +42,7 @@ intactos. Falha de leitura mantém Tentar novamente e Voltar.
 
 `tests/presentation/story_v3.gd` exige QSE_TEST_STORY=1 e um user:// isolado.
 Executado no Godot4.7.2 em1920×1080,844×390 com--iphone e640×360:
-65 verificações por perfil, zero falhas. Cada execução captura os oito quadros
+67 verificações por perfil, zero falhas. Cada execução captura os oito quadros
 mais a leitura com a fase pronta; verifica a altura das legendas, posição dos
 botões, navegação manual, cancelamento sem marcar leitura, pulo, persistência,
 revisita automática, replay e aquecimento dos recursos durante a leitura.
@@ -63,3 +63,10 @@ perfil (desktop e mobile). `story_lifecycle.gd` passou4 verificações, incluind
 Esc durante um worker ativo sem deixar referências pendentes. `failure.gd`
 passou com zero falhas; seus erros de recurso inexistente são intencionais. A revisão de layout inclui o script
 `tools/player_ui/check_design.py`.
+
+Após a correção do timer, os três perfis foram executados novamente:67/0cada.
+O teste confirma que o timer anterior da abertura foi interrompido antes da
+leitura manual e permanece parado durante os quadros. `flow.gd` foi alinhado
+ao boot atual (login primeiro) e passou10 verificações de login/visitante,
+acesso ao hero e entrada na fase com leitura durante a carga; não consulta
+as ofertas de Novidades, que hoje têm sua própria central e suíte.

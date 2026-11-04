@@ -163,9 +163,21 @@ func update_resources(player: Node) -> void:
 			if kind != "jump" and not player.discovered.has(kind): continue
 			if not _action_buttons.has(kind):
 				var button := Button.new()
-				button.custom_minimum_size = Vector2(92,76)
-				PlayerUI.style_button(button,false)
+				button.custom_minimum_size = Vector2(88,88)
+				PlayerUI.style_story_action(button)
 				button.tooltip_text = {"attack":"Fogo (J)","defense":"Defesa (Shift)","jump":"Pulo (Espaço)","rupture":"Ruptura (Q)","amber":"Âmbar (E)","dash":"Relâmpago (R)"}[kind]
+				button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				for spec: Array in [["Count",Vector2(60,7),18],["Key",Vector2(0,64),16]]:
+					var caption := Label.new()
+					caption.name = spec[0]
+					caption.position = spec[1]
+					caption.size = Vector2(88 if spec[0] == "Key" else 24,22)
+					caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+					caption.add_theme_font_size_override("font_size",spec[2])
+					caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
+					button.add_child(caption)
+				button.gui_input.connect(func(event: InputEvent) -> void:
+					if event is InputEventMouseButton and not event.pressed: button.release_focus())
 				button.button_down.connect(func() -> void: Input.action_press(kind))
 				button.button_up.connect(func() -> void: Input.action_release(kind))
 				_actions.add_child(button)
@@ -173,7 +185,9 @@ func update_resources(player: Node) -> void:
 			var node: Button = _action_buttons[kind]
 			_actions.move_child(node,action_index)
 			action_index += 1
-			node.text = "↑" if kind == "jump" else "%s %d" % [{"attack":"J","defense":"Shift","rupture":"Q","amber":"E","dash":"R"}[kind],player.charges(kind)]
+			node.text = "↑" if kind == "jump" else ""
+			(node.get_node("Count") as Label).text = "" if kind == "jump" else str(player.charges(kind))
+			(node.get_node("Key") as Label).text = {"attack":"J","defense":"Shift","rupture":"Q","amber":"E","dash":"R","jump":"Espaço"}[kind]
 			if kind != "jump": node.icon = Icons.medallion(kind,36,player.charges(kind)>0)
 		_layout()
 	for index in range(3):

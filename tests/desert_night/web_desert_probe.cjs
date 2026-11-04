@@ -1,0 +1,40 @@
+// Actual WebAssembly fixture: blocked external hosts, touch input, safe iPhone canvas.
+const {chromium}=require('playwright');
+const fs=require('fs');
+const out=process.env.QSE_DESERT_WEB_OUT||'/tmp/reino-web';fs.mkdirSync(out,{recursive:true});
+(async()=>{
+ const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+ const context=await browser.newContext({viewport:{width:844,height:390},deviceScaleFactor:3,isMobile:true,hasTouch:true,serviceWorkers:'block',userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'});
+ const blocked=[];await context.route('**/*',r=>{const u=new URL(r.request().url());if(['127.0.0.1','localhost'].includes(u.hostname))return r.continue();blocked.push(u.hostname);return r.abort();});
+ const page=await context.newPage(),errors=[],logs=[];
+ page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{logs.push(m.text());fs.appendFileSync(out+'/console.log',m.text()+'\n');});
+ await page.goto(process.env.QSE_DESERT_WEB_URL||'http://127.0.0.1:8135/quemsoueuv3/',{waitUntil:'domcontentloaded',timeout:120000});
+ await page.waitForFunction(()=>typeof window.qseDesertProbe==='function',null,{timeout:180000});
+ async function state(){return page.evaluate(()=>{window.qseDesertProbe('state');return window.qseDesertState;});}
+ async function tap(rect,s){const c=await page.locator('#canvas').boundingBox();await page.touchscreen.tap(c.x+(rect[0]+rect[2]/2)*c.width/s.size[0],c.y+(rect[1]+rect[3]/2)*c.height/s.size[1]);}
+ await page.waitForTimeout(2300);
+ const first=await state();if(first.index!==0)throw new Error("Story advanced automatically while reading");
+ const states=[];
+ for(let index=0;index<8;index++){
+  await page.waitForTimeout(500);const s=await state();states.push(s);
+  if(s.stage!=='loading'||s.index!==index||s.cards!==8)throw new Error('Unexpected intro state '+JSON.stringify(s));
+  if([0,4,7].includes(index))await page.screenshot({path:out+`/intro_${index+1}.png`,scale:'css'});
+  await tap(s.next,s);
+  if(index<7)await page.waitForFunction(expected=>{window.qseDesertProbe("state");return window.qseDesertState.index===expected;},index+1,{timeout:120000});
+ }
+ await page.waitForFunction(()=>{window.qseDesertProbe('state');return window.qseDesertState.stage==='play';},null,{timeout:120000});
+ await page.waitForTimeout(500);let game=await state();if(!game.read||!game.iphone)throw new Error('Read flag or iPhone profile missing');
+ await page.evaluate(()=>window.qseDesertProbe('powers'));await page.waitForTimeout(200);game=await state();
+ await page.screenshot({path:out+'/powers.png',scale:'css'});
+ const b=game.buttons.dash;if(!b)throw new Error('Dash touch button missing');
+ const c=await page.locator('#canvas').boundingBox();await page.touchscreen.tap(c.x+b[0]*c.width/game.size[0],c.y+b[1]*c.height/game.size[1]);
+ await page.waitForTimeout(180);const after=await state();
+ if(after.charges.dash>=3||after.x<=game.x)throw new Error('Dash touch did not consume charge and move player');
+ await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>typeof window.qseDesertProbe==='function',null,{timeout:120000});
+ await page.waitForFunction(()=>{window.qseDesertProbe('state');return window.qseDesertState.stage==='play';},null,{timeout:120000});
+ const replay=await state();if(!replay.read)throw new Error('Read flag did not persist');
+ if(!replay.buttons.rupture||!replay.buttons.amber||!replay.buttons.dash)throw new Error('Learned abilities did not persist after reload');
+ const report={states,game,after,replay,errors,blocked:[...new Set(blocked)],engineErrors:logs.filter(s=>/SCRIPT ERROR:|Parse Error:|^ERROR:/.test(s))};fs.writeFileSync(out+'/report.json',JSON.stringify(report,null,2));
+ await browser.close();if(report.errors.length||report.engineErrors.length)throw new Error('Browser or engine errors; see report');
+ console.log('REINO_WEB intro8 touch-dash replay-read PASS; external hosts blocked');
+})().catch(e=>{console.error(e);process.exit(1)});

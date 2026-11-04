@@ -179,6 +179,9 @@ func take_damage(amount: int) -> void:
 	super.take_damage(amount)
 func _die() -> void:
 	_state = State.DEAD
+	crystallized_left = 0.0
+	_model.set_rate(1.0)
+	if is_instance_valid(_crystal): _crystal.queue_free()
 	defeated.emit()
 	remove_from_group("enemies")
 	velocity = Vector3.ZERO

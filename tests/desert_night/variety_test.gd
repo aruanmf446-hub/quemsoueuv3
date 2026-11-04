@@ -33,11 +33,11 @@ func run() -> void:
 		for actor in get_nodes_in_group("enemies"): actor.queue_free()
 		await frames(5)
 		places[phase._scenery.current_place().name] = true
-	check(places.size() == 4,"percurso passa por quatro lugares diferentes (%s)" % ", ".join(places.keys()))
+	check(places.size() == spots.size(),"percurso passa por distritos diferentes (%s)" % ", ".join(places.keys()))
 	check(changes[0] >= 3,"cada troca de lugar avisa a fase (nome e luz)")
 	await frames(90)
-	var front: Sprite3D = phase._scenery._layers[phase._scenery._front]
-	check(is_equal_approx(front.modulate.a,1.0),"transição do fundo termina visível")
+	var front: Sprite3D = phase._scenery._layers[2]
+	check(is_equal_approx(front.modulate.a,1.0),"três camadas de cenário ficam visíveis")
 	# Coração: cura 1 e não passa do máximo; cheio, fica no mapa.
 	var heart: Dictionary
 	for pickup: Dictionary in phase._phase.pickups:

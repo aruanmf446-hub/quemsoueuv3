@@ -20,6 +20,7 @@ var _stick_actions := {}
 var _knob := Vector2.ZERO
 var _drawn_origin := Vector2.ZERO
 func _ready() -> void:
+	PlayerUI.apply_theme(self)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	visible = _wanted()
 func _wanted() -> bool:
@@ -73,7 +74,7 @@ func _draw() -> void:
 			var size := radius*2.0*(0.9 if down else 1.0)
 			draw_texture_rect(Icons.medallion(action, roundi(radius*2.0), full), Rect2(point-Vector2.ONE*size*0.5, Vector2.ONE*size), false)
 			if is_instance_valid(actor):
-				var font := ThemeDB.fallback_font
+				var font := get_theme_font("font","Label")
 				draw_string(font,point+Vector2(radius*0.45,radius*0.95),str(actor.charges(action)),HORIZONTAL_ALIGNMENT_LEFT,-1,20,Color.WHITE)
 func _process(delta: float) -> void:
 	var pixels := get_window().size

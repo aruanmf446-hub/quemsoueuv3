@@ -149,15 +149,25 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 		var unlock_order: int = {"rupture":2,"amber":4,"dash":6}[kind]
 		if order < unlock_order: continue
 		for slot in range(6):
-			var x := _checkpoint_x(spawn_x+24.0+slot*distance/7.0,pits,platforms,enemies)
+			var offset: float = {"rupture":0.0,"amber":5.0,"dash":10.0}[kind]
+			var x := spawn_x+24.0+slot*distance/7.0+offset
+			for attempt in range(40):
+				x = _checkpoint_x(x,pits,platforms,enemies)
+				var occupied := false
+				for item: Dictionary in pickups+checkpoints:
+					if absf(float(item.pos[0])-x) < 2.5: occupied = true
+				if not occupied: break
+				x += 3.0
 			pickups.append({"id":"%s.%s.%d" % [prefix,kind,slot],"kind":kind,"pos":[x,0.55,0.0]})
 	# Somente peças explícitas de piso podem romper; nunca as que sustentam itens/checkpoints.
 	for platform: Dictionary in platforms:
 		if platform.kind != "ground": continue
 		var x := float(platform.pos[0])
 		var protected := false
-		for item: Dictionary in pickups+checkpoints:
-			if absf(float(item.pos[0])-x) < float(platform.size[0])*0.5+2.0: protected = true
+		for item: Dictionary in pickups+checkpoints+geysers:
+			if absf(float(item.pos[0])-x) < 3.5: protected = true
+		for obstacle: Dictionary in platforms:
+			if obstacle.kind != "ground" and absf(float(obstacle.pos[0])-x) < float(obstacle.size[0])*0.5+2.0: protected = true
 		platform.breakable = not protected and x > spawn_x+30 and x < goal_x-30
 	# Rupturas são peças curtas independentes, não um chunk inteiro de 24m.
 	var partitioned: Array = []

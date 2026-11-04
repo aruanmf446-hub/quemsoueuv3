@@ -92,7 +92,7 @@ func _physics_process(delta: float) -> void:
 	if direction != 0.0 and _attack_timer <= 0.0:
 		facing = signf(direction)
 	velocity.y = maxf(velocity.y - GRAVITY * delta, MAX_FALL_SPEED)
-	if Input.is_action_just_pressed("jump"): _jump_buffer = JUMP_BUFFER
+	if Input.is_action_just_pressed("jump") and get_viewport().gui_get_focus_owner() == null: _jump_buffer = JUMP_BUFFER
 	if Input.is_action_just_pressed("attack"):
 		if attack_charges > 0: _attack_buffer = 0.15
 		else: action_empty.emit("attack")

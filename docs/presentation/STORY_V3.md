@@ -70,3 +70,8 @@ leitura manual e permanece parado durante os quadros. `flow.gd` foi alinhado
 ao boot atual (login primeiro) e passou10 verificações de login/visitante,
 acesso ao hero e entrada na fase com leitura durante a carga; não consulta
 as ofertas de Novidades, que hoje têm sua própria central e suíte.
+
+O shell PWA oculta o convite de instalação durante a intro e a fase.
+O carregador transfere esse estado ao controlador da fase; cancelamento restaura
+o convite. O fluxo Web verificado em Chromium com perfil iPhone está em
+`evidence/reino-v3/web_final/`; os29 testes PWA incluem ocultação e restauração.

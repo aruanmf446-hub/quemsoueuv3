@@ -1,0 +1,23 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS gêiser leva por cima da muralha indo para a direita
+PASS lançamento passa da altura da muralha (5.7m)
+PASS pulo volta ao normal depois de aterrissar
+PASS gêiser do outro lado traz de volta
+PASS salto alcança a pedra no meio do vão largo
+PASS pedra desmorona pouco depois de pisada
+PASS ficar parado na pedra derruba no vão
+PASS pedra volta para uma nova tentativa
+PASS vão largo atravessado indo
+PASS vão largo atravessado voltando
+PASS balsa existe no vão largo
+PASS balsa carrega o jogador sobre o vão
+PASS desce da balsa do outro lado
+PASS balsa também leva de volta
+PASS tempestade ativa com vento e véu
+PASS parado na tempestade o personagem não escorrega
+PASS vento reduz a velocidade para a direita
+PASS tempestade termina ao sair do trecho
+PARKOUR_RESULT checks=18 failures=0
+WARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)

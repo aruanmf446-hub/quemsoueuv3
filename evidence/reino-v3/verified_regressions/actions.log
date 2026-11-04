@@ -1,0 +1,16 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS clique real ativa Defesa pelo action defend
+PASS toque real ativa Defesa e consome sua carga
+PASS ação circular nativa fica visível no desktop
+PASS clique real ativa Âmbar uma vez
+PASS clique não prende o teclado de movimento na ação
+PASS Espaço continua pulando após clique no HUD
+PASS Enter ativa o botão focado uma única vez
+PASS clique real aciona Relâmpago antes da pausa
+PASS área ampliada de toque abre pausa sem atingir outro controle
+PASS pausa cancela impulso e congela posição sem velocidade residual extra
+STORY_ACTION_CONTROLS checks=10 failures=0
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)

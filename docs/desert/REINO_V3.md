@@ -27,7 +27,7 @@ Use Godot4.7.2. Os testes usam perfis locais isolados; fixtures não entram no e
 
 ```sh
 python3 tests/desert_night/run.py --godot /caminho/godot --output /tmp/reino-qa
-# Com display virtual :104 disponível para as etapas gráficas.
+# Use --display "$DISPLAY" dentro de xvfb-run -a para as etapas gráficas.
 GODOT=/caminho/godot tests/iphone/capture_models.sh /tmp/iphone-modelos
 xvfb-run -a /caminho/godot --path . --script res://tests/iphone/layout_guard.gd
 /caminho/godot --headless --fixed-fps 60 --path . --script res://tests/desert_night/reino_v3_test.gd
@@ -42,3 +42,14 @@ QSE_CHROMIUM_EXECUTABLE=/usr/bin/chromium node tests/web_pwa/sw_test.js
 `reino_v3_gallery.gd` e as capturas de intro são fixtures visuais identificadas; não comprovam travessia nem vitória. `web_desert_fixture.gd` só executa com feature de teste e `web_desert_probe.cjs` bloqueia destinos externos, testa os oito quadros por toque, leitura longa sem avanço automático, dash e preferência de não repetir após reload. Para montar o staging, use a cópia isolada descrita em [WEB_VALIDATION.md](../../tests/iphone/WEB_VALIDATION.md), substituindo apenas o script da fixture por `web_desert_fixture.gd` e mantendo esse conteúdo fora da publicação.
 
 Resultados e capturas finais: [evidence/reino-v3](../../evidence/reino-v3/README.md) e [evidence/story-v3](../../evidence/story-v3/README.md). Chromium com UA de iPhone é validação Web emulada; não representa Safari nem aparelho físico.
+
+## Refinamentos finais
+
+A arquitetura decorativa reúne trechos contíguos de chão somente para construir
+fachadas; colisores rompíveis e abismos permanecem separados. A densidade varia
+por fase; mineração recebe galpões e guindastes, ruínas não recebem casas novas,
+e telhados usam fachada rebaixada. Parallax avança continuamente com overscan.
+
+Defesa usa o action `defend` tanto no mouse quanto no toque. Pausa tem alvo de toque
+128×128 sem alterar escala por densidade. O shell HTML oculta o convite de
+instalação durante leitura/partida para preservar acesso aos controles.

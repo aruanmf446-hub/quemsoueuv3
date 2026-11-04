@@ -1,0 +1,102 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS cena carrega o mapa correto 09
+PASS vida e recursos iniciais 3/3, 1/1 e 1/1
+PASS sete checkpoints de distrito
+PASS distância obrigatória garante três minutos mesmo sem combate
+ROUTE_TICK phase=9 seconds=0.0 x=-8.0 hp=3 attack=1 loaded=3
+ROUTE_SLOW step=45 ms=39.841 x=-3.82666969299316 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=130 ms=35.416 x=4.67187309265137 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=214 ms=45.991 x=10.7585468292236 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=349 ms=62.697 x=23.2313575744629 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=471 ms=37.976 x=35.399055480957 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=572 ms=50.444 x=44.6995735168457 time_scale=1.0 active=8 queue=0
+ROUTE_TICK phase=9 seconds=10.0 x=47.4987907409668 hp=3 attack=1 loaded=4
+ROUTE_SLOW step=719 ms=33.382 x=59.3979072570801 time_scale=1.0 active=8 queue=0
+ROUTE_SLOW step=761 ms=39.952 x=63.5978507995605 time_scale=1.0 active=8 queue=0
+ROUTE_SLOW step=917 ms=36.946 x=79.1972427368164 time_scale=1.0 active=8 queue=0
+ROUTE_SLOW step=1007 ms=40.889 x=88.1970062255859 time_scale=1.0 active=8 queue=0
+ROUTE_SLOW step=1069 ms=43.429 x=94.3973846435547 time_scale=1.0 active=8 queue=0
+ROUTE_SLOW step=1107 ms=40.822 x=98.1976165771484 time_scale=1.0 active=8 queue=0
+ROUTE_TICK phase=9 seconds=20.0 x=106.603988647461 hp=3 attack=2 loaded=5
+ROUTE_SLOW step=1232 ms=40.934 x=109.804542541504 time_scale=1.0 active=8 queue=0
+ROUTE_SLOW step=1295 ms=36.137 x=116.104873657227 time_scale=1.0 active=8 queue=0
+ROUTE_SLOW step=1353 ms=43.533 x=121.905227661133 time_scale=1.0 active=8 queue=0
+ROUTE_SLOW step=1407 ms=40.239 x=127.305213928223 time_scale=1.0 active=8 queue=0
+ROUTE_SLOW step=1453 ms=34.537 x=131.905288696289 time_scale=1.0 active=8 queue=0
+ROUTE_SLOW step=1517 ms=35.368 x=138.304275512695 time_scale=1.0 active=8 queue=0
+ROUTE_SLOW step=1587 ms=36.176 x=145.304702758789 time_scale=1.0 active=8 queue=0
+ROUTE_SLOW step=1689 ms=33.684 x=152.164688110352 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=1795 ms=42.819 x=162.765335083008 time_scale=1.0 active=0 queue=0
+ROUTE_TICK phase=9 seconds=30.0 x=163.265365600586 hp=3 attack=2 loaded=5
+ROUTE_SLOW step=1904 ms=83.603 x=173.666091918945 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=2106 ms=41.287 x=191.517028808594 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=2192 ms=36.256 x=200.117553710938 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=2340 ms=38.903 x=214.917129516602 time_scale=1.0 active=1 queue=0
+ROUTE_TICK phase=9 seconds=40.0 x=218.904037475586 hp=3 attack=1 loaded=5
+ROUTE_TICK phase=9 seconds=50.0 x=277.577423095703 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=9 seconds=60.0 x=333.059906005859 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=9 seconds=70.0 x=389.707275390625 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=9 seconds=80.0 x=446.353912353516 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=9 seconds=90.0 x=491.092315673828 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=9 seconds=100.0 x=550.023071289062 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=6555 ms=37.166 x=595.27099609375 time_scale=1.0 active=1 queue=0
+ROUTE_TICK phase=9 seconds=110.0 x=598.584899902344 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=9 seconds=120.0 x=652.162353515625 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=9 seconds=130.0 x=712.147888183594 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=9 seconds=140.0 x=767.840576171875 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=8706 ms=35.908 x=795.094177246094 time_scale=1.0 active=1 queue=0
+ROUTE_TICK phase=9 seconds=150.0 x=823.456970214844 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=9261 ms=44.114 x=849.549011230469 time_scale=1.0 active=1 queue=0
+ROUTE_TICK phase=9 seconds=160.0 x=879.64892578125 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=9842 ms=42.485 x=899.690979003906 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=10048 ms=43.069 x=915.187438964844 time_scale=1.0 active=1 queue=0
+ROUTE_TICK phase=9 seconds=170.0 x=927.0439453125 hp=3 attack=2 loaded=5
+ROUTE_SLOW step=10288 ms=35.58 x=935.841796875 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=10337 ms=55.475 x=940.740600585938 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=10670 ms=35.493 x=971.973937988281 time_scale=1.0 active=1 queue=0
+ROUTE_TICK phase=9 seconds=180.0 x=984.970275878906 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=9 seconds=190.0 x=1040.78686523438 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=11837 ms=171.417 x=1081.13659667969 time_scale=1.0 active=0 queue=0
+ROUTE_TICK phase=9 seconds=200.0 x=1097.43286132812 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=12127 ms=35.841 x=1110.12976074219 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=12250 ms=45.46 x=1122.42687988281 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=12343 ms=34.29 x=1131.724609375 time_scale=1.0 active=8 queue=0
+ROUTE_SLOW step=12419 ms=42.712 x=1136.09020996094 time_scale=1.0 active=8 queue=0
+ROUTE_TICK phase=9 seconds=210.0 x=1154.07800292969 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=12855 ms=176.11 x=1177.3134765625 time_scale=1.0 active=8 queue=0
+ROUTE_SLOW step=12860 ms=44.928 x=1177.81335449219 time_scale=1.0 active=8 queue=0
+ROUTE_SLOW step=12901 ms=47.435 x=1181.91247558594 time_scale=1.0 active=8 queue=0
+ROUTE_SLOW step=13053 ms=45.685 x=1197.10815429688 time_scale=1.0 active=8 queue=0
+ROUTE_SLOW step=13139 ms=41.66 x=1205.70532226562 time_scale=1.0 active=8 queue=0
+ROUTE_TICK phase=9 seconds=220.0 x=1210.59020996094 hp=3 attack=2 loaded=5
+ROUTE_SLOW step=13671 ms=41.564 x=1253.6875 time_scale=1.0 active=1 queue=0
+ROUTE_TICK phase=9 seconds=230.0 x=1266.58447265625 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=13802 ms=45.732 x=1266.78442382812 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=13889 ms=123.151 x=1275.48229980469 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=13914 ms=43.364 x=1277.76843261719 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=13971 ms=48.921 x=1280.34057617188 time_scale=1.0 active=1 queue=6
+ROUTE_SLOW step=13974 ms=58.343 x=1280.64050292969 time_scale=1.0 active=1 queue=1
+ROUTE_SLOW step=14008 ms=45.887 x=1284.03967285156 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=14119 ms=41.264 x=1295.13696289062 time_scale=1.0 active=0 queue=0
+ROUTE_TICK phase=9 seconds=240.0 x=1318.54309082031 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=14872 ms=38.479 x=1351.55334472656 time_scale=1.0 active=1 queue=0
+ROUTE_TICK phase=9 seconds=250.0 x=1361.22436523438 hp=3 attack=3 loaded=4
+ROUTE_SLOW step=15050 ms=45.497 x=1366.22314453125 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=15231 ms=40.55 x=1384.31750488281 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=15250 ms=51.428 x=1386.21655273438 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=15251 ms=65.404 x=1386.31652832031 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=15263 ms=37.885 x=1387.51623535156 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=15434 ms=37.964 x=1404.6123046875 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=15564 ms=34.374 x=1417.60876464844 time_scale=1.0 active=0 queue=0
+ROUTE_TICK phase=9 seconds=260.0 x=1421.20727539062 hp=3 attack=3 loaded=3
+ROUTE_SLOW step=15695 ms=42.05 x=1430.70495605469 time_scale=1.0 active=0 queue=0
+ROUTE_SLOW step=15775 ms=49.501 x=1438.70300292969 time_scale=1.0 active=0 queue=0
+PASS travessia completa sem morte ou respawn
+PASS saída alcançada exclusivamente por ações reais
+PASS tempo físico da fase >=180s (263.30)
+PASS relógio independente confirma >=180s (263.67)
+PASS streaming mantém quantidade limitada de distritos carregados
+PASS percurso ativa os sete checkpoints
+PASS 95% dos quadros ficam no orçamento de 33ms (p95 3.3ms, pico 165.5ms)
+NIGHT_ROUTE_RESULT {"captured":false,"checks":11,"collected":31,"completed":true,"cpu_step":{"max_ms":176.11,"p95_ms":3.26},"deaths":0,"defeated":18,"failures":0,"health":3,"measurement":"wall-clock; physics intervals include intentional 0.05x hit-stop; all maxima retained","order":9,"phase_seconds":263.295000000089,"physics_seconds":263.666666666667,"position":[1443.20190429688,0.000883833272382617,0.0],"render_frame_wall":{"max_ms":165.543,"p95_ms":3.279},"swings":18}

@@ -1,60 +1,82 @@
-# Quem Sou Eu V3 — passagem de trabalho
+# Quem Sou Eu V3 — Reino do Deserto
 
-## Estado em 2026-11-04
+## Desenvolvimento atual
 
-**Trabalho incompleto, entregue para outra IA continuar. Não fazer merge/publicação sem terminar a validação final.**
-
-Branch: `work/reino-deserto-v3`. Base: `b10be149ba2d332a44cc1dcbb4c1ebe9aaaff3d6` (main já publicada anteriormente, incluindo heroPR97). Commits iniciais: `0ee699d` (fases/poderes) e `28d9a4d` (intro). O commit de handoff reúne refinamentos e provas restantes.
-
-O usuário confirmou escopo **tudo** do pacote e depois pediu, em paralelo, intro/roteiro/legendas/carregamento durante leitura. Sua última instrução foi colocar tudo na PR e deixar pendências neste README para continuação. **Não confundir a publicação anterior do hero com a reforma atual; esta branch ainda não foi integrada à main.**
+Branch `work/reino-deserto-v3`, baseada em `b10be149ba2d332a44cc1dcbb4c1ebe9aaaff3d6`.
+O dono confirmou o escopo completo do pacote: nove fases, perseguição em tropas,
+três cargas e três poderes, além da intro, roteiro, legendas e carregamento durante a leitura.
+O desenvolvimento foi retomado; este documento registra o resultado e as pendências.
+**Esta reforma ainda não foi integrada à main nem publicada no Pages.**
 
 ## Implementado
 
-- Nove fases,nomes/distritos do pacote,três camadas ilustrativas por fase e arquitetura próxima específica. Mantida câmera lateral ortográfica,personagens/modelos/FBX/animações originais. Fase10 e seu controlador original preservados.
-- Tropas persistentes fora dos chunks,pool de oito Cactus,ondas atrás da câmera,salto baixo com aterrissagem validada,parada em abismos/muros.
-- Capacidade3 para fogo,defesa e novos poderes. Ruptura física de peça marcada de3m atrás do jogador,restauração8s/reset,proteção de itens/checkpoints/personagens; Âmbar3,5s; Relâmpago7,4m/s por1,15s,colisão e cancelamento. Descobertas locais persistentes,garantidas nos capítulos2/4/6; recargas separadas sem sobreposição. Limite mínimo180s recalculado com margem para balsas.
-- HUD limpo,ações circulares nativas no desktop,joystick/círculos no toque. Poder desconhecido não deixa moldura. Estilos centralizados em PlayerUI. Último ajuste evita que foco de clique no HUD roube o pulo por Espaço.
-- Intro com8cenas e roteiro exato solicitado,atlas ilustrado,legendas nativas,capas próprias9fases,Rever história/Rever cena. Leitura/skip persistidos localmente,sem repetição automática. Recursos aquecem durante leitura; Web sem threads lê um recurso por quadro. Corrigido timer herdado que avançava quadro sozinho.
+- Nove fases com oito distritos cada, três planos ilustrativos, arquitetura próxima,
+  telhados, aquedutos, oásis, ruínas e área de mineração. Modelos, skins, FBX,
+  animações oficiais e controlador da fase 10 preservados.
+- Reserva persistente de oito Cactus, ondas atrás da câmera, salto baixo com
+  aterrissagem validada e parada em abismos e muros.
+- Até três cargas por ação; Ruptura abre uma peça de chão e restaura após oito
+  segundos; Âmbar imobiliza por 3,5 segundos; Relâmpago impulsiona por 1,15 segundo.
+  Descobertas garantidas nas fases 2/4/6, salvas localmente. Dano, morte, Defesa
+  e pausa interrompem o impulso. Percursos conservam o mínimo calculado de 180 segundos.
+- HUD com ações circulares, teclado, mouse, joystick e multitoque. Defesa corrigida
+  nos dois caminhos; pausa com alvo de toque ampliado; rótulos sem cortes no iPhone.
+- Oito cenas de origem com o roteiro solicitado e legendas nativas, capas das nove
+  fases, releitura explícita e preferência local para não repetir automaticamente.
+  Recursos carregam enquanto o jogador lê; Web sem threads aquece um recurso por quadro.
+- Convite HTML de instalação oculto durante intro/partida para não cobrir os controles,
+  restaurado ao sair. Estilos continuam em PlayerUI; exceção de layout somente no iPhone.
 
-Detalhes: [ReinoV3](docs/desert/REINO_V3.md),[Intro](docs/presentation/STORY_V3.md),[provasdasfases](evidence/reino-v3/README.md),[provasdaintro](evidence/story-v3/README.md).
+Detalhes: [fases e poderes](docs/desert/REINO_V3.md),
+[intro](docs/presentation/STORY_V3.md), [evidências](evidence/reino-v3/README.md).
 
-## Validação já executada — limites importantes
+## Validações executadas
 
-- Godot **4.7.2.stable.official.ed1daf0bf** real. Mecânicas:73/73; última guarda iPhone:504verificações,0falhas;108capturas de todos os modelos geradas.
-- Intro:67verificações em cada perfil(desktop,iPhone844×390,640×360),todas0falhas;20de geometria; navegação20+20; cancelamento4; fluxo10. Ver logs e contagens em evidence/story-v3.
-- Nove travessias completas sem morte/respawn passaram, **antes** do último refinamento da distribuição de itens/partição do chão e controles. Não declarar validadas no commit final sem repetir.
-- WebAssembly de staging passou8quadros por toque,leitura sem timer,dash e reload sem repetir. **Anterior** aos últimos refinamentos. A nova asserção de persistência das habilidades no reload ainda não foi rodada.
-- PWA28/28 e designchecker passaram. Regressões de layout,legado10,progresso,variedade,parkour,checkpoints,mouse/toque passaram em rodadas anteriores; repetir as pertinentes ao estado final.
-- O novo `tests/desert_night/action_controls.gd` testa mouse,Enter e Espaço. A primeira versão do teste usava push_input para teclado,que não atualiza Input global; foi corrigida para parse_input_event. **Última execução:5verificações,0falhas**, incluindo clique,Enter e pulo após clique.
-- Nenhum teste representa aparelho físico ou Safari real. Os fundos do ZIP são artes provisórias; a galeria desktop antiga não representa o último HUD.
+Godot **4.7.2.stable.official.ed1daf0bf**, perfis locais isolados e sem backend.
 
-## Pendências para a próxima IA
+- Mecânicas: **84 verificações, zero falhas**. Controles reais: **10, zero falhas**.
+- Runner final: **14 etapas aprovadas**, incluindo layout, fase 10, progresso,
+  regras desktop/toque, variedade, parkour, checkpoints e travessias 1/3/6/9.
+- As nove travessias completas passaram após os ajustes físicos de itens/chão.
+  A rodada final de quatro fases também inclui os últimos cenários/HUD.
+- **54 capturas finais** das fases: início e distrito 5, em desktop 1672×941,
+  iPhone 844×390 e janela padrão 640×360. O ponto intermediário é uma fixture
+  teleportada, identificada; não serve de prova de travessia.
+- Guarda iPhone: **504 verificações, zero falhas**, mais **108 capturas** dos nove modelos.
+- Intro: 67 verificações por perfil em três perfis; navegação, geometria,
+  cancelamento e fluxo registrados em [evidence/story-v3](evidence/story-v3/README.md).
+- WebAssembly real em Chromium com UA iPhone, 844×390 e DPR 3: oito quadros por toque,
+  leitura sem avanço automático, dash e persistência de leitura/habilidades após reload.
+- Export de produção separado da fixture; regressões locais de duelo/batalha aprovadas,
+  captura de batalha iPhone gerada; PWA **29 verificações, zero falhas**; design checker aprovado.
 
-1. Preservar a regressão de `action_controls.gd` (5/5aprovada); repeti-la se houver novos ajustes no HUD/foco.
-2. Reexecutar73testes de mecânica e toda a campanha01–09 sobre o estado final,incluindo progressão/retorno/checkpoints e fase10. Integrar os testes novos ao runner se conveniente.
-3. Gerar galeria **final** de todas as fases em desktop1672×941,iPhone844×390 e padrão640×360. `reino_v3_gallery.gd` já gera spawn+meio da fase por fixture explicitamente teleportada. Inspecionar arte/personagens,controles circulares,legibilidade e enquadramento. Não apresentar fotos antigas como finais.
-4. Fazer export Web final e executar `web_desert_probe.cjs` incluindo a nova asserção de habilidades descobertas após reload. Avaliar necessidade de backup localStorage dos desbloqueios se IndexedDB não sincronizar imediatamente; não há prova dessa falha ainda. Validar safe area e botões sem cortes.
-5. Rodar regressões de duelo/batalha pertinentes (`tests/duel_local/flow_test.gd`,`tests/battle_reveal/flow.gd`) e captura obrigatória de batalha iPhone. Não foram repetidas nesta entrega após os últimos ajustes.
-6. Inspecionar/otimizar picos de processamento. `route.gd` mantém máximos e p95,mede quadros separadamente do intervalo físico do hit-stop; aprovação de p95 não prova ausência de engasgos.
-7. Atualizar resultados/evidências e descrição da PR,concluir a revisão,então seguir a autorização de publicação do dono somente após fechar pendências. Confirmar sucesso de deploy-web.yml e pedir para fechar/reabrir o PWA.
+## Pendências e limites
 
-## GitHub / PR
+1. Validar Safari/PWA em iPhone físico e versões Android/Windows. Emulação Web e
+   capturas do motor não demonstram comportamento nesses aparelhos.
+2. Avaliar picos de processamento em hardware real: p95 das quatro travessias finais
+   ficou entre 2,7 e 4,6 ms, mas houve pico de 1,04 s no ambiente headless/software.
+   Esses números não constituem benchmark de renderização em aparelho.
+3. As ilustrações de cenário fornecidas no ZIP são provisórias. Conferir direção
+   artística antes de substituir por arte final; preservar modelos e identidades oficiais.
+4. Fixtures de encerramento imediato ainda registram avisos intermitentes de objetos
+   de áudio WAV/playback no ObjectDB. Não houve erro de script; investigar ciclo de áudio
+   ao encerrar/reabrir sessões prolongadas, sem confundir isso com validação de aparelho.
+5. Abrir/atualizar PR e publicar somente após confirmar os checks da entrega. A rede
+   atual permite Git, mas bloqueia `api.github.com` com Forbidden; não existe PR numerada
+   confirmada para esta branch. Não confundir a antiga publicação do hero com esta reforma.
 
-Branch publicada. A sessão permite Git mas **api.github.com está fora da allowlist de rede**; tanto GraphQL(`gh pr`) quanto REST retornaram Forbidden. Não foi possível abrir PR por essa API. Link de criação: https://github.com/aruanmf446-hub/quemsoueuv3/pull/new/work/reino-deserto-v3 . Não afirmar que existe PR numerada sem confirmar.
+Link para criar a PR: https://github.com/aruanmf446-hub/quemsoueuv3/pull/new/work/reino-deserto-v3
 
-## Ambiente para continuar
+## Regras e reprodução
 
-- Repositório local `/workspace/quemsoueuv3`.
-- Godot correto: `/workspace/.tools/godot-4.7.2/Godot_v4.7.2-stable_linux.x86_64`; o binário global pode ser4.6.3.
-- `XDG_DATA_HOME=/workspace/.runtime/data` contém templates4.7.2(Web sem threads). Para testes,use perfis XDG separados. `LP_NUM_THREADS=2` ajuda no renderer software.
-- Xvfb local: `/workspace/.tools/x11/usr/bin`; display:104 foi iniciado. Wrapper `/workspace/setup/iphone-capture-godot` adiciona áudioDummy e30FPS.
-- Imports/exports CLI: acrescente `-- --godot-mcp-no-bridge` para não abrir ponte do editor. Não editar .tscn à mão nem .godot.
-- Staging de Web usado: `/workspace/.runtime/iphone-web-fixture`,marcado `.iphone_web_fixture_stage`,main de teste efeature iphone_layout_fixture. NUNCA publicar esse staging como jogo. Copiar mudanças desde a base b10, não apenas diff do HEAD, pois há commits locais novos.
-- Staging teve seu `tests/iphone/web_fixture.gd` substituído **somente na cópia** por `tests/desert_night/web_desert_fixture.gd`; cena gerada por `make_web_fixture.gd` via ResourceSaver. Output `/workspace/.runtime/desert-v3-web/quemsoueuv3`,servidor8135. Fixtures ficam excluídas do export de produção.
-- Logs brutos e capturas adicionais em `/workspace/.runtime/desert-v3-*`; essenciais já copiados para evidence.
+Sem acesso ao Supabase, banco, credenciais, Edge Functions ou migrations.
+Nenhum desses sistemas foi alterado. Testes de duelo usam serviço local.
+Leia AGENTS.md, docs/layout/README_IPHONE.md e docs/referencias/README.md.
 
-## Regras persistentes do dono
-
-**Sem Supabase,banco,credenciais,Edge Functions ou migrations.** Não houve alteração/publicação desses sistemas. Se surgir dependência de backend,descrever para o ChatGPT.
-
-Ler AGENTS.md,docs/layout/README_IPHONE.md,docs/referencias/README.md. Estilo só PlayerUI. Exceção de escala/layout só iPhone; demais1672×941,sem compact/densidade. Preservar login,sessão,música,navegação,convites e modos existentes. Não substituir modelos/skins/FBX. Não declarar validação física a partir de captura do motor.
+Godot local: `/workspace/.tools/godot-4.7.2/Godot_v4.7.2-stable_linux.x86_64`.
+Templates em `XDG_DATA_HOME=/workspace/.runtime/data`.
+Use Xvfb próprio para os testes interativos: perda de foco pausa o jogo.
+Comandos reproduzíveis em [REINO_V3.md](docs/desert/REINO_V3.md).
+A fixture Web fica em uma cópia isolada, com feature `iphone_layout_fixture`,
+e nunca deve ser publicada como jogo; produção exclui `tests/*` e `evidence/*`.

@@ -13,6 +13,7 @@ var _web_invite_navigating := false
 var _initial_login_pending := true
 var _startup_cover: TextureRect
 var _nickname_modal: Control
+var _hero_carousel: Control
 
 
 func _ready() -> void:
@@ -66,6 +67,12 @@ func _ready() -> void:
 	add_child(_news_button)
 	resized.connect(_layout_news_button)
 	_layout_news_button.call_deferred()
+	# Hero cinematografico: apenas se as tres artes locais estiverem presentes.
+	_hero_carousel = preload("res://scripts/menu/hero_carousel.gd").new()
+	add_child(_hero_carousel)
+	move_child(_hero_carousel, $Navigation.get_index())
+	_hero_carousel.connect("route_requested", _hero_route_selected)
+	_hero_carousel.connect("news_requested", _open_news)
 	_rewards_changed()
 	# Nao mostrar o login quando um refresh token valido ja existe.
 	# A arte cobre o lobby durante a validacao (sem permitir cliques).
@@ -262,6 +269,9 @@ func _maybe_show_news() -> void:
 	_open_news()
 
 
+func _hero_route_selected(route: String) -> void:
+	_on_menu_button_activated(StringName(route))
+
 func _open_news() -> void:
 	if get_node_or_null("NewsOverlay") != null: return
 	var overlay := NewsOverlay.new()
@@ -347,10 +357,12 @@ func _refresh_friends() -> void:
 
 
 func _route_changed(route: String) -> void:
-	$LobbyArea/Stage/Viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS if route.is_empty() else SubViewport.UPDATE_DISABLED
-	# A hidden viewport stops drawing, but its skeleton/idle animations otherwise keep ticking.
-	$LobbyArea/Stage/Viewport/World.process_mode = Node.PROCESS_MODE_INHERIT if route.is_empty() else Node.PROCESS_MODE_DISABLED
-	if is_instance_valid(_news_button): _news_button.visible = route.is_empty()
+	var hero_active := is_instance_valid(_hero_carousel) and bool(_hero_carousel.get("using_art"))
+	var show_legacy_stage := route.is_empty() and not hero_active
+	$LobbyArea/Stage/Viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS if show_legacy_stage else SubViewport.UPDATE_DISABLED
+	# Keep the original 3D scene paused when the illustrated hero takes over.
+	$LobbyArea/Stage/Viewport/World.process_mode = Node.PROCESS_MODE_INHERIT if show_legacy_stage else Node.PROCESS_MODE_DISABLED
+	if is_instance_valid(_news_button): _news_button.visible = show_legacy_stage
 	# Lobby: player normal. Telas internas: versão mini no canto (some em sala/partida).
 	var now_playing := get_node_or_null("NowPlaying")
 	# Mini só onde o canto superior direito está livre (não cobre busca, filtros nem botões).

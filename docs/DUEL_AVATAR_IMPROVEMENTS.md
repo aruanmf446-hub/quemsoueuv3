@@ -1,5 +1,10 @@
 # Mata-Mata: reações e confirmações contextuais
 
+> Retorno recebido da PR #99: implantação de nickname, ordem e chat de bots
+> relatada pelo responsável do Supabase. Não reexecutar as migrations.
+> Permanecem os testes E2E reais. [Revisão do cliente](backend/REVISAO_CLIENTE_PR99.md).
+
+
 Origem: `work/duel-avatar-apresentacao`; publicação na main autorizada em 05/11/2026.
 Melhorias incrementais sobre a versão publicada;
 não altera regras de vitória, autenticação, inventário, economia ou Modo História.

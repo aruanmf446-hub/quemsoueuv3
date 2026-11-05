@@ -22,6 +22,7 @@ func shot(name: String) -> void:
 	root.get_texture().get_image().save_png(output+"/"+label+"_"+name+".png")
 func reset(value: Variant=null) -> void:
 	fake.nickname=value
+	fake.canonical_nickname=""
 	fake.next_code=""
 	fake.delay=0.0
 	fake.during_update=Callable()
@@ -127,6 +128,23 @@ func _run() -> void:
 	fake.during_update=func() -> void: services.session.user={"id":"00000000-0000-4000-8000-000000000022"}
 	var changed := await services.profile.update_nickname("Marta")
 	check(changed.code=="session_changed","resposta antiga não atualiza outra conta")
+	# PR #99: o servidor persiste NFC; a entrada pode ter acento decomposto.
+	reset()
+	fake.canonical_nickname="Café"
+	menu.call("_nickname_offer")
+	await settle()
+	prompt=menu.get("_nickname_modal")
+	entry=prompt.find_child("NicknameInput",true,false)
+	entry.text="Cafe\u0301"
+	entry.text_changed.emit(entry.text)
+	await prompt.call("_commit")
+	await settle()
+	check(services.profile.data.nickname=="Café","preserva grafia NFC confirmada pelo servidor")
+	check(not is_instance_valid(prompt),"confirma nickname normalizado sem falso erro de cadastro")
+	if is_instance_valid(prompt):
+		prompt.queue_free()
+		await settle()
+	check(DuelService.message("nickname_required").to_lower().contains("nickname"),"erro nickname_required do duelo orienta o cadastro")
 	services.session.user={}
 	services.session.client.access_token=""
 	menu.call("_nickname_offer")

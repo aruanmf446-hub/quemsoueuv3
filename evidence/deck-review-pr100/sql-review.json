@@ -1,0 +1,27 @@
+{
+  "pr": 100,
+  "head": "4f858b6e6dda1c5e47b8b6c871c01771c2ad9b53",
+  "tool": "pglast v8.7",
+  "database_access": false,
+  "sql_executed": false,
+  "files": [
+    {
+      "path": "supabase/game/migrations/20261105222130_qse_deck_review_acl_and_storage_20261105.sql",
+      "valid": false,
+      "error": "syntax error at or near \"revoke\", at index 2867",
+      "in_memory_terminator_check_statements": 15
+    },
+    {
+      "path": "supabase/game/migrations/20261105222157_qse_deck_review_read_rpcs_20261105.sql",
+      "valid": false,
+      "error": "syntax error at or near \"CREATE\", at index 405",
+      "in_memory_terminator_check_statements": 9
+    },
+    {
+      "path": "supabase/game/migrations/20261105222227_qse_deck_review_atomic_decide_20261105.sql",
+      "valid": false,
+      "error": "syntax error at or near \"revoke\", at index 4109",
+      "in_memory_terminator_check_statements": 3
+    }
+  ]
+}

@@ -1,5 +1,11 @@
 # Decks com Storage existente e revisão manual
 
+> Atualização após o PR #100: o responsável informou que as quatro RPCs, ACL e
+> política de prévias pendentes já foram implantadas no GAME. Não executar o
+> prompt de implantação abaixo novamente. O Codex conferiu o código versionado
+> e ajustou/testou o cliente com fixtures, sem acesso ao Supabase. Veja
+> [compatibilidade, problema nos registros SQL e testes reais pendentes](REVISAO_CLIENTE_PR100.md).
+
 Direção atual: Supabase GAME existente + bucket privado **qse-deck-originals**.
 Sem Cloudflare, Worker, R2, GitHub token no jogo ou outro provedor.
 A branch anterior `work/decks-revisao-repositorio` é uma alternativa descartada;
@@ -26,9 +32,10 @@ O editor oferece prompt baseado nos oficiais e envia para revisão gratuitamente
 Biblioteca → **Revisão manual** abre a tela nativa do dono. O servidor precisa
 confirmar seu papel; jogadores comuns não recebem a fila nem ações de decisão.
 
-`deck_review_service.gd` prevê o contrato abaixo, exclusivamente no GAME existente.
-Não há endpoint de hospedagem novo. Essas RPCs são **propostas para conferência**:
-não foram criadas nem verificadas no servidor por esta entrega. Se ausentes,
+`deck_review_service.gd` usa o contrato abaixo, exclusivamente no GAME existente.
+Não há endpoint de hospedagem novo. As RPCs estão registradas no PR #100 e foram
+reportadas como implantadas pelo responsável; a conferência direta no servidor
+não foi feita pelo Codex. Se ausentes,
 o cliente exibe “a revisão pelo jogo ainda precisa ser habilitada no Supabase”.
 Não simula aprovação, papel administrativo ou envio bem-sucedido.
 
@@ -75,6 +82,9 @@ Falha de negócio no formato existente `{"error":"forbidden"}`,
 
 ## O que o dono faz manualmente
 
+Após a implantação relatada, seguir o roteiro de teste em `REVISAO_CLIENTE_PR100.md`.
+Os passos de autorização abaixo são históricos; não cadastrar o revisor novamente.
+
 1. Ter em mãos o e-mail usado no login do jogo. Não é necessário obter ou criar
    um ID QSE. Não fornecer tokens/senhas.
 2. Abrir o ChatGPT com o plugin Supabase e colar o prompt abaixo. Informar o
@@ -87,6 +97,8 @@ Falha de negócio no formato existente `{"error":"forbidden"}`,
    o PWA após uma atualização do cliente. Isso não foi testado em produção aqui.
 
 ## Prompt para o ChatGPT com plugin Supabase
+
+Histórico da solicitação já atendida pelo responsável no PR #100. Não reaplicar.
 
 ```text
 Projeto: Quem Sou Eu V3. Quero autorizar minha conta existente como revisora.

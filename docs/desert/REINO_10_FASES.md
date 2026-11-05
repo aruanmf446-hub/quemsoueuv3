@@ -79,3 +79,23 @@ Evidências: [relatório e painel](../../evidence/reino-10-fases/README.md).
 
 Nenhuma autenticação, Supabase, economia, menu musical ou asset de personagem
 alterado. Esta rodada é entregue na branch de revisão, sem merge nem Pages.
+
+## Ajuste solicitado após reprovação visual
+
+A revisão de05/11 substitui a progressão anterior: congelamento para trás na fase3,
+corrida elétrica na fase4 e Ruptura atrás na fase5. Recargas desses poderes só
+aparecem a partir do capítulo correspondente; capítulos anteriores ocultam as
+habilidades mesmo quando já descobertas em outro save. Congelamento respeita a
+orientação de El Fuego; corrida aplica um choque por inimigo por carga.
+
+Nas fases1/2 os buracos reais permanecem entre superfícies. Telhados agora têm
+obstáculos baixos periódicos; soldados ficam depois das zonas de abastecimento,
+com apoio e corredor de aproximação, não encostados na primeira aterrissagem.
+Vida, ataque e defesa continuam em pedestais apoiados e separados. Pisos marcados
+usam o sistema existente de retirada/restauração real de colisão para Ruptura.
+
+As duas imagens em art-approved são conceitos gerados pela ferramenta de imagens,
+aprovados pelo dono, sem personagens substitutos. O panorama posterior foi
+reprovado e não foi instalado. **A arte aprovada ainda não foi integrada como
+camadas/módulos ao cenário jogável**; as alterações desta rodada são de gameplay.
+Não confundir os conceitos aprovados com as capturas da versão reprovada.

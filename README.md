@@ -1,5 +1,13 @@
 # Quem Sou Eu V3 — Reino do Deserto
 
+## Ajuste de parkour e progressão após reprovação
+
+Na mesma branch de revisão: congelamento para trás a partir da fase3, corrida com
+choque na4 e Ruptura na5. Guardas reposicionados após abastecimento e obstáculos
+baixos acrescentados aos telhados; vida/ataque/defesa mantidos no percurso.
+Os conceitos aprovados estão em [art-approved](docs/desert/art-approved/).
+**Pendente: integrar essa nova arte ao Godot. O visual anterior foi reprovado.**
+
 ## Reforma das dez fases — revisão separada
 
 Branch `work/reino-deserto-10-fases`, baseada na main `967a408`.

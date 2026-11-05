@@ -17,6 +17,7 @@ var abilities := {"rupture":0,"amber":0,"dash":0}
 var discovered := {"attack":true,"defense":true}
 var _dash_fx: Node3D
 var _dash_left := 0.0
+var _shock_hits := {}
 var attack_charges := 1
 var defense_charges := 1
 var _shield_timer := 0.0
@@ -128,6 +129,7 @@ func _physics_process(delta: float) -> void:
 		velocity.x = move_toward(velocity.x, target, (48.0 if is_on_floor() else 24.0) * delta)
 	velocity.z = 0.0
 	move_and_slide()
+	_shock_nearby()
 	_separate_actors()
 	global_position.z = 0.0
 	_update_floor_state(jumped)
@@ -294,14 +296,26 @@ func use_ability(kind: String) -> bool:
 		action_empty.emit(kind)
 		return false
 	abilities[kind] -= 1
-	if kind == "dash": _dash_left = 1.15
+	if kind == "dash":
+		_dash_left = 1.15
+		_shock_hits.clear()
 	if kind == "amber":
 		for enemy in get_tree().get_nodes_in_group("enemies"):
-			if global_position.distance_to(enemy.global_position) <= 8.0 and enemy.has_method("crystallize"):
+			if (enemy.global_position.x-global_position.x)*facing < 0.0 and global_position.distance_to(enemy.global_position) <= 8.0 and enemy.has_method("crystallize"):
 				enemy.crystallize(3.5)
 	ability_used.emit(kind)
 	inventory_changed.emit()
 	return true
+
+func _shock_nearby() -> void:
+	if _dash_left <= 0.0 or is_dead: return
+	for enemy in get_tree().get_nodes_in_group("enemies"):
+		if not enemy.has_method("take_damage") or enemy.health <= 0: continue
+		var id := enemy.get_instance_id()
+		if _shock_hits.has(id) or global_position.distance_to(enemy.global_position)>1.6: continue
+		_shock_hits[id]=true
+		enemy.take_damage(1)
+		strike_landed.emit(enemy.global_position+Vector3.UP*0.7)
 
 func cancel_dash() -> void:
 	_dash_left = 0.0

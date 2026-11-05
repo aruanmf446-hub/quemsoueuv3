@@ -98,7 +98,7 @@ func _ready() -> void:
 	_stream_world(_player.position.x,true)
 	_build_camera()
 	_build_hud()
-	_hud.notify({"rupture":"Ruptura descoberta • Q ou botão: rompa o piso marcado atrás de você", "amber":"Âmbar descoberto • E ou botão: imobilize as tropas próximas", "dash":"Relâmpago descoberto • R ou botão: avance com mais velocidade"}.get(_new_ability,"Vida 3/3 • guarde até três cargas de cada poder"))
+	_hud.notify({"rupture":"Ruptura descoberta • Q ou botão: rompa o piso marcado atrás de você", "amber":"Âmbar descoberto • E ou botão: congele os perseguidores atrás de você", "dash":"Relâmpago descoberto • R ou botão: avance com mais velocidade"}.get(_new_ability,"Vida 3/3 • guarde até três cargas de cada poder"))
 func _physics_process(delta: float) -> void:
 	if not is_instance_valid(_player): return
 	if not completed and not _respawning:
@@ -213,10 +213,14 @@ func _build_player() -> void:
 	_player.ability_used.connect(_on_ability_used)
 	_player.setup(_find_protagonist())
 	# Desbloqueio garantido ao alcançar o capítulo; recargas do mapa são opcionais.
-	var unlock: String = {2:"rupture",4:"amber",6:"dash"}.get(_order,"")
-	if not unlock.is_empty() and not _player.discovered.has(unlock):
-		_player.restore_charge(unlock)
-		_new_ability = unlock
+	for ability: String in Layout.ABILITY_PHASE:
+		var first_phase: int = Layout.ABILITY_PHASE[ability]
+		if _order < first_phase:
+			_player.discovered.erase(ability)
+			continue
+		if not _player.discovered.has(ability):
+			_player.restore_charge(ability)
+			if _order == first_phase: _new_ability = ability
 	# Luz de recorte que acompanha o protagonista: o traje escuro não some na muralha.
 	_key_light = OmniLight3D.new()
 	_key_light.name = "PlayerKeyLight"
@@ -487,7 +491,7 @@ func _pit_material(key: String) -> StandardMaterial3D:
 func _on_pickup_collected(id: String, kind: String) -> void:
 	_collected_ids[id] = true
 	_sfx.play("pickup",1.0 if kind == "attack" else 1.25)
-	_hud.notify({"attack":"Fogo +1","defense":"Defesa +1","health":"Vida +1","rupture":"Ruptura +1 • Q: quebre o piso marcado atrás de você","amber":"Âmbar +1 • E: imobilize as tropas próximas","dash":"Relâmpago +1 • R: corra mais rápido"}.get(kind,"+1"))
+	_hud.notify({"attack":"Fogo +1","defense":"Defesa +1","health":"Vida +1","rupture":"Ruptura +1 • Q: quebre o piso marcado atrás de você","amber":"Âmbar +1 • E: congele os perseguidores atrás de você","dash":"Relâmpago +1 • R: corra mais rápido"}.get(kind,"+1"))
 func _build_goal() -> void:
 	_goal = Area3D.new()
 	_goal.name = "ExitGate"

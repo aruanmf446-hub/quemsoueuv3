@@ -13,6 +13,8 @@ func run() -> void:
 	for order in range(1,11):
 		var stage := Layout.build(order)
 		check(stage.order == order and stage.districts.size()==8,"fase%d: identidade e oito setores" % order)
+		for ability: String in Layout.ABILITY_PHASE:
+			check(stage.pickups.any(func(item: Dictionary)->bool:return item.kind == ability) == (order >= Layout.ABILITY_PHASE[ability]),"fase%d: recarga %s respeita progressão" % [order,ability])
 		check(stage.minimum_traversal_seconds >= 180,"fase%d: percurso extenso" % order)
 		var safe := true
 		var separate := true
@@ -51,6 +53,34 @@ func run() -> void:
 		peak=maxf(peak,enemy.position.y)
 	check(enemy.position.x>float(gap.end)+0.4 and enemy.position.x>start+4,"Cactus atravessa vão real do primeiro telhado por física")
 	check(peak>float(gap.from_y)+0.9 and enemy.position.y>7.5,"Cactus salta na laje e não persegue na rua")
+	enemy.set_physics_process(false)
+	enemy.position=phase._player.position+Vector3(1.2,0,0)
+	enemy.health=3
+	phase._player.restore_charge("dash")
+	phase._player.use_ability("dash")
+	phase._player._shock_nearby()
+	check(enemy.health==2,"corrida elétrica causa choque real em inimigo próximo")
+	phase._player._shock_nearby()
+	check(enemy.health==2,"choque não repete dano a cada quadro da mesma corrida")
+	phase._player.cancel_dash()
+	# Congelamento deve atingir somente atrás, inclusive se El Fuego virar à esquerda.
+	enemy.set_physics_process(false)
+	phase._player.facing=1
+	enemy.position=phase._player.position+Vector3(3,0,0)
+	phase._player.restore_charge("amber")
+	phase._player.use_ability("amber")
+	check(enemy.crystallized_left==0,"congelamento não atinge inimigo à frente")
+	enemy.position=phase._player.position-Vector3(3,0,0)
+	phase._player.restore_charge("amber")
+	phase._player.use_ability("amber")
+	check(enemy.crystallized_left>0,"congelamento atinge perseguidor atrás")
+	enemy.crystallized_left=0
+	phase._player.facing=-1
+	phase._player.restore_charge("amber")
+	phase._player.use_ability("amber")
+	check(enemy.crystallized_left==0,"congelamento respeita orientação ao virar")
+	phase._player.facing=1
+	enemy.set_physics_process(true)
 	var landing_x := float(gap.end)
 	var landing_y := float(gap.to_y)
 	var target_before: Vector3 = phase._player.position

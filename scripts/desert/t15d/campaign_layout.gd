@@ -1,5 +1,6 @@
 extends RefCounted
 ## Percursos modulares mundiais: cada superfície, item e patrulha compartilha sua altura real.
+const ABILITY_PHASE := {"amber":3,"dash":4,"rupture":5}
 const MAX_HORIZONTAL_SPEED := 7.4
 const DEFAULT_DISTANCE := 1452.0
 const CHUNK_LENGTH := 24.0
@@ -62,7 +63,7 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 			holes.append({"id":"%s.gap.%02d" % [prefix,index],"start":end,"end":right,"width":gap,"from_y":top,"to_y":next_top,"stepping":false,"ferry":false})
 		# Guarda e itens pertencem à mesma laje. Recargas antecipam desafios;
 		# nenhuma é colocada em abismo, sobre obstáculo ou na peça destrutível.
-		var guard_x := left+(3.8 if order == 2 else (23.0 if index == 0 else 10.0))
+		var guard_x := left+(12.0 if order == 2 else (23.0 if index == 0 else 13.0))
 		if index%(6 if order == 2 else 2) == 0 and not (order == 2 and index == 0):
 			enemies.append({"id":"%s.cactus.%02d" % [prefix,index],"type":"cactus","pos":[guard_x,top+0.02,0],"patrol":[left+1,end-1],"district":district})
 		var supply_index := index/3 if order == 2 else index
@@ -70,11 +71,11 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 		if order != 2 or index%3 == 0:
 			pickups.append({"id":"%s.supply.%02d" % [prefix,index],"kind":kind,"pos":[spawn_x+2 if index == 0 and order == 2 else (spawn_x+4 if index == 0 else left+(7.0 if order == 2 else 8)),top,0],"surface":index})
 		for ability: String in ["rupture","amber","dash"]:
-			if order < {"rupture":2,"amber":4,"dash":6}[ability]: continue
+			if order < ABILITY_PHASE[ability]: continue
 			if index%(24 if order == 2 else 8) == ({"rupture":1,"amber":9,"dash":17}[ability] if order == 2 else {"rupture":1,"amber":3,"dash":5}[ability]):
 				pickups.append({"id":"%s.%s.%02d" % [prefix,ability,index],"kind":ability,"pos":[left+(3.6 if order == 2 else 12),top,0],"surface":index})
 		# Obstáculos baixos são caixas/balaustradas integradas ao módulo, não escadas.
-		if order != 2 and index > 0 and index%3 == 2:
+		if index > 0 and ((order == 2 and index%9 == 5) or (order != 2 and index%3 == 2)):
 			var height := 0.5 if order == 2 else 0.6
 			platforms.append({"id":"%s.obstacle.%02d" % [prefix,index],"kind":"ledge","pos":[left+module_length*0.55,top+height*0.5,0],"size":[0.9,height,2.6],"span_start":left+module_length*0.55-0.45,"span_end":left+module_length*0.55+0.45,"chunk":floori(left/64),"architecture":THEMES[order-1],"surface_top":top})
 	for index in range(8):

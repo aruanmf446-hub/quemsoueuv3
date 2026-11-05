@@ -1,7 +1,7 @@
 # Biblioteca visual — lote grande
 
 Dez módulos novos; quinze módulos no catálogo contando os anteriores.
-**Assets gerados e preparados para o Godot. O plano de montagem abaixo ainda não foi instalado nas cenas.**
+**Assets aprovados integrados às dez fases pelo controlador existente. Capturas e validação da integração em `evidence/ten-approved`.**
 As imagens desta página são assets isolados, não capturas de fases.
 
 ## Distribuição pelas dez fases
@@ -122,6 +122,6 @@ Fases: 06, 07, 10. Largura sugerida: 3.0m. Recurso: `desert_mine_crystals.res`.
 - Fontes RGBA: `assets/desert/modular/source/`; excluídas da exportação.
 - Texturas runtime `.res`: alfa, mipmaps, proporção preservada, maior dimensão1024.
 
-## Próxima etapa de integração
+## Regras da integração
 
-Instalar por trechos e conferir capturas do motor. Não criar colisões com a silhueta da imagem: conservar pisos3D e modelos oficiais, recortar fachadas/ponte por peça física, não esconder vãos, recargas, perseguição ou pisos de Ruptura. Água ilustrada não substitui a água animada existente. Rever alinhamento e profundidade na câmera real antes de marcar um asset como colocado.
+A instalação usa trechos carregados sob demanda, com capturas reais do motor. Não criar colisões com a silhueta da imagem: conservar pisos3D e modelos oficiais, recortar fachadas/ponte por peça física, não esconder vãos, recargas, perseguição ou pisos de Ruptura. Água ilustrada não substitui a água animada existente. Rever alinhamento e profundidade na câmera real antes de marcar um asset como colocado.

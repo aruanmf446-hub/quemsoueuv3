@@ -1,0 +1,1265 @@
+{
+	"engine": "4.7.2-stable (official)",
+	"failures": 0,
+	"positions": 63,
+	"stages": [
+		{
+			"name": "Portões da Capital",
+			"order": 1.0,
+			"placements": [
+				{
+					"anchor": "background",
+					"asset": "capital_watchtower",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.04,
+					"height": 6.995670995671,
+					"note": "vigia na aproximação do portão",
+					"section": "entrada",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.4,
+					"surface": 2,
+					"width": 3.2,
+					"world_center": [
+						50.08,
+						3.8978354978355,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "capital_archway",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.14,
+					"height": 3.57900318133616,
+					"note": "arcada depois do portão monumental existente",
+					"section": "entrada",
+					"shift_to_safe_surface": -0.588333333333367,
+					"status": "installed",
+					"supported_floor_y": 0.0,
+					"surface": 6,
+					"width": 4.5,
+					"world_center": [
+						194.691666666667,
+						1.78950159066808,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "capital_house",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.3,
+					"height": 4.93559322033898,
+					"note": "rua de acesso residencial",
+					"section": "movimentação",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.4,
+					"surface": 14,
+					"width": 6.0,
+					"world_center": [
+						427.6,
+						2.86779661016949,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "capital_merchant",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.47,
+					"height": 4.32889344262295,
+					"note": "fachada na rua comercial",
+					"section": "intermediário",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.35,
+					"surface": 22,
+					"width": 6.5,
+					"world_center": [
+						674.44,
+						2.51444672131148,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "capital_palm_garden",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.64,
+					"height": 3.96958174904943,
+					"note": "pátio lateral fora da pista",
+					"section": "recuperação",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.0,
+					"surface": 30,
+					"width": 4.0,
+					"world_center": [
+						921.28,
+						1.98479087452471,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "capital_watchtower",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.81,
+					"height": 6.995670995671,
+					"note": "torre do setor defensivo",
+					"section": "desafio final",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.4,
+					"surface": 38,
+					"width": 3.2,
+					"world_center": [
+						1168.12,
+						3.8978354978355,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "capital_balcony_house",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.94,
+					"height": 4.97802197802198,
+					"note": "antecipa o casario dos telhados",
+					"section": "saída",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.4,
+					"surface": 44,
+					"width": 6.0,
+					"world_center": [
+						1356.88,
+						2.88901098901099,
+						-5.0
+					]
+				}
+			]
+		},
+		{
+			"name": "Telhados da Capital",
+			"order": 2.0,
+			"placements": [
+				{
+					"anchor": "facade",
+					"asset": "capital_house",
+					"clip_to_physical_floor_pieces": true,
+					"fraction": 0.04,
+					"height": 4.93559322033898,
+					"note": "fachada sob a primeira laje",
+					"section": "entrada",
+					"shift_to_safe_surface": 3.97,
+					"status": "installed",
+					"supported_floor_y": 8.3,
+					"surface": 3,
+					"width": 6.0,
+					"world_center": [
+						54.05,
+						5.58220338983051,
+						1.65
+					]
+				},
+				{
+					"anchor": "facade",
+					"asset": "capital_balcony_house",
+					"clip_to_physical_floor_pieces": true,
+					"fraction": 0.23,
+					"height": 4.97802197802198,
+					"note": "fachada sob lajes de alturas diferentes",
+					"section": "parkour inicial",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 8.7,
+					"surface": 16,
+					"width": 6.0,
+					"world_center": [
+						325.96,
+						5.96098901098901,
+						1.65
+					]
+				},
+				{
+					"anchor": "facade",
+					"asset": "capital_merchant",
+					"clip_to_physical_floor_pieces": true,
+					"fraction": 0.43,
+					"height": 4.32889344262295,
+					"note": "fachada sob travessia dos becos",
+					"section": "intermediário",
+					"shift_to_safe_surface": -4.45999999999992,
+					"status": "installed",
+					"supported_floor_y": 8.0,
+					"surface": 30,
+					"width": 6.5,
+					"world_center": [
+						611.9,
+						5.58555327868852,
+						1.65
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "capital_watchtower",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.59,
+					"height": 6.995670995671,
+					"note": "torre distante sem bloquear aterrissagens",
+					"section": "orientação",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 8.0,
+					"surface": 42,
+					"width": 3.2,
+					"world_center": [
+						848.68,
+						11.4978354978355,
+						-5.0
+					]
+				},
+				{
+					"anchor": "facade",
+					"asset": "capital_balcony_house",
+					"clip_to_physical_floor_pieces": true,
+					"fraction": 0.77,
+					"height": 4.97802197802198,
+					"note": "sob saltos progressivos; varanda não é plataforma extra",
+					"section": "parkour final",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 8.4,
+					"surface": 55,
+					"width": 6.0,
+					"world_center": [
+						1110.04,
+						5.66098901098901,
+						1.65
+					]
+				},
+				{
+					"anchor": "street_below",
+					"asset": "capital_market_stall",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.94,
+					"height": 2.53658536585366,
+					"note": "bazar ao nível da rua bem abaixo da rota",
+					"section": "saída",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 8.4,
+					"surface": 67,
+					"width": 3.2,
+					"world_center": [
+						1356.88,
+						1.66829268292683,
+						-6.0
+					]
+				}
+			]
+		},
+		{
+			"name": "Bazar da Cidade",
+			"order": 3.0,
+			"placements": [
+				{
+					"anchor": "background",
+					"asset": "capital_market_stall",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.06,
+					"height": 2.53658536585366,
+					"note": "primeira rua dos tecidos",
+					"section": "entrada",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.15,
+					"surface": 3,
+					"width": 3.2,
+					"world_center": [
+						79.12,
+						1.41829268292683,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "capital_merchant",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.22,
+					"height": 4.32889344262295,
+					"note": "edificação comercial entre bancas",
+					"section": "movimentação",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.0,
+					"surface": 12,
+					"width": 6.5,
+					"world_center": [
+						311.44,
+						2.16444672131148,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "capital_market_stall",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.37,
+					"height": 2.53658536585366,
+					"note": "bancas de cerâmica e tecido fora da pista",
+					"section": "desafio inicial",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.4,
+					"surface": 20,
+					"width": 3.2,
+					"world_center": [
+						529.24,
+						1.66829268292683,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "capital_palm_garden",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.52,
+					"height": 3.96958174904943,
+					"note": "pequena praça aberta para aprender congelamento",
+					"section": "recuperação",
+					"shift_to_safe_surface": -1.74714285714288,
+					"status": "installed",
+					"supported_floor_y": 0.35,
+					"surface": 28,
+					"width": 4.0,
+					"world_center": [
+						745.292857142857,
+						2.33479087452471,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "capital_merchant",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.68,
+					"height": 4.32889344262295,
+					"note": "depósitos comerciais",
+					"section": "intermediário",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.2,
+					"surface": 37,
+					"width": 6.5,
+					"world_center": [
+						979.36,
+						2.36444672131148,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "capital_market_stall",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.82,
+					"height": 2.53658536585366,
+					"note": "última rua de mercado",
+					"section": "desafio final",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.15,
+					"surface": 45,
+					"width": 3.2,
+					"world_center": [
+						1182.64,
+						1.41829268292683,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "capital_archway",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.95,
+					"height": 3.57900318133616,
+					"note": "transição para a estrutura do aqueduto",
+					"section": "saída",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.35,
+					"surface": 52,
+					"width": 4.5,
+					"world_center": [
+						1371.4,
+						2.13950159066808,
+						-5.0
+					]
+				}
+			]
+		},
+		{
+			"name": "Aqueduto do Deserto",
+			"order": 4.0,
+			"placements": [
+				{
+					"anchor": "background",
+					"asset": "capital_archway",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.04,
+					"height": 3.57900318133616,
+					"note": "passagem de acesso",
+					"section": "entrada",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 3.98,
+					"surface": 2,
+					"width": 4.5,
+					"world_center": [
+						50.08,
+						5.76950159066808,
+						-5.0
+					]
+				},
+				{
+					"anchor": "under_surface",
+					"asset": "desert_aqueduct",
+					"clip_to_physical_floor_pieces": true,
+					"fraction": 0.19,
+					"height": 3.77910447761194,
+					"note": "arcos sob o canal jogável existente",
+					"section": "movimentação",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 3.68,
+					"surface": 9,
+					"width": 9.0,
+					"world_center": [
+						267.88,
+						1.54044776119403,
+						1.65
+					]
+				},
+				{
+					"anchor": "under_surface",
+					"asset": "desert_aqueduct",
+					"clip_to_physical_floor_pieces": true,
+					"fraction": 0.4,
+					"height": 3.77910447761194,
+					"note": "ponte apoiada: não desenhar piso sobre vão",
+					"section": "desafio inicial",
+					"shift_to_safe_surface": 1.04166666666663,
+					"status": "installed",
+					"supported_floor_y": 3.74,
+					"surface": 19,
+					"width": 9.0,
+					"world_center": [
+						573.841666666667,
+						1.60044776119403,
+						1.65
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "desert_oasis_fountain",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.55,
+					"height": 1.97837837837838,
+					"note": "reservatório lateral para corrida elétrica",
+					"section": "recuperação",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 3.98,
+					"surface": 26,
+					"width": 3.2,
+					"world_center": [
+						790.6,
+						4.96918918918919,
+						-5.0
+					]
+				},
+				{
+					"anchor": "under_surface",
+					"asset": "desert_aqueduct",
+					"clip_to_physical_floor_pieces": true,
+					"fraction": 0.73,
+					"height": 3.77910447761194,
+					"note": "arcos sob a travessia das cascatas",
+					"section": "desafio final",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 3.92,
+					"surface": 34,
+					"width": 9.0,
+					"world_center": [
+						1051.96,
+						1.78044776119403,
+						1.65
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "capital_palm_garden",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.94,
+					"height": 3.96958174904943,
+					"note": "antecipa a vegetação do oásis",
+					"section": "saída",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 3.98,
+					"surface": 44,
+					"width": 4.0,
+					"world_center": [
+						1356.88,
+						5.96479087452471,
+						-5.0
+					]
+				}
+			]
+		},
+		{
+			"name": "Jardins do Oásis",
+			"order": 5.0,
+			"placements": [
+				{
+					"anchor": "background",
+					"asset": "capital_palm_garden",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.06,
+					"height": 3.96958174904943,
+					"note": "palmeiras nas margens",
+					"section": "entrada",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.15,
+					"surface": 3,
+					"width": 4.0,
+					"world_center": [
+						79.12,
+						2.13479087452472,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "desert_oasis_fountain",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.24,
+					"height": 1.97837837837838,
+					"note": "primeiro jardim ornamentado",
+					"section": "movimentação",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.1,
+					"surface": 11,
+					"width": 3.2,
+					"world_center": [
+						340.48,
+						1.08918918918919,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "capital_palm_garden",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.42,
+					"height": 3.96958174904943,
+					"note": "vegetação após salto; não cobrir piso rompível",
+					"section": "desafio inicial",
+					"shift_to_safe_surface": 0.293333333333294,
+					"status": "installed",
+					"supported_floor_y": 0.4,
+					"surface": 20,
+					"width": 4.0,
+					"world_center": [
+						602.133333333333,
+						2.38479087452472,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "desert_oasis_fountain",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.58,
+					"height": 1.97837837837838,
+					"note": "praça para apresentar Ruptura",
+					"section": "recuperação",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.15,
+					"surface": 27,
+					"width": 3.2,
+					"world_center": [
+						834.16,
+						1.13918918918919,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "capital_palm_garden",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.77,
+					"height": 3.96958174904943,
+					"note": "corredor verde com visibilidade da perseguição",
+					"section": "desafio final",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.0,
+					"surface": 36,
+					"width": 4.0,
+					"world_center": [
+						1110.04,
+						1.98479087452471,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "capital_archway",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.95,
+					"height": 3.57900318133616,
+					"note": "arco antigo conduz às ruínas",
+					"section": "saída",
+					"shift_to_safe_surface": 0.775000000000091,
+					"status": "installed",
+					"supported_floor_y": 0.15,
+					"surface": 45,
+					"width": 4.5,
+					"world_center": [
+						1372.175,
+						1.93950159066808,
+						-5.0
+					]
+				}
+			]
+		},
+		{
+			"name": "Ruínas Enterradas",
+			"order": 6.0,
+			"placements": [
+				{
+					"anchor": "background",
+					"asset": "desert_ancient_ruins",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.06,
+					"height": 5.42077649527807,
+					"note": "primeiro monumento antigo",
+					"section": "entrada",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": -1.5,
+					"surface": 3,
+					"width": 6.0,
+					"world_center": [
+						79.12,
+						1.21038824763903,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "desert_ancient_ruins",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.29,
+					"height": 5.42077649527807,
+					"note": "câmara de colunas",
+					"section": "movimentação",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": -1.1,
+					"surface": 16,
+					"width": 6.0,
+					"world_center": [
+						413.08,
+						1.61038824763903,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "desert_mine_crystals",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.46,
+					"height": 1.90697674418605,
+					"note": "pequena concentração mineral em rocha lateral",
+					"section": "intermediário",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": -1.4,
+					"surface": 25,
+					"width": 3.0,
+					"world_center": [
+						659.92,
+						-0.446511627906977,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "desert_ancient_ruins",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.65,
+					"height": 5.42077649527807,
+					"note": "arco quebrado além de mudanças de altura",
+					"section": "desafio final",
+					"shift_to_safe_surface": 1.642857142857,
+					"status": "installed",
+					"supported_floor_y": -1.8,
+					"surface": 36,
+					"width": 6.0,
+					"world_center": [
+						937.442857142857,
+						0.910388247639035,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "desert_mine_crystals",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.83,
+					"height": 1.90697674418605,
+					"note": "minérios nas paredes da passagem",
+					"section": "recuperação",
+					"shift_to_safe_surface": 2.71142857142854,
+					"status": "installed",
+					"supported_floor_y": -1.1,
+					"surface": 46,
+					"width": 3.0,
+					"world_center": [
+						1199.87142857143,
+						-0.146511627906977,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "capital_archway",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.95,
+					"height": 3.57900318133616,
+					"note": "passagem para a estrada",
+					"section": "saída",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": -1.1,
+					"surface": 52,
+					"width": 4.5,
+					"world_center": [
+						1371.4,
+						0.689501590668081,
+						-5.0
+					]
+				}
+			]
+		},
+		{
+			"name": "Estrada da Mineração",
+			"order": 7.0,
+			"placements": [
+				{
+					"anchor": "background",
+					"asset": "capital_watchtower",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.05,
+					"height": 6.995670995671,
+					"note": "última torre próxima da capital",
+					"section": "entrada",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.96,
+					"surface": 2,
+					"width": 3.2,
+					"world_center": [
+						64.6,
+						4.4578354978355,
+						-5.0
+					]
+				},
+				{
+					"anchor": "under_surface",
+					"asset": "desert_timber_bridge",
+					"clip_to_physical_floor_pieces": true,
+					"fraction": 0.21,
+					"height": 2.18924302788845,
+					"note": "revestir ponte física; preservar os vãos ao lado",
+					"section": "desafio inicial",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.84,
+					"surface": 10,
+					"width": 7.0,
+					"world_center": [
+						296.92,
+						-0.504621513944223,
+						1.65
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "desert_mining_gantry",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.38,
+					"height": 4.31014823261117,
+					"note": "posto de transporte de minério",
+					"section": "intermediário",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.0,
+					"surface": 18,
+					"width": 5.0,
+					"world_center": [
+						543.76,
+						2.15507411630559,
+						-5.0
+					]
+				},
+				{
+					"anchor": "under_surface",
+					"asset": "desert_timber_bridge",
+					"clip_to_physical_floor_pieces": true,
+					"fraction": 0.56,
+					"height": 2.18924302788845,
+					"note": "segunda travessia apoiada",
+					"section": "desafio intermediário",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.96,
+					"surface": 26,
+					"width": 7.0,
+					"world_center": [
+						805.12,
+						-0.384621513944223,
+						1.65
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "desert_mining_gantry",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.75,
+					"height": 4.31014823261117,
+					"note": "carga e carrinho perto do desfiladeiro",
+					"section": "desafio final",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.24,
+					"surface": 35,
+					"width": 5.0,
+					"world_center": [
+						1081.0,
+						2.39507411630559,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "desert_mine_crystals",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.92,
+					"height": 1.90697674418605,
+					"note": "rochas de minério antecipam o complexo",
+					"section": "saída",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.48,
+					"surface": 43,
+					"width": 3.0,
+					"world_center": [
+						1327.84,
+						1.43348837209302,
+						-5.0
+					]
+				}
+			]
+		},
+		{
+			"name": "Posto de Controle",
+			"order": 8.0,
+			"placements": [
+				{
+					"anchor": "background",
+					"asset": "capital_watchtower",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.06,
+					"height": 6.995670995671,
+					"note": "posto avançado",
+					"section": "entrada",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.15,
+					"surface": 3,
+					"width": 3.2,
+					"world_center": [
+						79.12,
+						3.6478354978355,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "desert_military_gate",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.24,
+					"height": 3.5,
+					"note": "primeiro setor fortificado",
+					"section": "desafio inicial",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.2,
+					"surface": 13,
+					"width": 7.0,
+					"world_center": [
+						340.48,
+						1.95,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "capital_watchtower",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.44,
+					"height": 6.995670995671,
+					"note": "torre de vigia do pátio",
+					"section": "intermediário",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.0,
+					"surface": 24,
+					"width": 3.2,
+					"world_center": [
+						630.88,
+						3.4978354978355,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "capital_archway",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.62,
+					"height": 3.57900318133616,
+					"note": "passagem entre os setores",
+					"section": "recuperação",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.35,
+					"surface": 34,
+					"width": 4.5,
+					"world_center": [
+						892.24,
+						2.13950159066808,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "capital_watchtower",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.78,
+					"height": 6.995670995671,
+					"note": "última posição de vigilância",
+					"section": "desafio final",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.2,
+					"surface": 43,
+					"width": 3.2,
+					"world_center": [
+						1124.56,
+						3.6978354978355,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "desert_military_gate",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.95,
+					"height": 3.5,
+					"note": "grande portão antes da mineradora",
+					"section": "saída",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.35,
+					"surface": 52,
+					"width": 7.0,
+					"world_center": [
+						1371.4,
+						2.1,
+						-5.0
+					]
+				}
+			]
+		},
+		{
+			"name": "Entrada da Mineradora",
+			"order": 9.0,
+			"placements": [
+				{
+					"anchor": "background",
+					"asset": "desert_mining_gantry",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.06,
+					"height": 4.31014823261117,
+					"note": "rota de transporte, não o portal da mina",
+					"section": "entrada",
+					"shift_to_safe_surface": 0.0550000000000068,
+					"status": "installed",
+					"supported_floor_y": 0.15,
+					"surface": 3,
+					"width": 5.0,
+					"world_center": [
+						79.175,
+						2.30507411630559,
+						-5.0
+					]
+				},
+				{
+					"anchor": "under_surface",
+					"asset": "desert_timber_bridge",
+					"clip_to_physical_floor_pieces": true,
+					"fraction": 0.25,
+					"height": 2.18924302788845,
+					"note": "ponte de aproximação",
+					"section": "desafio inicial",
+					"shift_to_safe_surface": 2.30000000000001,
+					"status": "installed",
+					"supported_floor_y": 0.0,
+					"surface": 12,
+					"width": 7.0,
+					"world_center": [
+						357.3,
+						-1.34462151394422,
+						1.65
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "desert_mining_gantry",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.45,
+					"height": 4.31014823261117,
+					"note": "pátio de equipamentos",
+					"section": "intermediário",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.15,
+					"surface": 21,
+					"width": 5.0,
+					"world_center": [
+						645.4,
+						2.30507411630559,
+						-5.0
+					]
+				},
+				{
+					"anchor": "under_surface",
+					"asset": "desert_timber_bridge",
+					"clip_to_physical_floor_pieces": true,
+					"fraction": 0.64,
+					"height": 2.18924302788845,
+					"note": "última ponte antes das instalações",
+					"section": "desafio final",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.0,
+					"surface": 30,
+					"width": 7.0,
+					"world_center": [
+						921.28,
+						-1.34462151394422,
+						1.65
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "desert_mining_gantry",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.82,
+					"height": 4.31014823261117,
+					"note": "guindaste e carrinho junto ao portal",
+					"section": "aproximação final",
+					"shift_to_safe_surface": -3.22499999999991,
+					"status": "installed",
+					"supported_floor_y": 0.4,
+					"surface": 38,
+					"width": 5.0,
+					"world_center": [
+						1179.415,
+						2.55507411630559,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "desert_mine_entrance",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 1.0,
+					"height": 5.12031558185404,
+					"note": "portal monumental exatamente na saída da fase9",
+					"section": "saída",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": 0.1,
+					"surface": 47,
+					"width": 8.0,
+					"world_center": [
+						1444.0,
+						2.66015779092702,
+						-5.0
+					]
+				}
+			]
+		},
+		{
+			"name": "Interior da Mineração",
+			"order": 10.0,
+			"placements": [
+				{
+					"anchor": "background",
+					"asset": "desert_mining_gantry",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.06,
+					"height": 4.31014823261117,
+					"note": "primeira galeria industrial",
+					"section": "entrada",
+					"shift_to_safe_surface": 0.0550000000000068,
+					"status": "installed",
+					"supported_floor_y": -1.7,
+					"surface": 3,
+					"width": 5.0,
+					"world_center": [
+						79.175,
+						0.455074116305587,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "desert_mine_crystals",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.23,
+					"height": 1.90697674418605,
+					"note": "veios nas paredes da câmara",
+					"section": "movimentação",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": -1.8,
+					"surface": 11,
+					"width": 3.0,
+					"world_center": [
+						325.96,
+						-0.846511627906977,
+						-5.0
+					]
+				},
+				{
+					"anchor": "under_surface",
+					"asset": "desert_timber_bridge",
+					"clip_to_physical_floor_pieces": true,
+					"fraction": 0.39,
+					"height": 2.18924302788845,
+					"note": "passarela apoiada nos trilhos existentes",
+					"section": "desafio inicial",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": -2.0,
+					"surface": 18,
+					"width": 7.0,
+					"world_center": [
+						558.28,
+						-3.34462151394422,
+						1.65
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "desert_mining_gantry",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.55,
+					"height": 4.31014823261117,
+					"note": "galeria de guindastes",
+					"section": "intermediário",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": -1.2,
+					"surface": 26,
+					"width": 5.0,
+					"world_center": [
+						790.6,
+						0.955074116305587,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "desert_mine_crystals",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.72,
+					"height": 1.90697674418605,
+					"note": "cristais no poço industrial",
+					"section": "desafio final",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": -1.3,
+					"surface": 34,
+					"width": 3.0,
+					"world_center": [
+						1037.44,
+						-0.346511627906977,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "desert_mining_gantry",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.87,
+					"height": 4.31014823261117,
+					"note": "equipamento atrás do abastecimento; sem cobrir recargas",
+					"section": "preparação da arena",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": -1.8,
+					"surface": 41,
+					"width": 5.0,
+					"world_center": [
+						1255.24,
+						0.355074116305587,
+						-5.0
+					]
+				},
+				{
+					"anchor": "background",
+					"asset": "desert_mine_crystals",
+					"clip_to_physical_floor_pieces": false,
+					"fraction": 0.96,
+					"height": 1.90697674418605,
+					"note": "veio mineral atrás da arena de Malagueta",
+					"section": "arena",
+					"shift_to_safe_surface": 0.0,
+					"status": "installed",
+					"supported_floor_y": -1.7,
+					"surface": 45,
+					"width": 3.0,
+					"world_center": [
+						1385.92,
+						-0.746511627906977,
+						-5.0
+					]
+				}
+			]
+		}
+	],
+	"status": "installed"
+}

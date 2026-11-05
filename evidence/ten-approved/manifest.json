@@ -1,0 +1,52 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "runner_steps": 17,
+  "runner_failures": 0,
+  "integration_checks": 86,
+  "integration_failures": 0,
+  "native_captures": 63,
+  "profiles": [
+    {
+      "profile": "desktop",
+      "size": "1672x941",
+      "iphone": false,
+      "passed": true,
+      "exit_code": 0,
+      "captures": 21
+    },
+    {
+      "profile": "iphone",
+      "size": "844x390",
+      "iphone": true,
+      "passed": true,
+      "exit_code": 0,
+      "captures": 21
+    },
+    {
+      "profile": "standard_small",
+      "size": "640x360",
+      "iphone": false,
+      "passed": true,
+      "exit_code": 0,
+      "captures": 21
+    }
+  ],
+  "production_export": "passed",
+  "web_browser": {
+    "passed": true,
+    "engine_phases": 10,
+    "viewport": [
+      844,
+      390
+    ],
+    "device_scale_factor": 3,
+    "iphone_user_agent": true,
+    "physical_device": false,
+    "tested": "intro8, read persistence, touch dash, rooftop pursuit, approved-art opening in stages1–10"
+  },
+  "main_merged": false,
+  "pages_published": false,
+  "implementation_commit": "8a8fc45",
+  "mechanics_checks": 103,
+  "pwa_checks": 29
+}

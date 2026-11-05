@@ -1,121 +1,92 @@
-# Reforma das dez fases do Reino do Deserto
+# Dez fases com os assets aprovados
 
-Branch: work/reino-deserto-10-fases. Base:967a408. Sem merge/publicação autorizados nesta rodada.
+Branch `work/reino-deserto-10-fases`, Godot4.7.2. Revisão separada, sem merge ou
+publicação no Pages. A aprovação do dono aos assets autorizou esta integração.
 
-## Organização e recursos
+## O que foi instalado
 
-As cenas scenes/desert/phase_01.tscn até phase_10.tscn usam o controlador existente
-scripts/desert/t15d/phase.gd. A cena10 foi migrada pelo ResourceSaver, sem editar
-texto de cena. campaign_layout.gd define superfícies mundiais, vãos, patrulhas,
-recargas, checkpoints e oito setores por região. IDs antigos de fase continuam
-compatíveis com o contrato do projeto; nenhum backend é alterado.
+As cenas `scenes/desert/phase_01.tscn` até `phase_10.tscn` continuam usando o
+controlador existente `scripts/desert/t15d/phase.gd`. Cada percurso tem1452m,
+oito setores e sete checkpoints. Não são imagens de fase inteira: os pisos,
+vãos, ataques, inimigos e personagens continuam físicos e tridimensionais.
+As ilustrações são módulos independentes de arquitetura e vegetação.
 
-Ordem: Portões da Capital; Telhados da Capital; Bazar da Cidade; Aqueduto do Deserto;
-Jardins do Oásis; Ruínas Enterradas; Estrada da Mineração; Posto de Controle;
-Entrada da Mineradora; Interior da Mineração.
+| Fase | Composição e percurso |
+|---|---|
+|1 Portões da Capital|Portão com arcada e torres; ruas, casas e setores defensivos.|
+|2 Telhados da Capital|Rota inteira em lajes a8m ou mais; fachadas abaixo, varandas e rua distante.|
+|3 Bazar da Cidade|Bancas de tecido, casas de comerciantes e praças; congelamento para trás.|
+|4 Aqueduto do Deserto|Arcos ilustrados sob o tabuleiro físico, canais e água animada; corrida elétrica.|
+|5 Jardins do Oásis|Palmeiras, jardins, fontes e passagem às ruínas; Ruptura atrás do jogador.|
+|6 Ruínas Enterradas|Colunas e arcos antigos entre rochas e minérios, sem céu no subterrâneo.|
+|7 Estrada da Mineração|Pontes de madeira/pedra, guindastes, cargas e veios minerais.|
+|8 Posto de Controle|Torres, casario de apoio, arcadas e portões militares em setores separados.|
+|9 Entrada da Mineradora|Pátios de carga e pontes; o portal monumental aparece somente na saída.|
+|10 Interior da Mineração|Galerias, trilhos, passarelas, guindastes e cristais; Malagueta original.|
 
-Cada percurso tem pelo menos1452m, sem espera artificial na saída. A fase2 começa
-a8m da rua e todo piso jogável pertence às lajes. Fachadas, janelas inferiores,
-parapeitos e vãos são geometria3D. A fase9 recebe o portal monumental somente no
-fim. A fase10 tem galerias, suportes, trilhos, carrinhos, cristais e Malagueta com
-modelos/animações originais, vida20 e saída condicionada à derrota.
+## Estrutura editável
 
-A biblioteca modular é modular_architecture.gd + city_props.gd. Materiais de pedra
-são compartilhados; rochas volumétricas usam MultiMesh. Luz real é limitada por
-chunk; janelas e lanternas mantêm material emissivo. Panorâmicas noturnas aprovadas
-ficam exclusivamente distantes. Os planos simplificados do ZIP deixaram de compor
-o cenário. Procedência em assets/desert/modular/PROVENANCE.md.
+- `kingdom_assets.gd`: catálogo, paletas regionais, cache de texturas e63 âncoras
+  resolvidas no mesmo layout da física. Carrega somente recursos das fases usadas.
+- `city_props.gd`: composições por laje real, sob responsabilidade de um único
+  chunk, com uma camada adicional de casario nas regiões urbanas. Isso evita
+  módulos vazios e duplicação nas bordas de carregamento.
+- `modular_architecture.gd`: pisos volumétricos, rochas, suportes, trilhos e
+  recortes ilustrados de fachadas/aquedutos/pontes. AtlasTexture mantém escala e
+  proporção; cada recorte pertence à sua peça física, sem pintar sobre abismos.
+- `assets/desert/modular/city_assets.json`: quinze módulos aprovados, escala e
+  regiões de conteúdo. Os recortes removem apenas margens transparentes do
+  enquadramento; os PNGs de autoria continuam preservados.
+- `phase_asset_plan.json`: distribuição por fase e setor, agora instalada.
+- `night_scenery.gd`: deserto e cidade distantes com parallax; cavernas sem céu.
+  Rochas ficam atrás da decoração, sem esconder os módulos aprovados.
 
-## Gameplay
+Os recursos.res têm alfa/mipmaps e dimensão máxima1024. A pasta source/.gdignore
+preserva a autoria fora do export. Procedência em PROVENANCE.md. Nenhum modelo,
+FBX, GLB, animação ou skin de personagem foi substituído.
 
-Soldados são reaproveitados da reserva original, perseguem depois que o jogador
-os ultrapassa, saltam vãos com uma laje real de aterrissagem e obstáculos baixos,
-e mantêm espaçamento. Ondas verificam o apoio de cada soldado e nascem com intervalo,
-sem empilhamento instantâneo. A mesma consulta de piso sustenta inimigos e recargas.
+## Gameplay e continuidade
 
-Recargas ocupam pedestais na altura real do piso, em zonas de recuperação após os
-saltos; não são moedas decorativas. Capacidades continuam3. Ruptura altera o colisor
-de uma peça marcada atrás do jogador, inclusive sob perseguidores, preservando
-itens/checkpoints e o protagonista; Âmbar imobiliza temporariamente; Relâmpago
-continua com colisão e cancelamento. Corrigido contato que causava dano fora da
-janela de ataque, inclusive quando um inimigo estava congelado.
+O percurso existente conserva saltos, obstáculos, perseguição e retorno das
+fases. Soldados usam a altura real da laje e saltam os vãos, inclusive nos
+telhados. Vida/ataque/defesa e os poderes mantêm capacidade3 e recargas apoiadas.
+Congelamento só atinge atrás, disponível desde3; choque desde4; Ruptura desde5.
+A peça rompida perde colisão e arte, restaura após8s e espera se estiver ocupada.
 
-Os recursos aquecem durante a narrativa, incluindo o material novo e os modelos
-de Malagueta ao entrar na fase10. Histórico local de leitura é preservado.
+A câmera nas fases2/4/7 enquadra melhor as fachadas/arcos abaixo do percurso,
+conservando antecipação e acompanhamento suave de saltos. Não há escadas ou
+moedas decorativas. O portal9 coincide com a saída; a arena10 só abre após o
+chefe. Malagueta conserva modelo/animações, vida20 e dano2 originais.
 
-## Validação executada — Godot 4.7.2
+As oito cenas de origem e o histórico de leitura foram preservados. As capas
+são capturas reais atualizadas, não conceitos. Os capítulos2–10 agora descrevem
+seus ambientes e a progressão dos poderes. Os recursos da região aquecem durante
+a leitura; não se carregam os quinze módulos em todas as entradas.
 
-Evidências: [relatório e painel](../../evidence/reino-10-fases/README.md).
+## Validação
 
-- Dez travessias completas aprovadas por entradas físicas, sem teleporte ou
-  invulnerabilidade. A décima inclui derrota de Malagueta e saída. As rotas levaram
-  aproximadamente 4min08 a 4min39 de tempo simulado: o alvo de três minutos ainda
-  merece balanceamento com jogadores, sem uma espera artificial na saída.
-- Runner consolidado: 17 etapas aprovadas. Mecânicas novas: 67/0; layout: 130/0;
-  mineração/chefe: 6/0; progresso: 30/0; variedade: 15/0; checkpoints: 21/0;
-  controles: 10/0; cada travessia: 11/0.
-- Guarda iPhone: 504/0. Intro: 67/0. PWA: 29/0. Design e escopo aprovados.
-- 63 capturas reais em 1672×941, 844×390 e 640×360. Pontos intermediários e portal9
-  são fixtures teleportadas para inspeção, não provas de travessia.
-- Importação normal e export de produção concluídos. A restrição inicial do
-  importador foi resolvida após a continuação autorizada pelo dono; não houve
-  edição manual de cache. MCP Godot indisponível: CLI oficial e ResourceSaver usados.
-- WebAssembly real no Chromium, UA iPhone, viewport844×390, DPR3: oito quadros por
-  toque, consumo de carga, persistência após reload e soldado perseguindo sobre
-  a laje de8m. Relatório sem erros de página ou scripts do motor. Testes/fixtures,
-  evidências e fontes de autoria não entram no pacote de produção.
+Resultados desta integração em `evidence/ten-approved/README.md`. Capturas
+intermediárias são fixtures teleportadas identificadas, distintas das travessias
+completas por controles. As dez travessias usam entradas e itens reais, sem
+teleporte, invulnerabilidade ou alteração de vida. O piloto da arena foi adaptado
+para virar antes do congelamento e usar choque contra guardas, sem mudar o chefe.
 
-## Pendências para aprovação
+Reprodução:
 
-- Revisão artística do dono: as estruturas próximas agora são modulares e jogáveis,
-  mas a densidade arquitetônica, vegetação e acabamento de alguns módulos ainda
-  ficam abaixo da referência ilustrada. Não declarar fidelidade visual aprovada.
-- Balancear duração e dificuldade com jogadores; o piloto automatizado não mede
-  a experiência humana e seus tempos não são benchmark de renderização.
-- Validar Safari/PWA em iPhone físico, Android e Windows. Chromium emulado e capturas
-  nativas não validam esses aparelhos. Não foram testados OAuth ou backend online.
-- Alguns testes de encerramento imediato registram avisos de liberação de playback
-  WAV; não foram encontrados erros de script/importação nas capturas finais.
+```
+python3 tests/desert_night/run.py --godot /caminho/godot --only reino10 layout legacy10 progress variety checkpoints route-01 route-02 route-03 route-04 route-05 route-06 route-07 route-08 route-09 route-10
+xvfb-run -a python3 tests/desert_night/capture_reino10.py --godot /caminho/godot --output /tmp/capturas
+```
 
-Nenhuma autenticação, Supabase, economia, menu musical ou asset de personagem
-alterado. Esta rodada é entregue na branch de revisão, sem merge nem Pages.
+Use Godot4.7.2, templates Web correspondentes e perfis de teste isolados. O teste
+Web usa export de fixture separado; testes/evidências/fontes não entram no
+pacote de produção. A fixture bloqueia destinos externos, sem login ou backend.
 
-## Ajuste solicitado após reprovação visual
+## Limites
 
-A revisão de05/11 substitui a progressão anterior: congelamento para trás na fase3,
-corrida elétrica na fase4 e Ruptura atrás na fase5. Recargas desses poderes só
-aparecem a partir do capítulo correspondente; capítulos anteriores ocultam as
-habilidades mesmo quando já descobertas em outro save. Congelamento respeita a
-orientação de El Fuego; corrida aplica um choque por inimigo por carga.
-
-Nas fases1/2 os buracos reais permanecem entre superfícies. Telhados agora têm
-obstáculos baixos periódicos; soldados ficam depois das zonas de abastecimento,
-com apoio e corredor de aproximação, não encostados na primeira aterrissagem.
-Vida, ataque e defesa continuam em pedestais apoiados e separados. Pisos marcados
-usam o sistema existente de retirada/restauração real de colisão para Ruptura.
-
-As duas imagens em art-approved são conceitos gerados pela ferramenta de imagens,
-aprovados pelo dono, sem personagens substitutos. O panorama posterior foi
-reprovado e não foi instalado. **A arte aprovada ainda não foi integrada como
-camadas/módulos ao cenário jogável**; as alterações desta rodada são de gameplay.
-Não confundir os conceitos aprovados com as capturas da versão reprovada.
-
-### Acabamento incremental das fases1/2
-
-Portas das casas receberam madeira, tábuas e ferragens; janelas receberam
-divisórias e peitoris; a escala da alvenaria ficou menor. São malhas decorativas
-agrupadas nos materiais existentes, sem novas colisões ou mudanças de percurso.
-O fundo de dunas/cidade e as bandeiras continuam ativos. Capturas atualizadas em
-`evidence/city-desert`. Ainda não equivale à integração completa das fachadas
-ilustradas aprovadas.
-
-### Fachadas ilustradas modulares
-
-As duas primeiras fases agora usam uma casa ilustrada individual, gerada com
-referência à arte aprovada. O material tem alfa, mipmaps e proporção preservada.
-O casario usa Sprite3D apoiado em fundações; fachadas sob os telhados usam recortes
-AtlasTexture alinhados no mundo. Cada recorte pertence ao próprio piso, não
-atravessa buracos e some junto à peça rompida. Não é um plano de fase inteira
-e não substitui os personagens, plataformas, corpos de colisão ou perseguição.
-O portão monumental e demais estruturas próximas continuam3D. Falta ampliar
-a variedade de módulos e validar o resultado visual com o dono.
+Ainda é necessário validar Safari/PWA no iPhone físico, Android e Windows e
+avaliar duração/dificuldade com jogadores. O piloto leva cerca de quatro minutos
+por fase; não é medida da experiência humana. Picos de processamento em software
+são registrados nos logs; não se declara desempenho de aparelho a partir deles.
+Não foram testados OAuth ou serviços online. Supabase, autenticação, economia,
+menu musical e outros sistemas compartilhados não foram alterados.

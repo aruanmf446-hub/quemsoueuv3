@@ -1,3 +1,5 @@
+> Registro da preparação do lote. A integração posterior está em [ten-approved](../ten-approved/README.md).
+
 # Lote grande de assets
 
 Dez imagens realmente geradas; quinze módulos no catálogo total. As dez novas

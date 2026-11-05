@@ -1,0 +1,58 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS cena carrega o mapa correto 07
+PASS vida e recursos iniciais 3/3, 1/1 e 1/1
+PASS sete checkpoints de distrito
+PASS distância obrigatória garante três minutos mesmo sem combate
+ROUTE_TICK phase=7 seconds=0.0 x=-8.0 hp=3 attack=1 loaded=3
+ROUTE_SLOW step=95 ms=118.815 x=1.17263579368591 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=266 ms=40.038 x=14.9323806762695 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=376 ms=46.563 x=25.9324226379395 time_scale=1.0 active=1 queue=0
+ROUTE_TICK phase=7 seconds=10.0 x=48.331298828125 hp=3 attack=1 loaded=4
+ROUTE_TICK phase=7 seconds=20.0 x=108.438446044922 hp=3 attack=2 loaded=5
+ROUTE_SLOW step=1520 ms=35.314 x=137.099517822266 time_scale=1.0 active=2 queue=0
+ROUTE_TICK phase=7 seconds=30.0 x=165.101333618164 hp=3 attack=2 loaded=5
+ROUTE_SLOW step=1885 ms=64.918 x=173.601867675781 time_scale=1.0 active=2 queue=0
+ROUTE_SLOW step=2076 ms=34.98 x=192.088317871094 time_scale=1.0 active=2 queue=2
+ROUTE_TICK phase=7 seconds=40.0 x=221.761917114258 hp=3 attack=2 loaded=5
+ROUTE_SLOW step=2768 ms=35.45 x=254.880416870117 time_scale=1.0 active=2 queue=0
+ROUTE_TICK phase=7 seconds=50.0 x=277.176940917969 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=7 seconds=60.0 x=333.826385498047 hp=3 attack=2 loaded=5
+ROUTE_SLOW step=3796 ms=36.715 x=353.426177978516 time_scale=1.0 active=2 queue=0
+ROUTE_TICK phase=7 seconds=70.0 x=390.47802734375 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=7 seconds=80.0 x=450.53857421875 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=7 seconds=90.0 x=507.185546875 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=7 seconds=100.0 x=563.832641601562 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=7 seconds=110.0 x=620.4794921875 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=7 seconds=120.0 x=677.12548828125 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=7610 ms=56.18 x=718.11474609375 time_scale=1.0 active=3 queue=0
+ROUTE_TICK phase=7 seconds=130.0 x=733.771179199219 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=8189 ms=39.045 x=772.660522460938 time_scale=1.0 active=3 queue=0
+ROUTE_SLOW step=8254 ms=33.482 x=779.158935546875 time_scale=1.0 active=3 queue=0
+ROUTE_TICK phase=7 seconds=140.0 x=790.41650390625 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=7 seconds=150.0 x=847.68896484375 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=7 seconds=160.0 x=907.047790527344 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=7 seconds=170.0 x=963.692749023438 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=7 seconds=180.0 x=1020.33856201172 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=11272 ms=86.687 x=1064.18676757812 time_scale=1.0 active=7 queue=0
+ROUTE_TICK phase=7 seconds=190.0 x=1076.98364257812 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=11911 ms=52.212 x=1124.73022460938 time_scale=1.0 active=7 queue=0
+ROUTE_SLOW step=11970 ms=38.121 x=1130.62878417969 time_scale=1.0 active=8 queue=0
+ROUTE_TICK phase=7 seconds=200.0 x=1133.62805175781 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=12546 ms=109.707 x=1188.2138671875 time_scale=1.0 active=8 queue=0
+ROUTE_TICK phase=7 seconds=210.0 x=1193.61254882812 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=12808 ms=140.799 x=1214.40747070312 time_scale=1.0 active=8 queue=0
+ROUTE_TICK phase=7 seconds=220.0 x=1253.5966796875 hp=3 attack=3 loaded=5
+ROUTE_SLOW step=13485 ms=38.735 x=1282.08959960938 time_scale=1.0 active=8 queue=0
+ROUTE_TICK phase=7 seconds=230.0 x=1313.58093261719 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=7 seconds=240.0 x=1373.56481933594 hp=3 attack=3 loaded=4
+ROUTE_SLOW step=14944 ms=59.189 x=1427.95092773438 time_scale=1.0 active=8 queue=0
+ROUTE_TICK phase=7 seconds=250.0 x=1433.54956054688 hp=3 attack=3 loaded=3
+PASS travessia completa sem morte ou respawn
+PASS saída alcançada exclusivamente por ações reais
+PASS tempo físico da fase >=180s (251.29)
+PASS relógio independente confirma >=180s (251.62)
+PASS streaming mantém quantidade limitada de distritos carregados
+PASS percurso ativa os sete checkpoints
+PASS 95% dos quadros ficam no orçamento de 33ms (p95 5.3ms, pico 141.8ms)
+NIGHT_ROUTE_RESULT {"captured":false,"checks":11,"collected":31,"completed":true,"cpu_step":{"max_ms":140.799,"p95_ms":5.198},"deaths":0,"defeated":17,"failures":0,"health":3,"measurement":"wall-clock; physics intervals include intentional 0.05x hit-stop; all maxima retained","order":7,"phase_seconds":251.292500000092,"physics_seconds":251.616666666667,"position":[1443.24719238281,0.240883737802505,0.0],"render_frame_wall":{"max_ms":141.763,"p95_ms":5.309},"swings":17}

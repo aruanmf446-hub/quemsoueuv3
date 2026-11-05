@@ -1,0 +1,26 @@
+[
+  {
+    "profile": "desktop",
+    "size": "1672x941",
+    "iphone": false,
+    "passed": true,
+    "exit_code": 0,
+    "captures": 21
+  },
+  {
+    "profile": "iphone",
+    "size": "844x390",
+    "iphone": true,
+    "passed": true,
+    "exit_code": 0,
+    "captures": 21
+  },
+  {
+    "profile": "standard_small",
+    "size": "640x360",
+    "iphone": false,
+    "passed": true,
+    "exit_code": 0,
+    "captures": 21
+  }
+]

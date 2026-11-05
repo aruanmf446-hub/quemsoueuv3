@@ -1,0 +1,89 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS fase01 instala p01.art.00 capital_watchtower
+PASS fase01 instala p01.art.01 capital_archway
+PASS fase01 instala p01.art.02 capital_house
+PASS fase01 instala p01.art.03 capital_merchant
+PASS fase01 instala p01.art.04 capital_palm_garden
+PASS fase01 instala p01.art.05 capital_watchtower
+PASS fase01 instala p01.art.06 capital_balcony_house
+PASS fase01 preserva apoio do percurso
+PASS fase01 contém arte aprovada no mundo
+PASS fase02 instala p02.art.00 capital_house
+PASS fase02 instala p02.art.01 capital_balcony_house
+PASS fase02 instala p02.art.02 capital_merchant
+PASS fase02 instala p02.art.03 capital_watchtower
+PASS fase02 instala p02.art.04 capital_balcony_house
+PASS fase02 instala p02.art.05 capital_market_stall
+PASS fase02 preserva apoio do percurso
+PASS fase02 contém arte aprovada no mundo
+PASS fase03 instala p03.art.00 capital_market_stall
+PASS fase03 instala p03.art.01 capital_merchant
+PASS fase03 instala p03.art.02 capital_market_stall
+PASS fase03 instala p03.art.03 capital_palm_garden
+PASS fase03 instala p03.art.04 capital_merchant
+PASS fase03 instala p03.art.05 capital_market_stall
+PASS fase03 instala p03.art.06 capital_archway
+PASS fase03 preserva apoio do percurso
+PASS fase03 contém arte aprovada no mundo
+PASS fase04 instala p04.art.00 capital_archway
+PASS fase04 instala p04.art.01 desert_aqueduct
+PASS fase04 instala p04.art.02 desert_aqueduct
+PASS fase04 instala p04.art.03 desert_oasis_fountain
+PASS fase04 instala p04.art.04 desert_aqueduct
+PASS fase04 instala p04.art.05 capital_palm_garden
+PASS fase04 preserva apoio do percurso
+PASS fase04 contém arte aprovada no mundo
+PASS fase05 instala p05.art.00 capital_palm_garden
+PASS fase05 instala p05.art.01 desert_oasis_fountain
+PASS fase05 instala p05.art.02 capital_palm_garden
+PASS fase05 instala p05.art.03 desert_oasis_fountain
+PASS fase05 instala p05.art.04 capital_palm_garden
+PASS fase05 instala p05.art.05 capital_archway
+PASS fase05 preserva apoio do percurso
+PASS fase05 contém arte aprovada no mundo
+PASS fase06 instala p06.art.00 desert_ancient_ruins
+PASS fase06 instala p06.art.01 desert_ancient_ruins
+PASS fase06 instala p06.art.02 desert_mine_crystals
+PASS fase06 instala p06.art.03 desert_ancient_ruins
+PASS fase06 instala p06.art.04 desert_mine_crystals
+PASS fase06 instala p06.art.05 capital_archway
+PASS fase06 preserva apoio do percurso
+PASS fase06 subterrânea sem céu
+PASS fase06 contém arte aprovada no mundo
+PASS fase07 instala p07.art.00 capital_watchtower
+PASS fase07 instala p07.art.01 desert_timber_bridge
+PASS fase07 instala p07.art.02 desert_mining_gantry
+PASS fase07 instala p07.art.03 desert_timber_bridge
+PASS fase07 instala p07.art.04 desert_mining_gantry
+PASS fase07 instala p07.art.05 desert_mine_crystals
+PASS fase07 preserva apoio do percurso
+PASS fase07 contém arte aprovada no mundo
+PASS fase08 instala p08.art.00 capital_watchtower
+PASS fase08 instala p08.art.01 desert_military_gate
+PASS fase08 instala p08.art.02 capital_watchtower
+PASS fase08 instala p08.art.03 capital_archway
+PASS fase08 instala p08.art.04 capital_watchtower
+PASS fase08 instala p08.art.05 desert_military_gate
+PASS fase08 preserva apoio do percurso
+PASS fase08 contém arte aprovada no mundo
+PASS fase09 instala p09.art.00 desert_mining_gantry
+PASS fase09 instala p09.art.01 desert_timber_bridge
+PASS fase09 instala p09.art.02 desert_mining_gantry
+PASS fase09 instala p09.art.03 desert_timber_bridge
+PASS fase09 instala p09.art.04 desert_mining_gantry
+PASS fase09 instala p09.art.05 desert_mine_entrance
+PASS fase09 preserva apoio do percurso
+PASS fase09 contém arte aprovada no mundo
+PASS fase10 instala p10.art.00 desert_mining_gantry
+PASS fase10 instala p10.art.01 desert_mine_crystals
+PASS fase10 instala p10.art.02 desert_timber_bridge
+PASS fase10 instala p10.art.03 desert_mining_gantry
+PASS fase10 instala p10.art.04 desert_mine_crystals
+PASS fase10 instala p10.art.05 desert_mining_gantry
+PASS fase10 instala p10.art.06 desert_mine_crystals
+PASS fase10 preserva apoio do percurso
+PASS fase10 subterrânea sem céu
+PASS fase10 contém arte aprovada no mundo
+PASS quinze módulos aprovados usados nas dez fases
+APPROVED_ASSETS_RESULT checks=86 failures=0

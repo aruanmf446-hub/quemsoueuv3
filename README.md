@@ -1,11 +1,23 @@
 # Quem Sou Eu V3 — Reino do Deserto
 
+## Estado atual — dez fases com os assets aprovados
+
+Os quinze módulos aprovados estão integrados às dez fases na branch
+`work/reino-deserto-10-fases`: casario, mercado, aqueduto, oásis, ruínas, fortificações
+e mineração. Percursos, colisões, perseguição e personagens3D preservados.
+
+Veja [estrutura e regras](docs/desert/REINO_10_FASES.md),
+[evidências atuais](evidence/ten-approved/README.md) e
+[catálogo por fase](docs/desert/assets/LOTE_GRANDE.md).
+Não houve merge ou deploy no Pages nesta rodada. As seções históricas abaixo
+registram etapas anteriores e não substituem as evidências da integração atual.
+
+
 ## Bot assistido de assets
 
 [Fila e instruções](tools/asset_pipeline/desert_bot/README.md): gera argumentos para
 image_gen na conversa, registra fontes/hashes e prepara texturas no Godot. Biblioteca com15 módulos, incluindo o lote grande de10 novos assets. Veja a
-[galeria e distribuição por fase](docs/desert/assets/LOTE_GRANDE.md):63 âncoras
-resolvidas no Godot, ainda não instaladas nas cenas. Não é serviço24h nem
+[galeria e distribuição por fase](docs/desert/assets/LOTE_GRANDE.md):63 âncoras resolvidas no Godot e instaladas nas fases. Não é serviço24h nem
 publica/integra os assets sozinho. Lotes padrão de dois; grandes só quando pedidos.
 
 ## Ajuste de parkour e progressão após reprovação
@@ -16,7 +28,7 @@ baixos acrescentados aos telhados; vida/ataque/defesa mantidos no percurso.
 Os conceitos aprovados estão em [art-approved](docs/desert/art-approved/).
 Fases1/2 agora recebem fundo gerado de dunas, cidade e palácio, além de bandeiras
 com o emblema de chama existente, toldos e detalhes urbanos fora da pista.
-**Pendente: integrar integralmente as fachadas das artes aprovadas.**
+As fachadas aprovadas agora são módulos do cenário; veja o estado atual acima.
 
 ## Reforma das dez fases — revisão separada
 

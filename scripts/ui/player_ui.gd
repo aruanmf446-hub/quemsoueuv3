@@ -503,3 +503,33 @@ static func style_story_action(button: Button) -> void:
 	var focus := _flat(Color.TRANSPARENT,GOLD,44,Color.WHITE)
 	focus.set_border_width_all(2)
 	button.add_theme_stylebox_override("focus",focus)
+
+## Confirmação contextual compartilhada: alvos de toque nativos sobre o item.
+static func decision_controls(parent: Control,confirm: Callable,cancel: Callable,description := "seleção") -> Control:
+	var overlay := Control.new()
+	overlay.name="SelectionDecision"
+	overlay.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	parent.add_child(overlay)
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var row := HBoxContainer.new()
+	overlay.add_child(row)
+	row.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	row.offset_left=-100
+	row.offset_right=-4
+	row.offset_top=4
+	row.offset_bottom=48
+	for spec in [["✓",confirm,Color("#62db91"),"Confirmar "],["✕",cancel,Color("#ff7979"),"Cancelar "]]:
+		var button := PlayerUI.button(spec[0],spec[1])
+		button.name="AcceptSelection" if spec[0]=="✓" else "RejectSelection"
+		button.tooltip_text=spec[3]+description
+		PlayerUI.style_button(button,false)
+		for state in ["normal","hover","pressed","hover_pressed","focus","disabled"]:
+			var box := button.get_theme_stylebox(state).duplicate() as StyleBoxFlat
+			box.set_content_margin_all(6)
+			button.add_theme_stylebox_override(state,box)
+		for state in ["font_color","font_hover_color","font_focus_color","font_pressed_color","font_hover_pressed_color"]:
+			button.add_theme_color_override(state,spec[2])
+		button.add_theme_font_size_override("font_size",24)
+		button.custom_minimum_size=Vector2(44,44)
+		row.add_child(button)
+	return overlay

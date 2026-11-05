@@ -18,6 +18,44 @@ const SOCKET_BONES := {
 	&"back": &"mixamorig_Spine2",
 }
 
+static var _clip_cache := {}
+static var _warm_scenes := {}
+static var _requested := {}
+
+## Prepara apenas os avatares dos participantes durante a escolha de cartas.
+## Leitura em segundo plano; nenhuma espera bloqueante no início da apresentação.
+static func prepare_participants(players: Array) -> void:
+	var ids := players.map(func(p: Dictionary)->String:return str(p.get("skin_id","")))
+	for entry: Dictionary in CharacterCatalog.load_entries():
+		if not ids.has(str(entry.id)): continue
+		var paths: Array=[entry.model]
+		for alias in ["base","anim_2","anim_3","anim_4"]:
+			if entry.get("animations",{}).has(alias): paths.append(entry.animations[alias])
+		for path: String in paths:
+			if not _requested.has(path) and not _warm_scenes.has(path):
+				if ResourceLoader.load_threaded_request(path,"PackedScene")==OK: _requested[path]=true
+
+static func collect_prepared() -> void:
+	for path: String in _requested.keys():
+		var status := ResourceLoader.load_threaded_get_status(path)
+		if status==ResourceLoader.THREAD_LOAD_LOADED:
+			_warm_scenes[path]=ResourceLoader.load_threaded_get(path)
+			_requested.erase(path)
+		elif status==ResourceLoader.THREAD_LOAD_FAILED or status==ResourceLoader.THREAD_LOAD_INVALID_RESOURCE:
+			_requested.erase(path)
+
+## A apresentação pode aguardar frames sem bloquear a interface nem o áudio.
+static func entry_pending(entry: Dictionary) -> bool:
+	collect_prepared()
+	var paths: Array=[entry.model]
+	paths.append_array(entry.get("animations",{}).values())
+	return paths.any(func(path: String)->bool:return _requested.has(path))
+
+static func prepared_scene(path: String) -> PackedScene:
+	collect_prepared()
+	return _warm_scenes[path] as PackedScene if _warm_scenes.has(path) else load(path) as PackedScene
+
+
 var character_id: StringName = &""
 var is_static_pose: bool = false
 
@@ -33,7 +71,7 @@ func load_entry(entry: Dictionary) -> void:
 	unload()
 	character_id = StringName(entry["id"])
 
-	var model := load(entry["model"]) as PackedScene
+	var model := prepared_scene(entry["model"])
 	if model == null:
 		push_error("Modelo não encontrado: %s" % entry["model"])
 		return
@@ -169,6 +207,9 @@ func _merge_animations(entry: Dictionary) -> void:
 	var library := _anim_player.get_animation_library(&"")
 	if library == null:
 		return
+	library = library.duplicate()
+	_anim_player.remove_animation_library(&"")
+	_anim_player.add_animation_library(&"",library)
 	var animations: Dictionary = entry.get("animations", {})
 	for anim_name: String in animations:
 		var source_path: String = animations[anim_name]
@@ -183,7 +224,8 @@ func _merge_animations(entry: Dictionary) -> void:
 
 ## Carrega o FBX de origem, copia a primeira animação e libera a cena temporária.
 func _extract_clip(source_path: String) -> Animation:
-	var source := load(source_path) as PackedScene
+	if _clip_cache.has(source_path): return _clip_cache[source_path].duplicate() as Animation
+	var source := prepared_scene(source_path)
 	if source == null:
 		push_warning("Animação não encontrada: %s" % source_path)
 		return null
@@ -193,6 +235,7 @@ func _extract_clip(source_path: String) -> Animation:
 	if source_player:
 		clip = _first_animation_of(source_player)
 	source_root.free()
+	if clip != null: _clip_cache[source_path]=clip
 	return clip
 
 
@@ -200,7 +243,9 @@ func _first_animation_of(player: AnimationPlayer) -> Animation:
 	var names := player.get_animation_list()
 	if names.is_empty():
 		return null
-	return player.get_animation(names[0]).duplicate() as Animation
+	for key in names:
+		if key != "RESET" and player.get_animation(key).length>0: return player.get_animation(key).duplicate() as Animation
+	return null
 
 
 func _play_idle(entry: Dictionary) -> void:

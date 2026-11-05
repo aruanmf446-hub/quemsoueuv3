@@ -294,6 +294,10 @@ func _begin_match() -> void:
 		_players.append({"member_id": member.id, "is_bot": bot, "nickname": member.bot_name if bot else _nickname(),
 			"skin_id": member.character_id, "lives": int(settings.cards_per_player), "faults": 0, "confirmed": false,
 			"auto_selected": false, "eliminated_reason": null})
+	# Sorteio único, público antes da contagem; nunca é refeito nos próximos turnos.
+	var order: Array=_players.map(func(p: Dictionary)->String:return str(p.member_id))
+	_shuffle(order)
+	_match.turn_order=order
 	# Bots escolhem na hora (cartas aleatórias) e já ficam PRONTOS.
 	for player: Dictionary in _players:
 		if player.is_bot:
@@ -421,14 +425,10 @@ func _advance() -> void:
 						_fill_cards(player.member_id)
 						player.confirmed = true
 						player.auto_selected = true
-				_set_phase("countdown", TIMING.countdown)
+				_set_phase("countdown", maxf(TIMING.countdown,_match.turn_order.size()*1.8+0.4))
 			"countdown":
 				if now() < deadline: return
 				if _check_end(): continue
-				var order: Array = _players.filter(func(p: Dictionary) -> bool: return p.eliminated_reason == null) \
-					.map(func(p: Dictionary) -> String: return str(p.member_id))
-				_shuffle(order)
-				_match.turn_order = order
 				_match.turn_index = -1
 				_next_turn()
 			"turns":

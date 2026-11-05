@@ -1,5 +1,7 @@
 extends PlayerScreen
 var _iphone_room_actions: Control
+var _room_stage: LobbyStage
+var _room_stage_skin := ""
 ## Duelo (multiplayer), etapa 1: salas online. Três vistas na mesma tela:
 ## - "browse": salas públicas (no lobby), filtros e entrada por código de convite;
 ## - "form": criar sala ou (ADM) editar as configurações da sala;
@@ -89,6 +91,13 @@ func render() -> void:
 		return
 	heading.text = tr("Mata-Mata · Partida local") if duel.is_local() else tr("Mata-Mata")
 	if is_instance_valid(_match_view) and _match_view.get_parent() == body: body.remove_child(_match_view)
+	# Mantém a mesma instância animada entre heartbeats do lobby.
+	if is_instance_valid(_room_stage):
+		if _room_stage.get_parent()!=null: _room_stage.get_parent().remove_child(_room_stage)
+		if in_battle or not duel.in_room() or _view=="form":
+			_room_stage.queue_free()
+			_room_stage=null
+			_room_stage_skin=""
 	PlayerUI.clear(body)
 	banner.show_state("success")
 	_header_extras(_view == "browse" and _online() and not duel.in_room())
@@ -1054,6 +1063,7 @@ func _refresh_deck_grid() -> void:
 	for entry: Dictionary in shown: grid.add_child(_deck_choice(entry))
 
 
+var _deck_decision: Control
 func _deck_choice(entry: Dictionary) -> Control:
 	var selected: bool = (_form.decks as Array).has(entry.id)
 	var card := Button.new()
@@ -1123,21 +1133,27 @@ func _deck_choice(entry: Dictionary) -> Control:
 			if sync.available(): sync.set_remote_favorite(str(entry.id), value)
 		_refresh_deck_grid())
 	card.toggled.connect(func(value: bool) -> void:
-		var picked: Array = _form.decks
-		if value and not picked.has(entry.id):
-			if picked.size() >= MAX_DECKS:
-				card.set_pressed_no_signal(false)
-				banner.show_state("error", tr("Escolha no máximo %d decks.") % MAX_DECKS)
-				return
-			picked.append(entry.id)
-		elif not value:
-			if picked.size() <= 1:
-				card.set_pressed_no_signal(true)
-				banner.show_state("error", tr("Escolha pelo menos um deck."))
-				return
-			picked.erase(entry.id)
-		_refresh_deck_grid()
-		_update_summary())
+		card.set_pressed_no_signal(selected)
+		if is_instance_valid(_deck_decision): _deck_decision.queue_free()
+		var commit := func() -> void:
+			if is_instance_valid(_deck_decision): _deck_decision.queue_free()
+			var picked: Array = _form.decks
+			if value and not picked.has(entry.id):
+				if picked.size() >= MAX_DECKS:
+					card.set_pressed_no_signal(false)
+					banner.show_state("error", tr("Escolha no máximo %d decks.") % MAX_DECKS)
+					return
+				picked.append(entry.id)
+			elif not value:
+				if picked.size() <= 1:
+					card.set_pressed_no_signal(true)
+					banner.show_state("error", tr("Escolha pelo menos um deck."))
+					return
+				picked.erase(entry.id)
+			_refresh_deck_grid()
+			_update_summary()
+		_deck_decision=PlayerUI.decision_controls(card,commit,func() -> void:
+			if is_instance_valid(_deck_decision): _deck_decision.queue_free(),"deck"))
 	return card
 
 
@@ -1382,6 +1398,24 @@ func _member_card(member: Dictionary, admin: bool, status: String) -> Control:
 	portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	if not bool(member.get("online", true)) or member.get("role") == "spectator": portrait.modulate = Color(0.55, 0.58, 0.65)
 	column.add_child(portrait)
+	# Um único avatar 3D em repouso na sala; os demais são apresentados um a um
+	# antes da partida. Não multiplica viewports pelo número de participantes.
+	if member.get("is_you",false) and status=="lobby":
+		var skin := str(member.get("character_id",""))
+		var entries := CharacterCatalog.load_entries().filter(func(e: Dictionary)->bool:return str(e.id)==skin)
+		if not entries.is_empty() and entries[0].get("animations",{}).has("anim_2"):
+			if not is_instance_valid(_room_stage):
+				_room_stage=preload("res://scenes/lobby/lobby_stage.tscn").instantiate()
+				_room_stage.name="LobbyAvatarCurrent"
+			_room_stage.custom_minimum_size=portrait.custom_minimum_size
+			_room_stage.modulate=portrait.modulate
+			_room_stage.size_flags_horizontal=Control.SIZE_SHRINK_CENTER
+			column.add_child(_room_stage)
+			portrait.hide()
+			if _room_stage_skin!=skin:
+				_room_stage_skin=skin
+				CharacterSlot.prepare_participants([{"skin_id":skin}])
+				_animate_room_avatar(entries[0])
 	var nickname := PlayerUI.label(str(member.get("nickname", "")), 19, Color.WHITE)
 	nickname.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	nickname.autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -1403,6 +1437,17 @@ func _member_card(member: Dictionary, admin: bool, status: String) -> Control:
 		kick.add_theme_font_size_override("font_size", 16)
 		column.add_child(kick)
 	return card
+
+
+func _animate_room_avatar(source: Dictionary) -> void:
+	var entry := source.duplicate(true)
+	entry.animations={"base":source.animations.base,"anim_2":source.animations.anim_2}
+	while CharacterSlot.entry_pending(entry):
+		await get_tree().process_frame
+		if not is_inside_tree() or not is_instance_valid(_room_stage): return
+	if not is_instance_valid(_room_stage) or not _room_stage.is_inside_tree() or _room_stage_skin!=str(entry.id): return
+	entry.idle="anim_2"
+	_room_stage.show_character(entry)
 
 
 ## Ação no servidor (Callable do DuelService) com aviso de erro; devolve o resultado.
@@ -1427,6 +1472,7 @@ func animate_in() -> void:
 
 
 func _exit_tree() -> void:
+	if is_instance_valid(_room_stage) and _room_stage.get_parent()==null: _room_stage.free()
 	# The match is detached while another room view is rendered.
 	if is_instance_valid(_match_view) and _match_view.get_parent() == null: _match_view.free()
 

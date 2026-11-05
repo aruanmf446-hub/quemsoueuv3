@@ -9,6 +9,12 @@ var duel: DuelService
 var inventory: InventoryService
 var act: Callable
 var overlay_parent: Control
+var _presentation: Control
+var _order_shown := ""
+var _result_shown := ""
+var _submitting := false
+var _reveal_playing := false
+var _prepared_match := ""
 var _chosen: Array = []
 var _canvas: Control
 var _main: VBoxContainer
@@ -29,6 +35,7 @@ var _private_signature := ""
 var _last_lives := {}
 var _last_player_states := {}
 var _hand_before_reveal: Array = []
+var _public_before_reveal: Array = []
 var _notice_ttl := 0.0
 var _last_event := ""
 var _pending_pick := ""
@@ -333,15 +340,29 @@ func refresh() -> void:
 	if not _built: _build()
 	_data = duel.match()
 	if _data.is_empty(): return
+	if _prepared_match != str(_data.get("id","")):
+		_prepared_match=str(_data.get("id",""))
+		_last_event=""
+		_reveal_playing=false
+		_public_before_reveal.clear()
+		_hand_before_reveal.clear()
+		_last_player_states.clear()
+		_last_lives.clear()
+		CharacterSlot.prepare_participants(_data.get("players",[]))
 	var available_ids: Array = _data.pool.map(func(card: Dictionary) -> String: return str(card.card_id))
 	_chosen = _chosen.filter(func(id: String) -> bool: return available_ids.has(id))
 	var me := _me(_data)
 	if _data.phase != "selection": _chosen.clear()
 	if _data.phase != "turns" or not _is_my_turn(): _pending_pick = ""
+	var events: Array=_data.get("events",[])
+	var pending_reveal: bool=not events.is_empty() and events.back().get("kind","")=="pick" and events.back().get("revealed",false) and _last_event!=str(events.back().seq)
+	if pending_reveal: _reveal_playing=true
 	_render_players()
 	_render_instruction(me)
+	if pending_reveal and _data.phase != "reveal": _render_event()
 	_render_public(me)
 	_render_hand()
+	_maybe_present()
 	_layout.call_deferred()
 func _process(_delta: float) -> void:
 	if not is_visible_in_tree() or not is_instance_valid(_timer): return
@@ -361,6 +382,7 @@ func _process(_delta: float) -> void:
 	_timer.add_theme_color_override("font_color",Color("#ff8f86") if seconds <= 10 else PlayerUI.TEXT)
 	if _data.get("phase","") == "countdown":
 		_instruction.text = "Começa em %d" % maxi(seconds,1)
+	CharacterSlot.collect_prepared()
 	_poll_reveal(_delta)
 var _reveal_wait := 0.0
 var _reveal_seq := ""
@@ -388,9 +410,42 @@ func _poll_reveal(delta: float) -> void:
 	if is_inside_tree(): refresh()
 
 
+func _play_sequence(rows: Array,clip: String,duration: float,numbered := false) -> void:
+	if is_instance_valid(_presentation): _presentation.queue_free()
+	_presentation=preload("res://scripts/ui/battle/avatar_sequence.gd").new()
+	add_child(_presentation)
+	_presentation.set_meta("phase",str(_data.get("phase","")))
+	var current := _presentation
+	_presentation.finished.connect(func() -> void:
+		if _presentation==current: _presentation=null
+		refresh.call_deferred())
+	_presentation.present(rows,clip,duration,numbered)
+func _maybe_present() -> void:
+	if is_instance_valid(_presentation) and _presentation.get_meta("phase","")=="countdown" and _data.get("phase","")!="countdown":
+		_presentation.queue_free()
+		_presentation=null
+	var key := str(_data.get("id",""))
+	if _data.get("phase","")=="countdown" and _order_shown!=key:
+		var order: Array=_data.get("turn_order",[])
+		if order.is_empty(): return # Não inventar uma ordem diferente da autoridade online.
+		_order_shown=key
+		var rows: Array=[]
+		for id in order:
+			var row := _player(_data,str(id))
+			if not row.is_empty(): rows.append(row)
+		_play_sequence(rows,"anim_2",maxf(0.35,duel.seconds_left()-0.2),true)
+	if _data.get("phase","")=="finished" and not _reveal_playing and not is_instance_valid(_presentation) and _result_shown!=key:
+		_result_shown=key
+		var rows: Array=[]
+		var result: Dictionary=_data.get("result",{}) if _data.get("result") is Dictionary else {}
+		for id in result.get("winners",[]):
+			var row := _player(_data,str(id))
+			if not row.is_empty(): rows.append(row)
+		if not rows.is_empty(): _play_sequence(rows,"anim_4",minf(4.0,duel.seconds_left()))
 func _render_instruction(me: Dictionary) -> void:
 	_confirm.hide()
 	_cancel.hide()
+	if _submitting: return
 	var phase := str(_data.phase)
 	if _closed():
 		_instruction.text = "Partida encerrada"
@@ -424,31 +479,40 @@ func _render_instruction(me: Dictionary) -> void:
 			if bool(turn.get("is_you", false)):
 				_instruction.text = "Sua jogada"
 		"finished":
+			if _reveal_playing:
+				_instruction.text="Revelando resultado…"
+				return
 			var winners: Array = (_data.result if _data.get("result") is Dictionary else {}).get("winners",[])
 			_instruction.text = "Vitória de %s!" % str(_player(_data,str(winners[0])).get("nickname","")) if winners.size() == 1 else "Empate!"
 			_detail.text = "Voltando ao lobby da sala…"
 		_:
 			_instruction.text = "Batalha"
 			_detail.text = ""
-	if me.get("eliminated",false) and not _suspense(): _detail.text = "Você foi eliminado · acompanhando como espectador."
+	if me.get("eliminated",false) and not (_suspense() or _reveal_playing): _detail.text = "Você foi eliminado · acompanhando como espectador."
 	elif me.is_empty(): _detail.text = "Espectador · aguarde a próxima partida."
 func _render_event() -> void:
 	var events: Array = _data.get("events",[])
 	if events.is_empty(): return
 	var event: Dictionary = events.back()
 	if event.kind == "pick":
-		_instruction.text = "Carta eliminada!" if event.revealed else "Revelando…"
-		_detail.text = "%s escolheu %s" % [_player(_data,str(event.actor)).get("nickname","Jogador"),_name(str(event.card_id))]
+		_instruction.text = "Carta eliminada!" if event.revealed and not _reveal_playing else "Revelando…"
+		_detail.text = ("%s escolheu %s" % [_player(_data,str(event.actor)).get("nickname","Jogador"),_name(str(event.card_id))]) if event.revealed and not _reveal_playing else "%s está revelando uma carta…" % _player(_data,str(event.actor)).get("nickname","Jogador")
 		if event.revealed:
 			var hits: Array = event.hits if event.hits is Array else []
 			if _last_event != str(event.seq):
-				_notice.text = "Ninguém foi atingido." if hits.is_empty() else "%d jogador(es) atingido(s)." % hits.size()
-				_notice_ttl = 3.5
 				_last_event = str(event.seq)
 				_show_reveal(str(event.card_id), hits)
-	else:
+	elif event.kind in ["timeout","eliminated"]:
 		_instruction.text = "Tempo esgotado" if event.kind == "timeout" else "Jogador eliminado"
 		_detail.text = str(_player(_data,str(event.actor)).get("nickname","Jogador"))
+		if _last_event!=str(event.seq):
+			_last_event=str(event.seq)
+			var defeated: Array=[]
+			for hit: Variant in event.get("hits",[]) if event.get("hits") is Array else []:
+				if hit is Dictionary and hit.get("eliminated",false):
+					var player := _player(_data,str(hit.get("member_id",event.actor)))
+					if not player.is_empty(): defeated.append(player)
+			if not defeated.is_empty(): _play_sequence(defeated,"anim_3",minf(3.0,duel.seconds_left()))
 ## Revelação animada no meio da tela: carta escolhida + jogadores atingidos (✕ / caveira).
 func _show_reveal(card_id: String, hits: Array) -> void:
 	var old := get_node_or_null("RevealOverlay")
@@ -474,7 +538,10 @@ func _show_reveal(card_id: String, hits: Array) -> void:
 	add_child(layer)
 	var overlay := RevealOverlay.new()
 	layer.add_child(overlay)
-	overlay.tree_exited.connect(func() -> void: if is_instance_valid(layer): layer.queue_free())
+	overlay.tree_exited.connect(func() -> void:
+		_reveal_playing=false
+		if is_instance_valid(layer): layer.queue_free()
+		if is_inside_tree(): refresh.call_deferred())
 	overlay.present(card_id, _name(card_id), actor, rows, spared)
 
 
@@ -497,13 +564,13 @@ func _render_players() -> void:
 	for source: Dictionary in players:
 		var player := source.duplicate(true)
 		var uncertain := false
-		if _suspense():
+		if _suspense() or _reveal_playing:
 			if _last_player_states.has(player.member_id):
 				for key in ["lives","faults","eliminated","reason"]: player[key] = _last_player_states[player.member_id].get(key,player.get(key))
 			else: uncertain = true
 		else: _last_player_states[player.member_id] = player.duplicate(true)
 		var turn: bool = str(player.member_id) == str(_data.get("turn_member","")) and _data.phase in ["turns","reveal"] and not _closed() and not player.eliminated
-		var winner: bool = winners.has(player.member_id) and _data.phase == "finished"
+		var winner: bool = winners.has(player.member_id) and _data.phase == "finished" and not _reveal_playing
 		var panel := Surface.new()
 		panel.padding = 3 if players.size() <= 5 else 1
 		panel.variant = "player"
@@ -602,19 +669,39 @@ func _render_players() -> void:
 func _render_public(me: Dictionary) -> void:
 	var focus := get_viewport().gui_get_focus_owner()
 	var focus_id := str(focus.get("id")) if focus != null and focus.get_parent() == _grid else ""
+	var focus_action := ""
+	if focus != null and str(focus.name) in ["AcceptSelection","RejectSelection"]:
+		var owner_card := focus.get_parent().get_parent().get_parent()
+		if owner_card.get_parent()==_grid:
+			focus_id=str(owner_card.get("id"))
+			focus_action=str(focus.name)
 	PlayerUI.clear(_grid)
 	var phase := str(_data.phase)
 	var choosing: bool = not _closed() and phase == "selection" and not me.is_empty() and not me.get("confirmed",false) and not me.get("eliminated",false)
+	var masking := _suspense() or _reveal_playing
+	if not masking: _public_before_reveal=_data.pool.filter(func(c: Dictionary)->bool:return not c.removed).map(func(c: Dictionary)->String:return str(c.card_id))
 	for item: Dictionary in _data.pool:
 		var id := str(item.card_id)
 		var out := bool(item.removed)
+		if out and (not masking or not _public_before_reveal.has(id)): continue
+		if out: out=false
 		var card := Card.new()
 		card.setup(id,(_data.phase == "selection" and _chosen.has(id)) or id == _pending_pick,out,choosing or (_is_my_turn() and not out))
 		card.activated.connect(func() -> void: _activate(id))
 		_grid.add_child(card)
-		if id == focus_id: _focus_card.call_deferred(card)
+		var selection: bool = choosing and not _chosen.is_empty() and _chosen.back()==id
+		if not _submitting and (id==_pending_pick or selection):
+			var cancel := _close_overlay if not selection else _activate.bind(id)
+			var decision := PlayerUI.decision_controls(card,_commit_selection,cancel,"cartas" if selection else "eliminação")
+			decision.find_child("AcceptSelection",true,false).disabled=selection and _chosen.size()!=int(_data.cards_per_player)
+		if id == focus_id:
+			var target: Control=card.find_child(focus_action,true,false) if not focus_action.is_empty() else card
+			if target!=null: _focus_card.call_deferred(target)
+	_confirm.hide()
+	_cancel.hide()
 	_fit_cards.call_deferred()
 func _activate(id: String) -> void:
+	if _submitting: return
 	var me := _me(_data)
 	if _data.phase == "selection" and not me.is_empty() and not me.confirmed and not me.eliminated:
 		if _chosen.has(id): _chosen.erase(id)
@@ -623,16 +710,23 @@ func _activate(id: String) -> void:
 		_render_public(me)
 	elif _is_my_turn(): _confirm_pick(id)
 func _commit_selection() -> void:
+	if _submitting: return
+	_submitting=true
+	for button: Button in _grid.find_children("*Selection","Button",true,false): button.disabled=true
 	if not _pending_pick.is_empty():
 		var id := _pending_pick
 		_pending_pick = ""
 		_confirm.disabled = true
 		await act.call(duel.pick.bind(id))
+		_submitting=false
+		refresh()
 		return
 	var picked := _chosen.duplicate()
 	_confirm.disabled = true
 	await act.call(duel.select_cards.bind(picked))
+	_submitting=false
 	_chosen.clear()
+	refresh()
 func _confirm_pick(id: String) -> void:
 	if not _is_my_turn(): return
 	var item: Array = _data.pool.filter(func(card: Dictionary) -> bool: return str(card.card_id) == id and not card.removed)
@@ -647,7 +741,7 @@ func _close_overlay() -> void:
 		_render_public(_me(_data))
 func _render_hand() -> void:
 	var entries: Array = _data.get("my_cards",[])
-	if _suspense(): entries = _hand_before_reveal
+	if _suspense() or _reveal_playing: entries = _hand_before_reveal
 	else: _hand_before_reveal = entries.duplicate(true)
 	var signature := JSON.stringify(entries)+str(_private_shown)
 	if signature == _private_signature: return

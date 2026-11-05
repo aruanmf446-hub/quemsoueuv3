@@ -106,7 +106,7 @@ func _ready() -> void:
 	duel.local_server = LocalDuelServer.new()
 	duel.local_server.skin_provider = inventory.equipped_id
 	duel.local_server.nickname_provider = func() -> String:
-		return str(profile.data.get("nickname", "")) if session.authenticated() else "Jogador local"
+		return str(profile.data.nickname) if profile.has_nickname() else ("Defina seu nickname" if session.authenticated() else "Jogador local")
 	duel.add_child(duel.local_server)
 	add_child(duel)
 	voice = VoiceService.new()

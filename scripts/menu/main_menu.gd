@@ -129,15 +129,14 @@ func _nickname_offer() -> void:
 	if not is_inside_tree() or _initial_login_pending:
 		return
 	var logged := _services.session.authenticated()
-	var ready := _services.profile.state == "success"
-	var nickname := str(_services.profile.data.get("nickname", "")).strip_edges()
-	if not logged or (ready and not nickname.is_empty()):
+	var has_nickname := _services.profile.has_nickname()
+	if not logged or has_nickname:
 		if is_instance_valid(_nickname_modal):
 			_nickname_modal.queue_free()
 			_nickname_modal = null
 		_maybe_show_news.call_deferred()
 		return
-	if not ready or is_instance_valid(_nickname_modal):
+	if _services.session.needs_password_reset or is_instance_valid(_nickname_modal):
 		return
 	var prompt = preload("res://scripts/ui/nickname_onboarding.gd").new()
 	prompt.setup(_services)
@@ -259,7 +258,7 @@ func _maybe_show_news() -> void:
 	if not _services.session.authenticated() or _services.session.needs_password_reset: return
 	if _web_invite_intent.pending or _navigation.get("_active") != null: return
 	if is_instance_valid(_nickname_modal) or _services.profile.state != "success": return
-	if str(_services.profile.data.get("nickname", "")).strip_edges().is_empty(): return
+	if not _services.profile.has_nickname(): return
 	var reward := _services.rewards
 	if reward.state != "success" or reward.seen or reward.campaign.is_empty(): return
 	# T30: não anunciar deck até as dez imagens existirem no export do jogo.

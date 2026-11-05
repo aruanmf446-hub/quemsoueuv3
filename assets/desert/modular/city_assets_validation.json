@@ -1,0 +1,28 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "command": "godot --headless --path . --script res://tests/desert_night/build_city_assets.gd",
+  "failures": 0,
+  "resources": [
+    {
+      "id": "capital_merchant",
+      "size": [
+        1024,
+        662
+      ],
+      "alpha": "blend",
+      "save_error": 0,
+      "reload_dimensions_match": true
+    },
+    {
+      "id": "capital_watchtower",
+      "size": [
+        653,
+        1024
+      ],
+      "alpha": "blend",
+      "save_error": 0,
+      "reload_dimensions_match": true
+    }
+  ],
+  "gameplay_changes": false
+}

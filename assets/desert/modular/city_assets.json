@@ -1,0 +1,26 @@
+{
+  "assets": [
+    {
+      "id": "capital_house",
+      "texture": "res://assets/desert/modular/capital_house.res",
+      "role": "casa residencial",
+      "suggested_width_metres": 6.0,
+      "placed_in_game": true
+    },
+    {
+      "id": "capital_merchant",
+      "texture": "res://assets/desert/modular/capital_merchant.res",
+      "role": "casa de comerciante e loja de tecidos",
+      "suggested_width_metres": 6.5,
+      "placed_in_game": false
+    },
+    {
+      "id": "capital_watchtower",
+      "texture": "res://assets/desert/modular/capital_watchtower.res",
+      "role": "torre de vigia com cúpula vermelha",
+      "suggested_width_metres": 3.2,
+      "placed_in_game": false
+    }
+  ],
+  "placement": "Sprite3D decorativo; largura define pixel_size=largura/texture.get_width(); preservar proporção; colisões separadas existentes; não atravessar vãos"
+}

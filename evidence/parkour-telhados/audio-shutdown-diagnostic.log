@@ -1,0 +1,207 @@
+WorkerThreadPool: 5 threads, 1 max low-priority.
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+TextServer: Added interface "Dummy"
+TextServer: Added interface "ICU / HarfBuzz / Graphite (Built-in)"
+SDL: Init OK!
+Using "default" pen tablet driver...
+
+TextServer: Primary interface set to: "ICU / HarfBuzz / Graphite (Built-in)".
+CORE API HASH: 2004498165
+EDITOR API HASH: 1696660745
+Loading resource: res://tests/desert_night/parkour_revision_test.gd remapped: res://tests/desert_night/parkour_revision_test.gd
+Completed load for: 'res://tests/desert_night/parkour_revision_test.gd' remapped 'res://tests/desert_night/parkour_revision_test.gd' at thread -1
+SceneTreeFTI: traversal method DEFAULT
+Loading resource: res://scripts/diagnostics/web_perf.gd remapped: res://scripts/diagnostics/web_perf.gd
+Loading resource: res://scenes/lobby/lobby_stage.tscn remapped: res://scenes/lobby/lobby_stage.tscn
+Loading resource: res://scripts/lobby/lobby_stage.gd remapped: res://scripts/lobby/lobby_stage.gd
+Completed load for: 'res://scripts/lobby/lobby_stage.gd' remapped 'res://scripts/lobby/lobby_stage.gd' at thread -1
+Loading resource: res://scenes/lobby/character_slot.tscn remapped: res://scenes/lobby/character_slot.tscn
+Completed load for: 'res://scenes/lobby/character_slot.tscn' remapped 'res://scenes/lobby/character_slot.tscn' at thread -1
+Completed load for: 'res://scenes/lobby/lobby_stage.tscn' remapped 'res://scenes/lobby/lobby_stage.tscn' at thread -1
+Loading resource: res://assets/desert/phase01/interface.ttf remapped: res://assets/desert/phase01/interface.ttf
+Loading resource: res://.godot/imported/interface.ttf-15e7d0006382d77cfe847140535d935c.fontdata remapped: res://.godot/imported/interface.ttf-15e7d0006382d77cfe847140535d935c.fontdata
+Completed load for: 'res://assets/desert/phase01/interface.ttf' remapped 'res://assets/desert/phase01/interface.ttf' at thread -1
+Loading resource: res://assets/icons/vector/icon_friends.svg remapped: res://assets/icons/vector/icon_friends.svg
+Loading resource: res://.godot/imported/icon_friends.svg-4c2a6e1a94e8ade1ac0a141350af58ac.ctex remapped: res://.godot/imported/icon_friends.svg-4c2a6e1a94e8ade1ac0a141350af58ac.ctex
+Completed load for: 'res://assets/icons/vector/icon_friends.svg' remapped 'res://assets/icons/vector/icon_friends.svg' at thread -1
+Completed load for: 'res://scripts/diagnostics/web_perf.gd' remapped 'res://scripts/diagnostics/web_perf.gd' at thread -1
+Loading resource: res://scripts/audio/menu_music.gd remapped: res://scripts/audio/menu_music.gd
+Completed load for: 'res://scripts/audio/menu_music.gd' remapped 'res://scripts/audio/menu_music.gd' at thread -1
+Loading resource: res://scripts/ui/touch_scroll.gd remapped: res://scripts/ui/touch_scroll.gd
+Completed load for: 'res://scripts/ui/touch_scroll.gd' remapped 'res://scripts/ui/touch_scroll.gd' at thread -1
+Loading resource: res://scripts/ui/web_text_autoload.gd remapped: res://scripts/ui/web_text_autoload.gd
+Completed load for: 'res://scripts/ui/web_text_autoload.gd' remapped 'res://scripts/ui/web_text_autoload.gd' at thread -1
+Loaded system CA certificates
+PASS fase1: diferenças de nível visíveis
+PASS fase1: retorno por salto continua alcançável
+PASS fase1: oito conjuntos de patamares
+PASS fase1: duas pontes frágeis
+PASS fase2: diferenças de nível visíveis
+PASS fase2: retorno por salto continua alcançável
+PASS fase2: oito conjuntos de patamares
+PASS fase2: duas pontes frágeis
+PASS fase3: diferenças de nível visíveis
+PASS fase3: retorno por salto continua alcançável
+PASS fase3: oito conjuntos de patamares
+PASS fase3: duas pontes frágeis
+PASS fase4: diferenças de nível visíveis
+PASS fase4: retorno por salto continua alcançável
+PASS fase4: oito conjuntos de patamares
+PASS fase4: duas pontes frágeis
+PASS fase5: diferenças de nível visíveis
+PASS fase5: retorno por salto continua alcançável
+PASS fase5: oito conjuntos de patamares
+PASS fase5: duas pontes frágeis
+PASS fase6: diferenças de nível visíveis
+PASS fase6: retorno por salto continua alcançável
+PASS fase6: oito conjuntos de patamares
+PASS fase6: duas pontes frágeis
+PASS fase7: diferenças de nível visíveis
+PASS fase7: retorno por salto continua alcançável
+PASS fase7: oito conjuntos de patamares
+PASS fase7: duas pontes frágeis
+PASS fase8: diferenças de nível visíveis
+PASS fase8: retorno por salto continua alcançável
+PASS fase8: oito conjuntos de patamares
+PASS fase8: duas pontes frágeis
+PASS fase9: diferenças de nível visíveis
+PASS fase9: retorno por salto continua alcançável
+PASS fase9: oito conjuntos de patamares
+PASS fase9: duas pontes frágeis
+PASS uma única tarefa de ponte em toda a campanha; nenhuma habilidade nova
+Loading resource: res://scenes/desert/phase_04.tscn remapped: res://scenes/desert/phase_04.tscn
+Loading resource: res://scripts/desert/t15d/phase.gd remapped: res://scripts/desert/t15d/phase.gd
+Loading resource: res://assets/desert/phase01/sandstone.png remapped: res://assets/desert/phase01/sandstone.png
+Loading resource: res://.godot/imported/sandstone.png-e7fc14e1e3b3c24fd16124a244572d2c.ctex remapped: res://.godot/imported/sandstone.png-e7fc14e1e3b3c24fd16124a244572d2c.ctex
+Completed load for: 'res://assets/desert/phase01/sandstone.png' remapped 'res://assets/desert/phase01/sandstone.png' at thread -1
+Completed load for: 'res://scripts/desert/t15d/phase.gd' remapped 'res://scripts/desert/t15d/phase.gd' at thread -1
+Completed load for: 'res://scenes/desert/phase_04.tscn' remapped 'res://scenes/desert/phase_04.tscn' at thread -1
+Loading resource: res://assets/characters/El fuego/el_fuego_lite.scn remapped: res://assets/characters/El fuego/el_fuego_lite.scn
+Loading resource: res://assets/characters/El fuego/Correr_0.png remapped: res://assets/characters/El fuego/Correr_0.png
+Loading resource: res://.godot/imported/Correr_0.png-9df8fb19d506bb889dd6b3fc608ba354.ctex remapped: res://.godot/imported/Correr_0.png-9df8fb19d506bb889dd6b3fc608ba354.ctex
+Completed load for: 'res://assets/characters/El fuego/Correr_0.png' remapped 'res://assets/characters/El fuego/Correr_0.png' at thread -1
+Completed load for: 'res://assets/characters/El fuego/el_fuego_lite.scn' remapped 'res://assets/characters/El fuego/el_fuego_lite.scn' at thread -1
+Loading resource: res://assets/characters/El fuego/agachado.fbx remapped: res://assets/characters/El fuego/agachado.fbx
+Loading resource: res://.godot/imported/agachado.fbx-7cbc17be747a9ba79a78aa407190be9d.scn remapped: res://.godot/imported/agachado.fbx-7cbc17be747a9ba79a78aa407190be9d.scn
+Completed load for: 'res://assets/characters/El fuego/agachado.fbx' remapped 'res://assets/characters/El fuego/agachado.fbx' at thread -1
+Loading resource: res://assets/characters/El fuego/ataque.fbx remapped: res://assets/characters/El fuego/ataque.fbx
+Loading resource: res://.godot/imported/ataque.fbx-b73d8509f8f6f33de27704c8eccc2448.scn remapped: res://.godot/imported/ataque.fbx-b73d8509f8f6f33de27704c8eccc2448.scn
+Completed load for: 'res://assets/characters/El fuego/ataque.fbx' remapped 'res://assets/characters/El fuego/ataque.fbx' at thread -1
+Loading resource: res://assets/characters/El fuego/defesa.fbx remapped: res://assets/characters/El fuego/defesa.fbx
+Loading resource: res://.godot/imported/defesa.fbx-08f87be3457cfe6bd1571a8fd9dd4a3f.scn remapped: res://.godot/imported/defesa.fbx-08f87be3457cfe6bd1571a8fd9dd4a3f.scn
+Completed load for: 'res://assets/characters/El fuego/defesa.fbx' remapped 'res://assets/characters/El fuego/defesa.fbx' at thread -1
+Loading resource: res://assets/characters/El fuego/morte.fbx remapped: res://assets/characters/El fuego/morte.fbx
+Loading resource: res://.godot/imported/morte.fbx-4d6f0326e0b7053df7e4adb7f0bd624c.scn remapped: res://.godot/imported/morte.fbx-4d6f0326e0b7053df7e4adb7f0bd624c.scn
+Completed load for: 'res://assets/characters/El fuego/morte.fbx' remapped 'res://assets/characters/El fuego/morte.fbx' at thread -1
+Loading resource: res://assets/characters/El fuego/pulo duplo.fbx remapped: res://assets/characters/El fuego/pulo duplo.fbx
+Loading resource: res://.godot/imported/pulo duplo.fbx-e981706ab7f708fa94bac1e3c3b40ca9.scn remapped: res://.godot/imported/pulo duplo.fbx-e981706ab7f708fa94bac1e3c3b40ca9.scn
+Completed load for: 'res://assets/characters/El fuego/pulo duplo.fbx' remapped 'res://assets/characters/El fuego/pulo duplo.fbx' at thread -1
+Loading resource: res://assets/characters/El fuego/pulo.fbx remapped: res://assets/characters/El fuego/pulo.fbx
+Loading resource: res://.godot/imported/pulo.fbx-79809f11c91313cefb5611d04a3441a9.scn remapped: res://.godot/imported/pulo.fbx-79809f11c91313cefb5611d04a3441a9.scn
+Completed load for: 'res://assets/characters/El fuego/pulo.fbx' remapped 'res://assets/characters/El fuego/pulo.fbx' at thread -1
+Loading resource: res://assets/characters/El fuego/retorno.fbx remapped: res://assets/characters/El fuego/retorno.fbx
+Loading resource: res://.godot/imported/retorno.fbx-987b9f91bb742d10fae28be0a4f3f356.scn remapped: res://.godot/imported/retorno.fbx-987b9f91bb742d10fae28be0a4f3f356.scn
+Completed load for: 'res://assets/characters/El fuego/retorno.fbx' remapped 'res://assets/characters/El fuego/retorno.fbx' at thread -1
+Loading resource: res://assets/characters/cactus/andar.fbx remapped: res://assets/characters/cactus/andar.fbx
+Loading resource: res://.godot/imported/andar.fbx-9c531cefd51e20f0810cbca69c309180.scn remapped: res://.godot/imported/andar.fbx-9c531cefd51e20f0810cbca69c309180.scn
+Loading resource: res://assets/characters/cactus/andar_0.png remapped: res://assets/characters/cactus/andar_0.png
+Loading resource: res://.godot/imported/andar_0.png-1dd222baed8014dcfd4fe7295fde86b4.ctex remapped: res://.godot/imported/andar_0.png-1dd222baed8014dcfd4fe7295fde86b4.ctex
+Completed load for: 'res://assets/characters/cactus/andar_0.png' remapped 'res://assets/characters/cactus/andar_0.png' at thread -1
+Completed load for: 'res://assets/characters/cactus/andar.fbx' remapped 'res://assets/characters/cactus/andar.fbx' at thread -1
+Loading resource: res://assets/characters/cactus/ataque.fbx remapped: res://assets/characters/cactus/ataque.fbx
+Loading resource: res://.godot/imported/ataque.fbx-5d18a3a578e292f663cdadb9f898702b.scn remapped: res://.godot/imported/ataque.fbx-5d18a3a578e292f663cdadb9f898702b.scn
+Completed load for: 'res://assets/characters/cactus/ataque.fbx' remapped 'res://assets/characters/cactus/ataque.fbx' at thread -1
+Loading resource: res://assets/characters/cactus/correr.fbx remapped: res://assets/characters/cactus/correr.fbx
+Loading resource: res://.godot/imported/correr.fbx-c0f5149dd7dec667b8b7ecf9adca7476.scn remapped: res://.godot/imported/correr.fbx-c0f5149dd7dec667b8b7ecf9adca7476.scn
+Completed load for: 'res://assets/characters/cactus/correr.fbx' remapped 'res://assets/characters/cactus/correr.fbx' at thread -1
+Loading resource: res://assets/characters/cactus/morte.fbx remapped: res://assets/characters/cactus/morte.fbx
+Loading resource: res://.godot/imported/morte.fbx-cb9095c57dc328bbecb1863e401ab18c.scn remapped: res://.godot/imported/morte.fbx-cb9095c57dc328bbecb1863e401ab18c.scn
+Completed load for: 'res://assets/characters/cactus/morte.fbx' remapped 'res://assets/characters/cactus/morte.fbx' at thread -1
+Loading resource: res://assets/desert/reino_v3/ui/svg/ataque_fogo.svg remapped: res://assets/desert/reino_v3/ui/svg/ataque_fogo.svg
+Loading resource: res://.godot/imported/ataque_fogo.svg-60471deffee6bdcba647721450c8fdfc.ctex remapped: res://.godot/imported/ataque_fogo.svg-60471deffee6bdcba647721450c8fdfc.ctex
+Completed load for: 'res://assets/desert/reino_v3/ui/svg/ataque_fogo.svg' remapped 'res://assets/desert/reino_v3/ui/svg/ataque_fogo.svg' at thread -1
+Loading resource: res://assets/desert/reino_v3/ui/svg/defesa.svg remapped: res://assets/desert/reino_v3/ui/svg/defesa.svg
+Loading resource: res://.godot/imported/defesa.svg-26dd5704376a9241a3c98e060c700ea8.ctex remapped: res://.godot/imported/defesa.svg-26dd5704376a9241a3c98e060c700ea8.ctex
+Completed load for: 'res://assets/desert/reino_v3/ui/svg/defesa.svg' remapped 'res://assets/desert/reino_v3/ui/svg/defesa.svg' at thread -1
+Loading resource: res://assets/desert/reino_v3/ui/svg/ruptura.svg remapped: res://assets/desert/reino_v3/ui/svg/ruptura.svg
+Loading resource: res://.godot/imported/ruptura.svg-8c3980eec1d70aecc9f8b57458996f5e.ctex remapped: res://.godot/imported/ruptura.svg-8c3980eec1d70aecc9f8b57458996f5e.ctex
+Completed load for: 'res://assets/desert/reino_v3/ui/svg/ruptura.svg' remapped 'res://assets/desert/reino_v3/ui/svg/ruptura.svg' at thread -1
+Loading resource: res://assets/desert/reino_v3/ui/svg/cristal_ambar.svg remapped: res://assets/desert/reino_v3/ui/svg/cristal_ambar.svg
+Loading resource: res://.godot/imported/cristal_ambar.svg-fd57563b688da022773fd0727cd35c3f.ctex remapped: res://.godot/imported/cristal_ambar.svg-fd57563b688da022773fd0727cd35c3f.ctex
+Completed load for: 'res://assets/desert/reino_v3/ui/svg/cristal_ambar.svg' remapped 'res://assets/desert/reino_v3/ui/svg/cristal_ambar.svg' at thread -1
+Loading resource: res://assets/desert/reino_v3/ui/svg/corrida_raio.svg remapped: res://assets/desert/reino_v3/ui/svg/corrida_raio.svg
+Loading resource: res://.godot/imported/corrida_raio.svg-0361275b46c734269a0cb9193cf87125.ctex remapped: res://.godot/imported/corrida_raio.svg-0361275b46c734269a0cb9193cf87125.ctex
+Completed load for: 'res://assets/desert/reino_v3/ui/svg/corrida_raio.svg' remapped 'res://assets/desert/reino_v3/ui/svg/corrida_raio.svg' at thread -1
+Loading resource: res://assets/desert/modular/capital_desert.res remapped: res://assets/desert/modular/capital_desert.res
+Completed load for: 'res://assets/desert/modular/capital_desert.res' remapped 'res://assets/desert/modular/capital_desert.res' at thread -1
+Loading resource: res://assets/desert/modular/capital_watchtower.res remapped: res://assets/desert/modular/capital_watchtower.res
+Completed load for: 'res://assets/desert/modular/capital_watchtower.res' remapped 'res://assets/desert/modular/capital_watchtower.res' at thread -1
+Loading resource: res://assets/desert/modular/stone_masonry.res remapped: res://assets/desert/modular/stone_masonry.res
+Completed load for: 'res://assets/desert/modular/stone_masonry.res' remapped 'res://assets/desert/modular/stone_masonry.res' at thread -1
+Loading resource: res://assets/desert/modular/capital_house.res remapped: res://assets/desert/modular/capital_house.res
+Completed load for: 'res://assets/desert/modular/capital_house.res' remapped 'res://assets/desert/modular/capital_house.res' at thread -1
+Loading resource: res://assets/desert/modular/capital_merchant.res remapped: res://assets/desert/modular/capital_merchant.res
+Completed load for: 'res://assets/desert/modular/capital_merchant.res' remapped 'res://assets/desert/modular/capital_merchant.res' at thread -1
+Loading resource: res://assets/desert/modular/capital_archway.res remapped: res://assets/desert/modular/capital_archway.res
+Completed load for: 'res://assets/desert/modular/capital_archway.res' remapped 'res://assets/desert/modular/capital_archway.res' at thread -1
+Loading resource: res://assets/desert/modular/desert_aqueduct.res remapped: res://assets/desert/modular/desert_aqueduct.res
+Completed load for: 'res://assets/desert/modular/desert_aqueduct.res' remapped 'res://assets/desert/modular/desert_aqueduct.res' at thread -1
+Loading resource: res://assets/desert/modular/desert_oasis_fountain.res remapped: res://assets/desert/modular/desert_oasis_fountain.res
+Completed load for: 'res://assets/desert/modular/desert_oasis_fountain.res' remapped 'res://assets/desert/modular/desert_oasis_fountain.res' at thread -1
+Loading resource: res://assets/desert/modular/capital_palm_garden.res remapped: res://assets/desert/modular/capital_palm_garden.res
+Completed load for: 'res://assets/desert/modular/capital_palm_garden.res' remapped 'res://assets/desert/modular/capital_palm_garden.res' at thread -1
+Loading resource: res://assets/desert/reino_v3/ui/svg/ataque_fogo.svg remapped: res://assets/desert/reino_v3/ui/svg/ataque_fogo.svg
+Loading resource: res://.godot/imported/ataque_fogo.svg-60471deffee6bdcba647721450c8fdfc.ctex remapped: res://.godot/imported/ataque_fogo.svg-60471deffee6bdcba647721450c8fdfc.ctex
+Completed load for: 'res://assets/desert/reino_v3/ui/svg/ataque_fogo.svg' remapped 'res://assets/desert/reino_v3/ui/svg/ataque_fogo.svg' at thread -1
+Loading resource: res://assets/desert/reino_v3/ui/svg/cristal_ambar.svg remapped: res://assets/desert/reino_v3/ui/svg/cristal_ambar.svg
+Loading resource: res://.godot/imported/cristal_ambar.svg-fd57563b688da022773fd0727cd35c3f.ctex remapped: res://.godot/imported/cristal_ambar.svg-fd57563b688da022773fd0727cd35c3f.ctex
+Completed load for: 'res://assets/desert/reino_v3/ui/svg/cristal_ambar.svg' remapped 'res://assets/desert/reino_v3/ui/svg/cristal_ambar.svg' at thread -1
+Loading resource: res://assets/desert/reino_v3/ui/svg/corrida_raio.svg remapped: res://assets/desert/reino_v3/ui/svg/corrida_raio.svg
+Loading resource: res://.godot/imported/corrida_raio.svg-0361275b46c734269a0cb9193cf87125.ctex remapped: res://.godot/imported/corrida_raio.svg-0361275b46c734269a0cb9193cf87125.ctex
+Completed load for: 'res://assets/desert/reino_v3/ui/svg/corrida_raio.svg' remapped 'res://assets/desert/reino_v3/ui/svg/corrida_raio.svg' at thread -1
+Loading resource: res://assets/desert/reino_v3/ui/svg/defesa.svg remapped: res://assets/desert/reino_v3/ui/svg/defesa.svg
+Loading resource: res://.godot/imported/defesa.svg-26dd5704376a9241a3c98e060c700ea8.ctex remapped: res://.godot/imported/defesa.svg-26dd5704376a9241a3c98e060c700ea8.ctex
+Completed load for: 'res://assets/desert/reino_v3/ui/svg/defesa.svg' remapped 'res://assets/desert/reino_v3/ui/svg/defesa.svg' at thread -1
+Loading resource: res://assets/desert/reino_v3/ui/svg/ataque_fogo.svg remapped: res://assets/desert/reino_v3/ui/svg/ataque_fogo.svg
+Loading resource: res://.godot/imported/ataque_fogo.svg-60471deffee6bdcba647721450c8fdfc.ctex remapped: res://.godot/imported/ataque_fogo.svg-60471deffee6bdcba647721450c8fdfc.ctex
+Completed load for: 'res://assets/desert/reino_v3/ui/svg/ataque_fogo.svg' remapped 'res://assets/desert/reino_v3/ui/svg/ataque_fogo.svg' at thread -1
+Loading resource: res://assets/desert/reino_v3/ui/svg/defesa.svg remapped: res://assets/desert/reino_v3/ui/svg/defesa.svg
+Loading resource: res://.godot/imported/defesa.svg-26dd5704376a9241a3c98e060c700ea8.ctex remapped: res://.godot/imported/defesa.svg-26dd5704376a9241a3c98e060c700ea8.ctex
+Completed load for: 'res://assets/desert/reino_v3/ui/svg/defesa.svg' remapped 'res://assets/desert/reino_v3/ui/svg/defesa.svg' at thread -1
+Loading resource: res://assets/desert/reino_v3/ui/svg/cristal_ambar.svg remapped: res://assets/desert/reino_v3/ui/svg/cristal_ambar.svg
+Loading resource: res://.godot/imported/cristal_ambar.svg-fd57563b688da022773fd0727cd35c3f.ctex remapped: res://.godot/imported/cristal_ambar.svg-fd57563b688da022773fd0727cd35c3f.ctex
+Completed load for: 'res://assets/desert/reino_v3/ui/svg/cristal_ambar.svg' remapped 'res://assets/desert/reino_v3/ui/svg/cristal_ambar.svg' at thread -1
+Loading resource: res://assets/desert/reino_v3/ui/svg/corrida_raio.svg remapped: res://assets/desert/reino_v3/ui/svg/corrida_raio.svg
+Loading resource: res://.godot/imported/corrida_raio.svg-0361275b46c734269a0cb9193cf87125.ctex remapped: res://.godot/imported/corrida_raio.svg-0361275b46c734269a0cb9193cf87125.ctex
+Completed load for: 'res://assets/desert/reino_v3/ui/svg/corrida_raio.svg' remapped 'res://assets/desert/reino_v3/ui/svg/corrida_raio.svg' at thread -1
+PASS tarefa aparece apenas perto da passagem
+PASS vão realmente aberto antes da montagem
+PASS montagem começa girando a peça, sem colisão antecipada
+Loading resource: res://assets/desert/reino_v3/ui/svg/ataque_fogo.svg remapped: res://assets/desert/reino_v3/ui/svg/ataque_fogo.svg
+Loading resource: res://.godot/imported/ataque_fogo.svg-60471deffee6bdcba647721450c8fdfc.ctex remapped: res://.godot/imported/ataque_fogo.svg-60471deffee6bdcba647721450c8fdfc.ctex
+Completed load for: 'res://assets/desert/reino_v3/ui/svg/ataque_fogo.svg' remapped 'res://assets/desert/reino_v3/ui/svg/ataque_fogo.svg' at thread -1
+Loading resource: res://assets/desert/reino_v3/ui/svg/defesa.svg remapped: res://assets/desert/reino_v3/ui/svg/defesa.svg
+Loading resource: res://.godot/imported/defesa.svg-26dd5704376a9241a3c98e060c700ea8.ctex remapped: res://.godot/imported/defesa.svg-26dd5704376a9241a3c98e060c700ea8.ctex
+Completed load for: 'res://assets/desert/reino_v3/ui/svg/defesa.svg' remapped 'res://assets/desert/reino_v3/ui/svg/defesa.svg' at thread -1
+PASS ponte montada tem piso real
+PASS tarefa não usa poderes nem altera recursos
+PASS botão contextual some após concluir
+PASS ponte atravessável andando para a direita
+PASS ponte atravessável andando para a esquerda
+PASS descarregar e voltar preserva ponte sem duplicar
+PASS ponte frágil usa a peça física de desmoronamento
+PASS pisar inicia aviso antes da queda
+PASS ponte perde colisão e deixa cair de verdade
+PASS ponte se recompõe para retorno ou nova tentativa
+PASS saída limpa pontes e tarefas
+PARKOUR_REVISION checks=51 failures=0
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+XR: Clearing primary interface
+XR: Removed interface "Native mobile"
+XR: Removed interface "OpenXR"
+Leaked instance: AudioStreamWAV:9223372109533677215 - Reference count: 1
+Leaked instance: AudioStreamPlaybackWAV:9223372198318706662 - Reference count: 1
+Hint: Leaked instances typically happen when nodes are removed from the scene tree (with `remove_child()`) but not freed (with `free()` or `queue_free()`).
+Orphan StringName: Master (static: 0, total: 2)
+StringName: 1 unclaimed string names at exit.

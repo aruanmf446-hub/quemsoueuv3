@@ -1,0 +1,118 @@
+[
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": false,
+		"name": "fase_01_borda",
+		"x": 11.3916666666667,
+		"y": 0.0
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": false,
+		"name": "fase_01_patamares",
+		"x": 86.7508333333333,
+		"y": 1.65
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": false,
+		"name": "fase_02_borda",
+		"x": 6.35,
+		"y": 8.0
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": false,
+		"name": "fase_02_patamares",
+		"x": 55.855,
+		"y": 9.65
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": false,
+		"name": "telhado_alto",
+		"x": 94.25,
+		"y": 10.75
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": false,
+		"name": "telhado_descida",
+		"x": 167.59,
+		"y": 9.65
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": false,
+		"name": "fase_04_borda",
+		"x": 11.3916666666667,
+		"y": 3.5
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": false,
+		"name": "fase_04_patamares",
+		"x": 86.7508333333333,
+		"y": 5.15
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": false,
+		"name": "ponte_fragil",
+		"x": 442.015,
+		"y": 4.6
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": false,
+		"name": "ponte_fragil_caindo"
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": false,
+		"name": "tarefa_ponte_antes",
+		"x": 226.253333333333,
+		"y": 5.7
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": false,
+		"name": "tarefa_ponte_botao"
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": false,
+		"name": "tarefa_ponte_00"
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": false,
+		"name": "tarefa_ponte_01"
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": false,
+		"name": "tarefa_ponte_02"
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": false,
+		"name": "tarefa_ponte_03"
+	}
+]

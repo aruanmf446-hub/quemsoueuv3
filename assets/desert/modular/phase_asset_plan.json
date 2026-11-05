@@ -1,0 +1,604 @@
+{
+  "schema": 1,
+  "status": "planned_not_installed",
+  "units": "metres",
+  "notes": [
+    "Ilustrações decorativas, sem colisores próprios; gameplay3D existente preservado.",
+    "Percentuais são âncoras de composição, não percurso completo. Resolver pelo piso real antes de instalar.",
+    "Não cobrir HUD, inimigos, recargas, aterrissagens ou pisos de Ruptura.",
+    "Nos telhados, fachadas abaixo da laje e rua muito abaixo; não usar escadas.",
+    "Pontes/aqueduto só revestem superfícies físicas existentes, sem preencher abismos com arte.",
+    "Água ilustrada estática não substitui o efeito animado existente."
+  ],
+  "ability_progression": {
+    "freeze_back": 3,
+    "electric_run": 4,
+    "rupture_back": 5
+  },
+  "stages": [
+    {
+      "order": 1,
+      "name": "Portões da Capital",
+      "setting": "night",
+      "background": "desert_and_city",
+      "slots": [
+        {
+          "asset": "capital_watchtower",
+          "fraction": 0.04,
+          "section": "entrada",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "vigia na aproximação do portão"
+        },
+        {
+          "asset": "capital_archway",
+          "fraction": 0.14,
+          "section": "entrada",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "arcada depois do portão monumental existente"
+        },
+        {
+          "asset": "capital_house",
+          "fraction": 0.3,
+          "section": "movimentação",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "rua de acesso residencial"
+        },
+        {
+          "asset": "capital_merchant",
+          "fraction": 0.47,
+          "section": "intermediário",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "fachada na rua comercial"
+        },
+        {
+          "asset": "capital_palm_garden",
+          "fraction": 0.64,
+          "section": "recuperação",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "pátio lateral fora da pista"
+        },
+        {
+          "asset": "capital_watchtower",
+          "fraction": 0.81,
+          "section": "desafio final",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "torre do setor defensivo"
+        },
+        {
+          "asset": "capital_balcony_house",
+          "fraction": 0.94,
+          "section": "saída",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "antecipa o casario dos telhados"
+        }
+      ]
+    },
+    {
+      "order": 2,
+      "name": "Telhados da Capital",
+      "setting": "night",
+      "background": "desert_and_city",
+      "slots": [
+        {
+          "asset": "capital_house",
+          "fraction": 0.04,
+          "section": "entrada",
+          "anchor": "facade",
+          "z": 1.65,
+          "note": "fachada sob a primeira laje"
+        },
+        {
+          "asset": "capital_balcony_house",
+          "fraction": 0.23,
+          "section": "parkour inicial",
+          "anchor": "facade",
+          "z": 1.65,
+          "note": "fachada sob lajes de alturas diferentes"
+        },
+        {
+          "asset": "capital_merchant",
+          "fraction": 0.43,
+          "section": "intermediário",
+          "anchor": "facade",
+          "z": 1.65,
+          "note": "fachada sob travessia dos becos"
+        },
+        {
+          "asset": "capital_watchtower",
+          "fraction": 0.59,
+          "section": "orientação",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "torre distante sem bloquear aterrissagens"
+        },
+        {
+          "asset": "capital_balcony_house",
+          "fraction": 0.77,
+          "section": "parkour final",
+          "anchor": "facade",
+          "z": 1.65,
+          "note": "sob saltos progressivos; varanda não é plataforma extra"
+        },
+        {
+          "asset": "capital_market_stall",
+          "fraction": 0.94,
+          "section": "saída",
+          "anchor": "street_below",
+          "z": -6.0,
+          "note": "bazar ao nível da rua bem abaixo da rota"
+        }
+      ]
+    },
+    {
+      "order": 3,
+      "name": "Bazar da Cidade",
+      "setting": "night",
+      "background": "desert_and_city",
+      "slots": [
+        {
+          "asset": "capital_market_stall",
+          "fraction": 0.06,
+          "section": "entrada",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "primeira rua dos tecidos"
+        },
+        {
+          "asset": "capital_merchant",
+          "fraction": 0.22,
+          "section": "movimentação",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "edificação comercial entre bancas"
+        },
+        {
+          "asset": "capital_market_stall",
+          "fraction": 0.37,
+          "section": "desafio inicial",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "bancas de cerâmica e tecido fora da pista"
+        },
+        {
+          "asset": "capital_palm_garden",
+          "fraction": 0.52,
+          "section": "recuperação",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "pequena praça aberta para aprender congelamento"
+        },
+        {
+          "asset": "capital_merchant",
+          "fraction": 0.68,
+          "section": "intermediário",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "depósitos comerciais"
+        },
+        {
+          "asset": "capital_market_stall",
+          "fraction": 0.82,
+          "section": "desafio final",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "última rua de mercado"
+        },
+        {
+          "asset": "capital_archway",
+          "fraction": 0.95,
+          "section": "saída",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "transição para a estrutura do aqueduto"
+        }
+      ]
+    },
+    {
+      "order": 4,
+      "name": "Aqueduto do Deserto",
+      "setting": "night",
+      "background": "desert_and_city",
+      "slots": [
+        {
+          "asset": "capital_archway",
+          "fraction": 0.04,
+          "section": "entrada",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "passagem de acesso"
+        },
+        {
+          "asset": "desert_aqueduct",
+          "fraction": 0.19,
+          "section": "movimentação",
+          "anchor": "under_surface",
+          "z": 1.65,
+          "note": "arcos sob o canal jogável existente"
+        },
+        {
+          "asset": "desert_aqueduct",
+          "fraction": 0.4,
+          "section": "desafio inicial",
+          "anchor": "under_surface",
+          "z": 1.65,
+          "note": "ponte apoiada: não desenhar piso sobre vão"
+        },
+        {
+          "asset": "desert_oasis_fountain",
+          "fraction": 0.55,
+          "section": "recuperação",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "reservatório lateral para corrida elétrica"
+        },
+        {
+          "asset": "desert_aqueduct",
+          "fraction": 0.73,
+          "section": "desafio final",
+          "anchor": "under_surface",
+          "z": 1.65,
+          "note": "arcos sob a travessia das cascatas"
+        },
+        {
+          "asset": "capital_palm_garden",
+          "fraction": 0.94,
+          "section": "saída",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "antecipa a vegetação do oásis"
+        }
+      ]
+    },
+    {
+      "order": 5,
+      "name": "Jardins do Oásis",
+      "setting": "night",
+      "background": "desert_and_city",
+      "slots": [
+        {
+          "asset": "capital_palm_garden",
+          "fraction": 0.06,
+          "section": "entrada",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "palmeiras nas margens"
+        },
+        {
+          "asset": "desert_oasis_fountain",
+          "fraction": 0.24,
+          "section": "movimentação",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "primeiro jardim ornamentado"
+        },
+        {
+          "asset": "capital_palm_garden",
+          "fraction": 0.42,
+          "section": "desafio inicial",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "vegetação após salto; não cobrir piso rompível"
+        },
+        {
+          "asset": "desert_oasis_fountain",
+          "fraction": 0.58,
+          "section": "recuperação",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "praça para apresentar Ruptura"
+        },
+        {
+          "asset": "capital_palm_garden",
+          "fraction": 0.77,
+          "section": "desafio final",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "corredor verde com visibilidade da perseguição"
+        },
+        {
+          "asset": "capital_archway",
+          "fraction": 0.95,
+          "section": "saída",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "arco antigo conduz às ruínas"
+        }
+      ]
+    },
+    {
+      "order": 6,
+      "name": "Ruínas Enterradas",
+      "setting": "underground",
+      "background": "cave",
+      "slots": [
+        {
+          "asset": "desert_ancient_ruins",
+          "fraction": 0.06,
+          "section": "entrada",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "primeiro monumento antigo"
+        },
+        {
+          "asset": "desert_ancient_ruins",
+          "fraction": 0.29,
+          "section": "movimentação",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "câmara de colunas"
+        },
+        {
+          "asset": "desert_mine_crystals",
+          "fraction": 0.46,
+          "section": "intermediário",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "pequena concentração mineral em rocha lateral"
+        },
+        {
+          "asset": "desert_ancient_ruins",
+          "fraction": 0.65,
+          "section": "desafio final",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "arco quebrado além de mudanças de altura"
+        },
+        {
+          "asset": "desert_mine_crystals",
+          "fraction": 0.83,
+          "section": "recuperação",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "minérios nas paredes da passagem"
+        },
+        {
+          "asset": "capital_archway",
+          "fraction": 0.95,
+          "section": "saída",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "passagem para a estrada"
+        }
+      ]
+    },
+    {
+      "order": 7,
+      "name": "Estrada da Mineração",
+      "setting": "night",
+      "background": "desert_and_city",
+      "slots": [
+        {
+          "asset": "capital_watchtower",
+          "fraction": 0.05,
+          "section": "entrada",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "última torre próxima da capital"
+        },
+        {
+          "asset": "desert_timber_bridge",
+          "fraction": 0.21,
+          "section": "desafio inicial",
+          "anchor": "under_surface",
+          "z": 1.65,
+          "note": "revestir ponte física; preservar os vãos ao lado"
+        },
+        {
+          "asset": "desert_mining_gantry",
+          "fraction": 0.38,
+          "section": "intermediário",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "posto de transporte de minério"
+        },
+        {
+          "asset": "desert_timber_bridge",
+          "fraction": 0.56,
+          "section": "desafio intermediário",
+          "anchor": "under_surface",
+          "z": 1.65,
+          "note": "segunda travessia apoiada"
+        },
+        {
+          "asset": "desert_mining_gantry",
+          "fraction": 0.75,
+          "section": "desafio final",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "carga e carrinho perto do desfiladeiro"
+        },
+        {
+          "asset": "desert_mine_crystals",
+          "fraction": 0.92,
+          "section": "saída",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "rochas de minério antecipam o complexo"
+        }
+      ]
+    },
+    {
+      "order": 8,
+      "name": "Posto de Controle",
+      "setting": "night",
+      "background": "desert_and_city",
+      "slots": [
+        {
+          "asset": "capital_watchtower",
+          "fraction": 0.06,
+          "section": "entrada",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "posto avançado"
+        },
+        {
+          "asset": "desert_military_gate",
+          "fraction": 0.24,
+          "section": "desafio inicial",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "primeiro setor fortificado"
+        },
+        {
+          "asset": "capital_watchtower",
+          "fraction": 0.44,
+          "section": "intermediário",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "torre de vigia do pátio"
+        },
+        {
+          "asset": "capital_archway",
+          "fraction": 0.62,
+          "section": "recuperação",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "passagem entre os setores"
+        },
+        {
+          "asset": "capital_watchtower",
+          "fraction": 0.78,
+          "section": "desafio final",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "última posição de vigilância"
+        },
+        {
+          "asset": "desert_military_gate",
+          "fraction": 0.95,
+          "section": "saída",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "grande portão antes da mineradora"
+        }
+      ]
+    },
+    {
+      "order": 9,
+      "name": "Entrada da Mineradora",
+      "setting": "night",
+      "background": "desert_and_city",
+      "slots": [
+        {
+          "asset": "desert_mining_gantry",
+          "fraction": 0.06,
+          "section": "entrada",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "rota de transporte, não o portal da mina"
+        },
+        {
+          "asset": "desert_timber_bridge",
+          "fraction": 0.25,
+          "section": "desafio inicial",
+          "anchor": "under_surface",
+          "z": 1.65,
+          "note": "ponte de aproximação"
+        },
+        {
+          "asset": "desert_mining_gantry",
+          "fraction": 0.45,
+          "section": "intermediário",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "pátio de equipamentos"
+        },
+        {
+          "asset": "desert_timber_bridge",
+          "fraction": 0.64,
+          "section": "desafio final",
+          "anchor": "under_surface",
+          "z": 1.65,
+          "note": "última ponte antes das instalações"
+        },
+        {
+          "asset": "desert_mining_gantry",
+          "fraction": 0.82,
+          "section": "aproximação final",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "guindaste e carrinho junto ao portal"
+        },
+        {
+          "asset": "desert_mine_entrance",
+          "fraction": 1.0,
+          "section": "saída",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "portal monumental exatamente na saída da fase9"
+        }
+      ]
+    },
+    {
+      "order": 10,
+      "name": "Interior da Mineração",
+      "setting": "underground",
+      "background": "cave",
+      "slots": [
+        {
+          "asset": "desert_mining_gantry",
+          "fraction": 0.06,
+          "section": "entrada",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "primeira galeria industrial"
+        },
+        {
+          "asset": "desert_mine_crystals",
+          "fraction": 0.23,
+          "section": "movimentação",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "veios nas paredes da câmara"
+        },
+        {
+          "asset": "desert_timber_bridge",
+          "fraction": 0.39,
+          "section": "desafio inicial",
+          "anchor": "under_surface",
+          "z": 1.65,
+          "note": "passarela apoiada nos trilhos existentes"
+        },
+        {
+          "asset": "desert_mining_gantry",
+          "fraction": 0.55,
+          "section": "intermediário",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "galeria de guindastes"
+        },
+        {
+          "asset": "desert_mine_crystals",
+          "fraction": 0.72,
+          "section": "desafio final",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "cristais no poço industrial"
+        },
+        {
+          "asset": "desert_mining_gantry",
+          "fraction": 0.87,
+          "section": "preparação da arena",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "equipamento atrás do abastecimento; sem cobrir recargas"
+        },
+        {
+          "asset": "desert_mine_crystals",
+          "fraction": 0.96,
+          "section": "arena",
+          "anchor": "background",
+          "z": -5.0,
+          "note": "veio mineral atrás da arena de Malagueta"
+        }
+      ]
+    }
+  ]
+}

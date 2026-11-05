@@ -3,9 +3,10 @@
 ## Bot assistido de assets
 
 [Fila e instruções](tools/asset_pipeline/desert_bot/README.md): gera argumentos para
-image_gen na conversa, registra fontes/hashes e prepara texturas no Godot. Primeiro
-lote concluído: barraca de mercado e palmeiras; arcada e casa com varanda na fila.
-Não é serviço24h nem publica/integra os assets sozinho. Lotes limitados a dois.
+image_gen na conversa, registra fontes/hashes e prepara texturas no Godot. Biblioteca com15 módulos, incluindo o lote grande de10 novos assets. Veja a
+[galeria e distribuição por fase](docs/desert/assets/LOTE_GRANDE.md):63 âncoras
+resolvidas no Godot, ainda não instaladas nas cenas. Não é serviço24h nem
+publica/integra os assets sozinho. Lotes padrão de dois; grandes só quando pedidos.
 
 ## Ajuste de parkour e progressão após reprovação
 

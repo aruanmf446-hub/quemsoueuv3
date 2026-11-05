@@ -58,7 +58,13 @@ const out=process.env.QSE_DESERT_WEB_OUT||'/tmp/reino-web';fs.mkdirSync(out,{rec
   await page.screenshot({path:out+`/phase_${String(order).padStart(2,'0')}.png`,scale:'css'});
  }
  if(stageArt.some(level=>!level.art_ids?.length))throw new Error('Approved assets missing in Web phase');
- const report={stageArt,states,game,after,replay,roofBefore,roofAfter,errors,blocked:[...new Set(blocked)],engineErrors:logs.filter(s=>/SCRIPT ERROR:|Parse Error:|^ERROR:/.test(s))};fs.writeFileSync(out+'/report.json',JSON.stringify(report,null,2));
+ // Fixture identificada: contato físico real após aproximar o ator, sem backend.
+ const pedestalBefore=await page.evaluate(()=>{window.qseDesertProbe('pedestal');return window.qseDesertState;});
+ await page.waitForFunction(()=>{window.qseDesertProbe('state');return window.qseDesertState.pedestal_collected;},null,{timeout:15000,polling:100});
+ const pedestalAfter=await state();
+ if(!pedestalBefore.pedestal_fixture||pedestalAfter.pedestal_count!==1||pedestalAfter.pickup_count!==0)throw new Error('Collecting attack removed or duplicated the pedestal');
+ await page.screenshot({path:out+'/pedestal_after_collection_fixture.png',scale:'css'});
+ const report={stageArt,states,game,after,replay,roofBefore,roofAfter,pedestalBefore,pedestalAfter,errors,blocked:[...new Set(blocked)],engineErrors:logs.filter(s=>/SCRIPT ERROR:|Parse Error:|^ERROR:/.test(s))};fs.writeFileSync(out+'/report.json',JSON.stringify(report,null,2));
  await browser.close();if(report.errors.length||report.engineErrors.length)throw new Error('Browser or engine errors; see report');
  console.log('REINO_WEB phases10 approved-art intro8 touch-dash replay-read progression PASS; external hosts blocked');
 })().catch(async e=>{console.error(e);if(activeBrowser)await activeBrowser.close().catch(()=>{});process.exit(1)});

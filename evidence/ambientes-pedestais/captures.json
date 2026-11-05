@@ -1,0 +1,12 @@
+[
+  {
+    "profile": "desktop",
+    "passed": true,
+    "captures": 21
+  },
+  {
+    "profile": "iphone",
+    "passed": true,
+    "captures": 21
+  }
+]

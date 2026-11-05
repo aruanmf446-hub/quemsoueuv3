@@ -43,6 +43,8 @@ func run() -> void:
 				if not phase.is_ancestor_of(art) or not art.has_meta("composition_id"): continue
 				var id := str(art.get_meta("composition_id"))
 				if ids.has(id) or not phase._world.is_ancestor_of(art): valid=false
+				var half_width: float = art.pixel_size*float(art.texture.get_width())*0.5
+				if art.position.x-half_width < float(art.get_meta("surface_left"))+0.59 or art.position.x+half_width > float(art.get_meta("surface_right"))-0.59: valid=false
 				ids[id] = true
 			check(valid and not ids.is_empty(),"fase %02d x%.0f: sem duplicação e streaming limitado" % [order,x])
 		phase.free()

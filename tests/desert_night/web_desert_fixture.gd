@@ -5,6 +5,7 @@ var phase: Node3D
 var _callback: JavaScriptObject
 var _order := 1
 var _switching := false
+var _pedestal_fixture_id := ""
 func _ready() -> void:
 	if not OS.has_feature("iphone_layout_fixture"):
 		push_error("Use only the isolated Web fixture export")
@@ -35,11 +36,26 @@ func _probe(args: Array) -> void:
 	if args.size() and str(args[0]) == "powers" and is_instance_valid(phase):
 		for kind in ["rupture","amber","dash"]:
 			for index in range(3): phase._player.restore_charge(kind)
+	# TEST ONLY: aproxima o ator de uma recarga real; a física realiza a coleta.
+	if args.size() and str(args[0]) == "pedestal" and is_instance_valid(phase):
+		for item: Node3D in get_tree().get_nodes_in_group("campaign_pickups"):
+			if phase.is_ancestor_of(item) and item.get("kind") == "attack":
+				_pedestal_fixture_id = str(item.get_meta("pickup_id"))
+				phase._player.attack_charges = 2
+				phase._player._invulnerable = 999.0
+				phase._player.position = item.global_position + Vector3.UP*0.05
+				phase._player.velocity = Vector3.ZERO
+				break
 	var size := get_viewport().get_visible_rect().size
 	var state := {"size":[size.x,size.y],"iphone":UIScale.is_iphone(),"stage":"loading","read":PhaseStory.was_read(_order)}
 	if is_instance_valid(phase):
 		state.stage = "play"
 		state.order = phase._order
+		state.pedestal_fixture = not _pedestal_fixture_id.is_empty()
+		state.pedestal_collected = phase._collected_ids.has(_pedestal_fixture_id)
+		state.pedestal_count = get_tree().get_nodes_in_group("campaign_pedestals").filter(func(n: Node) -> bool: return n.get_meta("pickup_id","") == _pedestal_fixture_id).size()
+		state.pickup_count = get_tree().get_nodes_in_group("campaign_pickups").filter(func(n: Node) -> bool: return n.get_meta("pickup_id","") == _pedestal_fixture_id).size()
+
 		state.art_ids=[]
 		for node in get_tree().get_nodes_in_group("kingdom_art"):
 			if phase.is_ancestor_of(node):

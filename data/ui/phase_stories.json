@@ -103,7 +103,7 @@
       {
         "title": "TELHADOS DA CAPITAL",
         "eyebrow": "REINO DO DESERTO · FASE 02",
-        "image": "res://assets/story/covers/phase_03.jpg",
+        "image": "res://assets/story/covers/phase_02.res",
         "message": "A rua fica muito abaixo. Siga pelas lajes, salte entre os terraços e cuidado com os soldados que também atravessam os telhados."
       }
     ],
@@ -111,7 +111,7 @@
       {
         "title": "BAZAR DA CIDADE",
         "eyebrow": "REINO DO DESERTO · FASE 03",
-        "image": "res://assets/story/covers/phase_02.jpg",
+        "image": "res://assets/story/covers/phase_03.res",
         "message": "Atravesse bazar da cidade e encontre a passagem para a próxima região."
       }
     ],
@@ -119,7 +119,7 @@
       {
         "title": "AQUEDUTO DO DESERTO",
         "eyebrow": "REINO DO DESERTO · FASE 04",
-        "image": "res://assets/story/covers/phase_05.jpg",
+        "image": "res://assets/story/covers/phase_04.res",
         "message": "Atravesse aqueduto do deserto e encontre a passagem para a próxima região."
       }
     ],
@@ -127,7 +127,7 @@
       {
         "title": "JARDINS DO OÁSIS",
         "eyebrow": "REINO DO DESERTO · FASE 05",
-        "image": "res://assets/story/covers/phase_06.jpg",
+        "image": "res://assets/story/covers/phase_05.res",
         "message": "Atravesse jardins do oásis e encontre a passagem para a próxima região."
       }
     ],
@@ -135,7 +135,7 @@
       {
         "title": "RUÍNAS ENTERRADAS",
         "eyebrow": "REINO DO DESERTO · FASE 06",
-        "image": "res://assets/story/covers/phase_07.jpg",
+        "image": "res://assets/story/covers/phase_06.res",
         "message": "Atravesse ruínas enterradas e encontre a passagem para a próxima região."
       }
     ],
@@ -143,7 +143,7 @@
       {
         "title": "ESTRADA DA MINERAÇÃO",
         "eyebrow": "REINO DO DESERTO · FASE 07",
-        "image": "res://assets/story/covers/phase_08.jpg",
+        "image": "res://assets/story/covers/phase_07.res",
         "message": "Atravesse estrada da mineração e encontre a passagem para a próxima região."
       }
     ],
@@ -151,7 +151,7 @@
       {
         "title": "POSTO DE CONTROLE",
         "eyebrow": "REINO DO DESERTO · FASE 08",
-        "image": "res://assets/story/covers/phase_04.jpg",
+        "image": "res://assets/story/covers/phase_08.res",
         "message": "Atravesse posto de controle e encontre a passagem para a próxima região."
       }
     ],
@@ -159,7 +159,7 @@
       {
         "title": "ENTRADA DA MINERADORA",
         "eyebrow": "REINO DO DESERTO · FASE 09",
-        "image": "res://assets/story/covers/phase_09.jpg",
+        "image": "res://assets/story/covers/phase_09.res",
         "message": "Siga pelos pátios de transporte até a grande entrada iluminada da mineradora."
       }
     ],
@@ -167,7 +167,7 @@
       {
         "title": "INTERIOR DA MINERAÇÃO",
         "eyebrow": "REINO DO DESERTO · FASE 10",
-        "image": "res://assets/desert/night_city/outskirts.png",
+        "image": "res://assets/story/covers/phase_10.res",
         "message": "A jornada continua nas profundezas. Trilhos, passarelas, guindastes e cristais revelam o coração da mineração."
       }
     ]

@@ -79,13 +79,13 @@ func render() -> void:
 	var local_completed := LocalCampaign.completed_orders()
 	var unlocked := maxi(LocalCampaign.highest_unlocked(),online_unlocked)
 	_next_card = null
-	# Resumo: reino, protagonista e progresso em nove segmentos.
+	# Resumo: reino, protagonista e progresso em dez segmentos.
 	var summary := PlayerUI.row(body)
 	summary.add_theme_constant_override("separation",roundi(_px(18,8)))
 	var info := PlayerUI.column(summary)
 	info.add_theme_constant_override("separation",0)
 	info.add_child(_label("REINO DO DESERTO  ·  CIDADE NOTURNA",_px(15,11)/_unit_or_one(),GOLD))
-	info.add_child(_label("El Fuego  —  %d de 9 fases concluídas" % local_completed.size(),_px(22,14)/_unit_or_one()))
+	info.add_child(_label("El Fuego  —  %d de 10 fases concluídas" % local_completed.size(),_px(22,14)/_unit_or_one()))
 	var pips := Control.new()
 	pips.custom_minimum_size = Vector2(_px(300,150),_px(14,10))
 	pips.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -177,7 +177,8 @@ func _phase_card(parent: Control, order: int, title: String, description: String
 	panel.add_child(column)
 	# Arte da cidade com o número da fase por cima.
 	var art := TextureRect.new()
-	art.texture = load("res://assets/story/covers/phase_%02d.jpg" % order) if order <= 9 else ART[0]
+	var cover := "res://assets/story/covers/phase_%02d.res" % order
+	art.texture = load(cover) if ResourceLoader.exists(cover) else (load("res://assets/story/covers/phase_%02d.jpg" % order) if order <= 9 else ART[0])
 	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	art.custom_minimum_size.y = 80.0 if UIScale.is_iphone() else _px(150,46)
@@ -348,7 +349,7 @@ func _open_loaded_phase(packed: PackedScene, menu: Control) -> void:
 		_launching = false
 		render()
 	host.add_child(layer)
-	# As fases 01–09 oferecem pausa própria; o wrapper atende à fase 10 original.
+	# As dez fases usam pausa própria; o wrapper permanece como fallback de navegação.
 	if phase.has_signal("return_requested"):
 		phase.connect("return_requested",layer.return_action)
 		layer.hide()

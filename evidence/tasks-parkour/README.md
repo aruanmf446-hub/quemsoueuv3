@@ -58,3 +58,7 @@ Sem validação em iPhone físico/Safari/APK ou medição de FPS em hardware mó
 Os logs preservam avisos de recursos de áudio ativos ao encerrar certos testes headless, identificados anteriormente como AudioStreamWAV/AudioStreamPlaybackWAV. Os mecanismos são removidos ao sair das cenas.
 
 O smoke geral já apresentava falhas em `transition_01`–`transition_09` e `functional` na main anterior (`d0ae424` e `129f031`). Não foram removidos ou enfraquecidos esses testes; esta rodada não declara a suíte geral corrigida. Status do deploy e da publicação em `publication.json`.
+
+## Integração concorrente
+
+Antes do envio, a main avançou para `cb3bfc4` com entregas de perfil e Duelo. Merge preservou esse trabalho sem conflitos. Import, reino10, layout e percurso 03 passaram novamente após integrar. O teste de escopo ganhou `--base`, mantendo o padrão histórico e todos os caminhos protegidos; `--base cb3bfc4` confirmou que esta entrega não modifica os serviços, modelos e menus já presentes na main.

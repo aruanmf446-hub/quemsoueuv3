@@ -104,7 +104,7 @@
         "title": "TELHADOS DA CAPITAL",
         "eyebrow": "REINO DO DESERTO · FASE 02",
         "image": "res://assets/story/covers/phase_02.res",
-        "message": "A rua fica muito abaixo. Siga pelas lajes, salte entre os terraços e cuidado com os soldados que também atravessam os telhados."
+        "message": "Deixe as ruas para trás e atravesse a capital pelas lajes. Salte entre as casas, mantenha distância dos soldados e encontre a passagem para o mercado."
       }
     ],
     "03": [
@@ -112,7 +112,7 @@
         "title": "BAZAR DA CIDADE",
         "eyebrow": "REINO DO DESERTO · FASE 03",
         "image": "res://assets/story/covers/phase_03.res",
-        "message": "Atravesse bazar da cidade e encontre a passagem para a próxima região."
+        "message": "Os soldados chegaram ao mercado. Atravesse as ruas de tecidos e os depósitos; a partir daqui, use o congelamento para deter os perseguidores atrás de você."
       }
     ],
     "04": [
@@ -120,7 +120,7 @@
         "title": "AQUEDUTO DO DESERTO",
         "eyebrow": "REINO DO DESERTO · FASE 04",
         "image": "res://assets/story/covers/phase_04.res",
-        "message": "Atravesse aqueduto do deserto e encontre a passagem para a próxima região."
+        "message": "O aqueduto liga a capital às águas do oásis. Atravesse os canais e as pontes partidas; a corrida elétrica agora permite avançar com choque contra os inimigos."
       }
     ],
     "05": [
@@ -128,7 +128,7 @@
         "title": "JARDINS DO OÁSIS",
         "eyebrow": "REINO DO DESERTO · FASE 05",
         "image": "res://assets/story/covers/phase_05.res",
-        "message": "Atravesse jardins do oásis e encontre a passagem para a próxima região."
+        "message": "Entre fontes e palmeiras, a perseguição continua. El Fuego agora pode romper o piso marcado atrás de si: prepare sua passagem antes de abrir o buraco sob os soldados."
       }
     ],
     "06": [
@@ -136,7 +136,7 @@
         "title": "RUÍNAS ENTERRADAS",
         "eyebrow": "REINO DO DESERTO · FASE 06",
         "image": "res://assets/story/covers/phase_06.res",
-        "message": "Atravesse ruínas enterradas e encontre a passagem para a próxima região."
+        "message": "As ruínas guardam marcas de um reino antigo. Siga entre colunas e câmaras enterradas, conserve suas cargas e procure a saída para a estrada da mineração."
       }
     ],
     "07": [
@@ -144,7 +144,7 @@
         "title": "ESTRADA DA MINERAÇÃO",
         "eyebrow": "REINO DO DESERTO · FASE 07",
         "image": "res://assets/story/covers/phase_07.res",
-        "message": "Atravesse estrada da mineração e encontre a passagem para a próxima região."
+        "message": "A cidade fica para trás. Cruze desfiladeiros e pontes de transporte enquanto os guindastes e carrinhos anunciam a aproximação das minas."
       }
     ],
     "08": [
@@ -152,7 +152,7 @@
         "title": "POSTO DE CONTROLE",
         "eyebrow": "REINO DO DESERTO · FASE 08",
         "image": "res://assets/story/covers/phase_08.res",
-        "message": "Atravesse posto de controle e encontre a passagem para a próxima região."
+        "message": "O último posto militar separa você da mineradora. Atravesse os pátios, as torres de vigia e os setores fortificados até alcançar o grande portão."
       }
     ],
     "09": [
@@ -160,7 +160,7 @@
         "title": "ENTRADA DA MINERADORA",
         "eyebrow": "REINO DO DESERTO · FASE 09",
         "image": "res://assets/story/covers/phase_09.res",
-        "message": "Siga pelos pátios de transporte até a grande entrada iluminada da mineradora."
+        "message": "Avance pelos pátios de transporte, pontes e equipamentos de minério. A grande entrada iluminada espera no fim do percurso: é lá que começa a descida."
       }
     ],
     "10": [
@@ -168,7 +168,7 @@
         "title": "INTERIOR DA MINERAÇÃO",
         "eyebrow": "REINO DO DESERTO · FASE 10",
         "image": "res://assets/story/covers/phase_10.res",
-        "message": "A jornada continua nas profundezas. Trilhos, passarelas, guindastes e cristais revelam o coração da mineração."
+        "message": "Trilhos, passarelas e cristais revelam o coração da mineração. Atravesse as galerias, prepare suas cargas e enfrente Malagueta para abrir a saída."
       }
     ]
   }

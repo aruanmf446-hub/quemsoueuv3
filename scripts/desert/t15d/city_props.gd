@@ -3,6 +3,7 @@ extends Node3D
 ## Coordenadas mundiais como as plataformas clipadas do chunk; nunca cria colisores.
 ## Bordas artificiais de chunk NÃO recebem lanternas: para isso o chamador marca
 ## pit_left/pit_right somente nas extremidades que realmente tocam um buraco.
+const Assets = preload("res://scripts/desert/t15d/kingdom_assets.gd")
 const BUILDING_SPACING := 19.0
 static var _house_texture: Texture2D
 var _builders := {}
@@ -19,20 +20,32 @@ var lantern_count := 0
 ## A mesma geometria pode ser criada por etapas sem perder o agrupamento por material.
 func prepare_build(platforms: Array, order: int, length := 1452.0, start := -8.0) -> Array[Callable]:
 	_order = clampi(order,1,10)
-	_spacing = [11.0,10.0,9.0,14.0,12.0,18.0,22.0,13.0,22.0,18.0][_order-1]
+	_spacing = [13.0,13.0,11.0,25.0,18.0,18.0,22.0,19.0,22.0,18.0][_order-1]
 	_length = maxf(length,1.0)
 	_start = start
 	var tasks: Array[Callable] = []
+	var planned := {}
+	for run: Dictionary in _ground_runs(platforms):
+		var first := float(run.pos[0])-float(run.size[0])*0.5
+		var last := float(run.pos[0])+float(run.size[0])*0.5
+		for point: Dictionary in Assets.placements(_order):
+			if point.anchor in ["facade","under_surface"] or point.asset=="desert_mine_entrance": continue
+			if point.x>=first and point.x<last and not planned.has(point.id):
+				planned[point.id]=true
+				tasks.append(_planned_asset.bind(point))
 	for platform: Dictionary in _ground_runs(platforms):
 		var p: Array = platform.pos
 		var dimensions: Array = platform.size
 		var left := float(p[0])-float(dimensions[0])*0.5
 		var right := float(p[0])+float(dimensions[0])*0.5
 		var top := float(p[1])+float(dimensions[1])*0.5
-		var first := ceili((left-4.0)/_spacing)
-		var last := floori((right-4.0)/_spacing)
-		for slot in range(first,last+1):
-			tasks.append(_build_slot.bind(slot,left,right,top))
+		var module := int(platform.get("module",0))
+		var whole := Assets.surface(_order,module)
+		var center := (float(whole.left)+float(whole.right))*0.5
+		# Uma composição por laje real, sem a grade mundial deixar módulos vazios.
+		# O chunk que contém o centro é o único dono da composição.
+		if center>=left and center<right:
+			tasks.append(_build_slot.bind(module,float(whole.left),float(whole.right),top,center))
 		if bool(platform.get("pit_left",false)):
 			tasks.append(_lantern.bind(Vector3(left+0.55,top,-3.8)))
 		if bool(platform.get("pit_right",false)):
@@ -43,16 +56,24 @@ func prepare_build(platforms: Array, order: int, length := 1452.0, start := -8.0
 func build(platforms: Array, order: int) -> void:
 	for task in prepare_build(platforms,order): task.call()
 
-func _build_slot(slot: int, left: float, right: float, top: float) -> void:
-	var x := 4.0+float(slot)*_spacing
+func _build_slot(slot: int, left: float, right: float, top: float,at_x := INF) -> void:
+	var x := at_x if is_finite(at_x) else 4.0+float(slot)*_spacing
 	var rng := RandomNumberGenerator.new()
 	rng.seed = absi(_order*1000003+slot*9176+3059)
 	var width := rng.randf_range(3.8,5.1)
 	if x-width*0.5 < left+0.15 or x+width*0.5 > right-0.15: return
 	var origin := Vector3(x,top-(2.0 if _order == 2 else 0.0),rng.randf_range(-6.2,-5.3))
-	if _order in [7,9,10]: _warehouse(origin,width)
-	elif _order != 6: _building(origin,width,rng)
-	if _order not in [1,2]: _signature(Vector3(x,origin.y,-5.0),slot)
+	if _order in [1,2,3,8] and x-3.25>=left+0.2 and x+3.25<=right-0.2:
+		var backdrop: String=["capital_house","capital_balcony_house","capital_merchant"][posmod(slot,3)]
+		place_asset(backdrop,Vector3(x,top-(4.0 if _order==2 else 0.7),-10.5),6.5)
+	var palette: Array=Assets.PALETTES[_order-1]
+	var id: String=palette[posmod(slot+int((x-_start)/maxf(_length,1)*8),palette.size())]
+	var art_width := float(Assets.entry(id).suggested_width_metres)
+	if x-art_width*0.5<left+0.15 or x+art_width*0.5>right-0.15: return
+	# Os marcos do plano têm prioridade; não empilhar decoração aleatória sobre eles.
+	for point: Dictionary in Assets.placements(_order):
+		if point.anchor=="background" and absf(x-float(point.x))<(art_width+float(point.width))*0.5+1.0: return
+	place_asset(id,origin,art_width)
 	building_count += 1
 
 func _building(origin: Vector3, width: float, rng: RandomNumberGenerator) -> void:
@@ -120,6 +141,25 @@ func _building(origin: Vector3, width: float, rng: RandomNumberGenerator) -> voi
 
 	if _order != 2 and variant%2 == 0: _banner(Vector3(origin.x+width*0.28,origin.y+height*0.53,front+0.1))
 
+func place_asset(id: String,base: Vector3,width: float,landmark_id := "") -> Sprite3D:
+	var texture := Assets.texture(id)
+	if texture == null: return null
+	var pixels := width/texture.get_width()
+	var sprite := _house_sprite(texture,base+Vector3.UP*texture.get_height()*pixels*0.5,pixels)
+	sprite.set_meta("asset_id",id)
+	sprite.add_to_group("kingdom_art")
+	if not landmark_id.is_empty():
+		sprite.set_meta("landmark_id",landmark_id)
+		sprite.add_to_group("kingdom_landmark")
+	# Fundação atrás da pista, sem colisor e sem atravessar a lacuna do percurso.
+	_box(base-Vector3.UP*0.35,Vector3(width,0.7,1.0),"wood" if id.begins_with("desert_mining") else "stone")
+	return sprite
+
+func _planned_asset(point: Dictionary) -> void:
+	var base := Vector3(float(point.x),float(point.y),-5.0)
+	if point.anchor=="street_below": base.y-=8.0
+	place_asset(point.asset,base,float(point.width),point.id)
+
 func _house_art() -> Texture2D:
 	if _house_texture == null and ResourceLoader.exists("res://assets/desert/modular/capital_house.res"):
 		_house_texture=load("res://assets/desert/modular/capital_house.res")
@@ -146,14 +186,20 @@ func _painted_house(origin: Vector3,width: float) -> bool:
 	_house_sprite(texture,origin+Vector3.UP*texture.get_height()*pixels*0.5,pixels)
 	return true
 
-func _painted_facade(left: float,right: float,top: float,z: float) -> bool:
-	var texture := _house_art()
+func _painted_facade(left: float,right: float,top: float,z: float,asset_id := "capital_house",tile_width := 6.0) -> bool:
+	var texture := Assets.texture(asset_id)
 	if texture == null: return false
 	# Um recorte por peça física: não atravessa vãos nem cobre piso rompido.
 	# Atlas mantém proporção e coordenada mundial mesmo com o piso dividido em3.
-	var tile_width := 6.0
 	var pixels := tile_width/texture.get_width()
 	for tile in range(floori(left/tile_width),ceili(right/tile_width)):
+		var selected := asset_id
+		if _order==2 and asset_id=="capital_house":
+			selected=["capital_house","capital_balcony_house","capital_merchant"][posmod(tile,3)]
+			for point: Dictionary in Assets.placements(2):
+				if point.anchor=="facade" and absf((tile+0.5)*tile_width-float(point.x))<tile_width: selected=point.asset
+		texture=Assets.texture(selected)
+		pixels=tile_width/texture.get_width()
 		var a := maxf(left,tile*tile_width)
 		var b := minf(right,(tile+1)*tile_width)
 		if b-a < 0.01: continue
@@ -161,7 +207,11 @@ func _painted_facade(left: float,right: float,top: float,z: float) -> bool:
 		slice.atlas=texture
 		slice.region=Rect2((a-tile*tile_width)/pixels,0,(b-a)/pixels,texture.get_height())
 		slice.filter_clip=true
-		_house_sprite(slice,Vector3((a+b)*0.5,top-texture.get_height()*pixels*0.5,z),pixels)
+		var sprite := _house_sprite(slice,Vector3((a+b)*0.5,top-texture.get_height()*pixels*0.5,z),pixels)
+		sprite.set_meta("asset_id",selected)
+		sprite.set_meta("clip_left",a)
+		sprite.set_meta("clip_right",b)
+		sprite.add_to_group("kingdom_art")
 	return true
 
 func _city_door(at: Vector3,width: float,height: float) -> void:

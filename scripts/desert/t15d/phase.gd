@@ -583,6 +583,8 @@ func _follow_camera(delta: float) -> void:
 	var support := Layout.floor_at(_phase,_player.position.x)
 	if not support.is_empty(): base = float(support.height)
 	var floor_y := base+(0.75 if UIScale.is_iphone() else 1.65)
+	# Mostrar fachadas e arcos sob a rota, mantendo antecipação e acompanhamento do salto.
+	if _order in [2,4,7]: floor_y=base+(0.20 if UIScale.is_iphone() else 0.50)
 	var target := Vector3(clampf(_player.position.x+lead,float(_phase.player_spawn[0]),float(_phase.goal.pos[0])),maxf(floor_y,_player.position.y+1.4-_camera.size*0.5+0.55),0)
 	var destination := target+Vector3(0,1,14)
 	_camera.position = _camera.position.lerp(destination,1.0-exp(-8*delta))
@@ -981,15 +983,16 @@ func _update_troops() -> void:
 func _on_ability_used(kind: String) -> void:
 	if kind != "rupture": return
 	var best := ""
-	var best_right := -INF
+	var best_distance := INF
 	for id in _floor_parts:
 		if _ruptured.has(id): continue
 		for node in _floor_parts[id]:
 			if not is_instance_valid(node) or not node is StaticBody3D: continue
-			var right := float(node.get_meta("floor_right"))
-			if right <= _player.position.x-2.0 and right >= _player.position.x-32.0 and right > best_right:
+			var edge := float(node.get_meta("floor_right" if _player.facing>0 else "floor_left"))
+			var distance := (_player.position.x-edge)*_player.facing
+			if distance>=2.0 and distance<=32.0 and distance<best_distance:
 				best = id
-				best_right = right
+				best_distance = distance
 	if best.is_empty():
 		_player.abilities.rupture += 1
 		_hud.notify("Ruptura precisa de piso marcado atrás de você")

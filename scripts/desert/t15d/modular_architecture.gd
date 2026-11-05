@@ -19,7 +19,11 @@ func build_surface(platform: Dictionary, order: int) -> void:
 		_flush()
 		return
 	# Superfície sólida, frisos e fundações; não contém uma imagem de fase.
-	var material := "wood" if order in [7,10] and module%3 == 1 else "stone"
+	var bridge := false
+	if order in [7,9,10]:
+		for point: Dictionary in Assets.placements(order):
+			if point.asset=="desert_timber_bridge" and int(point.surface)==module: bridge=true
+	var material := "wood" if order in [7,9,10] and (module%3 == 1 or bridge) else "stone"
 	_box(Vector3(x,top-0.25,0),Vector3(width,0.5,4.0),material)
 	_box(Vector3(x,top-0.08,2.02),Vector3(width,0.16,0.16),"trim")
 	match order:
@@ -28,59 +32,33 @@ func build_surface(platform: Dictionary, order: int) -> void:
 			_facade(left,right,top-0.5,top-9.0)
 			_box(Vector3(x,top+0.14,-1.95),Vector3(width,0.28,0.22),"trim")
 		4:
-			for column in range(ceili(left/4.5),floori(right/4.5)):
-				_arch_frame(Vector3(column*4.5,top-6.2,-0.6),3.6,5.9,0.28)
-				_box(Vector3(column*4.5-2.15,top-3.4,-0.6),Vector3(0.7,5.8,1.5),"stone")
+			_painted_facade(left,right,top-0.18,2.12,"desert_aqueduct",9.0)
+			# O tabuleiro volumétrico e a água animada continuam independentes da arte.
 			_water_strip(Vector3(x,top-0.04,-2.8),Vector2(width,1.2),false)
 			if module%3 == 2 and width > 4: _water_strip(Vector3(x,top-2.2,-2.8),Vector2(1.8,4.2),true)
 		6,10:
 			_cave_wall(left,right,top)
 			for column in range(ceili(left/4.0),floori(right/4.0)):
 				_box(Vector3(column*4,top-1.8,-0.8),Vector3(0.4,3.1,2.8),"wood" if order == 10 else "stone")
+			if order==10 and material=="wood": _painted_facade(left,right,top-0.18,2.12,"desert_timber_bridge",7.0)
 			if order == 10:
 				for z: float in [-0.75,0.75]: _box(Vector3(x,top+0.035,z),Vector3(width,0.07,0.08),"metal")
 				for tie in range(ceili(left/1.3),floori(right/1.3)):
 					_box(Vector3(tie*1.3,top+0.015,0),Vector3(0.17,0.03,1.95),"wood")
 		5:
 			_water_strip(Vector3(x,top-0.18,-3.1),Vector2(width,1.9),false)
-		7:
+		7,9:
 			if material == "wood":
+				_painted_facade(left,right,top-0.18,2.12,"desert_timber_bridge",7.0)
 				for column in range(ceili(left/3.2),floori(right/3.2)):
 					_box(Vector3(column*3.2,top-2.8,-0.7),Vector3(0.24,5.2,2.8),"wood")
 		_:
 			_box(Vector3(x,top-1.0,0),Vector3(width,1.5,3.8),"stone")
-	# Identidade urbana nas duas primeiras regiões, fora da faixa de corrida.
-	# Apenas a primeira peça de cada módulo evita repetição em cada segmento do piso.
-	if order in [1,2] and String(platform.id).ends_with(".0"):
-		var accent_x := left+minf(width*0.5,3.5)
-		if order == 2:
-			_banner(Vector3(accent_x,top-1.3,1.54))
-			if module%2 == 0:
-				_awning(Vector3(accent_x,top-3.4,1.55),2.5,"cloth")
-			_city_door(Vector3(accent_x+1.5,top-6.8,1.49),0.8,1.7)
-		else:
-			_box(Vector3(accent_x,top+1.7,-2.6),Vector3(0.09,3.4,0.09),"metal")
-			_banner(Vector3(accent_x+0.35,top+2.3,-2.5))
-			if module%2 == 1:
-				_awning(Vector3(accent_x+2.2,top+2.6,-3.1),3.2,"cloth")
-				_box(Vector3(accent_x+2.2,top+0.55,-3.0),Vector3(2.2,0.16,0.75),"wood")
-				for pot in range(3):
-					_dome(Vector3(accent_x+1.4+pot*0.65,top+0.66,-3.0),0.23,0.4,"wood")
-			_lantern(Vector3(accent_x+1.1,top,-2.7))
 	# Variantes sémanticas aux limites des modules; aucun escalier.
 	for marker in range(ceili((left+1)/7.0),floori((right-1)/7.0)+1):
 		var at := Vector3(marker*7.0,top,-2.1)
-		if marker%3 == 0: _lantern(at)
-		if order == 3 and marker%2 == 0: _market_stall(at,marker)
 		if order == 4 and marker%3 == 1: _water_strip(at+Vector3(0,-1.5,-0.7),Vector2(1.6,3.0),true)
-		if order == 5 and marker%2 == 0:
-			_palm(at)
-			_garden(at+Vector3(2.0,0,-0.6))
-		if order in [1,8] and marker%4 == 0: _military(at)
-		if order in [6,10]: _underground(at,marker)
-		if order in [7,9,10] and marker%4 == 1:
-			_mine_cart(at+Vector3(0,0,-0.7))
-			_crane(at+Vector3(1.7,0,-1.0))
+		if order in [6,10] and marker%3==0: _underground(at,marker)
 	_flush()
 
 func _facade(left: float,right: float,top: float,bottom: float) -> void:
@@ -150,6 +128,17 @@ func _water_strip(at: Vector3,dimensions: Vector2,vertical: bool) -> void:
 func build_portal(at: Vector3,order: int) -> void:
 	_theme=order
 	_order=order
+	if order in [1,8,9]:
+		var id := "capital_archway" if order==1 else ("desert_military_gate" if order==8 else "desert_mine_entrance")
+		var landmark := ""
+		if order==9:
+			for point: Dictionary in Assets.placements(9):
+				if point.asset==id: landmark=point.id
+		place_asset(id,at+Vector3(0,0,0.7),8.0,landmark)
+		if order==1:
+			for side: float in [-1,1]: place_asset("capital_watchtower",at+Vector3(side*5.0,0,-0.4),3.0)
+		_flush()
+		return
 	var mining := order in [9,10]
 	_arch_frame(at,7.5,8.0,0.7)
 	for side: float in [-1,1]:
@@ -168,12 +157,12 @@ func build_portal(at: Vector3,order: int) -> void:
 
 func _cave_wall(left: float,right: float,top: float) -> void:
 	# Parede volumétrica em faixas desencontradas, atrás da pista e das estruturas.
-	_box(Vector3((left+right)*0.5,top+3.5,-8.5),Vector3(right-left+7.0,12.0,0.4),"stone")
+	_box(Vector3((left+right)*0.5,top+3.5,-13.5),Vector3(right-left+7.0,12.0,0.4),"stone")
 	var transforms: Array[Transform3D] = []
 	for index in range(ceili(left/6.0),floori(right/6.0)+1):
 		for row in range(2):
 			var basis := Basis(Vector3.FORWARD,sin(index*1.7+row)*0.3).scaled(Vector3(3.3,2.8,1.5))
-			var position := Vector3(index*6.0+sin(row*1.7)*0.5,top+row*4.3-0.6,-6.0-sin(index*1.3)*0.4)
+			var position := Vector3(index*6.0+sin(row*1.7)*0.5,top+row*4.3-0.6,-11.0-sin(index*1.3)*0.4)
 			transforms.append(Transform3D(basis,position))
 	if transforms.is_empty(): return
 	var rock := MultiMeshInstance3D.new()

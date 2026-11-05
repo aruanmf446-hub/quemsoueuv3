@@ -106,6 +106,8 @@ func _begin_read(ticket: int) -> void:
 		entries.append(enemies.enemies.cactus)
 		if order == 10: entries.append(enemies.enemies.malagueta)
 		var paths := {"res://assets/desert/modular/stone_masonry.res":true}
+		for art_path: String in preload("res://scripts/desert/t15d/kingdom_assets.gd").paths(order): paths[art_path]=true
+		if order not in [6,10]: paths["res://assets/desert/modular/capital_desert.res"]=true
 		for entry: Dictionary in entries:
 			paths[str(entry.model)] = true
 			for source in entry.animations.values(): paths[str(source)] = true

@@ -31,8 +31,12 @@ func run() -> void:
 		root.add_child(phase)
 		current_scene=phase
 		phase.set_physics_process(false)
-		var route: Dictionary=phase._phase.platforms.filter(func(p: Dictionary) -> bool:return p.get("parkour_route",false))[0]
-		phase._player.position=Vector3(float(route.span_start)+0.5,float(route.pos[1])+0.15,0)
+		if order==2:
+			var house: Dictionary=phase._phase.surfaces[0]
+			phase._player.position=Vector3(float(house.left)+1.0,float(house.height)+0.1,0)
+		else:
+			var route: Dictionary=phase._phase.platforms.filter(func(p: Dictionary) -> bool:return p.get("parkour_route",false))[0]
+			phase._player.position=Vector3(float(route.span_start)+0.5,float(route.pos[1])+0.15,0)
 		phase._player.velocity=Vector3.ZERO
 		phase._player._invulnerable=999
 		phase._stream_world(phase._player.position.x,true)

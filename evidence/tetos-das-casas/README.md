@@ -2,7 +2,7 @@
 
 Implementação após a confirmação explícita do proprietário: eliminar a faixa contínua de chão sobre as casas e saltar de um prédio para outro.
 
-**Branch de revisão `codex/tetos-das-casas`, sem publicação na main.** Base: `b38f356`. A proposta anterior de cobertura com telhas permanece somente no histórico de outra branch e não compõe esta versão.
+**Aprovada pelo proprietário para a main.** Base da revisão: `b38f356`; integrada à main atual `9d95989`, preservando os trabalhos concorrentes. Importação, reino10 e percurso 02 passaram novamente após integrar. A proposta anterior de cobertura com telhas permanece somente no histórico de outra branch e não compõe esta versão.
 
 ## O que mudou
 
@@ -31,3 +31,5 @@ Capturas gráficas reais do Godot 4.7.2 Compatibility, Mesa/llvmpipe. Aproximaç
 - Probe Web preparado para exigir tetos das casas em lugar de `City_roof`/terraços extras. Ainda não executado no navegador para esta versão.
 
 Os avisos de recursos de áudio ativos ao encerrar testes são preservados nos logs. Nenhum teste foi removido; expectativas visuais antigas foram substituídas pelo requisito confirmado nesta revisão. Aprovação estética pendente do proprietário.
+
+O helper geral de capturas também foi adaptado para pousar no teto da primeira casa da fase 2, sem buscar o antigo obstáculo removido.

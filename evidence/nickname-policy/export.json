@@ -1,0 +1,8 @@
+{
+  "godot": "4.7.2.stable.official.ed1daf0bf",
+  "target": "Web / web_nothreads release",
+  "pck_bytes": 180576112,
+  "sha256": "6d80f7758e465cca68d426f12d35e3dbcf16cecfbe04d0b347462ee1fee9726c",
+  "errors": [],
+  "client_commit": "b5091bd"
+}

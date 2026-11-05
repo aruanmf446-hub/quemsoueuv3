@@ -405,10 +405,7 @@ func _my_profile() -> void:
 	if not signed: shown = tr("Visitante")
 	var nick_row := _info_row(info, "user", "Nickname", shown)
 	nick_row.name = "NicknameRow"
-	if signed:
-		var edit := _icon_button("pencil", "Alterar nickname", func() -> void: _edit_nickname(info, nick_row))
-		edit.name = "EditNickname"
-		nick_row.get_child(0).add_child(edit)
+	nick_row.tooltip_text = tr("Nickname definitivo após o primeiro cadastro.")
 	var user: Dictionary = services.session.user if signed else {}
 	var email := str(user.get("email", "")) if signed else ""
 	_info_row(info, "mail", "E-mail", email if not email.is_empty() else "—").name = "EmailRow"
@@ -454,30 +451,8 @@ func _my_profile() -> void:
 	logout.name = "DisconnectAccount"
 
 
-func _edit_nickname(info: VBoxContainer, row: Control) -> void:
-	if info.has_node("NicknameEditor"): return
-	var editor := HBoxContainer.new()
-	editor.name = "NicknameEditor"
-	editor.add_theme_constant_override("separation", 10)
-	info.add_child(editor)
-	info.move_child(editor, row.get_index() + 1)
-	var field := LineEdit.new()
-	field.name = "NicknameField"
-	field.placeholder_text = tr("Novo nickname (3 a 24)")
-	field.max_length = 24
-	field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	field.custom_minimum_size.y = 44
-	PlayerUI.style_field(field)
-	editor.add_child(field)
-	PremiumUI.reveal_toggle(field)
-	var save := _action_button("Salvar", "check", true, func() -> void:
-		banner.show_state("loading")
-		var result: Dictionary = await services.profile.update_nickname(field.text)
-		status(result)
-		if result.ok and is_visible_in_tree() and _category == 0: _show_category())
-	save.name = "SaveNickname"
-	editor.add_child(save)
-	field.grab_focus.call_deferred()
+func _edit_nickname(_info: VBoxContainer, _row: Control) -> void:
+	status(ServiceResult.failure("nickname_locked"))
 
 
 func _change_password() -> void:

@@ -117,6 +117,7 @@ func refresh_availability() -> void:
 			# iPhone: a coluna lateral é larga e alta o bastante; o chat fica aberto.
 			if not _collapsed: _toggle()
 		if _owned: _stop()
+		_bot_comment()
 		_state()
 		return
 	if _local_started:
@@ -243,6 +244,8 @@ func _visibility() -> void:
 func _exit_tree() -> void: _stop()
 
 func _clear_messages() -> void:
+	_bot_seen.clear()
+	_bot_last_ms=-10000
 	_unread = 0
 	_local_count = 0
 	if is_instance_valid(_badge): _badge.hide()
@@ -251,3 +254,33 @@ func _clear_messages() -> void:
 		if child != _status:
 			_messages.remove_child(child)
 			child.queue_free()
+
+# Falas locais baseadas apenas no estado público; não fingem mensagens online.
+var _bot_seen := {}
+var _bot_last_ms := -10000
+func _bot_comment() -> void:
+	var data := services.duel.match()
+	if data.is_empty(): return
+	var bots: Array=data.get("players",[]).filter(func(p: Dictionary)->bool:return p.get("is_bot",false))
+	if bots.is_empty(): return
+	var events: Array=data.get("events",[])
+	var key := "%s:%s:%s" % [data.get("id",""),data.get("phase",""),events.back().get("seq",0) if not events.is_empty() else 0]
+	if _bot_seen.has(key) or Time.get_ticks_msec()-_bot_last_ms<4000: return
+	_bot_seen[key]=true
+	_bot_last_ms=Time.get_ticks_msec()
+	var bot: Dictionary=bots[posmod(key.hash(),bots.size())]
+	var personality := posmod(str(bot.member_id).hash(),3)
+	var lines := [["Vou pensar com calma antes da próxima.","Boa jogada! Estou de olho.","Uma carta de cada vez."],["Hoje eu vim para disputar!","Essa rodada foi intensa!","Ainda tenho jogo pela frente."],["Será que a sorte está comigo?","Prometo não culpar o baralho!","Esse duelo está rendendo história!"]]
+	var message: String=lines[personality][posmod(key.hash(),3)]
+	if data.get("phase","")=="finished": message=["Foi um bom duelo. Até a próxima!","Boa partida! Quero revanche.","Valeu pela diversão, pessoal!"][personality]
+	var bubble := PanelContainer.new()
+	bubble.add_theme_stylebox_override("panel",Style.panel(5))
+	var column := PlayerUI.column(bubble)
+	column.add_child(Style.label(str(bot.nickname)+" · BOT",10,PlayerUI.GOLD))
+	column.add_child(Style.label(message,12))
+	_messages.add_child(bubble)
+	_local_count+=1
+	if _collapsed:
+		_unread+=1
+		_badge.text=str(_unread)
+		_badge.show()

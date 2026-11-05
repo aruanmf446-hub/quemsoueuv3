@@ -1,0 +1,30 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+WARNING: Nodes with non-equal opposite anchors will have their size overridden after _ready(). 
+If you want to set size, change the anchors or consider using set_deferred().
+     at: _set_size (scene/gui/control.cpp:1519)
+     GDScript backtrace (most recent call first):
+         [0] _run (res://tests/battle_reveal/flow.gd:15)
+step 0 phase=countdown events=0
+step 50 phase=countdown events=0
+step 100 phase=reveal events=1
+REVEAL_SEEN at step 113
+step 150 phase=reveal events=1
+REVEAL_SEEN at step 189
+step 200 phase=reveal events=2
+step 250 phase=turns events=2
+step 300 phase=turns events=2
+step 350 phase=turns events=2
+step 400 phase=turns events=2
+step 450 phase=turns events=2
+step 500 phase=turns events=2
+step 550 phase=turns events=2
+step 600 phase=turns events=2
+step 650 phase=turns events=2
+step 700 phase=reveal events=3
+step 750 phase=reveal events=4
+REVEAL_SEEN at step 754
+step 800 phase=turns events=4
+REVEAL_SEEN at step 835
+step 850 phase=reveal events=5
+BATTLE_REVEAL shown=4

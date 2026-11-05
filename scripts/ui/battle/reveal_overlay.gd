@@ -23,6 +23,11 @@ const RED_DARK := Color("#3a1620")
 const TEAL := Color("#6fd3c0")
 const MUTED := Color("#aab3c0")
 
+var _result_body: Control
+var _result_title: Label
+var _final_title := ""
+var _final_title_color := Color.WHITE
+var _reaction_rows: Array = []
 var _audio: AudioStreamPlayer
 var _closing := false
 var _panel: PanelContainer
@@ -54,7 +59,7 @@ func present(card_id: String, card_name: String, actor_name: String, hits: Array
 	add_child(_panel)
 	_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_frame = _box(NAVY, GOLD, 18, 2)
-	_frame.shadow_color = Color(accent, 0.35)
+	_frame.shadow_color = Color(GOLD, 0.35)
 	_frame.shadow_size = 18
 	_frame.set_content_margin_all(26)
 	_panel.add_theme_stylebox_override("panel", _frame)
@@ -67,6 +72,11 @@ func present(card_id: String, card_name: String, actor_name: String, hits: Array
 		"hit": title_text = "1 JOGADOR ATINGIDO!" if struck.size() == 1 else "%d JOGADORES ATINGIDOS!" % struck.size()
 		_: title_text = "NINGUÉM FOI ATINGIDO"
 	var title := _label(title_text, 36, RED.lightened(0.2) if mode == "eliminated" else GOLD_SOFT, true)
+	_final_title_color=title.get_theme_color("font_color")
+	title.add_theme_color_override("font_color",GOLD_SOFT)
+	_result_title=title
+	_final_title=title_text
+	title.text="REVELANDO…"
 	title.name = "ResultTitle"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	column.add_child(title)
@@ -122,6 +132,8 @@ func present(card_id: String, card_name: String, actor_name: String, hits: Array
 	result.custom_minimum_size.x = 440
 	result.alignment = BoxContainer.ALIGNMENT_CENTER
 	body.add_child(result)
+	_result_body=result
+	_result_body.modulate.a=0.0
 	var animated: Array = []   # [node, sound, is_elimination]
 	if mode == "none":
 		var none_box := _vbox(6)
@@ -142,6 +154,7 @@ func present(card_id: String, card_name: String, actor_name: String, hits: Array
 		result.add_child(_section("ELIMINADOS" if not struck.is_empty() else "", RED))
 		for hit: Dictionary in eliminated:
 			var row := _eliminated_row(hit)
+			_reaction_rows.append({"skin":hit.get("skin",""),"avatar":row.find_child("Avatar",true,false)})
 			result.add_child(row)
 			animated.append([row, SFX_ELIMINATE, true])
 	if not struck.is_empty():
@@ -214,6 +227,12 @@ func _animate(animated: Array, mode: String, accent: Color) -> void:
 	tween.parallel().tween_property(self, "_intro", 1.0, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.tween_callback(_play.bind(SFX_PICK))
 	tween.tween_interval(0.3)
+	tween.tween_callback(func() -> void:
+		_result_title.text=_final_title
+		_result_title.add_theme_color_override("font_color",_final_title_color)
+		_frame.shadow_color=Color(accent,0.35)
+		_result_body.modulate.a=1.0
+		_react())
 	for item: Array in animated:
 		var node := item[0] as Control
 		if item[1] != null: tween.tween_callback(_play.bind(item[1]))
@@ -238,7 +257,7 @@ func _eliminate_fx(row: Control) -> void:
 		tween.tween_method(func(v: float) -> void: (avatar.material as ShaderMaterial).set_shader_parameter("saturation", v), 1.0, 0.0, 0.45)
 	if frame != null:
 		tween.parallel().tween_method(func(v: float) -> void: frame.border_color = Color(RED, v), 0.2, 1.0, 0.45)
-	if stamp != null:
+	if stamp != null and not stamp.get_parent().get_meta("animated_reaction",false):
 		stamp.visible = true
 		stamp.scale = Vector2.ONE * 1.8
 		stamp.modulate.a = 0.0
@@ -406,3 +425,40 @@ func _icon(icon_name: String, color: Color, side: int) -> TextureRect:
 	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return rect
+
+
+## Reutiliza um único palco no retrato eliminado, mantendo a carta escolhida visível.
+func _react() -> void:
+	if _reaction_rows.is_empty(): return
+	var stage: LobbyStage=preload("res://scenes/lobby/lobby_stage.tscn").instantiate()
+	stage.custom_minimum_size=Vector2(100,100)
+	for row: Dictionary in _reaction_rows:
+		var entries := CharacterCatalog.load_entries().filter(func(e: Dictionary)->bool:return str(e.id)==str(row.get("skin","")))
+		if entries.is_empty() or not entries[0].get("animations",{}).has("anim_3"): continue
+		var avatar: Control=row.avatar
+		if stage.get_parent()!=null: stage.reparent(avatar.get_parent(),false)
+		else: avatar.get_parent().add_child(stage)
+		avatar.get_parent().move_child(stage,0)
+		avatar.hide()
+		avatar.get_parent().set_meta("animated_reaction",true)
+		stage.modulate.a=0
+		var entry: Dictionary=entries[0].duplicate(true)
+		var actions: Dictionary=entry.animations
+		entry.animations={}
+		for alias: String in ["base","anim_3"]:
+			if actions.has(alias): entry.animations[alias]=actions[alias]
+		while CharacterSlot.entry_pending(entry):
+			await get_tree().process_frame
+			if not is_inside_tree(): return
+		stage.show_character(entry)
+		stage.character.play_animation(&"anim_3",false)
+		var fade := create_tween()
+		fade.tween_property(stage,"modulate:a",1.0,0.15)
+		fade.tween_interval(1.5)
+		fade.tween_property(stage,"modulate:a",0.0,0.15)
+		await fade.finished
+		avatar.show()
+		avatar.get_parent().set_meta("animated_reaction",false)
+		var stamp: Control=avatar.get_parent().get_node_or_null("EliminatedStamp")
+		if stamp!=null: stamp.show()
+	stage.queue_free()

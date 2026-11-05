@@ -36,14 +36,7 @@ func render() -> void:
 		info.add_child(PlayerUI.label("Demonstração local", 14, PlayerUI.MUTED))
 		account_button(info)
 		return
-	var nickname := LineEdit.new()
-	nickname.placeholder_text = tr("Novo nickname")
-	nickname.max_length = 24
-	nickname.custom_minimum_size.y = 52
-	info.add_child(nickname)
-	var save := PlayerUI.button("Salvar nickname", func() -> void: _save_nickname(nickname.text))
-	PlayerUI.style_button(save, true)
-	info.add_child(save)
+	info.add_child(PlayerUI.label("O nickname é definitivo após o primeiro cadastro.", 15, PlayerUI.MUTED))
 	info.add_child(PlayerUI.button("Atualizar", func() -> void: services.profile.refresh()))
 	info.add_child(PlayerUI.label("Conta: " + str(services.session.user.get("email", "Conectada")), 14, PlayerUI.MUTED))
 	var logout := PlayerUI.button("Desconectar / trocar conta", disconnect_account)
@@ -66,6 +59,5 @@ func render() -> void:
 	progress.add_child(PlayerUI.label("Floresta · Mar · Lunar: campanhas futuras"))
 
 
-func _save_nickname(value: String) -> void:
-	banner.show_state("loading")
-	status(await services.profile.update_nickname(value))
+func _save_nickname(_value: String) -> void:
+	status(ServiceResult.failure("nickname_locked"))

@@ -130,3 +130,13 @@ Use Xvfb próprio para os testes interativos: perda de foco pausa o jogo.
 Comandos reproduzíveis em [REINO_V3.md](docs/desert/REINO_V3.md).
 A fixture Web fica em uma cópia isolada, com feature `iphone_layout_fixture`,
 e nunca deve ser publicada como jogo; produção exclui `tests/*` e `evidence/*`.
+
+### Melhorias do Mata-Mata e política de nickname
+
+Reações dos avatares, apresentação da ordem e confirmação sobre cartas/decks:
+[implementação, testes e pendências online](docs/DUEL_AVATAR_IMPROVEMENTS.md).
+Publicação na main autorizada pelo dono. Contas cadastradas passam pelo nickname
+obrigatório e o cliente bloqueia sua troca; convidados mantêm o modo local.
+A unicidade/trava no banco, a ordem online e o chat de bots dependem do responsável
+pelo backend: [prompt consolidado e pendências](docs/backend/PENDENCIAS_2026_11_05.md).
+O Codex não modifica Supabase.

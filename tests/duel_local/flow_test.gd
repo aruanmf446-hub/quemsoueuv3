@@ -129,6 +129,8 @@ func _run() -> void:
 
 	# Seleção secreta pela interface.
 	await press("Iniciar partida")
+	var drawn: Array=duel.match().turn_order.duplicate()
+	check(drawn.size()==3,"ordem sorteada antes da seleção")
 	var data := duel.match()
 	check(str(data.phase) == "selection", "seleção secreta")
 	check((data.players as Array).filter(func(p: Dictionary) -> bool: return p.is_bot and p.confirmed).size() == 2, "bots prontos na hora")
@@ -156,10 +158,10 @@ func _run() -> void:
 	await click(grid.get_child(0))
 	await click(match_view().find_child("Cards", true, false).get_child(1))
 	await shot("05_selecionadas")
-	await press("Confirmar cartas")
+	await press("✓")
 	check(str(duel.match().phase) == "countdown", "todos prontos: contagem sem esperar")
 	await shot("06_contagem")
-	await skip(5.1)
+	await skip(duel.seconds_left()+0.1)
 	check(str(duel.match().phase) == "turns", "turnos começam")
 	check((duel.match().turn_order as Array).size() == 3, "ordem sorteada com os 3")
 
@@ -167,22 +169,27 @@ func _run() -> void:
 	var picked_by_me := false
 	for _step in range(80):
 		data = duel.match()
+		check(data.turn_order==drawn,"ordem permanece fixa durante a partida")
 		if str(duel.room.room.status) != "in_match" or str(data.get("phase", "")) == "finished": break
 		var me: Dictionary = (data.players as Array).filter(func(p: Dictionary) -> bool: return p.is_you)[0]
 		if str(data.phase) == "turns" and str(data.turn_member) == str(me.member_id):
 			var mine: Array = (data.my_cards as Array).map(func(c: Dictionary) -> String: return str(c.card_id))
 			var cards: Control = match_view().find_child("Cards", true, false)
-			var target := -1
+			var target := ""
 			for index in range(pool.size()):
 				var item: Dictionary = (data.pool as Array)[index]
 				if not item.removed and not mine.has(str(item.card_id)):
-					target = index
+					target = str(item.card_id)
 					break
-			if target < 0: target = (data.pool as Array).find_custom(func(c: Dictionary) -> bool: return not c.removed)
+			if target.is_empty():
+				var remaining: Array=(data.pool as Array).filter(func(c: Dictionary)->bool:return not c.removed)
+				target=str(remaining[0].card_id)
 			if not picked_by_me: await shot("07_sua_vez")
-			await click(cards.get_child(target))
+			var targets := cards.get_children().filter(func(c: Node)->bool:return str(c.get("id"))==target)
+			check(targets.size()==1,"carta disponível localizada por identidade")
+			await click(targets[0])
 			if not picked_by_me: await shot("08_confirmar")
-			await press("Eliminar")
+			await press("✓")
 			check(str(duel.match().phase) == "reveal", "voto vira revelação")
 			if not picked_by_me:
 				var own_move_label := match_view().find_child("RoundInstruction", true, false) as Label

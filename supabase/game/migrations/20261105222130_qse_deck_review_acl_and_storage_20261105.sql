@@ -62,7 +62,7 @@ CREATE OR REPLACE FUNCTION qse_v3.deck_review_is_moderator()
 AS $function$
  select auth.uid() is not null and exists (
  select 1 from public.qse_deck_reviewers r where r.user_id=auth.uid())
-$function$
+$function$;
 
 revoke all on function qse_v3.deck_review_is_moderator() from public,anon,authenticated;
 grant execute on function qse_v3.deck_review_is_moderator() to authenticated;
@@ -87,7 +87,7 @@ AS $function$
       c.owner_id::text||'/'||c.deck_id::text||'/'||c.id::text||'_duel.png'
     ))
  ))
-$function$
+$function$;
 
 revoke all on function qse_v3.deck_review_pending_asset(text) from public,anon,authenticated;
 grant execute on function qse_v3.deck_review_pending_asset(text) to authenticated;

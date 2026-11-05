@@ -9,7 +9,7 @@ CREATE OR REPLACE FUNCTION public.qse_deck_review_access()
 AS $function$
  select jsonb_build_object('is_moderator',
    coalesce(qse_v3.deck_review_is_moderator(),false))
-$function$
+$function$;
 
 
 CREATE OR REPLACE FUNCTION public.qse_deck_review_queue(p_limit integer DEFAULT 50)
@@ -30,7 +30,7 @@ begin
        where status='pending_review' order by updated_at,id limit p_limit) d;
  return jsonb_build_object('items',v_items);
 end
-$function$
+$function$;
 
 
 CREATE OR REPLACE FUNCTION public.qse_deck_review_detail(p_deck uuid)
@@ -89,7 +89,7 @@ begin
 
  return jsonb_build_object('deck',v_deck,'cards',v_cards);
 end
-$function$
+$function$;
 
 revoke all on function public.qse_deck_review_access() from public,anon,authenticated;
 grant execute on function public.qse_deck_review_access() to authenticated;

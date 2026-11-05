@@ -26,6 +26,7 @@ Migração `20261105191141_qse_duel_fixed_order_presentation_window_20261105`.
 - `qse_v3.duel_advance` não sorteia novamente no fim da contagem, salvo caso de partidas antigas que começaram com `turn_order` vazio.
 - Fase `countdown` usa `greatest(5,ceil(7 + 1.8 * quantidade_de_participantes))` segundos para apresentação antes de `duel_next_turn`.
 - Preservados: row lock na sala, heartbeat/sweep, regras de pick/timeout/reveal e cartões secretos.
+- **Diagnóstico de turnos:** `qse_v3.duel_advance` obtém `FOR UPDATE` na sala; `qse_duel_pick` valida fase e jogador após o avanço. Repetir pick depois da primeira jogada não reaplica a carta (a fase já mudou para reveal), mas devolve `not_your_turn`: idempotência do **estado**, não replay idempotente da resposta. `qse_duel_heartbeat` chama `duel_advance` para avançar timeout/bot sob o lock da sala. Saltos relatados ainda não foram reproduzidos com clientes reais.
 - Há 17 partidas históricas; 2 ainda em `selection` com ordem vazia antes da migração; fallback mantido por segurança.
 - **Ainda pendente:** E2E real com dois clientes e cenários de turnos pulados envolvendo humanos/bots/desconexões. Inspeção estática não substitui teste de concorrência no cliente.
 

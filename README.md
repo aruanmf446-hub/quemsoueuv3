@@ -142,3 +142,19 @@ pelo backend: [prompt consolidado e pendências](docs/backend/PENDENCIAS_2026_11
 O Codex não modifica Supabase.
 
 Retorno do backend registrado na PR #99: [compatibilidade do cliente e validações restantes](docs/backend/REVISAO_CLIENTE_PR99.md). As migrations já implantadas não devem ser reexecutadas.
+
+## Criador de decks — Storage e revisão manual
+
+Direção atual: reaproveitar `CreatorSync`, `CommunityService` e o bucket privado
+`qse-deck-originals` do Supabase GAME. Código do jogo no GitHub/Pages; imagens
+no Storage. Sem Worker, Cloudflare, R2 ou token GitHub no cliente.
+A alternativa `work/decks-revisao-repositorio` foi descartada e não deve ser integrada.
+
+Na branch `work/decks-storage-revisao-manual`: prompt baseado nos decks oficiais,
+criação gratuita e tela nativa de aprovação/reprovação. **Pendente de backend:**
+o responsável com o plugin deve conferir/habilitar as permissões e RPCs de
+moderação; o cliente informa essa pendência se elas não existirem.
+Nenhum acesso ao Supabase ou alteração de migrations/Edge Functions pelo Codex.
+
+Veja [passos manuais, contrato e prompt para o plugin](docs/backend/DECKS_STORAGE_REVISAO_MANUAL.md)
+e [testes e capturas](evidence/deck-storage-review/README.md).

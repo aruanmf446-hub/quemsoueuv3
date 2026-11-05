@@ -1,0 +1,50 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS recorte mantém a proporção da moldura (sem esticar) 0.71 {  }
+PASS recorte sempre dentro do original {  }
+PASS recorte mantém a proporção da moldura (sem esticar) 0.71 { "x": 0.0, "y": 0.0, "zoom": 1.0 }
+PASS recorte sempre dentro do original { "x": 0.0, "y": 0.0, "zoom": 1.0 }
+PASS recorte mantém a proporção da moldura (sem esticar) 0.71 { "x": 1.0, "y": 1.0, "zoom": 3.0 }
+PASS recorte sempre dentro do original { "x": 1.0, "y": 1.0, "zoom": 3.0 }
+PASS recorte mantém a proporção da moldura (sem esticar) 0.71 { "x": 0.3, "y": 0.8, "zoom": 99.0 }
+PASS recorte sempre dentro do original { "x": 0.3, "y": 0.8, "zoom": 99.0 }
+PASS recorte mantém a proporção da moldura (sem esticar) 3.20 {  }
+PASS recorte sempre dentro do original {  }
+PASS recorte mantém a proporção da moldura (sem esticar) 3.20 { "x": 0.0, "y": 0.0, "zoom": 1.0 }
+PASS recorte sempre dentro do original { "x": 0.0, "y": 0.0, "zoom": 1.0 }
+PASS recorte mantém a proporção da moldura (sem esticar) 3.20 { "x": 1.0, "y": 1.0, "zoom": 3.0 }
+PASS recorte sempre dentro do original { "x": 1.0, "y": 1.0, "zoom": 3.0 }
+PASS recorte mantém a proporção da moldura (sem esticar) 3.20 { "x": 0.3, "y": 0.8, "zoom": 99.0 }
+PASS recorte sempre dentro do original { "x": 0.3, "y": 0.8, "zoom": 99.0 }
+PASS zoom 1 usa a maior área possível
+PASS parâmetros inválidos voltam ao padrão
+PASS prévia leve e sem distorção
+PASS original não é alterado
+PASS editor abre no formato Biblioteca
+PASS arrastar reposiciona
+PASS roda do mouse amplia
+PASS gesto de pinça amplia
+PASS formato Duelo tem enquadramento próprio
+PASS restaurar um formato não mexe no outro
+PASS confirmar devolve os dois recortes
+PASS rascunho incompleto lista pendências
+PASS rascunho completo fica pronto para revisão
+PASS salva rascunho do dono A
+PASS dono B não vê rascunho do dono A
+PASS original preservado para reeditar
+PASS publicação real pela Comunidade (sem stub local)
+PASS favorito do dono A
+PASS favorito não vaza para o dono B
+PASS desfavoritar
+PASS excluir apaga só o rascunho do dono
+PASS deck oficial tem botão de favorito
+PASS aba Favoritos mostra o deck salvo
+PASS Meus Decks oferece Criar deck
+PASS abre o editor de deck
+PASS editor oferece referência oficial e prompt manual
+PASS prompt inclui assuntos e formatos reais
+PASS importar imagem abre o enquadramento
+PASS carta entra no rascunho com prévia
+PASS prévia do Duelo gerada
+PASS revisão bloqueia publicar com pendências
+T21_DECKS checks=47 failures=0

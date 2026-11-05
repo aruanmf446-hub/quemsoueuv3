@@ -130,3 +130,10 @@ Use Xvfb próprio para os testes interativos: perda de foco pausa o jogo.
 Comandos reproduzíveis em [REINO_V3.md](docs/desert/REINO_V3.md).
 A fixture Web fica em uma cópia isolada, com feature `iphone_layout_fixture`,
 e nunca deve ser publicada como jogo; produção exclui `tests/*` e `evidence/*`.
+
+### Melhorias do Mata-Mata em branch separada
+
+Reações dos avatares, apresentação da ordem e confirmação sobre cartas/decks:
+[implementação, testes e pendências online](docs/DUEL_AVATAR_IMPROVEMENTS.md).
+A ordem e o chat de bots online exigem a conferência do responsável pelo backend;
+esta branch não modifica Supabase e não está publicada no Pages.

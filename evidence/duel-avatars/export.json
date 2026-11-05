@@ -1,0 +1,10 @@
+{
+  "godot": "4.7.2.stable.official.ed1daf0bf",
+  "core_commit": "06a0844",
+  "target": "Web / web_nothreads release",
+  "pck_bytes": 180571136,
+  "pck_sha256": "bb26a4db23e609bba7e1e0cd6763915f35f01501a1d6e377f5c0cf819f779406",
+  "export_errors": [],
+  "native_screenshots": "1672x941, 844x390 --iphone, 640x360 --iphone",
+  "native_checks_per_resolution": 26
+}

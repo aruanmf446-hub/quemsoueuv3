@@ -90,8 +90,8 @@ func render() -> void:
 	pips.custom_minimum_size = Vector2(_px(300,150),_px(14,10))
 	pips.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	pips.draw.connect(func() -> void:
-		var w := pips.size.x/9.0
-		for index in range(9):
+		var w := pips.size.x/10.0
+		for index in range(10):
 			var rect := Rect2(index*w+1, 0, w-3, pips.size.y)
 			pips.draw_rect(rect, GOLD if index < local_completed.size() else (Color(1,1,1,0.35) if index < unlocked else Color(1,1,1,0.10))))
 	summary.add_child(pips)
@@ -122,7 +122,7 @@ func render() -> void:
 	_rail.add_child(cards)
 	for phase: Dictionary in rules.phases:
 		var order := int(phase.order)
-		var metadata: Dictionary = CampaignLayout.metadata(order) if order <= 9 else {"name":phase.name,"description":PlayerContracts.read_json("res://data/planning/desert/phase_10.json").get("narrative_description","")}
+		var metadata: Dictionary = CampaignLayout.metadata(order) if order <= 10 else {}
 		var path := "res://scenes/desert/phase_%02d.tscn" % order
 		var exists := ResourceLoader.exists(path,"PackedScene")
 		var available := order <= unlocked

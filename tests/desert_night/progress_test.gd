@@ -27,7 +27,7 @@ func run() -> void:
 	check(Progress.completed_orders().is_empty(),"instalação nova não inventa conclusões")
 	check(Progress.complete(9) == ERR_UNAUTHORIZED,"não aceita pular diretamente para fase 09")
 	check(not FileAccess.file_exists(Progress.SAVE_PATH),"tentativa bloqueada não cria progresso")
-	check(Progress.complete(0) == ERR_INVALID_PARAMETER and Progress.complete(10) == ERR_INVALID_PARAMETER,"escopo de conclusão aceita somente fases 01–09")
+	check(Progress.complete(0) == ERR_INVALID_PARAMETER and Progress.complete(11) == ERR_INVALID_PARAMETER,"escopo de conclusão aceita somente fases 01–10")
 	check(Progress.complete(1) == OK,"concluir fase 01 salva em disco")
 	check(Progress.is_unlocked(2) and not Progress.is_unlocked(3),"vitória libera exatamente a próxima fase")
 	var saved := ConfigFile.new()
@@ -38,8 +38,9 @@ func run() -> void:
 		check(Progress.complete(order) == OK and Progress.is_unlocked(order+1),"conclusão sequencial %02d libera %02d" % [order,order+1])
 	check(Progress.completed_orders() == [1,2,3,4,5,6,7,8,9],"histórico contém somente nove conclusões válidas")
 	check(Progress.highest_unlocked() == 10 and not Progress.is_completed(10),"fase 10 é liberada sem forjar sua conclusão")
+	check(Progress.complete(10) == OK and Progress.is_completed(10),"fase10 conclui localmente sem criar uma fase11")
 	check(not FileAccess.file_exists(Progress.TEMP_PATH),"save atômico não deixa arquivo temporário")
-	for value in [-1,10,"9",1.0,null]:
+	for value in [-1,11,"9",1.0,null]:
 		write_config(value)
 		check(Progress.highest_unlocked() == 1 and Progress.completed_orders().is_empty(),"save inválido %s volta ao início sem liberar fases" % str(value))
 	write_config(9,99)

@@ -7,7 +7,7 @@ var _generation := 0
 ## Perseguição: quem passa direto por um Cacto vivo (correndo ou pulando por cima) é
 ## perseguido por alguns segundos. Mais rápido que a patrulha, mas abaixo da corrida do
 ## jogador (6 m/s): continuar correndo despista; parar ou errar um pulo deixa ele alcançar.
-const PURSUE_SPEED := 5.0
+const PURSUE_SPEED := 5.7
 const PURSUE_TIME := 6.0
 const PURSUE_RANGE := 18.0
 const PASS_WINDOW := 4.0
@@ -51,8 +51,8 @@ func setup(entry: Dictionary, spawn: Dictionary) -> void:
 	collision_layer = 4
 	collision_mask = 1
 	velocity = Vector3.ZERO
-	health = 1
-	attack_range = 1.25
+	health = 1 if str(entry.get("id","cactus")) == "cactus" else int(entry.get("health",20))
+	attack_range = 1.25 if str(entry.get("id","cactus")) == "cactus" else float(entry.get("attack_range",1.7))
 	_model.rotation.y = _yaw_target
 func _physics_process(delta: float) -> void:
 	if _state == State.DEAD: return
@@ -76,6 +76,8 @@ func _physics_process(delta: float) -> void:
 	velocity.y = maxf(velocity.y - GRAVITY * delta, -26.0)
 	var offset := _player.global_position - global_position if is_instance_valid(_player) and not _player.is_dead else Vector3(INF, INF, 0)
 	_watch_pass(offset)
+	if is_finite(offset.x) and offset.x > 1.5 and offset.x < 16.0 and absf(offset.y) < 2.5:
+		persistent_follow = true
 	_model.set_rate(1.0)
 	if _stagger > 0.0:
 		velocity.x = move_toward(velocity.x, 0, delta * 10)
@@ -115,21 +117,22 @@ func _physics_process(delta: float) -> void:
 		var direction := signf(offset.x) if chasing else _direction
 		var ray := PhysicsRayQueryParameters3D.create(global_position + Vector3(direction * 0.75, 0.6, 0), global_position + Vector3(direction * 0.75, -0.7, 0), 1)
 		var has_ground := not get_world_3d().direct_space_state.intersect_ray(ray).is_empty()
-		var wall := test_move(global_transform, Vector3(direction * 0.2, 0, 0))
+		var wall := not get_world_3d().direct_space_state.intersect_ray(PhysicsRayQueryParameters3D.create(global_position+Vector3(0,0.3,0),global_position+Vector3(direction*0.9,0.3,0),1)).is_empty()
 		blocked_at_edge = is_on_floor() and (not has_ground or wall)
-		if is_on_floor() and wall and can_jump_low(direction):
-			velocity.y = 6.3
+		if is_on_floor() and (wall or not has_ground) and (can_jump_low(direction) if wall else pursuing and can_jump_gap(direction)):
+			velocity.y = 9.4 if not has_ground else 6.3
 			velocity.x = direction*PURSUE_SPEED
 			blocked_at_edge = false
 		elif blocked_at_edge:
 			velocity.x = 0
 			_direction = -direction
 			# Na beira de um vão ou contra um muro ele não segue: desiste em seguida.
-			if pursuing: _pursue = minf(_pursue, 0.7)
+			if pursuing: _pursue = maxf(_pursue, 0.7)
 			_model.play_animation("pronto",true)
 		else:
 			_move_toward(direction, PURSUE_SPEED if pursuing else (chase_speed if chasing else speed), "correr" if chasing else "base")
 		_model.set_rate(PURSUE_SPEED / chase_speed if pursuing and velocity.x != 0.0 else 1.0)
+	_keep_formation()
 	move_and_slide()
 	global_position.z = 0.0
 	_model.rotation.y = lerp_angle(_model.rotation.y,_yaw_target,1.0-exp(-16.0*delta))
@@ -231,3 +234,30 @@ func crystallize(seconds: float) -> void:
 		mesh.material_override = material
 		mesh.position = Vector3((index-1)*0.35,0.9,0.25)
 		_crystal.add_child(mesh)
+
+## Procura uma laje real de aterrissagem; não pula abismo sem destino nem muro alto.
+func can_jump_gap(direction: float) -> bool:
+	if direction == 0: return false
+	var space := get_world_3d().direct_space_state
+	for distance: float in [1.4,1.8,2.2,2.6,3.0,3.4,3.8,4.2]:
+		var point := global_position+Vector3(direction*distance,0,0)
+		var hit := space.intersect_ray(PhysicsRayQueryParameters3D.create(point+Vector3.UP*0.9,point-Vector3.UP*0.9,1))
+		if hit.is_empty(): continue
+		var height: float = hit.position.y-global_position.y
+		if height > 0.65 or height < -0.9: continue
+		var beyond: Vector3 = hit.position+Vector3(direction*0.6,0,0)
+		if space.intersect_ray(PhysicsRayQueryParameters3D.create(beyond+Vector3.UP*0.2,beyond-Vector3.UP*0.2,1)).is_empty(): continue
+		var above := PhysicsRayQueryParameters3D.create(global_position+Vector3.UP*1.8,hit.position+Vector3.UP*1.8,1)
+		if not space.intersect_ray(above).is_empty(): return false
+		return distance <= 4.2
+	return false
+
+## Espaçamento no mesmo patamar: soldados aguardam o líder, sem se empilhar.
+func _keep_formation() -> void:
+	if absf(velocity.x)<0.01 or not is_on_floor(): return
+	var direction := signf(velocity.x)
+	for other: Node3D in get_tree().get_nodes_in_group("enemies"):
+		if other == self or absf(other.global_position.y-global_position.y)>0.55: continue
+		var ahead := (other.global_position.x-global_position.x)*direction
+		if ahead > 0 and ahead < 0.85:
+			velocity.x = direction*maxf(0.0,minf(absf(velocity.x),absf(other.velocity.x)))

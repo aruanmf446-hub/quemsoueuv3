@@ -22,11 +22,15 @@ func run() -> void:
 	root.mode = Window.MODE_WINDOWED
 	root.size = Vector2i(int(dimensions[0]),int(dimensions[1]))
 	var records: Array = []
-	for order in range(1,10):
+	var only := 0
+	for arg in args:
+		if arg.begins_with("--phase="): only = int(arg.trim_prefix("--phase="))
+	for order in range(1,11):
+		if only > 0 and only != order: continue
 		var phase: Node3D = load("res://scenes/desert/phase_%02d.tscn" % order).instantiate()
 		root.add_child(phase)
 		current_scene = phase
-		phase._player.position.y = 0.02
+		phase._player.position.y = float(phase._phase.player_spawn[1])
 		await settle(phase,8)
 		if order >= 2: phase._player.restore_charge("rupture")
 		if order >= 4: phase._player.restore_charge("amber")
@@ -55,6 +59,16 @@ func run() -> void:
 		if middle_error != OK: failures += 1
 		records.append({"order":order,"name":phase._phase.name,"fixture_teleport":true,"district":5,"viewport":root.get_visible_rect().size,"window":root.size,"iphone":UIScale.is_iphone(),"image":middle_file,"result":middle_error})
 		print("CAPTURE ",middle_file," result=",middle_error)
+		if order == 9:
+			phase._player.position=Vector3(float(phase._phase.goal.pos[0])-6,float(phase._phase.goal.pos[1])-1.45,0)
+			phase._stream_world(phase._player.position.x,true)
+			phase._follow_camera(1.0)
+			await settle(phase,8)
+			phase._player._model.visible=true
+			await RenderingServer.frame_post_draw
+			var final_file := output+"/fase_09_portal_final_fixture.png"
+			var saved := root.get_texture().get_image().save_png(final_file)
+			records.append({"order":9,"fixture_teleport":true,"endpoint":true,"image":final_file,"result":saved})
 		root.remove_child(phase)
 		phase.queue_free()
 		current_scene = null

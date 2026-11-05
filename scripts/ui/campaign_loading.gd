@@ -51,11 +51,11 @@ func begin(path: String, callback: Callable, is_opening := false) -> void:
 	_ready_callback = callback
 	_phase_order = int(path.get_file().get_basename().trim_prefix("phase_")) if path.begins_with("res://scenes/desert/phase_") else 0
 	_web_story_handoff = false
-	if _phase_order >= 1 and _phase_order <= 9 and OS.has_feature("web"):
+	if _phase_order >= 1 and _phase_order <= 10 and OS.has_feature("web"):
 		JavaScriptBridge.eval("if (window.qseSetStoryPlaying) window.qseSetStoryPlaying(true);")
-	_story_mode = not opening and _phase_order >= 1 and _phase_order <= 9 and not PhaseStory.was_read(_phase_order)
+	_story_mode = not opening and _phase_order >= 1 and _phase_order <= 10 and not PhaseStory.was_read(_phase_order)
 	_story_done = not _story_mode
-	_min_advances = 2 if opening else (0 if _phase_order >= 1 and _phase_order <= 9 else 1)
+	_min_advances = 2 if opening else (0 if _phase_order >= 1 and _phase_order <= 10 else 1)
 	_ticket += 1
 	_packed = null
 	_can_skip = false
@@ -68,7 +68,7 @@ func begin(path: String, callback: Callable, is_opening := false) -> void:
 	_carousel.allow_skip = opening or _story_mode
 	if _story_mode:
 		_carousel.set_cards_data(PhaseStory.cards_for(_phase_order))
-	elif _phase_order >= 1 and _phase_order <= 9:
+	elif _phase_order >= 1 and _phase_order <= 10:
 		var entries := PhaseStory.cards_for(_phase_order)
 		var cover: Dictionary = entries[0].duplicate() if not entries.is_empty() else {}
 		cover.title = "Preparando fase"
@@ -77,7 +77,7 @@ func begin(path: String, callback: Callable, is_opening := false) -> void:
 		_carousel.set_cards_data([cover])
 	else:
 		_carousel.set_cards("opening" if opening else "transition")
-	_status.visible = _phase_order >= 1 and _phase_order <= 9
+	_status.visible = _phase_order >= 1 and _phase_order <= 10
 	_status.text = "Preparando fase…"
 	_error_panel.hide()
 	_begin_read.call_deferred(_ticket)
@@ -97,14 +97,15 @@ func _begin_read(ticket: int) -> void:
 	# Lê um recurso por quadro sob a capa, em vez de acumular todos no primeiro
 	# quadro após Pular história. As referências sobrevivem até a instanciação.
 	var order := int(_path.get_file().get_basename().trim_prefix("phase_"))
-	if _path.begins_with("res://scenes/desert/phase_") and order >= 1 and order <= 9:
+	if _path.begins_with("res://scenes/desert/phase_") and order >= 1 and order <= 10:
 		var groups := CharacterCatalog.load_all()
 		var entries: Array = []
 		for entry: Dictionary in groups.unlockable + groups.playable:
 			if entry.id == "el_fuego": entries.append(entry)
 		var enemies: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/desert_enemies.json"))
 		entries.append(enemies.enemies.cactus)
-		var paths := {}
+		if order == 10: entries.append(enemies.enemies.malagueta)
+		var paths := {"res://assets/desert/modular/stone_masonry.res":true}
 		for entry: Dictionary in entries:
 			paths[str(entry.model)] = true
 			for source in entry.animations.values(): paths[str(source)] = true
@@ -149,7 +150,7 @@ func _finish(ticket: int) -> void:
 	if ticket != _ticket or _packed == null: return
 	_ticket += 1
 	if _ready_callback.is_valid():
-		_web_story_handoff = _phase_order >= 1 and _phase_order <= 9
+		_web_story_handoff = _phase_order >= 1 and _phase_order <= 10
 		_ready_callback.call(_packed)
 	queue_free()
 
@@ -243,5 +244,5 @@ func _unhandled_input(event: InputEvent) -> void:
 		_cancel()
 
 func _exit_tree() -> void:
-	if not _web_story_handoff and _phase_order >= 1 and _phase_order <= 9 and OS.has_feature("web"):
+	if not _web_story_handoff and _phase_order >= 1 and _phase_order <= 10 and OS.has_feature("web"):
 		JavaScriptBridge.eval("if (window.qseSetStoryPlaying) window.qseSetStoryPlaying(false);")

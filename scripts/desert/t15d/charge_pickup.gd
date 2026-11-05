@@ -23,8 +23,21 @@ func _ready() -> void:
 	shape.shape = sphere
 	shape.position.y = 0.7
 	add_child(shape)
+	var pedestal := MeshInstance3D.new()
+	var base := CylinderMesh.new()
+	base.top_radius = 0.28
+	base.bottom_radius = 0.36
+	base.height = 0.25
+	base.radial_segments = 12
+	pedestal.mesh = base
+	pedestal.position.y = 0.125
+	var stone := StandardMaterial3D.new()
+	stone.albedo_texture = preload("res://assets/desert/phase01/sandstone.png")
+	stone.albedo_color = Color("#857467")
+	pedestal.material_override = stone
+	add_child(pedestal)
 	_visual = Node3D.new()
-	_visual.position.y = 0.85
+	_visual.position.y = 0.70
 	add_child(_visual)
 	# Mesmo medalhão do HUD (emblema + anel do kit), sempre virado para a câmera, com
 	# um halo aditivo na cor do recurso para ser visto de longe.
@@ -48,7 +61,7 @@ func _ready() -> void:
 		if body.is_in_group("player"): _try_collect(body))
 func _physics_process(delta: float) -> void:
 	_time += delta
-	_visual.position.y = 0.85+sin(_time*2.8)*0.06
+	_visual.position.y = 0.70
 	_visual.scale = Vector3.ONE*(1.0+sin(_time*3.4)*0.035)
 	if not is_instance_valid(_player): _player = get_tree().get_first_node_in_group("player")
 	if is_instance_valid(_player) and absf(_player.position.x-global_position.x)<0.65 and absf(_player.position.y-global_position.y)<1.15:

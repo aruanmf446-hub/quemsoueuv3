@@ -1,5 +1,5 @@
 extends "res://scripts/desert/phase_01.gd"
-## Campanha urbana noturna 01–09. A fase 10 continua no controlador original.
+## Dez percursos noturnos modulares; modelos e movimentação originais preservados.
 const ActorSlot = preload("res://scripts/desert/t15d/actor_slot.gd")
 const Player = preload("res://scripts/desert/t15d/player.gd")
 const Cactus = preload("res://scripts/desert/t15d/cactus.gd")
@@ -11,6 +11,7 @@ const CHUNK_SIZE := 64.0
 const AHEAD := 2
 signal return_requested
 var _new_ability := ""
+var _boss: Node3D
 var _order := 1
 var _scenery: Node3D
 var _session: CanvasLayer
@@ -20,6 +21,7 @@ var _reserve: Node3D
 var _troops: Node3D
 var _enemy_live := {}
 var _wave_gates := {}
+var _last_wave := -99.0
 var _ruptured := {}
 var _floor_parts := {}
 var _world: Node3D
@@ -53,7 +55,7 @@ func _ready() -> void:
 	_set_web_story_playing(true)
 	_previous_go_back = bool(get_meta("previous_go_back",get_tree().quit_on_go_back))
 	get_tree().quit_on_go_back = false
-	_order = clampi(int(phase_path.get_file().get_basename().trim_prefix("phase_")),1,9)
+	_order = clampi(int(phase_path.get_file().get_basename().trim_prefix("phase_")),1,10)
 	_ensure_input_actions()
 	_phase = Layout.build(_order)
 	_enemy_catalog = _read_json(ENEMIES_PATH).get("enemies",{})
@@ -116,7 +118,7 @@ func _physics_process(delta: float) -> void:
 			var occupied := false
 			for node in _floor_parts.get(id,[]):
 				if is_instance_valid(node) and node is StaticBody3D:
-					if _player.position.x > float(node.get_meta("floor_left"))-0.7 and _player.position.x < float(node.get_meta("floor_right"))+0.7 and _player.position.y < 0.5: occupied = true
+					if _player.position.x > float(node.get_meta("floor_left"))-0.7 and _player.position.x < float(node.get_meta("floor_right"))+0.7 and _player.position.y < float(node.get_meta("floor_top",0.0))+0.5: occupied = true
 			if occupied: continue
 			_ruptured.erase(id)
 			_set_floor_broken(id,false)
@@ -133,7 +135,7 @@ func _build_environment() -> void:
 	environment.background_color = Color("#091627")
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	environment.ambient_light_color = Color("#819ecb")
-	environment.ambient_light_energy = 0.62
+	environment.ambient_light_energy = 0.40 if _order == 10 else 0.62
 	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	add_child(world_environment)
 	_environment = environment
@@ -141,7 +143,7 @@ func _build_environment() -> void:
 	moon.name = "Moonlight"
 	moon.rotation_degrees = Vector3(-40,-30,0)
 	moon.light_color = Color("#aac8f3")
-	moon.light_energy = 0.72
+	moon.light_energy = 0.12 if _order == 10 else 0.72
 	moon.shadow_enabled = true
 	moon.directional_shadow_max_distance = 32
 	moon.shadow_bias = 0.04
@@ -317,8 +319,8 @@ func _build_collision(chunk: Node3D, platforms: Array) -> void:
 		var box := BoxShape3D.new()
 		var dimensions := _vec3(part.size)
 		if part.kind == "ground":
-			dimensions.y = 5.5
-			body.position.y = -2.75
+			dimensions.y = 1.0
+			body.position.y = float(part.pos[1])
 		box.size = dimensions
 		shape.shape = box
 		body.add_child(shape)
@@ -329,6 +331,7 @@ func _build_collision(chunk: Node3D, platforms: Array) -> void:
 			_floor_parts[id].append(body)
 			body.set_meta("floor_right",float(part.span_end))
 			body.set_meta("floor_left",float(part.span_start))
+			body.set_meta("floor_top",float(part.pos[1])+0.5)
 			if _ruptured.has(id): body.collision_layer = 0
 func _build_crumble(chunk: Node3D, platform: Dictionary) -> void:
 	var stone := preload("res://scripts/desert/t15d/parkour.gd").CrumbleStone.new()
@@ -337,10 +340,9 @@ func _build_crumble(chunk: Node3D, platform: Dictionary) -> void:
 	stone.crumbled.connect(func() -> void: _sfx.play("land",0.6,-2.0))
 	chunk.add_child(stone)
 func _build_terrain_piece(chunk: Node3D, platform: Dictionary) -> void:
-	var terrain := Terrain.new()
-	terrain.order = _order
+	var terrain := preload("res://scripts/desert/t15d/modular_architecture.gd").new()
 	chunk.add_child(terrain)
-	terrain.build([platform])
+	terrain.build_surface(platform,_order)
 	if platform.get("breakable",false):
 		var id := str(platform.id)
 		if not _floor_parts.has(id): _floor_parts[id] = []
@@ -448,6 +450,7 @@ func _retire_enemy(enemy: Node3D) -> void:
 ## Fundo do vão: antes o panorama aparecia pelo buraco e o vão parecia uma janela.
 ## Um poço escuro com gradiente deixa claro que ali não há chão.
 func _build_pit_void(chunk: Node3D, x0: float, x1: float) -> void:
+	if _order in [2,4,10]: return
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var bands := [[0.0,Color("#2b1d16")],[-0.7,Color("#140d0c")],[-2.4,Color("#050609")],[-12.0,Color("#020205")]]
@@ -482,7 +485,11 @@ func _build_pit_lip(chunk: Node3D, x: float, left_edge: bool) -> void:
 	var strip := BoxMesh.new()
 	strip.size = Vector3(0.07,0.06,4.1)
 	lip.mesh = strip
-	lip.position = Vector3(x+inward*0.035,0.0,0.0)
+	var floor_top := 0.0
+	for hole: Dictionary in _phase.holes:
+		if absf(float(hole.start)-x)<0.02: floor_top = float(hole.from_y)
+		if absf(float(hole.end)-x)<0.02: floor_top = float(hole.to_y)
+	lip.position = Vector3(x+inward*0.035,floor_top,0.0)
 	lip.set_meta("pit_edge",x)
 	lip.material_override = _pit_material("lip")
 	lip.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -492,7 +499,7 @@ func _build_pit_lip(chunk: Node3D, x: float, left_edge: bool) -> void:
 	var plane := PlaneMesh.new()
 	plane.size = Vector2(0.9,3.9)
 	band.mesh = plane
-	band.position = Vector3(x+inward*0.57,0.012,0.0)
+	band.position = Vector3(x+inward*0.57,floor_top+0.012,0.0)
 	band.material_override = _pit_material("band")
 	band.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	chunk.add_child(band)
@@ -527,9 +534,18 @@ func _build_goal() -> void:
 	add_child(_goal)
 	var arch := Terrain.new()
 	add_child(arch)
-	arch.arch(Vector3(float(_phase.goal.pos[0]),0,-1.8),1.8)
+	if _order in [8,9,10]:
+		var portal := preload("res://scripts/desert/t15d/modular_architecture.gd").new()
+		add_child(portal)
+		portal.build_portal(Vector3(float(_phase.goal.pos[0]),float(_phase.goal.pos[1])-1.5,-4.0),_order)
+	else:
+		arch.arch(Vector3(float(_phase.goal.pos[0]),float(_phase.goal.pos[1])-1.5,-1.8),1.8)
+	if _order == 1:
+		var entrance := preload("res://scripts/desert/t15d/modular_architecture.gd").new()
+		add_child(entrance)
+		entrance.build_portal(Vector3(float(_phase.player_spawn[0])+1.0,float(_phase.player_spawn[1])-0.1,-5.0),1)
 	var label := Label3D.new()
-	label.text = "MINERADORA" if _order == 9 else "SAÍDA"
+	label.text = "MINERADORA" if _order == 9 else ("FIM DO REINO" if _order == 10 else "SAÍDA")
 	label.font = preload("res://assets/desert/phase01/interface.ttf")
 	label.font_size = 48
 	label.pixel_size = 0.007
@@ -538,7 +554,7 @@ func _build_goal() -> void:
 	label.outline_size = 10
 	# Acima do arco e sem teste de profundidade: antes as colunas cortavam o texto.
 	label.no_depth_test = true
-	label.position = Vector3(float(_phase.goal.pos[0]),4.15,-1.0)
+	label.position = Vector3(float(_phase.goal.pos[0]),float(_phase.goal.pos[1])+2.65,-1.0)
 	add_child(label)
 	var boundary := StaticBody3D.new()
 	boundary.position = Vector3(float(_phase.bounds.min_x)-0.25,2.5,0)
@@ -584,13 +600,16 @@ func _warm_pickup_shaders() -> void:
 	if is_instance_valid(warm): warm.queue_free()
 func _follow_camera(delta: float) -> void:
 	# Telas baixas (844×390) aproximam mais: o personagem não pode virar um ícone.
-	_camera.size = 6.0 if UIScale.is_compact() else 7.0
+	_camera.size = 6.0 if UIScale.is_iphone() else 7.0
 	# Antecipação maior na direção da corrida: o próximo vão entra no quadro mais cedo.
 	_lead = move_toward(_lead,clampf(_player.velocity.x/6.0,-1.0,1.0)*2.4,delta*4.0)
 	var lead := _lead
 	# Em telas baixas o chão sobe no quadro (~60%): os botões de toque ficam sobre a
 	# parede do terreno, não sobre a borda dos buracos à frente.
-	var floor_y := 0.75 if UIScale.is_compact() else 1.65
+	var base := float(_phase.player_spawn[1])-0.1
+	var support := Layout.floor_at(_phase,_player.position.x)
+	if not support.is_empty(): base = float(support.height)
+	var floor_y := base+(0.75 if UIScale.is_iphone() else 1.65)
 	var target := Vector3(clampf(_player.position.x+lead,float(_phase.player_spawn[0]),float(_phase.goal.pos[0])),maxf(floor_y,_player.position.y+1.4-_camera.size*0.5+0.55),0)
 	var destination := target+Vector3(0,1,14)
 	_camera.position = _camera.position.lerp(destination,1.0-exp(-8*delta))
@@ -669,6 +688,9 @@ func _impact(point: Vector3, color := Color("#ffd58a")) -> void:
 	get_tree().create_timer(0.8,false).timeout.connect(particles.queue_free)
 func _on_goal_entered(body: Node3D) -> void:
 	if body != _player or completed or _player.is_dead or _respawning: return
+	if _order == 10 and not _boss_defeated:
+		_hud.notify("Derrote Malagueta para concluir a travessia",true)
+		return
 	completed = true
 	_saved = Progress.complete(_order) == OK
 	_player.velocity = Vector3.ZERO
@@ -857,6 +879,12 @@ func _return_to_story() -> void:
 	if return_requested.get_connections().is_empty(): get_tree().change_scene_to_file("res://scenes/menu/main_menu.tscn")
 	else: return_requested.emit()
 func _exit_tree() -> void:
+	# Cancela tarefas ligadas aos nós antes de liberar o cenário em streaming.
+	_build_queue.clear()
+	_actor_resources.clear()
+	_floor_parts.clear()
+	if is_instance_valid(_sfx):
+		for channel in _sfx._players: channel.stop()
 	_set_web_story_playing(false)
 	if _hit_stopping: Engine.time_scale = 1.0
 	if _paused: get_tree().paused = false
@@ -921,14 +949,20 @@ func _restore_game_checkpoint() -> void:
 	_player.position = _checkpoint + Vector3.UP * 0.05
 
 func _reset_remaster_state() -> void:
+	if is_instance_valid(_boss): _boss.queue_free()
+	_boss = null
+	_boss_defeated = false
 	for enemy in _troops.get_children():
 		_retire_enemy(enemy)
 	_enemy_live.clear()
 	_wave_gates.clear()
+	_last_wave=-99.0
 	_ruptured.clear()
 	_floor_parts.clear()
 
 func _update_troops() -> void:
+	if _order == 10 and not _boss_defeated and not is_instance_valid(_boss) and _player.position.x > float(_phase.goal.pos[0])-42:
+		_build_malagueta()
 	for id in _enemy_live.keys():
 		if not is_instance_valid(_enemy_live[id]):
 			_enemy_live.erase(id)
@@ -943,6 +977,11 @@ func _update_troops() -> void:
 	var district := clampi(int((_player.position.x-float(_phase.player_spawn[0]))/float(_phase.length)*8),0,7)
 	if _wave_gates.has(district): return
 	var gate := float(_phase.districts[district].start)+18.0
+	var support := Layout.floor_at(_phase,gate)
+	if support.is_empty():
+		_wave_gates[district] = true
+		return
+	var gate_y := float(support.height)
 	if _player.position.x < gate+28.0: return
 	var safe := false
 	for platform: Dictionary in _phase.platforms:
@@ -951,9 +990,15 @@ func _update_troops() -> void:
 		_wave_gates[district] = true
 		return
 	var count: int = _wave_gates.get("pending",0)
-	var desired: int = [2,3,4,5,5,6,6,7,8][_order-1]
-	if _troops.get_child_count() >= 8: return
-	_spawn_enemy(_troops,{"id":"wave.%d.%d" % [district,count],"pos":[gate-count*0.6,0.02,0],"patrol":[gate-2,gate+2],"troop":true})
+	var desired: int = [2,3,3,4,4,4,5,5,6,6][_order-1]
+	if _troops.get_child_count() >= 8 or _elapsed-_last_wave<0.65: return
+	var wave_x := gate-count*1.1
+	var wave_floor := Layout.floor_at(_phase,wave_x)
+	if wave_floor.is_empty() or wave_x<float(wave_floor.left)+0.6 or wave_x>float(wave_floor.right)-0.6:
+		_wave_gates[district]=true
+		return
+	_last_wave=_elapsed
+	_spawn_enemy(_troops,{"id":"wave.%d.%d" % [district,count],"pos":[wave_x,float(wave_floor.height)+0.02,0],"patrol":[gate-2,gate+2],"troop":true})
 	count += 1
 	_wave_gates["pending"] = count
 	if count >= desired:
@@ -969,10 +1014,6 @@ func _on_ability_used(kind: String) -> void:
 		for node in _floor_parts[id]:
 			if not is_instance_valid(node) or not node is StaticBody3D: continue
 			var right := float(node.get_meta("floor_right"))
-			var occupied := false
-			for enemy in get_tree().get_nodes_in_group("enemies"):
-				if enemy.global_position.x >= float(node.get_meta("floor_left"))-0.7 and enemy.global_position.x <= right+0.7 and absf(enemy.global_position.y) < 1.5: occupied = true
-			if occupied: continue
 			if right <= _player.position.x-2.0 and right >= _player.position.x-32.0 and right > best_right:
 				best = id
 				best_right = right
@@ -1010,3 +1051,27 @@ func _set_floor_broken(id: String, broken: bool) -> void:
 func _set_web_story_playing(active: bool) -> void:
 	if OS.has_feature("web"):
 		JavaScriptBridge.eval("if (window.qseSetStoryPlaying) window.qseSetStoryPlaying(%s);" % ("true" if active else "false"))
+
+## Reutiliza o chefe existente, sem reciclar seu modelo na reserva de soldados.
+func _build_malagueta() -> void:
+	_boss = Cactus.new()
+	_boss.name = "Malagueta"
+	_boss.position = _vec3(_phase.boss.pos)
+	var shape := CollisionShape3D.new()
+	var capsule := CapsuleShape3D.new()
+	capsule.radius = 0.4
+	capsule.height = 1.7
+	shape.shape = capsule
+	shape.position.y = 0.85
+	_boss.add_child(shape)
+	var model := ActorSlot.new()
+	model.name = "Model"
+	_boss.add_child(model)
+	add_child(_boss)
+	_boss.setup(_enemy_catalog.malagueta,_phase.boss)
+	_boss.persistent_follow = true
+	_boss.defeated.connect(func() -> void:
+		_boss_defeated = true
+		_hud.notify("Malagueta derrotado • saída liberada")
+		if _goal.get_overlapping_bodies().has(_player): _on_goal_entered(_player))
+	_boss.retired.connect(func(enemy: Node3D) -> void: enemy.queue_free())

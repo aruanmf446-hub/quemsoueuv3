@@ -18,7 +18,7 @@ parser.add_argument('--godot',required=True)
 parser.add_argument('--output',default='/tmp/desert-night-validation')
 parser.add_argument('--display',default=':104')
 parser.add_argument('--only',nargs='+')
-parser.add_argument('--orders',nargs='+',type=int,default=list(range(1,10)))
+parser.add_argument('--orders',nargs='+',type=int,default=list(range(1,11)))
 parser.add_argument('--timeout',type=int,default=1200)
 a=parser.parse_args()
 root=Path(__file__).resolve().parents[2]
@@ -29,6 +29,7 @@ headless=['--headless','--fixed-fps','60']
 targets=[
  ('import',engine+['--headless','--editor','--import','--quit','--','--godot-mcp-no-bridge']),
  ('reino-v3',engine+headless+['--script','res://tests/desert_night/reino_v3_test.gd']),
+ ('reino10',engine+headless+['--script','res://tests/desert_night/reino10_test.gd']),
  ('actions',engine+window+['--script','res://tests/desert_night/action_controls.gd']),
  ('layout',engine+headless+['--script','res://tests/desert_night/layout_test.gd']),
  ('legacy10',engine+headless+['--script','res://tests/desert_night/legacy10_test.gd']),

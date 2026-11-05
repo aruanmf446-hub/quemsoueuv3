@@ -18,6 +18,9 @@ var _previous_x := 0.0
 var _stalled := 0
 var _jump_release_at := -1
 var _attack_release_at := -1
+var _rupture_release_at := -1
+var _amber_release_at := -1
+var _defense_release_at := -1
 var _previous_attack_charge := 1
 var _render_intervals: Array[float] = []
 var _last_render_tick := 0
@@ -84,6 +87,22 @@ func run() -> void:
 		if phase.completed or deaths > 0: break
 		if step == _jump_release_at: Input.action_release("jump")
 		if step == _attack_release_at: Input.action_release("attack")
+		if step == _rupture_release_at: Input.action_release("rupture")
+		if step == _amber_release_at: Input.action_release("amber")
+		if step == _defense_release_at: Input.action_release("defend")
+		if player.is_on_floor() and player.defense_charges>0 and player._shield_timer<=0 and player._attack_timer<=0.15:
+			for threat: Node3D in get_nodes_in_group("enemies"):
+				if threat.has_method("can_jump_gap") and threat._windup>0 and absf(threat.position.x-player.position.x)<2.2:
+					Input.action_press("defend")
+					_defense_release_at=step+2
+					break
+		if order >= 2 and player.is_on_floor() and player.charges("rupture")>0 and step%60==0:
+			for pursuer: Node3D in get_nodes_in_group("enemies"):
+				var behind := player.position.x-pursuer.position.x
+				if behind>3 and behind<20:
+					Input.action_press("rupture")
+					_rupture_release_at=step+2
+					break
 		var share := (player.position.x-origin)/maxf(goal-origin,1)
 		if capture_frames:
 			if player.attack_charges == 0 and _previous_attack_charge == 1 and not _captured.has("attack"):
@@ -112,13 +131,24 @@ func run() -> void:
 			print("STALL x=",player.position.x," y=",player.position.y," ahead=",surface_at(player.position.x+0.9)," grounded=",player.is_on_floor()," timer=",player._attack_timer," charge=",player.attack_charges)
 			check(false,"não fica preso no percurso por oito segundos")
 			break
+		if order==10 and phase._boss_defeated and player.position.x>goal:
+			Input.action_release("move_right")
+			Input.action_press("move_left")
+			await physics_frame
+			continue
+		if fight_malagueta(step):
+			await physics_frame
+			continue
 		var enemy := enemy_ahead(2.5)
 		if await ride_ferry(step):
 			_stalled = 0
 			continue
 		if player._attack_timer > 0.0:
-			Input.action_release("move_right")
-		elif enemy != null and player.attack_charges > 0 and player.is_on_floor():
+			if player.is_on_floor() or order!=2: Input.action_release("move_right")
+			else:
+				Input.action_press("move_right")
+				auto_jump(step)
+		elif enemy != null and player.attack_charges > 0 and (player.is_on_floor() or (order==2 and surface_at(player.position.x) != -INF)):
 			var gap := enemy.global_position.x-player.global_position.x
 			var ray := PhysicsRayQueryParameters3D.create(player.global_position+Vector3.UP*0.7,enemy.global_position+Vector3.UP*0.7,1)
 			var clear := player.get_world_3d().direct_space_state.intersect_ray(ray).is_empty()
@@ -196,7 +226,13 @@ func auto_jump(step: int) -> void:
 	if player.is_on_floor():
 		if ahead == -INF or ahead > player.position.y+0.3: jump(step)
 	elif player.jumps_used == 1:
-		if (ahead == -INF and player.position.y > 0.2) or (ahead > 1.5 and player.position.y >= 1.0 and player.position.y <= 1.6): jump(step)
+		if order!=2 and ahead == -INF and player.velocity.y>0:
+			jump(step)
+		elif player.velocity.y < 0:
+			var landing := -INF
+			for hole: Dictionary in phase._phase.holes:
+				if player.position.x >= float(hole.start)-1.0 and player.position.x <= float(hole.end)+1.0: landing=maxf(float(hole.get("from_y",0.0)),float(hole.get("to_y",0.0)))
+			if (ahead == -INF and player.position.y < landing+0.6) or (ahead != -INF and ahead > player.position.y-0.1): jump(step)
 func surface_at(x: float) -> float:
 	var top := -INF
 	for platform: Dictionary in platforms:
@@ -211,3 +247,31 @@ func enemy_ahead(distance: float) -> Node3D:
 		if gap > 0 and gap < distance and absf(actor.global_position.y-player.global_position.y) < 1.1:
 			if nearest == null or gap < nearest.global_position.x-player.global_position.x: nearest = actor
 	return nearest
+
+## A arena usa as mesmas entradas e itens do jogador, inclusive Âmbar para recarregar.
+func fight_malagueta(step: int) -> bool:
+	if order!=10 or not is_instance_valid(phase._boss) or phase._boss_defeated: return false
+	var boss: Node3D=phase._boss
+	if absf(player.position.x-boss.position.x)>38:return false
+	if player.charges("amber")>0 and boss.crystallized_left<=0.15 and absf(player.position.x-boss.position.x)<7:
+		Input.action_press("amber")
+		_amber_release_at=step+2
+	var target:float=boss.position.x
+	if player.attack_charges==0:
+		var distance:=INF
+		for item: Dictionary in phase._phase.pickups:
+			if item.kind!="attack" or phase._collected_ids.has(str(item.id)):continue
+			var gap:=absf(float(item.pos[0])-player.position.x)
+			if gap<distance:
+				distance=gap
+				target=float(item.pos[0])
+	var direction:=signf(target-player.position.x)
+	Input.action_release("move_left")
+	Input.action_release("move_right")
+	if player._attack_timer<=0 or not player.is_on_floor():Input.action_press("move_right" if direction>=0 else "move_left")
+	if player.attack_charges>0 and absf(boss.position.x-player.position.x)<=1.65 and absf(boss.position.y-player.position.y)<1.3 and player._attack_cooldown<=0:
+		Input.action_press("attack")
+		_attack_release_at=step+2
+		swings+=1
+	if player.attack_charges==0 and absf(boss.position.x-player.position.x)<2.5 and player.is_on_floor():jump(step)
+	return true

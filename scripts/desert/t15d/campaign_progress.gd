@@ -3,7 +3,7 @@ extends RefCounted
 const SAVE_PATH := "user://desert_campaign_v1.cfg"
 const TEMP_PATH := "user://desert_campaign_v1.cfg.tmp"
 const VERSION := 1
-const LAST_UPDATED_PHASE := 9
+const LAST_UPDATED_PHASE := 10
 ## Backup local Web contra falhas de sincronizacao do user:// no navegador.
 ## Não valida recompensas/achievements no GAME. Storage exclusivo da origem.
 const WEB_BACKUP := "qse-v3:desert:campaign:v1"

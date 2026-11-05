@@ -1,5 +1,13 @@
 # Quem Sou Eu V3 — Reino do Deserto
 
+## Reforma das dez fases — branch em desenvolvimento
+
+A nova tarefa está em `work/reino-deserto-10-fases`, partindo da main967a408.
+Não fazer merge desta branch: o dono pediu revisão separada.
+O relatório desta rodada está em [REINO_10_FASES.md](docs/desert/REINO_10_FASES.md).
+A validação e o painel serão atualizados conforme os testes terminarem;
+resultados antigos abaixo correspondem à entrega anterior, já publicada.
+
 ## Desenvolvimento atual
 
 Branch `work/reino-deserto-v3`, baseada em `b10be149ba2d332a44cc1dcbb4c1ebe9aaaff3d6`.

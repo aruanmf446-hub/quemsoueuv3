@@ -101,80 +101,74 @@
     ],
     "02": [
       {
-        "image": "res://assets/story/covers/phase_02.jpg",
-        "eyebrow": "CAPÍTULO 02 · BAZAR DA MEIA-NOITE",
-        "title": "As tendas escondem uma passagem",
-        "message": "Os soldados de Pimento vasculham o bazar. Preciso cruzar as ruas comerciais e encontrar a subida para os telhados."
+        "title": "TELHADOS DA CAPITAL",
+        "eyebrow": "REINO DO DESERTO · FASE 02",
+        "image": "res://assets/story/covers/phase_03.jpg",
+        "message": "A rua fica muito abaixo. Siga pelas lajes, salte entre os terraços e cuidado com os soldados que também atravessam os telhados."
       }
     ],
     "03": [
       {
-        "image": "res://assets/story/covers/phase_03.jpg",
-        "eyebrow": "CAPÍTULO 03 · TELHADOS DA CIDADE",
-        "title": "Acima das patrulhas",
-        "message": "Os telhados ligam os pátios e as torres da cidade. Vou seguir por cima para alcançar as muralhas do palácio."
+        "title": "BAZAR DA CIDADE",
+        "eyebrow": "REINO DO DESERTO · FASE 03",
+        "image": "res://assets/story/covers/phase_02.jpg",
+        "message": "Atravesse bazar da cidade e encontre a passagem para a próxima região."
       }
     ],
     "04": [
       {
-        "image": "res://assets/story/covers/phase_04.jpg",
-        "eyebrow": "CAPÍTULO 04 · MURALHAS DO PALÁCIO",
-        "title": "À sombra das cúpulas vermelhas",
-        "message": "As torres de guarda protegem o palácio. Se atravessar suas pontes e corredores, encontrarei a saída para os aquedutos."
+        "title": "AQUEDUTO DO DESERTO",
+        "eyebrow": "REINO DO DESERTO · FASE 04",
+        "image": "res://assets/story/covers/phase_05.jpg",
+        "message": "Atravesse aqueduto do deserto e encontre a passagem para a próxima região."
       }
     ],
     "05": [
       {
-        "image": "res://assets/story/covers/phase_05.jpg",
-        "eyebrow": "CAPÍTULO 05 · AQUEDUTOS DO REINO",
-        "title": "O caminho da água",
-        "message": "Os arcos antigos levam além do palácio. Preciso cruzar os canais e as passarelas para chegar aos jardins."
+        "title": "JARDINS DO OÁSIS",
+        "eyebrow": "REINO DO DESERTO · FASE 05",
+        "image": "res://assets/story/covers/phase_06.jpg",
+        "message": "Atravesse jardins do oásis e encontre a passagem para a próxima região."
       }
     ],
     "06": [
       {
-        "image": "res://assets/story/covers/phase_06.jpg",
-        "eyebrow": "CAPÍTULO 06 · JARDINS DO OÁSIS",
-        "title": "Um respiro entre as palmeiras",
-        "message": "A água corta o silêncio do oásis, mas as patrulhas continuam por perto. Vou atravessar os jardins rumo à fronteira."
+        "title": "RUÍNAS ENTERRADAS",
+        "eyebrow": "REINO DO DESERTO · FASE 06",
+        "image": "res://assets/story/covers/phase_07.jpg",
+        "message": "Atravesse ruínas enterradas e encontre a passagem para a próxima região."
       }
     ],
     "07": [
       {
-        "image": "res://assets/story/covers/phase_07.jpg",
-        "eyebrow": "CAPÍTULO 07 · RUÍNAS DA FRONTEIRA",
-        "title": "Além dos muros da capital",
-        "message": "As colunas partidas guardam a antiga saída da cidade. Entre escadarias e pátios soterrados, sigo procurando o caminho das minas."
+        "title": "ESTRADA DA MINERAÇÃO",
+        "eyebrow": "REINO DO DESERTO · FASE 07",
+        "image": "res://assets/story/covers/phase_08.jpg",
+        "message": "Atravesse estrada da mineração e encontre a passagem para a próxima região."
       }
     ],
     "08": [
       {
-        "image": "res://assets/story/covers/phase_08.jpg",
-        "eyebrow": "CAPÍTULO 08 · ESTRADA DA MINERAÇÃO",
-        "title": "A rota das cargas",
-        "message": "Guindastes e depósitos marcam a estrada da mineração. Cada carga que passa me aproxima das minas onde meus pais ficaram."
+        "title": "POSTO DE CONTROLE",
+        "eyebrow": "REINO DO DESERTO · FASE 08",
+        "image": "res://assets/story/covers/phase_04.jpg",
+        "message": "Atravesse posto de controle e encontre a passagem para a próxima região."
       }
     ],
     "09": [
       {
+        "title": "ENTRADA DA MINERADORA",
+        "eyebrow": "REINO DO DESERTO · FASE 09",
         "image": "res://assets/story/covers/phase_09.jpg",
-        "eyebrow": "CAPÍTULO 09 · ENTRADA DA MINERADORA",
-        "title": "O pátio diante das minas",
-        "message": "Cheguei ao cercamento da mineradora. Ainda não é hora de entrar: primeiro preciso alcançar o portão e descobrir quem protege esse lugar."
+        "message": "Siga pelos pátios de transporte até a grande entrada iluminada da mineradora."
       }
     ],
     "10": [
       {
-        "image": "res://assets/desert/night_city/citadel.png",
-        "eyebrow": "CAPÍTULO 10 · CONFRONTO FINAL",
-        "title": "Malagueta espera",
-        "message": "A jornada pelo Reino do Deserto chega ao seu confronto final."
-      },
-      {
-        "image": "res://assets/desert/night_city/bazaar.png",
-        "eyebrow": "CAPÍTULO 10 · EL FUEGO",
-        "title": "Encerre a campanha",
-        "message": "Derrote Malagueta para concluir a história do deserto."
+        "title": "INTERIOR DA MINERAÇÃO",
+        "eyebrow": "REINO DO DESERTO · FASE 10",
+        "image": "res://assets/desert/night_city/outskirts.png",
+        "message": "A jornada continua nas profundezas. Trilhos, passarelas, guindastes e cristais revelam o coração da mineração."
       }
     ]
   }

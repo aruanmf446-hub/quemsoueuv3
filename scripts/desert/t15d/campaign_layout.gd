@@ -1,254 +1,117 @@
 extends RefCounted
-## Campanha noturna 01–09. Dados determinísticos separados do controlador e da Fase 10.
-## O percurso mínimo vem da distância real: não há bloqueio por relógio nem espera na saída.
+## Percursos modulares mundiais: cada superfície, item e patrulha compartilha sua altura real.
 const MAX_HORIZONTAL_SPEED := 7.4
 const DEFAULT_DISTANCE := 1452.0
 const CHUNK_LENGTH := 24.0
-const NAMES := ["Portões da Capital", "Bazar da Meia-Noite", "Telhados da Cidade", "Muralhas do Palácio", "Aquedutos do Reino", "Jardins do Oásis", "Ruínas da Fronteira", "Estrada da Mineração", "Entrada da Mineradora"]
-const THEMES := ["city_gates", "bazaar", "rooftops", "ramparts", "aqueduct", "oasis", "ruins", "mining_road", "mine_entrance"]
-const DESCRIPTIONS := [
- "Atravesse os portões da capital sob a luz da lua.",
- "Escape das tropas entre tendas e passagens do bazar.",
- "Siga pelos telhados da cidade e seus pátios iluminados.",
- "Contorne as muralhas do palácio de cúpulas vermelhas.",
- "Cruze os aquedutos que abastecem o reino.",
- "Atravesse os jardins e as águas do oásis.",
- "Deixe a capital pelas antigas ruínas da fronteira.",
- "Siga a rota dos guindastes e das cargas da mineração.",
- "Alcance o pátio da mineradora; a entrada é seu destino.",
-]
-const STAGE_DISTRICTS := [["Portão externo", "praça vigiada", "estrada de arenito", "pátio", "muro baixo", "arcadas", "praça de lanternas", "saída pelo bazar"], ["Barracas", "rua estreita", "armazém", "pátio de caixas", "rua comercial", "ponte de serviço", "corredor murado", "escada para telhados"], ["Acesso ao telhado", "casario baixo", "varanda", "passarelas", "cúpulas baixas", "torres", "cobertura quebradiça", "terraço de saída"], ["Base da muralha", "torres laterais", "corredor de guarda", "ponte lateral", "patio militar", "plataforma superior", "ponte murada", "saída aqueduto"], ["Ponte baixa", "arco externo", "canal de areia", "coluna", "ponte antiga", "passarela quebrável", "canal elevado", "saída jardim"], ["Entrada do jardim", "área das palmeiras", "margem", "passagem de pedras", "pátio", "ponte baixa", "corredor de água", "saída do jardim"], ["Portão arruinado", "colunas", "escadarias", "pátio soterrado", "ruínas altas", "muralha caída", "passagem estreita", "saída planalto"], ["Porto de carga", "estrada", "depósitos", "pátios logísticos", "guindaste", "trilhos externos", "posto militar", "ponte de minério"], ["Primeiro cercamento", "estrada de minério", "rampa externa", "containers", "ponte de ferro", "portão de controle", "pátio de guindastes", "entrada da mina"]]
-const DISTRICT_LABELS := ["Portões", "Ruas da Areia", "Pátio Antigo", "Passagens", "Mercado", "Muralhas", "Galerias", "Saída"]
+const NAMES := ["Portões da Capital","Telhados da Capital","Bazar da Cidade","Aqueduto do Deserto","Jardins do Oásis","Ruínas Enterradas","Estrada da Mineração","Posto de Controle","Entrada da Mineradora","Interior da Mineração"]
+const THEMES := ["city_gates","rooftops","bazaar","aqueduct","oasis","ruins","mining_road","checkpoint","mine_entrance","mine_interior"]
+const DESCRIPTIONS := ["Atravesse os portões, pátios e muralhas de acesso à capital.","Corra sobre lajes e terraços; a rua fica muito abaixo.","Cruze o mercado noturno, depósitos e corredores comerciais.","Atravesse canais, pontes e arcos do grande aqueduto.","Siga pelas águas, jardins e palmeiras do oásis.","Explore câmaras e passagens do reino antigo.","Deixe a capital pela rota de transporte de minério.","Atravesse os setores militares e o portão de controle.","Avance pelos pátios até a grande entrada da mineradora.","Entre nas cavernas industriais e atravesse o complexo subterrâneo."]
+const STAGE_DISTRICTS := [
+ ["Portão monumental","Muralha externa","Rua de acesso","Pátio das bandeiras","Torres de vigia","Defesas da capital","Arcadas iluminadas","Terraço da cidade"],
+ ["Lajes da muralha","Casario elevado","Terraços de tecido","Telhados separados","Cúpulas vermelhas","Torres da capital","Coberturas antigas","Terraço do mercado"],
+ ["Praça dos tecidos","Rua dos mercadores","Corredor de arcos","Depósitos de especiarias","Pátio comercial","Bancas de cerâmica","Galerias de carga","Saída do mercado"],
+ ["Ponte de acesso","Arcos monumentais","Canal superior","Colunas de água","Ponte avariada","Travessia das cascatas","Reservatório","Saída para o oásis"],
+ ["Palmeiras do reino","Margem iluminada","Jardins de pedra","Fontes antigas","Pontes do jardim","Pátio verde","Ribeirão noturno","Arco das ruínas"],
+ ["Monumento enterrado","Colunas antigas","Câmara da areia","Arcos partidos","Galeria subterrânea","Pátio soterrado","Passagem de rochas","Saída do complexo"],
+ ["Armazém de carga","Estrada rochosa","Ponte de madeira","Desfiladeiro","Torre de observação","Equipamentos de transporte","Trilhos de carga","Passagem militar"],
+ ["Posto avançado","Pátio de vigia","Muralhas defensivas","Torres dos guardas","Depósito militar","Travessia fortificada","Grande portão","Estrada da mineradora"],
+ ["Estrada de minério","Ponte de transporte","Depósitos externos","Pátio dos carrinhos","Guindastes de carga","Instalações de pedra","Aproximação da entrada","Portal da mineradora"],
+ ["Galeria de entrada","Trilhos subterrâneos","Passarelas de madeira","Câmara dos cristais","Poço industrial","Guindastes internos","Galeria profunda","Coração da mineração"]]
 
 static func metadata(order: int) -> Dictionary:
-	if order < 1 or order > 9: return {}
-	return {
-		"id": "desert_phase_%02d" % order,
-		"order": order,
-		"name": NAMES[order-1],
-		"description": DESCRIPTIONS[order-1],
-		"theme": THEMES[order-1],
-	}
+	if order < 1 or order > 10: return {}
+	return {"id":"desert_phase_%02d" % order,"order":order,"name":NAMES[order-1],"description":DESCRIPTIONS[order-1],"theme":THEMES[order-1]}
 
 static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 	var stage := metadata(order)
 	if stage.is_empty(): return {}
-	# Reserva 20 segundos além do piso pedido: aceleração, colisão da saída e qualquer
-	# margem de entrada não podem baixar uma fase de 180s para menos de três minutos.
-	var requested_seconds := maxf(minimum_seconds,180.0)
-	var distance := maxf(DEFAULT_DISTANCE,ceilf(requested_seconds*MAX_HORIZONTAL_SPEED)+120.0)
+	var distance := maxf(DEFAULT_DISTANCE,ceilf(maxf(180,minimum_seconds)*MAX_HORIZONTAL_SPEED)+120)
 	var spawn_x := -8.0
 	var goal_x := spawn_x+distance
-	var pit_count := mini(14+order-1,20)
-	var enemy_count := mini(14+order-1,20)
-	var pits: Array = []
-	var spans: Array = []
 	var platforms: Array = []
+	var holes: Array = []
 	var enemies: Array = []
 	var pickups: Array = []
-	var signs: Array = []
+	var checkpoints: Array = []
 	var districts: Array = []
 	var landmarks: Array = []
-	var checkpoints: Array = []
-	var geysers: Array = []
+	var surfaces: Array = []
 	var prefix := "p%02d" % order
-	var left := spawn_x-8.0
-	# As distâncias normais são 57–84m entre vãos, com variação de posição/largura.
-	# A mesma passagem é alcançável nos dois sentidos, sem plataformas de mão única.
-	for index in range(pit_count):
-		var normalized := float(index)/maxf(float(pit_count-1),1.0)
-		var jitter: float = [2.0,-3.0,4.0,-1.0,0.0,3.0,-2.0][(index+order)%7]
-		var center := lerpf(spawn_x+62.0,goal_x-48.0,normalized)+jitter
-		var width := 3.0+float((index+order)%3)*0.25
-		# Vão largo com pedra no meio que desmorona: dois saltos rápidos em vez de um.
-		var stepping := index > 0 and (index*3+order)%5 == 1
-		# Vão de 9m com balsa de pedra indo e voltando: esperar, subir e saltar na hora.
-		var ferry := index > 1 and not stepping and (index*7+order)%6 == 3
-		if ferry: width = 9.0
-		# Pulo normal saindo da borda pousa na pedra (2,4m larga, 2,5m de cada borda).
-		if stepping: width = 7.4
-		var pit_left := center-width*0.5
-		var pit_right := center+width*0.5
-		spans.append({"left":left,"right":pit_left})
-		pits.append({"id":"%s.pit.%02d" % [prefix,index],"start":pit_left,"end":pit_right,"width":width,"stepping":stepping,"ferry":ferry})
-		if stepping:
-			platforms.append({"id":"%s.crumble.%02d" % [prefix,index],"kind":"crumble","pos":[center,-0.3,0.0],"size":[2.4,0.6,3.0],"span_start":center-1.2,"span_end":center+1.2,"chunk":floori(center/CHUNK_LENGTH)})
-		signs.append({"id":"%s.pit.%02d.left" % [prefix,index],"kind":"pit_warning","pos":[pit_left-5.0,0.0,-1.5],"direction":1})
-		signs.append({"id":"%s.pit.%02d.right" % [prefix,index],"kind":"pit_warning","pos":[pit_right+5.0,0.0,-1.5],"direction":-1})
-		left = pit_right
-	spans.append({"left":left,"right":goal_x+10.0})
-	var defense_slots := {}
-	for index in range(12):
-		defense_slots[roundi(float(index)*float(enemy_count-1)/11.0)] = true
-	var extra_attack_slots := [maxi(2,enemy_count/4),enemy_count/2,enemy_count-2]
-	for index in range(spans.size()):
-		var span: Dictionary = spans[index]
-		var span_left := float(span.left)
-		var span_right := float(span.right)
-		var span_width := span_right-span_left
-		_ground(platforms,prefix,index,span_left,span_right)
-		if index >= enemy_count: continue
-		var variation := float((index+order)%3-1)*1.0
-		var enemy_x := span_left+span_width*0.40+variation
-		enemy_x = clampf(enemy_x,span_left+minf(14.0,span_width*0.3),span_right-minf(18.0,span_width*0.3))
-		enemies.append({
-			"id":"%s.cactus.%02d" % [prefix,index],"type":"cactus",
-			"pos":[enemy_x,0.02,0.0],
-			"patrol":[maxf(span_left+7.0,enemy_x-4.0),minf(span_right-10.0,enemy_x+4.0)],
-			"district":clampi(int((enemy_x-spawn_x)/(distance/8.0)),0,7),
-		})
-		# A primeira carga vem do inventário inicial. A reposição fica depois do Cactus,
-		# em piso livre; também pode ser alcançada saltando sobre ele e voltando.
-		pickups.append({"id":"%s.attack.%02d" % [prefix,index],"kind":"attack","pos":[enemy_x+6.0,0.55,0.0]})
-		if index in extra_attack_slots:
-			pickups.append({"id":"%s.attack.extra.%02d" % [prefix,index],"kind":"attack","pos":[enemy_x-5.0,0.55,0.0]})
-		# Recarga de vida: um coração a cada três trechos, entre o Cactus e os degraus.
-		if index % 3 == 1:
-			pickups.append({"id":"%s.health.%02d" % [prefix,index],"kind":"health","pos":[span_left+span_width*0.58,0.55,0.0]})
-		if defense_slots.has(index):
-			pickups.append({"id":"%s.defense.%02d" % [prefix,index],"kind":"defense","pos":[enemy_x-9.0,0.55,0.0]})
-		if index%2 == 0 and span_width > 45:
-			_ledge(platforms,prefix,index,9,span_left+span_width*0.63,1.1,0.55)
-		# Os degraus ficam fora do espaço de duelo/reposição e a pelo menos 8m do vão.
-		# Módulos alternam pátio aberto, degrau baixo, degrau largo e salto duplo.
-		var pattern := (index+order*3)%7
-		# Peças de parkour que se revezam com os degraus: telhados em escada e muralha com gêiser.
-		var piece := (index*5+order*2)%6
-		if span_width >= 50.0 and index > 0 and piece == 0:
-			var center_x := span_left+span_width*0.74
-			for step in range(3):
-				_ledge(platforms,prefix,index,step,center_x+(step-1)*3.8,2.6,[1.0,1.9,2.6][step])
-		elif span_width >= 50.0 and index > 0 and piece == 3:
-			var wall_x := span_left+span_width*0.74
-			platforms.append({"id":"%s.wall.%02d" % [prefix,index],"kind":"geyser_wall","pos":[wall_x,2.1,0.0],"size":[2.4,4.2,3.0],"span_start":wall_x-1.2,"span_end":wall_x+1.2,"chunk":floori(wall_x/CHUNK_LENGTH)})
-			for side in [-1.0,1.0]:
-				geysers.append({"id":"%s.geyser.%02d.%s" % [prefix,index,"l" if side < 0 else "r"],"pos":[wall_x+side*4.2,0.0,0.0]})
-		elif span_width >= 48.0 and pattern != 4:
-			var ledge_x := span_left+span_width*0.74
-			var height: float = [1.2,2.7,1.3,1.3,0.0,2.5,1.0][pattern]
-			var width: float = [3.4,3.2,3.6,5.0,0.0,3.4,3.8][pattern]
-			_ledge(platforms,prefix,index,0,ledge_x,width,height)
-			if pattern == 2 and span_width >= 64.0:
-				# Duas elevações no mesmo pátio, com topos que aceitam o retorno.
-				platforms.pop_back()
-				_ledge(platforms,prefix,index,0,span_left+span_width*0.66,3.0,1.2)
-				_ledge(platforms,prefix,index,1,span_left+span_width*0.82,3.2,1.3)
+	var modules: int = [48,72,56,48,48,56,48,56,48,48][order-1]
+	var sector_modules := modules/8
+	var module_length := (distance+(6.0 if order == 2 else 26.0))/modules
+	var origin := spawn_x-(2.0 if order == 2 else 8.0)
+	for index in range(modules):
+		var left := origin+index*module_length
+		var right := origin+(index+1)*module_length
+		var top := _height(order,index)
+		var next_top := _height(order,mini(index+1,modules-1))
+		var gap := 0.0 if index == modules-1 else (2.3+0.18*float(index%6))
+		if index%4 == 0 and order != 2: gap = 1.8
+		var end := right-gap
+		var district := mini(7,index/sector_modules)
+		surfaces.append({"left":left,"right":end,"height":top,"index":index})
+		# Peça central de3m independente; todas as outras mantêm colisão ao romper.
+		var crack := left+(end-left)*0.62
+		var bounds := [left,crack-1.5,crack+1.5,end]
+		for segment in range(3):
+			var x0: float = bounds[segment]
+			var x1: float = bounds[segment+1]
+			platforms.append({"id":"%s.surface.%02d.%d" % [prefix,index,segment],"kind":"ground","pos":[(x0+x1)*0.5,top-0.5,0],"size":[x1-x0,1.0,4.0],"span_start":x0,"span_end":x1,"chunk":floori((x0+x1)*0.5/64.0),"breakable":segment == 1 and index%3 == 1,"module":index,"district":district,"surface_top":top,"architecture":THEMES[order-1]})
+		if gap > 0:
+			holes.append({"id":"%s.gap.%02d" % [prefix,index],"start":end,"end":right,"width":gap,"from_y":top,"to_y":next_top,"stepping":false,"ferry":false})
+		# Guarda e itens pertencem à mesma laje. Recargas antecipam desafios;
+		# nenhuma é colocada em abismo, sobre obstáculo ou na peça destrutível.
+		var guard_x := left+(3.8 if order == 2 else (23.0 if index == 0 else 10.0))
+		if index%(6 if order == 2 else 2) == 0 and not (order == 2 and index == 0):
+			enemies.append({"id":"%s.cactus.%02d" % [prefix,index],"type":"cactus","pos":[guard_x,top+0.02,0],"patrol":[left+1,end-1],"district":district})
+		var supply_index := index/3 if order == 2 else index
+		var kind: String = ["attack","defense","attack","health"][supply_index%4]
+		if order != 2 or index%3 == 0:
+			pickups.append({"id":"%s.supply.%02d" % [prefix,index],"kind":kind,"pos":[spawn_x+2 if index == 0 and order == 2 else (spawn_x+4 if index == 0 else left+(7.0 if order == 2 else 8)),top,0],"surface":index})
+		for ability: String in ["rupture","amber","dash"]:
+			if order < {"rupture":2,"amber":4,"dash":6}[ability]: continue
+			if index%(24 if order == 2 else 8) == ({"rupture":1,"amber":9,"dash":17}[ability] if order == 2 else {"rupture":1,"amber":3,"dash":5}[ability]):
+				pickups.append({"id":"%s.%s.%02d" % [prefix,ability,index],"kind":ability,"pos":[left+(3.6 if order == 2 else 12),top,0],"surface":index})
+		# Obstáculos baixos são caixas/balaustradas integradas ao módulo, não escadas.
+		if order != 2 and index > 0 and index%3 == 2:
+			var height := 0.5 if order == 2 else 0.6
+			platforms.append({"id":"%s.obstacle.%02d" % [prefix,index],"kind":"ledge","pos":[left+module_length*0.76,top+height*0.5,0],"size":[0.9,height,2.6],"span_start":left+module_length*0.76-0.45,"span_end":left+module_length*0.76+0.45,"chunk":floori(left/64),"architecture":THEMES[order-1],"surface_top":top})
 	for index in range(8):
-		var start := spawn_x+distance*float(index)/8.0
-		var end := spawn_x+distance*float(index+1)/8.0
-		var district_theme: String = THEMES[order-1]
-		districts.append({"id":"%s.district.%02d" % [prefix,index],"index":index,"name":STAGE_DISTRICTS[order-1][index],"start":start,"end":end,"theme":district_theme})
-		var landmark_x := _safe_floor_x(start+12.0,pits)
-		landmarks.append({"id":"%s.landmark.%02d" % [prefix,index],"kind":"district_gate","pos":[landmark_x,0.0,-4.5],"theme":district_theme})
-		# Checkpoint no começo de cada distrito (menos o primeiro, que é o spawn), em chão
-		# firme: fora de vãos e degraus e longe da patrulha dos Cactus.
-		if index > 0:
-			checkpoints.append({"id":"%s.checkpoint.%02d" % [prefix,index],"district":index,"pos":[_checkpoint_x(start+4.0,pits,platforms,enemies),0.0,0.0]})
-	# Poderes são apresentados em piso seguro, com identidade persistente por item.
-	for kind in ["rupture", "amber", "dash"]:
-		var unlock_order: int = {"rupture":2,"amber":4,"dash":6}[kind]
-		if order < unlock_order: continue
-		for slot in range(6):
-			var offset: float = {"rupture":0.0,"amber":5.0,"dash":10.0}[kind]
-			var x := spawn_x+24.0+slot*distance/7.0+offset
-			for attempt in range(40):
-				x = _checkpoint_x(x,pits,platforms,enemies)
-				var occupied := false
-				for item: Dictionary in pickups+checkpoints:
-					if absf(float(item.pos[0])-x) < 2.5: occupied = true
-				if not occupied: break
-				x += 3.0
-			pickups.append({"id":"%s.%s.%d" % [prefix,kind,slot],"kind":kind,"pos":[x,0.55,0.0]})
-	# Somente peças explícitas de piso podem romper; nunca as que sustentam itens/checkpoints.
+		var module := index*sector_modules
+		var floor: Dictionary = surfaces[module]
+		var start := spawn_x+distance*index/8.0
+		districts.append({"id":"%s.district.%d" % [prefix,index],"name":STAGE_DISTRICTS[order-1][index],"start":start,"end":spawn_x+distance*(index+1)/8.0,"theme":THEMES[order-1]})
+		landmarks.append({"id":"%s.landmark.%d" % [prefix,index],"kind":"district_gate","pos":[float(floor.left)+1.0,float(floor.height),-5.0],"theme":THEMES[order-1]})
+		if index > 0: checkpoints.append({"id":"%s.checkpoint.%d" % [prefix,index],"district":index,"pos":[float(floor.left)+1.3,float(floor.height),0]})
 	for platform: Dictionary in platforms:
-		if platform.kind != "ground": continue
-		var x := float(platform.pos[0])
-		var protected := false
-		for item: Dictionary in pickups+checkpoints+geysers:
-			if absf(float(item.pos[0])-x) < 3.5: protected = true
-		for obstacle: Dictionary in platforms:
-			if obstacle.kind != "ground" and absf(float(obstacle.pos[0])-x) < float(obstacle.size[0])*0.5+2.0: protected = true
-		platform.breakable = not protected and x > spawn_x+30 and x < goal_x-30
-	# Rupturas são peças curtas independentes, não um chunk inteiro de 24m.
-	var partitioned: Array = []
-	for platform: Dictionary in platforms:
-		if not platform.get("breakable",false):
-			partitioned.append(platform)
-			continue
-		var center := float(platform.pos[0])
-		for piece in range(3):
-			var part := platform.duplicate(true)
-			var segment_left: float = [float(platform.span_start),center-1.5,center+1.5][piece]
-			var segment_right: float = [center-1.5,center+1.5,float(platform.span_end)][piece]
-			part.id = str(platform.id)+".segment%d" % piece
-			part.pos[0] = (segment_left+segment_right)*0.5
-			part.size[0] = segment_right-segment_left
-			part.span_start = segment_left
-			part.span_end = segment_right
-			part.breakable = piece == 1
-			partitioned.append(part)
-	platforms = partitioned
-	var carried_distance := 0.0
-	for hole: Dictionary in pits:
-		if hole.get("ferry",false): carried_distance += float(hole.width)+2.0
-	stage.merge({
-		"protagonist":"el_fuego","player_spawn":[spawn_x,1.0,0.0],
-		"length":distance,"total_length":distance,"minimum_seconds":requested_seconds,
-		"minimum_traversal_seconds":(distance-1.0-carried_distance)/MAX_HORIZONTAL_SPEED,
-		"transport_allowance":carried_distance,
-		"maximum_horizontal_speed":MAX_HORIZONTAL_SPEED,
-		"platforms":platforms,"enemies":enemies,"pickups":pickups,"holes":pits,
-		"signs":signs,"districts":districts,"landmarks":landmarks,
-		"checkpoints":checkpoints,"geysers":geysers,"storms":[_storm(order,spawn_x,distance)],"goal":{"pos":[goal_x,1.5,0.0]},
-		"kill_plane_y":-8.0,"boss_id":null,"legacy_placeholder_visuals":false,
-		"bounds":{"min_x":spawn_x-8.0,"max_x":goal_x+10.0},
-		"next_scene":"res://scenes/desert/phase_%02d.tscn" % (order+1),
-		"reach":{"max_gap":3.5,"single_jump_max_step_top":1.3,"double_jump_max_step_top":2.7},
-	},true)
+		if not platform.get("breakable",false): continue
+		for item: Dictionary in pickups+checkpoints:
+			if float(item.pos[0])>=float(platform.span_start)-0.8 and float(item.pos[0])<=float(platform.span_end)+0.8: platform.breakable=false
+	# Mantém Malagueta e seu modelo/animações originais no fim do percurso10.
+	# Abastecimento de arena ocupa toda a laje final, não um item sobreposto ao chefe.
+	if order == 10:
+		var arena: Dictionary = surfaces[-1]
+		pickups = pickups.filter(func(item: Dictionary) -> bool: return float(item.pos[0]) < float(arena.left))
+		for index in range(8):
+			pickups.append({"id":"p10.arena.attack.%d" % index,"kind":"attack","pos":[float(arena.left)+1.0+index*3.4,float(arena.height),0],"surface":47})
+	var goal_top: float = surfaces[-1].height
+	stage.merge({"protagonist":"el_fuego","player_spawn":[spawn_x,_height(order,0)+0.1,0],"length":distance,"total_length":distance,"minimum_seconds":180.0,"minimum_traversal_seconds":(distance-1)/MAX_HORIZONTAL_SPEED,"transport_allowance":0.0,"maximum_horizontal_speed":MAX_HORIZONTAL_SPEED,"platforms":platforms,"enemies":enemies,"pickups":pickups,"holes":holes,"signs":[],"districts":districts,"landmarks":landmarks,"checkpoints":checkpoints,"geysers":[],"storms":[],"surfaces":surfaces,"goal":{"pos":[goal_x,goal_top+1.5,0]},"kill_plane_y":-10.0 if order == 2 else -12.0,"boss_id":"malagueta" if order == 10 else null,"legacy_placeholder_visuals":false,"bounds":{"min_x":origin,"max_x":goal_x+10.0},"next_scene":"res://scenes/desert/phase_%02d.tscn" % (order+1) if order < 10 else "","reach":{"max_gap":3.2,"single_jump_max_step_top":0.65,"double_jump_max_step_top":1.3}},true)
+	if order == 10:
+		stage.boss = {"id":"p10.malagueta","pos":[goal_x-4.0,goal_top+0.02,0],"patrol":[goal_x-8.0,goal_x+8.0]}
 	return stage
 
-static func _ground(platforms: Array, prefix: String, span: int, left: float, right: float) -> void:
-	var pieces := maxi(1,ceili((right-left)/CHUNK_LENGTH))
-	for piece in range(pieces):
-		var x0 := lerpf(left,right,float(piece)/pieces)
-		var x1 := lerpf(left,right,float(piece+1)/pieces)
-		platforms.append({
-			"id":"%s.ground.%02d.%02d" % [prefix,span,piece],
-			"kind":"ground","pos":[(x0+x1)*0.5,-0.5,0.0],"size":[x1-x0,1.0,4.0],
-			"span_start":x0,"span_end":x1,"chunk":floori(((x0+x1)*0.5)/CHUNK_LENGTH),
-		})
+static func _height(order: int,index: int) -> float:
+	var pattern: float = [0.0,0.4,0.8,0.3,0.7,0.2][index%6]
+	match order:
+		2: return 8.0+pattern
+		4: return 3.5+pattern*0.6
+		6: return -1.8+pattern
+		7: return pattern*1.2
+		10: return -2.0+pattern
+	return pattern*0.5
 
-static func _ledge(platforms: Array, prefix: String, span: int, index: int, x: float, width: float, height: float) -> void:
-	platforms.append({
-		"id":"%s.ledge.%02d.%02d" % [prefix,span,index],
-		"kind":"ledge_high" if height > 1.5 else "ledge",
-		"pos":[x,height*0.5,0.0],"size":[width,height,3.0],
-		"span_start":x-width*0.5,"span_end":x+width*0.5,"chunk":floori(x/CHUNK_LENGTH),
-	})
-
-static func _checkpoint_x(value: float, holes: Array, platforms: Array, enemies: Array) -> float:
-	var x := value
-	for attempt in range(40):
-		var blocked := false
-		for hole: Dictionary in holes:
-			if x >= float(hole.start)-3.0 and x <= float(hole.end)+3.0: blocked = true
-		for platform: Dictionary in platforms:
-			var margin := 6.0 if platform.kind == "geyser_wall" else 1.5
-			if platform.kind != "ground" and absf(x-float(platform.pos[0])) <= float(platform.size[0])*0.5+margin: blocked = true
-		for enemy: Dictionary in enemies:
-			if x >= float(enemy.patrol[0])-7.0 and x <= float(enemy.patrol[1])+7.0: blocked = true
-		if not blocked: return x
-		x += 2.0
-	return x
-
-## Trecho de tempestade de areia: 70m dentro de um distrito do meio (varia por fase).
-static func _storm(order: int, spawn_x: float, distance: float) -> Dictionary:
-	var district := 2 + (order % 4)
-	var start := spawn_x + distance * district / 8.0 + 12.0
-	return {"id": "p%02d.storm" % order, "start": start, "end": start + 70.0}
-
-static func _safe_floor_x(value: float, holes: Array) -> float:
-	for hole: Dictionary in holes:
-		if value >= float(hole.start)-2.0 and value <= float(hole.end)+2.0:
-			return float(hole.end)+4.0
-	return value
+static func floor_at(stage: Dictionary,x: float) -> Dictionary:
+	for surface: Dictionary in stage.surfaces:
+		if x >= float(surface.left) and x <= float(surface.right): return surface
+	return {}

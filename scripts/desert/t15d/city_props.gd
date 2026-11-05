@@ -5,6 +5,7 @@ extends Node3D
 ## pit_left/pit_right somente nas extremidades que realmente tocam um buraco.
 const BUILDING_SPACING := 19.0
 var _builders := {}
+static var _shared_materials := {}
 var _materials := {}
 var _order := 1
 var _spacing := 19.0
@@ -16,8 +17,8 @@ var lantern_count := 0
 
 ## A mesma geometria pode ser criada por etapas sem perder o agrupamento por material.
 func prepare_build(platforms: Array, order: int, length := 1452.0, start := -8.0) -> Array[Callable]:
-	_order = clampi(order,1,9)
-	_spacing = [11.0,9.0,10.0,12.0,14.0,12.0,18.0,20.0,18.0][_order-1]
+	_order = clampi(order,1,10)
+	_spacing = [11.0,10.0,9.0,14.0,12.0,18.0,22.0,13.0,22.0,18.0][_order-1]
 	_length = maxf(length,1.0)
 	_start = start
 	var tasks: Array[Callable] = []
@@ -47,16 +48,16 @@ func _build_slot(slot: int, left: float, right: float, top: float) -> void:
 	rng.seed = absi(_order*1000003+slot*9176+3059)
 	var width := rng.randf_range(3.8,5.1)
 	if x-width*0.5 < left+0.15 or x+width*0.5 > right-0.15: return
-	var origin := Vector3(x,top-(3.0 if _order == 3 else 0.0),rng.randf_range(-6.2,-5.3))
-	if _order >= 8: _warehouse(origin,width)
-	elif _order != 7: _building(origin,width,rng)
+	var origin := Vector3(x,top-(2.0 if _order == 2 else 0.0),rng.randf_range(-6.2,-5.3))
+	if _order in [7,9,10]: _warehouse(origin,width)
+	elif _order != 6: _building(origin,width,rng)
 	_signature(Vector3(x,origin.y,-5.0),slot)
 	building_count += 1
 
 func _building(origin: Vector3, width: float, rng: RandomNumberGenerator) -> void:
 	var district := int((_order-1)/3.0)
 	var variant := rng.randi_range(0,3)
-	var height := rng.randf_range(2.45,3.1)+float(district)*0.23
+	var height := rng.randf_range(3.6,5.5)+float(district)*0.23
 	var depth := rng.randf_range(1.1,1.6)
 	var front := origin.z+depth*0.5
 	_box(origin+Vector3(0,height*0.5,0),Vector3(width,height,depth),"stone")
@@ -113,7 +114,7 @@ func _building(origin: Vector3, width: float, rng: RandomNumberGenerator) -> voi
 			_arch_frame(niche,0.82,1.56,0.065)
 			_arch_patch(niche,0.82,1.56,"recess")
 
-	if _order != 3 and variant%2 == 0: _banner(Vector3(origin.x+width*0.28,origin.y+height*0.53,front+0.1))
+	if _order != 2 and variant%2 == 0: _banner(Vector3(origin.x+width*0.28,origin.y+height*0.53,front+0.1))
 
 func _awning(origin: Vector3, width: float, key: String) -> void:
 	# O toldo avança apenas0.65m: a frente continua em z<-3.5.
@@ -236,50 +237,50 @@ func _flush() -> void:
 	_builders.clear()
 
 func _material(key: String) -> StandardMaterial3D:
-	if _materials.has(key): return _materials[key]
+	if _shared_materials.has(key): return _shared_materials[key]
 	var mat := StandardMaterial3D.new()
-	var colors := {"stone":"#927e74","trim":"#ae9480","recess":"#354051","dome":"#9d292e","metal":"#344054","cloth":"#a52c30","cloth_alt":"#7e252b","window":"#d5a667","leaf":"#396d50","water":"#286f85"}
-	mat.albedo_color = Color(colors.get(key,"#72849a")).srgb_to_linear()
+	var colors := {"stone":"#b4acbb","trim":"#c8b79b","recess":"#354051","dome":"#9d292e","metal":"#344054","cloth":"#6b1018","cloth_alt":"#59151c","window":"#d5a667","leaf":"#396d50","water":"#286f85","wood":"#816044","crystal":"#e9a84e"}
+	mat.albedo_color = Color(colors.get(key,"#72849a"))
 	mat.roughness = 0.15 if key == "water" else 0.92
 	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 	if key in ["stone","trim","dome"]:
-		mat.albedo_texture = preload("res://assets/desert/phase01/sandstone.png")
+		mat.albedo_texture = load("res://assets/desert/modular/stone_masonry.res") if ResourceLoader.exists("res://assets/desert/modular/stone_masonry.res") else preload("res://assets/desert/phase01/sandstone.png")
 		mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	if key == "window":
+	if key in ["window","crystal"]:
 		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		mat.albedo_color = Color("#ca9554").srgb_to_linear()
 		mat.emission_enabled = true
 		mat.emission = Color("#c88a42").srgb_to_linear()
 		mat.emission_energy_multiplier = 0.18
-	_materials[key] = mat
+	_shared_materials[key] = mat
 	return mat
 
 ## Marcos próximos específicos de cada rota, agrupados nas malhas já existentes.
 func _signature(origin: Vector3, slot: int) -> void:
 	var district := clampi(int((origin.x-_start)/_length*8.0),0,7)
 	match _order:
-		1,4:
+		1,8:
 			if district%2 == 0:
 				_arch_frame(origin,3.3,4.5,0.25)
 				_box(origin+Vector3(-1.8,2.4,0),Vector3(0.8,4.8,0.8),"stone")
-		2:
+		3:
 			_awning(origin+Vector3(0,2.7,0.5),4.8,"cloth")
 			for side in [-1,1]: _box(origin+Vector3(side*1.6,0.4,0.7),Vector3(0.9,0.8,0.9),"metal")
-		3:
+		2:
 			_box(origin+Vector3(0,3.8,0),Vector3(5.4,0.25,1.5),"trim")
 			_awning(origin+Vector3(0,3.6,0.7),3.0,"cloth")
-		5:
+		4:
 			_arch_frame(origin,4.6,4.7,0.3)
 			_box(origin+Vector3(0,4.8,0),Vector3(5.0,0.35,0.8),"stone")
-		6:
+		5:
 			_box(origin+Vector3(0,0.025,-0.4),Vector3(6,0.05,1.2),"water")
 			for side in [-1,1]:
 				_box(origin+Vector3(side*2,1.5,0),Vector3(0.25,3.0,0.25),"metal")
 				_awning(origin+Vector3(side*2,3.0,0),2.3,"leaf")
-		7:
+		6:
 			_box(origin+Vector3(0,0.65,0),Vector3(2.8,1.3,1.2),"stone")
 			_arch_frame(origin+Vector3(1,0,0),1.8,2.8,0.16)
-		8,9:
+		7,9,10:
 			for side in [-1.0,1.0]:
 				_box(origin+Vector3(0,0.05,side*0.6),Vector3(18,0.06,0.06),"metal")
 			_box(origin+Vector3(-2,2.5,0),Vector3(0.22,5,0.25),"metal")

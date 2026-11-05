@@ -270,8 +270,8 @@ func _separate_actors() -> void:
 	for enemy: Node3D in get_tree().get_nodes_in_group("enemies"):
 		if absf(enemy.global_position.y-global_position.y) > 1.15: continue
 		var dx := global_position.x-enemy.global_position.x
-		if absf(dx) <= 1.08:
-			take_damage(1,enemy.global_position.x)
+		# Contato separa corpos; o dano só vale na janela real do ataque inimigo.
+		# O contato antigo ignorava a preparação do golpe e até machucava no Âmbar.
 		if absf(dx) >= 1.05: continue
 		var side := signf(dx) if absf(dx) > 0.01 else -facing
 		var correction := Vector3(side*1.05-dx,0,0)

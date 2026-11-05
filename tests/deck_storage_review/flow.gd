@@ -51,11 +51,31 @@ func _run() -> void:
 	check((await transport.decide(fake.PUBLISHED,true,"")).code=="forbidden","chamada direta sem permissão não aprova")
 	fake.reviewer=true
 	check((await transport.pending()).data.items.size()==1,"fila carrega para conta autorizada")
-	check((await transport.open_deck(fake.PUBLISHED)).ok,"detalhe usa o UUID do deck existente")
+	var detail: Dictionary=await transport.open_deck(fake.PUBLISHED)
+	check(detail.ok,"detalhe usa o UUID do deck existente")
+	var path := str(detail.data.cards[0].preview_library_path)
+	var reads := fake.asset_reads
+	var local := await transport.image(path)
+	await transport.image(path)
+	check(not local.is_empty() and fake.asset_reads==reads+1,"reaproveita uma prévia somente dentro da mesma abertura")
+	var old_url: String=fake.asset_urls.back()
+	var changed := Image.create(100,140,false,Image.FORMAT_RGB8)
+	changed.fill(Color.ORANGE_RED)
+	fake.files[path]=changed.save_png_to_buffer()
+	await transport.open_deck(fake.PUBLISHED)
+	local=await transport.image(path)
+	check(not local.is_empty() and Image.load_from_file(local).get_pixel(0,0).is_equal_approx(Color.ORANGE_RED),"reabrir busca a imagem corrigida no mesmo caminho")
+	check(fake.asset_urls.back()!=old_url and str(fake.asset_urls.back()).contains("?qse_review="),"nova abertura também muda a URL para invalidar cache HTTP do navegador")
+	fake.break_preview=true
+	await transport.open_deck(fake.PUBLISHED)
+	check((await transport.image(path)).is_empty(),"falha de leitura não reutiliza prévia antiga como se fosse atual")
+	fake.break_preview=false
 	var original := "%s/%s/00000000-0000-4000-8000-000000000001_original.png" % [fake.OTHER,fake.PUBLISHED]
 	check((await transport.image(original)).is_empty(),"tela de revisão não solicita o original")
 	check((await transport.image("../segredo.png")).is_empty(),"caminhos fora do detalhe são recusados")
 	var view := Review.new()
+	fake.null_nickname=true
+	fake.cover_from_card=true
 	view.setup(transport)
 	root.add_child(view)
 	await settle(20)
@@ -65,6 +85,8 @@ func _run() -> void:
 	var reject: Button=view.find_child("RejectDeck",true,false)
 	var reason: LineEdit=view.find_child("DeckReviewReason",true,false)
 	check(approve!=null and not approve.disabled and reject!=null,"revisor vê dois recortes e ações nativas")
+	check(view.find_child("DeckReviewAuthor",true,false).text=="Enviado por criador sem nickname","nickname nulo tem rótulo legível sem criar ou alterar o perfil")
+	check(not approve.disabled,"capa automática ou escolhida usa a prévia retornada pelo backend")
 	await shot("revisao")
 	var scroll: ScrollContainer=view.find_children("*","ScrollContainer",true,false)[0]
 	scroll.scroll_vertical=int(scroll.get_v_scroll_bar().max_value)
@@ -95,6 +117,14 @@ func _run() -> void:
 	await view._open(fake.PUBLISHED)
 	check(view.find_child("ApproveDeck",true,false).disabled and not view.find_child("RejectDeck",true,false).disabled,"prévia incompleta bloqueia aprovação e permite reprovar")
 	fake.missing_preview=false
+	await view._open(fake.PUBLISHED)
+	reason=view.find_child("DeckReviewReason",true,false)
+	fake.review_status="draft"
+	await view._decide(fake.PUBLISHED,true,reason)
+	await settle()
+	check(fake.decisions==2 and view.find_child("ApproveDeck",true,false)==null and view._notice.text.contains("mudou"),"retirada pelo autor antes da decisão atualiza a fila sem aprovar")
+	await view._open(fake.PUBLISHED)
+	check(view._notice.text.contains("não está mais na fila"),"detalhe retirado mostra retorno deck_not_found do backend")
 	view.queue_free()
 	await settle()
 	fake.reviewer=false

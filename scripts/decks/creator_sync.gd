@@ -71,6 +71,13 @@ func _rest(table: String) -> String:
 	return "/rest/v1/" + table
 
 
+static func _content_hash(bytes: PackedByteArray) -> String:
+	var hash := HashingContext.new()
+	hash.start(HashingContext.HASH_SHA256)
+	hash.update(bytes)
+	return hash.finish().hex_encode()
+
+
 ## Envia um rascunho (deck, imagens, cartas). Atualiza e salva o rascunho local a cada
 ## etapa confirmada. Em falha, marca sync_state = "error" e mantém tudo local.
 func push(draft: Dictionary) -> Dictionary:
@@ -103,12 +110,16 @@ func push(draft: Dictionary) -> Dictionary:
 		if not str(card.get("image_file", "")).is_empty():
 			var extension := str(card.image_file).get_extension().to_lower()
 			image_path = storage_path(deck_id, card_id, "original." + extension)
-			if str(card.get("uploaded_original", "")) != image_path:
-				result = await _upload(image_path, store.file_bytes(str(draft.id), str(card.image_file)), EXT_TYPES.get(extension, "image/png"))
+			var original := store.file_bytes(str(draft.id), str(card.image_file))
+			if original.is_empty(): return _failed(draft,ServiceResult.failure("missing_image"))
+			var image_hash := _content_hash(original)
+			if str(card.get("uploaded_original", "")) != image_path or str(card.get("uploaded_original_hash",""))!=image_hash:
+				result = await _upload(image_path, original, EXT_TYPES.get(extension, "image/png"))
 				if not result.ok: return _failed(draft, result)
 				card.uploaded_original = image_path
+				card.uploaded_original_hash = image_hash
 				store.save(draft)
-			var crop_key := JSON.stringify(card.get("crops", {}))
+			var crop_key := image_hash+":"+JSON.stringify(card.get("crops", {}))
 			if str(card.get("uploaded_crops", "")) != crop_key:
 				for format: String in ["library", "duel"]:
 					var bytes := store.preview_bytes(str(draft.id), card, format)
@@ -230,9 +241,10 @@ func pull() -> Dictionary:
 					card.uploaded_original = image_path
 					var image := Image.new()
 					var bytes: PackedByteArray = download.data.bytes
+					card.uploaded_original_hash=_content_hash(bytes)
 					if (image.load_png_from_buffer(bytes) if extension == "png" else (image.load_webp_from_buffer(bytes) if extension == "webp" else image.load_jpg_from_buffer(bytes))) == OK:
 						store.store_previews(str(draft.id), card, image)
-						card.uploaded_crops = JSON.stringify(card.crops)
+						card.uploaded_crops = str(card.uploaded_original_hash)+":"+JSON.stringify(card.crops)
 			cards.append(card)
 		draft.cards = cards
 		if COVER_COLUMNS and deck.get("cover_mode") is String:

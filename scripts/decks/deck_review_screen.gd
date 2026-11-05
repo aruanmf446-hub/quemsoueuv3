@@ -92,13 +92,19 @@ func _open(id: String) -> void:
 	if not is_inside_tree(): return
 	if not result.ok:
 		_busy=false
-		_notice.text=Service.message(str(result.code))
+		var code := str(result.code)
+		if code in ["invalid_status","deck_not_found"]: await _list()
+		_notice.text=Service.message(code)
 		return
 	PlayerUI.clear(_body)
 	_body.add_child(PlayerUI.button("Voltar à fila",_list))
 	var deck: Dictionary=result.data.deck
 	_body.add_child(PlayerUI.label(str(deck.name),28,PlayerUI.GOLD))
-	_body.add_child(PlayerUI.label("Enviado por "+str(deck.creator.get("nickname","")),18))
+	var nickname: Variant=deck.creator.get("nickname")
+	var author := str(nickname).strip_edges() if nickname is String else ""
+	var author_label := PlayerUI.label("Enviado por "+(author if not author.is_empty() else "criador sem nickname"),18)
+	author_label.name="DeckReviewAuthor"
+	_body.add_child(author_label)
 	var description := PlayerUI.label(str(deck.get("description","")),18,PlayerUI.MUTED)
 	description.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	_body.add_child(description)
@@ -143,7 +149,9 @@ func _decide(id: String,approved: bool,reason: LineEdit) -> void:
 	if not is_inside_tree(): return
 	_busy=false
 	if not result.ok:
-		_notice.text=Service.message(str(result.code))
+		var code := str(result.code)
+		if code in ["invalid_status","deck_not_found"]: await _list()
+		_notice.text=Service.message(code)
 		return
 	await _list()
 	_notice.text="Deck aprovado para a Comunidade." if approved else "Reprovado. O autor verá o motivo em Meus Decks."

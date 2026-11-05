@@ -7,6 +7,7 @@ var _client: SupabaseClient
 var _owner := ""
 var _generation := 0
 var _paths := {}
+var _image_revision := ""
 
 func _init() -> void:
 	_services=PlayerServices.current
@@ -22,8 +23,11 @@ static func message(code: String) -> String:
 	match code:
 		"backend_pending": return "A revisão pelo jogo ainda precisa ser habilitada no Supabase. Seus decks e envios continuam salvos."
 		"forbidden": return "Só uma conta autorizada pela administração pode revisar decks. Acompanhe seus envios em Meus Decks."
-		"not_authenticated", "session_changed": return "Entre novamente na sua conta para continuar."
+		"not_authenticated", "unauthorized", "session_changed": return "Entre novamente na sua conta para continuar."
 		"invalid_status": return "Este deck já mudou de situação. Atualize a fila."
+		"deck_not_found": return "Este deck não está mais na fila de revisão. Atualize a fila."
+		"min_cards", "invalid_card_count": return "O deck precisa de 5 a 30 cartas para ser aprovado."
+		"missing_images_or_previews": return "O servidor encontrou imagens ou prévias pendentes. Atualize o deck antes de aprovar."
 		"invalid_reason": return "Informe o motivo da reprovação, de 3 a 280 caracteres."
 		"invalid_image": return "Não foi possível abrir todas as prévias. Atualize o deck antes de aprovar."
 	return "Não foi possível concluir agora. Atualize a fila e tente novamente."
@@ -53,6 +57,7 @@ func pending() -> Dictionary:
 
 func open_deck(id: String) -> Dictionary:
 	_paths.clear()
+	_image_revision=str(int(Time.get_unix_time_from_system()*1000000))+"-"+str(Time.get_ticks_usec())
 	if not CreatorSync.is_uuid(id): return ServiceResult.failure("invalid_contract")
 	var result := await _rpc("qse_deck_review_detail",{"p_deck":id})
 	if not result.ok: return result
@@ -76,8 +81,10 @@ static func _valid_path(path: String,deck_id: String,file: String) -> bool:
 func image(path: String) -> String:
 	if not available() or not _paths.has(path): return ""
 	var local := OwnerStorage.path(OwnerStorage.safe(_owner),"deck_review/"+path.sha256_text()+".png")
-	if FileAccess.file_exists(local): return local
-	var result := await _client.send("/storage/v1/object/authenticated/"+BUCKET+"/"+path,HTTPClient.METHOD_GET,null,PackedStringArray(),PackedByteArray(),"application/octet-stream",60.0)
+	# O autor pode corrigir e reenviar usando o mesmo caminho. Reabrir o detalhe
+	# inicia uma leitura nova; só reaproveitamos a imagem dentro desta abertura.
+	if _paths[path] is String and FileAccess.file_exists(local): return local
+	var result := await _client.send("/storage/v1/object/authenticated/"+BUCKET+"/"+path+"?qse_review="+_image_revision,HTTPClient.METHOD_GET,null,PackedStringArray(["Cache-Control: no-cache"]),PackedByteArray(),"application/octet-stream",60.0)
 	if not available() or not result.ok or not result.data is Dictionary: return ""
 	var bytes: PackedByteArray=result.data.get("bytes",PackedByteArray())
 	if bytes.is_empty() or bytes.size()>4*1024*1024: return ""
@@ -87,6 +94,7 @@ func image(path: String) -> String:
 	if file==null: return ""
 	file.store_buffer(bytes)
 	file.close()
+	_paths[path]=local
 	return local
 
 func decide(id: String,approved: bool,reason: String) -> Dictionary:

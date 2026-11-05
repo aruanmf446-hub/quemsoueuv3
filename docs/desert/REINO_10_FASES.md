@@ -108,3 +108,14 @@ agrupadas nos materiais existentes, sem novas colisões ou mudanças de percurso
 O fundo de dunas/cidade e as bandeiras continuam ativos. Capturas atualizadas em
 `evidence/city-desert`. Ainda não equivale à integração completa das fachadas
 ilustradas aprovadas.
+
+### Fachadas ilustradas modulares
+
+As duas primeiras fases agora usam uma casa ilustrada individual, gerada com
+referência à arte aprovada. O material tem alfa, mipmaps e proporção preservada.
+O casario usa Sprite3D apoiado em fundações; fachadas sob os telhados usam recortes
+AtlasTexture alinhados no mundo. Cada recorte pertence ao próprio piso, não
+atravessa buracos e some junto à peça rompida. Não é um plano de fase inteira
+e não substitui os personagens, plataformas, corpos de colisão ou perseguição.
+O portão monumental e demais estruturas próximas continuam3D. Falta ampliar
+a variedade de módulos e validar o resultado visual com o dono.

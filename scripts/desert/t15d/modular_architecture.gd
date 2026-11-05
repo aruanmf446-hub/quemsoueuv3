@@ -85,6 +85,7 @@ func build_surface(platform: Dictionary, order: int) -> void:
 
 func _facade(left: float,right: float,top: float,bottom: float) -> void:
 	_box(Vector3((left+right)*0.5,(top+bottom)*0.5,-0.25),Vector3(right-left,top-bottom,3.4),"stone")
+	if _painted_facade(left,right,top+0.25,1.65): return
 	for x in range(ceili((left+0.4)/2.5),floori((right-0.4)/2.5)+1):
 		for row in range(3):
 			var at := Vector3(x*2.5,top-2.1-row*2.1,1.48)

@@ -4,6 +4,7 @@ extends Node3D
 ## Bordas artificiais de chunk NÃO recebem lanternas: para isso o chamador marca
 ## pit_left/pit_right somente nas extremidades que realmente tocam um buraco.
 const BUILDING_SPACING := 19.0
+static var _house_texture: Texture2D
 var _builders := {}
 static var _shared_materials := {}
 var _materials := {}
@@ -51,10 +52,11 @@ func _build_slot(slot: int, left: float, right: float, top: float) -> void:
 	var origin := Vector3(x,top-(2.0 if _order == 2 else 0.0),rng.randf_range(-6.2,-5.3))
 	if _order in [7,9,10]: _warehouse(origin,width)
 	elif _order != 6: _building(origin,width,rng)
-	_signature(Vector3(x,origin.y,-5.0),slot)
+	if _order not in [1,2]: _signature(Vector3(x,origin.y,-5.0),slot)
 	building_count += 1
 
 func _building(origin: Vector3, width: float, rng: RandomNumberGenerator) -> void:
+	if _order in [1,2] and _painted_house(origin,width): return
 	var district := int((_order-1)/3.0)
 	var variant := rng.randi_range(0,3)
 	var height := rng.randf_range(3.6,5.5)+float(district)*0.23
@@ -117,6 +119,50 @@ func _building(origin: Vector3, width: float, rng: RandomNumberGenerator) -> voi
 			_arch_patch(niche,0.82,1.56,"recess")
 
 	if _order != 2 and variant%2 == 0: _banner(Vector3(origin.x+width*0.28,origin.y+height*0.53,front+0.1))
+
+func _house_art() -> Texture2D:
+	if _house_texture == null and ResourceLoader.exists("res://assets/desert/modular/capital_house.res"):
+		_house_texture=load("res://assets/desert/modular/capital_house.res")
+	return _house_texture
+
+func _house_sprite(texture: Texture2D,at: Vector3,pixels: float) -> Sprite3D:
+	var sprite := Sprite3D.new()
+	sprite.name="CapitalHouseArt"
+	sprite.texture=texture
+	sprite.pixel_size=pixels
+	sprite.position=at
+	sprite.shaded=false
+	sprite.modulate=Color(0.82,0.84,0.94)
+	sprite.texture_filter=BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	sprite.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(sprite)
+	return sprite
+
+func _painted_house(origin: Vector3,width: float) -> bool:
+	var texture := _house_art()
+	if texture == null: return false
+	var pixels := width/texture.get_width()
+	_box(origin+Vector3(0,-0.45,0),Vector3(width,0.9,1.4),"stone")
+	_house_sprite(texture,origin+Vector3.UP*texture.get_height()*pixels*0.5,pixels)
+	return true
+
+func _painted_facade(left: float,right: float,top: float,z: float) -> bool:
+	var texture := _house_art()
+	if texture == null: return false
+	# Um recorte por peça física: não atravessa vãos nem cobre piso rompido.
+	# Atlas mantém proporção e coordenada mundial mesmo com o piso dividido em3.
+	var tile_width := 6.0
+	var pixels := tile_width/texture.get_width()
+	for tile in range(floori(left/tile_width),ceili(right/tile_width)):
+		var a := maxf(left,tile*tile_width)
+		var b := minf(right,(tile+1)*tile_width)
+		if b-a < 0.01: continue
+		var slice := AtlasTexture.new()
+		slice.atlas=texture
+		slice.region=Rect2((a-tile*tile_width)/pixels,0,(b-a)/pixels,texture.get_height())
+		slice.filter_clip=true
+		_house_sprite(slice,Vector3((a+b)*0.5,top-texture.get_height()*pixels*0.5,z),pixels)
+	return true
 
 func _city_door(at: Vector3,width: float,height: float) -> void:
 	_arch_patch(at,width,height,"wood")

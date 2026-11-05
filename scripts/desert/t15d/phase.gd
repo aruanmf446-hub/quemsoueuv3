@@ -594,14 +594,16 @@ func _follow_camera(delta: float) -> void:
 	# Mostrar fachadas e arcos sob a rota, mantendo antecipação e acompanhamento do salto.
 	if _order in [2,4,7]: floor_y=base+(0.20 if UIScale.is_iphone() else 0.50)
 	var target := Vector3(clampf(_player.position.x+lead,float(_phase.player_spawn[0]),float(_phase.goal.pos[0])),maxf(floor_y,_player.position.y+1.4-_camera.size*0.5+0.55),0)
-	var destination := target+Vector3(0,1,14)
+	# Só a fase 2 inclina mais para revelar a superfície dos telhados; mira e alcance iguais.
+	var camera_drop := 2.2 if _order == 2 else 1.0
+	var destination := target+Vector3(0,camera_drop,14)
 	_camera.position = _camera.position.lerp(destination,1.0-exp(-8*delta))
 	# Tremida curta no golpe e no dano; some em ~0,1s.
 	if _shake > 0.0:
 		_shake = maxf(_shake-delta,0.0)
 		var amount := _shake*0.6
 		_camera.position += Vector3(randf_range(-amount,amount),randf_range(-amount,amount),0)
-	_camera.look_at(Vector3(_camera.position.x,_camera.position.y-1,0),Vector3.UP)
+	_camera.look_at(Vector3(_camera.position.x,_camera.position.y-camera_drop,0),Vector3.UP)
 	_scenery.follow(_camera,_player.position.x)
 func _build_hud() -> void:
 	_hud = preload("res://scripts/desert/t15d/campaign_hud.gd").new()

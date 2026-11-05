@@ -31,6 +31,14 @@ func build_surface(platform: Dictionary, order: int) -> void:
 			# Fachada desce8m: janelas/portas abaixo, topo inteiro jogável, sem rua acessível.
 			_facade(left,right,top-0.5,top-9.0)
 			_box(Vector3(x,top+0.14,-1.95),Vector3(width,0.28,0.22),"trim")
+			# Cobertura e cornija sobre o mesmo piso físico: leitura de telhado, não rua.
+			_box(Vector3(x,top-0.025,0),Vector3(width,0.05,3.98),"roof")
+			_box(Vector3(x,top-0.12,2.05),Vector3(width,0.20,0.23),"roof")
+			for seam in range(ceili(left/6.0),floori(right/6.0)+1):
+				_box(Vector3(seam*6.0,top+0.006,0),Vector3(0.045,0.012,3.95),"trim")
+			for edge in [["pit_left",left+0.17],["pit_right",right-0.17]]:
+				if platform.get(edge[0],false):
+					_box(Vector3(float(edge[1]),top+0.30,-1.8),Vector3(0.30,0.60,0.34),"trim")
 		4:
 			_painted_facade(left,right,top-0.18,2.12,"desert_aqueduct",9.0)
 			# O tabuleiro volumétrico e a água animada continuam independentes da arte.

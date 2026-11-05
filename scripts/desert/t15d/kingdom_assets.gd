@@ -45,6 +45,7 @@ static func paths(order: int) -> Array[String]:
 	var ids: Array=PALETTES[order-1].duplicate()
 	for slot: Dictionary in _plan.stages[order-1].slots: ids.append(slot.asset)
 	ids.append_array(composition_ids(order))
+	if order not in [6,10]: ids.append_array(["capital_house","capital_merchant","capital_watchtower","capital_archway"])
 	if order==2: ids.append_array(["capital_house","capital_balcony_house","capital_merchant"])
 	if order==4: ids.append("desert_aqueduct")
 	if order in [7,10]: ids.append("desert_timber_bridge")

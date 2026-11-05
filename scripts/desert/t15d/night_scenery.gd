@@ -3,6 +3,7 @@ extends Node3D
 signal location_changed(place: Dictionary)
 const Layout = preload("res://scripts/desert/t15d/campaign_layout.gd")
 var _panorama: Sprite3D
+var _skyline: Node3D
 var _order := 1
 var _length := 1452.0
 var _start := -8.0
@@ -25,6 +26,9 @@ func _ready() -> void:
 	_panorama.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	_panorama.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(_panorama)
+	_skyline = preload("res://scripts/desert/t15d/capital_skyline.gd").new()
+	_skyline.configure(_order)
+	add_child(_skyline)
 func current_place() -> Dictionary:
 	return {"name":Layout.STAGE_DISTRICTS[_order-1][district],"ambient":Color("#8895be")}
 func follow(camera: Camera3D,x: float) -> void:
@@ -42,3 +46,4 @@ func follow(camera: Camera3D,x: float) -> void:
 	_panorama.position = camera.position-camera.basis.z*48-camera.basis.x*parallax_offset
 	_panorama.position += camera.basis.y*camera.size*0.22
 	_panorama.scale = Vector3.ONE*height/(_panorama.texture.get_height()*0.01)
+	if is_instance_valid(_skyline): _skyline.follow(camera,x,travel)

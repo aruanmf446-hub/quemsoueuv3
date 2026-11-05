@@ -7,23 +7,28 @@ const BUILDING_SPACING := 19.0
 var _builders := {}
 var _materials := {}
 var _order := 1
+var _spacing := 19.0
+var _length := 1452.0
+var _start := -8.0
 var _light_added := false
 var building_count := 0
 var lantern_count := 0
 
 ## A mesma geometria pode ser criada por etapas sem perder o agrupamento por material.
-func prepare_build(platforms: Array, order: int) -> Array[Callable]:
+func prepare_build(platforms: Array, order: int, length := 1452.0, start := -8.0) -> Array[Callable]:
 	_order = clampi(order,1,9)
+	_spacing = [11.0,9.0,10.0,12.0,14.0,12.0,18.0,20.0,18.0][_order-1]
+	_length = maxf(length,1.0)
+	_start = start
 	var tasks: Array[Callable] = []
-	for platform: Dictionary in platforms:
-		if platform.get("kind","") != "ground": continue
+	for platform: Dictionary in _ground_runs(platforms):
 		var p: Array = platform.pos
 		var dimensions: Array = platform.size
 		var left := float(p[0])-float(dimensions[0])*0.5
 		var right := float(p[0])+float(dimensions[0])*0.5
 		var top := float(p[1])+float(dimensions[1])*0.5
-		var first := ceili((left-4.0)/BUILDING_SPACING)
-		var last := floori((right-4.0)/BUILDING_SPACING)
+		var first := ceili((left-4.0)/_spacing)
+		var last := floori((right-4.0)/_spacing)
 		for slot in range(first,last+1):
 			tasks.append(_build_slot.bind(slot,left,right,top))
 		if bool(platform.get("pit_left",false)):
@@ -37,12 +42,15 @@ func build(platforms: Array, order: int) -> void:
 	for task in prepare_build(platforms,order): task.call()
 
 func _build_slot(slot: int, left: float, right: float, top: float) -> void:
-	var x := 4.0+float(slot)*BUILDING_SPACING
+	var x := 4.0+float(slot)*_spacing
 	var rng := RandomNumberGenerator.new()
 	rng.seed = absi(_order*1000003+slot*9176+3059)
 	var width := rng.randf_range(3.8,5.1)
 	if x-width*0.5 < left+0.15 or x+width*0.5 > right-0.15: return
-	_building(Vector3(x,top,rng.randf_range(-6.2,-5.3)),width,rng)
+	var origin := Vector3(x,top-(3.0 if _order == 3 else 0.0),rng.randf_range(-6.2,-5.3))
+	if _order >= 8: _warehouse(origin,width)
+	elif _order != 7: _building(origin,width,rng)
+	_signature(Vector3(x,origin.y,-5.0),slot)
 	building_count += 1
 
 func _building(origin: Vector3, width: float, rng: RandomNumberGenerator) -> void:
@@ -104,6 +112,8 @@ func _building(origin: Vector3, width: float, rng: RandomNumberGenerator) -> voi
 			var niche := Vector3(origin.x+side*(width*0.33),origin.y+0.16,front+0.085)
 			_arch_frame(niche,0.82,1.56,0.065)
 			_arch_patch(niche,0.82,1.56,"recess")
+
+	if _order != 3 and variant%2 == 0: _banner(Vector3(origin.x+width*0.28,origin.y+height*0.53,front+0.1))
 
 func _awning(origin: Vector3, width: float, key: String) -> void:
 	# O toldo avança apenas0.65m: a frente continua em z<-3.5.
@@ -228,9 +238,9 @@ func _flush() -> void:
 func _material(key: String) -> StandardMaterial3D:
 	if _materials.has(key): return _materials[key]
 	var mat := StandardMaterial3D.new()
-	var colors := {"stone":"#927e74","trim":"#ae9480","recess":"#354051","dome":"#586883","metal":"#344054","cloth":"#446e76","cloth_alt":"#745c68","window":"#d5a667"}
+	var colors := {"stone":"#927e74","trim":"#ae9480","recess":"#354051","dome":"#9d292e","metal":"#344054","cloth":"#a52c30","cloth_alt":"#7e252b","window":"#d5a667","leaf":"#396d50","water":"#286f85"}
 	mat.albedo_color = Color(colors.get(key,"#72849a")).srgb_to_linear()
-	mat.roughness = 0.92
+	mat.roughness = 0.15 if key == "water" else 0.92
 	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 	if key in ["stone","trim","dome"]:
 		mat.albedo_texture = preload("res://assets/desert/phase01/sandstone.png")
@@ -243,3 +253,76 @@ func _material(key: String) -> StandardMaterial3D:
 		mat.emission_energy_multiplier = 0.18
 	_materials[key] = mat
 	return mat
+
+## Marcos próximos específicos de cada rota, agrupados nas malhas já existentes.
+func _signature(origin: Vector3, slot: int) -> void:
+	var district := clampi(int((origin.x-_start)/_length*8.0),0,7)
+	match _order:
+		1,4:
+			if district%2 == 0:
+				_arch_frame(origin,3.3,4.5,0.25)
+				_box(origin+Vector3(-1.8,2.4,0),Vector3(0.8,4.8,0.8),"stone")
+		2:
+			_awning(origin+Vector3(0,2.7,0.5),4.8,"cloth")
+			for side in [-1,1]: _box(origin+Vector3(side*1.6,0.4,0.7),Vector3(0.9,0.8,0.9),"metal")
+		3:
+			_box(origin+Vector3(0,3.8,0),Vector3(5.4,0.25,1.5),"trim")
+			_awning(origin+Vector3(0,3.6,0.7),3.0,"cloth")
+		5:
+			_arch_frame(origin,4.6,4.7,0.3)
+			_box(origin+Vector3(0,4.8,0),Vector3(5.0,0.35,0.8),"stone")
+		6:
+			_box(origin+Vector3(0,0.025,-0.4),Vector3(6,0.05,1.2),"water")
+			for side in [-1,1]:
+				_box(origin+Vector3(side*2,1.5,0),Vector3(0.25,3.0,0.25),"metal")
+				_awning(origin+Vector3(side*2,3.0,0),2.3,"leaf")
+		7:
+			_box(origin+Vector3(0,0.65,0),Vector3(2.8,1.3,1.2),"stone")
+			_arch_frame(origin+Vector3(1,0,0),1.8,2.8,0.16)
+		8,9:
+			for side in [-1.0,1.0]:
+				_box(origin+Vector3(0,0.05,side*0.6),Vector3(18,0.06,0.06),"metal")
+			_box(origin+Vector3(-2,2.5,0),Vector3(0.22,5,0.25),"metal")
+			_box(origin+Vector3(0,5,0),Vector3(5,0.22,0.25),"metal")
+			_box(origin+Vector3(1,3.5,0),Vector3(0.06,3,0.06),"metal")
+			_box(origin+Vector3(1,1.8,0),Vector3(1.0,0.7,0.9),"stone")
+
+## A partição física da ruptura não pode criar fachadas cortadas ou ruas vazias.
+## Somente geometria decorativa é reunida; colisores e IDs de piso permanecem separados.
+static func _ground_runs(platforms: Array) -> Array[Dictionary]:
+	var entries: Array[Dictionary] = []
+	for value: Dictionary in platforms:
+		if value.get("kind","") == "ground": entries.append(value.duplicate(true))
+	entries.sort_custom(func(a: Dictionary,b: Dictionary) -> bool: return float(a.pos[0])-float(a.size[0])*0.5 < float(b.pos[0])-float(b.size[0])*0.5)
+	var runs: Array[Dictionary] = []
+	for value: Dictionary in entries:
+		var left := float(value.pos[0])-float(value.size[0])*0.5
+		var right := float(value.pos[0])+float(value.size[0])*0.5
+		if not runs.is_empty() and left <= float(runs[-1].run_right)+0.01 and absf(float(value.pos[1])-float(runs[-1].pos[1])) < 0.01:
+			var previous: Dictionary = runs[-1]
+			previous.run_right = maxf(float(previous.run_right),right)
+			previous.pos[0] = (float(previous.run_left)+float(previous.run_right))*0.5
+			previous.size[0] = float(previous.run_right)-float(previous.run_left)
+			previous.pit_right = value.get("pit_right",false)
+		else:
+			value.run_left = left
+			value.run_right = right
+			runs.append(value)
+	return runs
+
+func _banner(origin: Vector3) -> void:
+	_box(origin,Vector3(0.58,0.96,0.04),"cloth")
+	_box(origin+Vector3(0,0.52,0),Vector3(0.76,0.06,0.08),"metal")
+	var contour := [Vector2(-0.15,-0.22),Vector2(-0.22,0.0),Vector2(0.02,0.34),Vector2(0.03,0.08),Vector2(0.17,0.24),Vector2(0.22,-0.08),Vector2(0.1,-0.24)]
+	for index in range(contour.size()):
+		var a: Vector2 = contour[index]
+		var b: Vector2 = contour[(index+1)%contour.size()]
+		_triangle("window",origin+Vector3(0,0,0.03),origin+Vector3(a.x,a.y,0.03),origin+Vector3(b.x,b.y,0.03))
+
+func _warehouse(origin: Vector3, width: float) -> void:
+	_box(origin+Vector3(0,1.2,0),Vector3(width,2.4,1.7),"stone")
+	_box(origin+Vector3(0,2.45,0),Vector3(width+0.3,0.16,1.9),"metal")
+	_box(origin+Vector3(0,0.92,0.88),Vector3(1.45,1.84,0.05),"recess")
+	for side in [-1.0,1.0]:
+		_box(origin+Vector3(side*width*0.35,1.1,0.9),Vector3(0.08,2.2,0.07),"metal")
+	_banner(origin+Vector3(width*0.32,1.45,0.94))

@@ -1,0 +1,29 @@
+PASS um único service worker registrado (1)
+PASS cache único por conteúdo ["qse-files"]
+PASS em cache: index.html
+PASS em cache: index.js
+PASS em cache: index.wasm
+PASS em cache: index.pck
+PASS em cache: manifest.webmanifest
+PASS nenhuma resposta de terceiros (Supabase/OAuth) no cache
+PASS manifest standalone/landscape/escopo
+PASS versão nova detectada e preparada
+PASS em partida/telas internas o aviso fica oculto
+PASS versão em uso continua intacta até o jogador aceitar
+PASS no lobby aparece "Reiniciar para atualizar"
+PASS motor (index.wasm) igual NÃO é baixado de novo na versão nova
+PASS pacote antigo removido; só o novo fica
+PASS sem cópias duplicadas no cache
+PASS iOS detectado (ponte de teclado ativa)
+PASS iPhone: canvas fora do notch e na área útil {"top":16,"h":353,"w":720,"iphone":true,"safe":true,"bg":"rgb(0, 0, 0)"}
+PASS iPhone: faixas fora da área segura são pretas
+PASS iPhone: área segura restaurada após o motor substituir o CSS do canvas
+PASS computador: canvas na tela inteira (nada muda)
+PASS toque na área do campo cai num <input> real (INPUT)
+PASS um toque foca o campo real (teclado abre) com o visual do jogo
+PASS texto volta ao jogo e Enter envia input:o|input:oi|submit:oi
+PASS campo some quando a tela do jogo fecha
+PASS e-mail real no formulário (senhas salvas) email,username,true,qse-login
+PASS pedido para salvar a senha não quebra
+PASS convite de instalação não bloqueia o jogo
+PWA_TEST checks=28 failures=0

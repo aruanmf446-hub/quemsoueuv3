@@ -75,13 +75,18 @@ static func medallion(kind: String, pixels: int, full := true, mipmaps := false)
 	pixels = _size(pixels)
 	var key := "%s/%d/%s/%s" % [kind, pixels, full, mipmaps]
 	if _cache.has(key): return _cache[key]
-	var svg: String = {"attack": ATTACK, "defense": DEFENSE, "health": HEALTH}.get(kind, HEALTH)
-	var image := _raster(svg if full else _greyscale(svg), pixels)
-	var ring := (load(RINGS[kind] if full else RINGS.empty) as Texture2D).get_image()
-	if ring.is_compressed(): ring.decompress()
-	ring.convert(Image.FORMAT_RGBA8)
-	ring.resize(pixels, pixels, Image.INTERPOLATE_LANCZOS)
-	image.blend_rect(ring, Rect2i(Vector2i.ZERO, ring.get_size()), Vector2i.ZERO)
+	var names := {"attack":"ataque_fogo", "defense":"defesa", "rupture":"ruptura", "amber":"cristal_ambar", "dash":"corrida_raio"}
+	var image: Image
+	if names.has(kind):
+		# load respeita o remapeamento .ctex do export Web; o SVG-fonte não é um arquivo cru no PCK.
+		var source := load("res://assets/desert/reino_v3/ui/svg/%s.svg" % names[kind]) as Texture2D
+		image = source.get_image()
+		if image.is_compressed(): image.decompress()
+		image.convert(Image.FORMAT_RGBA8)
+		image.resize(pixels,pixels,Image.INTERPOLATE_LANCZOS)
+		if not full: image.adjust_bcs(0.62,1.0,0.0)
+	else:
+		image = _raster(HEALTH if full else _greyscale(HEALTH),pixels)
 	if mipmaps: image.generate_mipmaps()
 	var texture := ImageTexture.create_from_image(image)
 	_cache[key] = texture

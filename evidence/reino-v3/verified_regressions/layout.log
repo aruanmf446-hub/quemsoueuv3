@@ -1,0 +1,192 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS fase 01 · ordem estável
+PASS fase 01 · limite inferior de duração >=180s
+PASS fase 01 · um checkpoint por distrito depois do primeiro
+PASS fase 01 · saída aponta para a próxima cena existente
+PASS fase 01 · próxima cena existe
+PASS fase 01 · identidade de fase distinta
+PASS fase 01 · spawn e saída sobre chão seguro
+PASS fase 01 · degraus acessíveis ao pulo duplo
+PASS fase 01 · buracos reais distribuídos pelo percurso
+PASS fase 01 · vãos largos com pedra que desmorona
+PASS fase 01 · vão com balsa de pedra (2)
+PASS fase 01 · trecho de tempestade de areia
+PASS fase 01 · muralhas altas com gêiser dos dois lados
+PASS fase 01 · vãos reversíveis dentro do alcance de salto
+PASS fase 01 · ataques suficientes para todos os Cactus
+PASS fase 01 · defesa pode ser reposta no mapa
+PASS fase 01 · densidade de Cactus adequada ao percurso longo
+PASS fase 01 · ids únicos e estáveis: []
+PASS fase 01 · reposições em áreas seguras: []
+PASS fase 01 · combates afastados dos vãos: []
+LAYOUT_SUMMARY order=1 distance=1452.0 lower_seconds=241.833333333333 pits=14 enemies=14 attack_pickups=17 defense_pickups=12
+PASS fase 02 · ordem estável
+PASS fase 02 · limite inferior de duração >=180s
+PASS fase 02 · um checkpoint por distrito depois do primeiro
+PASS fase 02 · saída aponta para a próxima cena existente
+PASS fase 02 · próxima cena existe
+PASS fase 02 · identidade de fase distinta
+PASS fase 02 · spawn e saída sobre chão seguro
+PASS fase 02 · degraus acessíveis ao pulo duplo
+PASS fase 02 · buracos reais distribuídos pelo percurso
+PASS fase 02 · vãos largos com pedra que desmorona
+PASS fase 02 · vão com balsa de pedra (1)
+PASS fase 02 · trecho de tempestade de areia
+PASS fase 02 · muralhas altas com gêiser dos dois lados
+PASS fase 02 · vãos reversíveis dentro do alcance de salto
+PASS fase 02 · ataques suficientes para todos os Cactus
+PASS fase 02 · defesa pode ser reposta no mapa
+PASS fase 02 · densidade de Cactus adequada ao percurso longo
+PASS fase 02 · ids únicos e estáveis: []
+PASS fase 02 · reposições em áreas seguras: []
+PASS fase 02 · combates afastados dos vãos: []
+LAYOUT_SUMMARY order=2 distance=1452.0 lower_seconds=241.833333333333 pits=15 enemies=15 attack_pickups=18 defense_pickups=12
+PASS fase 03 · ordem estável
+PASS fase 03 · limite inferior de duração >=180s
+PASS fase 03 · um checkpoint por distrito depois do primeiro
+PASS fase 03 · saída aponta para a próxima cena existente
+PASS fase 03 · próxima cena existe
+PASS fase 03 · identidade de fase distinta
+PASS fase 03 · spawn e saída sobre chão seguro
+PASS fase 03 · degraus acessíveis ao pulo duplo
+PASS fase 03 · buracos reais distribuídos pelo percurso
+PASS fase 03 · vãos largos com pedra que desmorona
+PASS fase 03 · vão com balsa de pedra (1)
+PASS fase 03 · trecho de tempestade de areia
+PASS fase 03 · muralhas altas com gêiser dos dois lados
+PASS fase 03 · vãos reversíveis dentro do alcance de salto
+PASS fase 03 · ataques suficientes para todos os Cactus
+PASS fase 03 · defesa pode ser reposta no mapa
+PASS fase 03 · densidade de Cactus adequada ao percurso longo
+PASS fase 03 · ids únicos e estáveis: []
+PASS fase 03 · reposições em áreas seguras: []
+PASS fase 03 · combates afastados dos vãos: []
+LAYOUT_SUMMARY order=3 distance=1452.0 lower_seconds=241.833333333333 pits=16 enemies=16 attack_pickups=19 defense_pickups=12
+PASS fase 04 · ordem estável
+PASS fase 04 · limite inferior de duração >=180s
+PASS fase 04 · um checkpoint por distrito depois do primeiro
+PASS fase 04 · saída aponta para a próxima cena existente
+PASS fase 04 · próxima cena existe
+PASS fase 04 · identidade de fase distinta
+PASS fase 04 · spawn e saída sobre chão seguro
+PASS fase 04 · degraus acessíveis ao pulo duplo
+PASS fase 04 · buracos reais distribuídos pelo percurso
+PASS fase 04 · vãos largos com pedra que desmorona
+PASS fase 04 · vão com balsa de pedra (2)
+PASS fase 04 · trecho de tempestade de areia
+PASS fase 04 · muralhas altas com gêiser dos dois lados
+PASS fase 04 · vãos reversíveis dentro do alcance de salto
+PASS fase 04 · ataques suficientes para todos os Cactus
+PASS fase 04 · defesa pode ser reposta no mapa
+PASS fase 04 · densidade de Cactus adequada ao percurso longo
+PASS fase 04 · ids únicos e estáveis: []
+PASS fase 04 · reposições em áreas seguras: []
+PASS fase 04 · combates afastados dos vãos: []
+LAYOUT_SUMMARY order=4 distance=1452.0 lower_seconds=241.833333333333 pits=17 enemies=17 attack_pickups=20 defense_pickups=12
+PASS fase 05 · ordem estável
+PASS fase 05 · limite inferior de duração >=180s
+PASS fase 05 · um checkpoint por distrito depois do primeiro
+PASS fase 05 · saída aponta para a próxima cena existente
+PASS fase 05 · próxima cena existe
+PASS fase 05 · identidade de fase distinta
+PASS fase 05 · spawn e saída sobre chão seguro
+PASS fase 05 · degraus acessíveis ao pulo duplo
+PASS fase 05 · buracos reais distribuídos pelo percurso
+PASS fase 05 · vãos largos com pedra que desmorona
+PASS fase 05 · vão com balsa de pedra (3)
+PASS fase 05 · trecho de tempestade de areia
+PASS fase 05 · muralhas altas com gêiser dos dois lados
+PASS fase 05 · vãos reversíveis dentro do alcance de salto
+PASS fase 05 · ataques suficientes para todos os Cactus
+PASS fase 05 · defesa pode ser reposta no mapa
+PASS fase 05 · densidade de Cactus adequada ao percurso longo
+PASS fase 05 · ids únicos e estáveis: []
+PASS fase 05 · reposições em áreas seguras: []
+PASS fase 05 · combates afastados dos vãos: []
+LAYOUT_SUMMARY order=5 distance=1452.0 lower_seconds=241.833333333333 pits=18 enemies=18 attack_pickups=21 defense_pickups=12
+PASS fase 06 · ordem estável
+PASS fase 06 · limite inferior de duração >=180s
+PASS fase 06 · um checkpoint por distrito depois do primeiro
+PASS fase 06 · saída aponta para a próxima cena existente
+PASS fase 06 · próxima cena existe
+PASS fase 06 · identidade de fase distinta
+PASS fase 06 · spawn e saída sobre chão seguro
+PASS fase 06 · degraus acessíveis ao pulo duplo
+PASS fase 06 · buracos reais distribuídos pelo percurso
+PASS fase 06 · vãos largos com pedra que desmorona
+PASS fase 06 · vão com balsa de pedra (2)
+PASS fase 06 · trecho de tempestade de areia
+PASS fase 06 · muralhas altas com gêiser dos dois lados
+PASS fase 06 · vãos reversíveis dentro do alcance de salto
+PASS fase 06 · ataques suficientes para todos os Cactus
+PASS fase 06 · defesa pode ser reposta no mapa
+PASS fase 06 · densidade de Cactus adequada ao percurso longo
+PASS fase 06 · ids únicos e estáveis: []
+PASS fase 06 · reposições em áreas seguras: []
+PASS fase 06 · combates afastados dos vãos: []
+LAYOUT_SUMMARY order=6 distance=1452.0 lower_seconds=241.833333333333 pits=19 enemies=19 attack_pickups=22 defense_pickups=12
+PASS fase 07 · ordem estável
+PASS fase 07 · limite inferior de duração >=180s
+PASS fase 07 · um checkpoint por distrito depois do primeiro
+PASS fase 07 · saída aponta para a próxima cena existente
+PASS fase 07 · próxima cena existe
+PASS fase 07 · identidade de fase distinta
+PASS fase 07 · spawn e saída sobre chão seguro
+PASS fase 07 · degraus acessíveis ao pulo duplo
+PASS fase 07 · buracos reais distribuídos pelo percurso
+PASS fase 07 · vãos largos com pedra que desmorona
+PASS fase 07 · vão com balsa de pedra (2)
+PASS fase 07 · trecho de tempestade de areia
+PASS fase 07 · muralhas altas com gêiser dos dois lados
+PASS fase 07 · vãos reversíveis dentro do alcance de salto
+PASS fase 07 · ataques suficientes para todos os Cactus
+PASS fase 07 · defesa pode ser reposta no mapa
+PASS fase 07 · densidade de Cactus adequada ao percurso longo
+PASS fase 07 · ids únicos e estáveis: []
+PASS fase 07 · reposições em áreas seguras: []
+PASS fase 07 · combates afastados dos vãos: []
+LAYOUT_SUMMARY order=7 distance=1452.0 lower_seconds=241.833333333333 pits=20 enemies=20 attack_pickups=23 defense_pickups=12
+PASS fase 08 · ordem estável
+PASS fase 08 · limite inferior de duração >=180s
+PASS fase 08 · um checkpoint por distrito depois do primeiro
+PASS fase 08 · saída aponta para a próxima cena existente
+PASS fase 08 · próxima cena existe
+PASS fase 08 · identidade de fase distinta
+PASS fase 08 · spawn e saída sobre chão seguro
+PASS fase 08 · degraus acessíveis ao pulo duplo
+PASS fase 08 · buracos reais distribuídos pelo percurso
+PASS fase 08 · vãos largos com pedra que desmorona
+PASS fase 08 · vão com balsa de pedra (3)
+PASS fase 08 · trecho de tempestade de areia
+PASS fase 08 · muralhas altas com gêiser dos dois lados
+PASS fase 08 · vãos reversíveis dentro do alcance de salto
+PASS fase 08 · ataques suficientes para todos os Cactus
+PASS fase 08 · defesa pode ser reposta no mapa
+PASS fase 08 · densidade de Cactus adequada ao percurso longo
+PASS fase 08 · ids únicos e estáveis: []
+PASS fase 08 · reposições em áreas seguras: []
+PASS fase 08 · combates afastados dos vãos: []
+LAYOUT_SUMMARY order=8 distance=1452.0 lower_seconds=241.833333333333 pits=20 enemies=20 attack_pickups=23 defense_pickups=12
+PASS fase 09 · ordem estável
+PASS fase 09 · limite inferior de duração >=180s
+PASS fase 09 · um checkpoint por distrito depois do primeiro
+PASS fase 09 · saída aponta para a próxima cena existente
+PASS fase 09 · próxima cena existe
+PASS fase 09 · identidade de fase distinta
+PASS fase 09 · spawn e saída sobre chão seguro
+PASS fase 09 · degraus acessíveis ao pulo duplo
+PASS fase 09 · buracos reais distribuídos pelo percurso
+PASS fase 09 · vãos largos com pedra que desmorona
+PASS fase 09 · vão com balsa de pedra (3)
+PASS fase 09 · trecho de tempestade de areia
+PASS fase 09 · muralhas altas com gêiser dos dois lados
+PASS fase 09 · vãos reversíveis dentro do alcance de salto
+PASS fase 09 · ataques suficientes para todos os Cactus
+PASS fase 09 · defesa pode ser reposta no mapa
+PASS fase 09 · densidade de Cactus adequada ao percurso longo
+PASS fase 09 · ids únicos e estáveis: []
+PASS fase 09 · reposições em áreas seguras: []
+PASS fase 09 · combates afastados dos vãos: []
+LAYOUT_SUMMARY order=9 distance=1452.0 lower_seconds=241.833333333333 pits=20 enemies=20 attack_pickups=23 defense_pickups=12
+NIGHT_LAYOUT_RESULT checks=180 failures=0

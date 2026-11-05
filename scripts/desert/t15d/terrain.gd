@@ -10,6 +10,14 @@ func build(platforms: Array) -> void:
 		var top := float(p[1]) + float(s[1]) * 0.5
 		var bottom := -5.5 if platform.kind == "ground" else 0.0
 		_shelf(float(p[0]), float(s[0]), top, bottom, float(s[2]),bool(platform.get("cap_left",true)),bool(platform.get("cap_right",true)))
+		if platform.get("breakable",false):
+			var mark := MeshInstance3D.new()
+			var strip := BoxMesh.new()
+			strip.size = Vector3(minf(float(s[0]),3.0),0.035,0.08)
+			mark.mesh = strip
+			mark.material_override = stone_material(Color("#e9a33f"))
+			mark.position = Vector3(float(p[0]),top+0.025,0.6)
+			add_child(mark)
 		if platform.kind == "ground":
 			for i in range(int(float(s[0]) / 1.8)):
 				var rock := MeshInstance3D.new()
@@ -56,8 +64,9 @@ func _shelf(x: float, width: float, top: float, bottom: float, depth: float, cap
 	surface.generate_normals()
 	var sand := MeshInstance3D.new()
 	sand.mesh = surface.commit()
-	sand.material_override = sand_material()
+	sand.material_override = _surface_material()
 	add_child(sand)
+	if order == 3 and bottom < -1.0: _roof_facade(x,width,top,depth)
 
 ## Piso de areia/pedra quente com a mesma textura do arenito (antes era um plano
 ## cinza-azulado liso, que parecia inacabado ao lado do cenário).
@@ -198,3 +207,35 @@ func _dry_grass(origin: Vector3) -> void:
 	mesh.material_override = material
 	mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mesh)
+
+static var _surface_cache := {}
+static var _roof_window_material: StandardMaterial3D
+func _surface_material() -> StandardMaterial3D:
+	if _surface_cache.has(order): return _surface_cache[order]
+	var material := sand_material().duplicate() as StandardMaterial3D
+	material.albedo_color = {2:Color(0.68,0.51,0.31),3:Color(0.74,0.38,0.26),5:Color(0.70,0.70,0.63),7:Color(0.55,0.52,0.46),8:Color(0.44,0.46,0.46),9:Color(0.44,0.46,0.46)}.get(order,Color(0.62,0.50,0.42))
+	_surface_cache[order] = material
+	return material
+
+## A plataforma da fase3 é o topo de um edifício, sem alterar sua colisão ou a câmera.
+func _roof_facade(x: float,width: float,top: float,depth: float) -> void:
+	var surface := SurfaceTool.new()
+	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var first := ceili((x-width*0.5+0.5)/2.2)
+	var last := floori((x+width*0.5-0.5)/2.2)
+	for column in range(first,last+1):
+		for level: float in [1.2,2.8,4.4]:
+			var center := Vector3(column*2.2,top-level,depth*0.5+0.28)
+			_quad(surface,center+Vector3(-0.18,-0.32,0),center+Vector3(-0.18,0.32,0),center+Vector3(0.18,0.32,0),center+Vector3(0.18,-0.32,0),Color.WHITE)
+	if first > last: return
+	surface.generate_normals()
+	var windows := MeshInstance3D.new()
+	windows.mesh = surface.commit()
+	windows.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	if _roof_window_material == null:
+		_roof_window_material = StandardMaterial3D.new()
+		_roof_window_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		_roof_window_material.albedo_color = Color("#d69b54")
+		_roof_window_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	windows.material_override = _roof_window_material
+	add_child(windows)

@@ -10,11 +10,18 @@ const Pickup = preload("res://scripts/desert/t15d/charge_pickup.gd")
 const CHUNK_SIZE := 64.0
 const AHEAD := 2
 signal return_requested
+var _new_ability := ""
 var _order := 1
 var _scenery: Node3D
 var _session: CanvasLayer
 var _hud: CanvasLayer
 var _touch_pad: Control
+var _reserve: Node3D
+var _troops: Node3D
+var _enemy_live := {}
+var _wave_gates := {}
+var _ruptured := {}
+var _floor_parts := {}
 var _world: Node3D
 var _loaded_chunks := {}
 var _defeated_ids := {}
@@ -43,6 +50,7 @@ var _environment: Environment
 var _announced_place := false
 var _key_light: OmniLight3D
 func _ready() -> void:
+	_set_web_story_playing(true)
 	_previous_go_back = bool(get_meta("previous_go_back",get_tree().quit_on_go_back))
 	get_tree().quit_on_go_back = false
 	_order = clampi(int(phase_path.get_file().get_basename().trim_prefix("phase_")),1,9)
@@ -56,12 +64,29 @@ func _ready() -> void:
 		for source in entry.animations.values(): sources[str(source)] = true
 	for source in sources: _actor_resources.append(load(source) as PackedScene)
 	# Medalhões dos itens (SVG + anel) montados já, e não no meio da corrida.
-	for kind in ["attack","defense","health"]: Pickup.Icons.medallion(kind,256,true,true)
+	for kind in ["attack","defense","health","rupture","amber","dash"]: Pickup.Icons.medallion(kind,256,true,true)
 	_checkpoint = _vec3(_phase.player_spawn)
 	_sfx = preload("res://scripts/desert/t15d/combat_sfx.gd").new()
 	_sfx.name = "CombatSfx"
 	add_child(_sfx)
 	_build_environment()
+	_troops = Node3D.new()
+	_troops.name = "PersistentTroops"
+	add_child(_troops)
+	_reserve = Node3D.new()
+	_reserve.name = "TroopReserve"
+	_reserve.process_mode = Node.PROCESS_MODE_DISABLED
+	add_child(_reserve)
+	for index in range(8):
+		var enemy := _create_enemy()
+		enemy.setup(_enemy_catalog.cactus,{"patrol":[-2,2]})
+		_retire_enemy(enemy)
+	for pair in [["rupture",KEY_Q],["amber",KEY_E],["dash",KEY_R]]:
+		if not InputMap.has_action(pair[0]):
+			InputMap.add_action(pair[0])
+			var key := InputEventKey.new()
+			key.physical_keycode = pair[1]
+			InputMap.action_add_event(pair[0],key)
 	_world = Node3D.new()
 	_world.name = "StreamedCity"
 	add_child(_world)
@@ -71,19 +96,30 @@ func _ready() -> void:
 	_stream_world(_player.position.x,true)
 	_build_camera()
 	_build_hud()
-	_hud.notify("Vida 3/3 • ataque e defesa têm uma carga")
+	_hud.notify({"rupture":"Ruptura descoberta • Q ou botão: rompa o piso marcado atrás de você", "amber":"Âmbar descoberto • E ou botão: imobilize as tropas próximas", "dash":"Relâmpago descoberto • R ou botão: avance com mais velocidade"}.get(_new_ability,"Vida 3/3 • guarde até três cargas de cada poder"))
 func _physics_process(delta: float) -> void:
 	if not is_instance_valid(_player): return
 	if not completed and not _respawning:
 		_elapsed += delta
 		if _player.position.y < float(_phase.kill_plane_y): _player.fall_out()
 		_stream_world(_player.position.x)
+		_update_troops()
 		_update_progress()
 		_check_checkpoints()
 		_update_storm()
 		if not _tutorial_pit and _player.position.x > float(_phase.holes[0].start)-12.0:
 			_tutorial_pit = true
 			_hud.notify("Buraco à frente • pule para atravessar")
+	for id in _ruptured.keys():
+		_ruptured[id] -= delta
+		if float(_ruptured[id]) <= 0.0:
+			var occupied := false
+			for node in _floor_parts.get(id,[]):
+				if is_instance_valid(node) and node is StaticBody3D:
+					if _player.position.x > float(node.get_meta("floor_left"))-0.7 and _player.position.x < float(node.get_meta("floor_right"))+0.7 and _player.position.y < 0.5: occupied = true
+			if occupied: continue
+			_ruptured.erase(id)
+			_set_floor_broken(id,false)
 	_follow_camera(delta)
 	_key_light.position = _player.position+Vector3(0.0,1.5,1.8)
 	_shield.active = _player.is_defending and not _player.is_dead
@@ -170,9 +206,15 @@ func _build_player() -> void:
 	_player.blocked.connect(func() -> void: _sfx.play("block"))
 	_player.action_empty.connect(func(_kind: String) -> void: _sfx.play("empty",1.0,-5.0))
 	_player.action_empty.connect(func(kind: String) -> void:
-		if is_instance_valid(_hud): _hud.notify("Sem ataque • procure a lâmina dourada" if kind == "attack" else "Sem defesa • procure o escudo azul",true))
+		if is_instance_valid(_hud): _hud.notify("Sem carga de %s • procure uma recarga" % {"attack":"fogo","defense":"defesa","rupture":"ruptura","amber":"âmbar","dash":"relâmpago"}.get(kind,kind),true))
 	_player.blocked.connect(func() -> void: _impact(_player.position+Vector3(_player.facing*0.45,0.9,0),Color("#9cdeff")))
+	_player.ability_used.connect(_on_ability_used)
 	_player.setup(_find_protagonist())
+	# Desbloqueio garantido ao alcançar o capítulo; recargas do mapa são opcionais.
+	var unlock: String = {2:"rupture",4:"amber",6:"dash"}.get(_order,"")
+	if not unlock.is_empty() and not _player.discovered.has(unlock):
+		_player.restore_charge(unlock)
+		_new_ability = unlock
 	# Luz de recorte que acompanha o protagonista: o traje escuro não some na muralha.
 	_key_light = OmniLight3D.new()
 	_key_light.name = "PlayerKeyLight"
@@ -225,7 +267,7 @@ func _load_chunk(index: int, immediate := true) -> void:
 			tasks.append(_build_terrain_piece.bind(chunk,platform))
 		var props := preload("res://scripts/desert/t15d/city_props.gd").new()
 		chunk.add_child(props)
-		for job: Callable in props.prepare_build(solid,_order):
+		for job: Callable in props.prepare_build(solid,_order,float(_phase.length),float(_phase.player_spawn[0])):
 			tasks.append(_build_props_piece.bind(chunk,job))
 	for spawn: Dictionary in _phase.enemies:
 		if _in_chunk(float(spawn.pos[0]),index) and not _defeated_ids.has(str(spawn.id)):
@@ -281,6 +323,13 @@ func _build_collision(chunk: Node3D, platforms: Array) -> void:
 		shape.shape = box
 		body.add_child(shape)
 		chunk.add_child(body)
+		if part.get("breakable",false):
+			var id := str(part.id)
+			if not _floor_parts.has(id): _floor_parts[id] = []
+			_floor_parts[id].append(body)
+			body.set_meta("floor_right",float(part.span_end))
+			body.set_meta("floor_left",float(part.span_start))
+			if _ruptured.has(id): body.collision_layer = 0
 func _build_crumble(chunk: Node3D, platform: Dictionary) -> void:
 	var stone := preload("res://scripts/desert/t15d/parkour.gd").CrumbleStone.new()
 	stone.position = _vec3(platform.pos)
@@ -292,6 +341,11 @@ func _build_terrain_piece(chunk: Node3D, platform: Dictionary) -> void:
 	terrain.order = _order
 	chunk.add_child(terrain)
 	terrain.build([platform])
+	if platform.get("breakable",false):
+		var id := str(platform.id)
+		if not _floor_parts.has(id): _floor_parts[id] = []
+		_floor_parts[id].append(terrain)
+		terrain.visible = not _ruptured.has(id)
 func _build_props_piece(_chunk: Node3D, job: Callable) -> void:
 	if job.is_valid(): job.call()
 func _build_props(chunk: Node3D, platforms: Array) -> void:
@@ -347,10 +401,8 @@ func _is_pit_edge(x: float, left: bool) -> bool:
 func _is_exposed_edge(x: float, left: bool, kind: String) -> bool:
 	if kind != "ground": return true
 	return _is_pit_edge(x,left) or absf(x-float(_phase.bounds.min_x if left else _phase.bounds.max_x))<0.02
-func _spawn_enemy(chunk: Node3D, spawn: Dictionary) -> void:
+func _create_enemy() -> Node3D:
 	var enemy := Cactus.new()
-	enemy.position = _vec3(spawn.pos)
-	enemy.set_meta("spawn_id",str(spawn.id))
 	var collision := CollisionShape3D.new()
 	var capsule := CapsuleShape3D.new()
 	capsule.radius = 0.35
@@ -361,13 +413,38 @@ func _spawn_enemy(chunk: Node3D, spawn: Dictionary) -> void:
 	var model := ActorSlot.new()
 	model.name = "Model"
 	enemy.add_child(model)
-	chunk.add_child(enemy)
-	enemy.setup(_enemy_catalog.cactus,spawn)
+	_reserve.add_child(enemy)
 	enemy.winding_up.connect(func() -> void: _sfx.play("windup",0.9,-4.0))
 	enemy.alerted.connect(func() -> void: _sfx.play("windup",1.45,-7.0))
+	enemy.retired.connect(_retire_enemy)
 	enemy.defeated.connect(func() -> void:
-		_defeated_ids[str(spawn.id)] = true
+		_defeated_ids[str(enemy.get_meta("spawn_id",""))] = true
 		_defeated = _defeated_ids.size())
+	return enemy
+
+func _spawn_enemy(_chunk: Node3D, spawn: Dictionary) -> void:
+	var id := str(spawn.id)
+	if not spawn.get("troop",false) and absf(float(spawn.pos[0])-_player.position.x) > 50.0: return
+	if is_instance_valid(_enemy_live.get(id)) or _troops.get_child_count() >= 8 or _reserve.get_child_count() == 0: return
+	var enemy := _reserve.get_child(0) as Cactus
+	enemy.reparent(_troops,false)
+	enemy.position = _vec3(spawn.pos)
+	enemy.set_meta("spawn_id",id)
+	_enemy_live[id] = enemy
+	enemy.persistent_follow = bool(spawn.get("troop",false))
+	enemy.setup(_enemy_catalog.cactus,spawn)
+	enemy.add_to_group("enemies")
+	enemy.show()
+	enemy.set_physics_process(true)
+
+func _retire_enemy(enemy: Node3D) -> void:
+	_enemy_live.erase(str(enemy.get_meta("spawn_id","")))
+	enemy.remove_from_group("enemies")
+	enemy.set_physics_process(false)
+	enemy.collision_layer = 0
+	enemy.hide()
+	if enemy.get_parent() != _reserve: enemy.reparent(_reserve,false)
+
 ## Fundo do vão: antes o panorama aparecia pelo buraco e o vão parecia uma janela.
 ## Um poço escuro com gradiente deixa claro que ali não há chão.
 func _build_pit_void(chunk: Node3D, x0: float, x1: float) -> void:
@@ -434,7 +511,7 @@ func _pit_material(key: String) -> StandardMaterial3D:
 func _on_pickup_collected(id: String, kind: String) -> void:
 	_collected_ids[id] = true
 	_sfx.play("pickup",1.0 if kind == "attack" else 1.25)
-	_hud.notify({"attack":"Ataque +1","defense":"Defesa +1","health":"Vida +1"}.get(kind,"+1"))
+	_hud.notify({"attack":"Fogo +1","defense":"Defesa +1","health":"Vida +1","rupture":"Ruptura +1 • Q: quebre o piso marcado atrás de você","amber":"Âmbar +1 • E: imobilize as tropas próximas","dash":"Relâmpago +1 • R: corra mais rápido"}.get(kind,"+1"))
 func _build_goal() -> void:
 	_goal = Area3D.new()
 	_goal.name = "ExitGate"
@@ -452,7 +529,7 @@ func _build_goal() -> void:
 	add_child(arch)
 	arch.arch(Vector3(float(_phase.goal.pos[0]),0,-1.8),1.8)
 	var label := Label3D.new()
-	label.text = "PRÓXIMO DISTRITO"
+	label.text = "MINERADORA" if _order == 9 else "SAÍDA"
 	label.font = preload("res://assets/desert/phase01/interface.ttf")
 	label.font_size = 48
 	label.pixel_size = 0.007
@@ -598,6 +675,7 @@ func _on_goal_entered(body: Node3D) -> void:
 	_player.set_physics_process(false)
 	_player._model.play_animation("pronto",true)
 	_release_input()
+	_player.cancel_dash()
 	_touch_pad.hide()
 	_touch_pad.set_process(false)
 	_hud.set_completed(true)
@@ -607,10 +685,11 @@ func _on_goal_entered(body: Node3D) -> void:
 	_session.show_completion(_defeated,_elapsed,_saved)
 func _release_input() -> void:
 	if is_instance_valid(_touch_pad): _touch_pad.release_all()
-	for action in ["move_left","move_right","jump","attack","defend","crouch"]: Input.action_release(action)
+	for action in ["move_left","move_right","jump","attack","defend","crouch","rupture","amber","dash"]: Input.action_release(action)
 func _pause() -> void:
 	if completed or _paused or _respawning: return
 	_release_input()
+	_player.cancel_dash()
 	_touch_pad.hide()
 	_paused = true
 	_session.show_pause()
@@ -677,6 +756,7 @@ func _respawn_at_checkpoint() -> void:
 	_defeated_ids = (_snapshot.defeated as Dictionary).duplicate()
 	_collected_ids = (_snapshot.collected as Dictionary).duplicate()
 	_defeated = _defeated_ids.size()
+	_reset_remaster_state()
 	for chunk: Node in _loaded_chunks.values():
 		_world.remove_child(chunk)
 		chunk.queue_free()
@@ -722,6 +802,7 @@ func _restart_level() -> void:
 	_hud.set_storm(false)
 	_checkpoint = _vec3(_phase.player_spawn)
 	_build_queue.clear()
+	_reset_remaster_state()
 	for chunk: Node in _loaded_chunks.values():
 		_world.remove_child(chunk)
 		chunk.queue_free()
@@ -776,6 +857,7 @@ func _return_to_story() -> void:
 	if return_requested.get_connections().is_empty(): get_tree().change_scene_to_file("res://scenes/menu/main_menu.tscn")
 	else: return_requested.emit()
 func _exit_tree() -> void:
+	_set_web_story_playing(false)
 	if _hit_stopping: Engine.time_scale = 1.0
 	if _paused: get_tree().paused = false
 	if not _handoff: get_tree().quit_on_go_back = _previous_go_back
@@ -837,3 +919,94 @@ func _restore_game_checkpoint() -> void:
 	_checkpoint = _vec3(points[index].pos)
 	_snapshot = {"defeated": {}, "collected": {}, "attack": 0, "defense": 0}
 	_player.position = _checkpoint + Vector3.UP * 0.05
+
+func _reset_remaster_state() -> void:
+	for enemy in _troops.get_children():
+		_retire_enemy(enemy)
+	_enemy_live.clear()
+	_wave_gates.clear()
+	_ruptured.clear()
+	_floor_parts.clear()
+
+func _update_troops() -> void:
+	for id in _enemy_live.keys():
+		if not is_instance_valid(_enemy_live[id]):
+			_enemy_live.erase(id)
+			continue
+		var enemy := _enemy_live[id] as Node3D
+		if _player.position.x-enemy.global_position.x > 110.0:
+			_retire_enemy(enemy)
+	for spawn: Dictionary in _phase.enemies:
+		var ahead := float(spawn.pos[0])-_player.position.x
+		if ahead >= -12 and ahead <= 40 and not _defeated_ids.has(str(spawn.id)): _spawn_enemy(_troops,spawn)
+	# Pequenas ondas só de um portão já ultrapassado e fora do quadro da câmera.
+	var district := clampi(int((_player.position.x-float(_phase.player_spawn[0]))/float(_phase.length)*8),0,7)
+	if _wave_gates.has(district): return
+	var gate := float(_phase.districts[district].start)+18.0
+	if _player.position.x < gate+28.0: return
+	var safe := false
+	for platform: Dictionary in _phase.platforms:
+		if platform.kind == "ground" and gate > float(platform.span_start)+4 and gate < float(platform.span_end)-4: safe = true
+	if not safe:
+		_wave_gates[district] = true
+		return
+	var count: int = _wave_gates.get("pending",0)
+	var desired: int = [2,3,4,5,5,6,6,7,8][_order-1]
+	if _troops.get_child_count() >= 8: return
+	_spawn_enemy(_troops,{"id":"wave.%d.%d" % [district,count],"pos":[gate-count*0.6,0.02,0],"patrol":[gate-2,gate+2],"troop":true})
+	count += 1
+	_wave_gates["pending"] = count
+	if count >= desired:
+		_wave_gates[district] = true
+		_wave_gates.erase("pending")
+
+func _on_ability_used(kind: String) -> void:
+	if kind != "rupture": return
+	var best := ""
+	var best_right := -INF
+	for id in _floor_parts:
+		if _ruptured.has(id): continue
+		for node in _floor_parts[id]:
+			if not is_instance_valid(node) or not node is StaticBody3D: continue
+			var right := float(node.get_meta("floor_right"))
+			var occupied := false
+			for enemy in get_tree().get_nodes_in_group("enemies"):
+				if enemy.global_position.x >= float(node.get_meta("floor_left"))-0.7 and enemy.global_position.x <= right+0.7 and absf(enemy.global_position.y) < 1.5: occupied = true
+			if occupied: continue
+			if right <= _player.position.x-2.0 and right >= _player.position.x-32.0 and right > best_right:
+				best = id
+				best_right = right
+	if best.is_empty():
+		_player.abilities.rupture += 1
+		_hud.notify("Ruptura precisa de piso marcado atrás de você")
+		return
+	_ruptured[best] = 8.0
+	_set_floor_broken(best,true)
+	_hud.notify("Piso rompido • restaura em 8 segundos")
+
+func _set_floor_broken(id: String, broken: bool) -> void:
+	for node in _floor_parts.get(id,[]):
+		if not is_instance_valid(node): continue
+		if node is StaticBody3D: node.collision_layer = 0 if broken else 1
+		elif node is Node3D:
+			if node.has_meta("rupture_tween"):
+				var previous: Tween = node.get_meta("rupture_tween")
+				if previous != null and previous.is_valid(): previous.kill()
+			if broken:
+				node.set_meta("rupture_state","BREAKING")
+				var fall: Tween = node.create_tween()
+				node.set_meta("rupture_tween",fall)
+				fall.tween_property(node,"position:y",-3.0,0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+				fall.tween_callback(func() -> void:
+					node.visible = false
+					node.set_meta("rupture_state","BROKEN"))
+			else:
+				node.set_meta("rupture_state","RESTORING")
+				node.position.y = 0
+				node.visible = true
+				node.set_meta("rupture_state","INTACT")
+
+## O convite HTML de instalação não pode cobrir a pausa da campanha.
+func _set_web_story_playing(active: bool) -> void:
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("if (window.qseSetStoryPlaying) window.qseSetStoryPlaying(%s);" % ("true" if active else "false"))

@@ -1,0 +1,182 @@
+[
+	{
+		"image": "/workspace/.runtime/reino-final-gallery/standard_small/fase_01.png",
+		"iphone": false,
+		"name": "Portões da Capital",
+		"order": 1,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(640, 360)"
+	},
+	{
+		"district": 5,
+		"fixture_teleport": true,
+		"image": "/workspace/.runtime/reino-final-gallery/standard_small/fase_01_distrito05_fixture.png",
+		"iphone": false,
+		"name": "Portões da Capital",
+		"order": 1,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(640, 360)"
+	},
+	{
+		"image": "/workspace/.runtime/reino-final-gallery/standard_small/fase_02.png",
+		"iphone": false,
+		"name": "Bazar da Meia-Noite",
+		"order": 2,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(640, 360)"
+	},
+	{
+		"district": 5,
+		"fixture_teleport": true,
+		"image": "/workspace/.runtime/reino-final-gallery/standard_small/fase_02_distrito05_fixture.png",
+		"iphone": false,
+		"name": "Bazar da Meia-Noite",
+		"order": 2,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(640, 360)"
+	},
+	{
+		"image": "/workspace/.runtime/reino-final-gallery/standard_small/fase_03.png",
+		"iphone": false,
+		"name": "Telhados da Cidade",
+		"order": 3,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(640, 360)"
+	},
+	{
+		"district": 5,
+		"fixture_teleport": true,
+		"image": "/workspace/.runtime/reino-final-gallery/standard_small/fase_03_distrito05_fixture.png",
+		"iphone": false,
+		"name": "Telhados da Cidade",
+		"order": 3,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(640, 360)"
+	},
+	{
+		"image": "/workspace/.runtime/reino-final-gallery/standard_small/fase_04.png",
+		"iphone": false,
+		"name": "Muralhas do Palácio",
+		"order": 4,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(640, 360)"
+	},
+	{
+		"district": 5,
+		"fixture_teleport": true,
+		"image": "/workspace/.runtime/reino-final-gallery/standard_small/fase_04_distrito05_fixture.png",
+		"iphone": false,
+		"name": "Muralhas do Palácio",
+		"order": 4,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(640, 360)"
+	},
+	{
+		"image": "/workspace/.runtime/reino-final-gallery/standard_small/fase_05.png",
+		"iphone": false,
+		"name": "Aquedutos do Reino",
+		"order": 5,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(640, 360)"
+	},
+	{
+		"district": 5,
+		"fixture_teleport": true,
+		"image": "/workspace/.runtime/reino-final-gallery/standard_small/fase_05_distrito05_fixture.png",
+		"iphone": false,
+		"name": "Aquedutos do Reino",
+		"order": 5,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(640, 360)"
+	},
+	{
+		"image": "/workspace/.runtime/reino-final-gallery/standard_small/fase_06.png",
+		"iphone": false,
+		"name": "Jardins do Oásis",
+		"order": 6,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(640, 360)"
+	},
+	{
+		"district": 5,
+		"fixture_teleport": true,
+		"image": "/workspace/.runtime/reino-final-gallery/standard_small/fase_06_distrito05_fixture.png",
+		"iphone": false,
+		"name": "Jardins do Oásis",
+		"order": 6,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(640, 360)"
+	},
+	{
+		"image": "/workspace/.runtime/reino-final-gallery/standard_small/fase_07.png",
+		"iphone": false,
+		"name": "Ruínas da Fronteira",
+		"order": 7,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(640, 360)"
+	},
+	{
+		"district": 5,
+		"fixture_teleport": true,
+		"image": "/workspace/.runtime/reino-final-gallery/standard_small/fase_07_distrito05_fixture.png",
+		"iphone": false,
+		"name": "Ruínas da Fronteira",
+		"order": 7,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(640, 360)"
+	},
+	{
+		"image": "/workspace/.runtime/reino-final-gallery/standard_small/fase_08.png",
+		"iphone": false,
+		"name": "Estrada da Mineração",
+		"order": 8,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(640, 360)"
+	},
+	{
+		"district": 5,
+		"fixture_teleport": true,
+		"image": "/workspace/.runtime/reino-final-gallery/standard_small/fase_08_distrito05_fixture.png",
+		"iphone": false,
+		"name": "Estrada da Mineração",
+		"order": 8,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(640, 360)"
+	},
+	{
+		"image": "/workspace/.runtime/reino-final-gallery/standard_small/fase_09.png",
+		"iphone": false,
+		"name": "Entrada da Mineradora",
+		"order": 9,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(640, 360)"
+	},
+	{
+		"district": 5,
+		"fixture_teleport": true,
+		"image": "/workspace/.runtime/reino-final-gallery/standard_small/fase_09_distrito05_fixture.png",
+		"iphone": false,
+		"name": "Entrada da Mineradora",
+		"order": 9,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(640, 360)"
+	}
+]

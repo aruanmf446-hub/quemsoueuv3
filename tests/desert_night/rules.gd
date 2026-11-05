@@ -58,7 +58,9 @@ func run() -> void:
 	player.blocked.connect(func() -> void: blocks += 1)
 	player.died.connect(func() -> void: deaths += 1)
 	check(player.health == 3 and player.attack_charges == 1 and player.defense_charges == 1,"estado inicial real: vida3, ataque1, defesa1")
-	check(not player.restore_charge("attack") and not player.restore_charge("defense"),"cargas cheias recusam reposição sem consumir item")
+	check(player.restore_charge("attack") and player.restore_charge("defense"),"inventário inicial aceita recargas até três")
+	player.attack_charges = 1
+	player.defense_charges = 1
 	check(player.is_on_floor(),"spawn seguro no piso")
 	var x := player.position.x
 	key(KEY_D,true)
@@ -109,8 +111,8 @@ func run() -> void:
 	await frames(25)
 	await tap(KEY_J)
 	check(player.attack_charges == 0 and empty_actions > 0,"atacar vazio informa falta de carga sem gerar golpe")
-	check(player.restore_charge("attack") and player.attack_charges == 1,"reposição restaura uma carga, até o limite1")
-	check(not player.restore_charge("attack"),"segunda reposição não cria carga acima de1")
+	check(player.restore_charge("attack") and player.attack_charges == 1,"reposição restaura uma carga, uma de até três")
+	check(player.restore_charge("attack") and player.restore_charge("attack") and not player.restore_charge("attack"),"armazena três cargas e rejeita a quarta")
 	await fresh()
 	await tap(KEY_SHIFT)
 	check(player.defense_charges == 0 and player.is_defending,"defesa consome carga e abre a janela de proteção")
@@ -128,6 +130,7 @@ func run() -> void:
 	var pickup: Dictionary
 	for entry: Dictionary in phase._phase.pickups:
 		if entry.kind == "attack": pickup = entry; break
+	player.attack_charges = 3
 	var safe_origin := player.position
 	player.position = Vector3(float(pickup.pos[0]),0.05,0)
 	player.velocity = Vector3.ZERO
@@ -136,7 +139,7 @@ func run() -> void:
 	for actor in get_nodes_in_group("enemies"): actor.position.x = player.position.x-30
 	await tap(KEY_J)
 	await frames(5)
-	check(phase._collected_ids.has(pickup.id) and player.attack_charges == 1,"usar carga sobre o item permite coleta real da reposição")
+	check(phase._collected_ids.has(pickup.id) and player.attack_charges == 3,"usar carga sobre o item permite coleta real da reposição")
 	var collected_count: int = phase._collected_ids.size()
 	# Só nesta fixture: teleporte para exercitar descarregamento/retorno de chunks.
 	player.position = safe_origin+Vector3(260,0.1,0)

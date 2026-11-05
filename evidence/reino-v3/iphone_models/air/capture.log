@@ -1,0 +1,17 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+CAPTURED lobby_788x383
+CAPTURED news_788x383
+CAPTURED account_788x383
+CAPTURED profile_788x383
+CAPTURED skins_788x383
+CAPTURED duel_788x383
+CAPTURED deck_library_788x383
+CAPTURED friends_788x383
+CAPTURED settings_788x383
+CAPTURED wallet_788x383
+CAPTURED story_788x383
+CAPTURED music_788x383

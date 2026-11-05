@@ -27,7 +27,9 @@ engine=[a.godot,'--path',str(root)]
 window=['--rendering-method','gl_compatibility','--audio-driver','Dummy']
 headless=['--headless','--fixed-fps','60']
 targets=[
- ('import',engine+['--headless','--editor','--import','--quit']),
+ ('import',engine+['--headless','--editor','--import','--quit','--','--godot-mcp-no-bridge']),
+ ('reino-v3',engine+headless+['--script','res://tests/desert_night/reino_v3_test.gd']),
+ ('actions',engine+window+['--script','res://tests/desert_night/action_controls.gd']),
  ('layout',engine+headless+['--script','res://tests/desert_night/layout_test.gd']),
  ('legacy10',engine+headless+['--script','res://tests/desert_night/legacy10_test.gd']),
  ('progress',engine+headless+['--script','res://tests/desert_night/progress_test.gd']),

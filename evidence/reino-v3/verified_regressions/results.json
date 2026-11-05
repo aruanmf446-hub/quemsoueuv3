@@ -1,0 +1,114 @@
+[
+  {
+    "test": "reino-v3",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 3.61,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "actions",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 24.36,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "layout",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 1.23,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "legacy10",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 1.74,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "progress",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 0.78,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "rules-desktop",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 77.01,
+    "graphical": true,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "rules-mobile",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 38.97,
+    "graphical": true,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "variety",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 3.52,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "parkour",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 4.71,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "checkpoints",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 4.12,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "route-01",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 22.7,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-03",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 26.95,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-06",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 35.27,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-09",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 32.16,
+    "graphical": false,
+    "fixed_physics_step": true
+  }
+]

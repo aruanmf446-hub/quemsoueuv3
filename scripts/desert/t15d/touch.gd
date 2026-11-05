@@ -2,7 +2,7 @@ extends Control
 ## Controles de toque: joystick à esquerda (andar e agachar) e botões de pulo, ataque e
 ## defesa à direita. Multitoque real e alvos em pixels físicos; não depende da emulação de mouse.
 const Icons = preload("res://scripts/desert/t15d/resource_icons.gd")
-const ACTIONS := ["move_left", "move_right", "crouch", "defend", "attack", "jump"]
+const ACTIONS := ["move_left", "move_right", "crouch", "defend", "attack", "jump", "rupture", "amber", "dash"]
 ## _areas segue ACTIONS: as três primeiras são zonas do joystick (esquerda, direita, baixo).
 var _areas: Array[Rect2] = []
 var _held := {}
@@ -20,6 +20,7 @@ var _stick_actions := {}
 var _knob := Vector2.ZERO
 var _drawn_origin := Vector2.ZERO
 func _ready() -> void:
+	PlayerUI.apply_theme(self)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	visible = _wanted()
 func _wanted() -> bool:
@@ -27,12 +28,18 @@ func _wanted() -> bool:
 func _layout() -> void:
 	var screen := get_viewport_rect().size
 	var unit := UIScale.unit_for(get_viewport())
-	_radius = 60.0*unit
+	_radius = (104.0 if UIScale.is_iphone() else 128.0)*unit
 	_base = Vector2(_radius+34*unit, screen.y-_radius-28*unit)
-	var jump := Vector2(screen.x-70*unit, screen.y-68*unit)
-	_buttons = {"jump": [jump, 40.0*unit], "attack": [jump+Vector2(-90*unit, 14*unit), 32.0*unit], "defend": [jump+Vector2(-26*unit, -86*unit), 32.0*unit]}
+	var radius := (52.0 if UIScale.is_iphone() else 64.0)*unit
+	var gap := (120.0 if UIScale.is_iphone() else 144.0)*unit
+	var jump := Vector2(screen.x-radius-30*unit, screen.y-radius-28*unit)
+	_buttons = {"jump": [jump, radius], "attack": [jump+Vector2(-gap, 0), radius], "defend": [jump+Vector2(-gap*0.35, -gap), radius]}
+	for index in range(3):
+		var kind: String = ["rupture","amber","dash"][index]
+		if is_instance_valid(actor) and actor.discovered.has(kind):
+			_buttons[kind] = [jump+Vector2(-gap*(index+2),0),radius]
 	var half := _radius*0.55
-	_areas = [Rect2(_base+Vector2(-_radius, -half), Vector2(_radius, half*2)), Rect2(_base+Vector2(0, -half), Vector2(_radius, half*2)), Rect2(_base+Vector2(-half, _radius*0.15), Vector2(half*2, _radius*0.85))]
+	_areas = [Rect2(_base+Vector2(-_radius, -half), Vector2(_radius, half*2)), Rect2(_base+Vector2(0, -half), Vector2(_radius, half*2)), Rect2(_base+Vector2(-half, 0), Vector2(half*2, _radius))]
 	for action in ["defend", "attack", "jump"]:
 		var spec: Array = _buttons[action]
 		_areas.append(Rect2(spec[0]-Vector2.ONE*spec[1], Vector2.ONE*spec[1]*2))
@@ -52,7 +59,7 @@ func _draw() -> void:
 	draw_circle(knob, _radius*0.44, Color(0.48, 0.32, 0.11, 0.85) if _stick_finger != null else Color(0.10, 0.16, 0.24, 0.85))
 	draw_arc(knob, _radius*0.44, 0, TAU, 36, Color("#f2c76e"), 2.0*unit, true)
 	# Botões: pulo com seta; ataque e defesa com os ícones do HUD.
-	for action in ["jump", "attack", "defend"]:
+	for action in _buttons.keys():
 		var spec: Array = _buttons[action]
 		var point: Vector2 = spec[0]
 		var radius: float = spec[1]
@@ -63,9 +70,13 @@ func _draw() -> void:
 			var s := radius*0.42
 			draw_colored_polygon(PackedVector2Array([point+Vector2(0, -s*1.05), point+Vector2(s, s*0.15), point+Vector2(s*0.38, s*0.15), point+Vector2(s*0.38, s*0.9), point+Vector2(-s*0.38, s*0.9), point+Vector2(-s*0.38, s*0.15), point+Vector2(-s, s*0.15)]), Color("#f5e4bd"))
 		else:
-			var full: bool = not is_instance_valid(actor) or (actor.attack_charges > 0 if action == "attack" else actor.defense_charges > 0)
+			var resource_kind: String = "defense" if action == "defend" else action
+			var full: bool = not is_instance_valid(actor) or actor.charges(resource_kind) > 0
 			var size := radius*2.0*(0.9 if down else 1.0)
-			draw_texture_rect(Icons.medallion("attack" if action == "attack" else "defense", roundi(radius*2.0), full), Rect2(point-Vector2.ONE*size*0.5, Vector2.ONE*size), false)
+			draw_texture_rect(Icons.medallion(resource_kind, roundi(radius*2.0), full), Rect2(point-Vector2.ONE*size*0.5, Vector2.ONE*size), false)
+			if is_instance_valid(actor):
+				var font := get_theme_font("font","Label")
+				draw_string(font,point+Vector2(radius*0.45,radius*0.95),str(actor.charges(resource_kind)),HORIZONTAL_ALIGNMENT_LEFT,-1,20,Color.WHITE)
 func _process(delta: float) -> void:
 	var pixels := get_window().size
 	if pixels != _last_pixels:
@@ -74,6 +85,7 @@ func _process(delta: float) -> void:
 		if not visible: release_all()
 		_layout()
 		_drawn_origin = _base
+	_layout()
 	var follow := 1.0-exp(-delta*22.0)
 	_knob = _knob.lerp(_stick, follow)
 	_drawn_origin = _drawn_origin.lerp(_stick_origin if _stick_finger != null else _base, 1.0-exp(-delta*14.0))
@@ -91,7 +103,7 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventMouseMotion and event.device != InputEvent.DEVICE_ID_EMULATION and _stick_finger == -1:
 		_drag(-1, event.position)
 func _button_at(point: Vector2) -> String:
-	for action in ["jump", "attack", "defend"]:
+	for action in _buttons.keys():
 		var spec: Array = _buttons[action]
 		if point.distance_to(spec[0]) <= float(spec[1])*1.15: return action
 	return ""

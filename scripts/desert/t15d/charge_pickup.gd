@@ -28,7 +28,7 @@ func _ready() -> void:
 	add_child(_visual)
 	# Mesmo medalhão do HUD (emblema + anel do kit), sempre virado para a câmera, com
 	# um halo aditivo na cor do recurso para ser visto de longe.
-	var color: Color = {"attack": Color("#ff9a3c"), "defense": Color("#5ec4ef"), "health": Color("#ff5d6a")}.get(kind, Color.WHITE)
+	var color: Color = {"attack": Color("#ff9a3c"), "defense": Color("#5ec4ef"), "health": Color("#ff5d6a"),"rupture":Color("#efa33d"),"amber":Color("#ffe0a1"),"dash":Color("#ffe93f")}.get(kind, Color.WHITE)
 	var halo := MeshInstance3D.new()
 	var quad := QuadMesh.new()
 	quad.size = Vector2(1.25, 1.25)
@@ -37,7 +37,7 @@ func _ready() -> void:
 	halo.material_override = _halo_material(color)
 	_visual.add_child(halo)
 	var medal := Sprite3D.new()
-	medal.texture = Icons.medallion(kind if kind in ["attack", "defense"] else "health", 256, true, true)
+	medal.texture = Icons.medallion(kind, 256, true, true)
 	medal.pixel_size = 0.64 / 256.0
 	medal.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	medal.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS

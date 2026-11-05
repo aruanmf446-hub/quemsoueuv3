@@ -1,0 +1,354 @@
+{
+  "states": [
+    {
+      "cards": 8,
+      "index": 0,
+      "iphone": true,
+      "next": [
+        1096,
+        547,
+        224,
+        88
+      ],
+      "read": false,
+      "ready": true,
+      "size": [
+        1376,
+        675
+      ],
+      "skip": [
+        1120,
+        24,
+        224,
+        88
+      ],
+      "stage": "loading",
+      "story": true
+    },
+    {
+      "cards": 8,
+      "index": 1,
+      "iphone": true,
+      "next": [
+        1096,
+        547,
+        224,
+        88
+      ],
+      "read": false,
+      "ready": true,
+      "size": [
+        1376,
+        675
+      ],
+      "skip": [
+        1120,
+        24,
+        224,
+        88
+      ],
+      "stage": "loading",
+      "story": true
+    },
+    {
+      "cards": 8,
+      "index": 2,
+      "iphone": true,
+      "next": [
+        1096,
+        547,
+        224,
+        88
+      ],
+      "read": false,
+      "ready": true,
+      "size": [
+        1376,
+        675
+      ],
+      "skip": [
+        1120,
+        24,
+        224,
+        88
+      ],
+      "stage": "loading",
+      "story": true
+    },
+    {
+      "cards": 8,
+      "index": 3,
+      "iphone": true,
+      "next": [
+        1096,
+        547,
+        224,
+        88
+      ],
+      "read": false,
+      "ready": true,
+      "size": [
+        1376,
+        675
+      ],
+      "skip": [
+        1120,
+        24,
+        224,
+        88
+      ],
+      "stage": "loading",
+      "story": true
+    },
+    {
+      "cards": 8,
+      "index": 4,
+      "iphone": true,
+      "next": [
+        1096,
+        547,
+        224,
+        88
+      ],
+      "read": false,
+      "ready": true,
+      "size": [
+        1376,
+        675
+      ],
+      "skip": [
+        1120,
+        24,
+        224,
+        88
+      ],
+      "stage": "loading",
+      "story": true
+    },
+    {
+      "cards": 8,
+      "index": 5,
+      "iphone": true,
+      "next": [
+        1096,
+        547,
+        224,
+        88
+      ],
+      "read": false,
+      "ready": true,
+      "size": [
+        1376,
+        675
+      ],
+      "skip": [
+        1120,
+        24,
+        224,
+        88
+      ],
+      "stage": "loading",
+      "story": true
+    },
+    {
+      "cards": 8,
+      "index": 6,
+      "iphone": true,
+      "next": [
+        1096,
+        547,
+        224,
+        88
+      ],
+      "read": false,
+      "ready": true,
+      "size": [
+        1376,
+        675
+      ],
+      "skip": [
+        1120,
+        24,
+        224,
+        88
+      ],
+      "stage": "loading",
+      "story": true
+    },
+    {
+      "cards": 8,
+      "index": 7,
+      "iphone": true,
+      "next": [
+        1096,
+        547,
+        224,
+        88
+      ],
+      "read": false,
+      "ready": true,
+      "size": [
+        1376,
+        675
+      ],
+      "skip": [
+        1120,
+        24,
+        224,
+        88
+      ],
+      "stage": "loading",
+      "story": true
+    }
+  ],
+  "game": {
+    "buttons": {
+      "amber": [
+        934,
+        595,
+        52
+      ],
+      "attack": [
+        1174,
+        595,
+        52
+      ],
+      "dash": [
+        814,
+        595,
+        52
+      ],
+      "defend": [
+        1252,
+        475,
+        52
+      ],
+      "jump": [
+        1294,
+        595,
+        52
+      ],
+      "rupture": [
+        1054,
+        595,
+        52
+      ]
+    },
+    "charges": {
+      "amber": 3,
+      "dash": 3,
+      "rupture": 3
+    },
+    "health": 3,
+    "iphone": true,
+    "player_dash": 0,
+    "read": true,
+    "size": [
+      1376,
+      675
+    ],
+    "stage": "play",
+    "x": -8
+  },
+  "after": {
+    "buttons": {
+      "amber": [
+        934,
+        595,
+        52
+      ],
+      "attack": [
+        1174,
+        595,
+        52
+      ],
+      "dash": [
+        814,
+        595,
+        52
+      ],
+      "defend": [
+        1252,
+        475,
+        52
+      ],
+      "jump": [
+        1294,
+        595,
+        52
+      ],
+      "rupture": [
+        1054,
+        595,
+        52
+      ]
+    },
+    "charges": {
+      "amber": 3,
+      "dash": 2,
+      "rupture": 3
+    },
+    "health": 3,
+    "iphone": true,
+    "player_dash": 1.03333333333333,
+    "read": true,
+    "size": [
+      1376,
+      675
+    ],
+    "stage": "play",
+    "x": -7.51999950408936
+  },
+  "replay": {
+    "buttons": {
+      "amber": [
+        934,
+        595,
+        52
+      ],
+      "attack": [
+        1174,
+        595,
+        52
+      ],
+      "dash": [
+        814,
+        595,
+        52
+      ],
+      "defend": [
+        1252,
+        475,
+        52
+      ],
+      "jump": [
+        1294,
+        595,
+        52
+      ],
+      "rupture": [
+        1054,
+        595,
+        52
+      ]
+    },
+    "charges": {
+      "amber": 0,
+      "dash": 0,
+      "rupture": 0
+    },
+    "health": 3,
+    "iphone": true,
+    "player_dash": 0,
+    "read": true,
+    "size": [
+      1376,
+      675
+    ],
+    "stage": "play",
+    "x": -8
+  },
+  "errors": [],
+  "blocked": [],
+  "engineErrors": []
+}

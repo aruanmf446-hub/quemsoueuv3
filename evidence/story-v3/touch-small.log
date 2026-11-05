@@ -1,0 +1,8 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS (640, 360): altura da ação 64
+PASS (640, 360): pular e voltar têm alvo adequado
+PASS (640, 360): fala longa não cobre ação
+PASS (640, 360): Voltar fica fora da legenda
+PASS (640, 360): ação dentro do viewport
+STORY_TOUCH_LAYOUT_RESULT checks=5 failures=0

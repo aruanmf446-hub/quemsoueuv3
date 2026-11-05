@@ -95,6 +95,13 @@ func render() -> void:
 			var rect := Rect2(index*w+1, 0, w-3, pips.size.y)
 			pips.draw_rect(rect, GOLD if index < local_completed.size() else (Color(1,1,1,0.35) if index < unlocked else Color(1,1,1,0.10))))
 	summary.add_child(pips)
+	var replay := Button.new()
+	replay.name = "ReplayOrigin"
+	replay.text = "Rever história"
+	replay.custom_minimum_size = Vector2(208,60)
+	PlayerUI.style_button(replay,false)
+	replay.pressed.connect(_replay_story.bind(1))
+	summary.add_child(replay)
 	_rail = ScrollContainer.new()
 	_rail.name = "PhaseRail"
 	_rail.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -170,7 +177,7 @@ func _phase_card(parent: Control, order: int, title: String, description: String
 	panel.add_child(column)
 	# Arte da cidade com o número da fase por cima.
 	var art := TextureRect.new()
-	art.texture = ART[(order-1)%ART.size()]
+	art.texture = load("res://assets/story/covers/phase_%02d.jpg" % order) if order <= 9 else ART[0]
 	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	art.custom_minimum_size.y = 80.0 if UIScale.is_iphone() else _px(150,46)
@@ -207,6 +214,20 @@ func _phase_card(parent: Control, order: int, title: String, description: String
 	chip.add_theme_stylebox_override("normal",chip_style)
 	chip.position = Vector2(_px(12,6),_px(12,6))
 	art.add_child(chip)
+	if available and order > 1:
+		var replay := Button.new()
+		replay.name = "ReplayScene%02d" % order
+		replay.text = "↺"
+		replay.tooltip_text = "Rever cena desta fase"
+		replay.custom_minimum_size = Vector2(56,56)
+		replay.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+		replay.offset_left = -68
+		replay.offset_right = -12
+		replay.offset_top = 12
+		replay.offset_bottom = 68
+		PlayerUI.style_button(replay,false)
+		replay.pressed.connect(_replay_story.bind(order))
+		art.add_child(replay)
 	var content := VBoxContainer.new()
 	content.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	content.add_theme_constant_override("separation",roundi(_px(8,3)))
@@ -300,6 +321,9 @@ func _launch(phase_id: String, path: String) -> void:
 
 func _present_phase_story(packed: PackedScene, menu: Control, order: int) -> void:
 	if not is_instance_valid(menu): return
+	if PhaseStory.was_read(order):
+		_open_loaded_phase(packed,menu)
+		return
 	menu.hide()
 	var story := PhaseStory.new()
 	story.name = "PhaseStory"
@@ -334,3 +358,22 @@ func _open_loaded_phase(packed: PackedScene, menu: Control) -> void:
 				layer.show()
 				layer.process_mode = Node.PROCESS_MODE_INHERIT)
 	menu.hide()
+
+func _replay_story(order: int) -> void:
+	if _launching: return
+	_launching = true
+	var menu := get_tree().current_scene as Control
+	if menu == null:
+		_launching = false
+		return
+	var story := PhaseStory.new()
+	story.name = "PhaseStory"
+	story.force_replay = true
+	get_tree().root.add_child(story)
+	var close := func() -> void:
+		if is_instance_valid(menu): menu.show()
+		_launching = false
+	story.finished.connect(close)
+	story.cancelled.connect(close)
+	menu.hide()
+	story.begin(order)

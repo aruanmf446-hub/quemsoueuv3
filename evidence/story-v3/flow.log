@@ -1,0 +1,13 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS boot abre a cena principal
+PASS história não interrompe o login inicial
+PASS primeira tela navegável é o login
+PASS notícias acessíveis pelo lobby
+PASS fase inicial disponível
+PASS transição da fase mostra cartão de abertura
+PASS história da fase já aparece enquanto carrega
+PASS fase01 apresenta oito quadros de origem
+PASS Próximo apresenta segunda imagem
+PASS cena da fase abre após carregar recursos
+PRESENTATION_RESULT checks=10 failures=0

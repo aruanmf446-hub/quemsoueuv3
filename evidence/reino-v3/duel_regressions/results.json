@@ -1,0 +1,12 @@
+[
+  {
+    "test": "duel_local",
+    "passed": true,
+    "exit_code": 0
+  },
+  {
+    "test": "battle_reveal",
+    "passed": true,
+    "exit_code": 0
+  }
+]

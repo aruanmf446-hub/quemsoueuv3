@@ -20,6 +20,10 @@ func _models() -> Array:
 		if parts.is_empty() or parts[0].begins_with("#"): continue
 		var dims := parts[parts.size() - 1].split("x")
 		list.append([parts[0], Vector2i(int(dims[0]), int(dims[1]))])
+	for arg: String in OS.get_cmdline_user_args():
+		if arg.begins_with("--models="):
+			var requested := arg.trim_prefix("--models=").split(",")
+			return list.filter(func(model: Array) -> bool: return model[0] in requested)
 	return list
 
 
@@ -69,7 +73,10 @@ func _run() -> void:
 		for i in 4: await process_frame
 		var nav: Node = menu.get_node("Navigation")
 		if not nav.get("_history").is_empty() and nav.get("_history").back().route == "account":
-			nav.back()
+			var startup_back := (nav.get("_active") as Control).get_node_or_null("Margin/Column/Header/Back") as Button
+			if startup_back != null: startup_back.pressed.emit()
+			else: nav.back()
+			await _settle(nav, "")
 			for i in 3: await process_frame
 		_audit("%s lobby" % model[0])
 		for route: String in ROUTES:
@@ -81,6 +88,7 @@ func _run() -> void:
 			if active == null or not (active as Control).is_visible_in_tree() or nav.get("_history").is_empty() or nav.get("_history").back().route != route:
 				failures += 1
 				print("IPHONE_FAIL %s %s: tela não abriu" % [model[0], route])
+				print("IPHONE_NAV_STATE ",JSON.stringify({"expected":route,"history":nav.get("_history").map(func(entry: Dictionary) -> String: return str(entry.route)),"busy":nav.get("_busy"),"pending":str(nav.get("_pending").get("kind","")),"paused":paused,"active":str(active.name) if is_instance_valid(active) else "null","visible":(active as Control).is_visible_in_tree() if is_instance_valid(active) else false}))
 			_audit("%s %s" % [model[0], route])
 			nav.back()
 			await _settle(nav, "")

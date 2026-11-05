@@ -1,6 +1,9 @@
 extends CactusEnemy
 signal winding_up
 signal alerted
+signal retired(enemy: Node3D)
+var _loaded := false
+var _generation := 0
 ## Perseguição: quem passa direto por um Cacto vivo (correndo ou pulando por cima) é
 ## perseguido por alguns segundos. Mais rápido que a patrulha, mas abaixo da corrida do
 ## jogador (6 m/s): continuar correndo despista; parar ou errar um pulo deixa ele alcançar.
@@ -8,6 +11,10 @@ const PURSUE_SPEED := 5.0
 const PURSUE_TIME := 6.0
 const PURSUE_RANGE := 18.0
 const PASS_WINDOW := 4.0
+var crystallized_left := 0.0
+var _crystal: Node3D
+var blocked_at_edge := false
+var persistent_follow := false
 var _pursue := 0.0
 var _side := 0.0
 var _windup := 0.0
@@ -22,7 +29,28 @@ func _ready() -> void:
 	collision_mask = 1
 	floor_snap_length = 0.18
 func setup(entry: Dictionary, spawn: Dictionary) -> void:
-	super.setup(entry, spawn)
+	_generation += 1
+	if not _loaded:
+		super.setup(entry, spawn)
+		_loaded = true
+	else:
+		var patrol: Array = spawn.get("patrol",[position.x-3,position.x+3])
+		_patrol_min = float(patrol[0])
+		_patrol_max = float(patrol[1])
+	_state = State.PATROL
+	_pursue = 0.0
+	_side = 0.0
+	_windup = 0.0
+	_stagger = 0.0
+	_recovery = 0.0
+	_cooldown = 0.0
+	crystallized_left = 0.0
+	if is_instance_valid(_crystal): _crystal.queue_free()
+	_model.set_rate(1.0)
+	_model.play_animation("base",true)
+	collision_layer = 4
+	collision_mask = 1
+	velocity = Vector3.ZERO
 	health = 1
 	attack_range = 1.25
 	_model.rotation.y = _yaw_target
@@ -30,9 +58,17 @@ func _physics_process(delta: float) -> void:
 	if _state == State.DEAD: return
 	if global_position.y < KILL_PLANE_Y:
 		remove_from_group("enemies")
-		queue_free()
+		retired.emit(self)
 		return
 	if not is_instance_valid(_player): _player = get_tree().get_first_node_in_group("player") as SidePlayer
+	if crystallized_left > 0.0:
+		crystallized_left = maxf(0.0,crystallized_left-delta)
+		velocity = Vector3.ZERO
+		_model.set_rate(0.0)
+		if crystallized_left <= 0.0:
+			if is_instance_valid(_crystal): _crystal.queue_free()
+			_model.set_rate(1.0)
+		return
 	_cooldown = maxf(_cooldown - delta, 0.0)
 	_stagger = maxf(_stagger - delta, 0.0)
 	_recovery = maxf(_recovery - delta, 0.0)
@@ -69,7 +105,7 @@ func _physics_process(delta: float) -> void:
 		else:
 			_model.play_animation("pronto",true)
 	else:
-		var pursuing := _pursue > 0.0 and absf(offset.x) < PURSUE_RANGE and absf(offset.y) < 3.0
+		var pursuing := persistent_follow or (_pursue > 0.0 and absf(offset.x) < PURSUE_RANGE and absf(offset.y) < 3.0)
 		if _pursue > 0.0 and not pursuing: _pursue = 0.0
 		var chasing := pursuing or (absf(offset.x) < detect_range and absf(offset.y) < 1.6)
 		_state = State.CHASE if chasing else State.PATROL
@@ -80,7 +116,12 @@ func _physics_process(delta: float) -> void:
 		var ray := PhysicsRayQueryParameters3D.create(global_position + Vector3(direction * 0.75, 0.6, 0), global_position + Vector3(direction * 0.75, -0.7, 0), 1)
 		var has_ground := not get_world_3d().direct_space_state.intersect_ray(ray).is_empty()
 		var wall := test_move(global_transform, Vector3(direction * 0.2, 0, 0))
-		if is_on_floor() and (not has_ground or wall):
+		blocked_at_edge = is_on_floor() and (not has_ground or wall)
+		if is_on_floor() and wall and can_jump_low(direction):
+			velocity.y = 6.3
+			velocity.x = direction*PURSUE_SPEED
+			blocked_at_edge = false
+		elif blocked_at_edge:
 			velocity.x = 0
 			_direction = -direction
 			# Na beira de um vão ou contra um muro ele não segue: desiste em seguida.
@@ -138,10 +179,55 @@ func take_damage(amount: int) -> void:
 	super.take_damage(amount)
 func _die() -> void:
 	_state = State.DEAD
+	crystallized_left = 0.0
+	_model.set_rate(1.0)
+	if is_instance_valid(_crystal): _crystal.queue_free()
 	defeated.emit()
 	remove_from_group("enemies")
 	velocity = Vector3.ZERO
 	collision_layer = 0
 	collision_mask = 0
 	_model.play_animation("morte",false)
-	get_tree().create_timer(1.6,false).timeout.connect(queue_free)
+	var generation := _generation
+	get_tree().create_timer(1.6,false).timeout.connect(func() -> void:
+		if generation == _generation: retired.emit(self))
+
+## Somente obstáculo sólido baixo/estreito e piso contínuo do outro lado.
+func can_jump_low(direction: float) -> bool:
+	var space := get_world_3d().direct_space_state
+	var origin := global_position
+	var low := space.intersect_ray(PhysicsRayQueryParameters3D.create(origin+Vector3(0,0.15,0),origin+Vector3(direction*1.9,0.15,0),1))
+	if low.is_empty(): return false
+	var high := space.intersect_ray(PhysicsRayQueryParameters3D.create(origin+Vector3(0,0.68,0),origin+Vector3(direction*1.9,0.68,0),1))
+	if not high.is_empty(): return false
+	var reverse := space.intersect_ray(PhysicsRayQueryParameters3D.create(origin+Vector3(direction*2.1,0.15,0),origin+Vector3(0,0.15,0),1))
+	if reverse.is_empty() or reverse.collider != low.collider: return false
+	if absf(float(reverse.position.x)-float(low.position.x)) > 1.25: return false
+	# O patamar de aterrissagem deve ser chão, não o topo do próprio bloco.
+	for distance in [2.0,2.25,2.5]:
+		var hit := space.intersect_ray(PhysicsRayQueryParameters3D.create(origin+Vector3(direction*distance,0.7,0),origin+Vector3(direction*distance,-0.25,0),1))
+		if hit.is_empty() or absf(float(hit.position.y)-origin.y) > 0.12: return false
+	return true
+
+func crystallize(seconds: float) -> void:
+	if _state == State.DEAD: return
+	crystallized_left = maxf(crystallized_left,seconds)
+	_windup = 0.0
+	velocity = Vector3.ZERO
+	if is_instance_valid(_crystal): return
+	_crystal = Node3D.new()
+	add_child(_crystal)
+	var material := StandardMaterial3D.new()
+	material.albedo_color = Color(1.0,0.77,0.30,0.35)
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	for index in range(3):
+		var mesh := MeshInstance3D.new()
+		var crystal := CylinderMesh.new()
+		crystal.top_radius = 0.0
+		crystal.bottom_radius = 0.38
+		crystal.height = 1.6+index*0.2
+		crystal.radial_segments = 5
+		mesh.mesh = crystal
+		mesh.material_override = material
+		mesh.position = Vector3((index-1)*0.35,0.9,0.25)
+		_crystal.add_child(mesh)

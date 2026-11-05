@@ -109,7 +109,8 @@ function assemble(build) { execSync(`python3 tests/web_pwa/assemble.py ${site}/q
   });
   check(loginKinds.join() === 'email,username,true,qse-login', `e-mail real no formulário (senhas salvas) ${loginKinds}`);
   check(await phone.evaluate(() => { try { window.qseNativeInput.remember(); return true; } catch (e) { return false; } }), 'pedido para salvar a senha não quebra');
-  check(await phone.evaluate(() => getComputedStyle(document.getElementById('qse-install')).display) === 'none' || true, 'convite de instalação não bloqueia o jogo');
+  check(await phone.evaluate(() => { window.qseSetStoryPlaying(true); window.qseShowInstall(); return getComputedStyle(document.getElementById('qse-install')).display; }) === 'none', 'convite de instalação oculto durante a campanha');
+  check(await phone.evaluate(() => { window.qseSetStoryPlaying(false); return getComputedStyle(document.getElementById('qse-install')).display; }) === 'block', 'convite de instalação restaurado ao sair da campanha');
   await browser.close();
   server.kill();
   console.log(`PWA_TEST checks=${checks} failures=${failures}`);

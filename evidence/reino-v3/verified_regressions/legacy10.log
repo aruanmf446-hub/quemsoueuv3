@@ -1,0 +1,11 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS Fase10 permanece no controlador original
+PASS Fase10 mantém movimento e combate compartilhados originais
+PASS Fase10 mantém vida original5
+PASS Fase10 mantém mapa e chefe originais
+PASS Malagueta original aparece
+PASS ataque original preserva dano2 na Fase10
+PASS Fase10 mantém ataques reutilizáveis sem carga consumível
+PASS saída continua bloqueada enquanto chefe vive
+LEGACY10_RESULT checks=8 failures=0

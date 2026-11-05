@@ -1,0 +1,18 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS (750, 353): altura da ação 88
+PASS (750, 353): pular e voltar têm alvo adequado
+PASS (750, 353): fala longa não cobre ação
+PASS (750, 353): Voltar fica fora da legenda
+PASS (750, 353): ação dentro do viewport
+PASS (712, 338): altura da ação 88
+PASS (712, 338): pular e voltar têm alvo adequado
+PASS (712, 338): fala longa não cobre ação
+PASS (712, 338): Voltar fica fora da legenda
+PASS (712, 338): ação dentro do viewport
+PASS (667, 359): altura da ação 88
+PASS (667, 359): pular e voltar têm alvo adequado
+PASS (667, 359): fala longa não cobre ação
+PASS (667, 359): Voltar fica fora da legenda
+PASS (667, 359): ação dentro do viewport
+STORY_TOUCH_LAYOUT_RESULT checks=15 failures=0

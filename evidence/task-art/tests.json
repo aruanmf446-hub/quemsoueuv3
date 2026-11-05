@@ -1,0 +1,38 @@
+[
+  {
+    "test": "scenario_tasks_test",
+    "exit": 0,
+    "seconds": 10.33,
+    "errors": [],
+    "summary": [
+      "SCENARIO_TASKS checks=177 failures=0"
+    ]
+  },
+  {
+    "test": "parkour_revision_test",
+    "exit": 0,
+    "seconds": 2.03,
+    "errors": [],
+    "summary": [
+      "PARKOUR_REVISION checks=52 failures=0"
+    ]
+  },
+  {
+    "test": "task_barriers_test",
+    "exit": 0,
+    "seconds": 2.12,
+    "errors": [],
+    "summary": [
+      "TASK_BARRIERS checks=26 failures=0"
+    ]
+  },
+  {
+    "test": "first_use_tutorial_test",
+    "exit": 0,
+    "seconds": 2.68,
+    "errors": [],
+    "summary": [
+      "FIRST_USE_TUTORIAL checks=21 failures=0"
+    ]
+  }
+]

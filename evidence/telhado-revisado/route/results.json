@@ -1,0 +1,10 @@
+[
+  {
+    "test": "route-02",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 19.9,
+    "graphical": false,
+    "fixed_physics_step": true
+  }
+]

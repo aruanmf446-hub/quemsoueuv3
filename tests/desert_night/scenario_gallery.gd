@@ -26,6 +26,7 @@ func run() -> void:
 	root.mode=Window.MODE_WINDOWED
 	root.size=Vector2i(844,390) if profile=="iphone" else (Vector2i(640,360) if profile=="640" else Vector2i(1672,941))
 	var orders: Array=range(1,11) if profile=="iphone" else ([1,2,3,7] if profile=="desktop" else [2,7])
+	if "--roof-only" in args:orders=[2]
 	for order: int in orders:
 		var phase: Node3D=load("res://scenes/desert/phase_%02d.tscn" % order).instantiate()
 		root.add_child(phase)

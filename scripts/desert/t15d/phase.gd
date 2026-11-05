@@ -307,6 +307,9 @@ func _chunk_platforms(index: int) -> Array:
 		var part: Dictionary = source.duplicate(true)
 		part.pos[0] = (x0+x1)*0.5
 		part.size[0] = x1-x0
+		if _order==2 and source.get("parkour_route",false):
+			part.route_center=float(source.pos[0])
+			part.route_width=float(source.size[0])
 		# Somente bordas reais do terreno recebem laterais/lanternas de aviso.
 		part.cap_left = _is_exposed_edge(x0,true,source.kind)
 		part.cap_right = _is_exposed_edge(x1,false,source.kind)
@@ -330,6 +333,19 @@ func _build_collision(chunk: Node3D, platforms: Array) -> void:
 			body.position.y = float(part.pos[1])
 		box.size = dimensions
 		shape.shape = box
+		if _order==2 and part.get("parkour_route",false):
+			var roof := ConvexPolygonShape3D.new()
+			var vertices := PackedVector3Array()
+			var center: float=part.route_center
+			var points := [body.position.x-dimensions.x*0.5,body.position.x+dimensions.x*0.5]
+			for ridge in [center-1.0,center+1.0]:
+				if ridge>float(points[0]) and ridge<float(points[1]):points.append(ridge)
+			for world_x: float in points:
+				for z in [-1.9,1.9]:
+					vertices.append(Vector3(world_x-body.position.x,float(part.surface_top)-body.position.y,z))
+					vertices.append(Vector3(world_x-body.position.x,float(part.surface_top)+Layout.roof_height(world_x-center,float(part.route_width))-body.position.y,z))
+			roof.points=vertices
+			shape.shape=roof
 		body.add_child(shape)
 		if part.get("parkour_route",false): body.set_meta("parkour_route",true)
 		if part.kind=="ground": body.set_meta("walkable_floor",true)

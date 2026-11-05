@@ -359,6 +359,7 @@ func _triangle(key: String, a: Vector3, b: Vector3, c: Vector3) -> void:
 	var st: SurfaceTool = _builders[key]
 	var normal := (b-a).cross(c-a).normalized()
 	for point in [a,b,c]:
+		if key in ["roof","roof_clay","roof_clay_alt","roof_grout"]: st.set_smooth_group(-1)
 		var uv := Vector2(point.x,point.y)
 		if absf(normal.y) > 0.65: uv = Vector2(point.x,point.z)
 		elif absf(normal.x) > 0.65: uv = Vector2(point.z,point.y)
@@ -381,13 +382,21 @@ func _flush() -> void:
 func _material(key: String) -> StandardMaterial3D:
 	if _shared_materials.has(key): return _shared_materials[key]
 	var mat := StandardMaterial3D.new()
-	var colors := {"stone":"#b4acbb","trim":"#c8b79b","recess":"#354051","dome":"#9d292e","metal":"#344054","cloth":"#6b1018","cloth_alt":"#59151c","window":"#d5a667","leaf":"#396d50","water":"#286f85","wood":"#816044","crystal":"#e9a84e","roof":"#b88669"}
+	var colors := {"stone":"#b4acbb","trim":"#c8b79b","recess":"#354051","dome":"#9d292e","metal":"#344054","cloth":"#6b1018","cloth_alt":"#59151c","window":"#d5a667","leaf":"#396d50","water":"#286f85","wood":"#816044","crystal":"#e9a84e","roof":"#c6a582","roof_clay":"#ac6448","roof_clay_alt":"#99563d","roof_grout":"#5e3b2c"}
 	mat.albedo_color = Color(colors.get(key,"#72849a"))
 	mat.roughness = 0.15 if key == "water" else 0.92
 	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 	if key in ["stone","trim","dome","roof"]:
 		mat.albedo_texture = load("res://assets/desert/modular/stone_masonry.res") if ResourceLoader.exists("res://assets/desert/modular/stone_masonry.res") else preload("res://assets/desert/phase01/sandstone.png")
 		mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	if key=="roof":
+		# Textura contínua própria para repetição; o atlas da fachada criava faixas esticadas.
+		mat.albedo_texture=preload("res://assets/desert/phase01/sandstone.png")
+		mat.roughness=1.0
+	if key in ["roof","roof_clay","roof_clay_alt","roof_grout"]:
+		mat.albedo_color=mat.albedo_color.srgb_to_linear()
+		mat.metallic_specular=0.1
+		mat.roughness=1.0
 	if key in ["window","crystal"]:
 		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		mat.albedo_color = Color("#ca9554").srgb_to_linear()

@@ -15,6 +15,10 @@ func build_surface(platform: Dictionary, order: int) -> void:
 	var right := x+width*0.5
 	var module: int = platform.get("module",0)
 	if platform.get("parkour_route",false):
+		if order==2 and platform.has("route_center"):
+			if floori(x/64.0)!=floori(float(platform.route_center)/64.0): return
+			x=float(platform.route_center)
+			width=float(platform.route_width)
 		_build_running_obstacle(x,width,float(platform.surface_top),top,order)
 		_flush()
 		return
@@ -28,8 +32,9 @@ func build_surface(platform: Dictionary, order: int) -> void:
 		for point: Dictionary in Assets.placements(order):
 			if point.asset=="desert_timber_bridge" and int(point.surface)==module: bridge=true
 	var material := "wood" if order in [7,9,10] and (module%3 == 1 or bridge) else "stone"
-	_box(Vector3(x,top-0.25,0),Vector3(width,0.5,4.0),material)
-	_box(Vector3(x,top-0.08,2.02),Vector3(width,0.16,0.16),"trim")
+	if order!=2:
+		_box(Vector3(x,top-0.25,0),Vector3(width,0.5,4.0),material)
+		_box(Vector3(x,top-0.08,2.02),Vector3(width,0.16,0.16),"trim")
 	match order:
 		2:
 			# Fachada desce8m: janelas/portas abaixo, topo inteiro jogável, sem rua acessível.
@@ -39,8 +44,7 @@ func build_surface(platform: Dictionary, order: int) -> void:
 			_box(Vector3(x,top-0.12,2.06),Vector3(width,0.24,0.30),"trim")
 			_box(Vector3(x,top+0.14,-1.95),Vector3(width,0.28,0.22),"trim")
 			# Cobertura e cornija sobre o mesmo piso físico: leitura de telhado, não rua.
-			_box(Vector3(x,top-0.025,0),Vector3(width,0.05,3.98),"roof")
-			_box(Vector3(x,top-0.12,2.05),Vector3(width,0.20,0.23),"roof")
+			_box(Vector3(x,top-0.10,0),Vector3(width,0.20,3.98),"roof")
 			for seam in range(ceili(left/6.0),floori(right/6.0)+1):
 				_box(Vector3(seam*6.0,top+0.006,0),Vector3(0.045,0.012,3.95),"trim")
 			for edge in [["pit_left",left+0.17],["pit_right",right-0.17]]:
@@ -78,6 +82,9 @@ func build_surface(platform: Dictionary, order: int) -> void:
 
 func _build_running_obstacle(x: float,width: float,base: float,top: float,order: int) -> void:
 	# Um objeto reconhecível com topo percorrível, nunca outra pilha de pisos.
+	if order==2:
+		_tiled_roof(x,width,base)
+		return
 	var material := "cloth" if order==3 else ("wood" if order in [5,7,9,10] else "stone")
 	if order in [5,6]:
 		var log := MeshInstance3D.new()
@@ -104,6 +111,30 @@ func _build_running_obstacle(x: float,width: float,base: float,top: float,order:
 			for stripe in range(ceili(width/0.7)):
 				_box(Vector3(x-width*0.5+stripe*0.7+0.12,top+0.006,0),Vector3(0.16,0.015,3.8),"cloth_alt")
 		elif order in [1,4,8]: _arch_frame(Vector3(x,base,1.7),width-1.0,1.02,0.12)
+
+func _roof_y(local_x: float,width: float) -> float:
+	return Assets.Layout.roof_height(local_x,width)
+
+func _tiled_roof(x: float,width: float,base: float) -> void:
+	# Volume fechado e ligado ao prédio. Telhas em duas águas e faixa central percorrível.
+	var profile := [-width*0.5,-1.0,1.0,width*0.5]
+	for i in 3:
+		var a: float=profile[i]
+		var b: float=profile[i+1]
+		_quad("roof_grout",Vector3(x+a,base+_roof_y(a,width),-2.0),Vector3(x+b,base+_roof_y(b,width),-2.0),Vector3(x+b,base+_roof_y(b,width),2.0),Vector3(x+a,base+_roof_y(a,width),2.0))
+		for z in [-2.0,2.0]:
+			_quad("stone",Vector3(x+a,base,z),Vector3(x+a,base+_roof_y(a,width),z),Vector3(x+b,base+_roof_y(b,width),z),Vector3(x+b,base,z))
+	for side in [-1.0,1.0]:
+		_box(Vector3(x+side*width*0.5,base+0.275,0),Vector3(0.08,0.55,4.0),"stone")
+	# Juntas reais evitam depender de uma imagem esticada sobre todo o teto.
+	var columns := ceili(width/0.42)
+	for column in columns:
+		var a := -width*0.5+column*width/columns+0.012
+		var b := -width*0.5+(column+1)*width/columns-0.012
+		for row in 8:
+			var z := -2.0+row*0.5+0.012
+			var key := "roof_clay" if (column+row)%3 else "roof_clay_alt"
+			_quad(key,Vector3(x+a,base+_roof_y(a,width)+0.012,z),Vector3(x+b,base+_roof_y(b,width)+0.012,z),Vector3(x+b,base+_roof_y(b,width)+0.012,z+0.476),Vector3(x+a,base+_roof_y(a,width)+0.012,z+0.476))
 
 func _facade(left: float,right: float,top: float,bottom: float) -> void:
 	_box(Vector3((left+right)*0.5,(top+bottom)*0.5,-0.25),Vector3(right-left,top-bottom,3.4),"stone")

@@ -81,7 +81,8 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 		if order==10 and index>=modules/2: stair_run=false # Arena final preservada.
 		if stair_run:
 			var route_width := 5.6
-			var route_x := left+module_length*0.5
+			# Telhados inclinados precisam de área livre para pousar antes do vão seguinte.
+			var route_x := left+module_length*(0.35 if order==2 else 0.5)
 			platforms.append({"id":"%s.route.%02d" % [prefix,index],"kind":"route","pos":[route_x,top+1.0,0],"size":[route_width,0.20,3.8],"span_start":route_x-route_width*0.5,"span_end":route_x+route_width*0.5,"module":index,"architecture":THEMES[order-1],"surface_top":top,"parkour_route":true})
 		if not stair_run and index > 0 and ((order == 2 and index%9 == 5) or (order != 2 and index%3 == 2)):
 			var height := 0.5 if order == 2 else 0.6
@@ -156,6 +157,9 @@ static func _height(order: int,index: int) -> float:
 		7: return pattern*1.2
 		10: return -2.0+pattern
 	return pattern*0.5
+
+static func roof_height(local_x: float,width: float) -> float:
+	return 1.1-0.55*clampf((absf(local_x)-1.0)/(width*0.5-1.0),0,1)
 
 static func floor_at(stage: Dictionary,x: float) -> Dictionary:
 	for surface: Dictionary in stage.surfaces:

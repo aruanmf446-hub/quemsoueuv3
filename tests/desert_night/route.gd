@@ -252,7 +252,10 @@ func surface_at(x: float) -> float:
 	for platform: Dictionary in platforms:
 		var half := float(platform.size[0])*0.5
 		if x >= float(platform.pos[0])-half and x <= float(platform.pos[0])+half:
-			top = maxf(top,float(platform.pos[1])+float(platform.size[1])*0.5)
+			var height := float(platform.pos[1])+float(platform.size[1])*0.5
+			if order==2 and platform.get("parkour_route",false):
+				height=float(platform.surface_top)+phase.Layout.roof_height(x-float(platform.pos[0]),float(platform.size[0]))
+			top = maxf(top,height)
 	return top
 func enemy_ahead(distance: float) -> Node3D:
 	var nearest: Node3D

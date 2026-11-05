@@ -42,7 +42,7 @@ usuário, nickname, metadata editável pelo usuário ou papel de administrador d
 |---|---|---|
 | `qse_deck_review_access()` | `{}` | `{"is_moderator":true/false}` |
 | `qse_deck_review_queue(p_limit integer)` | `{"p_limit":50}` | `{"items":[{"id":"uuid","name":"…","status":"pending_review"}]}` |
-| `qse_deck_review_detail(p_deck uuid)` | `{"p_deck":"uuid"}` | `{ "deck":{ "id":"uuid", "name":"…", "description":"…", "status":"pending_review", "creator":{"nickname":"…","public_id":"QSE-…"}, "cover_path":"caminho ou null" }, "cards":[{ "id":"uuid", "name":"…", "preview_library_path":"…", "preview_duel_path":"…" }] }` |
+| `qse_deck_review_detail(p_deck uuid)` | `{"p_deck":"uuid"}` | `{ "deck":{ "id":"uuid", "name":"…", "description":"…", "status":"pending_review", "creator":{"nickname":"…"}, "cover_path":"caminho ou null" }, "cards":[{ "id":"uuid", "name":"…", "preview_library_path":"…", "preview_duel_path":"…" }] }` |
 | `qse_deck_review_decide(p_deck uuid,p_approved boolean,p_reason text)` | UUID, boolean, motivo ou null | `{"deck_id":"uuid","status":"published ou rejected","review_note":"…"}` |
 
 Falha de negócio no formato existente `{"error":"forbidden"}`,
@@ -75,9 +75,11 @@ Falha de negócio no formato existente `{"error":"forbidden"}`,
 
 ## O que o dono faz manualmente
 
-1. Copiar seu **ID público QSE-…** do perfil do jogo. Não fornecer tokens/senhas.
-2. Abrir o ChatGPT com o plugin Supabase e colar o prompt abaixo, informando esse
-   ID. O plugin deve confirmar o projeto GAME e inspecionar o que já existe.
+1. Ter em mãos o e-mail usado no login do jogo. Não é necessário obter ou criar
+   um ID QSE. Não fornecer tokens/senhas.
+2. Abrir o ChatGPT com o plugin Supabase e colar o prompt abaixo. Informar o
+   e-mail nessa conversa quando solicitado; o plugin deve localizar a conta
+   existente no projeto GAME e confirmar com você antes de autorizar o revisor.
 3. Receber o relatório das RPCs/políticas e trazer a resposta para o Codex ajustar
    qualquer diferença de contrato. Não é necessário criar conta em outro provedor.
 4. Depois da publicação do cliente, testar com jogador e revisor: enviar, reprovar,
@@ -87,7 +89,9 @@ Falha de negócio no formato existente `{"error":"forbidden"}`,
 ## Prompt para o ChatGPT com plugin Supabase
 
 ```text
-Projeto: Quem Sou Eu V3. ID público do dono/revisor: [PREENCHER QSE-…].
+Projeto: Quem Sou Eu V3. Quero autorizar minha conta existente como revisora.
+Peça o e-mail que uso no login do jogo para localizar a conta. Não exija um
+identificador QSE; não crie outra conta nem altere meu perfil para este fluxo.
 
 Usaremos somente o Supabase GAME existente e seu Storage privado. Não criar
 Cloudflare Worker, R2, outro provedor ou credencial administrativa no cliente.
@@ -108,9 +112,10 @@ qse_deck_review_decide(p_deck uuid,p_approved boolean,p_reason text).
 Reaproveite equivalentes existentes ou implemente apenas o que faltar,
 respeitando os retornos e requisitos do documento.
 
-Associe a permissão de moderador à conta do ID público fornecido, usando
-autorização protegida no servidor. Se o ID não identificar uma única conta
-real, pare e explique. Não autorize automaticamente quem chamar primeiro.
+Localize a conta real pelo e-mail de login e confirme comigo qual conta será
+autorizada antes de conceder a permissão. Use seu identificador Auth existente
+somente no mecanismo protegido do servidor. Se não houver correspondência
+única, pare e explique. Não autorize automaticamente quem chamar primeiro.
 Administrador de sala, nickname ou metadata editável não concedem moderação.
 
 Bucket privado; originais protegidos; revisor pode ler apenas as prévias/capa

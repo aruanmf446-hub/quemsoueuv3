@@ -1,6 +1,7 @@
 extends CanvasLayer
 ## HUD em pixels físicos: recursos, distrito e avanço têm hierarquias diferentes.
 signal pause_requested
+signal bridge_requested
 const Icons = preload("res://scripts/desert/t15d/resource_icons.gd")
 var _root: Control
 var _identity: PanelContainer
@@ -32,6 +33,7 @@ var _flash_length := 1.0
 var _flash_peak := 0.0
 var _last_health := 3
 var _actions: HBoxContainer
+var _bridge_task: Button
 var _action_buttons := {}
 var _stage: Dictionary
 func configure(stage: Dictionary) -> void:
@@ -107,6 +109,14 @@ func _ready() -> void:
 	_actions = HBoxContainer.new()
 	_actions.add_theme_constant_override("separation",8)
 	_root.add_child(_actions)
+	_bridge_task = Button.new()
+	_bridge_task.text = "Montar ponte · F"
+	_bridge_task.custom_minimum_size = Vector2(520,64)
+	_bridge_task.focus_mode = Control.FOCUS_NONE
+	PlayerUI.style_button(_bridge_task,true)
+	_bridge_task.pressed.connect(bridge_requested.emit)
+	_bridge_task.hide()
+	_root.add_child(_bridge_task)
 	_actions.visible = not (DisplayServer.is_touchscreen_available() or OS.has_feature("android") or OS.has_feature("web") or UIScale.is_handheld() or "--touch-controls" in OS.get_cmdline_user_args())
 	get_viewport().size_changed.connect(_layout)
 	_layout()
@@ -119,6 +129,11 @@ func label(text: String, size: int, color: Color) -> Label:
 	return node
 func box() -> StyleBoxFlat:
 	return PlayerUI.plate()
+func set_bridge_task(available: bool,caption := "Montar ponte · F") -> void:
+	_bridge_task.visible = available
+	if _bridge_task.text!=caption:
+		_bridge_task.text=caption
+		_layout()
 func _layout() -> void:
 	var viewport_size := get_viewport().get_visible_rect().size
 	var compact := UIScale.is_iphone()
@@ -140,6 +155,8 @@ func _layout() -> void:
 	_actions.position = Vector2(maxf(14,screen.x-_actions.get_combined_minimum_size().x-24),screen.y-104)
 	_toast.position = Vector2(maxf(14,(screen.x-760)*0.5),92 if compact else 128)
 	_toast.size = Vector2(minf(screen.x-28,760),76)
+	_bridge_task.size = _bridge_task.custom_minimum_size
+	_bridge_task.position = Vector2((screen.x-_bridge_task.size.x)*0.5,screen.y-182)
 ## Corações para a vida e dois medalhões (espada em chamas = ataque, escudo = defesa), os
 ## mesmos dos itens no mapa. Sem carga, o medalhão fica cinza.
 func _draw_resources() -> void:

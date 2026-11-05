@@ -1,0 +1,77 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS fase01: camada de muralhas/palácios presente
+PASS fase01: dunas aprovadas mantidas
+PASS fase01: pool fixo de três muros e três palácios
+PASS fase01: fundo não adiciona colisão nem luz
+PASS fase01: avançar e voltar não cria objetos
+PASS fase01: fundo sem sombras novas
+PASS fase01: decoração de cobertura não invade outras fases
+PASS fase01: sair limpa o fundo e os terraços
+PASS fase02: camada de muralhas/palácios presente
+PASS fase02: dunas aprovadas mantidas
+PASS fase02: pool fixo de três muros e três palácios
+PASS fase02: fundo não adiciona colisão nem luz
+PASS fase02: avançar e voltar não cria objetos
+PASS fase02: fundo sem sombras novas
+PASS fase2: jogador continua na altura dos telhados
+PASS fase2: terraços únicos, fora da pista do jogador
+PASS fase2: cobertura dos prédios presente
+PASS fase2: primeiro vão continua realmente aberto
+PASS fase2: aterrissagem na altura original
+PASS fase02: sair limpa o fundo e os terraços
+PASS fase03: camada de muralhas/palácios presente
+PASS fase03: dunas aprovadas mantidas
+PASS fase03: pool fixo de três muros e três palácios
+PASS fase03: fundo não adiciona colisão nem luz
+PASS fase03: avançar e voltar não cria objetos
+PASS fase03: fundo sem sombras novas
+PASS fase03: decoração de cobertura não invade outras fases
+PASS fase03: sair limpa o fundo e os terraços
+PASS fase04: camada de muralhas/palácios presente
+PASS fase04: dunas aprovadas mantidas
+PASS fase04: pool fixo de três muros e três palácios
+PASS fase04: fundo não adiciona colisão nem luz
+PASS fase04: avançar e voltar não cria objetos
+PASS fase04: fundo sem sombras novas
+PASS fase04: decoração de cobertura não invade outras fases
+PASS fase04: sair limpa o fundo e os terraços
+PASS fase05: camada de muralhas/palácios presente
+PASS fase05: dunas aprovadas mantidas
+PASS fase05: pool fixo de três muros e três palácios
+PASS fase05: fundo não adiciona colisão nem luz
+PASS fase05: avançar e voltar não cria objetos
+PASS fase05: fundo sem sombras novas
+PASS fase05: decoração de cobertura não invade outras fases
+PASS fase05: sair limpa o fundo e os terraços
+PASS fase06: subterrâneo preservado sem céu ou palácios
+PASS fase06: decoração de cobertura não invade outras fases
+PASS fase06: sair limpa o fundo e os terraços
+PASS fase07: camada de muralhas/palácios presente
+PASS fase07: dunas aprovadas mantidas
+PASS fase07: pool fixo de três muros e três palácios
+PASS fase07: fundo não adiciona colisão nem luz
+PASS fase07: avançar e voltar não cria objetos
+PASS fase07: fundo sem sombras novas
+PASS fase07: decoração de cobertura não invade outras fases
+PASS fase07: sair limpa o fundo e os terraços
+PASS fase08: camada de muralhas/palácios presente
+PASS fase08: dunas aprovadas mantidas
+PASS fase08: pool fixo de três muros e três palácios
+PASS fase08: fundo não adiciona colisão nem luz
+PASS fase08: avançar e voltar não cria objetos
+PASS fase08: fundo sem sombras novas
+PASS fase08: decoração de cobertura não invade outras fases
+PASS fase08: sair limpa o fundo e os terraços
+PASS fase09: camada de muralhas/palácios presente
+PASS fase09: dunas aprovadas mantidas
+PASS fase09: pool fixo de três muros e três palácios
+PASS fase09: fundo não adiciona colisão nem luz
+PASS fase09: avançar e voltar não cria objetos
+PASS fase09: fundo sem sombras novas
+PASS fase09: decoração de cobertura não invade outras fases
+PASS fase09: sair limpa o fundo e os terraços
+PASS fase10: subterrâneo preservado sem céu ou palácios
+PASS fase10: decoração de cobertura não invade outras fases
+PASS fase10: sair limpa o fundo e os terraços
+SKYLINE_ROOFS checks=74 failures=0

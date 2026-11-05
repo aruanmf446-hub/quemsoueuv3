@@ -1,0 +1,98 @@
+[
+  {
+    "test": "reino10",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 8.68,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "layout",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 3.54,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "checkpoints",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 4.76,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "route-01",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 15.61,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-02",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 17.02,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-03",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 15.53,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-04",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 17.21,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-05",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 20.67,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-06",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 17.77,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-07",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 17.54,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-08",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 14.84,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-09",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 17.92,
+    "graphical": false,
+    "fixed_physics_step": true
+  }
+]

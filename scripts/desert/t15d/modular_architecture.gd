@@ -14,6 +14,10 @@ func build_surface(platform: Dictionary, order: int) -> void:
 	var left := x-width*0.5
 	var right := x+width*0.5
 	var module: int = platform.get("module",0)
+	if platform.get("parkour_route",false):
+		_build_running_obstacle(x,width,float(platform.surface_top),top,order)
+		_flush()
+		return
 	if platform.kind != "ground":
 		_crate(Vector3(x,top-float(platform.size[1]),0),width,float(platform.size[1]))
 		_flush()
@@ -29,8 +33,19 @@ func build_surface(platform: Dictionary, order: int) -> void:
 	match order:
 		2:
 			# Fachada desce8m: janelas/portas abaixo, topo inteiro jogável, sem rua acessível.
-			_facade(left,right,top-0.5,top-9.0)
+			_facade(left,right,top-0.16,top-9.0)
+			# Testeira contínua liga a laje física à alvenaria, sem faixa vazia sobre a arte.
+			_box(Vector3(x,top-0.43,1.92),Vector3(width,0.86,0.24),"roof")
+			_box(Vector3(x,top-0.12,2.06),Vector3(width,0.24,0.30),"trim")
 			_box(Vector3(x,top+0.14,-1.95),Vector3(width,0.28,0.22),"trim")
+			# Cobertura e cornija sobre o mesmo piso físico: leitura de telhado, não rua.
+			_box(Vector3(x,top-0.025,0),Vector3(width,0.05,3.98),"roof")
+			_box(Vector3(x,top-0.12,2.05),Vector3(width,0.20,0.23),"roof")
+			for seam in range(ceili(left/6.0),floori(right/6.0)+1):
+				_box(Vector3(seam*6.0,top+0.006,0),Vector3(0.045,0.012,3.95),"trim")
+			for edge in [["pit_left",left+0.17],["pit_right",right-0.17]]:
+				if platform.get(edge[0],false):
+					_box(Vector3(float(edge[1]),top+0.30,-1.8),Vector3(0.30,0.60,0.34),"trim")
 		4:
 			_painted_facade(left,right,top-0.18,2.12,"desert_aqueduct",9.0)
 			# O tabuleiro volumétrico e a água animada continuam independentes da arte.
@@ -60,6 +75,35 @@ func build_surface(platform: Dictionary, order: int) -> void:
 		if order == 4 and marker%3 == 1: _water_strip(at+Vector3(0,-1.5,-0.7),Vector2(1.6,3.0),true)
 		if order in [6,10] and marker%3==0: _underground(at,marker)
 	_flush()
+
+func _build_running_obstacle(x: float,width: float,base: float,top: float,order: int) -> void:
+	# Um objeto reconhecível com topo percorrível, nunca outra pilha de pisos.
+	var material := "cloth" if order==3 else ("wood" if order in [5,7,9,10] else "stone")
+	if order in [5,6]:
+		var log := MeshInstance3D.new()
+		var cylinder := CylinderMesh.new()
+		cylinder.top_radius=0.54
+		cylinder.bottom_radius=0.54
+		cylinder.height=width
+		cylinder.radial_segments=12
+		log.mesh=cylinder
+		log.position=Vector3(x,base+0.55,0)
+		log.rotation.z=PI*0.5
+		log.material_override=_material(material)
+		add_child(log)
+	elif order in [7,9]:
+		_crate(Vector3(x,base+0.22,0),width,0.88)
+		for side in [-1.0,1.0]:
+			for end in [-1.0,1.0]: _dome(Vector3(x+side*(width*0.5-0.65),base+0.20,end*1.40),0.25,0.24,"metal")
+	else:
+		_box(Vector3(x,top-0.10,0),Vector3(width,0.20,3.8),"roof" if order==2 else material)
+		for side in [-1.0,1.0]:
+			for end in [-1.0,1.0]:
+				_box(Vector3(x+side*(width*0.5-0.16),base+0.48,end*1.65),Vector3(0.16,0.96,0.16),"wood" if order in [3,10] else "stone")
+		if order==3:
+			for stripe in range(ceili(width/0.7)):
+				_box(Vector3(x-width*0.5+stripe*0.7+0.12,top+0.006,0),Vector3(0.16,0.015,3.8),"cloth_alt")
+		elif order in [1,4,8]: _arch_frame(Vector3(x,base,1.7),width-1.0,1.02,0.12)
 
 func _facade(left: float,right: float,top: float,bottom: float) -> void:
 	_box(Vector3((left+right)*0.5,(top+bottom)*0.5,-0.25),Vector3(right-left,top-bottom,3.4),"stone")

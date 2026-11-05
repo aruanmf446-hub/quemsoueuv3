@@ -1,0 +1,74 @@
+[
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": true,
+		"name": "telhados_inicio",
+		"x": -8.0,
+		"y": 8.1
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": true,
+		"name": "telhados_vao_00",
+		"x": 6.75,
+		"y": 8.0
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": true,
+		"name": "telhados_vao_04",
+		"x": 87.03,
+		"y": 8.7
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": true,
+		"name": "telhados_vao_12",
+		"x": 249.75,
+		"y": 8.0
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": true,
+		"name": "fase_02_fundo",
+		"x": 727.975,
+		"y": 8.0
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": true,
+		"name": "fase_03_fundo",
+		"x": 735.296428571429,
+		"y": 0.35
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": true,
+		"name": "fase_05_fundo",
+		"x": 737.495833333333,
+		"y": 0.0
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": true,
+		"name": "fase_07_fundo",
+		"x": 737.495833333333,
+		"y": 0.0
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": true,
+		"name": "fase_09_fundo",
+		"x": 737.495833333333,
+		"y": 0.0
+	}
+]

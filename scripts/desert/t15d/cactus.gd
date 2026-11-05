@@ -24,6 +24,10 @@ var _attack_direction := 1.0
 var _recovery := 0.0
 var attacks_delivered := 0
 var _yaw_target := PI*0.5
+var _challenger := false
+var _elite := false
+var _windup_duration := 0.36
+var readout_pips := 1
 func _ready() -> void:
 	super._ready()
 	collision_layer = 4
@@ -31,6 +35,10 @@ func _ready() -> void:
 	floor_snap_length = 0.18
 func setup(entry: Dictionary, spawn: Dictionary) -> void:
 	_generation += 1
+	_challenger = bool(spawn.get("challenger",false))
+	_elite = bool(spawn.get("elite",false))
+	_windup_duration=0.42 if _elite else 0.36
+	readout_pips=3 if _elite else (2 if _challenger else 1)
 	allow_gap_jumps = str(entry.get("id","cactus")) == "cactus"
 	if not _loaded:
 		super.setup(entry, spawn)
@@ -54,6 +62,8 @@ func setup(entry: Dictionary, spawn: Dictionary) -> void:
 	collision_mask = 1
 	velocity = Vector3.ZERO
 	health = 1 if str(entry.get("id","cactus")) == "cactus" else int(entry.get("health",20))
+	if _challenger:
+		health=3 if _elite else 2
 	attack_range = 1.25 if str(entry.get("id","cactus")) == "cactus" else float(entry.get("attack_range",1.7))
 	_model.rotation.y = _yaw_target
 func _physics_process(delta: float) -> void:
@@ -100,7 +110,7 @@ func _physics_process(delta: float) -> void:
 		velocity.x = 0
 		_face(signf(offset.x))
 		if _cooldown <= 0.0:
-			_windup = 0.36
+			_windup = _windup_duration
 			_cooldown = attack_cooldown_time
 			_attack_direction = signf(offset.x)
 			_model.play_animation("ataque", false)
@@ -117,11 +127,20 @@ func _physics_process(delta: float) -> void:
 			if position.x <= _patrol_min: _direction = 1
 			if position.x >= _patrol_max: _direction = -1
 		var direction := signf(offset.x) if chasing else _direction
+		var pursuit_speed := (6.15 if absf(offset.x)>5.0 else 5.6) if _challenger else PURSUE_SPEED
 		var ray := PhysicsRayQueryParameters3D.create(global_position + Vector3(direction * 0.75, 0.6, 0), global_position + Vector3(direction * 0.75, -0.7, 0), 1)
 		var has_ground := not get_world_3d().direct_space_state.intersect_ray(ray).is_empty()
+		if _challenger and not has_ground:
+			# Pode descer do objeto para piso confirmado; não confunde a descida com abismo.
+			var below := get_world_3d().direct_space_state.intersect_ray(PhysicsRayQueryParameters3D.create(global_position+Vector3(direction*0.9,0.2,0),global_position+Vector3(direction*0.9,-1.4,0),1))
+			has_ground=not below.is_empty() and below.collider.get_meta("walkable_floor",false)
 		var wall := not get_world_3d().direct_space_state.intersect_ray(PhysicsRayQueryParameters3D.create(global_position+Vector3(0,0.3,0),global_position+Vector3(direction*0.9,0.3,0),1)).is_empty()
 		blocked_at_edge = is_on_floor() and (not has_ground or wall)
-		if is_on_floor() and (wall or not has_ground) and (can_jump_low(direction) if wall else pursuing and allow_gap_jumps and can_jump_gap(direction)):
+		if is_on_floor() and chasing and _can_jump_route(direction):
+			velocity.y=9.4
+			velocity.x=direction*pursuit_speed
+			blocked_at_edge=false
+		elif is_on_floor() and (wall or not has_ground) and (can_jump_low(direction) if wall else pursuing and allow_gap_jumps and can_jump_gap(direction)):
 			velocity.y = 9.4 if not has_ground else 6.3
 			velocity.x = direction*PURSUE_SPEED
 			blocked_at_edge = false
@@ -132,8 +151,8 @@ func _physics_process(delta: float) -> void:
 			if pursuing: _pursue = maxf(_pursue, 0.7)
 			_model.play_animation("pronto",true)
 		else:
-			_move_toward(direction, PURSUE_SPEED if pursuing else (chase_speed if chasing else speed), "correr" if chasing else "base")
-		_model.set_rate(PURSUE_SPEED / chase_speed if pursuing and velocity.x != 0.0 else 1.0)
+			_move_toward(direction, pursuit_speed if pursuing else (chase_speed if chasing else speed), "correr" if chasing else "base")
+		_model.set_rate(absf(velocity.x) / chase_speed if pursuing and velocity.x != 0.0 else 1.0)
 	_keep_formation()
 	move_and_slide()
 	global_position.z = 0.0
@@ -160,7 +179,7 @@ func _alert() -> void:
 	mark.font_size = 96
 	mark.pixel_size = 0.006
 	mark.outline_size = 18
-	mark.modulate = Color("#ffcf5a")
+	mark.modulate = Color("#ff7854") if _elite else Color("#ffcf5a")
 	mark.outline_modulate = Color("#2a1205")
 	mark.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	mark.no_depth_test = true
@@ -213,6 +232,12 @@ func can_jump_low(direction: float) -> bool:
 		var hit := space.intersect_ray(PhysicsRayQueryParameters3D.create(origin+Vector3(direction*distance,0.7,0),origin+Vector3(direction*distance,-0.25,0),1))
 		if hit.is_empty() or absf(float(hit.position.y)-origin.y) > 0.12: return false
 	return true
+
+func _can_jump_route(direction: float) -> bool:
+	if not _challenger: return false
+	var point := global_position+Vector3(direction*1.0,0,0)
+	var hit := get_world_3d().direct_space_state.intersect_ray(PhysicsRayQueryParameters3D.create(point+Vector3.UP*1.7,point+Vector3.UP*0.35,1))
+	return not hit.is_empty() and hit.collider.get_meta("parkour_route",false) and float(hit.position.y)-global_position.y<=1.3
 
 func crystallize(seconds: float) -> void:
 	if _state == State.DEAD: return

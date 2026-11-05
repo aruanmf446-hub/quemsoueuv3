@@ -24,6 +24,8 @@ var _wave_gates := {}
 var _last_wave := -99.0
 var _ruptured := {}
 var _floor_parts := {}
+var _raised_bridges := {}
+var _bridge_hints := {}
 var _world: Node3D
 var _loaded_chunks := {}
 var _defeated_ids := {}
@@ -109,6 +111,7 @@ func _physics_process(delta: float) -> void:
 		_update_progress()
 		_check_checkpoints()
 		_update_storm()
+		_update_bridge_hint()
 		if not _tutorial_pit and _player.position.x > float(_phase.holes[0].start)-12.0:
 			_tutorial_pit = true
 			_hud.notify("Buraco à frente • pule para atravessar")
@@ -328,6 +331,8 @@ func _build_collision(chunk: Node3D, platforms: Array) -> void:
 		box.size = dimensions
 		shape.shape = box
 		body.add_child(shape)
+		if part.get("parkour_route",false): body.set_meta("parkour_route",true)
+		if part.kind=="ground": body.set_meta("walkable_floor",true)
 		chunk.add_child(body)
 		if part.get("breakable",false):
 			var id := str(part.id)
@@ -381,11 +386,26 @@ func _build_chunk_details(chunk: Node3D, index: int) -> void:
 			chunk.add_child(item)
 	for hole: Dictionary in _phase.holes:
 		var middle := (float(hole.start)+float(hole.end))*0.5
+		if _in_chunk(middle,index):
+			if hole.get("crumble_bridge",false):
+				var bridge := preload("res://scripts/desert/t15d/parkour.gd").CrumbleStone.new()
+				bridge.name = "CrumblingBridge"
+				bridge.timber = true
+				bridge.delay = 0.85
+				bridge.stone_size = Vector3(float(hole.width)+0.12,0.22,3.8)
+				bridge.position = Vector3(middle,minf(float(hole.from_y),float(hole.to_y))-0.11,0)
+				chunk.add_child(bridge)
 		if hole.get("ferry",false) and _in_chunk(middle,index):
 			var ferry := preload("res://scripts/desert/t15d/parkour.gd").Ferry.new()
 			ferry.from_x = float(hole.start)+1.9
 			ferry.to_x = float(hole.end)-1.9
 			chunk.add_child(ferry)
+	for task: Dictionary in _phase.get("tasks",[]):
+		if _in_chunk((float(task.start)+float(task.end))*0.5,index):
+			var device := preload("res://scripts/desert/t15d/earth_bridge.gd").new()
+			device.configure(task)
+			chunk.add_child(device)
+			if _raised_bridges.has(str(task.id)): device.raise_bridge(false)
 	for geyser: Dictionary in _phase.get("geysers",[]):
 		if _in_chunk(float(geyser.pos[0]),index):
 			var pad := preload("res://scripts/desert/t15d/parkour.gd").Geyser.new()
@@ -407,6 +427,37 @@ func _build_chunk_details(chunk: Node3D, index: int) -> void:
 			if _in_chunk(edge,index): _build_pit_lip(chunk,edge,edge == float(hole.start))
 func _in_chunk(x: float, index: int) -> bool:
 	return floori(x/CHUNK_SIZE) == index
+func _near_bridge(hole: Dictionary, distance := 4.0) -> bool:
+	var x := _player.position.x
+	return (absf(x-float(hole.start))<distance and absf(_player.position.y-float(hole.from_y))<0.7) or (absf(x-float(hole.end))<distance and absf(_player.position.y-float(hole.to_y))<0.7)
+func _update_bridge_hint() -> void:
+	var task_available := false
+	var caption := ""
+	for hole: Dictionary in _phase.holes:
+		if hole.get("crumble_bridge",false) and _near_bridge(hole,6.0) and not _bridge_hints.has(str(hole.id)):
+			_bridge_hints[str(hole.id)] = true
+			_hud.notify("Ponte frágil • atravesse antes que desabe; ela se recompõe")
+	for device in get_tree().get_nodes_in_group("earth_bridges"):
+		if is_ancestor_of(device) and not device.raised and _near_bridge(device.hole) and _player.is_on_floor():
+			task_available=true
+			caption=str(device.hole.get("task_text","Montar ponte"))+" · F"
+			break
+	_hud.set_bridge_task(task_available and not _player.is_dead and not completed,caption)
+func _raise_earth_bridge() -> void:
+	if _player.is_dead or not _player.is_on_floor() or completed or _paused: return
+	for bridge in get_tree().get_nodes_in_group("earth_bridges"):
+		if not is_ancestor_of(bridge) or bridge.raised or not _near_bridge(bridge.hole): continue
+		# Montagem dura 0,8s: impede correr no vazio antes de a peça virar piso.
+		var life := _life_token
+		_player.velocity = Vector3.ZERO
+		_player.set_physics_process(false)
+		bridge.assembled.connect(func() -> void:
+			if life == _life_token and not _player.is_dead: _player.set_physics_process(true),CONNECT_ONE_SHOT)
+		bridge.raise_bridge()
+		_raised_bridges[str(bridge.hole.id)] = true
+		_hud.set_bridge_task(false)
+		_hud.notify("Tarefa concluída • passagem liberada")
+		return
 func _is_pit_edge(x: float, left: bool) -> bool:
 	for hole: Dictionary in _phase.holes:
 		if absf(x-float(hole.end if left else hole.start)) < 0.02: return true
@@ -445,7 +496,9 @@ func _spawn_enemy(_chunk: Node3D, spawn: Dictionary) -> void:
 	enemy.set_meta("spawn_id",id)
 	_enemy_live[id] = enemy
 	enemy.persistent_follow = bool(spawn.get("troop",false))
-	enemy.setup(_enemy_catalog.cactus,spawn)
+	var encounter := spawn.duplicate(true)
+	encounter.challenger=_order<10
+	enemy.setup(_enemy_catalog.cactus,encounter)
 	enemy.add_to_group("enemies")
 	enemy.show()
 	enemy.set_physics_process(true)
@@ -594,20 +647,23 @@ func _follow_camera(delta: float) -> void:
 	# Mostrar fachadas e arcos sob a rota, mantendo antecipação e acompanhamento do salto.
 	if _order in [2,4,7]: floor_y=base+(0.20 if UIScale.is_iphone() else 0.50)
 	var target := Vector3(clampf(_player.position.x+lead,float(_phase.player_spawn[0]),float(_phase.goal.pos[0])),maxf(floor_y,_player.position.y+1.4-_camera.size*0.5+0.55),0)
-	var destination := target+Vector3(0,1,14)
+	# Só a fase 2 inclina mais para revelar a superfície dos telhados; mira e alcance iguais.
+	var camera_drop := 2.2 if _order == 2 else 1.0
+	var destination := target+Vector3(0,camera_drop,14)
 	_camera.position = _camera.position.lerp(destination,1.0-exp(-8*delta))
 	# Tremida curta no golpe e no dano; some em ~0,1s.
 	if _shake > 0.0:
 		_shake = maxf(_shake-delta,0.0)
 		var amount := _shake*0.6
 		_camera.position += Vector3(randf_range(-amount,amount),randf_range(-amount,amount),0)
-	_camera.look_at(Vector3(_camera.position.x,_camera.position.y-1,0),Vector3.UP)
+	_camera.look_at(Vector3(_camera.position.x,_camera.position.y-camera_drop,0),Vector3.UP)
 	_scenery.follow(_camera,_player.position.x)
 func _build_hud() -> void:
 	_hud = preload("res://scripts/desert/t15d/campaign_hud.gd").new()
 	_hud.configure(_phase)
 	add_child(_hud)
 	_hud.pause_requested.connect(_pause)
+	_hud.bridge_requested.connect(_raise_earth_bridge)
 	_touch_pad = preload("res://scripts/desert/t15d/touch.gd").new()
 	_touch_pad.actor = _player
 	_hud.add_child(_touch_pad)
@@ -707,6 +763,8 @@ func _resume() -> void:
 	_touch_pad._last_pixels = Vector2i.ZERO
 	get_viewport().gui_release_focus()
 func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_F:
+		_raise_earth_bridge()
 	if event.is_action_pressed("ui_cancel") and not completed:
 		_pause()
 		get_viewport().set_input_as_handled()
@@ -941,6 +999,8 @@ func _reset_remaster_state() -> void:
 	_wave_gates.clear()
 	_last_wave=-99.0
 	_ruptured.clear()
+	_raised_bridges.clear()
+	_bridge_hints.clear()
 	_floor_parts.clear()
 
 func _update_troops() -> void:

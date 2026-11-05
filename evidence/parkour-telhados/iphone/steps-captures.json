@@ -1,0 +1,26 @@
+[
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": true,
+		"name": "fase_01_patamares",
+		"x": 87.7708333333333,
+		"y": 1.65
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": true,
+		"name": "fase_02_patamares",
+		"x": 53.8375,
+		"y": 9.65
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"iphone": true,
+		"name": "fase_04_patamares",
+		"x": 87.7708333333333,
+		"y": 5.15
+	}
+]

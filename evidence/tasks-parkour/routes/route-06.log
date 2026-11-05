@@ -1,0 +1,42 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS cena carrega o mapa correto 06
+PASS vida e recursos iniciais 3/3, 1/1 e 1/1
+PASS sete checkpoints de distrito
+PASS distância obrigatória garante três minutos mesmo sem combate
+ROUTE_TICK phase=6 seconds=0.0 x=-8.0 hp=3 attack=1 loaded=3
+ROUTE_TICK phase=6 seconds=10.0 x=48.3326225280762 hp=3 attack=2 loaded=4
+ROUTE_TICK phase=6 seconds=20.0 x=106.811363220215 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=6 seconds=30.0 x=161.046447753906 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=6 seconds=40.0 x=216.241119384766 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=6 seconds=50.0 x=275.375183105469 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=6 seconds=60.0 x=332.026306152344 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=6 seconds=70.0 x=392.327270507812 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=6 seconds=80.0 x=448.124420166016 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=6 seconds=90.0 x=504.773590087891 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=6 seconds=100.0 x=561.417541503906 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=6 seconds=110.0 x=618.062866210938 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=6 seconds=120.0 x=671.750732421875 hp=3 attack=1 loaded=5
+ROUTE_TICK phase=6 seconds=130.0 x=727.070495605469 hp=3 attack=1 loaded=5
+ROUTE_TICK phase=6 seconds=140.0 x=783.716857910156 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=6 seconds=150.0 x=839.477661132812 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=6 seconds=160.0 x=886.766967773438 hp=3 attack=1 loaded=5
+ROUTE_TICK phase=6 seconds=170.0 x=943.412963867188 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=6 seconds=180.0 x=999.173767089844 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=6 seconds=190.0 x=1055.8193359375 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=6 seconds=200.0 x=1112.46545410156 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=6 seconds=210.0 x=1169.1123046875 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=6 seconds=220.0 x=1224.87377929688 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=6 seconds=230.0 x=1281.52038574219 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=6 seconds=240.0 x=1338.16711425781 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=6 seconds=250.0 x=1393.86779785156 hp=3 attack=2 loaded=4
+PASS travessia completa sem morte ou respawn
+PASS saída alcançada exclusivamente por ações reais
+PASS tempo físico da fase >=180s (258.13)
+PASS relógio independente confirma >=180s (258.78)
+PASS streaming mantém quantidade limitada de distritos carregados
+PASS percurso ativa os sete checkpoints
+PASS 95% dos quadros ficam no orçamento de 33ms (p95 1.0ms, pico 15.5ms)
+NIGHT_ROUTE_RESULT {"captured":false,"checks":11,"collected":37,"completed":true,"cpu_step":{"max_ms":15.573,"p95_ms":0.971},"deaths":0,"defeated":24,"failures":0,"health":3,"measurement":"wall-clock; physics intervals include intentional 0.05x hit-stop; all maxima retained","order":6,"phase_seconds":258.126666666761,"physics_seconds":258.783333333333,"position":[1443.2138671875,0.400883674621582,0.0],"render_frame_wall":{"max_ms":15.513,"p95_ms":0.97},"swings":24}
+WARNING: 6 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)

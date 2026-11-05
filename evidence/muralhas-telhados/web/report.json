@@ -1,0 +1,802 @@
+{
+  "stageArt": [
+    {
+      "order": 1,
+      "art_ids": [
+        "capital_watchtower",
+        "capital_house",
+        "capital_merchant",
+        "capital_archway",
+        "capital_balcony_house",
+        "capital_palm_garden"
+      ]
+    },
+    {
+      "order": 2,
+      "art_ids": [
+        "capital_watchtower",
+        "capital_house",
+        "capital_merchant",
+        "capital_archway",
+        "capital_balcony_house"
+      ]
+    },
+    {
+      "order": 3,
+      "art_ids": [
+        "capital_watchtower",
+        "capital_house",
+        "capital_merchant",
+        "capital_archway",
+        "capital_market_stall",
+        "capital_palm_garden"
+      ],
+      "skyline": true,
+      "palace_pool": 3
+    },
+    {
+      "order": 4,
+      "art_ids": [
+        "capital_watchtower",
+        "capital_house",
+        "capital_merchant",
+        "capital_archway",
+        "desert_oasis_fountain",
+        "desert_aqueduct",
+        "capital_palm_garden"
+      ],
+      "skyline": true,
+      "palace_pool": 3
+    },
+    {
+      "order": 5,
+      "art_ids": [
+        "capital_watchtower",
+        "capital_house",
+        "capital_merchant",
+        "capital_archway",
+        "capital_palm_garden",
+        "desert_oasis_fountain"
+      ],
+      "skyline": true,
+      "palace_pool": 3
+    },
+    {
+      "order": 6,
+      "art_ids": [
+        "desert_ancient_ruins",
+        "desert_mine_crystals"
+      ],
+      "skyline": false,
+      "palace_pool": 0
+    },
+    {
+      "order": 7,
+      "art_ids": [
+        "capital_watchtower",
+        "capital_house",
+        "capital_merchant",
+        "capital_archway",
+        "desert_mining_gantry",
+        "desert_mine_crystals",
+        "desert_timber_bridge"
+      ],
+      "skyline": true,
+      "palace_pool": 3
+    },
+    {
+      "order": 8,
+      "art_ids": [
+        "capital_watchtower",
+        "capital_house",
+        "capital_merchant",
+        "capital_archway",
+        "desert_military_gate"
+      ],
+      "skyline": true,
+      "palace_pool": 3
+    },
+    {
+      "order": 9,
+      "art_ids": [
+        "capital_watchtower",
+        "capital_house",
+        "capital_merchant",
+        "capital_archway",
+        "desert_mining_gantry",
+        "desert_mine_crystals",
+        "desert_timber_bridge",
+        "desert_mine_entrance"
+      ],
+      "skyline": true,
+      "palace_pool": 3
+    },
+    {
+      "order": 10,
+      "art_ids": [
+        "desert_mining_gantry",
+        "desert_mine_crystals",
+        "desert_timber_bridge"
+      ],
+      "skyline": false,
+      "palace_pool": 0
+    }
+  ],
+  "states": [
+    {
+      "cards": 8,
+      "index": 0,
+      "iphone": true,
+      "next": [
+        1096,
+        547,
+        224,
+        88
+      ],
+      "read": false,
+      "ready": true,
+      "size": [
+        1376,
+        675
+      ],
+      "skip": [
+        1120,
+        24,
+        224,
+        88
+      ],
+      "stage": "loading",
+      "story": true
+    },
+    {
+      "cards": 8,
+      "index": 1,
+      "iphone": true,
+      "next": [
+        1096,
+        547,
+        224,
+        88
+      ],
+      "read": false,
+      "ready": true,
+      "size": [
+        1376,
+        675
+      ],
+      "skip": [
+        1120,
+        24,
+        224,
+        88
+      ],
+      "stage": "loading",
+      "story": true
+    },
+    {
+      "cards": 8,
+      "index": 2,
+      "iphone": true,
+      "next": [
+        1096,
+        547,
+        224,
+        88
+      ],
+      "read": false,
+      "ready": true,
+      "size": [
+        1376,
+        675
+      ],
+      "skip": [
+        1120,
+        24,
+        224,
+        88
+      ],
+      "stage": "loading",
+      "story": true
+    },
+    {
+      "cards": 8,
+      "index": 3,
+      "iphone": true,
+      "next": [
+        1096,
+        547,
+        224,
+        88
+      ],
+      "read": false,
+      "ready": true,
+      "size": [
+        1376,
+        675
+      ],
+      "skip": [
+        1120,
+        24,
+        224,
+        88
+      ],
+      "stage": "loading",
+      "story": true
+    },
+    {
+      "cards": 8,
+      "index": 4,
+      "iphone": true,
+      "next": [
+        1096,
+        547,
+        224,
+        88
+      ],
+      "read": false,
+      "ready": true,
+      "size": [
+        1376,
+        675
+      ],
+      "skip": [
+        1120,
+        24,
+        224,
+        88
+      ],
+      "stage": "loading",
+      "story": true
+    },
+    {
+      "cards": 8,
+      "index": 5,
+      "iphone": true,
+      "next": [
+        1096,
+        547,
+        224,
+        88
+      ],
+      "read": false,
+      "ready": true,
+      "size": [
+        1376,
+        675
+      ],
+      "skip": [
+        1120,
+        24,
+        224,
+        88
+      ],
+      "stage": "loading",
+      "story": true
+    },
+    {
+      "cards": 8,
+      "index": 6,
+      "iphone": true,
+      "next": [
+        1096,
+        547,
+        224,
+        88
+      ],
+      "read": false,
+      "ready": true,
+      "size": [
+        1376,
+        675
+      ],
+      "skip": [
+        1120,
+        24,
+        224,
+        88
+      ],
+      "stage": "loading",
+      "story": true
+    },
+    {
+      "cards": 8,
+      "index": 7,
+      "iphone": true,
+      "next": [
+        1096,
+        547,
+        224,
+        88
+      ],
+      "read": false,
+      "ready": true,
+      "size": [
+        1376,
+        675
+      ],
+      "skip": [
+        1120,
+        24,
+        224,
+        88
+      ],
+      "stage": "loading",
+      "story": true
+    }
+  ],
+  "game": {
+    "art_ids": [
+      "capital_watchtower",
+      "capital_house",
+      "capital_merchant",
+      "capital_archway",
+      "capital_balcony_house",
+      "capital_palm_garden"
+    ],
+    "buttons": {
+      "amber": [
+        934,
+        595,
+        52
+      ],
+      "attack": [
+        1174,
+        595,
+        52
+      ],
+      "dash": [
+        814,
+        595,
+        52
+      ],
+      "defend": [
+        1252,
+        475,
+        52
+      ],
+      "jump": [
+        1294,
+        595,
+        52
+      ],
+      "rupture": [
+        1054,
+        595,
+        52
+      ]
+    },
+    "charges": {
+      "amber": 3,
+      "dash": 3,
+      "rupture": 3
+    },
+    "health": 3,
+    "iphone": true,
+    "order": 1,
+    "palace_pool": 3,
+    "pedestal_collected": false,
+    "pedestal_count": 0,
+    "pedestal_fixture": false,
+    "pickup_count": 0,
+    "player_dash": 0,
+    "read": true,
+    "roof_surfaces": 0,
+    "rooftop_terraces": 0,
+    "size": [
+      1376,
+      675
+    ],
+    "skyline": true,
+    "soldiers": [
+      {
+        "id": "p01.cactus.00",
+        "vx": 2,
+        "x": 8.43332576751709,
+        "y": 0.00093871948774904
+      }
+    ],
+    "stage": "play",
+    "x": -8,
+    "y": -1.11758708953857e-8
+  },
+  "after": {
+    "art_ids": [
+      "capital_watchtower",
+      "capital_house",
+      "capital_merchant",
+      "capital_archway",
+      "capital_balcony_house",
+      "capital_palm_garden"
+    ],
+    "buttons": {
+      "amber": [
+        934,
+        595,
+        52
+      ],
+      "attack": [
+        1174,
+        595,
+        52
+      ],
+      "dash": [
+        814,
+        595,
+        52
+      ],
+      "defend": [
+        1252,
+        475,
+        52
+      ],
+      "jump": [
+        1294,
+        595,
+        52
+      ],
+      "rupture": [
+        1054,
+        595,
+        52
+      ]
+    },
+    "charges": {
+      "amber": 3,
+      "dash": 2,
+      "rupture": 3
+    },
+    "health": 3,
+    "iphone": true,
+    "order": 1,
+    "palace_pool": 3,
+    "pedestal_collected": false,
+    "pedestal_count": 0,
+    "pedestal_fixture": false,
+    "pickup_count": 0,
+    "player_dash": 1.03333333333333,
+    "read": true,
+    "roof_surfaces": 0,
+    "rooftop_terraces": 0,
+    "size": [
+      1376,
+      675
+    ],
+    "skyline": true,
+    "soldiers": [
+      {
+        "id": "p01.cactus.00",
+        "vx": 2,
+        "x": 11.2332830429077,
+        "y": 0.000938682234846056
+      }
+    ],
+    "stage": "play",
+    "x": -7.51999950408936,
+    "y": 0.000883772445376962
+  },
+  "replay": {
+    "art_ids": [
+      "capital_watchtower",
+      "capital_house",
+      "capital_merchant",
+      "capital_archway",
+      "capital_balcony_house",
+      "capital_palm_garden"
+    ],
+    "buttons": {
+      "attack": [
+        1174,
+        595,
+        52
+      ],
+      "defend": [
+        1252,
+        475,
+        52
+      ],
+      "jump": [
+        1294,
+        595,
+        52
+      ]
+    },
+    "charges": {
+      "amber": 0,
+      "dash": 0,
+      "rupture": 0
+    },
+    "health": 3,
+    "iphone": true,
+    "order": 1,
+    "palace_pool": 3,
+    "pedestal_collected": false,
+    "pedestal_count": 0,
+    "pedestal_fixture": false,
+    "pickup_count": 0,
+    "player_dash": 0,
+    "read": true,
+    "roof_surfaces": 0,
+    "rooftop_terraces": 0,
+    "size": [
+      1376,
+      675
+    ],
+    "skyline": true,
+    "soldiers": [
+      {
+        "id": "p01.cactus.00",
+        "vx": 2,
+        "x": 7.26666593551636,
+        "y": 0.000938745797611773
+      }
+    ],
+    "stage": "play",
+    "x": -8,
+    "y": -1.11758708953857e-8
+  },
+  "roofBefore": {
+    "art_ids": [
+      "capital_watchtower",
+      "capital_house",
+      "capital_merchant",
+      "capital_archway",
+      "capital_balcony_house"
+    ],
+    "buttons": {
+      "attack": [
+        1174,
+        595,
+        52
+      ],
+      "defend": [
+        1252,
+        475,
+        52
+      ],
+      "jump": [
+        1294,
+        595,
+        52
+      ]
+    },
+    "charges": {
+      "amber": 0,
+      "dash": 0,
+      "rupture": 0
+    },
+    "health": 3,
+    "iphone": true,
+    "order": 2,
+    "palace_pool": 3,
+    "pedestal_collected": false,
+    "pedestal_count": 0,
+    "pedestal_fixture": false,
+    "pickup_count": 0,
+    "player_dash": 0,
+    "read": true,
+    "roof_surfaces": 19,
+    "rooftop_terraces": 4,
+    "size": [
+      1376,
+      675
+    ],
+    "skyline": true,
+    "soldiers": [
+      {
+        "id": "web.roof.pursuit",
+        "vx": 0,
+        "x": -2,
+        "y": 8.02000045776367
+      }
+    ],
+    "stage": "play",
+    "x": -8,
+    "y": 7.99999856948853
+  },
+  "roofAfter": {
+    "art_ids": [
+      "capital_watchtower",
+      "capital_house",
+      "capital_merchant",
+      "capital_archway",
+      "capital_balcony_house"
+    ],
+    "buttons": {
+      "attack": [
+        1174,
+        595,
+        52
+      ],
+      "defend": [
+        1252,
+        475,
+        52
+      ],
+      "jump": [
+        1294,
+        595,
+        52
+      ]
+    },
+    "charges": {
+      "amber": 0,
+      "dash": 0,
+      "rupture": 0
+    },
+    "health": 3,
+    "iphone": true,
+    "order": 2,
+    "palace_pool": 3,
+    "pedestal_collected": false,
+    "pedestal_count": 0,
+    "pedestal_fixture": false,
+    "pickup_count": 0,
+    "player_dash": 0,
+    "read": true,
+    "roof_surfaces": 22,
+    "rooftop_terraces": 4,
+    "size": [
+      1376,
+      675
+    ],
+    "skyline": true,
+    "soldiers": [
+      {
+        "id": "web.roof.pursuit",
+        "vx": -5.69999980926514,
+        "x": -4.28000020980835,
+        "y": 8.00088310241699
+      }
+    ],
+    "stage": "play",
+    "x": -8,
+    "y": 7.99999856948853
+  },
+  "pedestalBefore": {
+    "art_ids": [
+      "desert_mining_gantry",
+      "desert_mine_crystals",
+      "desert_timber_bridge"
+    ],
+    "buttons": {
+      "amber": [
+        934,
+        595,
+        52
+      ],
+      "attack": [
+        1174,
+        595,
+        52
+      ],
+      "dash": [
+        814,
+        595,
+        52
+      ],
+      "defend": [
+        1252,
+        475,
+        52
+      ],
+      "jump": [
+        1294,
+        595,
+        52
+      ],
+      "rupture": [
+        1054,
+        595,
+        52
+      ]
+    },
+    "charges": {
+      "amber": 0,
+      "dash": 0,
+      "rupture": 0
+    },
+    "health": 3,
+    "iphone": true,
+    "order": 10,
+    "palace_pool": 0,
+    "pedestal_collected": false,
+    "pedestal_count": 1,
+    "pedestal_fixture": true,
+    "pickup_count": 1,
+    "player_dash": 0,
+    "read": true,
+    "roof_surfaces": 0,
+    "rooftop_terraces": 0,
+    "size": [
+      1376,
+      675
+    ],
+    "skyline": false,
+    "soldiers": [
+      {
+        "id": "p10.cactus.00",
+        "vx": 2,
+        "x": 10.0666341781616,
+        "y": -1.99906134605408
+      }
+    ],
+    "stage": "play",
+    "x": -4,
+    "y": -1.95000004768372
+  },
+  "pedestalAfter": {
+    "art_ids": [
+      "desert_mining_gantry",
+      "desert_mine_crystals",
+      "desert_timber_bridge"
+    ],
+    "buttons": {
+      "amber": [
+        934,
+        595,
+        52
+      ],
+      "attack": [
+        1174,
+        595,
+        52
+      ],
+      "dash": [
+        814,
+        595,
+        52
+      ],
+      "defend": [
+        1252,
+        475,
+        52
+      ],
+      "jump": [
+        1294,
+        595,
+        52
+      ],
+      "rupture": [
+        1054,
+        595,
+        52
+      ]
+    },
+    "charges": {
+      "amber": 0,
+      "dash": 0,
+      "rupture": 0
+    },
+    "health": 3,
+    "iphone": true,
+    "order": 10,
+    "palace_pool": 0,
+    "pedestal_collected": true,
+    "pedestal_count": 1,
+    "pedestal_fixture": true,
+    "pickup_count": 0,
+    "player_dash": 0,
+    "read": true,
+    "roof_surfaces": 0,
+    "rooftop_terraces": 0,
+    "size": [
+      1376,
+      675
+    ],
+    "skyline": false,
+    "soldiers": [
+      {
+        "id": "p10.cactus.00",
+        "vx": 2,
+        "x": 10.8666219711304,
+        "y": -1.99906134605408
+      }
+    ],
+    "stage": "play",
+    "x": -4,
+    "y": -1.9995573759079
+  },
+  "errors": [],
+  "blocked": [],
+  "engineErrors": []
+}

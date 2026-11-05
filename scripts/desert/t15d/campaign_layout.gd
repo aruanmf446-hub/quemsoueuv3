@@ -37,6 +37,7 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 	var districts: Array = []
 	var landmarks: Array = []
 	var surfaces: Array = []
+	var tasks: Array = []
 	var prefix := "p%02d" % order
 	var modules: int = [48,72,56,48,48,56,48,56,48,48][order-1]
 	var sector_modules := modules/8
@@ -60,12 +61,13 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 			var x1: float = bounds[segment+1]
 			platforms.append({"id":"%s.surface.%02d.%d" % [prefix,index,segment],"kind":"ground","pos":[(x0+x1)*0.5,top-0.5,0],"size":[x1-x0,1.0,4.0],"span_start":x0,"span_end":x1,"chunk":floori((x0+x1)*0.5/64.0),"breakable":segment == 1 and index%3 == 1,"module":index,"district":district,"surface_top":top,"architecture":THEMES[order-1]})
 		if gap > 0:
-			holes.append({"id":"%s.gap.%02d" % [prefix,index],"start":end,"end":right,"width":gap,"from_y":top,"to_y":next_top,"stepping":false,"ferry":false})
+			var crumble := order < 10 and index in [floori(modules*0.3),floori(modules*0.7)]
+			holes.append({"id":"%s.gap.%02d" % [prefix,index],"start":end,"end":right,"width":gap,"from_y":top,"to_y":next_top,"stepping":false,"ferry":false,"crumble_bridge":crumble,"earth_bridge":false})
 		# Guarda e itens pertencem à mesma laje. Recargas antecipam desafios;
 		# nenhuma é colocada em abismo, sobre obstáculo ou na peça destrutível.
 		var guard_x := left+(12.0 if order == 2 else (23.0 if index == 0 else 13.0))
 		if index%(6 if order == 2 else 2) == 0 and not (order == 2 and index == 0):
-			enemies.append({"id":"%s.cactus.%02d" % [prefix,index],"type":"cactus","pos":[guard_x,top+0.02,0],"patrol":[left+1,end-1],"district":district})
+			enemies.append({"id":"%s.cactus.%02d" % [prefix,index],"type":"cactus","pos":[guard_x,top+0.02,0],"patrol":[left+1,end-1],"district":district,"challenger":order<10,"elite":order in [3,5,7,8,9] and index%12==6})
 		var supply_index := index/3 if order == 2 else index
 		var kind: String = ["attack","defense","attack","health"][supply_index%4]
 		if order != 2 or index%3 == 0:
@@ -74,8 +76,14 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 			if order < ABILITY_PHASE[ability]: continue
 			if index%(24 if order == 2 else 8) == ({"rupture":1,"amber":9,"dash":17}[ability] if order == 2 else {"rupture":1,"amber":3,"dash":5}[ability]):
 				pickups.append({"id":"%s.%s.%02d" % [prefix,ability,index],"kind":ability,"pos":[left+(3.6 if order == 2 else 12),top,0],"surface":index})
-		# Obstáculos baixos são caixas/balaustradas integradas ao módulo, não escadas.
-		if index > 0 and ((order == 2 and index%9 == 5) or (order != 2 and index%3 == 2)):
+		# Patamares e obstáculos apoiados na mesma superfície do módulo.
+		var stair_run := index%sector_modules == (4 if order==2 else 3)
+		if order==10 and index>=modules/2: stair_run=false # Arena final preservada.
+		if stair_run:
+			var route_width := 5.6
+			var route_x := left+module_length*0.5
+			platforms.append({"id":"%s.route.%02d" % [prefix,index],"kind":"route","pos":[route_x,top+1.0,0],"size":[route_width,0.20,3.8],"span_start":route_x-route_width*0.5,"span_end":route_x+route_width*0.5,"module":index,"architecture":THEMES[order-1],"surface_top":top,"parkour_route":true})
+		if not stair_run and index > 0 and ((order == 2 and index%9 == 5) or (order != 2 and index%3 == 2)):
 			var height := 0.5 if order == 2 else 0.6
 			platforms.append({"id":"%s.obstacle.%02d" % [prefix,index],"kind":"ledge","pos":[left+module_length*0.55,top+height*0.5,0],"size":[0.9,height,2.6],"span_start":left+module_length*0.55-0.45,"span_end":left+module_length*0.55+0.45,"chunk":floori(left/64),"architecture":THEMES[order-1],"surface_top":top})
 	for index in range(8):
@@ -101,14 +109,46 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 		if not platform.get("breakable",false): continue
 		for item: Dictionary in pickups+checkpoints:
 			if float(item.pos[0])>=float(platform.span_start)-0.8 and float(item.pos[0])<=float(platform.span_end)+0.8: platform.breakable=false
+	# Duas intervenções próprias do cenário; na fase final, uma antes da arena.
+	var plans: Array = [
+	 [["gate","Abrir portão da capital"],["bridge","Baixar ponte da muralha"]],
+	 [["bridge","Estender passarela dos telhados"],["lift","Içar plataforma de manutenção"]],
+	 [["bridge","Estender toldo do mercado"],["gate","Liberar depósito de especiarias"]],
+	 [["gate","Abrir comporta do aqueduto"],["bridge","Reconstruir passagem do canal"]],
+	 [["bridge","Reposicionar tronco do oásis"],["gate","Abrir passagem dos jardins"]],
+	 [["lift","Alinhar laje das ruínas"],["gate","Abrir portal antigo"]],
+	 [["lift","Acionar plataforma de carga"],["bridge","Baixar viga do desfiladeiro"]],
+	 [["gate","Abrir portão do posto"],["bridge","Baixar passarela de vigia"]],
+	 [["lift","Acionar guindaste de minério"],["gate","Liberar portão de serviço"]],
+	 [["lift","Içar passarela da galeria"]]
+	][order-1]
+	for i in plans.size():
+		var module := 7 if i==0 else floori(modules*0.58)
+		var floor: Dictionary=surfaces[module]
+		var kind: String=plans[i][0]
+		var data: Dictionary
+		if kind=="gate":
+			var x := float(floor.left)+module_length*0.77
+			data={"start":x-1.2,"end":x+1.2,"from_y":floor.height,"to_y":floor.height}
+		else:
+			data=holes[module].duplicate(true)
+			data.crumble_bridge=false
+			holes[module].crumble_bridge=false
+		data.merge({"id":"%s.task.%d" % [prefix,i],"task_kind":kind,"task_text":plans[i][1],"theme":order,"width":float(data.end)-float(data.start)})
+		tasks.append(data)
 	var goal_top: float = surfaces[-1].height
-	stage.merge({"protagonist":"el_fuego","player_spawn":[spawn_x,_height(order,0)+0.1,0],"length":distance,"total_length":distance,"minimum_seconds":180.0,"minimum_traversal_seconds":(distance-1)/MAX_HORIZONTAL_SPEED,"transport_allowance":0.0,"maximum_horizontal_speed":MAX_HORIZONTAL_SPEED,"platforms":platforms,"enemies":enemies,"pickups":pickups,"holes":holes,"signs":[],"districts":districts,"landmarks":landmarks,"checkpoints":checkpoints,"geysers":[],"storms":[],"surfaces":surfaces,"goal":{"pos":[goal_x,goal_top+1.5,0]},"kill_plane_y":-10.0 if order == 2 else -12.0,"boss_id":"malagueta" if order == 10 else null,"legacy_placeholder_visuals":false,"bounds":{"min_x":origin,"max_x":goal_x+10.0},"next_scene":"res://scenes/desert/phase_%02d.tscn" % (order+1) if order < 10 else "","reach":{"max_gap":3.2,"single_jump_max_step_top":0.65,"double_jump_max_step_top":1.3}},true)
+	stage.merge({"protagonist":"el_fuego","player_spawn":[spawn_x,_height(order,0)+0.1,0],"length":distance,"total_length":distance,"minimum_seconds":180.0,"minimum_traversal_seconds":(distance-1)/MAX_HORIZONTAL_SPEED,"transport_allowance":0.0,"maximum_horizontal_speed":MAX_HORIZONTAL_SPEED,"tasks":tasks,"platforms":platforms,"enemies":enemies,"pickups":pickups,"holes":holes,"signs":[],"districts":districts,"landmarks":landmarks,"checkpoints":checkpoints,"geysers":[],"storms":[],"surfaces":surfaces,"goal":{"pos":[goal_x,goal_top+1.5,0]},"kill_plane_y":-10.0 if order == 2 else -12.0,"boss_id":"malagueta" if order == 10 else null,"legacy_placeholder_visuals":false,"bounds":{"min_x":origin,"max_x":goal_x+10.0},"next_scene":"res://scenes/desert/phase_%02d.tscn" % (order+1) if order < 10 else "","reach":{"max_gap":3.2,"single_jump_max_step_top":0.65,"double_jump_max_step_top":1.3}},true)
 	if order == 10:
 		stage.boss = {"id":"p10.malagueta","pos":[goal_x-4.0,goal_top+0.02,0],"patrol":[goal_x-8.0,goal_x+8.0]}
 	return stage
 
 static func _height(order: int,index: int) -> float:
 	var pattern: float = [0.0,0.4,0.8,0.3,0.7,0.2][index%6]
+	# Sequências de subida, patamar e descida. Degraus entre prédios continuam <=0,55m.
+	if order < 10:
+		var climb: float = [0.0,0.55,1.1,1.65,2.2,2.75,2.75,2.2,1.65,1.1,0.55,0.0][index%12]
+		var base := 8.0 if order == 2 else (3.5 if order == 4 else (-1.8 if order == 6 else 0.0))
+		return base+climb
 	match order:
 		2: return 8.0+pattern
 		4: return 3.5+pattern*0.6

@@ -1,0 +1,28 @@
+{
+  "captured": false,
+  "checks": 11,
+  "collected": 31,
+  "completed": true,
+  "cpu_step": {
+    "max_ms": 24.217,
+    "p95_ms": 1.148
+  },
+  "deaths": 0,
+  "defeated": 22,
+  "failures": 0,
+  "health": 3,
+  "measurement": "wall-clock; physics intervals include intentional 0.05x hit-stop; all maxima retained",
+  "order": 4,
+  "phase_seconds": 254.171666666761,
+  "physics_seconds": 254.733333333333,
+  "position": [
+    1443.18688964844,
+    3.50088357925415,
+    0.0
+  ],
+  "render_frame_wall": {
+    "max_ms": 24.134,
+    "p95_ms": 1.146
+  },
+  "swings": 30
+}

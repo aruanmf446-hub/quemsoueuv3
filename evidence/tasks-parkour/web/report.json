@@ -1,0 +1,1043 @@
+{
+  "fixture_teleport": true,
+  "viewport": "844x390",
+  "dpr": 3,
+  "physical_device": false,
+  "results": [
+    {
+      "order": 1,
+      "before": {
+        "art_ids": [
+          "capital_watchtower",
+          "capital_house",
+          "capital_merchant",
+          "capital_archway",
+          "capital_balcony_house",
+          "capital_palm_garden"
+        ],
+        "bridge_task": [
+          428,
+          493,
+          520,
+          64
+        ],
+        "bridges": [
+          {
+            "end": 224.45125,
+            "kind": "gate",
+            "raised": false,
+            "solid": true,
+            "start": 222.05125
+          }
+        ],
+        "buttons": {
+          "attack": [
+            1174,
+            595,
+            52
+          ],
+          "defend": [
+            1252,
+            475,
+            52
+          ],
+          "jump": [
+            1294,
+            595,
+            52
+          ]
+        },
+        "charges": {
+          "amber": 0,
+          "dash": 0,
+          "rupture": 0
+        },
+        "defense_charge": 0,
+        "health": 3,
+        "iphone": true,
+        "order": 1,
+        "palace_pool": 3,
+        "pedestal_collected": false,
+        "pedestal_count": 0,
+        "pedestal_fixture": false,
+        "pickup_count": 0,
+        "player_dash": 0,
+        "read": true,
+        "roof_surfaces": 0,
+        "rooftop_terraces": 0,
+        "size": [
+          1376,
+          675
+        ],
+        "skyline": true,
+        "soldiers": [
+          {
+            "id": "p01.cactus.08",
+            "vx": 2,
+            "x": 244.133483886719,
+            "y": 1.65093874931335
+          },
+          {
+            "id": "p01.cactus.06",
+            "vx": 2,
+            "x": 182.550155639648,
+            "y": 2.7509388923645
+          }
+        ],
+        "stage": "play",
+        "x": 220.451248168945,
+        "y": 2.20052075386047
+      },
+      "after": {
+        "art_ids": [
+          "capital_watchtower",
+          "capital_house",
+          "capital_merchant",
+          "capital_archway",
+          "capital_balcony_house",
+          "capital_palm_garden"
+        ],
+        "bridge_task": [],
+        "bridges": [
+          {
+            "end": 224.45125,
+            "kind": "gate",
+            "raised": true,
+            "solid": true,
+            "start": 222.05125
+          }
+        ],
+        "buttons": {
+          "attack": [
+            1174,
+            595,
+            52
+          ],
+          "defend": [
+            1252,
+            475,
+            52
+          ],
+          "jump": [
+            1294,
+            595,
+            52
+          ]
+        },
+        "charges": {
+          "amber": 0,
+          "dash": 0,
+          "rupture": 0
+        },
+        "defense_charge": 0,
+        "health": 3,
+        "iphone": true,
+        "order": 1,
+        "palace_pool": 3,
+        "pedestal_collected": false,
+        "pedestal_count": 0,
+        "pedestal_fixture": false,
+        "pickup_count": 0,
+        "player_dash": 0,
+        "read": true,
+        "roof_surfaces": 0,
+        "rooftop_terraces": 0,
+        "size": [
+          1376,
+          675
+        ],
+        "skyline": true,
+        "soldiers": [
+          {
+            "id": "p01.cactus.08",
+            "vx": 2,
+            "x": 250.596160888672,
+            "y": 1.65093886852264
+          },
+          {
+            "id": "p01.cactus.06",
+            "vx": 2,
+            "x": 188.950500488281,
+            "y": 2.75093817710876
+          }
+        ],
+        "stage": "play",
+        "x": 221.25129699707,
+        "y": 2.20094156265259
+      },
+      "right": {
+        "art_ids": [
+          "capital_watchtower",
+          "capital_house",
+          "capital_merchant",
+          "capital_archway",
+          "capital_balcony_house",
+          "capital_palm_garden"
+        ],
+        "bridge_task": [],
+        "bridges": [
+          {
+            "end": 224.45125,
+            "kind": "gate",
+            "raised": true,
+            "solid": true,
+            "start": 222.05125
+          }
+        ],
+        "buttons": {
+          "attack": [
+            1174,
+            595,
+            52
+          ],
+          "defend": [
+            1252,
+            475,
+            52
+          ],
+          "jump": [
+            1294,
+            595,
+            52
+          ]
+        },
+        "charges": {
+          "amber": 0,
+          "dash": 0,
+          "rupture": 0
+        },
+        "defense_charge": 0,
+        "health": 3,
+        "iphone": true,
+        "order": 1,
+        "palace_pool": 3,
+        "pedestal_collected": false,
+        "pedestal_count": 0,
+        "pedestal_fixture": false,
+        "pickup_count": 0,
+        "player_dash": 0,
+        "read": true,
+        "roof_surfaces": 0,
+        "rooftop_terraces": 0,
+        "size": [
+          1376,
+          675
+        ],
+        "skyline": true,
+        "soldiers": [
+          {
+            "id": "p01.cactus.08",
+            "vx": 2,
+            "x": 254.897079467773,
+            "y": 1.65093874931335
+          },
+          {
+            "id": "p01.cactus.06",
+            "vx": 2,
+            "x": 193.250640869141,
+            "y": 2.75093817710876
+          }
+        ],
+        "stage": "play",
+        "x": 226.851623535156,
+        "y": 2.20094156265259
+      },
+      "left": {
+        "art_ids": [
+          "capital_watchtower",
+          "capital_house",
+          "capital_merchant",
+          "capital_archway",
+          "capital_balcony_house",
+          "capital_palm_garden"
+        ],
+        "bridge_task": [],
+        "bridges": [
+          {
+            "end": 224.45125,
+            "kind": "gate",
+            "raised": true,
+            "solid": true,
+            "start": 222.05125
+          }
+        ],
+        "buttons": {
+          "attack": [
+            1174,
+            595,
+            52
+          ],
+          "defend": [
+            1252,
+            475,
+            52
+          ],
+          "jump": [
+            1294,
+            595,
+            52
+          ]
+        },
+        "charges": {
+          "amber": 0,
+          "dash": 0,
+          "rupture": 0
+        },
+        "defense_charge": 0,
+        "health": 3,
+        "iphone": true,
+        "order": 1,
+        "palace_pool": 3,
+        "pedestal_collected": false,
+        "pedestal_count": 0,
+        "pedestal_fixture": false,
+        "pickup_count": 0,
+        "player_dash": 0,
+        "read": true,
+        "roof_surfaces": 0,
+        "rooftop_terraces": 0,
+        "size": [
+          1376,
+          675
+        ],
+        "skyline": true,
+        "soldiers": [
+          {
+            "id": "p01.cactus.08",
+            "vx": 2,
+            "x": 257.296508789062,
+            "y": 1.65093874931335
+          },
+          {
+            "id": "p01.cactus.06",
+            "vx": 2,
+            "x": 195.651153564453,
+            "y": 2.75093865394592
+          }
+        ],
+        "stage": "play",
+        "x": 220.777954101562,
+        "y": 2.20088362693787
+      }
+    },
+    {
+      "order": 3,
+      "before": {
+        "art_ids": [
+          "capital_watchtower",
+          "capital_house",
+          "capital_merchant",
+          "capital_archway",
+          "capital_palm_garden",
+          "capital_market_stall"
+        ],
+        "bridge_task": [
+          428,
+          493,
+          520,
+          64
+        ],
+        "bridges": [
+          {
+            "end": 195.142857142857,
+            "kind": "bridge",
+            "raised": false,
+            "solid": false,
+            "start": 192.662857142857
+          }
+        ],
+        "buttons": {
+          "amber": [
+            934,
+            595,
+            52
+          ],
+          "attack": [
+            1174,
+            595,
+            52
+          ],
+          "defend": [
+            1252,
+            475,
+            52
+          ],
+          "jump": [
+            1294,
+            595,
+            52
+          ]
+        },
+        "charges": {
+          "amber": 1,
+          "dash": 0,
+          "rupture": 0
+        },
+        "defense_charge": 0,
+        "health": 3,
+        "iphone": true,
+        "order": 3,
+        "palace_pool": 3,
+        "pedestal_collected": false,
+        "pedestal_count": 0,
+        "pedestal_fixture": false,
+        "pickup_count": 0,
+        "player_dash": 0,
+        "read": true,
+        "roof_surfaces": 0,
+        "rooftop_terraces": 0,
+        "size": [
+          1376,
+          675
+        ],
+        "skyline": true,
+        "soldiers": [
+          {
+            "id": "p03.cactus.06",
+            "vx": 2,
+            "x": 156.156768798828,
+            "y": 2.7509388923645
+          },
+          {
+            "id": "p03.cactus.08",
+            "vx": 2,
+            "x": 209.004699707031,
+            "y": 2.50596833229065
+          }
+        ],
+        "stage": "play",
+        "x": 191.062850952148,
+        "y": 2.20052075386047
+      },
+      "after": {
+        "art_ids": [
+          "capital_watchtower",
+          "capital_house",
+          "capital_merchant",
+          "capital_archway",
+          "capital_palm_garden",
+          "capital_market_stall"
+        ],
+        "bridge_task": [],
+        "bridges": [
+          {
+            "end": 195.142857142857,
+            "kind": "bridge",
+            "raised": true,
+            "solid": true,
+            "start": 192.662857142857
+          }
+        ],
+        "buttons": {
+          "amber": [
+            934,
+            595,
+            52
+          ],
+          "attack": [
+            1174,
+            595,
+            52
+          ],
+          "defend": [
+            1252,
+            475,
+            52
+          ],
+          "jump": [
+            1294,
+            595,
+            52
+          ]
+        },
+        "charges": {
+          "amber": 1,
+          "dash": 0,
+          "rupture": 0
+        },
+        "defense_charge": 0,
+        "health": 3,
+        "iphone": true,
+        "order": 3,
+        "palace_pool": 3,
+        "pedestal_collected": false,
+        "pedestal_count": 0,
+        "pedestal_fixture": false,
+        "pickup_count": 0,
+        "player_dash": 0,
+        "read": true,
+        "roof_surfaces": 0,
+        "rooftop_terraces": 0,
+        "size": [
+          1376,
+          675
+        ],
+        "skyline": true,
+        "soldiers": [
+          {
+            "id": "p03.cactus.06",
+            "vx": 2,
+            "x": 162.457565307617,
+            "y": 2.75093817710876
+          },
+          {
+            "id": "p03.cactus.08",
+            "vx": 2,
+            "x": 215.30485534668,
+            "y": 1.65093886852264
+          }
+        ],
+        "stage": "play",
+        "x": 191.862899780273,
+        "y": 2.20094156265259
+      },
+      "right": {
+        "art_ids": [
+          "capital_watchtower",
+          "capital_house",
+          "capital_merchant",
+          "capital_archway",
+          "capital_market_stall",
+          "capital_palm_garden"
+        ],
+        "bridge_task": [],
+        "bridges": [
+          {
+            "end": 195.142857142857,
+            "kind": "bridge",
+            "raised": true,
+            "solid": true,
+            "start": 192.662857142857
+          }
+        ],
+        "buttons": {
+          "amber": [
+            934,
+            595,
+            52
+          ],
+          "attack": [
+            1174,
+            595,
+            52
+          ],
+          "defend": [
+            1252,
+            475,
+            52
+          ],
+          "jump": [
+            1294,
+            595,
+            52
+          ]
+        },
+        "charges": {
+          "amber": 1,
+          "dash": 0,
+          "rupture": 0
+        },
+        "defense_charge": 0,
+        "health": 3,
+        "iphone": true,
+        "order": 3,
+        "palace_pool": 3,
+        "pedestal_collected": false,
+        "pedestal_count": 0,
+        "pedestal_fixture": false,
+        "pickup_count": 0,
+        "player_dash": 0,
+        "read": true,
+        "roof_surfaces": 0,
+        "rooftop_terraces": 0,
+        "size": [
+          1376,
+          675
+        ],
+        "skyline": true,
+        "soldiers": [
+          {
+            "id": "p03.cactus.06",
+            "vx": -2,
+            "x": 164.591354370117,
+            "y": 2.75093865394592
+          },
+          {
+            "id": "p03.cactus.08",
+            "vx": -2,
+            "x": 218.30549621582,
+            "y": 1.65093886852264
+          }
+        ],
+        "stage": "play",
+        "x": 196.663681030273,
+        "y": 1.65094184875488
+      },
+      "left": {
+        "art_ids": [
+          "capital_watchtower",
+          "capital_house",
+          "capital_merchant",
+          "capital_archway",
+          "capital_market_stall",
+          "capital_palm_garden"
+        ],
+        "bridge_task": [],
+        "bridges": [
+          {
+            "end": 195.142857142857,
+            "kind": "bridge",
+            "raised": true,
+            "solid": true,
+            "start": 192.662857142857
+          }
+        ],
+        "buttons": {
+          "amber": [
+            934,
+            595,
+            52
+          ],
+          "attack": [
+            1174,
+            595,
+            52
+          ],
+          "defend": [
+            1252,
+            475,
+            52
+          ],
+          "jump": [
+            1294,
+            595,
+            52
+          ]
+        },
+        "charges": {
+          "amber": 1,
+          "dash": 0,
+          "rupture": 0
+        },
+        "defense_charge": 0,
+        "health": 3,
+        "iphone": true,
+        "order": 3,
+        "palace_pool": 3,
+        "pedestal_collected": false,
+        "pedestal_count": 0,
+        "pedestal_fixture": false,
+        "pickup_count": 0,
+        "player_dash": 0,
+        "read": true,
+        "roof_surfaces": 0,
+        "rooftop_terraces": 0,
+        "size": [
+          1376,
+          675
+        ],
+        "skyline": true,
+        "soldiers": [
+          {
+            "id": "p03.cactus.06",
+            "vx": -2,
+            "x": 161.924118041992,
+            "y": 2.7509388923645
+          },
+          {
+            "id": "p03.cactus.08",
+            "vx": -2,
+            "x": 215.638259887695,
+            "y": 1.65093874931335
+          }
+        ],
+        "stage": "play",
+        "x": 190.430740356445,
+        "y": 2.20094156265259
+      }
+    },
+    {
+      "order": 7,
+      "before": {
+        "art_ids": [
+          "capital_watchtower",
+          "capital_house",
+          "capital_merchant",
+          "capital_archway",
+          "desert_mining_gantry",
+          "desert_mine_crystals",
+          "desert_timber_bridge"
+        ],
+        "bridge_task": [
+          428,
+          493,
+          520,
+          64
+        ],
+        "bridges": [
+          {
+            "end": 230.333333333333,
+            "kind": "lift",
+            "raised": false,
+            "solid": false,
+            "start": 227.853333333333
+          }
+        ],
+        "buttons": {
+          "amber": [
+            934,
+            595,
+            52
+          ],
+          "attack": [
+            1174,
+            595,
+            52
+          ],
+          "dash": [
+            814,
+            595,
+            52
+          ],
+          "defend": [
+            1252,
+            475,
+            52
+          ],
+          "jump": [
+            1294,
+            595,
+            52
+          ],
+          "rupture": [
+            1054,
+            595,
+            52
+          ]
+        },
+        "charges": {
+          "amber": 0,
+          "dash": 1,
+          "rupture": 1
+        },
+        "defense_charge": 0,
+        "health": 3,
+        "iphone": true,
+        "order": 7,
+        "palace_pool": 3,
+        "pedestal_collected": false,
+        "pedestal_count": 0,
+        "pedestal_fixture": false,
+        "pickup_count": 0,
+        "player_dash": 0,
+        "read": true,
+        "roof_surfaces": 0,
+        "rooftop_terraces": 0,
+        "size": [
+          1376,
+          675
+        ],
+        "skyline": true,
+        "soldiers": [
+          {
+            "id": "p07.cactus.08",
+            "vx": 2,
+            "x": 244.133483886719,
+            "y": 1.65093874931335
+          },
+          {
+            "id": "p07.cactus.06",
+            "vx": 2,
+            "x": 182.550155639648,
+            "y": 2.7509388923645
+          }
+        ],
+        "stage": "play",
+        "x": 226.253326416016,
+        "y": 2.20052075386047
+      },
+      "after": {
+        "art_ids": [
+          "capital_watchtower",
+          "capital_house",
+          "capital_merchant",
+          "capital_archway",
+          "desert_mining_gantry",
+          "desert_mine_crystals",
+          "desert_timber_bridge"
+        ],
+        "bridge_task": [],
+        "bridges": [
+          {
+            "end": 230.333333333333,
+            "kind": "lift",
+            "raised": true,
+            "solid": true,
+            "start": 227.853333333333
+          }
+        ],
+        "buttons": {
+          "amber": [
+            934,
+            595,
+            52
+          ],
+          "attack": [
+            1174,
+            595,
+            52
+          ],
+          "dash": [
+            814,
+            595,
+            52
+          ],
+          "defend": [
+            1252,
+            475,
+            52
+          ],
+          "jump": [
+            1294,
+            595,
+            52
+          ],
+          "rupture": [
+            1054,
+            595,
+            52
+          ]
+        },
+        "charges": {
+          "amber": 0,
+          "dash": 1,
+          "rupture": 1
+        },
+        "defense_charge": 0,
+        "health": 3,
+        "iphone": true,
+        "order": 7,
+        "palace_pool": 3,
+        "pedestal_collected": false,
+        "pedestal_count": 0,
+        "pedestal_fixture": false,
+        "pickup_count": 0,
+        "player_dash": 0,
+        "read": true,
+        "roof_surfaces": 0,
+        "rooftop_terraces": 0,
+        "size": [
+          1376,
+          675
+        ],
+        "skyline": true,
+        "soldiers": [
+          {
+            "id": "p07.cactus.08",
+            "vx": 2,
+            "x": 250.096099853516,
+            "y": 1.65093874931335
+          },
+          {
+            "id": "p07.cactus.06",
+            "vx": 2,
+            "x": 188.450393676758,
+            "y": 2.7509388923645
+          }
+        ],
+        "stage": "play",
+        "x": 226.253326416016,
+        "y": 2.20052075386047
+      },
+      "right": {
+        "art_ids": [
+          "capital_watchtower",
+          "capital_house",
+          "capital_merchant",
+          "capital_archway",
+          "desert_mining_gantry",
+          "desert_mine_crystals",
+          "desert_timber_bridge"
+        ],
+        "bridge_task": [],
+        "bridges": [
+          {
+            "end": 230.333333333333,
+            "kind": "lift",
+            "raised": true,
+            "solid": true,
+            "start": 227.853333333333
+          }
+        ],
+        "buttons": {
+          "amber": [
+            934,
+            595,
+            52
+          ],
+          "attack": [
+            1174,
+            595,
+            52
+          ],
+          "dash": [
+            814,
+            595,
+            52
+          ],
+          "defend": [
+            1252,
+            475,
+            52
+          ],
+          "jump": [
+            1294,
+            595,
+            52
+          ],
+          "rupture": [
+            1054,
+            595,
+            52
+          ]
+        },
+        "charges": {
+          "amber": 0,
+          "dash": 1,
+          "rupture": 1
+        },
+        "defense_charge": 0,
+        "health": 3,
+        "iphone": true,
+        "order": 7,
+        "palace_pool": 3,
+        "pedestal_collected": false,
+        "pedestal_count": 0,
+        "pedestal_fixture": false,
+        "pickup_count": 0,
+        "player_dash": 0,
+        "read": true,
+        "roof_surfaces": 0,
+        "rooftop_terraces": 0,
+        "size": [
+          1376,
+          675
+        ],
+        "skyline": true,
+        "soldiers": [
+          {
+            "id": "p07.cactus.08",
+            "vx": 2,
+            "x": 253.496826171875,
+            "y": 1.65093898773193
+          },
+          {
+            "id": "p07.cactus.06",
+            "vx": 2,
+            "x": 191.851119995117,
+            "y": 2.7509388923645
+          }
+        ],
+        "stage": "play",
+        "x": 232.95426940918,
+        "y": 1.65094184875488
+      },
+      "left": {
+        "art_ids": [
+          "capital_watchtower",
+          "capital_house",
+          "capital_merchant",
+          "capital_archway",
+          "desert_mining_gantry",
+          "desert_mine_crystals",
+          "desert_timber_bridge"
+        ],
+        "bridge_task": [],
+        "bridges": [
+          {
+            "end": 230.333333333333,
+            "kind": "lift",
+            "raised": true,
+            "solid": true,
+            "start": 227.853333333333
+          }
+        ],
+        "buttons": {
+          "amber": [
+            934,
+            595,
+            52
+          ],
+          "attack": [
+            1174,
+            595,
+            52
+          ],
+          "dash": [
+            814,
+            595,
+            52
+          ],
+          "defend": [
+            1252,
+            475,
+            52
+          ],
+          "jump": [
+            1294,
+            595,
+            52
+          ],
+          "rupture": [
+            1054,
+            595,
+            52
+          ]
+        },
+        "charges": {
+          "amber": 0,
+          "dash": 1,
+          "rupture": 1
+        },
+        "defense_charge": 0,
+        "health": 3,
+        "iphone": true,
+        "order": 7,
+        "palace_pool": 3,
+        "pedestal_collected": false,
+        "pedestal_count": 0,
+        "pedestal_fixture": false,
+        "pickup_count": 0,
+        "player_dash": 0,
+        "read": true,
+        "roof_surfaces": 0,
+        "rooftop_terraces": 0,
+        "size": [
+          1376,
+          675
+        ],
+        "skyline": true,
+        "soldiers": [
+          {
+            "id": "p07.cactus.08",
+            "vx": 2,
+            "x": 256.163513183594,
+            "y": 1.65093886852264
+          },
+          {
+            "id": "p07.cactus.06",
+            "vx": 2,
+            "x": 194.517578125,
+            "y": 2.75093817710876
+          }
+        ],
+        "stage": "play",
+        "x": 226.711288452148,
+        "y": 2.20094156265259
+      }
+    }
+  ],
+  "errors": [],
+  "blocked": [],
+  "engineErrors": []
+}

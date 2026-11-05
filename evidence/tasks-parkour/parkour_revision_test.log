@@ -1,0 +1,57 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS fase1: diferenças de nível visíveis
+PASS fase1: retorno por salto continua alcançável
+PASS fase1: oito obstáculos com topo percorrível
+PASS fase1: duas pontes frágeis
+PASS fase2: diferenças de nível visíveis
+PASS fase2: retorno por salto continua alcançável
+PASS fase2: oito obstáculos com topo percorrível
+PASS fase2: duas pontes frágeis
+PASS fase3: diferenças de nível visíveis
+PASS fase3: retorno por salto continua alcançável
+PASS fase3: oito obstáculos com topo percorrível
+PASS fase3: duas pontes frágeis
+PASS fase4: diferenças de nível visíveis
+PASS fase4: retorno por salto continua alcançável
+PASS fase4: oito obstáculos com topo percorrível
+PASS fase4: duas pontes frágeis
+PASS fase5: diferenças de nível visíveis
+PASS fase5: retorno por salto continua alcançável
+PASS fase5: oito obstáculos com topo percorrível
+PASS fase5: duas pontes frágeis
+PASS fase6: diferenças de nível visíveis
+PASS fase6: retorno por salto continua alcançável
+PASS fase6: oito obstáculos com topo percorrível
+PASS fase6: duas pontes frágeis
+PASS fase7: diferenças de nível visíveis
+PASS fase7: retorno por salto continua alcançável
+PASS fase7: oito obstáculos com topo percorrível
+PASS fase7: duas pontes frágeis
+PASS fase8: diferenças de nível visíveis
+PASS fase8: retorno por salto continua alcançável
+PASS fase8: oito obstáculos com topo percorrível
+PASS fase8: duas pontes frágeis
+PASS fase9: diferenças de nível visíveis
+PASS fase9: retorno por salto continua alcançável
+PASS fase9: oito obstáculos com topo percorrível
+PASS fase9: duas pontes frágeis
+PASS dezenove tarefas de cenário, sem habilidades permanentes
+PASS tarefa aparece apenas perto da passagem
+PASS vão realmente aberto antes da montagem
+PASS montagem começa girando a peça, sem colisão antecipada
+PASS segurar avanço durante a montagem não derruba no vazio
+PASS ponte montada tem piso real
+PASS tarefa não usa poderes nem altera recursos
+PASS botão contextual some após concluir
+PASS ponte atravessável andando para a direita
+PASS ponte atravessável andando para a esquerda
+PASS descarregar e voltar preserva ponte sem duplicar
+PASS ponte frágil usa a peça física de desmoronamento
+PASS pisar inicia aviso antes da queda
+PASS ponte perde colisão e deixa cair de verdade
+PASS ponte se recompõe para retorno ou nova tentativa
+PASS saída limpa pontes e tarefas
+PARKOUR_REVISION checks=52 failures=0
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)

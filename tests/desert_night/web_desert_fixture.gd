@@ -37,6 +37,14 @@ func _probe(args: Array) -> void:
 		for kind in ["rupture","amber","dash"]:
 			for index in range(3): phase._player.restore_charge(kind)
 	# TEST ONLY: aproxima o ator de uma recarga real; a física realiza a coleta.
+	if args.size() and str(args[0]) in ["bridge","task"] and is_instance_valid(phase):
+		var hole: Dictionary=phase._phase.tasks[0] if str(args[0])=="task" else phase._phase.tasks.filter(func(g: Dictionary) -> bool:return g.task_kind=="bridge")[0]
+		phase._player.position=Vector3(float(hole.start)-1.6,float(hole.from_y)+0.1,0)
+		phase._player.velocity=Vector3.ZERO
+		phase._player._invulnerable=999
+		phase._player.attack_charges=0
+		phase._player.defense_charges=0
+		phase._stream_world(phase._player.position.x,true)
 	if args.size() and str(args[0]) == "pedestal" and is_instance_valid(phase):
 		for item: Node3D in get_tree().get_nodes_in_group("campaign_pickups"):
 			if phase.is_ancestor_of(item) and item.get("kind") == "attack":
@@ -51,6 +59,15 @@ func _probe(args: Array) -> void:
 	if is_instance_valid(phase):
 		state.stage = "play"
 		state.order = phase._order
+		state.skyline = is_instance_valid(phase._scenery._skyline)
+		state.palace_pool = phase._scenery._skyline._palaces.size() if state.skyline else 0
+		state.rooftop_terraces = get_tree().get_nodes_in_group("rooftop_terraces").size()
+		state.roof_surfaces = phase._world.find_children("City_roof","MeshInstance3D",true,false).size()
+		state.bridge_task = rect(phase._hud._bridge_task) if phase._hud._bridge_task.visible else []
+		state.bridges = []
+		for bridge in get_tree().get_nodes_in_group("earth_bridges"):
+			state.bridges.append({"raised":bridge.raised,"solid":not bridge._shape.disabled,"end":bridge.hole.end,"start":bridge.hole.start,"kind":bridge.hole.task_kind})
+		state.defense_charge = phase._player.defense_charges
 		state.pedestal_fixture = not _pedestal_fixture_id.is_empty()
 		state.pedestal_collected = phase._collected_ids.has(_pedestal_fixture_id)
 		state.pedestal_count = get_tree().get_nodes_in_group("campaign_pedestals").filter(func(n: Node) -> bool: return n.get_meta("pickup_id","") == _pedestal_fixture_id).size()

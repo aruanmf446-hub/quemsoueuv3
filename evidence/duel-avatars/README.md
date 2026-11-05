@@ -56,4 +56,5 @@ não novas animações nem prova automática do significado de cada gesto.
   [pendências](../../docs/DUEL_AVATAR_IMPROVEMENTS.md).
 
 Nenhuma modificação de Supabase, assets de personagens, economia ou Modo História.
-Nenhum merge/publicação desta branch foi realizado.
+Publicação na main autorizada pelo dono em 05/11/2026. O resultado do deploy é
+verificado pelo workflow `deploy-web.yml`; as limitações online acima permanecem.

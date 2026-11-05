@@ -1,6 +1,7 @@
 # Mata-Mata: reações e confirmações contextuais
 
-Branch: `work/duel-avatar-apresentacao`. Melhorias incrementais sobre a versão publicada;
+Origem: `work/duel-avatar-apresentacao`; publicação na main autorizada em 05/11/2026.
+Melhorias incrementais sobre a versão publicada;
 não altera regras de vitória, autenticação, inventário, economia ou Modo História.
 
 ## Implementação
@@ -85,3 +86,5 @@ QSE_TEST_IPHONE=1 xvfb-run -a godot --audio-driver Dummy --path . --script res:/
 Os testes de interação usam uma partida local e uma fixture de vidas explicitamente
 identificada para provocar a derrota. Não simulam validação de servidor nem iPhone físico.
 Resultados e capturas: [evidence/duel-avatars](../evidence/duel-avatars/README.md).
+
+Pendências consolidadas, incluindo nicknames: [handoff Supabase](backend/PENDENCIAS_2026_11_05.md).

@@ -4,6 +4,8 @@ const ABILITY_PHASE := {"amber":3,"dash":4,"rupture":5}
 const MAX_HORIZONTAL_SPEED := 7.4
 const DEFAULT_DISTANCE := 1452.0
 const CHUNK_LENGTH := 24.0
+const TASK_MIN_GAP := 18.0
+const TASK_GATE_HEIGHT := 5.2
 const NAMES := ["Portões da Capital","Telhados da Capital","Bazar da Cidade","Aqueduto do Deserto","Jardins do Oásis","Ruínas Enterradas","Estrada da Mineração","Posto de Controle","Entrada da Mineradora","Interior da Mineração"]
 const THEMES := ["city_gates","rooftops","bazaar","aqueduct","oasis","ruins","mining_road","checkpoint","mine_entrance","mine_interior"]
 const DESCRIPTIONS := ["Atravesse os portões, pátios e muralhas de acesso à capital.","Corra sobre lajes e terraços; a rua fica muito abaixo.","Cruze o mercado noturno, depósitos e corredores comerciais.","Atravesse canais, pontes e arcos do grande aqueduto.","Siga pelas águas, jardins e palmeiras do oásis.","Explore câmaras e passagens do reino antigo.","Deixe a capital pela rota de transporte de minério.","Atravesse os setores militares e o portão de controle.","Avance pelos pátios até a grande entrada da mineradora.","Entre nas cavernas industriais e atravesse o complexo subterrâneo."]
@@ -135,8 +137,26 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 			data=holes[module].duplicate(true)
 			data.crumble_bridge=false
 			holes[module].crumble_bridge=false
+			var landing := module+1
+			while float(surfaces[landing].left)-float(data.start)<TASK_MIN_GAP:
+				surfaces[landing].task_void=true
+				landing+=1
+			data.end=surfaces[landing].left
+			data.to_y=surfaces[landing].height
+			holes[module].end=data.end
+			holes[module].to_y=data.to_y
+			holes[module].width=float(data.end)-float(data.start)
+			holes[module].requires_task=true
 		data.merge({"id":"%s.task.%d" % [prefix,i],"task_kind":kind,"task_text":plans[i][1],"theme":order,"width":float(data.end)-float(data.start)})
+		data.width=float(data.end)-float(data.start)
 		tasks.append(data)
+	# Retira de fato piso, atores e decoração dentro da passagem que depende da Task.
+	for task: Dictionary in tasks:
+		if task.task_kind=="gate":continue
+		platforms=platforms.filter(func(p: Dictionary) -> bool:return float(p.pos[0])<=float(task.start) or float(p.pos[0])>=float(task.end))
+		pickups=pickups.filter(func(p: Dictionary) -> bool:return float(p.pos[0])<=float(task.start) or float(p.pos[0])>=float(task.end))
+		enemies=enemies.filter(func(p: Dictionary) -> bool:return float(p.pos[0])<=float(task.start) or float(p.pos[0])>=float(task.end))
+		holes=holes.filter(func(h: Dictionary) -> bool:return float(h.start)<=float(task.start) or float(h.start)>=float(task.end))
 	var goal_top: float = surfaces[-1].height
 	stage.merge({"protagonist":"el_fuego","player_spawn":[spawn_x,_height(order,0)+0.1,0],"length":distance,"total_length":distance,"minimum_seconds":180.0,"minimum_traversal_seconds":(distance-1)/MAX_HORIZONTAL_SPEED,"transport_allowance":0.0,"maximum_horizontal_speed":MAX_HORIZONTAL_SPEED,"tasks":tasks,"platforms":platforms,"enemies":enemies,"pickups":pickups,"holes":holes,"signs":[],"districts":districts,"landmarks":landmarks,"checkpoints":checkpoints,"geysers":[],"storms":[],"surfaces":surfaces,"goal":{"pos":[goal_x,goal_top+1.5,0]},"kill_plane_y":-10.0 if order == 2 else -12.0,"boss_id":"malagueta" if order == 10 else null,"legacy_placeholder_visuals":false,"bounds":{"min_x":origin,"max_x":goal_x+10.0},"next_scene":"res://scenes/desert/phase_%02d.tscn" % (order+1) if order < 10 else "","reach":{"max_gap":3.2,"single_jump_max_step_top":0.65,"double_jump_max_step_top":1.3}},true)
 	if order == 10:
@@ -160,5 +180,6 @@ static func _height(order: int,index: int) -> float:
 
 static func floor_at(stage: Dictionary,x: float) -> Dictionary:
 	for surface: Dictionary in stage.surfaces:
+		if surface.get("task_void",false):continue
 		if x >= float(surface.left) and x <= float(surface.right): return surface
 	return {}

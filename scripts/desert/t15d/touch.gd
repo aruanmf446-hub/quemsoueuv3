@@ -19,10 +19,17 @@ var _stick_actions := {}
 ## Posições desenhadas: seguem o dedo com amortecimento e voltam ao centro ao soltar.
 var _knob := Vector2.ZERO
 var _drawn_origin := Vector2.ZERO
+static func task_area(screen: Vector2) -> Rect2:
+	var r:=52.0 if UIScale.is_iphone() else 64.0
+	var gap:=120.0 if UIScale.is_iphone() else 144.0
+	var jump:=Vector2(screen.x-r-30,screen.y-r-28)
+	return Rect2(jump+Vector2(-gap,-gap)-Vector2.ONE*r,Vector2.ONE*r*2)
 func _ready() -> void:
 	PlayerUI.apply_theme(self)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	visible = _wanted()
+	_layout()
+	_drawn_origin=_base
 func _wanted() -> bool:
 	return DisplayServer.is_touchscreen_available() or OS.has_feature("android") or OS.has_feature("web") or UIScale.is_handheld() or "--touch-controls" in OS.get_cmdline_user_args()
 func _layout() -> void:
@@ -33,7 +40,7 @@ func _layout() -> void:
 	var radius := (52.0 if UIScale.is_iphone() else 64.0)*unit
 	var gap := (120.0 if UIScale.is_iphone() else 144.0)*unit
 	var jump := Vector2(screen.x-radius-30*unit, screen.y-radius-28*unit)
-	_buttons = {"jump": [jump, radius], "attack": [jump+Vector2(-gap, 0), radius], "defend": [jump+Vector2(-gap*0.35, -gap), radius]}
+	_buttons = {"jump": [jump, radius], "attack": [jump+Vector2(-gap, 0), radius], "defend": [jump+Vector2(0, -gap), radius]}
 	for index in range(3):
 		var kind: String = ["rupture","amber","dash"][index]
 		if is_instance_valid(actor) and actor.discovered.has(kind):

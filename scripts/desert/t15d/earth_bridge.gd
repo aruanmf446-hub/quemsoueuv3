@@ -47,13 +47,18 @@ func _ready() -> void:
 	if _kind=="gate":
 		_hinge.position=Vector3((start.x+finish.x)*0.5,start.y,0)
 		_hinge.rotation=Vector3.ZERO
-		_deck.position=Vector3(0,1.2,0)
-		box.size=Vector3(2.4,2.4,3.6)
+		_deck.position=Vector3(0,2.6,0)
+		box.size=Vector3(2.4,5.2,3.6)
 		slab.size=box.size
 		earth.albedo_texture=null
 		earth.albedo_color=Color("#795739")
 		_deck.show()
 		_shape.disabled=false
+		var detail:=preload("res://scripts/desert/t15d/city_props.gd").new()
+		_deck.add_child(detail)
+		for y in [-1.8,0.0,1.8]:detail._box(Vector3(0,y,1.84),Vector3(2.4,0.12,0.10),"metal")
+		for x in [-1.16,1.16]:detail._box(Vector3(x,0,1.84),Vector3(0.12,5.2,0.10),"metal")
+		detail._flush()
 	elif _kind=="lift":
 		_deck.show()
 		_deck.position.y-=1.6
@@ -91,7 +96,7 @@ func raise_bridge(animated := true) -> void:
 	raised = true
 	_deck.show()
 	if not animated:
-		if _kind=="gate": _hinge.position.y+=3.2
+		if _kind=="gate": _hinge.position.y+=5.5
 		elif _kind=="lift": _deck.position.y=-0.13
 		_shape.set_deferred("disabled",false)
 		return
@@ -99,7 +104,7 @@ func raise_bridge(animated := true) -> void:
 	var tween := create_tween()
 	_shape.set_deferred("disabled",true)
 	if _kind=="gate":
-		tween.tween_property(_hinge,"position:y",_hinge.position.y+3.2,0.8)
+		tween.tween_property(_hinge,"position:y",_hinge.position.y+5.5,0.8)
 	elif _kind=="lift":
 		tween.tween_property(_deck,"position:y",-0.13,0.8)
 	else:

@@ -71,6 +71,7 @@ static func placements(order: int) -> Array:
 		var chosen: Dictionary={}
 		var x := desired
 		for floor: Dictionary in stage.surfaces:
+			if floor.get("task_void",false):continue
 			var left := float(floor.left)+width*0.5+0.3
 			var right := float(floor.right)-width*0.5-0.3
 			if left>right: continue
@@ -87,6 +88,7 @@ static func placements(order: int) -> Array:
 ## Conjuntos decorativos ancorados em uma laje real. Nunca alteram a física.
 ## Posições relativas e duas profundidades formam ruas e praças, em vez de uma grade.
 static func composition(order: int, slot: int, left: float, right: float, top: float) -> Array[Dictionary]:
+	if surface(order,slot).get("task_void",false):return []
 	var variants: Array
 	match order:
 		1:

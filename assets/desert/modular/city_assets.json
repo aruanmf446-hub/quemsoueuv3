@@ -34,6 +34,76 @@
       "role": "palmeiras e jardim desértico",
       "suggested_width_metres": 4.0,
       "placed_in_game": false
+    },
+    {
+      "id": "capital_archway",
+      "texture": "res://assets/desert/modular/capital_archway.res",
+      "role": "arcada de passagem",
+      "suggested_width_metres": 4.5,
+      "placed_in_game": false
+    },
+    {
+      "id": "capital_balcony_house",
+      "texture": "res://assets/desert/modular/capital_balcony_house.res",
+      "role": "casa com varanda de madeira",
+      "suggested_width_metres": 6.0,
+      "placed_in_game": false
+    },
+    {
+      "id": "desert_aqueduct",
+      "texture": "res://assets/desert/modular/desert_aqueduct.res",
+      "role": "módulo de aqueduto",
+      "suggested_width_metres": 9.0,
+      "placed_in_game": false
+    },
+    {
+      "id": "desert_oasis_fountain",
+      "texture": "res://assets/desert/modular/desert_oasis_fountain.res",
+      "role": "fonte dos jardins do oásis",
+      "suggested_width_metres": 3.2,
+      "placed_in_game": false
+    },
+    {
+      "id": "desert_ancient_ruins",
+      "texture": "res://assets/desert/modular/desert_ancient_ruins.res",
+      "role": "ruínas e colunas antigas",
+      "suggested_width_metres": 6.0,
+      "placed_in_game": false
+    },
+    {
+      "id": "desert_mining_gantry",
+      "texture": "res://assets/desert/modular/desert_mining_gantry.res",
+      "role": "guindaste e transporte de minério",
+      "suggested_width_metres": 5.0,
+      "placed_in_game": false
+    },
+    {
+      "id": "desert_military_gate",
+      "texture": "res://assets/desert/modular/desert_military_gate.res",
+      "role": "portão militar de controle",
+      "suggested_width_metres": 7.0,
+      "placed_in_game": false
+    },
+    {
+      "id": "desert_mine_entrance",
+      "texture": "res://assets/desert/modular/desert_mine_entrance.res",
+      "role": "entrada monumental da mineradora",
+      "suggested_width_metres": 8.0,
+      "placed_in_game": false
+    },
+    {
+      "id": "desert_timber_bridge",
+      "texture": "res://assets/desert/modular/desert_timber_bridge.res",
+      "role": "ponte de madeira e pedra",
+      "suggested_width_metres": 7.0,
+      "placed_in_game": false
+    },
+    {
+      "id": "desert_mine_crystals",
+      "texture": "res://assets/desert/modular/desert_mine_crystals.res",
+      "role": "minérios e cristais subterrâneos",
+      "suggested_width_metres": 3.0,
+      "placed_in_game": false
     }
   ],
   "placement": "Sprite3D decorativo; largura define pixel_size=largura/texture.get_width(); preservar proporção; colisões separadas existentes; não atravessar vãos"

@@ -11,7 +11,8 @@ nesta conversa. Não precisa de credenciais adicionais.
 1. `python3 tools/asset_pipeline/desert_bot/asset_bot.py next --limit 2`
    imprime os argumentos exatos para a ferramenta de imagens. Não altera a fila.
 2. Codex executa as chamadas `image_gen__imagegen` com esses argumentos e mostra
-   as imagens reais. Lotes são limitados a um ou dois itens; não gerar os itens
+   as imagens reais. Lotes padrão são de um ou dois itens. Quando o dono pedir explicitamente um
+   lote grande, usar `next --limit 10 --large-batch` (máximo12). Não gerar lotes
    restantes automaticamente nem afirmar gasto fixo de cota.
 3. `python3 tools/asset_pipeline/desert_bot/asset_bot.py register ID /caminho/gerado.png`
    registra PNG RGBA com transparência, origem e hash. Não sobrescreve fontes

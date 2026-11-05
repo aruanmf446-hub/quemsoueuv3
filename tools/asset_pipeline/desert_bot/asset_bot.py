@@ -19,12 +19,12 @@ def find(q,key):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__);sub=p.add_subparsers(dest='command',required=True)
-    n=sub.add_parser('next');n.add_argument('--limit',type=int,default=2)
+    n=sub.add_parser('next');n.add_argument('--limit',type=int,default=2);n.add_argument('--large-batch',action='store_true',help='usar somente para lote grande pedido pelo dono')
     r=sub.add_parser('register');r.add_argument('id');r.add_argument('image',type=Path)
     b=sub.add_parser('build');b.add_argument('--godot',required=True)
     sub.add_parser('status');a=p.parse_args();q=read()
     if a.command=='next':
-        if not 1<=a.limit<=2: p.error('Lotes de1 ou2 para revisão e controle de gasto')
+        if not 1<=a.limit<=(12 if a.large_batch else 2): p.error('Padrão1–2; lote grande autorizado exige --large-batch, máximo12')
         for item in [x for x in q['assets'] if x['state']=='pending'][:a.limit]:
             print(json.dumps({'id':item['id'],'tool':'image_gen__imagegen','arguments':{
                 'prompt':COMMON+item['brief'],'transparent_background':True,

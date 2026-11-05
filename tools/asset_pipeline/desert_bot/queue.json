@@ -35,15 +35,151 @@
       "id": "capital_archway",
       "label": "arcada de passagem",
       "width_metres": 4.5,
-      "state": "pending",
-      "brief": "A freestanding monumental sandstone archway with transparent open passage, weathered stone blocks, restrained crimson flame banner on left pillar and warm lantern on right pillar. Flat walkable stone lintel above rounded arch, believable 3D volume, complete two pillars and arch, no surrounding buildings or floor."
+      "state": "prepared",
+      "brief": "A freestanding monumental sandstone archway with transparent open passage, weathered stone blocks, restrained crimson flame banner on left pillar and warm lantern on right pillar. Flat walkable stone lintel above rounded arch, believable 3D volume, complete two pillars and arch, no surrounding buildings or floor.",
+      "source": "assets/desert/modular/source/capital_archway.png",
+      "size": [
+        1430,
+        1100
+      ],
+      "sha256": "5ca039bf08355d5fc158f6f475c35fe85cc496b59880abb785fbdd955d7d00dd",
+      "generated_with": "image_gen__imagegen",
+      "texture": "res://assets/desert/modular/capital_archway.res"
     },
     {
       "id": "capital_balcony_house",
       "label": "casa com varanda de madeira",
       "width_metres": 6.0,
-      "state": "pending",
-      "brief": "A distinct two-story sandstone plaster residence with flat parkour roof, a modest timber balcony on upper right, warm lattice windows, arched dark wooden door left below red awning, narrow crimson gold flame banner and two pots at base. Same premium material detail as approved reference. Orthographic front view, no people."
+      "state": "prepared",
+      "brief": "A distinct two-story sandstone plaster residence with flat parkour roof, a modest timber balcony on upper right, warm lattice windows, arched dark wooden door left below red awning, narrow crimson gold flame banner and two pots at base. Same premium material detail as approved reference. Orthographic front view, no people.",
+      "source": "assets/desert/modular/source/capital_balcony_house.png",
+      "size": [
+        1430,
+        1100
+      ],
+      "sha256": "e5bfab20595f9896b5fd429ff39e7f2523c108968c52df3b83caf505893b8dc1",
+      "generated_with": "image_gen__imagegen",
+      "texture": "res://assets/desert/modular/capital_balcony_house.res"
+    },
+    {
+      "id": "desert_aqueduct",
+      "label": "módulo de aqueduto",
+      "width_metres": 9.0,
+      "state": "prepared",
+      "brief": "A complete monumental sandstone AQUEDUCT MODULE, three open arches with genuinely transparent openings, thick stone piers and flat horizontal water channel along top. Small visible turquoise water stream in top channel, warm lantern on a pier and one restrained crimson gold flame banner. Side elevation, believable water-carrying infrastructure. No detached floating rocks, no sky, no surrounding landscape. No waterfall reaching off canvas.",
+      "source": "assets/desert/modular/source/desert_aqueduct.png",
+      "size": [
+        1920,
+        819
+      ],
+      "sha256": "cf4fb8639565f221048fdf03121723cdd6092facbb0c67ed8d0feda4ad129f13",
+      "generated_with": "image_gen__imagegen",
+      "texture": "res://assets/desert/modular/desert_aqueduct.res"
+    },
+    {
+      "id": "desert_oasis_fountain",
+      "label": "fonte dos jardins do oásis",
+      "width_metres": 3.2,
+      "state": "prepared",
+      "brief": "An elegant OASIS FOUNTAIN module: low wide carved sandstone octagonal basin, one smaller tier supported at center, gentle turquoise water spilling into basin, modest flowering green desert plants at base and small brass lantern. Match kingdom motifs with a discreet gold flame medallion. Transparent area around and above fountain. Premium volumetric water and weathered stone; no broad pool or landscape.",
+      "source": "assets/desert/modular/source/desert_oasis_fountain.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "04ebba9c570514e25b7f841c9e0fbf8691393acbdb0c9783d082ba966688b6e3",
+      "generated_with": "image_gen__imagegen",
+      "texture": "res://assets/desert/modular/desert_oasis_fountain.res"
+    },
+    {
+      "id": "desert_ancient_ruins",
+      "label": "ruínas e colunas antigas",
+      "width_metres": 6.0,
+      "state": "prepared",
+      "brief": "A complete ANCIENT RUIN ARCH MODULE: two weathered sandstone columns supporting a cracked lintel with a modest central ancient flame relief, a smaller broken column to one side, a few rubble blocks at base and one old warm lantern. Transparent opening under arch. Restrained archaeological architecture sharing the kingdom materials, hints of sand and weathering on individual blocks. No mountains, no cave background, no giant floor.",
+      "source": "assets/desert/modular/source/desert_ancient_ruins.png",
+      "size": [
+        1312,
+        1199
+      ],
+      "sha256": "52f417e4d7cfbe84149b29ddf426132b7d1311eae72de799f051524573429167",
+      "generated_with": "image_gen__imagegen",
+      "texture": "res://assets/desert/modular/desert_ancient_ruins.res"
+    },
+    {
+      "id": "desert_mining_gantry",
+      "label": "guindaste e transporte de minério",
+      "width_metres": 5.0,
+      "state": "prepared",
+      "brief": "A complete primitive MINING GANTRY module: believable weathered dark timber posts and crossbeam with iron brackets, working rope pulley and hook holding one ore crate, one separate small four-wheeled mine cart loaded with rock at base, amber hanging lantern. No modern engines or modern machinery. Side-on front elevation, mechanically coherent structure for a medieval desert mine, everything inside canvas. No rails extending beyond image.",
+      "source": "assets/desert/modular/source/desert_mining_gantry.png",
+      "size": [
+        1430,
+        1100
+      ],
+      "sha256": "3845ee9b3f393b08ab3f74db1e19d2e42f74fb8909e6341359eb879fd59eed62",
+      "generated_with": "image_gen__imagegen",
+      "texture": "res://assets/desert/modular/desert_mining_gantry.res"
+    },
+    {
+      "id": "desert_military_gate",
+      "label": "portão militar de controle",
+      "width_metres": 7.0,
+      "state": "prepared",
+      "brief": "A complete MILITARY CHECKPOINT GATE: two sturdy sandstone guard piers with warm small lanterns and long crimson banners bearing elegant gold flame insignia, heavy reinforced timber double gate visibly OPEN inward leaving a transparent passage between piers, a flat stone lintel and modest crenellations above. No giant city behind it. Clearly defensive yet restrained, no spikes placed on playable floor.",
+      "source": "assets/desert/modular/source/desert_military_gate.png",
+      "size": [
+        1774,
+        887
+      ],
+      "sha256": "e934f22c9080e8ddfd9ef63fdb701d4866f6d3acdc27b68fe8472eb65ae81b58",
+      "generated_with": "image_gen__imagegen",
+      "texture": "res://assets/desert/modular/desert_military_gate.res"
+    },
+    {
+      "id": "desert_mine_entrance",
+      "label": "entrada monumental da mineradora",
+      "width_metres": 8.0,
+      "state": "prepared",
+      "brief": "A complete MINE ENTRANCE PORTAL module: enormous timber-and-weathered-sandstone reinforced tunnel mouth, warm lanterns framing a dark recessed opening, short visible rails ending neatly at base inside asset, understated crimson gold flame banners on side supports, small metal ore pipes and one crate at side. Opening is dark tunnel interior, background around outer rock silhouette transparent. No whole mountain, no scenery. Front elevation, arch shape differs from urban gate.",
+      "source": "assets/desert/modular/source/desert_mine_entrance.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "bd12290d6d08369fa9b67472de3f95fcb31847aa5e5877d5050bacfbf075db42",
+      "generated_with": "image_gen__imagegen",
+      "texture": "res://assets/desert/modular/desert_mine_entrance.res"
+    },
+    {
+      "id": "desert_timber_bridge",
+      "label": "ponte de madeira e pedra",
+      "width_metres": 7.0,
+      "state": "prepared",
+      "brief": "A complete horizontal TIMBER BRIDGE MODULE for a medieval desert mining route: flat sturdy walking planks, timber trestles below with iron brackets and cross braces, restrained rope handrail BEHIND walking line, one small amber lantern on far end support. No stairs, no ladders, no floating disconnected planks. Straight SIDE ELEVATION, top beam remains visibly flat across frame. Entire structure isolated, no terrain or gorge painted behind.",
+      "source": "assets/desert/modular/source/desert_timber_bridge.png",
+      "size": [
+        2172,
+        724
+      ],
+      "sha256": "7241f60db1b7e057205159b40e03fa1f8e6849bcfc49992313442dcf6e1c75d7",
+      "generated_with": "image_gen__imagegen",
+      "texture": "res://assets/desert/modular/desert_timber_bridge.res"
+    },
+    {
+      "id": "desert_mine_crystals",
+      "label": "minérios e cristais subterrâneos",
+      "width_metres": 3.0,
+      "state": "prepared",
+      "brief": "A complete small UNDERGROUND MINERAL CLUSTER module: a craggy natural dark sandstone rock outcrop with beautiful orange amber translucent crystals embedded in it, smaller violet-blue mineral seams, one primitive hanging lantern on a short timber support and two modest ore fragments at base. Believable geology, restrained soft luminous crystals not a giant explosion. Grounded side elevation with transparent background; no cave walls or scenery, no interface pickups or coins.",
+      "source": "assets/desert/modular/source/desert_mine_crystals.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "7b304f945058211bedd71152d5ac42a952d58c4f2f63d90e3e5e59b9066b24ae",
+      "generated_with": "image_gen__imagegen",
+      "texture": "res://assets/desert/modular/desert_mine_crystals.res"
     }
   ]
 }

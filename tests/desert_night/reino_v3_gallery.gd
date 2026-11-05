@@ -60,7 +60,7 @@ func run() -> void:
 		records.append({"order":order,"name":phase._phase.name,"fixture_teleport":true,"district":5,"viewport":root.get_visible_rect().size,"window":root.size,"iphone":UIScale.is_iphone(),"image":middle_file,"result":middle_error})
 		print("CAPTURE ",middle_file," result=",middle_error)
 		if order == 9:
-			phase._player.position=Vector3(float(phase._phase.goal.pos[0])-6,float(phase._phase.goal.pos[1])-1.45,0)
+			phase._player.position=Vector3(float(phase._phase.goal.pos[0])-1.6,float(phase._phase.goal.pos[1])-1.45,0)
 			phase._stream_world(phase._player.position.x,true)
 			phase._follow_camera(1.0)
 			await settle(phase,8)
@@ -69,6 +69,27 @@ func run() -> void:
 			var final_file := output+"/fase_09_portal_final_fixture.png"
 			var saved := root.get_texture().get_image().save_png(final_file)
 			records.append({"order":9,"fixture_teleport":true,"endpoint":true,"image":final_file,"result":saved})
+		# Capa de autoria: captura separada, sem HUD, preservando a proporção real.
+		phase.set_physics_process(false)
+		if order == 1:
+			phase._player.position=phase._vec3(phase._phase.player_spawn)
+			phase._key_light.position=phase._player.position+Vector3(0,1.5,1.8)
+			phase._stream_world(phase._player.position.x,true)
+			phase._follow_camera(1.0)
+			phase._camera.size=10.5
+			phase._camera.position.y+=1.5
+			phase._camera.look_at(Vector3(phase._camera.position.x,phase._camera.position.y-1,0),Vector3.UP)
+			phase._scenery.follow(phase._camera,phase._player.position.x)
+			await settle(phase,6)
+		phase._hud.hide()
+		await RenderingServer.frame_post_draw
+		var cover := root.get_texture().get_image()
+		cover.resize(768,roundi(768.0*cover.get_height()/cover.get_width()),Image.INTERPOLATE_LANCZOS)
+		cover.convert(Image.FORMAT_RGB8)
+		var cover_texture := ImageTexture.create_from_image(cover)
+		var cover_error := ResourceSaver.save(cover_texture,output+"/cover_phase_%02d.res" % order,ResourceSaver.FLAG_COMPRESS)
+		if cover_error != OK: failures+=1
+		phase._hud.show()
 		root.remove_child(phase)
 		phase.queue_free()
 		current_scene = null

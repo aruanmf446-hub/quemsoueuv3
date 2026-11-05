@@ -1,12 +1,18 @@
 # Quem Sou Eu V3 — Reino do Deserto
 
-## Reforma das dez fases — branch em desenvolvimento
+## Reforma das dez fases — revisão separada
 
-A nova tarefa está em `work/reino-deserto-10-fases`, partindo da main967a408.
-Não fazer merge desta branch: o dono pediu revisão separada.
-O relatório desta rodada está em [REINO_10_FASES.md](docs/desert/REINO_10_FASES.md).
-A validação e o painel serão atualizados conforme os testes terminarem;
-resultados antigos abaixo correspondem à entrega anterior, já publicada.
+Branch `work/reino-deserto-10-fases`, baseada na main `967a408`.
+Dez percursos modulares implementados; perseguição nos telhados, contato dos
+inimigos, poderes e apoio das recargas corrigidos. Modelos originais preservados.
+Dez travessias completas e 17 etapas do runner aprovadas; export Web e teste
+Chromium com perfil iPhone executados. Sem merge ou publicação nesta rodada.
+
+Veja [implementação e pendências](docs/desert/REINO_10_FASES.md) e
+[capturas reais e resultados](evidence/reino-10-fases/README.md).
+Ainda dependem de revisão o acabamento visual frente à referência, o balanceamento
+(~4min08–4min39 no piloto) e aparelhos físicos. Os resultados abaixo são da
+**entrega anterior**, já publicada, e não substituem as evidências desta branch.
 
 ## Desenvolvimento atual
 

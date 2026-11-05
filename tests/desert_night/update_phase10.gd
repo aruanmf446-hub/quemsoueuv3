@@ -9,4 +9,4 @@ func _initialize() -> void:
 	var error := ResourceSaver.save(packed,"res://scenes/desert/phase_10.tscn")
 	scene.free()
 	print("PHASE10_SAVE ",error)
-	quit(error)
+	quit.call_deferred(error)

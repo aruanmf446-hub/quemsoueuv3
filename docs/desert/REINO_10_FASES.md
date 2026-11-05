@@ -43,26 +43,39 @@ janela de ataque, inclusive quando um inimigo estava congelado.
 Os recursos aquecem durante a narrativa, incluindo o material novo e os modelos
 de Malagueta ao entrar na fase10. Histórico local de leitura é preservado.
 
-## Validação em curso
+## Validação executada — Godot 4.7.2
 
-- Testes novos: reino10_test.gd (abertura das dez cenas, recargas apoiadas/separadas,
-  perseguição, salto real entre lajes, cristal, Ruptura elevada e capacidades).
-- legacy10_test.gd foi atualizado para o escopo agora autorizado: mineração extensa,
-  modelo/vida originais de Malagueta, ataque real e bloqueio da saída enquanto vive.
-- progress_test.gd aceita dez conclusões e rejeita fase11; dados locais isolados.
-- route.gd usa somente entradas e itens reais. Resultados finais devem incluir todas
-  as travessias e a arena, não apenas as provas isoladas. Tentativas que falham não
-  são apresentadas como vitória nem validadas em aparelho.
-- Capturas nativas: início, setor intermediário e portal final9. Pontos intermediários
-  são fixtures teleportadas identificadas e não demonstram travessia.
-- Nenhuma autenticação, Supabase, economia, menu musical ou asset de personagem alterado.
+Evidências: [relatório e painel](../../evidence/reino-10-fases/README.md).
 
-A revisão automática bloqueou o editor/importador, alegando conflito com
-AGENTS.md:7 sobre .godot/. Foi solicitada autorização ao dono para geração normal
-do cache. Não houve edição manual nem importação por caminho indireto. Como alternativa
-permitida, o material foi salvo via runtime headless como ImageTexture nativo.res:
-não exige importador e conserva PNG de autoria numa pasta.gdignore. A importação
-de editor e o exportWeb ainda precisam ser liberados/validados nesta rodada.
+- Dez travessias completas aprovadas por entradas físicas, sem teleporte ou
+  invulnerabilidade. A décima inclui derrota de Malagueta e saída. As rotas levaram
+  aproximadamente 4min08 a 4min39 de tempo simulado: o alvo de três minutos ainda
+  merece balanceamento com jogadores, sem uma espera artificial na saída.
+- Runner consolidado: 17 etapas aprovadas. Mecânicas novas: 67/0; layout: 130/0;
+  mineração/chefe: 6/0; progresso: 30/0; variedade: 15/0; checkpoints: 21/0;
+  controles: 10/0; cada travessia: 11/0.
+- Guarda iPhone: 504/0. Intro: 67/0. PWA: 29/0. Design e escopo aprovados.
+- 63 capturas reais em 1672×941, 844×390 e 640×360. Pontos intermediários e portal9
+  são fixtures teleportadas para inspeção, não provas de travessia.
+- Importação normal e export de produção concluídos. A restrição inicial do
+  importador foi resolvida após a continuação autorizada pelo dono; não houve
+  edição manual de cache. MCP Godot indisponível: CLI oficial e ResourceSaver usados.
+- WebAssembly real no Chromium, UA iPhone, viewport844×390, DPR3: oito quadros por
+  toque, consumo de carga, persistência após reload e soldado perseguindo sobre
+  a laje de8m. Relatório sem erros de página ou scripts do motor. Testes/fixtures,
+  evidências e fontes de autoria não entram no pacote de produção.
 
-Não considerar esta rodada concluída até fechar as regressões finais e a revisão
-visual dos dez percursos, especialmente telhados e arena da mineração.
+## Pendências para aprovação
+
+- Revisão artística do dono: as estruturas próximas agora são modulares e jogáveis,
+  mas a densidade arquitetônica, vegetação e acabamento de alguns módulos ainda
+  ficam abaixo da referência ilustrada. Não declarar fidelidade visual aprovada.
+- Balancear duração e dificuldade com jogadores; o piloto automatizado não mede
+  a experiência humana e seus tempos não são benchmark de renderização.
+- Validar Safari/PWA em iPhone físico, Android e Windows. Chromium emulado e capturas
+  nativas não validam esses aparelhos. Não foram testados OAuth ou backend online.
+- Alguns testes de encerramento imediato registram avisos de liberação de playback
+  WAV; não foram encontrados erros de script/importação nas capturas finais.
+
+Nenhuma autenticação, Supabase, economia, menu musical ou asset de personagem
+alterado. Esta rodada é entregue na branch de revisão, sem merge nem Pages.

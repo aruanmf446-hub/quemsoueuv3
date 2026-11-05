@@ -1,0 +1,26 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+CAPTURE /workspace/.runtime/reino10-review-final/iphone/fase_01.png result=0
+CAPTURE /workspace/.runtime/reino10-review-final/iphone/fase_01_distrito05_fixture.png result=0
+CAPTURE /workspace/.runtime/reino10-review-final/iphone/fase_02.png result=0
+CAPTURE /workspace/.runtime/reino10-review-final/iphone/fase_02_distrito05_fixture.png result=0
+CAPTURE /workspace/.runtime/reino10-review-final/iphone/fase_03.png result=0
+CAPTURE /workspace/.runtime/reino10-review-final/iphone/fase_03_distrito05_fixture.png result=0
+CAPTURE /workspace/.runtime/reino10-review-final/iphone/fase_04.png result=0
+CAPTURE /workspace/.runtime/reino10-review-final/iphone/fase_04_distrito05_fixture.png result=0
+CAPTURE /workspace/.runtime/reino10-review-final/iphone/fase_05.png result=0
+CAPTURE /workspace/.runtime/reino10-review-final/iphone/fase_05_distrito05_fixture.png result=0
+CAPTURE /workspace/.runtime/reino10-review-final/iphone/fase_06.png result=0
+CAPTURE /workspace/.runtime/reino10-review-final/iphone/fase_06_distrito05_fixture.png result=0
+CAPTURE /workspace/.runtime/reino10-review-final/iphone/fase_07.png result=0
+CAPTURE /workspace/.runtime/reino10-review-final/iphone/fase_07_distrito05_fixture.png result=0
+CAPTURE /workspace/.runtime/reino10-review-final/iphone/fase_08.png result=0
+CAPTURE /workspace/.runtime/reino10-review-final/iphone/fase_08_distrito05_fixture.png result=0
+CAPTURE /workspace/.runtime/reino10-review-final/iphone/fase_09.png result=0
+CAPTURE /workspace/.runtime/reino10-review-final/iphone/fase_09_distrito05_fixture.png result=0
+CAPTURE /workspace/.runtime/reino10-review-final/iphone/fase_10.png result=0
+CAPTURE /workspace/.runtime/reino10-review-final/iphone/fase_10_distrito05_fixture.png result=0
+REINO_GALLERY failures=0

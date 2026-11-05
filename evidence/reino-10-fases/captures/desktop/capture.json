@@ -1,0 +1,209 @@
+[
+	{
+		"image": "/workspace/.runtime/reino10-review-final/desktop/fase_01.png",
+		"iphone": false,
+		"name": "Portões da Capital",
+		"order": 1,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(1672, 941)"
+	},
+	{
+		"district": 5,
+		"fixture_teleport": true,
+		"image": "/workspace/.runtime/reino10-review-final/desktop/fase_01_distrito05_fixture.png",
+		"iphone": false,
+		"name": "Portões da Capital",
+		"order": 1,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(1672, 941)"
+	},
+	{
+		"image": "/workspace/.runtime/reino10-review-final/desktop/fase_02.png",
+		"iphone": false,
+		"name": "Telhados da Capital",
+		"order": 2,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(1672, 941)"
+	},
+	{
+		"district": 5,
+		"fixture_teleport": true,
+		"image": "/workspace/.runtime/reino10-review-final/desktop/fase_02_distrito05_fixture.png",
+		"iphone": false,
+		"name": "Telhados da Capital",
+		"order": 2,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(1672, 941)"
+	},
+	{
+		"image": "/workspace/.runtime/reino10-review-final/desktop/fase_03.png",
+		"iphone": false,
+		"name": "Bazar da Cidade",
+		"order": 3,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(1672, 941)"
+	},
+	{
+		"district": 5,
+		"fixture_teleport": true,
+		"image": "/workspace/.runtime/reino10-review-final/desktop/fase_03_distrito05_fixture.png",
+		"iphone": false,
+		"name": "Bazar da Cidade",
+		"order": 3,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(1672, 941)"
+	},
+	{
+		"image": "/workspace/.runtime/reino10-review-final/desktop/fase_04.png",
+		"iphone": false,
+		"name": "Aqueduto do Deserto",
+		"order": 4,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(1672, 941)"
+	},
+	{
+		"district": 5,
+		"fixture_teleport": true,
+		"image": "/workspace/.runtime/reino10-review-final/desktop/fase_04_distrito05_fixture.png",
+		"iphone": false,
+		"name": "Aqueduto do Deserto",
+		"order": 4,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(1672, 941)"
+	},
+	{
+		"image": "/workspace/.runtime/reino10-review-final/desktop/fase_05.png",
+		"iphone": false,
+		"name": "Jardins do Oásis",
+		"order": 5,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(1672, 941)"
+	},
+	{
+		"district": 5,
+		"fixture_teleport": true,
+		"image": "/workspace/.runtime/reino10-review-final/desktop/fase_05_distrito05_fixture.png",
+		"iphone": false,
+		"name": "Jardins do Oásis",
+		"order": 5,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(1672, 941)"
+	},
+	{
+		"image": "/workspace/.runtime/reino10-review-final/desktop/fase_06.png",
+		"iphone": false,
+		"name": "Ruínas Enterradas",
+		"order": 6,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(1672, 941)"
+	},
+	{
+		"district": 5,
+		"fixture_teleport": true,
+		"image": "/workspace/.runtime/reino10-review-final/desktop/fase_06_distrito05_fixture.png",
+		"iphone": false,
+		"name": "Ruínas Enterradas",
+		"order": 6,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(1672, 941)"
+	},
+	{
+		"image": "/workspace/.runtime/reino10-review-final/desktop/fase_07.png",
+		"iphone": false,
+		"name": "Estrada da Mineração",
+		"order": 7,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(1672, 941)"
+	},
+	{
+		"district": 5,
+		"fixture_teleport": true,
+		"image": "/workspace/.runtime/reino10-review-final/desktop/fase_07_distrito05_fixture.png",
+		"iphone": false,
+		"name": "Estrada da Mineração",
+		"order": 7,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(1672, 941)"
+	},
+	{
+		"image": "/workspace/.runtime/reino10-review-final/desktop/fase_08.png",
+		"iphone": false,
+		"name": "Posto de Controle",
+		"order": 8,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(1672, 941)"
+	},
+	{
+		"district": 5,
+		"fixture_teleport": true,
+		"image": "/workspace/.runtime/reino10-review-final/desktop/fase_08_distrito05_fixture.png",
+		"iphone": false,
+		"name": "Posto de Controle",
+		"order": 8,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(1672, 941)"
+	},
+	{
+		"image": "/workspace/.runtime/reino10-review-final/desktop/fase_09.png",
+		"iphone": false,
+		"name": "Entrada da Mineradora",
+		"order": 9,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(1672, 941)"
+	},
+	{
+		"district": 5,
+		"fixture_teleport": true,
+		"image": "/workspace/.runtime/reino10-review-final/desktop/fase_09_distrito05_fixture.png",
+		"iphone": false,
+		"name": "Entrada da Mineradora",
+		"order": 9,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(1672, 941)"
+	},
+	{
+		"endpoint": true,
+		"fixture_teleport": true,
+		"image": "/workspace/.runtime/reino10-review-final/desktop/fase_09_portal_final_fixture.png",
+		"order": 9,
+		"result": 0
+	},
+	{
+		"image": "/workspace/.runtime/reino10-review-final/desktop/fase_10.png",
+		"iphone": false,
+		"name": "Interior da Mineração",
+		"order": 10,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(1672, 941)"
+	},
+	{
+		"district": 5,
+		"fixture_teleport": true,
+		"image": "/workspace/.runtime/reino10-review-final/desktop/fase_10_distrito05_fixture.png",
+		"iphone": false,
+		"name": "Interior da Mineração",
+		"order": 10,
+		"result": 0,
+		"viewport": "(1672.0, 941.0)",
+		"window": "(1672, 941)"
+	}
+]

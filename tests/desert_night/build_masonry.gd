@@ -3,6 +3,8 @@ extends SceneTree
 func _initialize() -> void:
 	var image := Image.load_from_file("res://assets/desert/modular/source/stone_masonry.png")
 	if image == null: quit(1); return
+	image.resize(1024,1024,Image.INTERPOLATE_LANCZOS)
+	image.convert(Image.FORMAT_RGB8)
 	image.generate_mipmaps()
 	var texture := ImageTexture.create_from_image(image)
 	var error := ResourceSaver.save(texture,"res://assets/desert/modular/stone_masonry.res",ResourceSaver.FLAG_COMPRESS)

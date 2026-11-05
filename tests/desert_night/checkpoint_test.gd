@@ -14,19 +14,14 @@ func frames(count: int) -> void:
 func buttons(phase: Node) -> Array:
 	return phase._session._column.get_children().filter(func(c: Node) -> bool: return c is Button)
 func run() -> void:
-	for order in range(1,10):
-		var stage := Layout.build(order)
-		var points: Array = stage.checkpoints
-		var safe := points.size() == 7
-		for point: Dictionary in points:
-			var x := float(point.pos[0])
-			for hole: Dictionary in stage.holes:
-				if x >= float(hole.start)-3.0 and x <= float(hole.end)+3.0: safe = false
-			for platform: Dictionary in stage.platforms:
-				if platform.kind != "ground" and absf(x-float(platform.pos[0])) <= float(platform.size[0])*0.5+1.0: safe = false
-			for enemy: Dictionary in stage.enemies:
-				if x >= float(enemy.patrol[0])-6.0 and x <= float(enemy.patrol[1])+6.0: safe = false
-		check(safe,"fase %02d: sete checkpoints em chão firme, longe de vãos, degraus e Cactus" % order)
+	for order in range(1,11):
+		var stage:=Layout.build(order)
+		var safe: bool = stage.checkpoints.size()==7
+		for point: Dictionary in stage.checkpoints:
+			var floor:=Layout.floor_at(stage,float(point.pos[0]))
+			if floor.is_empty():safe=false;continue
+			if absf(float(point.pos[1])-float(floor.height))>0.01 or float(point.pos[0])-float(floor.left)<0.8 or float(floor.right)-float(point.pos[0])<0.8:safe=false
+		check(safe,"fase%02d: sete checkpoints na altura real e sobre piso apoiado" % order)
 	var phase: Node3D = load("res://scenes/desert/phase_03.tscn").instantiate()
 	root.add_child(phase)
 	current_scene = phase
@@ -35,7 +30,7 @@ func run() -> void:
 	var returned := [0]
 	phase.return_requested.connect(func() -> void: returned[0] += 1)
 	var first: Dictionary = phase._phase.checkpoints[0]
-	player.position = Vector3(float(first.pos[0])-1.0,0.05,0)
+	player.position = Vector3(float(first.pos[0])-1.0,float(first.pos[1])+0.05,0)
 	phase._stream_world(player.position.x,true)
 	await frames(10)
 	Input.action_press("move_right")

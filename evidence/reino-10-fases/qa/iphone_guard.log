@@ -1,0 +1,15 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+IPHONE_MODEL_DONE pro_max
+IPHONE_MODEL_DONE pro
+IPHONE_MODEL_DONE air
+IPHONE_MODEL_DONE plus
+IPHONE_MODEL_DONE plus14
+IPHONE_MODEL_DONE std61
+IPHONE_MODEL_DONE notch61
+IPHONE_MODEL_DONE mini
+IPHONE_MODEL_DONE se
+IPHONE_LAYOUT checks=504 failures=0

@@ -78,6 +78,8 @@ func run() -> void:
 	var step_times: Array[float] = []
 	for step in range(60*420):
 		_frame_count = step
+		if "--trace-gap" in args and player.position.x>465 and player.position.x<485 and step%4==0:
+			print("GAPTRACE ",step," pos=",player.position," vel=",player.velocity," floor=",player.is_on_floor()," jumps=",player.jumps_used," attack=",player._attack_timer," knock=",player._knockback_timer," ahead=",surface_at(player.position.x+0.9)," pressed=",Input.is_action_pressed("jump"))
 		var tick := Time.get_ticks_usec()
 		# O passo da vitória (salvar e abrir a tela final) fica fora: o jogo já parou.
 		if step > 30 and not phase.completed:
@@ -134,6 +136,7 @@ func run() -> void:
 		if order==10 and phase._boss_defeated and player.position.x>goal:
 			Input.action_release("move_right")
 			Input.action_press("move_left")
+			auto_jump_left(step)
 			await physics_frame
 			continue
 		if fight_malagueta(step):
@@ -252,11 +255,18 @@ func enemy_ahead(distance: float) -> Node3D:
 func fight_malagueta(step: int) -> bool:
 	if order!=10 or not is_instance_valid(phase._boss) or phase._boss_defeated: return false
 	var boss: Node3D=phase._boss
+	if step%30==0:
+		print("BOSS_TRACE frame=",step," hero=",player.position," hp=",player.health," fire=",player.attack_charges," defense=",player.defense_charges," amber=",player.charges("amber")," face=",player.facing," boss=",boss.position," boss_hp=",boss.health," frozen=",boss.crystallized_left," attack=",player._attack_timer," cooldown=",player._attack_cooldown," shield=",player._shield_timer)
 	if absf(player.position.x-boss.position.x)>38:return false
-	if player.charges("amber")>0 and boss.crystallized_left<=0.15 and absf(player.position.x-boss.position.x)<7:
+	if player.charges("amber")>0 and boss.crystallized_left<=0.15 and absf(player.position.x-boss.position.x)<7 and not Input.is_action_pressed("amber") and not player.is_defending and player._attack_timer<=0 and player._hurt_timer<=0:
 		Input.action_press("amber")
 		_amber_release_at=step+2
-	var target:float=boss.position.x
+	var opponent: Node3D=boss
+	for guard: Node3D in get_nodes_in_group("enemies"):
+		if guard==boss or absf(guard.position.y-player.position.y)>1.3:continue
+		if absf(guard.position.x-player.position.x)<minf(3.0,absf(opponent.position.x-player.position.x)):opponent=guard
+	var side:=signf(opponent.position.x-player.position.x)
+	var target:float=opponent.position.x-side*1.4
 	if player.attack_charges==0:
 		var distance:=INF
 		for item: Dictionary in phase._phase.pickups:
@@ -265,13 +275,23 @@ func fight_malagueta(step: int) -> bool:
 			if gap<distance:
 				distance=gap
 				target=float(item.pos[0])
-	var direction:=signf(target-player.position.x)
+	var direction:=signf(target-player.position.x) if absf(target-player.position.x)>0.12 else 0.0
 	Input.action_release("move_left")
 	Input.action_release("move_right")
-	if player._attack_timer<=0 or not player.is_on_floor():Input.action_press("move_right" if direction>=0 else "move_left")
-	if player.attack_charges>0 and absf(boss.position.x-player.position.x)<=1.65 and absf(boss.position.y-player.position.y)<1.3 and player._attack_cooldown<=0:
+	if direction!=0 and (player._attack_timer<=0 or not player.is_on_floor()):Input.action_press("move_right" if direction>0 else "move_left")
+	if player.attack_charges>0 and absf(opponent.position.x-player.position.x)<=1.7 and absf(opponent.position.y-player.position.y)<1.3 and player.is_on_floor() and player._attack_cooldown<=0 and player._attack_timer<=0 and not player.is_defending and not Input.is_action_pressed("attack"):
+		Input.action_release("move_left")
+		Input.action_release("move_right")
+		Input.action_press("move_right" if opponent.position.x>=player.position.x else "move_left")
 		Input.action_press("attack")
 		_attack_release_at=step+2
 		swings+=1
+	if direction>0 and player._attack_timer<=0: auto_jump(step)
+	if direction<0 and player._attack_timer<=0: auto_jump_left(step)
 	if player.attack_charges==0 and absf(boss.position.x-player.position.x)<2.5 and player.is_on_floor():jump(step)
 	return true
+
+func auto_jump_left(step: int) -> void:
+	var ahead:=surface_at(player.position.x-0.9)
+	if player.is_on_floor() and (ahead==-INF or ahead>player.position.y+0.3):jump(step)
+	elif not player.is_on_floor() and player.jumps_used==1 and ahead==-INF and player.velocity.y>0:jump(step)

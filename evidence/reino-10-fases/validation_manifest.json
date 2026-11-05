@@ -1,0 +1,17 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "branch": "work/reino-deserto-10-fases",
+  "runner_steps": 17,
+  "native_captures": 63,
+  "web": {
+    "browser": "Chromium",
+    "viewport": [
+      844,
+      390
+    ],
+    "deviceScaleFactor": 3,
+    "physical_device": false
+  },
+  "main_merged": false,
+  "pages_deployed": false
+}

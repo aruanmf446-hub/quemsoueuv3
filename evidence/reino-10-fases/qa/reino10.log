@@ -1,0 +1,72 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS fase1: identidade e oito setores
+PASS fase1: percurso extenso
+PASS fase1: recargas sustentadas pelo piso e separadas
+PASS fase1: saltos alcançáveis por soldados
+PASS fase1: cena real abre na altura projetada
+PASS fase2: identidade e oito setores
+PASS fase2: percurso extenso
+PASS fase2: recargas sustentadas pelo piso e separadas
+PASS fase2: saltos alcançáveis por soldados
+PASS fase2: toda rota sobre edifícios, sem rua como piso
+PASS fase2: cena real abre na altura projetada
+PASS fase3: identidade e oito setores
+PASS fase3: percurso extenso
+PASS fase3: recargas sustentadas pelo piso e separadas
+PASS fase3: saltos alcançáveis por soldados
+PASS fase3: cena real abre na altura projetada
+PASS fase4: identidade e oito setores
+PASS fase4: percurso extenso
+PASS fase4: recargas sustentadas pelo piso e separadas
+PASS fase4: saltos alcançáveis por soldados
+PASS fase4: cena real abre na altura projetada
+PASS fase5: identidade e oito setores
+PASS fase5: percurso extenso
+PASS fase5: recargas sustentadas pelo piso e separadas
+PASS fase5: saltos alcançáveis por soldados
+PASS fase5: cena real abre na altura projetada
+PASS fase6: identidade e oito setores
+PASS fase6: percurso extenso
+PASS fase6: recargas sustentadas pelo piso e separadas
+PASS fase6: saltos alcançáveis por soldados
+PASS fase6: cena real abre na altura projetada
+PASS fase7: identidade e oito setores
+PASS fase7: percurso extenso
+PASS fase7: recargas sustentadas pelo piso e separadas
+PASS fase7: saltos alcançáveis por soldados
+PASS fase7: cena real abre na altura projetada
+PASS fase8: identidade e oito setores
+PASS fase8: percurso extenso
+PASS fase8: recargas sustentadas pelo piso e separadas
+PASS fase8: saltos alcançáveis por soldados
+PASS fase8: cena real abre na altura projetada
+PASS fase9: identidade e oito setores
+PASS fase9: percurso extenso
+PASS fase9: recargas sustentadas pelo piso e separadas
+PASS fase9: saltos alcançáveis por soldados
+PASS fase9: cena real abre na altura projetada
+PASS fase10: identidade e oito setores
+PASS fase10: percurso extenso
+PASS fase10: recargas sustentadas pelo piso e separadas
+PASS fase10: saltos alcançáveis por soldados
+PASS fase10: cena real abre na altura projetada
+PASS Cactus atravessa vão real do primeiro telhado por física
+PASS Cactus salta na laje e não persegue na rua
+PASS contato na aterrissagem não empurra o jogador para o vão
+PASS Âmbar imobiliza temporariamente
+PASS soldado em cristal não causa dano por contato
+PASS Cactus retoma perseguição depois do cristal
+PASS telhados mantêm pisos explicitamente rompíveis
+PASS laje alta tem colisão antes da Ruptura
+PASS botão/poder aciona Ruptura na laje alta
+PASS Ruptura remove colisão real na altura do telhado
+PASS restauração recupera a laje alta
+PASS attack respeita capacidade3 sem consumir recarga cheia
+PASS defense respeita capacidade3 sem consumir recarga cheia
+PASS rupture respeita capacidade3 sem consumir recarga cheia
+PASS amber respeita capacidade3 sem consumir recarga cheia
+PASS dash respeita capacidade3 sem consumir recarga cheia
+REINO10_RESULT checks=67 failures=0
+WARNING: 3 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)

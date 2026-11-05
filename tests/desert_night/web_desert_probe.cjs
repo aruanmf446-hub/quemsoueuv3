@@ -36,7 +36,16 @@ const out=process.env.QSE_DESERT_WEB_OUT||'/tmp/reino-web';fs.mkdirSync(out,{rec
  await page.waitForFunction(()=>{window.qseDesertProbe('state');return window.qseDesertState.stage==='play';},null,{timeout:120000});
  const replay=await state();if(!replay.read)throw new Error('Read flag did not persist');
  if(!replay.buttons.rupture||!replay.buttons.amber||!replay.buttons.dash)throw new Error('Learned abilities did not persist after reload');
- const report={states,game,after,replay,errors,blocked:[...new Set(blocked)],engineErrors:logs.filter(s=>/SCRIPT ERROR:|Parse Error:|^ERROR:/.test(s))};fs.writeFileSync(out+'/report.json',JSON.stringify(report,null,2));
+ await page.evaluate(()=>window.qseDesertProbe('rooftops'));
+ await page.waitForFunction(()=>{window.qseDesertProbe('state');return window.qseDesertState.stage==='loading'&&window.qseDesertState.cards===1;},null,{timeout:120000});
+ let brief=await state();await tap(brief.next,brief);
+ await page.waitForFunction(()=>{window.qseDesertProbe('state');return window.qseDesertState.stage==='play'&&window.qseDesertState.order===2;},null,{timeout:120000});
+ const roofBefore=await page.evaluate(()=>{window.qseDesertProbe('cactus');return window.qseDesertState;});
+ const soldierBefore=roofBefore.soldiers.find(s=>s.id==='web.roof.pursuit');if(!soldierBefore)throw new Error('Roof soldier missing');
+ await page.waitForFunction(before=>{window.qseDesertProbe('state');const soldier=window.qseDesertState.soldiers?.find(s=>s.id==='web.roof.pursuit');return soldier&&soldier.x<before-0.8;},soldierBefore.x,{timeout:15000,polling:100});const roofAfter=await state();const soldierAfter=roofAfter.soldiers.find(s=>s.id==='web.roof.pursuit');
+ if(roofAfter.y<7.8||!soldierAfter||soldierAfter.y<7.8||soldierAfter.x>=soldierBefore.x-0.8)throw new Error('Web rooftop pursuit stopped or used street floor');
+ await page.screenshot({path:out+'/roof_pursuit.png',scale:'css'});
+ const report={states,game,after,replay,roofBefore,roofAfter,errors,blocked:[...new Set(blocked)],engineErrors:logs.filter(s=>/SCRIPT ERROR:|Parse Error:|^ERROR:/.test(s))};fs.writeFileSync(out+'/report.json',JSON.stringify(report,null,2));
  await browser.close();if(report.errors.length||report.engineErrors.length)throw new Error('Browser or engine errors; see report');
  console.log('REINO_WEB intro8 touch-dash replay-read PASS; external hosts blocked');
 })().catch(e=>{console.error(e);process.exit(1)});

@@ -51,6 +51,20 @@ func run() -> void:
 		peak=maxf(peak,enemy.position.y)
 	check(enemy.position.x>float(gap.end)+0.4 and enemy.position.x>start+4,"Cactus atravessa vão real do primeiro telhado por física")
 	check(peak>float(gap.from_y)+0.9 and enemy.position.y>7.5,"Cactus salta na laje e não persegue na rua")
+	var landing_x := float(gap.end)
+	var landing_y := float(gap.to_y)
+	var target_before: Vector3 = phase._player.position
+	enemy.set_physics_process(false)
+	enemy.position=Vector3(landing_x+0.75,landing_y+0.02,0)
+	phase._player.position=Vector3(landing_x+0.3,landing_y+0.02,0)
+	phase._player.set_physics_process(true)
+	await frames(3)
+	phase._player.set_physics_process(false)
+	var supported:Vector3=phase._player.position
+	phase._player._separate_actors()
+	check(phase._player.position.x>=landing_x,"contato na aterrissagem não empurra o jogador para o vão")
+	phase._player.position=target_before
+	enemy.set_physics_process(true)
 	enemy.position.x=phase._player.position.x-3
 	enemy.crystallize(0.3)
 	var frozen:Vector3=enemy.position

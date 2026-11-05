@@ -1,0 +1,115 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS cena carrega o mapa correto 10
+PASS vida e recursos iniciais 3/3, 1/1 e 1/1
+PASS sete checkpoints de distrito
+PASS distância obrigatória garante três minutos mesmo sem combate
+ROUTE_TICK phase=10 seconds=0.0 x=-8.0 hp=3 attack=1 loaded=3
+ROUTE_SLOW step=92 ms=36.207 x=0.87263506650925 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=273 ms=61.458 x=15.6323823928833 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=552 ms=40.85 x=43.5313682556152 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=553 ms=332.331 x=43.6313667297363 time_scale=1.0 active=1 queue=0
+ROUTE_TICK phase=10 seconds=10.0 x=48.3312950134277 hp=3 attack=1 loaded=4
+ROUTE_TICK phase=10 seconds=20.0 x=103.996284484863 hp=3 attack=1 loaded=5
+ROUTE_SLOW step=1453 ms=67.411 x=129.295669555664 time_scale=1.0 active=1 queue=0
+ROUTE_SLOW step=1495 ms=36.28 x=131.482467651367 time_scale=1.0 active=1 queue=0
+ROUTE_TICK phase=10 seconds=30.0 x=160.657211303711 hp=3 attack=1 loaded=5
+ROUTE_TICK phase=10 seconds=40.0 x=217.319488525391 hp=3 attack=1 loaded=5
+ROUTE_TICK phase=10 seconds=50.0 x=277.318817138672 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=10 seconds=60.0 x=333.966156005859 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=10 seconds=70.0 x=390.617431640625 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=10 seconds=80.0 x=446.290893554688 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=10 seconds=90.0 x=498.174102783203 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=10 seconds=100.0 x=550.911376953125 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=10 seconds=110.0 x=610.895812988281 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=10 seconds=120.0 x=667.690063476562 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=10 seconds=130.0 x=724.335388183594 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=10 seconds=140.0 x=778.75048828125 hp=3 attack=2 loaded=5
+ROUTE_SLOW step=8639 ms=63.344 x=802.644836425781 time_scale=1.0 active=3 queue=0
+ROUTE_SLOW step=8640 ms=43.895 x=802.744812011719 time_scale=1.0 active=3 queue=0
+ROUTE_SLOW step=8944 ms=44.013 x=828.787353515625 time_scale=1.0 active=3 queue=0
+ROUTE_TICK phase=10 seconds=150.0 x=834.384643554688 hp=3 attack=2 loaded=5
+ROUTE_TICK phase=10 seconds=160.0 x=887.915405273438 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=10 seconds=170.0 x=944.560485839844 hp=3 attack=2 loaded=5
+ROUTE_SLOW step=10326 ms=76.337 x=957.156616210938 time_scale=1.0 active=7 queue=0
+ROUTE_TICK phase=10 seconds=180.0 x=1004.5439453125 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=10 seconds=190.0 x=1064.52795410156 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=10 seconds=200.0 x=1124.51342773438 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=10 seconds=210.0 x=1184.49792480469 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=10 seconds=220.0 x=1244.48254394531 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=10 seconds=230.0 x=1304.46606445312 hp=3 attack=3 loaded=5
+ROUTE_TICK phase=10 seconds=240.0 x=1364.44970703125 hp=3 attack=3 loaded=4
+ROUTE_SLOW step=14777 ms=51.611 x=1402.13977050781 time_scale=1.0 active=8 queue=0
+BOSS_TRACE frame=14790 hero=(1403.439, -1.299116, 0.0) hp=3 fire=3 defense=3 amber=3 face=1.0 boss=(1440.303, -1.799058, 0.0) boss_hp=20 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=14820 hero=(1406.439, -1.299116, 0.0) hp=3 fire=3 defense=3 amber=3 face=1.0 boss=(1441.003, -1.799059, 0.0) boss_hp=20 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=14850 hero=(1409.438, -1.299116, 0.0) hp=3 fire=3 defense=3 amber=3 face=1.0 boss=(1441.702, -1.799058, 0.0) boss_hp=20 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=14880 hero=(1412.437, -1.299116, 0.0) hp=3 fire=3 defense=3 amber=3 face=1.0 boss=(1442.401, -1.799058, 0.0) boss_hp=20 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=14910 hero=(1415.437, -1.299116, 0.0) hp=3 fire=3 defense=3 amber=3 face=1.0 boss=(1443.101, -1.799058, 0.0) boss_hp=20 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=14940 hero=(1418.435, -1.299116, 0.0) hp=3 fire=3 defense=3 amber=3 face=1.0 boss=(1443.8, -1.799058, 0.0) boss_hp=20 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=14970 hero=(1421.435, -1.299116, 0.0) hp=3 fire=3 defense=3 amber=3 face=1.0 boss=(1444.5, -1.799058, 0.0) boss_hp=20 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+ROUTE_TICK phase=10 seconds=250.0 x=1424.43383789062 hp=3 attack=3 loaded=3
+BOSS_TRACE frame=15000 hero=(1424.434, -1.299116, 0.0) hp=3 fire=3 defense=3 amber=3 face=1.0 boss=(1445.199, -1.799058, 0.0) boss_hp=20 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=15030 hero=(1427.433, -1.299116, 0.0) hp=3 fire=3 defense=3 amber=3 face=1.0 boss=(1445.899, -1.799058, 0.0) boss_hp=20 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=15060 hero=(1430.432, 0.494288, 0.0) hp=3 fire=3 defense=3 amber=3 face=1.0 boss=(1446.598, -1.799058, 0.0) boss_hp=20 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=15090 hero=(1433.432, -1.799116, 0.0) hp=3 fire=3 defense=3 amber=3 face=1.0 boss=(1447.369, -0.994031, 0.0) boss_hp=20 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=15120 hero=(1436.431, -1.799116, 0.0) hp=3 fire=3 defense=3 amber=3 face=1.0 boss=(1448.003, -1.199059, 0.0) boss_hp=20 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=15150 hero=(1439.43, -1.799116, 0.0) hp=3 fire=3 defense=3 amber=3 face=1.0 boss=(1448.704, -1.220605, 0.0) boss_hp=20 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=15180 hero=(1442.43, -1.799116, 0.0) hp=3 fire=3 defense=3 amber=3 face=1.0 boss=(1449.404, -1.799058, 0.0) boss_hp=20 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=15210 hero=(1445.429, -1.799116, 0.0) hp=3 fire=3 defense=3 amber=2 face=1.0 boss=(1449.428, -1.799058, 0.0) boss_hp=20 frozen=3.01666666666667 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=15240 hero=(1448.328, -0.199045, 0.0) hp=3 fire=3 defense=3 amber=2 face=-1.0 boss=(1449.428, -1.799058, 0.0) boss_hp=20 frozen=2.51666666666667 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=15270 hero=(1447.742, -1.199059, 0.0) hp=3 fire=2 defense=3 amber=2 face=1.0 boss=(1449.428, -1.799058, 0.0) boss_hp=20 frozen=2.01666666666667 attack=0.42 cooldown=0.62 shield=0.0
+BOSS_TRACE frame=15300 hero=(1447.755, -1.199059, 0.0) hp=3 fire=2 defense=3 amber=2 face=1.0 boss=(1449.428, -1.799058, 0.0) boss_hp=18 frozen=1.56416666666667 attack=0.0 cooldown=0.1675 shield=0.0
+BOSS_TRACE frame=15330 hero=(1448.089, -1.199059, 0.0) hp=3 fire=2 defense=3 amber=2 face=1.0 boss=(1449.428, -1.799058, 0.0) boss_hp=16 frozen=1.11166666666668 attack=0.18416666666667 cooldown=0.38416666666667 shield=0.0
+BOSS_TRACE frame=15360 hero=(1448.102, -1.199059, 0.0) hp=3 fire=1 defense=3 amber=2 face=1.0 boss=(1449.428, -1.799058, 0.0) boss_hp=16 frozen=0.61166666666667 attack=0.35333333333333 cooldown=0.55333333333333 shield=0.0
+BOSS_TRACE frame=15390 hero=(1448.102, -1.199059, 0.0) hp=3 fire=1 defense=3 amber=2 face=1.0 boss=(1449.428, -1.799058, 0.0) boss_hp=14 frozen=0.15916666666667 attack=0.0 cooldown=0.10083333333333 shield=0.0
+BOSS_TRACE frame=15420 hero=(1448.108, -0.899008, 0.0) hp=3 fire=0 defense=3 amber=1 face=1.0 boss=(1449.428, -1.799058, 0.0) boss_hp=12 frozen=3.08083333333333 attack=0.1175 cooldown=0.3175 shield=0.0
+BOSS_TRACE frame=15450 hero=(1446.082, 0.400992, 0.0) hp=3 fire=0 defense=3 amber=1 face=1.0 boss=(1449.428, -1.799058, 0.0) boss_hp=12 frozen=2.58083333333334 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=15480 hero=(1446.142, -1.799098, 0.0) hp=3 fire=0 defense=3 amber=1 face=-1.0 boss=(1449.428, -1.799058, 0.0) boss_hp=12 frozen=2.08083333333334 attack=0.33666666666667 cooldown=0.53666666666667 shield=0.0
+BOSS_TRACE frame=15510 hero=(1445.862, -1.799116, 0.0) hp=3 fire=0 defense=3 amber=1 face=-1.0 boss=(1449.428, -1.799058, 0.0) boss_hp=12 frozen=1.62833333333334 attack=0.0 cooldown=0.08416666666667 shield=0.0
+BOSS_TRACE frame=15540 hero=(1444.569, -1.799116, 0.0) hp=3 fire=0 defense=3 amber=1 face=-1.0 boss=(1449.428, -1.799058, 0.0) boss_hp=12 frozen=1.17583333333334 attack=0.20083333333333 cooldown=0.40083333333333 shield=0.0
+BOSS_TRACE frame=15570 hero=(1443.196, -1.799116, 0.0) hp=3 fire=0 defense=3 amber=1 face=-1.0 boss=(1449.428, -1.799058, 0.0) boss_hp=12 frozen=0.67583333333334 attack=0.0 cooldown=0.0 shield=0.0
+ROUTE_TICK phase=10 seconds=260.0 x=1443.59545898438 hp=3 attack=1 loaded=3
+BOSS_TRACE frame=15600 hero=(1443.595, -1.799116, 0.0) hp=3 fire=1 defense=3 amber=1 face=1.0 boss=(1449.428, -1.799058, 0.0) boss_hp=12 frozen=0.17583333333334 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=15630 hero=(1446.595, -1.799116, 0.0) hp=3 fire=1 defense=3 amber=0 face=1.0 boss=(1449.428, -1.799058, 0.0) boss_hp=12 frozen=3.05 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=15660 hero=(1448.688, 0.000955, 0.0) hp=3 fire=1 defense=3 amber=0 face=-1.0 boss=(1449.428, -1.799058, 0.0) boss_hp=12 frozen=2.55 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=15690 hero=(1447.761, -1.199098, 0.0) hp=3 fire=0 defense=3 amber=0 face=1.0 boss=(1449.428, -1.799058, 0.0) boss_hp=10 frozen=2.08166666666667 attack=0.25166666666667 cooldown=0.45166666666667 shield=0.0
+BOSS_TRACE frame=15720 hero=(1449.261, 0.640987, 0.0) hp=3 fire=0 defense=3 amber=0 face=1.0 boss=(1449.428, -1.799058, 0.0) boss_hp=10 frozen=1.59750000000001 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=15750 hero=(1451.941, -1.799059, 0.0) hp=3 fire=1 defense=3 amber=0 face=-1.0 boss=(1449.428, -1.799058, 0.0) boss_hp=10 frozen=1.09750000000001 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=15780 hero=(1450.981, -1.799116, 0.0) hp=3 fire=0 defense=3 amber=0 face=-1.0 boss=(1449.428, -1.799058, 0.0) boss_hp=8 frozen=0.64500000000001 attack=0.23416666666667 cooldown=0.43416666666667 shield=0.0
+BOSS_TRACE frame=15810 hero=(1452.681, 0.034318, 0.0) hp=3 fire=0 defense=3 amber=0 face=1.0 boss=(1449.428, -1.799058, 0.0) boss_hp=8 frozen=0.14500000000001 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=15840 hero=(1454.228, -1.799098, 0.0) hp=3 fire=1 defense=3 amber=0 face=-1.0 boss=(1450.472, -1.799116, 0.0) boss_hp=8 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=15870 hero=(1453.041, -1.799116, 0.0) hp=3 fire=0 defense=3 amber=0 face=-1.0 boss=(1451.517, -1.799116, 0.0) boss_hp=6 frozen=0.0 attack=0.18416666666667 cooldown=0.38416666666667 shield=0.0
+BOSS_TRACE frame=15900 hero=(1455.041, -0.025682, 0.0) hp=3 fire=0 defense=3 amber=0 face=1.0 boss=(1453.511, -1.799116, 0.0) boss_hp=6 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=15930 hero=(1456.694, -1.799059, 0.0) hp=3 fire=0 defense=3 amber=0 face=-1.0 boss=(1455.031, -1.799116, 0.0) boss_hp=6 frozen=0.0 attack=0.28666666666667 cooldown=0.48666666666667 shield=0.0
+BOSS_TRACE frame=15960 hero=(1457.794, -0.025674, 0.0) hp=3 fire=0 defense=3 amber=0 face=1.0 boss=(1456.266, -1.799116, 0.0) boss_hp=4 frozen=0.0 attack=0.0 cooldown=0.03416666666667 shield=0.0
+BOSS_TRACE frame=15990 hero=(1459.481, -1.799059, 0.0) hp=3 fire=1 defense=3 amber=0 face=-1.0 boss=(1458.07, -1.799116, 0.0) boss_hp=4 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=16020 hero=(1459.467, -1.799058, 0.0) hp=3 fire=0 defense=2 amber=0 face=-1.0 boss=(1458.07, -1.799116, 0.0) boss_hp=2 frozen=0.0 attack=0.20083333333333 cooldown=0.40083333333333 shield=0.0
+BOSS_TRACE frame=16050 hero=(1457.568, 0.000992, 0.0) hp=3 fire=0 defense=2 amber=0 face=-1.0 boss=(1457.595, -1.799116, 0.0) boss_hp=2 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=16080 hero=(1454.359, -1.799058, 0.0) hp=3 fire=0 defense=1 amber=0 face=-1.0 boss=(1456.551, -1.799116, 0.0) boss_hp=2 frozen=0.0 attack=0.0 cooldown=0.0 shield=1.08333333333333
+BOSS_TRACE frame=16110 hero=(1454.359, -1.799058, 0.0) hp=3 fire=0 defense=1 amber=0 face=-1.0 boss=(1456.456, -1.799116, 0.0) boss_hp=2 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.58333333333333
+BOSS_TRACE frame=16140 hero=(1454.359, -1.799058, 0.0) hp=3 fire=0 defense=1 amber=0 face=-1.0 boss=(1456.456, -1.799116, 0.0) boss_hp=2 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.08333333333333
+BOSS_TRACE frame=16170 hero=(1452.366, 0.020992, 0.0) hp=3 fire=0 defense=1 amber=0 face=-1.0 boss=(1456.456, -1.799116, 0.0) boss_hp=2 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+ROUTE_TICK phase=10 seconds=270.0 x=1449.36682128906 hp=3 attack=0 loaded=3
+BOSS_TRACE frame=16200 hero=(1449.367, -1.799116, 0.0) hp=3 fire=0 defense=1 amber=0 face=-1.0 boss=(1454.461, -1.799116, 0.0) boss_hp=2 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=16230 hero=(1446.367, -0.099045, 0.0) hp=3 fire=0 defense=1 amber=0 face=-1.0 boss=(1451.612, -1.799115, 0.0) boss_hp=2 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=16260 hero=(1443.368, -1.799116, 0.0) hp=3 fire=0 defense=1 amber=0 face=-1.0 boss=(1448.763, -1.20406, 0.0) boss_hp=2 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=16290 hero=(1440.369, -1.799116, 0.0) hp=3 fire=0 defense=1 amber=0 face=-1.0 boss=(1445.914, -1.799116, 0.0) boss_hp=2 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=16320 hero=(1441.069, -1.799116, 0.0) hp=3 fire=0 defense=1 amber=0 face=1.0 boss=(1443.35, -1.799116, 0.0) boss_hp=2 frozen=0.0 attack=0.32 cooldown=0.52 shield=0.0
+BOSS_TRACE frame=16350 hero=(1440.169, -0.152348, 0.0) hp=3 fire=0 defense=1 amber=0 face=-1.0 boss=(1442.775, -1.799116, 0.0) boss_hp=2 frozen=0.0 attack=0.0 cooldown=0.0675 shield=0.0
+BOSS_TRACE frame=16380 hero=(1437.269, -1.799093, 0.0) hp=3 fire=1 defense=1 amber=0 face=1.0 boss=(1441.92, -1.799116, 0.0) boss_hp=2 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=16410 hero=(1438.109, -1.799116, 0.0) hp=3 fire=0 defense=1 amber=0 face=1.0 boss=(1439.921, -1.799133, 0.0) boss_hp=2 frozen=0.0 attack=0.2525 cooldown=0.4525 shield=0.0
+BOSS_TRACE frame=16440 hero=(1436.709, 0.034318, 0.0) hp=3 fire=0 defense=1 amber=0 face=-1.0 boss=(1439.722, -1.799116, 0.0) boss_hp=2 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=16470 hero=(1434.343, -1.225681, 0.0) hp=3 fire=1 defense=1 amber=0 face=1.0 boss=(1437.822, -1.799116, 0.0) boss_hp=2 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=16500 hero=(1435.763, -0.325681, 0.0) hp=3 fire=1 defense=1 amber=0 face=-1.0 boss=(1435.733, -1.799116, 0.0) boss_hp=2 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=16530 hero=(1437.12, -0.145685, 0.0) hp=3 fire=0 defense=1 amber=0 face=1.0 boss=(1436.683, -1.799116, 0.0) boss_hp=2 frozen=0.0 attack=0.18666666666667 cooldown=0.38666666666667 shield=0.0
+BOSS_TRACE frame=16560 hero=(1434.557, -1.645685, 0.0) hp=3 fire=0 defense=1 amber=0 face=-1.0 boss=(1435.353, -1.799116, 0.0) boss_hp=2 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=16590 hero=(1432.983, -0.199008, 0.0) hp=3 fire=0 defense=0 amber=0 face=-1.0 boss=(1435.163, -1.799116, 0.0) boss_hp=2 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+BOSS_TRACE frame=16620 hero=(1431.61, -1.499008, 0.0) hp=3 fire=1 defense=0 amber=0 face=1.0 boss=(1432.979, -1.799116, 0.0) boss_hp=2 frozen=0.0 attack=0.0 cooldown=0.0 shield=0.0
+PASS travessia completa sem morte ou respawn
+PASS saída alcançada exclusivamente por ações reais
+PASS tempo físico da fase >=180s (278.82)
+PASS relógio independente confirma >=180s (279.62)
+PASS streaming mantém quantidade limitada de distritos carregados
+PASS percurso ativa os sete checkpoints
+PASS 95% dos quadros ficam no orçamento de 33ms (p95 2.9ms, pico 366.1ms)
+NIGHT_ROUTE_RESULT {"captured":false,"checks":11,"collected":47,"completed":true,"cpu_step":{"max_ms":332.331,"p95_ms":2.869},"deaths":0,"defeated":21,"failures":0,"health":3,"measurement":"wall-clock; physics intervals include intentional 0.05x hit-stop; all maxima retained","order":10,"phase_seconds":278.817500000075,"physics_seconds":279.616666666667,"position":[1443.220703125,-0.565702378749847,0.0],"render_frame_wall":{"max_ms":366.141,"p95_ms":2.861},"swings":45}

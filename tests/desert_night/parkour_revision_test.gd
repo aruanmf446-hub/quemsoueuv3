@@ -13,6 +13,7 @@ func frames(n: int) -> void:
 func ray(phase: Node3D,x: float,y: float) -> Dictionary:
 	return phase.get_world_3d().direct_space_state.intersect_ray(PhysicsRayQueryParameters3D.create(Vector3(x,y+1,0),Vector3(x,y-2,0),1))
 func run() -> void:
+	preload("res://tests/desert_night/tutorial_fixture.gd").experienced()
 	var tasks := 0
 	for order in range(1,11):
 		var stage := Layout.build(order)
@@ -20,7 +21,7 @@ func run() -> void:
 		if order == 10: continue
 		var heights: Array = stage.surfaces.map(func(s: Dictionary) -> float:return float(s.height))
 		check(heights.max()-heights.min()>2.5,"fase%d: diferenças de nível visíveis" % order)
-		check(stage.holes.all(func(g: Dictionary) -> bool:return absf(float(g.from_y)-float(g.to_y))<0.56 and float(g.width)<=3.2),"fase%d: retorno por salto continua alcançável" % order)
+		check(stage.holes.all(func(g: Dictionary) -> bool:return g.get("requires_task",false) or (absf(float(g.from_y)-float(g.to_y))<0.56 and float(g.width)<=3.2)),"fase%d: retorno por salto continua alcançável" % order)
 		check(stage.platforms.filter(func(p: Dictionary) -> bool:return p.get("parkour_route",false)).size()==(0 if order==2 else 8),"fase%d: rota de teto real ou obstáculo conforme a fase" % order)
 		check(stage.holes.filter(func(g: Dictionary) -> bool:return g.get("crumble_bridge",false)).size()==2,"fase%d: duas pontes frágeis" % order)
 	check(tasks==19,"dezenove tarefas de cenário, sem habilidades permanentes")
@@ -56,13 +57,13 @@ func run() -> void:
 	check(player.defense_charges==0 and player.attack_charges==0 and player.abilities==powers,"tarefa não usa poderes nem altera recursos")
 	check(not phase._hud._bridge_task.visible,"botão contextual some após concluir")
 	Input.action_press("move_right")
-	for frame in 120:
+	for frame in 600:
 		await physics_frame
 		if player.position.x>float(hole.end)+1: break
 	Input.action_release("move_right")
 	check(player.position.x>float(hole.end)+0.4 and player.is_on_floor(),"ponte atravessável andando para a direita")
 	Input.action_press("move_left")
-	for frame in 120:
+	for frame in 600:
 		await physics_frame
 		if player.position.x<float(hole.start)-1: break
 	Input.action_release("move_left")

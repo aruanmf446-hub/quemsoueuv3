@@ -1,0 +1,31 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS p01.gap.27: vão excede alcance de pulo duplo e corrida
+PASS p01.gap.27: sem piso ou obstáculo para contornar a Task
+PASS p02.gap.07: vão excede alcance de pulo duplo e corrida
+PASS p02.gap.07: sem piso ou obstáculo para contornar a Task
+PASS p02.gap.69: vão excede alcance de pulo duplo e corrida
+PASS p02.gap.69: sem piso ou obstáculo para contornar a Task
+PASS p03.gap.07: vão excede alcance de pulo duplo e corrida
+PASS p03.gap.07: sem piso ou obstáculo para contornar a Task
+PASS p04.gap.27: vão excede alcance de pulo duplo e corrida
+PASS p04.gap.27: sem piso ou obstáculo para contornar a Task
+PASS p05.gap.07: vão excede alcance de pulo duplo e corrida
+PASS p05.gap.07: sem piso ou obstáculo para contornar a Task
+PASS p06.gap.07: vão excede alcance de pulo duplo e corrida
+PASS p06.gap.07: sem piso ou obstáculo para contornar a Task
+PASS p07.gap.07: vão excede alcance de pulo duplo e corrida
+PASS p07.gap.07: sem piso ou obstáculo para contornar a Task
+PASS p07.gap.27: vão excede alcance de pulo duplo e corrida
+PASS p07.gap.27: sem piso ou obstáculo para contornar a Task
+PASS p08.gap.32: vão excede alcance de pulo duplo e corrida
+PASS p08.gap.32: sem piso ou obstáculo para contornar a Task
+PASS p09.gap.07: vão excede alcance de pulo duplo e corrida
+PASS p09.gap.07: sem piso ou obstáculo para contornar a Task
+PASS p10.gap.07: vão excede alcance de pulo duplo e corrida
+PASS p10.gap.07: sem piso ou obstáculo para contornar a Task
+PASS fase1: não atravessa Task fechada com pulo duplo e corrida
+PASS fase2: não atravessa Task fechada com pulo duplo e corrida
+TASK_BARRIERS checks=26 failures=0
+WARNING: 3 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)

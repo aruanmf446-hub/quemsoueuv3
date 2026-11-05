@@ -19,6 +19,7 @@ func snap(phase: Node3D,out: String,name: String) -> void:
 	var error:=root.get_texture().get_image().save_png(out+"/"+name+".png")
 	records.append({"name":name,"error":error,"fixture_teleport":true,"on_floor":phase._player.is_on_floor(),"x":phase._player.position.x,"y":phase._player.position.y})
 func run() -> void:
+	preload("res://tests/desert_night/tutorial_fixture.gd").experienced()
 	var args:=OS.get_cmdline_user_args()
 	var out:=args[0]
 	var profile:=args[1]

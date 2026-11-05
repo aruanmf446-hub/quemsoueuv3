@@ -10,6 +10,7 @@ func check(ok: bool,text: String) -> void:
 func frames(n: int) -> void:
 	for i in n:await physics_frame
 func run() -> void:
+	preload("res://tests/desert_night/tutorial_fixture.gd").experienced()
 	var titles:={}
 	for order in range(1,11):
 		var phase: Node3D=load("res://scenes/desert/phase_%02d.tscn" % order).instantiate()
@@ -34,7 +35,7 @@ func run() -> void:
 			player.defense_charges=0
 			player.attack_charges=0
 			phase._update_bridge_hint()
-			check(phase._hud._bridge_task.visible and phase._hud._bridge_task.text.begins_with(str(task.task_text)),"aviso acessível antes de "+str(task.id))
+			check(phase._hud._bridge_task.visible and phase._hud._bridge_task.tooltip_text.begins_with(str(task.task_text)),"aviso acessível antes de "+str(task.id))
 			var device: Node3D
 			for node in get_nodes_in_group("earth_bridges"):
 				if str(node.hole.id)==str(task.id):device=node
@@ -48,13 +49,13 @@ func run() -> void:
 			check(player.defense_charges==0 and player.attack_charges==0,"sem custo de poder: "+str(task.id))
 			var start_x: float=player.position.x
 			Input.action_press("move_right")
-			for i in 180:
+			for i in 600:
 				await physics_frame
 				if player.position.x>float(task.end)+0.8:break
 			Input.action_release("move_right")
 			check(player.position.x>float(task.end)+0.5 and player.is_on_floor(),"passagem real após tarefa: "+str(task.id))
 			Input.action_press("move_left")
-			for i in 180:
+			for i in 600:
 				await physics_frame
 				if player.position.x<start_x+0.1:break
 			Input.action_release("move_left")

@@ -14,6 +14,7 @@ func frames(count: int) -> void:
 func buttons(phase: Node) -> Array:
 	return phase._session._column.get_children().filter(func(c: Node) -> bool: return c is Button)
 func run() -> void:
+	preload("res://tests/desert_night/tutorial_fixture.gd").experienced()
 	for order in range(1,11):
 		var stage:=Layout.build(order)
 		var safe: bool = stage.checkpoints.size()==7

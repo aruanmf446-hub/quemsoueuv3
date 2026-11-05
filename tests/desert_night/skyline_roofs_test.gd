@@ -10,6 +10,7 @@ func check(ok: bool,text: String) -> void:
 func frames() -> void:
 	for i in 3: await physics_frame
 func run() -> void:
+	preload("res://tests/desert_night/tutorial_fixture.gd").experienced()
 	for order in range(1,11):
 		var phase: Node3D = load("res://scenes/desert/phase_%02d.tscn" % order).instantiate()
 		root.add_child(phase)

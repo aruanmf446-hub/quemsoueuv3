@@ -46,6 +46,8 @@ func run() -> void:
 		print("CAPTURE ",file," result=",error)
 		phase._player._invulnerable = 999.0
 		phase._player.position = phase._vec3(phase._phase.checkpoints[3].pos)+Vector3.UP*0.05
+		var supporting: Dictionary=preload("res://scripts/desert/t15d/campaign_layout.gd").floor_at(phase._phase,phase._player.position.x)
+		phase._player.position.x=(float(supporting.left)+float(supporting.right))*0.5
 		phase._player.velocity = Vector3.ZERO
 		phase._stream_world(phase._player.position.x,true)
 		phase._follow_camera(1.0)
@@ -57,7 +59,7 @@ func run() -> void:
 		var middle_file := "%s/fase_%02d_distrito05_fixture.png" % [output,order]
 		var middle_error := root.get_texture().get_image().save_png(middle_file)
 		if middle_error != OK: failures += 1
-		records.append({"order":order,"name":phase._phase.name,"fixture_teleport":true,"district":5,"viewport":root.get_visible_rect().size,"window":root.size,"iphone":UIScale.is_iphone(),"image":middle_file,"result":middle_error})
+		records.append({"order":order,"name":phase._phase.name,"fixture_teleport":true,"district":5,"world_x":phase._player.position.x,"viewport":root.get_visible_rect().size,"window":root.size,"iphone":UIScale.is_iphone(),"image":middle_file,"result":middle_error})
 		print("CAPTURE ",middle_file," result=",middle_error)
 		if order == 9:
 			phase._player.position=Vector3(float(phase._phase.goal.pos[0])-1.6,float(phase._phase.goal.pos[1])-1.45,0)

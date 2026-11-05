@@ -15,6 +15,7 @@ func _ready() -> void:
 	add_child(loading)
 	loading.begin("res://scenes/desert/phase_01.tscn",_launch)
 func _launch(packed: PackedScene) -> void:
+	_switching=false
 	phase = packed.instantiate()
 	get_tree().root.add_child(phase)
 	get_tree().current_scene = phase
@@ -25,7 +26,10 @@ func rect(control: Control) -> Array:
 func _probe(args: Array) -> void:
 	if args.size() and str(args[0]) == "rooftops" and not _switching:
 		_switching=true
-		_rooftops.call_deferred()
+		_switch_to.call_deferred(2)
+	if args.size() and str(args[0]).begins_with("phase:") and not _switching:
+		_switching=true
+		_switch_to.call_deferred(clampi(int(str(args[0]).trim_prefix("phase:")),1,10))
 	if args.size() and str(args[0]) == "cactus" and is_instance_valid(phase) and _order==2:
 		phase._spawn_enemy(phase._troops,{"id":"web.roof.pursuit","pos":[phase._player.position.x+6.0,float(phase._phase.surfaces[0].height)+0.02,0],"patrol":[-4,4],"troop":true})
 	if args.size() and str(args[0]) == "powers" and is_instance_valid(phase):
@@ -36,6 +40,11 @@ func _probe(args: Array) -> void:
 	if is_instance_valid(phase):
 		state.stage = "play"
 		state.order = phase._order
+		state.art_ids=[]
+		for node in get_tree().get_nodes_in_group("kingdom_art"):
+			if phase.is_ancestor_of(node):
+				var id: String=node.get_meta("asset_id","")
+				if not state.art_ids.has(id): state.art_ids.append(id)
 		state.y = phase._player.position.y
 		state.soldiers = []
 		for enemy in phase._troops.get_children():
@@ -58,11 +67,11 @@ func _probe(args: Array) -> void:
 		state.skip = rect(loading._carousel._skip)
 	JavaScriptBridge.eval("window.qseDesertState="+JSON.stringify(state))
 
-func _rooftops() -> void:
+func _switch_to(order: int) -> void:
 	if is_instance_valid(phase): phase.queue_free()
 	phase=null
 	await get_tree().process_frame
-	_order=2
+	_order=order
 	loading=CampaignLoading.new()
 	add_child(loading)
-	loading.begin("res://scenes/desert/phase_02.tscn",_launch)
+	loading.begin("res://scenes/desert/phase_%02d.tscn" % order,_launch)

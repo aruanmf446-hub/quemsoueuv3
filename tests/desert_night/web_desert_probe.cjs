@@ -1,12 +1,14 @@
 // Actual WebAssembly fixture: blocked external hosts, touch input, safe iPhone canvas.
 const {chromium}=require('playwright');
 const fs=require('fs');
+let activeBrowser;
 const out=process.env.QSE_DESERT_WEB_OUT||'/tmp/reino-web';fs.mkdirSync(out,{recursive:true});
 (async()=>{
  const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+ activeBrowser=browser;
  const context=await browser.newContext({viewport:{width:844,height:390},deviceScaleFactor:3,isMobile:true,hasTouch:true,serviceWorkers:'block',userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'});
  const blocked=[];await context.route('**/*',r=>{const u=new URL(r.request().url());if(['127.0.0.1','localhost'].includes(u.hostname))return r.continue();blocked.push(u.hostname);return r.abort();});
- const page=await context.newPage(),errors=[],logs=[];
+ const page=await context.newPage(),errors=[],logs=[];page.setDefaultTimeout(120000);
  page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{logs.push(m.text());fs.appendFileSync(out+'/console.log',m.text()+'\n');});
  await page.goto(process.env.QSE_DESERT_WEB_URL||'http://127.0.0.1:8135/quemsoueuv3/',{waitUntil:'domcontentloaded',timeout:120000});
  await page.waitForFunction(()=>typeof window.qseDesertProbe==='function',null,{timeout:180000});
@@ -35,7 +37,7 @@ const out=process.env.QSE_DESERT_WEB_OUT||'/tmp/reino-web';fs.mkdirSync(out,{rec
  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>typeof window.qseDesertProbe==='function',null,{timeout:120000});
  await page.waitForFunction(()=>{window.qseDesertProbe('state');return window.qseDesertState.stage==='play';},null,{timeout:120000});
  const replay=await state();if(!replay.read)throw new Error('Read flag did not persist');
- if(!replay.buttons.rupture||!replay.buttons.amber||!replay.buttons.dash)throw new Error('Learned abilities did not persist after reload');
+ if(replay.buttons.rupture||replay.buttons.amber||replay.buttons.dash)throw new Error('Early chapter exposes later abilities after reload');
  await page.evaluate(()=>window.qseDesertProbe('rooftops'));
  await page.waitForFunction(()=>{window.qseDesertProbe('state');return window.qseDesertState.stage==='loading'&&window.qseDesertState.cards===1;},null,{timeout:120000});
  let brief=await state();await tap(brief.next,brief);
@@ -45,7 +47,18 @@ const out=process.env.QSE_DESERT_WEB_OUT||'/tmp/reino-web';fs.mkdirSync(out,{rec
  await page.waitForFunction(before=>{window.qseDesertProbe('state');const soldier=window.qseDesertState.soldiers?.find(s=>s.id==='web.roof.pursuit');return soldier&&soldier.x<before-0.8;},soldierBefore.x,{timeout:15000,polling:100});const roofAfter=await state();const soldierAfter=roofAfter.soldiers.find(s=>s.id==='web.roof.pursuit');
  if(roofAfter.y<7.8||!soldierAfter||soldierAfter.y<7.8||soldierAfter.x>=soldierBefore.x-0.8)throw new Error('Web rooftop pursuit stopped or used street floor');
  await page.screenshot({path:out+'/roof_pursuit.png',scale:'css'});
- const report={states,game,after,replay,roofBefore,roofAfter,errors,blocked:[...new Set(blocked)],engineErrors:logs.filter(s=>/SCRIPT ERROR:|Parse Error:|^ERROR:/.test(s))};fs.writeFileSync(out+'/report.json',JSON.stringify(report,null,2));
+ const stageArt=[{order:1,art_ids:game.art_ids},{order:2,art_ids:roofAfter.art_ids}];
+ for(let order=3;order<=10;order++){
+  await page.evaluate(value=>window.qseDesertProbe('phase:'+value),order);
+  await page.waitForFunction(()=>{window.qseDesertProbe('state');return window.qseDesertState.stage==='loading'&&window.qseDesertState.ready;},null,{timeout:180000});
+  const intro=await state();await tap(intro.next,intro);
+  await page.waitForFunction(value=>{window.qseDesertProbe('state');return window.qseDesertState.stage==='play'&&window.qseDesertState.order===value;},order,{timeout:180000});
+  await page.waitForFunction(()=>{window.qseDesertProbe('state');return window.qseDesertState.art_ids?.length>0;},null,{timeout:60000});
+  const level=await state();stageArt.push({order,art_ids:level.art_ids});
+  await page.screenshot({path:out+`/phase_${String(order).padStart(2,'0')}.png`,scale:'css'});
+ }
+ if(stageArt.some(level=>!level.art_ids?.length))throw new Error('Approved assets missing in Web phase');
+ const report={stageArt,states,game,after,replay,roofBefore,roofAfter,errors,blocked:[...new Set(blocked)],engineErrors:logs.filter(s=>/SCRIPT ERROR:|Parse Error:|^ERROR:/.test(s))};fs.writeFileSync(out+'/report.json',JSON.stringify(report,null,2));
  await browser.close();if(report.errors.length||report.engineErrors.length)throw new Error('Browser or engine errors; see report');
- console.log('REINO_WEB intro8 touch-dash replay-read PASS; external hosts blocked');
-})().catch(e=>{console.error(e);process.exit(1)});
+ console.log('REINO_WEB phases10 approved-art intro8 touch-dash replay-read progression PASS; external hosts blocked');
+})().catch(async e=>{console.error(e);if(activeBrowser)await activeBrowser.close().catch(()=>{});process.exit(1)});

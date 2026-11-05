@@ -21,6 +21,7 @@ var _attack_release_at := -1
 var _rupture_release_at := -1
 var _amber_release_at := -1
 var _defense_release_at := -1
+var _dash_release_at := -1
 var _previous_attack_charge := 1
 var _render_intervals: Array[float] = []
 var _last_render_tick := 0
@@ -92,13 +93,14 @@ func run() -> void:
 		if step == _rupture_release_at: Input.action_release("rupture")
 		if step == _amber_release_at: Input.action_release("amber")
 		if step == _defense_release_at: Input.action_release("defend")
+		if step == _dash_release_at: Input.action_release("dash")
 		if player.is_on_floor() and player.defense_charges>0 and player._shield_timer<=0 and player._attack_timer<=0.15:
 			for threat: Node3D in get_nodes_in_group("enemies"):
 				if threat.has_method("can_jump_gap") and threat._windup>0 and absf(threat.position.x-player.position.x)<2.2:
 					Input.action_press("defend")
 					_defense_release_at=step+2
 					break
-		if order >= 2 and player.is_on_floor() and player.charges("rupture")>0 and step%60==0:
+		if order >= 5 and player.is_on_floor() and player.charges("rupture")>0 and step%60==0:
 			for pursuer: Node3D in get_nodes_in_group("enemies"):
 				var behind := player.position.x-pursuer.position.x
 				if behind>3 and behind<20:
@@ -258,14 +260,32 @@ func fight_malagueta(step: int) -> bool:
 	if step%30==0:
 		print("BOSS_TRACE frame=",step," hero=",player.position," hp=",player.health," fire=",player.attack_charges," defense=",player.defense_charges," amber=",player.charges("amber")," face=",player.facing," boss=",boss.position," boss_hp=",boss.health," frozen=",boss.crystallized_left," attack=",player._attack_timer," cooldown=",player._attack_cooldown," shield=",player._shield_timer)
 	if absf(player.position.x-boss.position.x)>38:return false
-	if player.charges("amber")>0 and boss.crystallized_left<=0.15 and absf(player.position.x-boss.position.x)<7 and not Input.is_action_pressed("amber") and not player.is_defending and player._attack_timer<=0 and player._hurt_timer<=0:
+	var ice_target: Node3D
+	for threat: Node3D in get_nodes_in_group("enemies"):
+		if threat.crystallized_left>0.15 or player.position.distance_to(threat.position)>=7: continue
+		if ice_target==null or player.position.distance_to(threat.position)<player.position.distance_to(ice_target.position): ice_target=threat
+	if player.charges("amber")>0 and ice_target!=null and not Input.is_action_pressed("amber") and not player.is_defending and player._attack_timer<=0 and player._hurt_timer<=0:
+		# O poder aprovado só congela atrás. Virar usa entrada real, sem editar facing.
+		Input.action_release("move_left")
+		Input.action_release("move_right")
+		if (ice_target.position.x-player.position.x)*player.facing>=0:
+			Input.action_press("move_left" if ice_target.position.x>player.position.x else "move_right")
+			return true
 		Input.action_press("amber")
 		_amber_release_at=step+2
+		return true
 	var opponent: Node3D=boss
 	for guard: Node3D in get_nodes_in_group("enemies"):
 		if guard==boss or absf(guard.position.y-player.position.y)>1.3:continue
 		if absf(guard.position.x-player.position.x)<minf(3.0,absf(opponent.position.x-player.position.x)):opponent=guard
 	var side:=signf(opponent.position.x-player.position.x)
+	if opponent!=boss and player.charges("dash")>0 and player._dash_left<=0 and absf(opponent.position.x-player.position.x)<2.5 and not player.is_defending and player._attack_timer<=0 and player._hurt_timer<=0:
+		Input.action_release("move_left")
+		Input.action_release("move_right")
+		Input.action_press("move_right" if side>0 else "move_left")
+		Input.action_press("dash")
+		_dash_release_at=step+2
+		return true
 	var target:float=opponent.position.x-side*1.4
 	if player.attack_charges==0:
 		var distance:=INF

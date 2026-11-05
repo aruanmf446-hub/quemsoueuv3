@@ -16,7 +16,7 @@ func _initialize() -> void:
 				failures += 1
 				continue
 			var item: Dictionary=resources[slot.asset]
-			var texture := load(String(item.texture)) as Texture2D
+			var texture := preload("res://scripts/desert/t15d/kingdom_assets.gd").texture(String(slot.asset))
 			if texture == null:
 				failures += 1
 				continue
@@ -45,7 +45,7 @@ func _initialize() -> void:
 			if slot.anchor=="street_below": center=y-8.0+height*0.5
 			if int(stage_info.order)==2 and y<8.0: failures += 1
 			if slot.asset=="desert_mine_entrance" and (int(stage_info.order)!=9 or float(slot.fraction)!=1.0 or absf(x-float(stage.goal.pos[0]))>0.01): failures += 1
-			placements.append({"asset":slot.asset,"section":slot.section,"fraction":slot.fraction,"world_center":[x,center,slot.z],"supported_floor_y":y,"surface":surface.index,"width":width,"height":height,"shift_to_safe_surface":x-wanted,"anchor":slot.anchor,"note":slot.note,"status":"planned_not_installed","clip_to_physical_floor_pieces":slot.anchor in ["facade","under_surface"]})
+			placements.append({"asset":slot.asset,"section":slot.section,"fraction":slot.fraction,"world_center":[x,center,slot.z],"supported_floor_y":y,"surface":surface.index,"width":width,"height":height,"shift_to_safe_surface":x-wanted,"anchor":slot.anchor,"note":slot.note,"status":plan.status,"clip_to_physical_floor_pieces":slot.anchor in ["facade","under_surface"]})
 			count += 1
 		output.append({"order":stage_info.order,"name":stage_info.name,"placements":placements})
 	if plan.ability_progression.freeze_back!=Layout.ABILITY_PHASE.amber or plan.ability_progression.electric_run!=Layout.ABILITY_PHASE.dash or plan.ability_progression.rupture_back!=Layout.ABILITY_PHASE.rupture: failures += 1
@@ -54,6 +54,6 @@ func _initialize() -> void:
 	var path: String=args[0] if not args.is_empty() else "/tmp/desert_asset_positions.json"
 	var file := FileAccess.open(path,FileAccess.WRITE)
 	if file == null: failures += 1
-	else: file.store_string(JSON.stringify({"engine":Engine.get_version_info().string,"failures":failures,"positions":count,"status":"planned_not_installed","stages":output},"\t"))
+	else: file.store_string(JSON.stringify({"engine":Engine.get_version_info().string,"failures":failures,"positions":count,"status":plan.status,"stages":output},"\t"))
 	print("ASSET_PLACEMENTS stages=",output.size()," positions=",count," failures=",failures)
 	quit.call_deferred(1 if failures else 0)

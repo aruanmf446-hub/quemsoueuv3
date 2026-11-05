@@ -130,6 +130,12 @@ func run() -> void:
 		phase._set_floor_broken(str(candidate.id),false)
 		await frames(2)
 		check(not phase.get_world_3d().direct_space_state.intersect_ray(ray).is_empty(),"restauração recupera a laje alta")
+	if not candidate.is_empty():
+		phase._player.position=Vector3(float(candidate.span_start)-2.1,float(candidate.pos[1])+0.52,0)
+		phase._player.facing=-1
+		phase._player.restore_charge("rupture")
+		phase._player.use_ability("rupture")
+		check(phase._ruptured.has(str(candidate.id)),"Ruptura abre piso à direita quando El Fuego olha para esquerda")
 	for kind in ["attack","defense","rupture","amber","dash"]:
 		for index in range(4): phase._player.restore_charge(kind)
 		check(phase._player.charges(kind)==3 and not phase._player.restore_charge(kind),"%s respeita capacidade3 sem consumir recarga cheia" % kind)

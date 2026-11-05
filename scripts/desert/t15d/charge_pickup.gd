@@ -23,19 +23,6 @@ func _ready() -> void:
 	shape.shape = sphere
 	shape.position.y = 0.7
 	add_child(shape)
-	var pedestal := MeshInstance3D.new()
-	var base := CylinderMesh.new()
-	base.top_radius = 0.28
-	base.bottom_radius = 0.36
-	base.height = 0.25
-	base.radial_segments = 12
-	pedestal.mesh = base
-	pedestal.position.y = 0.125
-	var stone := StandardMaterial3D.new()
-	stone.albedo_texture = preload("res://assets/desert/phase01/sandstone.png")
-	stone.albedo_color = Color("#857467")
-	pedestal.material_override = stone
-	add_child(pedestal)
 	_visual = Node3D.new()
 	_visual.position.y = 0.70
 	add_child(_visual)
@@ -78,6 +65,22 @@ func _try_collect(body: Node3D) -> void:
 	_taken = true
 	collected.emit(pickup_id,kind)
 	queue_free()
+## A base pertence ao chunk, nunca ao Area3D descartável do item.
+static func create_pedestal() -> MeshInstance3D:
+	var pedestal := MeshInstance3D.new()
+	var base := CylinderMesh.new()
+	base.top_radius = 0.28
+	base.bottom_radius = 0.36
+	base.height = 0.25
+	base.radial_segments = 12
+	pedestal.mesh = base
+	pedestal.position.y = 0.125
+	var stone := StandardMaterial3D.new()
+	stone.albedo_texture = preload("res://assets/desert/phase01/sandstone.png")
+	stone.albedo_color = Color("#857467")
+	pedestal.material_override = stone
+	return pedestal
+
 static func _halo_material(color: Color) -> StandardMaterial3D:
 	if _halo_texture == null:
 		var ramp := Gradient.new()

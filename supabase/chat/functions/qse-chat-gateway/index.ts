@@ -147,36 +147,34 @@ async function canAccessRoom(token: string, roomId: string): Promise<RoomAccess 
 // Vozes originais dos bots: estilo fixo por identidade de membro e skin.
 // Nunca consultar cartas secretas. Somente eventos com reveal_at <= server_now.
 function botPhrase(bot: RoomBot, kind: string, sequence: number): string {
-  const hash = [...(bot.member_id + bot.skin_id)].reduce((n, c) => (n * 31 + c.charCodeAt(0)) % 65521, 7);
-  const personalities: Record<string,string[][]> = {
+  const hash = [...bot.member_id].reduce((n, c) => (n * 31 + c.charCodeAt(0)) % 65521, 7);
+  // As MESMAS tres personalidades de scripts/ui/battle/battle_chat.gd (modo local).
+  // O sorteio de voz usa ID de membro no servidor, estavel durante a partida.
+  const voice = hash % 3;
+  const lines: Record<string,string[][]> = {
     greeting: [
-      ["Opa! Começou! Quero ver quem vai segurar essa batalha!","Hoje ninguém me pega desprevenido!"],
-      ["Pensem bem antes de escolher. Cada rodada importa.","A estratégia começa agora. Boa sorte a todos!"],
-      ["Bora, pessoal! Essa disputa promete!","Preparados? Eu tô pronto pra essa!"],
-      ["Ai, que nervoso... boa sorte pra todo mundo!","Tomara que eu não seja o primeiro a cair!"]
+      ["Vou pensar com calma antes da próxima.", "Uma carta de cada vez."],
+      ["Hoje eu vim para disputar!", "Ainda tenho jogo pela frente."],
+      ["Será que a sorte está comigo?", "Prometo não culpar o baralho!"]
     ],
     pick: [
-      ["Eita! Essa jogada foi ousada!","Quero ver a próxima rodada!"],
-      ["Escolha interessante. Vamos analisar o resultado.","Agora o jogo ficou mais estratégico."],
-      ["Uhuu! Que rodada!","Isso sim é emoção!"],
-      ["Nossa... quase derrubei meu chapéu!","Ai! Essa me pegou de surpresa!"]
+      ["Boa jogada! Estou de olho.", "Uma carta de cada vez."],
+      ["Essa rodada foi intensa!", "Hoje eu vim para disputar!"],
+      ["Esse duelo está rendendo história!", "Será que a sorte está comigo?"]
     ],
     timeout: [
-      ["Demorou demais! Aqui o relógio não perdoa!","Tem que pensar mais rápido, hein!"],
-      ["O tempo também faz parte da estratégia.","Atenção ao cronômetro na próxima vez."],
-      ["Ih, acabou o tempo! Bora pra próxima!","O relógio apitou! Segue o jogo!"],
-      ["Nossa, o tempo voou!","Ai, não pode vacilar com o relógio!"]
+      ["Uma carta de cada vez.", "Vou pensar com calma antes da próxima."],
+      ["Ainda tenho jogo pela frente.", "Hoje eu vim para disputar!"],
+      ["Prometo não culpar o baralho!", "Será que a sorte está comigo?"]
     ],
     eliminated: [
-      ["Eita! Menos um na disputa!","O jogo tá ficando sério!"],
-      ["A disputa afunilou. Resta manter a calma.","Cada eliminação muda o cenário."],
-      ["Que disputa! A torcida vai à loucura!","Caramba! Isso foi intenso!"],
-      ["Puxa... essa deve ter doído.","Ai, fiquei até arrepiado!"]
+      ["Boa jogada! Estou de olho.", "Vou pensar com calma antes da próxima."],
+      ["Essa rodada foi intensa!", "Ainda tenho jogo pela frente."],
+      ["Esse duelo está rendendo história!", "Prometo não culpar o baralho!"]
     ]
   };
-  const variants = personalities[kind];
-  if (!variants) return "";
-  return variants[hash % variants.length][Math.floor(sequence / Math.max(1, variants.length)) % 2];
+  const alternatives = lines[kind]?.[voice];
+  return alternatives ? alternatives[(sequence + hash) % alternatives.length] : "";
 }
 
 // Autoridade dos bots é exclusiva do servidor: o gateway valida GAME em toda leitura,

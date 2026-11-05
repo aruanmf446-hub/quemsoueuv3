@@ -4,7 +4,7 @@
 > política de prévias pendentes já foram implantadas no GAME. Não executar o
 > prompt de implantação abaixo novamente. O Codex conferiu o código versionado
 > e ajustou/testou o cliente com fixtures, sem acesso ao Supabase. Veja
-> [compatibilidade, problema nos registros SQL e testes reais pendentes](REVISAO_CLIENTE_PR100.md).
+> [compatibilidade, correção SQL validada e testes reais pendentes](REVISAO_CLIENTE_PR100.md).
 
 Direção atual: Supabase GAME existente + bucket privado **qse-deck-originals**.
 Sem Cloudflare, Worker, R2, GitHub token no jogo ou outro provedor.

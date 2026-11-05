@@ -1,6 +1,6 @@
 # Cliente e PR #100 — revisão manual de decks
 
-Fonte conferida por Git: PR #100, commit **4f858b6e6dda1c5e47b8b6c871c01771c2ad9b53**,
+Fonte corrigida conferida por Git: PR #100, commit **d96d0ecbe9e56a0eeb3b3d93fdb63ee8be7870c9**,
 branch `chatgpt/decks-review-game-20261105`, destino `work/decks-storage-revisao-manual`.
 O responsável pelo backend informou que as três migrations já foram aplicadas.
 **Não reexecutá-las.** O Codex não acessou o Supabase nem executou SQL.
@@ -28,38 +28,33 @@ O responsável pelo backend informou que as três migrations já foram aplicadas
   revalidação, para não depender do cache do navegador. Se o download falhar,
   não usa o arquivo antigo para aprovar.
 
-## Pendência no PR #100: registros SQL com erro de sintaxe
+## Correção SQL validada e PR integrado
 
-Validação **somente de texto**, com o parser PostgreSQL `pglast v8.7`:
+O commit `d96d0ec` contém exatamente seis terminadores `;` adicionados após
+`$function$`. Uma comparação integral confirmou que o restante dos três arquivos
+é idêntico ao commit anterior `4f858b6`.
 
-| Arquivo registrado no PR | Resultado |
-|---|---|
-| `20261105222130_qse_deck_review_acl_and_storage_20261105.sql` | Erro próximo a `revoke`, offset 2867 |
-| `20261105222157_qse_deck_review_read_rpcs_20261105.sql` | Erro próximo a `CREATE`, offset 405 |
-| `20261105222227_qse_deck_review_atomic_decide_20261105.sql` | Erro próximo a `revoke`, offset 4109 |
+Validação dos arquivos completos com o parser PostgreSQL `pglast v8.7`:
 
-Faltam terminadores `;` depois das linhas que fecham funções com `$function$`.
-Adicionar esses terminadores **apenas em uma string em memória** fez os três
-textos passarem no parser (15, 9 e 3 comandos, respectivamente). Nenhum comando
-foi executado e nenhum arquivo de migration foi alterado.
+| Arquivo | Terminadores adicionados | Comandos válidos |
+|---|---:|---:|
+| `20261105222130_qse_deck_review_acl_and_storage_20261105.sql` | 2 | 15 |
+| `20261105222157_qse_deck_review_read_rpcs_20261105.sql` | 3 | 9 |
+| `20261105222227_qse_deck_review_atomic_decide_20261105.sql` | 1 | 3 |
+| Total | 6 | 27 |
 
-O PR #100 foi inspecionado por Git, mas **não mesclado** na branch do cliente.
-O autor deve corrigir a formatação dos registros antes da integração, mantendo
-nomes/versões e a indicação de que já foram aplicados. A análise do texto não
-verifica o estado atual do servidor reportado pelo responsável.
+O PR #100 foi integrado à branch **work/decks-storage-revisao-manual**, incluindo
+os registros já aplicados e o relatório do responsável. Nenhuma migration foi
+editada pelo Codex ou reaplicada; não houve acesso ao Supabase. A main e o Pages
+não foram atualizados nesta integração.
 
-Mensagem para o ChatGPT responsável pelo PR:
+A falha de sintaxe está resolvida. A análise anterior permanece como histórico
+em `evidence/deck-review-pr100/sql-review.json`; a validação atual está em
+`evidence/deck-review-pr100/sql-review-corrected.json`.
+Os scripts do cliente permaneceram idênticos aos da versão testada; o merge
+trouxe somente documentação e os registros SQL. Os testes com contas reais
+continuam pendentes conforme o roteiro abaixo.
 
-```text
-O cliente foi conferido com as RPCs do PR #100. O parser PostgreSQL encontrou
-falta de ; após os fechamentos $function$ nos três arquivos SQL versionados.
-Corrija somente esses terminadores nos registros do PR, preservando nomes,
-versões e o aviso de que as migrations já foram aplicadas. Valide o parse dos
-arquivos completos. Não execute/reaplique SQL no GAME para corrigir arquivos
-do GitHub. Não altere ACL, RLS ou semântica das funções por causa desse ajuste.
-```
-
-Resultado reproduzível da análise de texto: `evidence/deck-review-pr100/sql-review.json`.
 O privilégio TRUNCATE continua como pendência separada relatada pelo responsável;
 nenhum TRUNCATE, REVOKE ou outro comando de banco foi executado nesta revisão.
 

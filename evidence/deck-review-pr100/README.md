@@ -1,6 +1,7 @@
 # Compatibilidade do cliente com o PR #100
 
-Godot 4.7.2 oficial. Fonte do backend lida por Git no commit `4f858b6` do PR #100.
+Godot 4.7.2 oficial. Contrato inicialmente lido em `4f858b6`; correção SQL
+validada no commit `d96d0ec` do PR #100 e integrada à branch do cliente.
 Nenhum acesso ao Supabase, execução de SQL ou alteração de migrations.
 Os testes nativos usam fixtures dos retornos registrados no PR. As imagens
 coloridas são fixtures, não novos assets ou conteúdo publicado.
@@ -16,7 +17,7 @@ coloridas são fixtures, não novos assets ou conteúdo publicado.
 | Comunidade T27 | 14 verificações; 0 falhas |
 | Verificação PlayerUI | OK |
 | Export Web release oficial 4.7.2 | HTML/PCK/WASM gerados; sem erros de script/exportação |
-| Parser dos três SQLs do PR #100 | 3 erros confirmados; ver `sql-review.json` |
+| Parser dos três SQLs corrigidos do PR #100 | 27 comandos válidos, 0 erros; ver `sql-review-corrected.json` |
 
 Somente perfis iPhone usam `--iphone`/1200×675. Os arquivos `*_acoes.png` mostram
 os controles depois de rolar o conteúdo. Nenhuma captura comprova uso em aparelho
@@ -33,14 +34,16 @@ de download na nova abertura. Cache local só é reutilizado dentro da abertura;
 o comportamento CDN/browser de produção requer teste real. Os testes de decisão
 simulam erro de negócio/retirada sem sessões reais ou concorrência simultânea.
 
-O parser `pglast v8.7` analisou textos obtidos do Git. A verificação de terminadores
-ocorreu apenas em memória. Nenhum banco foi conectado, nenhum SQL executado e os
-arquivos do PR não foram alterados nem incorporados à branch do cliente.
+O parser `pglast v8.7` analisou os arquivos completos corrigidos e confirmou 27
+comandos válidos. O diff contém somente os seis terminadores esperados. O PR #100
+foi integrado sem alterar scripts do cliente, mantendo os resultados acima. Nenhum
+banco foi conectado, nenhum SQL executado nem migrations editadas pelo Codex.
+`sql-review.json` preserva a falha histórica da versão anterior.
 
 V-Sync indisponível em Xvfb/Mesa e o aviso conhecido de duas instâncias ObjectDB
 na regressão antiga de comunidade foram observados. Não houve erro de script
 nesses testes finais. Testes HTTP com contas reais, RLS, concorrência entre dois
 clientes, PWA e iPhone físico permanecem pendentes.
 
-Detalhes, solicitação de correção dos arquivos do PR e roteiro de teste real:
+Detalhes da integração e roteiro de teste real:
 [REVISAO_CLIENTE_PR100.md](../../docs/backend/REVISAO_CLIENTE_PR100.md).

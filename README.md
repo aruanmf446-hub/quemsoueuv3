@@ -152,7 +152,8 @@ A alternativa `work/decks-revisao-repositorio` foi descartada e não deve ser in
 
 Na branch `work/decks-storage-revisao-manual`: prompt baseado nos decks oficiais,
 criação gratuita e tela nativa de aprovação/reprovação. O responsável reportou
-a implantação das quatro RPCs/permissões no PR #100. O cliente foi ajustado aos
+a implantação das quatro RPCs/permissões no PR #100, agora integrado nesta branch
+após validação dos seis terminadores SQL corrigidos. O cliente foi ajustado aos
 retornos registrados, incluindo reenvio de imagens corrigidas e atualização das
 prévias do revisor. Testes locais passaram; testes HTTP com contas reais ainda
 estão pendentes. Nenhum acesso ao Supabase ou alteração de migrations/Edge Functions

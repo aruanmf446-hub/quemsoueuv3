@@ -266,15 +266,19 @@ func _set_crouched(value: bool) -> void:
 	super._set_crouched(value)
 
 func _separate_actors() -> void:
+	if not is_on_floor(): return
 	# Contato lateral sem permitir aterrissar na cabeça do inimigo.
 	for enemy: Node3D in get_tree().get_nodes_in_group("enemies"):
-		if absf(enemy.global_position.y-global_position.y) > 1.15: continue
+		if not enemy.is_on_floor() or absf(enemy.global_position.y-global_position.y) > 1.15: continue
 		var dx := global_position.x-enemy.global_position.x
 		# Contato separa corpos; o dano só vale na janela real do ataque inimigo.
 		# O contato antigo ignorava a preparação do golpe e até machucava no Âmbar.
 		if absf(dx) >= 1.05: continue
 		var side := signf(dx) if absf(dx) > 0.01 else -facing
 		var correction := Vector3(side*1.05-dx,0,0)
+		var target := global_position+correction
+		var support := PhysicsRayQueryParameters3D.create(target+Vector3.UP*0.3,target-Vector3.UP*0.45,1)
+		if get_world_3d().direct_space_state.intersect_ray(support).is_empty(): continue
 		if not test_move(global_transform,correction):
 			global_position += correction
 			if velocity.x*side < 0: velocity.x = 0.0

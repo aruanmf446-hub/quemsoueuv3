@@ -391,7 +391,6 @@ func _build_chunk_details(chunk: Node3D, index: int) -> void:
 	for hole: Dictionary in _phase.holes:
 		var x0 := maxf(float(hole.start),left)
 		var x1 := minf(float(hole.end),right)
-		if x1 > x0: _build_pit_void(chunk,x0,x1)
 		for edge in [float(hole.start),float(hole.end)]:
 			if _in_chunk(edge,index): _build_pit_lip(chunk,edge,edge == float(hole.start))
 func _in_chunk(x: float, index: int) -> bool:
@@ -447,36 +446,6 @@ func _retire_enemy(enemy: Node3D) -> void:
 	enemy.hide()
 	if enemy.get_parent() != _reserve: enemy.reparent(_reserve,false)
 
-## Fundo do vão: antes o panorama aparecia pelo buraco e o vão parecia uma janela.
-## Um poço escuro com gradiente deixa claro que ali não há chão.
-func _build_pit_void(chunk: Node3D, x0: float, x1: float) -> void:
-	if _order in [2,4,10]: return
-	var st := SurfaceTool.new()
-	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var bands := [[0.0,Color("#2b1d16")],[-0.7,Color("#140d0c")],[-2.4,Color("#050609")],[-12.0,Color("#020205")]]
-	for band in range(bands.size()-1):
-		var top: float = bands[band][0]
-		var bottom: float = bands[band+1][0]
-		var a: Color = bands[band][1]
-		var b: Color = bands[band+1][1]
-		for vertex in [[x0,top,a],[x1,top,a],[x1,bottom,b],[x0,top,a],[x1,bottom,b],[x0,bottom,b]]:
-			st.set_color(vertex[2])
-			st.add_vertex(Vector3(vertex[0],vertex[1],-2.1))
-	# Fundo da fenda atrás do corredor: sem ele o panorama aparecia numa faixa acima do poço.
-	for vertex in [[x0,-6.5],[x1,-6.5],[x1,-2.1],[x0,-6.5],[x1,-2.1],[x0,-2.1]]:
-		st.set_color(Color("#21160f"))
-		st.add_vertex(Vector3(vertex[0],-0.01,vertex[1]))
-	var mesh := MeshInstance3D.new()
-	mesh.name = "PitVoid"
-	mesh.set_meta("pit_void",Vector2(x0,x1))
-	mesh.mesh = st.commit()
-	var material := StandardMaterial3D.new()
-	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	material.vertex_color_use_as_albedo = true
-	material.cull_mode = BaseMaterial3D.CULL_DISABLED
-	mesh.material_override = material
-	mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	chunk.add_child(mesh)
 ## Borda de perigo: friso âmbar no lábio do piso e faixa marcada antes do vão.
 func _build_pit_lip(chunk: Node3D, x: float, left_edge: bool) -> void:
 	var inward := -1.0 if left_edge else 1.0
@@ -1069,7 +1038,7 @@ func _build_malagueta() -> void:
 	_boss.add_child(model)
 	add_child(_boss)
 	_boss.setup(_enemy_catalog.malagueta,_phase.boss)
-	_boss.persistent_follow = true
+	_boss.persistent_follow = false
 	_boss.defeated.connect(func() -> void:
 		_boss_defeated = true
 		_hud.notify("Malagueta derrotado • saída liberada")

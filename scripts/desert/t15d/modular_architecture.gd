@@ -31,7 +31,7 @@ func build_surface(platform: Dictionary, order: int) -> void:
 			for column in range(ceili(left/4.5),floori(right/4.5)):
 				_arch_frame(Vector3(column*4.5,top-6.2,-0.6),3.6,5.9,0.28)
 				_box(Vector3(column*4.5-2.15,top-3.4,-0.6),Vector3(0.7,5.8,1.5),"stone")
-			_water_strip(Vector3(x,top-0.04,-1.3),Vector2(width,0.75),false)
+			_water_strip(Vector3(x,top-0.04,-2.8),Vector2(width,1.2),false)
 			if module%3 == 2 and width > 4: _water_strip(Vector3(x,top-2.2,-2.8),Vector2(1.8,4.2),true)
 		6,10:
 			_cave_wall(left,right,top)
@@ -53,10 +53,16 @@ func build_surface(platform: Dictionary, order: int) -> void:
 	for marker in range(ceili((left+1)/7.0),floori((right-1)/7.0)+1):
 		var at := Vector3(marker*7.0,top,-2.1)
 		if marker%3 == 0: _lantern(at)
-		if order == 5 and marker%2 == 0: _palm(at)
+		if order == 3 and marker%2 == 0: _market_stall(at,marker)
+		if order == 4 and marker%3 == 1: _water_strip(at+Vector3(0,-1.5,-0.7),Vector2(1.6,3.0),true)
+		if order == 5 and marker%2 == 0:
+			_palm(at)
+			_garden(at+Vector3(2.0,0,-0.6))
 		if order in [1,8] and marker%4 == 0: _military(at)
 		if order in [6,10]: _underground(at,marker)
-		if order in [7,9,10] and marker%4 == 1: _mine_cart(at+Vector3(0,0,-0.7))
+		if order in [7,9,10] and marker%4 == 1:
+			_mine_cart(at+Vector3(0,0,-0.7))
+			_crane(at+Vector3(1.7,0,-1.0))
 	_flush()
 
 func _facade(left: float,right: float,top: float,bottom: float) -> void:
@@ -178,3 +184,25 @@ func _crystal(at: Vector3) -> void:
 	crystal.position = at+Vector3.UP*0.7
 	crystal.rotation.z = 0.2*sin(at.x)
 	add_child(crystal)
+
+func _market_stall(at: Vector3,index: int) -> void:
+	var width := 3.0+0.3*posmod(index,3)
+	_awning(at+Vector3(0,2.45,-0.15),width,"cloth" if index%4==0 else "cloth_alt")
+	_box(at+Vector3(0,0.50,0.1),Vector3(width-0.2,0.20,0.85),"wood")
+	for side: float in [-1,1]:
+		_box(at+Vector3(side*(width*0.5-0.25),0.22,0.1),Vector3(0.12,0.44,0.7),"wood")
+	for item in range(5):
+		var position := at+Vector3((item-2)*0.46,0.63,0.13)
+		if index%4==0:_dome(position,0.22,0.38,"trim")
+		else:_box(position+Vector3.UP*0.16,Vector3(0.33,0.32,0.46),"wood")
+
+func _garden(at: Vector3) -> void:
+	_box(at+Vector3.UP*0.20,Vector3(1.7,0.4,0.9),"trim")
+	_dome(at+Vector3(0,0.4,0),0.65,0.38,"leaf")
+	_water_strip(at+Vector3(0,0.43,0),Vector2(1.25,0.65),false)
+
+func _crane(at: Vector3) -> void:
+	_box(at+Vector3(0,1.8,0),Vector3(0.28,3.6,0.3),"wood")
+	_box(at+Vector3(0.5,3.6,0),Vector3(3.8,0.26,0.4),"wood")
+	_box(at+Vector3(1.7,2.5,0),Vector3(0.06,2.0,0.06),"metal")
+	_box(at+Vector3(1.7,1.43,0),Vector3(0.75,0.75,0.7),"metal")

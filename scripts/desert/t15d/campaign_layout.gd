@@ -76,7 +76,7 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 		# Obstáculos baixos são caixas/balaustradas integradas ao módulo, não escadas.
 		if order != 2 and index > 0 and index%3 == 2:
 			var height := 0.5 if order == 2 else 0.6
-			platforms.append({"id":"%s.obstacle.%02d" % [prefix,index],"kind":"ledge","pos":[left+module_length*0.76,top+height*0.5,0],"size":[0.9,height,2.6],"span_start":left+module_length*0.76-0.45,"span_end":left+module_length*0.76+0.45,"chunk":floori(left/64),"architecture":THEMES[order-1],"surface_top":top})
+			platforms.append({"id":"%s.obstacle.%02d" % [prefix,index],"kind":"ledge","pos":[left+module_length*0.55,top+height*0.5,0],"size":[0.9,height,2.6],"span_start":left+module_length*0.55-0.45,"span_end":left+module_length*0.55+0.45,"chunk":floori(left/64),"architecture":THEMES[order-1],"surface_top":top})
 	for index in range(8):
 		var module := index*sector_modules
 		var floor: Dictionary = surfaces[module]
@@ -84,17 +84,22 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 		districts.append({"id":"%s.district.%d" % [prefix,index],"name":STAGE_DISTRICTS[order-1][index],"start":start,"end":spawn_x+distance*(index+1)/8.0,"theme":THEMES[order-1]})
 		landmarks.append({"id":"%s.landmark.%d" % [prefix,index],"kind":"district_gate","pos":[float(floor.left)+1.0,float(floor.height),-5.0],"theme":THEMES[order-1]})
 		if index > 0: checkpoints.append({"id":"%s.checkpoint.%d" % [prefix,index],"district":index,"pos":[float(floor.left)+1.3,float(floor.height),0]})
-	for platform: Dictionary in platforms:
-		if not platform.get("breakable",false): continue
-		for item: Dictionary in pickups+checkpoints:
-			if float(item.pos[0])>=float(platform.span_start)-0.8 and float(item.pos[0])<=float(platform.span_end)+0.8: platform.breakable=false
 	# Mantém Malagueta e seu modelo/animações originais no fim do percurso10.
 	# Abastecimento de arena ocupa toda a laje final, não um item sobreposto ao chefe.
 	if order == 10:
 		var arena: Dictionary = surfaces[-1]
+		var supply_room: Dictionary = surfaces[-2]
+		pickups=pickups.filter(func(item: Dictionary)->bool:return float(item.pos[0])<float(supply_room.left) or float(item.pos[0])>float(supply_room.right))
+		for index in range(6):
+			var kind: String=["attack","health","attack","amber","attack","attack"][index]
+			pickups.append({"id":"p10.preparation.%d" % index,"kind":kind,"pos":[float(supply_room.left)+3+index*4.0,float(supply_room.height),0],"surface":46})
 		pickups = pickups.filter(func(item: Dictionary) -> bool: return float(item.pos[0]) < float(arena.left))
-		for index in range(8):
-			pickups.append({"id":"p10.arena.attack.%d" % index,"kind":"attack","pos":[float(arena.left)+1.0+index*3.4,float(arena.height),0],"surface":47})
+		for index in range(12):
+			pickups.append({"id":"p10.arena.attack.%d" % index,"kind":"attack","pos":[float(arena.left)+1.0+index*2.4,float(arena.height),0],"surface":47})
+	for platform: Dictionary in platforms:
+		if not platform.get("breakable",false): continue
+		for item: Dictionary in pickups+checkpoints:
+			if float(item.pos[0])>=float(platform.span_start)-0.8 and float(item.pos[0])<=float(platform.span_end)+0.8: platform.breakable=false
 	var goal_top: float = surfaces[-1].height
 	stage.merge({"protagonist":"el_fuego","player_spawn":[spawn_x,_height(order,0)+0.1,0],"length":distance,"total_length":distance,"minimum_seconds":180.0,"minimum_traversal_seconds":(distance-1)/MAX_HORIZONTAL_SPEED,"transport_allowance":0.0,"maximum_horizontal_speed":MAX_HORIZONTAL_SPEED,"platforms":platforms,"enemies":enemies,"pickups":pickups,"holes":holes,"signs":[],"districts":districts,"landmarks":landmarks,"checkpoints":checkpoints,"geysers":[],"storms":[],"surfaces":surfaces,"goal":{"pos":[goal_x,goal_top+1.5,0]},"kill_plane_y":-10.0 if order == 2 else -12.0,"boss_id":"malagueta" if order == 10 else null,"legacy_placeholder_visuals":false,"bounds":{"min_x":origin,"max_x":goal_x+10.0},"next_scene":"res://scenes/desert/phase_%02d.tscn" % (order+1) if order < 10 else "","reach":{"max_gap":3.2,"single_jump_max_step_top":0.65,"double_jump_max_step_top":1.3}},true)
 	if order == 10:

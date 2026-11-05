@@ -15,6 +15,7 @@ var crystallized_left := 0.0
 var _crystal: Node3D
 var blocked_at_edge := false
 var persistent_follow := false
+var allow_gap_jumps := true
 var _pursue := 0.0
 var _side := 0.0
 var _windup := 0.0
@@ -30,6 +31,7 @@ func _ready() -> void:
 	floor_snap_length = 0.18
 func setup(entry: Dictionary, spawn: Dictionary) -> void:
 	_generation += 1
+	allow_gap_jumps = str(entry.get("id","cactus")) == "cactus"
 	if not _loaded:
 		super.setup(entry, spawn)
 		_loaded = true
@@ -119,7 +121,7 @@ func _physics_process(delta: float) -> void:
 		var has_ground := not get_world_3d().direct_space_state.intersect_ray(ray).is_empty()
 		var wall := not get_world_3d().direct_space_state.intersect_ray(PhysicsRayQueryParameters3D.create(global_position+Vector3(0,0.3,0),global_position+Vector3(direction*0.9,0.3,0),1)).is_empty()
 		blocked_at_edge = is_on_floor() and (not has_ground or wall)
-		if is_on_floor() and (wall or not has_ground) and (can_jump_low(direction) if wall else pursuing and can_jump_gap(direction)):
+		if is_on_floor() and (wall or not has_ground) and (can_jump_low(direction) if wall else pursuing and allow_gap_jumps and can_jump_gap(direction)):
 			velocity.y = 9.4 if not has_ground else 6.3
 			velocity.x = direction*PURSUE_SPEED
 			blocked_at_edge = false

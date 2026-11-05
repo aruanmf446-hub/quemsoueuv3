@@ -49,6 +49,24 @@ func build_surface(platform: Dictionary, order: int) -> void:
 					_box(Vector3(column*3.2,top-2.8,-0.7),Vector3(0.24,5.2,2.8),"wood")
 		_:
 			_box(Vector3(x,top-1.0,0),Vector3(width,1.5,3.8),"stone")
+	# Identidade urbana nas duas primeiras regiões, fora da faixa de corrida.
+	# Apenas a primeira peça de cada módulo evita repetição em cada segmento do piso.
+	if order in [1,2] and String(platform.id).ends_with(".0"):
+		var accent_x := left+minf(width*0.5,3.5)
+		if order == 2:
+			_banner(Vector3(accent_x,top-1.3,1.54))
+			if module%2 == 0:
+				_awning(Vector3(accent_x,top-3.4,1.55),2.5,"cloth")
+			_arch_patch(Vector3(accent_x+1.5,top-6.8,1.49),0.8,1.7,"wood")
+		else:
+			_box(Vector3(accent_x,top+1.7,-2.6),Vector3(0.09,3.4,0.09),"metal")
+			_banner(Vector3(accent_x+0.35,top+2.3,-2.5))
+			if module%2 == 1:
+				_awning(Vector3(accent_x+2.2,top+2.6,-3.1),3.2,"cloth")
+				_box(Vector3(accent_x+2.2,top+0.55,-3.0),Vector3(2.2,0.16,0.75),"wood")
+				for pot in range(3):
+					_dome(Vector3(accent_x+1.4+pot*0.65,top+0.66,-3.0),0.23,0.4,"wood")
+			_lantern(Vector3(accent_x+1.1,top,-2.7))
 	# Variantes sémanticas aux limites des modules; aucun escalier.
 	for marker in range(ceili((left+1)/7.0),floori((right-1)/7.0)+1):
 		var at := Vector3(marker*7.0,top,-2.1)

@@ -1,0 +1,1 @@
+Capturas reais Godot4.7.2,1672×941, fases1/2. Pontos distrito05 são fixtures teleportadas para revisão. Fundo gerado de dunas/cidade integrado atrás da geometria; bandeiras e detalhes urbanos acrescentados sem colisores. Duas galerias failures=0; design/scope check aprovados. Não representa teste em aparelho ou export Web novo.

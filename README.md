@@ -6,7 +6,9 @@ Na mesma branch de revisão: congelamento para trás a partir da fase3, corrida 
 choque na4 e Ruptura na5. Guardas reposicionados após abastecimento e obstáculos
 baixos acrescentados aos telhados; vida/ataque/defesa mantidos no percurso.
 Os conceitos aprovados estão em [art-approved](docs/desert/art-approved/).
-**Pendente: integrar essa nova arte ao Godot. O visual anterior foi reprovado.**
+Fases1/2 agora recebem fundo gerado de dunas, cidade e palácio, além de bandeiras
+com o emblema de chama existente, toldos e detalhes urbanos fora da pista.
+**Pendente: integrar integralmente as fachadas das artes aprovadas.**
 
 ## Reforma das dez fases — revisão separada
 

@@ -18,10 +18,10 @@ func _ready() -> void:
 	if _order == 10: return
 	_panorama = Sprite3D.new()
 	var key := "bazaar" if _order == 3 else ("outskirts" if _order in [6,7,9] else "citadel")
-	_panorama.texture = load("res://assets/desert/night_city/"+key+".png")
+	_panorama.texture = load("res://assets/desert/modular/capital_desert.res") if _order in [1,2] else load("res://assets/desert/night_city/"+key+".png")
 	_panorama.pixel_size = 0.01
 	_panorama.shaded = false
-	_panorama.modulate = Color(0.47,0.54,0.72)
+	_panorama.modulate = Color(0.85,0.85,0.94) if _order in [1,2] else Color(0.47,0.54,0.72)
 	_panorama.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	_panorama.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(_panorama)
@@ -40,4 +40,5 @@ func follow(camera: Camera3D,x: float) -> void:
 	parallax_offset = lerpf(-1.0,1.0,travel)*camera.size*0.22
 	_panorama.basis = camera.basis
 	_panorama.position = camera.position-camera.basis.z*48-camera.basis.x*parallax_offset
+	if _order in [1,2]: _panorama.position += camera.basis.y*camera.size*0.30
 	_panorama.scale = Vector3.ONE*height/(_panorama.texture.get_height()*0.01)

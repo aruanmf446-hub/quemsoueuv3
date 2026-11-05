@@ -32,9 +32,9 @@ func run() -> void:
 		current_scene = phase
 		phase._player.position.y = float(phase._phase.player_spawn[1])
 		await settle(phase,8)
-		if order >= 2: phase._player.restore_charge("rupture")
-		if order >= 4: phase._player.restore_charge("amber")
-		if order >= 6: phase._player.restore_charge("dash")
+		if order >= 5: phase._player.restore_charge("rupture")
+		if order >= 3: phase._player.restore_charge("amber")
+		if order >= 4: phase._player.restore_charge("dash")
 		phase._player.inventory_changed.emit()
 		await settle(phase,3)
 		await RenderingServer.frame_post_draw

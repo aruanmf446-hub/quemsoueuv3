@@ -8,3 +8,5 @@
 - Nenhuma nova panorâmica foi gerada para fingir uma fase jogável. O painel de revisão é montado de capturas reais do motor, identificando os pontos teleportados da fixture.
 
 - `assets/story/covers/phase_01.res` até `phase_10.res`: capas de512px, capturadas no Godot4.7.2 sem HUD, instaladas por `tests/desert_night/install_native_covers.gd`. Não são imagens geradas. O enquadramento da capa1 é mais aberto para mostrar o portal; a câmera jogável permanece igual.
+
+- `source/capital_desert.png`: novo fundo de dunas/cidade realmente gerado pela ferramenta de imagens, usando os telhados aprovados como referência. Somente cenário distante das fases1/2; não substitui plataformas/colisões. `capital_desert.res` é ImageTexture RGB8 1672×941 com mipmaps; reconstruir com `tests/desert_night/build_capital_backdrop.gd`.

@@ -6,7 +6,9 @@ Branch `work/reino-deserto-v3`, baseada em `b10be149ba2d332a44cc1dcbb4c1ebe9aaaf
 O dono confirmou o escopo completo do pacote: nove fases, perseguição em tropas,
 três cargas e três poderes, além da intro, roteiro, legendas e carregamento durante a leitura.
 O desenvolvimento foi retomado; este documento registra o resultado e as pendências.
-**Esta reforma ainda não foi integrada à main nem publicada no Pages.**
+Em 05/11/2026, o dono autorizou integrar toda esta entrega diretamente à `main`.
+A publicação no Pages é executada pelo workflow `deploy-web.yml`; o resultado
+de cada execução deve ser conferido no GitHub Actions.
 
 ## Implementado
 
@@ -62,11 +64,11 @@ Godot **4.7.2.stable.official.ed1daf0bf**, perfis locais isolados e sem backend.
 4. Fixtures de encerramento imediato ainda registram avisos intermitentes de objetos
    de áudio WAV/playback no ObjectDB. Não houve erro de script; investigar ciclo de áudio
    ao encerrar/reabrir sessões prolongadas, sem confundir isso com validação de aparelho.
-5. Abrir/atualizar PR e publicar somente após confirmar os checks da entrega. A rede
-   atual permite Git, mas bloqueia `api.github.com` com Forbidden; não existe PR numerada
-   confirmada para esta branch. Não confundir a antiga publicação do hero com esta reforma.
+5. Conferir o resultado do deploy desta entrega no Pages e validar o PWA instalado.
+   O dono autorizou integração direta na `main`, dispensando a PR pendente. A rede
+   deste ambiente permite Git, mas continua bloqueando `api.github.com`.
 
-Link para criar a PR: https://github.com/aruanmf446-hub/quemsoueuv3/pull/new/work/reino-deserto-v3
+Publicações: https://github.com/aruanmf446-hub/quemsoueuv3/actions/workflows/deploy-web.yml
 
 ## Regras e reprodução
 

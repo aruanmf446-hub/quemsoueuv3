@@ -93,7 +93,10 @@ async function canMessage(token: string, peerId: string): Promise<boolean | null
 // 16D: autorização pontual (SEM cache) no GAME para membro atual de sala;
 // recusa sala encerrada, saída, kick, sala inexistente ou falha da rede.
 type RoomParticipant = { tag: string; member_id: string; nickname: string };
-type RoomAccess = { allowed: boolean; participants: RoomParticipant[] };
+type RoomBot = { member_id: string; nickname: string; skin_id: string };
+type BotEvent = { seq: number; kind: "pick" | "timeout" | "eliminated"; created_at: string };
+type RoomAccess = { allowed: boolean; participants: RoomParticipant[];
+  bots: RoomBot[]; bot_match_id: string | null; bot_phase: string | null; bot_events: BotEvent[] };
 
 // GAME valida a identidade e devolve tags pseudonimas e nomes, nunca IDs GAME ao cliente.
 async function canAccessRoom(token: string, roomId: string): Promise<RoomAccess | null> {
@@ -125,7 +128,84 @@ async function canAccessRoom(token: string, roomId: string): Promise<RoomAccess 
         UUID.test((p as RoomParticipant).member_id) &&
         typeof (p as RoomParticipant).nickname === "string")
     : [];
-  return { allowed: value.allowed, participants };
+  const bots: RoomBot[] = Array.isArray(value?.bots) ? value.bots.filter((p: unknown): p is RoomBot =>
+    !!p && typeof p === "object" &&
+    typeof (p as RoomBot).member_id === "string" && UUID.test((p as RoomBot).member_id) &&
+    typeof (p as RoomBot).nickname === "string" && typeof (p as RoomBot).skin_id === "string") : [];
+  const bot_events: BotEvent[] = Array.isArray(value?.bot_events)
+    ? value.bot_events.filter((e: unknown): e is BotEvent =>
+        !!e && typeof e === "object" &&
+        Number.isInteger((e as BotEvent).seq) && (e as BotEvent).seq > 0 &&
+        ["pick","timeout","eliminated"].includes((e as BotEvent).kind) &&
+        typeof (e as BotEvent).created_at === "string") : [];
+  const bot_match_id = typeof value?.bot_match_id === "string" && UUID.test(value.bot_match_id)
+    ? value.bot_match_id : null;
+  const bot_phase = typeof value?.bot_phase === "string" ? value.bot_phase : null;
+  return { allowed: value.allowed, participants, bots, bot_events, bot_match_id, bot_phase };
+}
+
+// Vozes originais dos bots: estilo fixo por identidade de membro e skin.
+// Nunca consultar cartas secretas. Somente eventos com reveal_at <= server_now.
+function botPhrase(bot: RoomBot, kind: string, sequence: number): string {
+  const hash = [...(bot.member_id + bot.skin_id)].reduce((n, c) => (n * 31 + c.charCodeAt(0)) % 65521, 7);
+  const personalities: Record<string,string[][]> = {
+    greeting: [
+      ["Opa! Começou! Quero ver quem vai segurar essa batalha!","Hoje ninguém me pega desprevenido!"],
+      ["Pensem bem antes de escolher. Cada rodada importa.","A estratégia começa agora. Boa sorte a todos!"],
+      ["Bora, pessoal! Essa disputa promete!","Preparados? Eu tô pronto pra essa!"],
+      ["Ai, que nervoso... boa sorte pra todo mundo!","Tomara que eu não seja o primeiro a cair!"]
+    ],
+    pick: [
+      ["Eita! Essa jogada foi ousada!","Quero ver a próxima rodada!"],
+      ["Escolha interessante. Vamos analisar o resultado.","Agora o jogo ficou mais estratégico."],
+      ["Uhuu! Que rodada!","Isso sim é emoção!"],
+      ["Nossa... quase derrubei meu chapéu!","Ai! Essa me pegou de surpresa!"]
+    ],
+    timeout: [
+      ["Demorou demais! Aqui o relógio não perdoa!","Tem que pensar mais rápido, hein!"],
+      ["O tempo também faz parte da estratégia.","Atenção ao cronômetro na próxima vez."],
+      ["Ih, acabou o tempo! Bora pra próxima!","O relógio apitou! Segue o jogo!"],
+      ["Nossa, o tempo voou!","Ai, não pode vacilar com o relógio!"]
+    ],
+    eliminated: [
+      ["Eita! Menos um na disputa!","O jogo tá ficando sério!"],
+      ["A disputa afunilou. Resta manter a calma.","Cada eliminação muda o cenário."],
+      ["Que disputa! A torcida vai à loucura!","Caramba! Isso foi intenso!"],
+      ["Puxa... essa deve ter doído.","Ai, fiquei até arrepiado!"]
+    ]
+  };
+  const variants = personalities[kind];
+  if (!variants) return "";
+  return variants[hash % variants.length][Math.floor(sequence / Math.max(1, variants.length)) % 2];
+}
+
+// Autoridade dos bots é exclusiva do servidor: o gateway valida GAME em toda leitura,
+// e a RPC de emissão só aceita service_role. O índice do CHAT garante dedupe entre clientes.
+async function emitBotRoomLines(db: any, conversationId: string, access: RoomAccess): Promise<void> {
+  if (!access.allowed || !access.bot_match_id || access.bots.length === 0) return;
+  const events: {seq:number;kind:string}[] = [];
+  if (access.bot_phase === "selection" || access.bot_phase === "countdown")
+    events.push({seq:0,kind:"greeting"});
+  const now = Date.now();
+  for (const event of access.bot_events
+    .filter(e => { const age = now - Date.parse(e.created_at); return Number.isFinite(age) && age >= -5000 && age <= 45000; })
+    .sort((a,b) => a.seq-b.seq).slice(-4)) {
+    events.push({seq:event.seq,kind:event.kind});
+  }
+  for (const event of events) {
+    const index = event.seq === 0 ? 0 : (event.seq-1) % access.bots.length;
+    const bot = access.bots[index];
+    const phrase = botPhrase(bot,event.kind,event.seq);
+    if (!phrase) continue;
+    const {error} = await db.rpc("qse_chat_room_bot_emit",{
+      p_conversation_id:conversationId,p_match_id:access.bot_match_id,
+      p_bot_member_id:bot.member_id,p_event_seq:event.seq,p_body:phrase,
+    });
+    if (error) {
+      console.warn("qse-chat-gateway: BOT_EMIT_FAILED");
+      break; // nunca indisponibilizar a leitura do chat humano por falha de bot
+    }
+  }
 }
 
 async function roomSenderTag(roomId: string, senderId: string): Promise<string> {
@@ -250,6 +330,7 @@ export default {
           if (permitted === null) return respond({error:"game_unavailable"},503);
           if (!permitted.allowed) return respond({error:"room_access_denied"},403);
           if (action === "messages") {
+            await emitBotRoomLines(db,id,permitted);
             const {data,error} = await db.rpc("qse_chat_room_read",{
               p_user_id:userId,p_conversation_id:id,p_limit:50,
             });
@@ -265,15 +346,19 @@ export default {
             await Promise.all(senders.map(async sender =>
               tags.set(sender, await roomSenderTag(room.game_room_id, sender))
             ));
-            const mapped = messages.map((m:{id:string;body:string;sent_at:string;sender_game_user_id?:string}) => {
+            const botRoster = new Map(permitted.bots.map(b => [b.member_id.toLowerCase(),b]));
+            const mapped = messages.map((m:{id:string;body:string;sent_at:string;sender_game_user_id?:string|null;sender_bot_member_id?:string|null}) => {
               const sender = typeof m.sender_game_user_id === "string"
                 ? m.sender_game_user_id.toLowerCase() : "";
+              const bot = typeof m.sender_bot_member_id === "string"
+                ? botRoster.get(m.sender_bot_member_id.toLowerCase()) : undefined;
               const member = roster.get(tags.get(sender) ?? "");
               return {
                 id:m.id, body:m.body, sent_at:m.sent_at,
-                sender_member_id:member?.member_id ?? null,
-                sender_name:member?.nickname ?? "Ex-participante",
-                is_you:sender === userId.toLowerCase(),
+                sender_member_id:bot?.member_id ?? member?.member_id ?? null,
+                sender_name:bot ? bot.nickname + " · BOT" : (member?.nickname ?? "Ex-participante"),
+                is_bot:!!bot,
+                is_you:!bot && sender === userId.toLowerCase(),
               };
             });
             return respond({messages:mapped});

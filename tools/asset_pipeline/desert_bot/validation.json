@@ -1,0 +1,29 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "prepared": [
+    {
+      "id": "capital_market_stall",
+      "size": [
+        1024,
+        665
+      ]
+    },
+    {
+      "id": "capital_palm_garden",
+      "size": [
+        1024,
+        805
+      ]
+    }
+  ],
+  "resource_build_failures": 0,
+  "guards_passed": [
+    "batch_limit_2",
+    "reject_duplicate_registration",
+    "reject_non_alpha_png",
+    "queue_unchanged_on_rejection",
+    "skip_prepared_on_next"
+  ],
+  "gameplay_changed": false,
+  "unattended_generation": false
+}

@@ -1,5 +1,12 @@
 # Quem Sou Eu V3 — Reino do Deserto
 
+## Bot assistido de assets
+
+[Fila e instruções](tools/asset_pipeline/desert_bot/README.md): gera argumentos para
+image_gen na conversa, registra fontes/hashes e prepara texturas no Godot. Primeiro
+lote concluído: barraca de mercado e palmeiras; arcada e casa com varanda na fila.
+Não é serviço24h nem publica/integra os assets sozinho. Lotes limitados a dois.
+
 ## Ajuste de parkour e progressão após reprovação
 
 Na mesma branch de revisão: congelamento para trás a partir da fase3, corrida com

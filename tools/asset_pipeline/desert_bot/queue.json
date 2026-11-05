@@ -1,0 +1,49 @@
+{
+  "reference": "assets/desert/modular/source/capital_house.png",
+  "assets": [
+    {
+      "id": "capital_market_stall",
+      "label": "barraca de tecidos e cerâmicas",
+      "width_metres": 3.2,
+      "state": "prepared",
+      "brief": "A freestanding night-market stall, weathered dark timber posts, luxurious crimson cloth awning with subtle gold edge and small gold flame pennant, wooden counter with neatly stacked red/gold woven fabrics, ceramic jars, one warm hanging lantern. Tasteful believable materials, modest ornament, readable simple silhouette. Entire stall isolated, not attached to a building.",
+      "source": "assets/desert/modular/source/capital_market_stall.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "73113e0ec853b1da650494f06ac2b1219eb9af13254cd681485acfc0eb5d8461",
+      "generated_with": "image_gen__imagegen",
+      "texture": "res://assets/desert/modular/capital_market_stall.res"
+    },
+    {
+      "id": "capital_palm_garden",
+      "label": "palmeiras e jardim desértico",
+      "width_metres": 4.0,
+      "state": "prepared",
+      "brief": "A beautiful small desert garden cluster: two natural date palms at slightly different heights, detailed curved fibrous trunks and graceful green fronds, restrained low flowering desert shrubs around a low sandstone planter, two small terracotta pots. Realistic volumetric foliage with cool lunar edges, subtle amber light from a tiny lantern at planter base. Not polygonal or toy-like. Full foliage and base visible. One isolated reusable vegetation cluster.",
+      "source": "assets/desert/modular/source/capital_palm_garden.png",
+      "size": [
+        1430,
+        1100
+      ],
+      "sha256": "2db3ef64be9391cd24b207e5e77d4ba0d00b2d5ed6a1324eb4241e82a3ea9fc9",
+      "generated_with": "image_gen__imagegen",
+      "texture": "res://assets/desert/modular/capital_palm_garden.res"
+    },
+    {
+      "id": "capital_archway",
+      "label": "arcada de passagem",
+      "width_metres": 4.5,
+      "state": "pending",
+      "brief": "A freestanding monumental sandstone archway with transparent open passage, weathered stone blocks, restrained crimson flame banner on left pillar and warm lantern on right pillar. Flat walkable stone lintel above rounded arch, believable 3D volume, complete two pillars and arch, no surrounding buildings or floor."
+    },
+    {
+      "id": "capital_balcony_house",
+      "label": "casa com varanda de madeira",
+      "width_metres": 6.0,
+      "state": "pending",
+      "brief": "A distinct two-story sandstone plaster residence with flat parkour roof, a modest timber balcony on upper right, warm lattice windows, arched dark wooden door left below red awning, narrow crimson gold flame banner and two pots at base. Same premium material detail as approved reference. Orthographic front view, no people."
+    }
+  ]
+}

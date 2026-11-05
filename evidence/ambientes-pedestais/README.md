@@ -1,6 +1,6 @@
 # Revisão de ambientes e pedestais — para avaliação
 
-Base: `d0ae424`. Branch: `codex/ambientes-pedestais`. **Sem publicação na main ou deploy.**
+Base: `d0ae424`. Branch: `codex/ambientes-pedestais`. **Publicação na main autorizada pelo proprietário em 05/11/2026.**
 
 ## Resultado para o jogador
 

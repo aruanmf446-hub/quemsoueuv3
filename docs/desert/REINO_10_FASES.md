@@ -59,8 +59,8 @@ Somente os recursos da região são aquecidos. Nenhum asset novo foi gerado.
 Os pedestais agora pertencem ao chunk, como irmãos do coletável. A coleta libera
 somente o Area3D do item; revisitar recria uma base, sem recriar o item consumido.
 Capacidade, sinais e IDs de persistência continuam iguais. Detalhes, capturas e
-limitações em `evidence/ambientes-pedestais/README.md`. Esta revisão ainda não foi
-publicada na main.
+limitações em `evidence/ambientes-pedestais/README.md`. O proprietário aprovou esta revisão e autorizou sua publicação na main em
+05/11/2026.
 
 ## Gameplay e continuidade
 

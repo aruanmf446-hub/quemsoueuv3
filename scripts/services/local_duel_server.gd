@@ -100,6 +100,10 @@ func decks() -> Array:
 		if cards.size() < 2: continue
 		_decks.append({"id": folder, "name": str(info.get("name", folder.replace("_", " ").capitalize())).left(32),
 			"order": int(info.get("order", 99)), "cards": cards})
+	var catalog := preload("res://scripts/decks/deck_library_catalog.gd")
+	for deck: Dictionary in catalog.decks():
+		if str(deck.id).begins_with("repo_"):
+			_decks.append({"id":str(deck.id),"name":str(deck.name).left(32),"order":99,"cards":deck.cards.map(func(c: Dictionary)->String:return str(c.id))})
 	_decks.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return a.id < b.id if a.order == b.order else a.order < b.order)
 	return _decks

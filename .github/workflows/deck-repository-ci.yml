@@ -1,0 +1,19 @@
+name: Deck repository checks
+on:
+  pull_request:
+    paths: ['services/deck-repository/**', 'data/community/**', 'assets/duel/decks/community/**', 'tools/decks/repository_catalog.py', '.github/workflows/deck-repository-ci.yml']
+  push:
+    branches: [main]
+    paths: ['services/deck-repository/**', 'data/community/**', 'assets/duel/decks/community/**', 'tools/decks/repository_catalog.py', '.github/workflows/deck-repository-ci.yml']
+permissions:
+  contents: read
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node --test-isolation=none --test services/deck-repository/tests/worker.test.mjs
+      - run: python3 tools/decks/repository_catalog.py

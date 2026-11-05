@@ -32,6 +32,9 @@ static func exists(path: String) -> bool:
 
 
 static func load_texture(path: String) -> Texture2D:
+	if path.begins_with("res://assets/duel/decks/community/") and path.get_file()!="cover.webp":
+		var id := path.trim_prefix("res://assets/duel/decks/community/").trim_suffix(".webp")
+		return preload("res://scripts/decks/repository_art.gd").texture(id)
 	if not exists(path): return null
 	var key := stamp(path)
 	if not _textures.has(key):

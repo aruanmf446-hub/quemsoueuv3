@@ -74,6 +74,7 @@ func _rest(table: String) -> String:
 ## Envia um rascunho (deck, imagens, cartas). Atualiza e salva o rascunho local a cada
 ## etapa confirmada. Em falha, marca sync_state = "error" e mantém tudo local.
 func push(draft: Dictionary) -> Dictionary:
+	if draft.get("publication_backend","")=="repository": return ServiceResult.failure("repository_only")
 	if not available(): return ServiceResult.failure("not_authenticated", "unauthorized")
 	var blocked := deck_ready(draft)
 	if not blocked.is_empty():
@@ -207,6 +208,7 @@ func pull() -> Dictionary:
 		var cards_result := await client.send(_rest(SCHEMA.cards) + "?select=*&%s=eq.%s&order=%s.asc" % [SCHEMA.card_deck, deck_id, SCHEMA.card_order], HTTPClient.METHOD_GET)
 		if not cards_result.ok: return cards_result
 		var draft := existing if not existing.is_empty() else store.new_draft()
+		draft.publication_backend = "game"
 		draft.server_id = deck_id
 		draft.name = str(deck.get("name", ""))
 		draft.description = str(deck.get("description", "")) if deck.get("description") != null else ""
@@ -291,9 +293,13 @@ func sync_favorites() -> Dictionary:
 	for id: String in remote:
 		if not pending_removals.has(id) and not store.is_favorite(id): store.set_favorite(id, true)
 	for id: String in pending_removals:
+		if id.begins_with("repo_"):
+			store.clear_pending_favorite(id)
+			continue
 		result = await set_remote_favorite(id, false)
 		if result.ok: store.clear_pending_favorite(id)
 	for id: String in store.favorites():
+		if id.begins_with("repo_"): continue
 		if not remote.has(id):
 			result = await set_remote_favorite(id, true)
 			if not result.ok: return result

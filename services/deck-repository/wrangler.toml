@@ -1,0 +1,14 @@
+name = "qse-deck-repository"
+main = "src/worker.mjs"
+compatibility_date = "2026-11-01"
+workers_dev = true
+
+[vars]
+GITHUB_REPOSITORY = "aruanmf446-hub/quemsoueuv3"
+MAIN_BRANCH = "main"
+INBOX_BRANCH = "deck-inbox"
+GAME_URL = "https://shuzporktifgiotvnpbz.supabase.co"
+ALLOWED_ORIGINS = "https://aruanmf446-hub.github.io"
+# Configurar com o ID público QSE-... do dono, não e-mail nem UUID privado.
+MODERATOR_PUBLIC_IDS = ""
+# Secrets no provedor: GITHUB_TOKEN e GAME_PUBLISHABLE_KEY. Nunca no cliente.

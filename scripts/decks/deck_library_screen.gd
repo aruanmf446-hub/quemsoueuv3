@@ -2,6 +2,8 @@ extends PlayerScreen
 ## Descoberta pública dos decks, favoritos e rascunhos do dono atual (neste aparelho).
 ## Publicar depende do backend: o fluxo existe até a revisão e avisa quando não há servidor.
 const Catalog = preload("res://scripts/decks/deck_library_catalog.gd")
+const Repository = preload("res://scripts/decks/repository_service.gd")
+const StylePrompt = preload("res://scripts/decks/deck_style_prompt.gd")
 const TABS := ["Descobrir", "Populares", "Recentes", "Favoritos", "Meus Decks"]
 var _query := ""
 var _tab := "Descobrir"
@@ -28,6 +30,8 @@ var _editor_overlay: CardFrameEditor
 var _pulled_decks := false
 var _pulled_favorites := false
 var _remote_busy := false
+var _repo_status_busy := false
+var _repo_checked_at := -1000.0
 ## Filtros e ordenação (T23). _demo_entries só é preenchido por testes/capturas.
 var _types := {}
 var _themes := {}
@@ -177,6 +181,11 @@ func _render_library() -> void:
 	# Ao (re)abrir a Biblioteca o header começa no destaque de maior prioridade.
 	_featured = 0
 	_page("BIBLIOTECA DE DECKS", "library")
+	if Repository.new().configured() and services.session.authenticated():
+		var submissions := _action("Meus envios / Revisão manual",_open_repository_review)
+		submissions.name="OpenRepositoryReview"
+		body.add_child(submissions)
+		_refresh_repository_statuses.call_deferred()
 	_search.text = _query
 	_search.editable = true
 	var compact := _compact()
@@ -325,11 +334,24 @@ func _report_deck(deck_id: String) -> void:
 
 ## Situação de moderação de um rascunho já enviado ("" = nunca pediu publicação).
 func _moderation(draft: Dictionary) -> String:
+	if Repository.for_draft(draft): return str(draft.get("repo_status","draft"))
 	return str(draft.get("server_status", "draft"))
 
 
 ## Envia para a conta e pede publicação (moderação). Erros do servidor viram mensagens claras.
 func _publish_draft(draft: Dictionary) -> void:
+	if Repository.for_draft(draft):
+		if _remote_busy: return
+		_remote_busy=true
+		banner.show_state("loading")
+		var result: Dictionary=await Repository.new().submit(_store(),draft)
+		if not is_inside_tree(): return
+		_remote_busy=false
+		if result.ok:
+			banner.show_state("success","Deck enviado para revisão manual. A aprovação não é automática.")
+			if _view=="review": _render_review()
+		else: banner.show_state("error",Repository.message(str(result.code)))
+		return
 	var sync := _sync()
 	if not sync.available():
 		banner.show_state("error", CommunityService.message("unauthorized"))
@@ -609,7 +631,7 @@ func _clear_filters() -> void:
 
 
 func _create_deck() -> void:
-	_draft = _store().new_draft()
+	_draft = _new_editor_draft()
 	_render_editor()
 
 
@@ -932,12 +954,12 @@ func _deck_menu(entry: Dictionary) -> Control:
 	popup.add_item(tr("Abrir / Editar"), 0)
 	popup.add_item(tr("Duplicar"), 1)
 	var moderation := _moderation(entry.draft)
-	if moderation in ["pending_review", "published"]: popup.add_item(tr("Retirar da Comunidade"), 5)
+	if moderation in ["pending_review", "published"] and not Repository.for_draft(entry.draft): popup.add_item(tr("Retirar da Comunidade"), 5)
 	else: popup.add_item(tr("Revisar e publicar"), 2)
 	if str(entry.draft.get("sync_state", "")) in ["error", "pending"] and _sync().available():
 		popup.add_item(tr("Tentar novamente"), 4)
 	popup.add_separator()
-	popup.add_item(tr("Excluir"), 3)
+	popup.add_item(tr("Excluir cópia deste aparelho" if Repository.for_draft(entry.draft) else "Excluir"), 3)
 	popup.id_pressed.connect(_menu_action.bind(entry))
 	return menu
 
@@ -974,9 +996,11 @@ func _retry_draft(draft: Dictionary) -> void:
 
 
 func _duplicate_draft(draft: Dictionary) -> void:
-	var copy := _store().new_draft()
+	var copy := _new_editor_draft()
 	copy.name = (str(draft.name) + " " + tr("(cópia)")).left(DeckDrafts.NAME_MAX)
 	for key in ["description", "category", "visibility"]: copy[key] = draft.get(key, copy[key])
+	if Repository.for_draft(copy): copy.visibility = "public"
+	if draft.has("style_reference"): copy.style_reference = draft.style_reference
 	for card: Dictionary in draft.get("cards", []):
 		var clone := {"id": "card_%d_%d" % [Time.get_ticks_msec(), randi() % 100000], "name": card.get("name", ""), "description": card.get("description", ""), "crops": card.get("crops", {}).duplicate(true), "image_file": ""}
 		var bytes := _store().file_bytes(str(draft.id), str(card.get("image_file", "")))
@@ -1349,7 +1373,7 @@ func _heart(deck_id: String) -> Button:
 		heart.tooltip_text = tr("Remover dos favoritos" if value else "Adicionar aos favoritos")
 		if _view == "library" and _tab == "Favoritos": _update_results.call_deferred()
 		var sync := _sync()
-		if sync.available():
+		if sync.available() and not deck_id.begins_with("repo_"):
 			var result: Dictionary = await sync.set_remote_favorite(deck_id, value)
 			if result.ok and not value: _store().clear_pending_favorite(deck_id)
 			if not result.ok and is_inside_tree():
@@ -1405,10 +1429,16 @@ func _confirm_delete(draft: Dictionary) -> void:
 	dialog.name = "ConfirmDeleteDraft"
 	dialog.title = tr("Excluir rascunho")
 	dialog.dialog_text = tr("Excluir \"%s\" deste aparelho e da sua conta? Não dá para desfazer.") % (str(draft.name) if not str(draft.name).is_empty() else tr("Sem nome"))
+	if Repository.for_draft(draft):
+		dialog.dialog_text = "Excluir a cópia deste aparelho? O envio e a decisão de revisão permanecem no repositório."
 	dialog.ok_button_text = tr("Excluir")
 	dialog.cancel_button_text = tr("Cancelar")
 	add_child(dialog)
 	dialog.confirmed.connect(func() -> void:
+		if Repository.for_draft(draft):
+			if not _store().delete(str(draft.id)): banner.show_state("error", "Não foi possível excluir a cópia deste aparelho.")
+			_update_results()
+			return
 		# Só o dono atual enxerga (e apaga) a própria pasta de rascunhos.
 		# Servidor primeiro; a cópia local só sai depois que ele confirmar.
 		var result: Dictionary = await _sync().remove(draft)
@@ -1419,14 +1449,14 @@ func _confirm_delete(draft: Dictionary) -> void:
 
 
 func _render_editor() -> void:
-	if _draft.is_empty(): _draft = _store().new_draft()
+	if _draft.is_empty(): _draft = _new_editor_draft()
 	if _moderation(_draft) in ["pending_review", "published"]:
 		_page(str(_draft.name), "editor")
 		$Margin/Column/Header/Back.text = tr("‹ Meus Decks")
-		var locked := _text("Este deck está %s. Para editar, retire-o da Comunidade primeiro." % (tr("em revisão") if _moderation(_draft) == "pending_review" else tr("publicado")), 18)
+		var locked := _text(("Este deck já foi enviado. Crie uma cópia para preparar outra versão." if Repository.for_draft(_draft) else "Este deck está %s. Para editar, retire-o da Comunidade primeiro." % (tr("em revisão") if _moderation(_draft) == "pending_review" else tr("publicado"))), 18)
 		locked.name = "EditorLocked"
 		body.add_child(locked)
-		var withdraw := _action("Retirar da Comunidade para editar", _unpublish_draft.bind(_draft))
+		var withdraw := _action("Criar cópia para editar" if Repository.for_draft(_draft) else "Retirar da Comunidade para editar", _duplicate_draft.bind(_draft) if Repository.for_draft(_draft) else _unpublish_draft.bind(_draft))
 		withdraw.name = "UnpublishDeck"
 		withdraw.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		body.add_child(withdraw)
@@ -1457,8 +1487,18 @@ func _render_editor() -> void:
 	right.add_child(_text("CATEGORIA", 12, PlayerUI.GOLD))
 	right.add_child(_options("DeckCategory", DeckDrafts.CATEGORIES, DeckDrafts.CATEGORIES, "category"))
 	right.add_child(_text("VISIBILIDADE", 12, PlayerUI.GOLD))
-	right.add_child(_options("DeckVisibility", ["Privado", "Não listado", "Público"], DeckDrafts.VISIBILITY, "visibility"))
+	if Repository.for_draft(_draft): right.add_child(_text("Público após aprovação manual",18,PlayerUI.MUTED))
+	else: right.add_child(_options("DeckVisibility", ["Privado", "Não listado", "Público"], DeckDrafts.VISIBILITY, "visibility"))
 	right.add_child(_cover_section())
+	right.add_child(_text("REFERÊNCIA VISUAL",12,PlayerUI.GOLD))
+	var references := StylePrompt.references()
+	right.add_child(_options("DeckStyleReference",references.map(func(item: Dictionary)->String:return str(item.name)),references.map(func(item: Dictionary)->String:return str(item.id)),"style_reference"))
+	var prompt := _action("Copiar prompt dos oficiais",_copy_style_prompt)
+	prompt.name="CopyDeckStylePrompt"
+	right.add_child(prompt)
+	var free_note := _text("Criar é gratuito. Você adiciona as imagens; a publicação passa por revisão.",14,PlayerUI.MUTED)
+	free_note.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	right.add_child(free_note)
 	body.add_child(_text("CARTAS  ·  %d (mínimo %d, máximo %d)" % [_draft.cards.size(), Catalog.MIN_CARDS, Catalog.MAX_CARDS], 12, PlayerUI.GOLD))
 	var list := PlayerUI.column(body)
 	list.name = "DraftCards"
@@ -1484,6 +1524,33 @@ func _render_editor() -> void:
 	PlayerUI.style_button(review, true)
 	actions.add_child(review)
 	_reveal()
+
+
+func _refresh_repository_statuses() -> void:
+	var now := Time.get_ticks_msec()/1000.0
+	if _repo_status_busy or now-_repo_checked_at<60.0: return
+	_repo_status_busy=true
+	_repo_checked_at=now
+	var result: Dictionary=await Repository.new().sync_statuses(_store())
+	_repo_status_busy=false
+	if is_inside_tree() and result.ok and result.data.get("changed",false) and _view=="library": _update_results()
+
+func _open_repository_review() -> void:
+	if get_node_or_null("RepositoryDeckReview")!=null: return
+	var overlay := preload("res://scripts/decks/repository_review.gd").new()
+	overlay.setup(Repository.new())
+	add_child(overlay)
+
+func _new_editor_draft() -> Dictionary:
+	var draft := _store().new_draft()
+	if PlayerContracts.read_json(Repository.CONFIG).get("mode","")=="repository":
+		draft.publication_backend="repository"
+		draft.visibility="public"
+	return draft
+
+func _copy_style_prompt() -> void:
+	DisplayServer.clipboard_set(StylePrompt.build(_draft))
+	banner.show_state("success",tr("Prompt copiado. Cole na sua ferramenta de imagens e anexe referências do deck oficial escolhido."))
 
 
 func _field(value: String, placeholder: String, limit: int) -> LineEdit:
@@ -1707,7 +1774,7 @@ func _save_draft() -> void:
 		status(result)
 		return
 	var sync := _sync()
-	if not sync.available():
+	if Repository.for_draft(_draft) or not sync.available():
 		banner.show_state("success", "Rascunho salvo neste aparelho.")
 		return
 	banner.show_state("loading")
@@ -1752,7 +1819,7 @@ func _render_review() -> void:
 		body.add_child(_data_text(tr("Recusado pela moderação: ") + str(_draft.review_note), 16, Color("#ff9797")))
 	var publish := _action("Publicar na Comunidade", _publish_draft.bind(_draft))
 	publish.name = "PublishDeck"
-	publish.disabled = not problems.is_empty() or moderation in ["pending_review", "published", "removed"] or not _sync().available()
+	publish.disabled = not problems.is_empty() or moderation in ["pending_review", "published", "removed"] or (not Repository.new().available() if Repository.for_draft(_draft) else not _sync().available())
 	PlayerUI.style_button(publish, true)
 	publish.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	publish.custom_minimum_size.x = 200
@@ -1760,7 +1827,13 @@ func _render_review() -> void:
 	var note: String = {"pending_review": "Em revisão pela moderação. Ele aparece na Comunidade quando for aprovado.",
 		"published": "Publicado na Comunidade.", "removed": "Removido pela moderação."}.get(moderation,
 		"Ao publicar, o deck vai para revisão antes de aparecer para outros jogadores." if _sync().available() else "Entre na conta para publicar na Comunidade.")
+	if Repository.for_draft(_draft):
+		publish.text=tr("Enviar para revisão · grátis")
+		if not Repository.new().configured(): note="O envio para revisão ainda não foi ativado. Seu rascunho continua salvo."
+		elif not services.session.authenticated(): note="Entre na sua conta do jogo para enviar. Não é necessária conta GitHub."
+		else: note="As imagens, seu nickname e o envio ficam públicos no repositório, inclusive durante a revisão. Só os aprovados entram na biblioteca após a atualização do jogo."
 	var note_label := _text(note, 14, PlayerUI.MUTED)
+	note_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	note_label.name = "PublishNote"
 	body.add_child(note_label)
 	_reveal()

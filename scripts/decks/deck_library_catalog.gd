@@ -1,5 +1,6 @@
 extends RefCounted
 ## Read-only local catalog. Discovery lists public decks only; private content is never exposed.
+const RepoArt = preload("res://scripts/decks/repository_art.gd")
 const ROOT := "res://assets/duel/decks/oficial"
 const OFFICIAL_IDS := ["lendas_urbanas", "nostalgia_web", "sol_nascente", "pinturas", "diva_pop"]
 const MIN_CARDS := 5
@@ -17,19 +18,23 @@ static func decks() -> Array[Dictionary]:
 	for folder in DirAccess.get_directories_at(ROOT):
 		var deck := find_deck(folder)
 		if not deck.is_empty() and deck.visibility == "public": result.append(deck)
+	for id: String in RepoArt.approved_ids():
+		var deck := _parse_deck(id,_read_json(RepoArt.ROOT+"/"+id+"/deck.json"),RepoArt.ROOT)
+		if not deck.is_empty(): result.append(deck)
 	result.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return search_key(a.name).naturalnocasecmp_to(search_key(b.name)) < 0)
 	return result
 
 static func find_deck(id: String) -> Dictionary:
+	if RepoArt.approved_ids().has(id): return _parse_deck(id,_read_json(RepoArt.ROOT+"/"+id+"/deck.json"),RepoArt.ROOT)
 	if not DirAccess.get_directories_at(ROOT).has(id): return {}
 	return _parse_deck(id, _read_json("%s/%s/deck.json" % [ROOT, id]))
 
-static func _parse_deck(id: String, info: Dictionary) -> Dictionary:
+static func _parse_deck(id: String, info: Dictionary, root := ROOT) -> Dictionary:
 	if info.is_empty() or not info.get("cards") is Dictionary: return {}
 	var official := OFFICIAL_IDS.has(id)
 	var visibility := str(info.get("visibility", "public" if official else "private"))
 	if not visibility in ["public", "unlisted"]: return {}
-	var entries := cards(id, info)
+	var entries := cards(id, info, root)
 	# A broken image must not silently turn a nine-card collection into eight cards.
 	if entries.size() != info.cards.size() or entries.size() < MIN_CARDS or entries.size() > MAX_CARDS: return {}
 	var age := str(info.get("age_rating", ""))
@@ -42,22 +47,22 @@ static func _parse_deck(id: String, info: Dictionary) -> Dictionary:
 		"official": official, "creator": "Quem Sou Eu" if official else _string(info.get("creator", "")),
 		"category": _string(live.get("subtitle", ""), _string(info.get("category", ""))),
 		"description": _string(live.get("description", ""), _string(remote.get("description", info.get("description", "")))),
-		"cover_path": _string(live.get("cover_path", "")),
+		"cover_path": _string(live.get("cover_path", ""), root+"/"+id+"/cover.webp" if root!=ROOT and info.get("cover",false) else ""),
 		"tags": _strings(info.get("tags", []), 3), "age_rating": age,
 		"content_warnings": _strings(info.get("content_warnings", [])),
 		"cards": entries, "count": entries.size(), "origin": "local", "visibility": visibility,
 		"original_language": _string(info.get("original_language", "")),
-		"published_at": _string(remote.get("published_at", ""))
+		"published_at": _string(remote.get("published_at", info.get("published_at","")))
 	}
 
-static func cards(folder: String, info: Dictionary) -> Array[Dictionary]:
+static func cards(folder: String, info: Dictionary, root := ROOT) -> Array[Dictionary]:
 	var entries: Array[Dictionary] = []
 	var definitions: Dictionary = info.get("cards", {})
 	for card_id in definitions:
 		if not card_id is String or not str(card_id).is_valid_filename(): continue
 		var definition: Variant = definitions[card_id]
 		var name := _string(definition.get("name", "")) if definition is Dictionary else _string(definition)
-		var path := "%s/%s/%s.png" % [ROOT, folder, card_id]
+		var path := "%s/%s/%s.%s" % [root, folder, card_id,"png" if root==ROOT else "webp"]
 		if name.is_empty() or not ResourceLoader.exists(path, "Texture2D"): continue
 		entries.append({"id": "%s/%s" % [folder, card_id], "name": name, "image": path,
 			"description": _string(definition.get("description", "")) if definition is Dictionary else _description(info, card_id)})

@@ -141,6 +141,16 @@ func _screen_flow() -> void:
 	create.pressed.emit()
 	await process_frame
 	check(screen._view == "editor" and screen.find_child("DeckName", true, false) != null, "abre o editor de deck")
+	var style: OptionButton=screen.find_child("DeckStyleReference",true,false)
+	var copy_prompt: Button=screen.find_child("CopyDeckStylePrompt",true,false)
+	check(style!=null and copy_prompt!=null,"editor oferece referência e prompt manual")
+	if style!=null and copy_prompt!=null:
+		style.select(1)
+		style.item_selected.emit(1)
+		screen._draft.name="Deck de teste do prompt"
+		var prompt := preload("res://scripts/decks/deck_style_prompt.gd").build(screen._draft)
+		check(prompt.contains("Deck de teste do prompt") and prompt.contains(style.get_item_text(1)),"prompt usa o deck e a referência escolhidos no editor")
+		check(prompt.contains("5:7") and prompt.contains("16:5") and prompt.contains("16:10"),"prompt respeita formatos reais das cartas e capa")
 	var png := _fixture(900, 1200)
 	screen._pending_card = -1
 	screen._image_picked(png, png.save_png_to_buffer(), "png")

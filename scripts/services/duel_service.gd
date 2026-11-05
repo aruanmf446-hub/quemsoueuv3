@@ -175,11 +175,15 @@ func pick(card_id: String) -> Dictionary:
 ## Imagem e nome de uma carta "<deck>/<arquivo>" (assets/duel/decks/<deck>/<arquivo>.png).
 static var _deck_info := {}
 static func card_texture(card_id: String) -> Texture2D:
+	if card_id.begins_with("repo_"): return preload("res://scripts/decks/repository_art.gd").texture(card_id,"duel")
 	var path := "res://assets/duel/decks/oficial/%s.png" % card_id
 	return load(path) as Texture2D if ResourceLoader.exists(path) else null
 
 
 static func card_name(card_id: String) -> String:
+	if card_id.begins_with("repo_"):
+		var row := preload("res://scripts/decks/repository_art.gd").definition(card_id)
+		return str(row.get("name","Carta da comunidade"))
 	var deck := card_id.get_slice("/", 0)
 	var file := card_id.get_slice("/", 1)
 	if not _deck_info.has(deck):

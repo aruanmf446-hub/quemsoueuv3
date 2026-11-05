@@ -1,0 +1,65 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS attack: recarga existe
+PASS attack: um item e uma base
+PASS attack: base pertence ao chunk e não ao item
+PASS attack: cheia preserva item, capacidade e aviso único
+PASS attack: coleta uma vez e persiste ID
+PASS attack: repõe exatamente uma carga
+PASS attack: coletável removido, pedestal permanece
+PASS attack: descarregar chunk remove base sem resíduos
+PASS attack: revisitar recupera só a base, sem duplicar ou reaparecer item
+PASS health: recarga existe
+PASS health: um item e uma base
+PASS health: base pertence ao chunk e não ao item
+PASS health: cheia preserva item, capacidade e aviso único
+PASS health: coleta uma vez e persiste ID
+PASS health: repõe exatamente uma carga
+PASS health: coletável removido, pedestal permanece
+PASS health: descarregar chunk remove base sem resíduos
+PASS health: revisitar recupera só a base, sem duplicar ou reaparecer item
+PASS defense: recarga existe
+PASS defense: um item e uma base
+PASS defense: base pertence ao chunk e não ao item
+PASS defense: cheia preserva item, capacidade e aviso único
+PASS defense: coleta uma vez e persiste ID
+PASS defense: repõe exatamente uma carga
+PASS defense: coletável removido, pedestal permanece
+PASS defense: descarregar chunk remove base sem resíduos
+PASS defense: revisitar recupera só a base, sem duplicar ou reaparecer item
+PASS amber: recarga existe
+PASS amber: um item e uma base
+PASS amber: base pertence ao chunk e não ao item
+PASS amber: cheia preserva item, capacidade e aviso único
+PASS amber: coleta uma vez e persiste ID
+PASS amber: repõe exatamente uma carga
+PASS amber: coletável removido, pedestal permanece
+PASS amber: descarregar chunk remove base sem resíduos
+PASS amber: revisitar recupera só a base, sem duplicar ou reaparecer item
+PASS dash: recarga existe
+PASS dash: um item e uma base
+PASS dash: base pertence ao chunk e não ao item
+PASS dash: cheia preserva item, capacidade e aviso único
+PASS dash: coleta uma vez e persiste ID
+PASS dash: repõe exatamente uma carga
+PASS dash: coletável removido, pedestal permanece
+PASS dash: descarregar chunk remove base sem resíduos
+PASS dash: revisitar recupera só a base, sem duplicar ou reaparecer item
+PASS rupture: recarga existe
+PASS rupture: um item e uma base
+PASS rupture: base pertence ao chunk e não ao item
+PASS rupture: cheia preserva item, capacidade e aviso único
+PASS rupture: coleta uma vez e persiste ID
+PASS rupture: repõe exatamente uma carga
+PASS rupture: coletável removido, pedestal permanece
+PASS rupture: descarregar chunk remove base sem resíduos
+PASS rupture: revisitar recupera só a base, sem duplicar ou reaparecer item
+PASS stream 0: bases únicas em até cinco chunks
+PASS stream 350: bases únicas em até cinco chunks
+PASS stream 700: bases únicas em até cinco chunks
+PASS stream 1100: bases únicas em até cinco chunks
+PASS stream 0: bases únicas em até cinco chunks
+PASS sair da fase remove todos os pedestais
+PEDESTALS checks=60 failures=0
+WARNING: 7 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)

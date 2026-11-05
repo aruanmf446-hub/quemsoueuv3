@@ -1,0 +1,105 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS fase 01: grupos no piso, atrás da pista, aquecidos, até cinco módulos
+PASS fase 01: conjuntos e profundidades variados
+PASS fase 01 x30: sem duplicação e streaming limitado
+PASS fase 01 x61: sem duplicação e streaming limitado
+PASS fase 01 x65: sem duplicação e streaming limitado
+PASS fase 01 x350: sem duplicação e streaming limitado
+PASS fase 01 x700: sem duplicação e streaming limitado
+PASS fase 01 x1100: sem duplicação e streaming limitado
+PASS fase 01 x30: sem duplicação e streaming limitado
+PASS fase 01: descarte remove a arte
+PASS fase 02: grupos no piso, atrás da pista, aquecidos, até cinco módulos
+PASS fase 02: conjuntos e profundidades variados
+PASS fase 02 x30: sem duplicação e streaming limitado
+PASS fase 02 x61: sem duplicação e streaming limitado
+PASS fase 02 x65: sem duplicação e streaming limitado
+PASS fase 02 x350: sem duplicação e streaming limitado
+PASS fase 02 x700: sem duplicação e streaming limitado
+PASS fase 02 x1100: sem duplicação e streaming limitado
+PASS fase 02 x30: sem duplicação e streaming limitado
+PASS fase 02: descarte remove a arte
+PASS fase 03: grupos no piso, atrás da pista, aquecidos, até cinco módulos
+PASS fase 03: conjuntos e profundidades variados
+PASS fase 03 x30: sem duplicação e streaming limitado
+PASS fase 03 x61: sem duplicação e streaming limitado
+PASS fase 03 x65: sem duplicação e streaming limitado
+PASS fase 03 x350: sem duplicação e streaming limitado
+PASS fase 03 x700: sem duplicação e streaming limitado
+PASS fase 03 x1100: sem duplicação e streaming limitado
+PASS fase 03 x30: sem duplicação e streaming limitado
+PASS fase 03: descarte remove a arte
+PASS fase 04: grupos no piso, atrás da pista, aquecidos, até cinco módulos
+PASS fase 04: conjuntos e profundidades variados
+PASS fase 04 x30: sem duplicação e streaming limitado
+PASS fase 04 x61: sem duplicação e streaming limitado
+PASS fase 04 x65: sem duplicação e streaming limitado
+PASS fase 04 x350: sem duplicação e streaming limitado
+PASS fase 04 x700: sem duplicação e streaming limitado
+PASS fase 04 x1100: sem duplicação e streaming limitado
+PASS fase 04 x30: sem duplicação e streaming limitado
+PASS fase 04: descarte remove a arte
+PASS fase 05: grupos no piso, atrás da pista, aquecidos, até cinco módulos
+PASS fase 05: conjuntos e profundidades variados
+PASS fase 05 x30: sem duplicação e streaming limitado
+PASS fase 05 x61: sem duplicação e streaming limitado
+PASS fase 05 x65: sem duplicação e streaming limitado
+PASS fase 05 x350: sem duplicação e streaming limitado
+PASS fase 05 x700: sem duplicação e streaming limitado
+PASS fase 05 x1100: sem duplicação e streaming limitado
+PASS fase 05 x30: sem duplicação e streaming limitado
+PASS fase 05: descarte remove a arte
+PASS fase 06: grupos no piso, atrás da pista, aquecidos, até cinco módulos
+PASS fase 06: conjuntos e profundidades variados
+PASS fase 06 x30: sem duplicação e streaming limitado
+PASS fase 06 x61: sem duplicação e streaming limitado
+PASS fase 06 x65: sem duplicação e streaming limitado
+PASS fase 06 x350: sem duplicação e streaming limitado
+PASS fase 06 x700: sem duplicação e streaming limitado
+PASS fase 06 x1100: sem duplicação e streaming limitado
+PASS fase 06 x30: sem duplicação e streaming limitado
+PASS fase 06: descarte remove a arte
+PASS fase 07: grupos no piso, atrás da pista, aquecidos, até cinco módulos
+PASS fase 07: conjuntos e profundidades variados
+PASS fase 07 x30: sem duplicação e streaming limitado
+PASS fase 07 x61: sem duplicação e streaming limitado
+PASS fase 07 x65: sem duplicação e streaming limitado
+PASS fase 07 x350: sem duplicação e streaming limitado
+PASS fase 07 x700: sem duplicação e streaming limitado
+PASS fase 07 x1100: sem duplicação e streaming limitado
+PASS fase 07 x30: sem duplicação e streaming limitado
+PASS fase 07: descarte remove a arte
+PASS fase 08: grupos no piso, atrás da pista, aquecidos, até cinco módulos
+PASS fase 08: conjuntos e profundidades variados
+PASS fase 08 x30: sem duplicação e streaming limitado
+PASS fase 08 x61: sem duplicação e streaming limitado
+PASS fase 08 x65: sem duplicação e streaming limitado
+PASS fase 08 x350: sem duplicação e streaming limitado
+PASS fase 08 x700: sem duplicação e streaming limitado
+PASS fase 08 x1100: sem duplicação e streaming limitado
+PASS fase 08 x30: sem duplicação e streaming limitado
+PASS fase 08: descarte remove a arte
+PASS fase 09: grupos no piso, atrás da pista, aquecidos, até cinco módulos
+PASS fase 09: conjuntos e profundidades variados
+PASS fase 09 x30: sem duplicação e streaming limitado
+PASS fase 09 x61: sem duplicação e streaming limitado
+PASS fase 09 x65: sem duplicação e streaming limitado
+PASS fase 09 x350: sem duplicação e streaming limitado
+PASS fase 09 x700: sem duplicação e streaming limitado
+PASS fase 09 x1100: sem duplicação e streaming limitado
+PASS fase 09 x30: sem duplicação e streaming limitado
+PASS fase 09: descarte remove a arte
+PASS fase 10: grupos no piso, atrás da pista, aquecidos, até cinco módulos
+PASS fase 10: conjuntos e profundidades variados
+PASS fase 10 x30: sem duplicação e streaming limitado
+PASS fase 10 x61: sem duplicação e streaming limitado
+PASS fase 10 x65: sem duplicação e streaming limitado
+PASS fase 10 x350: sem duplicação e streaming limitado
+PASS fase 10 x700: sem duplicação e streaming limitado
+PASS fase 10 x1100: sem duplicação e streaming limitado
+PASS fase 10 x30: sem duplicação e streaming limitado
+PASS fase 10: descarte remove a arte
+COMPOSITION checks=100 failures=0
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)

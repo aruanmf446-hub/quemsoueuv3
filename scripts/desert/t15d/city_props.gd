@@ -56,25 +56,24 @@ func prepare_build(platforms: Array, order: int, length := 1452.0, start := -8.0
 func build(platforms: Array, order: int) -> void:
 	for task in prepare_build(platforms,order): task.call()
 
-func _build_slot(slot: int, left: float, right: float, top: float,at_x := INF) -> void:
-	var x := at_x if is_finite(at_x) else 4.0+float(slot)*_spacing
-	var rng := RandomNumberGenerator.new()
-	rng.seed = absi(_order*1000003+slot*9176+3059)
-	var width := rng.randf_range(3.8,5.1)
-	if x-width*0.5 < left+0.15 or x+width*0.5 > right-0.15: return
-	var origin := Vector3(x,top-(2.0 if _order == 2 else 0.0),rng.randf_range(-6.2,-5.3))
-	if _order in [1,2,3,8] and x-3.25>=left+0.2 and x+3.25<=right-0.2:
-		var backdrop: String=["capital_house","capital_balcony_house","capital_merchant"][posmod(slot,3)]
-		place_asset(backdrop,Vector3(x,top-(4.0 if _order==2 else 0.7),-10.5),6.5)
-	var palette: Array=Assets.PALETTES[_order-1]
-	var id: String=palette[posmod(slot+int((x-_start)/maxf(_length,1)*8),palette.size())]
-	var art_width := float(Assets.entry(id).suggested_width_metres)
-	if x-art_width*0.5<left+0.15 or x+art_width*0.5>right-0.15: return
-	# Os marcos do plano têm prioridade; não empilhar decoração aleatória sobre eles.
-	for point: Dictionary in Assets.placements(_order):
-		if point.anchor=="background" and absf(x-float(point.x))<(art_width+float(point.width))*0.5+1.0: return
-	place_asset(id,origin,art_width)
-	building_count += 1
+func _build_slot(slot: int, left: float, right: float, top: float,_at_x := INF) -> void:
+	var piece := 0
+	for part: Dictionary in Assets.composition(_order,slot,left,right,top):
+		# Marcos preservam o primeiro plano; o casario de fundo pode continuar atrás.
+		var reserved := false
+		if float(part.z) > -9.0:
+			for point: Dictionary in Assets.placements(_order):
+				if point.anchor == "background" and absf(float(part.x)-float(point.x)) < (float(part.width)+float(point.width))*0.5+0.6:
+					reserved = true
+					break
+		if reserved: continue
+		var art := place_asset(part.asset,Vector3(part.x,part.y,part.z),part.width)
+		if art != null:
+			art.set_meta("composition_id","p%02d.block.%02d.%d" % [_order,slot,piece])
+			art.set_meta("surface_left",left)
+			art.set_meta("surface_right",right)
+			building_count += 1
+		piece += 1
 
 func _building(origin: Vector3, width: float, rng: RandomNumberGenerator) -> void:
 	if _order in [1,2] and _painted_house(origin,width): return

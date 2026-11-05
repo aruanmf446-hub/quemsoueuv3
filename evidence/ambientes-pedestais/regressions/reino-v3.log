@@ -1,0 +1,89 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS fase 1: oito distritos
+PASS fase 1: piso180s com dash
+PASS fase 1: piso rompível sinalizado
+PASS fase 1: arquitetura contínua preserva todos os abismos
+PASS fase 1: recargas novas não sobrepõem outros itens
+PASS fase 2: oito distritos
+PASS fase 2: piso180s com dash
+PASS fase 2: piso rompível sinalizado
+PASS fase 2: arquitetura contínua preserva todos os abismos
+PASS fase 2: recargas novas não sobrepõem outros itens
+PASS fase 3: oito distritos
+PASS fase 3: piso180s com dash
+PASS fase 3: piso rompível sinalizado
+PASS fase 3: arquitetura contínua preserva todos os abismos
+PASS fase 3: recargas novas não sobrepõem outros itens
+PASS fase 4: oito distritos
+PASS fase 4: piso180s com dash
+PASS fase 4: piso rompível sinalizado
+PASS fase 4: arquitetura contínua preserva todos os abismos
+PASS fase 4: recargas novas não sobrepõem outros itens
+PASS fase 5: oito distritos
+PASS fase 5: piso180s com dash
+PASS fase 5: piso rompível sinalizado
+PASS fase 5: arquitetura contínua preserva todos os abismos
+PASS fase 5: recargas novas não sobrepõem outros itens
+PASS fase 6: oito distritos
+PASS fase 6: piso180s com dash
+PASS fase 6: piso rompível sinalizado
+PASS fase 6: arquitetura contínua preserva todos os abismos
+PASS fase 6: recargas novas não sobrepõem outros itens
+PASS fase 7: oito distritos
+PASS fase 7: piso180s com dash
+PASS fase 7: piso rompível sinalizado
+PASS fase 7: arquitetura contínua preserva todos os abismos
+PASS fase 7: recargas novas não sobrepõem outros itens
+PASS fase 8: oito distritos
+PASS fase 8: piso180s com dash
+PASS fase 8: piso rompível sinalizado
+PASS fase 8: arquitetura contínua preserva todos os abismos
+PASS fase 8: recargas novas não sobrepõem outros itens
+PASS fase 9: oito distritos
+PASS fase 9: piso180s com dash
+PASS fase 9: piso rompível sinalizado
+PASS fase 9: arquitetura contínua preserva todos os abismos
+PASS fase 9: recargas novas não sobrepõem outros itens
+PASS poderes desconhecidos não deixam botões ou molduras
+PASS apenas o poder aprendido aparece
+PASS capítulo6 garante descoberta do Relâmpago
+PASS attack armazena até três cargas
+PASS attack cheio preserva coletável
+PASS defense armazena até três cargas
+PASS defense cheio preserva coletável
+PASS rupture armazena até três cargas
+PASS rupture cheio preserva coletável
+PASS amber armazena até três cargas
+PASS amber cheio preserva coletável
+PASS dash armazena até três cargas
+PASS dash cheio preserva coletável
+PASS dash ativa impulso temporário
+PASS cancelamento/pausa remove dash
+PASS inimigo real disponível
+PASS âmbar imobiliza movimento e ataque
+PASS âmbar libera inimigo
+PASS inimigo fora dos chunks
+PASS fixture encontra piso rompível
+PASS ruptura registra estado por ID
+PASS ruptura abre colisão real
+PASS restauração recupera colisão
+PASS salto baixo reconhece bloco de 0,55m com aterrissagem sólida
+PASS Cactus atravessa bloco baixo por salto físico real
+PASS bloco largo demais não provoca salto
+PASS muro alto bloqueia perseguidor
+PASS sem chão depois do bloco nunca pula
+PASS Cactus para fisicamente na borda do abismo
+PASS fixture mede corrida normal real a 6m/s
+PASS dash percorre mais distância que corrida normal: 6.90 > 5.68
+PASS dash respeita a colisão de uma parede
+PASS tropas acumulam até oito e rejeitam o nono
+PASS três ou mais Cactus perseguem simultaneamente
+FAIL descarregar chunks preserva perseguidores vivos
+PASS reset limpa tropas e ruptura
+PASS replay conserva descobertas e reinicia cargas novas
+PASS dano real interrompe Relâmpago
+PASS morte real interrompe Relâmpago e velocidade
+REINO_V3_RESULT checks=84 failures=1
+WARNING: 5 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)

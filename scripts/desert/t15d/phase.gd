@@ -362,7 +362,15 @@ func _build_chunk_details(chunk: Node3D, index: int) -> void:
 	var left := index*CHUNK_SIZE
 	var right := left+CHUNK_SIZE
 	for spawn: Dictionary in _phase.pickups:
-		if _in_chunk(float(spawn.pos[0]),index) and not _collected_ids.has(str(spawn.id)):
+		if _in_chunk(float(spawn.pos[0]),index):
+			# Uma base por estação, inclusive ao revisitar um trecho já coletado.
+			var pedestal := Pickup.create_pedestal()
+			pedestal.name = "RechargePedestal"
+			pedestal.position += _vec3(spawn.pos)
+			pedestal.set_meta("pickup_id",str(spawn.id))
+			pedestal.add_to_group("campaign_pedestals")
+			chunk.add_child(pedestal)
+			if _collected_ids.has(str(spawn.id)): continue
 			var item := Pickup.new()
 			item.pickup_id = str(spawn.id)
 			item.kind = str(spawn.kind)

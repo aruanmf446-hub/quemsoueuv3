@@ -1,0 +1,42 @@
+[
+  {
+    "test": "reino-v3",
+    "passed": false,
+    "exit_code": 1,
+    "wall_seconds": 4.66,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "reino10",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 8.67,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "checkpoints",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 4.75,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "route-03",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 16.33,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-10",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 19.4,
+    "graphical": false,
+    "fixed_physics_step": true
+  }
+]

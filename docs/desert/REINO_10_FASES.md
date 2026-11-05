@@ -46,6 +46,22 @@ Os recursos.res têm alfa/mipmaps e dimensão máxima1024. A pasta source/.gdign
 preserva a autoria fora do export. Procedência em PROVENANCE.md. Nenhum modelo,
 FBX, GLB, animação ou skin de personagem foi substituído.
 
+## Revisão de composição e pedestais (branch de avaliação)
+
+Sobre a base aprovada `d0ae424`, `kingdom_assets.gd` descreve três conjuntos por
+região, com até cinco módulos aprovados e duas ou mais profundidades. Casas
+próximas, praças, jardins e núcleos de mineração substituem o módulo isolado de
+cada laje. A montagem continua pertencendo ao chunk que contém o centro da laje;
+as peças não atravessam seus limites nem criam colisores. Marcos do plano mantêm
+prioridade, telhados continuam livres e a arena tem menos decoração central.
+Somente os recursos da região são aquecidos. Nenhum asset novo foi gerado.
+
+Os pedestais agora pertencem ao chunk, como irmãos do coletável. A coleta libera
+somente o Area3D do item; revisitar recria uma base, sem recriar o item consumido.
+Capacidade, sinais e IDs de persistência continuam iguais. Detalhes, capturas e
+limitações em `evidence/ambientes-pedestais/README.md`. O proprietário aprovou esta revisão e autorizou sua publicação na main em
+05/11/2026.
+
 ## Gameplay e continuidade
 
 O percurso existente conserva saltos, obstáculos, perseguição e retorno das

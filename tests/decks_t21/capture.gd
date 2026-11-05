@@ -45,6 +45,13 @@ func _run() -> void:
 	await _shot(folder, "enquadrar_duelo_" + tag)
 	editor.find_child("ConfirmFrame", true, false).pressed.emit()
 	await _shot(folder, "editor_" + tag)
+	var scroll: ScrollContainer=screen.get_node("Margin/Column/Scroll")
+	scroll.ensure_control_visible(screen.find_child("CopyDeckStylePrompt",true,false))
+	await _shot(folder,"editor_prompt_"+tag)
+	screen._render_review()
+	for i in 4: await process_frame
+	scroll.ensure_control_visible(screen.find_child("PublishNote",true,false))
+	await _shot(folder,"revisao_envio_"+tag)
 	# Limpa o rascunho de captura (pasta do visitante).
 	screen._store().delete(str(screen._draft.id))
 	quit(0)

@@ -142,3 +142,15 @@ pelo backend: [prompt consolidado e pendências](docs/backend/PENDENCIAS_2026_11
 O Codex não modifica Supabase.
 
 Retorno do backend registrado na PR #99: [compatibilidade do cliente e validações restantes](docs/backend/REVISAO_CLIENTE_PR99.md). As migrations já implantadas não devem ser reexecutadas.
+
+## Criador de decks com revisão manual
+
+Implementado na branch `work/decks-revisao-repositorio`: editor existente com
+imagens/nomes/capa, prompt baseado nos decks oficiais, envio pela conta do jogo e
+tela nativa de aprovação/reprovação. Sem R2, geração automática ou cobrança.
+**Ainda não ativado online:** falta hospedar a ponte e configurar sua URL e o
+ID público do moderador. O editor salva rascunhos; o envio informa essa pendência.
+Decks aprovados entram no build da Biblioteca e duelo local; o cadastro no
+catálogo de partidas online depende do responsável pelo backend.
+Veja [ativação, limites e repasse para o backend](services/deck-repository/README.md)
+e [testes/capturas](evidence/deck-repository/README.md). Nenhuma mudança no Supabase.

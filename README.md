@@ -2,15 +2,19 @@
 
 ## Estado atual — dez fases com os assets aprovados
 
-Os quinze módulos aprovados estão integrados às dez fases na branch
-`work/reino-deserto-10-fases`: casario, mercado, aqueduto, oásis, ruínas, fortificações
-e mineração. Percursos, colisões, perseguição e personagens3D preservados.
+Os quinze módulos aprovados estão integrados às dez fases: casario, mercado,
+aqueduto, oásis, ruínas, fortificações e mineração. Percursos, colisões, perseguição
+e personagens3D preservados. O dono autorizou publicar esta versão na main
+em05/11/2026, substituindo a apresentação anterior do Reino do Deserto.
 
 Veja [estrutura e regras](docs/desert/REINO_10_FASES.md),
 [evidências atuais](evidence/ten-approved/README.md) e
 [catálogo por fase](docs/desert/assets/LOTE_GRANDE.md).
-Não houve merge ou deploy no Pages nesta rodada. As seções históricas abaixo
-registram etapas anteriores e não substituem as evidências da integração atual.
+A publicação é feita pelo [deploy-web.yml](https://github.com/aruanmf446-hub/quemsoueuv3/actions/workflows/deploy-web.yml)
+no [Pages](https://aruanmf446-hub.github.io/quemsoueuv3/). Confira a execução
+correspondente ao commit da main; a autorização não substitui o resultado do deploy.
+As seções históricas abaixo registram etapas anteriores à autorização de publicação
+e não substituem as evidências da integração atual.
 
 
 ## Bot assistido de assets

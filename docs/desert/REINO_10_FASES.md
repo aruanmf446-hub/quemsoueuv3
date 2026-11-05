@@ -1,7 +1,8 @@
 # Dez fases com os assets aprovados
 
-Branch `work/reino-deserto-10-fases`, Godot4.7.2. Revisão separada, sem merge ou
-publicação no Pages. A aprovação do dono aos assets autorizou esta integração.
+Godot4.7.2. Implementação revisada na branch `work/reino-deserto-10-fases`.
+O dono autorizou a integração na main e publicação no Pages em05/11/2026.
+A versão aprovada substitui o cenário anterior; o histórico é preservado no Git.
 
 ## O que foi instalado
 

@@ -1,7 +1,8 @@
 # Dez fases com os assets aprovados — integração
 
 Godot4.7.2 oficial. Implementação8a8fc45 na branch work/reino-deserto-10-fases.
-Sem merge/main ou publicação no Pages. As evidências anteriores registram etapas
+A QA precedeu a publicação; o dono autorizou posteriormente merge/main e Pages.
+Confira o resultado do deploy no workflow, além destes testes locais. As evidências anteriores registram etapas
 históricas; esta pasta documenta a integração atual dos quinze módulos aprovados.
 
 ![Capturas reais das dez fases](painel_10_fases.jpg)

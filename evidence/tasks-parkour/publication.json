@@ -1,5 +1,20 @@
 {
   "previous_main": "cb3bfc4205ebcc69807f24a0298a5ee6a6fdabb6",
-  "state": "validated_pending_deploy",
-  "production": "https://aruanmf446-hub.github.io/quemsoueuv3/"
+  "code_commit": "c98d7bf66d2b59ccfeffb736b1a6e693765fb678",
+  "state": "deployed",
+  "deploy_run": "https://github.com/aruanmf446-hub/quemsoueuv3/actions/runs/42095996902",
+  "deploy_conclusion": "success",
+  "production": "https://aruanmf446-hub.github.io/quemsoueuv3/",
+  "http_status": 200,
+  "published_build": "c98d7bf66d2b",
+  "general_smoke_at_verification": {
+    "status": "in_progress",
+    "url": "https://github.com/aruanmf446-hub/quemsoueuv3/actions/runs/42095996706"
+  },
+  "iphone_layout_at_verification": {
+    "status": "in_progress",
+    "url": "https://github.com/aruanmf446-hub/quemsoueuv3/actions/runs/42095996809"
+  },
+  "targeted_validation": "10 routes + 177 scenario + 52 parkour + 74 preservation + Web gate/canopy/lift passed",
+  "physical_iphone_tested": false
 }

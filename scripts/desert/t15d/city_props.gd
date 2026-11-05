@@ -20,6 +20,7 @@ var lantern_count := 0
 ## A mesma geometria pode ser criada por etapas sem perder o agrupamento por material.
 func prepare_build(platforms: Array, order: int, length := 1452.0, start := -8.0) -> Array[Callable]:
 	_order = clampi(order,1,10)
+	var lantern_z := -1.72 if _order < 10 else -3.8
 	_spacing = [13.0,13.0,11.0,25.0,18.0,18.0,22.0,19.0,22.0,18.0][_order-1]
 	_length = maxf(length,1.0)
 	_start = start
@@ -47,9 +48,9 @@ func prepare_build(platforms: Array, order: int, length := 1452.0, start := -8.0
 		if center>=left and center<right:
 			tasks.append(_build_slot.bind(module,float(whole.left),float(whole.right),top,center))
 		if bool(platform.get("pit_left",false)):
-			tasks.append(_lantern.bind(Vector3(left+0.55,top,-3.8)))
+			tasks.append(_lantern.bind(Vector3(left+0.55,top,lantern_z)))
 		if bool(platform.get("pit_right",false)):
-			tasks.append(_lantern.bind(Vector3(right-0.55,top,-3.8)))
+			tasks.append(_lantern.bind(Vector3(right-0.55,top,lantern_z)))
 	tasks.append(_flush)
 	return tasks
 

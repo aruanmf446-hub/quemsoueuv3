@@ -60,7 +60,10 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 			var x1: float = bounds[segment+1]
 			platforms.append({"id":"%s.surface.%02d.%d" % [prefix,index,segment],"kind":"ground","pos":[(x0+x1)*0.5,top-0.5,0],"size":[x1-x0,1.0,4.0],"span_start":x0,"span_end":x1,"chunk":floori((x0+x1)*0.5/64.0),"breakable":segment == 1 and index%3 == 1,"module":index,"district":district,"surface_top":top,"architecture":THEMES[order-1]})
 		if gap > 0:
-			holes.append({"id":"%s.gap.%02d" % [prefix,index],"start":end,"end":right,"width":gap,"from_y":top,"to_y":next_top,"stepping":false,"ferry":false})
+			var crumble := order < 10 and index in [floori(modules*0.3),floori(modules*0.7)]
+			# Tarefa única no aqueduto, sem transformar a ponte em poder permanente.
+			var earth := order == 4 and index == 7
+			holes.append({"id":"%s.gap.%02d" % [prefix,index],"start":end,"end":right,"width":gap,"from_y":top,"to_y":next_top,"stepping":false,"ferry":false,"crumble_bridge":crumble,"earth_bridge":earth and not crumble})
 		# Guarda e itens pertencem à mesma laje. Recargas antecipam desafios;
 		# nenhuma é colocada em abismo, sobre obstáculo ou na peça destrutível.
 		var guard_x := left+(12.0 if order == 2 else (23.0 if index == 0 else 13.0))
@@ -74,8 +77,16 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 			if order < ABILITY_PHASE[ability]: continue
 			if index%(24 if order == 2 else 8) == ({"rupture":1,"amber":9,"dash":17}[ability] if order == 2 else {"rupture":1,"amber":3,"dash":5}[ability]):
 				pickups.append({"id":"%s.%s.%02d" % [prefix,ability,index],"kind":ability,"pos":[left+(3.6 if order == 2 else 12),top,0],"surface":index})
-		# Obstáculos baixos são caixas/balaustradas integradas ao módulo, não escadas.
-		if index > 0 and ((order == 2 and index%9 == 5) or (order != 2 and index%3 == 2)):
+		# Patamares e obstáculos apoiados na mesma superfície do módulo.
+		var stair_run := order < 10 and index%sector_modules == 3
+		if stair_run:
+			# Pequeno conjunto escalável: subir, pousar no patamar e descer, nos dois sentidos.
+			for step in range(5):
+				var h: float = [0.45,0.9,1.35,0.9,0.45][step]
+				# Nos tetos mais curtos, deixa área de aterrissagem antes do próximo vão.
+				var sx := left+module_length*(0.35 if order == 2 else 0.5)+(step-2)*1.05
+				platforms.append({"id":"%s.parkour.%02d.%d" % [prefix,index,step],"kind":"ledge","pos":[sx,top+h*0.5,0],"size":[1.05,h,3.8],"span_start":sx-0.525,"span_end":sx+0.525,"module":index,"architecture":THEMES[order-1],"surface_top":top,"parkour_step":true})
+		if not stair_run and index > 0 and ((order == 2 and index%9 == 5) or (order != 2 and index%3 == 2)):
 			var height := 0.5 if order == 2 else 0.6
 			platforms.append({"id":"%s.obstacle.%02d" % [prefix,index],"kind":"ledge","pos":[left+module_length*0.55,top+height*0.5,0],"size":[0.9,height,2.6],"span_start":left+module_length*0.55-0.45,"span_end":left+module_length*0.55+0.45,"chunk":floori(left/64),"architecture":THEMES[order-1],"surface_top":top})
 	for index in range(8):
@@ -109,6 +120,11 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 
 static func _height(order: int,index: int) -> float:
 	var pattern: float = [0.0,0.4,0.8,0.3,0.7,0.2][index%6]
+	# Sequências de subida, patamar e descida. Degraus entre prédios continuam <=0,55m.
+	if order < 10:
+		var climb: float = [0.0,0.55,1.1,1.65,2.2,2.75,2.75,2.2,1.65,1.1,0.55,0.0][index%12]
+		var base := 8.0 if order == 2 else (3.5 if order == 4 else (-1.8 if order == 6 else 0.0))
+		return base+climb
 	match order:
 		2: return 8.0+pattern
 		4: return 3.5+pattern*0.6

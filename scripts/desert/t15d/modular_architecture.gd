@@ -15,7 +15,12 @@ func build_surface(platform: Dictionary, order: int) -> void:
 	var right := x+width*0.5
 	var module: int = platform.get("module",0)
 	if platform.kind != "ground":
-		_crate(Vector3(x,top-float(platform.size[1]),0),width,float(platform.size[1]))
+		if platform.get("parkour_step",false):
+			# Patamares de alvenaria pertencem aos edifícios, sem caixas metálicas nos tetos.
+			_box(Vector3(x,top-float(platform.size[1])*0.5,0),Vector3(width,float(platform.size[1]),3.8),"stone")
+			_box(Vector3(x,top-0.05,0),Vector3(width,0.10,3.8),"roof" if order==2 else "trim")
+		else:
+			_crate(Vector3(x,top-float(platform.size[1]),0),width,float(platform.size[1]))
 		_flush()
 		return
 	# Superfície sólida, frisos e fundações; não contém uma imagem de fase.
@@ -29,7 +34,10 @@ func build_surface(platform: Dictionary, order: int) -> void:
 	match order:
 		2:
 			# Fachada desce8m: janelas/portas abaixo, topo inteiro jogável, sem rua acessível.
-			_facade(left,right,top-0.5,top-9.0)
+			_facade(left,right,top-0.16,top-9.0)
+			# Testeira contínua liga a laje física à alvenaria, sem faixa vazia sobre a arte.
+			_box(Vector3(x,top-0.43,1.92),Vector3(width,0.86,0.24),"roof")
+			_box(Vector3(x,top-0.12,2.06),Vector3(width,0.24,0.30),"trim")
 			_box(Vector3(x,top+0.14,-1.95),Vector3(width,0.28,0.22),"trim")
 			# Cobertura e cornija sobre o mesmo piso físico: leitura de telhado, não rua.
 			_box(Vector3(x,top-0.025,0),Vector3(width,0.05,3.98),"roof")

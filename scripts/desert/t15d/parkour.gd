@@ -100,6 +100,8 @@ class CrumbleStone extends StaticBody3D:
 	const DELAY := 0.55
 	const RETURN := 2.5
 	var stone_size := Vector3(2.4, 0.6, 3.0)
+	var timber := false
+	var delay := DELAY
 	var _shape: CollisionShape3D
 	var _mesh: MeshInstance3D
 	var _timer := -1.0
@@ -121,9 +123,21 @@ class CrumbleStone extends StaticBody3D:
 		var mat := StandardMaterial3D.new()
 		mat.albedo_texture = preload("res://assets/desert/phase01/sandstone.png")
 		mat.albedo_color = Color(0.85, 0.66, 0.48)
+		if timber:
+			mat.albedo_texture = null
+			mat.albedo_color = Color("#795038")
 		mat.uv1_scale = Vector3(1.5, 1.5, 1)
 		_mesh.material_override = mat
 		add_child(_mesh)
+		if timber:
+			for i in range(ceili(stone_size.x/0.34)):
+				var plank := MeshInstance3D.new()
+				var board := BoxMesh.new()
+				board.size = Vector3(0.025,0.012,stone_size.z)
+				plank.mesh = board
+				plank.position = Vector3(-stone_size.x*0.5+i*0.34,stone_size.y*0.5+0.006,0)
+				plank.material_override = mat
+				_mesh.add_child(plank)
 		# Rachaduras escuras indicam que a pedra não aguenta.
 		for crack in range(3):
 			var line := MeshInstance3D.new()
@@ -146,7 +160,7 @@ class CrumbleStone extends StaticBody3D:
 			for player in get_tree().get_nodes_in_group("player"):
 				if player.is_on_floor() and absf(player.global_position.x - global_position.x) < stone_size.x * 0.5 + 0.3 \
 						and absf(player.global_position.y - (global_position.y + stone_size.y * 0.5)) < 0.15:
-					_timer = DELAY
+					_timer = delay
 			return
 		_timer -= delta
 		_mesh.position = Vector3(_rng.randf_range(-0.04, 0.04), _rng.randf_range(-0.03, 0.0), 0)

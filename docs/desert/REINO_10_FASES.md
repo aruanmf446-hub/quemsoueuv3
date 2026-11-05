@@ -99,3 +99,12 @@ aprovados pelo dono, sem personagens substitutos. O panorama posterior foi
 reprovado e não foi instalado. **A arte aprovada ainda não foi integrada como
 camadas/módulos ao cenário jogável**; as alterações desta rodada são de gameplay.
 Não confundir os conceitos aprovados com as capturas da versão reprovada.
+
+### Acabamento incremental das fases1/2
+
+Portas das casas receberam madeira, tábuas e ferragens; janelas receberam
+divisórias e peitoris; a escala da alvenaria ficou menor. São malhas decorativas
+agrupadas nos materiais existentes, sem novas colisões ou mudanças de percurso.
+O fundo de dunas/cidade e as bandeiras continuam ativos. Capturas atualizadas em
+`evidence/city-desert`. Ainda não equivale à integração completa das fachadas
+ilustradas aprovadas.

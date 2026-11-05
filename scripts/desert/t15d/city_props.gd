@@ -68,7 +68,8 @@ func _building(origin: Vector3, width: float, rng: RandomNumberGenerator) -> voi
 		_box(Vector3(origin.x+side*(width*0.5-0.13),origin.y+height*0.5,front+0.03),Vector3(0.16,height,0.12),"trim")
 	var doorway := Vector3(origin.x+rng.randf_range(-0.5,0.5),origin.y+0.14,front+0.085)
 	_arch_frame(doorway,0.88,1.70,0.09)
-	_arch_patch(doorway,0.88,1.70,"recess")
+	if _order in [1,2]: _city_door(doorway,0.88,1.70)
+	else: _arch_patch(doorway,0.88,1.70,"recess")
 	# A base escura da porta é visível; brilho limitado a uma faixa interior estreita.
 	_arch_patch(doorway+Vector3(0.22,0.06,0.008),0.12,1.42,"window")
 	var windows := maxi(2,int(width/1.45))
@@ -78,7 +79,8 @@ func _building(origin: Vector3, width: float, rng: RandomNumberGenerator) -> voi
 		var y := origin.y+height-1.02
 		_arch_frame(Vector3(x,y-0.04,front+0.075),0.48,0.78,0.055)
 		_arch_patch(Vector3(x,y-0.04,front+0.075),0.48,0.78,"recess")
-		_arch_patch(Vector3(x,y,front+0.085),0.30,0.61,"window")
+		if _order in [1,2]: _city_window(Vector3(x,y,front+0.085),0.34,0.64)
+		else: _arch_patch(Vector3(x,y,front+0.085),0.30,0.61,"window")
 		_box(Vector3(x,y+0.24,front+0.095),Vector3(0.035,0.48,0.028),"trim")
 		if district == 2 and height > 3.6 and index%2 == 0:
 			_arch_frame(Vector3(x,origin.y+0.71,front+0.065),0.46,0.76,0.05)
@@ -115,6 +117,23 @@ func _building(origin: Vector3, width: float, rng: RandomNumberGenerator) -> voi
 			_arch_patch(niche,0.82,1.56,"recess")
 
 	if _order != 2 and variant%2 == 0: _banner(Vector3(origin.x+width*0.28,origin.y+height*0.53,front+0.1))
+
+func _city_door(at: Vector3,width: float,height: float) -> void:
+	_arch_patch(at,width,height,"wood")
+	# Tábuas estreitas, travessas e ferragens sobre madeira, sem porta azul lisa.
+	for index in range(1,6):
+		var x := -width*0.5+width*index/6.0
+		_box(at+Vector3(x,(height-width*0.5)*0.5,0.025),Vector3(0.018,height-width*0.5,0.018),"metal")
+	for y: float in [height*0.25,height*0.62]:
+		_box(at+Vector3(0,y,0.045),Vector3(width*0.9,0.055,0.045),"metal")
+	_box(at+Vector3(width*0.23,height*0.43,0.065),Vector3(0.07,0.10,0.04),"trim")
+
+func _city_window(at: Vector3,width: float,height: float) -> void:
+	_arch_patch(at,width,height,"window")
+	var center := at+Vector3(0,height*0.44,0.025)
+	_box(center,Vector3(0.035,height*0.87,0.04),"wood")
+	_box(center,Vector3(width,0.035,0.04),"wood")
+	_box(at+Vector3(0,-0.045,0.08),Vector3(width+0.18,0.09,0.18),"trim")
 
 func _awning(origin: Vector3, width: float, key: String) -> void:
 	# O toldo avança apenas0.65m: a frente continua em z<-3.5.
@@ -220,7 +239,7 @@ func _triangle(key: String, a: Vector3, b: Vector3, c: Vector3) -> void:
 		var uv := Vector2(point.x,point.y)
 		if absf(normal.y) > 0.65: uv = Vector2(point.x,point.z)
 		elif absf(normal.x) > 0.65: uv = Vector2(point.z,point.y)
-		st.set_uv(uv*0.30)
+		st.set_uv(uv*(0.48 if _order in [1,2] else 0.30))
 		st.add_vertex(point)
 
 func _flush() -> void:

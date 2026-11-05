@@ -57,7 +57,7 @@ func build_surface(platform: Dictionary, order: int) -> void:
 			_banner(Vector3(accent_x,top-1.3,1.54))
 			if module%2 == 0:
 				_awning(Vector3(accent_x,top-3.4,1.55),2.5,"cloth")
-			_arch_patch(Vector3(accent_x+1.5,top-6.8,1.49),0.8,1.7,"wood")
+			_city_door(Vector3(accent_x+1.5,top-6.8,1.49),0.8,1.7)
 		else:
 			_box(Vector3(accent_x,top+1.7,-2.6),Vector3(0.09,3.4,0.09),"metal")
 			_banner(Vector3(accent_x+0.35,top+2.3,-2.5))
@@ -88,7 +88,7 @@ func _facade(left: float,right: float,top: float,bottom: float) -> void:
 	for x in range(ceili((left+0.4)/2.5),floori((right-0.4)/2.5)+1):
 		for row in range(3):
 			var at := Vector3(x*2.5,top-2.1-row*2.1,1.48)
-			_arch_patch(at,0.62,1.25,"window")
+			_city_window(at,0.62,1.25)
 			_arch_frame(at,0.62,1.25,0.10)
 			_box(at+Vector3(0,0.60,0.06),Vector3(0.055,1.2,0.06),"metal")
 		_box(Vector3(x*2.5,top-4.3,1.6),Vector3(0.13,8.0,0.2),"trim")

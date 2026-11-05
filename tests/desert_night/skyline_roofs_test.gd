@@ -32,14 +32,9 @@ func run() -> void:
 			check(nodes.all(func(n: Node) -> bool: return not n is GeometryInstance3D or n.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF),"fase%02d: fundo sem sombras novas" % order)
 		if order==2:
 			check(phase._player.position.y>=8,"fase2: jogador continua na altura dos telhados")
-			var ids := {}
-			var unique := true
-			for terrace: Node3D in get_nodes_in_group("rooftop_terraces"):
-				var id: int = terrace.get_meta("surface")
-				if ids.has(id) or terrace.position.z>=-2.0: unique=false
-				ids[id]=true
-			check(unique and not ids.is_empty(),"fase2: terraços únicos, fora da pista do jogador")
-			check(not phase._world.find_children("City_roof","MeshInstance3D",true,false).is_empty(),"fase2: cobertura dos prédios presente")
+			check(get_nodes_in_group("rooftop_terraces").is_empty(),"fase2: nenhuma cobertura extra sobre as casas")
+			check(not get_nodes_in_group("playable_house_roofs").is_empty(),"fase2: tetos das próprias casas presentes")
+			check(phase._world.find_children("City_roof","MeshInstance3D",true,false).is_empty(),"fase2: faixa contínua de piso removida")
 			var gap: Dictionary = phase._phase.holes[0]
 			var x := (float(gap.start)+float(gap.end))*0.5
 			var query := PhysicsRayQueryParameters3D.create(Vector3(x,float(gap.from_y)+2,0),Vector3(x,-15,0),1)

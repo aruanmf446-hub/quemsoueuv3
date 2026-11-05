@@ -47,9 +47,9 @@ func prepare_build(platforms: Array, order: int, length := 1452.0, start := -8.0
 		# O chunk que contém o centro é o único dono da composição.
 		if center>=left and center<right:
 			tasks.append(_build_slot.bind(module,float(whole.left),float(whole.right),top,center))
-		if bool(platform.get("pit_left",false)):
+		if _order!=2 and bool(platform.get("pit_left",false)):
 			tasks.append(_lantern.bind(Vector3(left+0.55,top,lantern_z)))
-		if bool(platform.get("pit_right",false)):
+		if _order!=2 and bool(platform.get("pit_right",false)):
 			tasks.append(_lantern.bind(Vector3(right-0.55,top,lantern_z)))
 	tasks.append(_flush)
 	return tasks
@@ -75,33 +75,6 @@ func _build_slot(slot: int, left: float, right: float, top: float,_at_x := INF) 
 			art.set_meta("surface_right",right)
 			building_count += 1
 		piece += 1
-	if _order == 2: _roof_terrace(slot,left,right,top)
-
-func _roof_terrace(slot: int,left: float,right: float,top: float) -> void:
-	var x := clampf(lerpf(left,right,0.36 if slot%2==0 else 0.65),left+3.0,right-3.0)
-	var at := Vector3(x,top,-3.0)
-	_box(at-Vector3.UP*0.12,Vector3(4.8,0.24,2.0),"roof")
-	var marker := Node3D.new()
-	marker.name = "RooftopTerrace"
-	marker.position = at
-	marker.set_meta("surface",slot)
-	marker.add_to_group("rooftop_terraces")
-	add_child(marker)
-	match slot%3:
-		0:
-			_box(at+Vector3(0,0.8,0),Vector3(2.5,1.6,1.3),"stone")
-			_box(at+Vector3(0,1.65,0),Vector3(2.7,0.12,1.5),"trim")
-			_dome(at+Vector3(0,1.69,0),0.85,0.55,"dome")
-			_arch_frame(at+Vector3(0,0,0.7),0.75,1.35,0.08)
-			_city_door(at+Vector3(0,0,0.71),0.75,1.35)
-		1:
-			_box(at+Vector3(-0.8,1.2,0),Vector3(0.85,2.4,0.85),"stone")
-			_box(at+Vector3(-0.8,2.45,0),Vector3(1.12,0.14,1.12),"trim")
-			for vent in range(3):
-				_box(at+Vector3(-0.8,1.72+vent*0.18,0.44),Vector3(0.60,0.09,0.03),"recess")
-			_dome(at+Vector3(0.9,0.12,0),0.6,1.0,"metal")
-		_:
-			_awning(at+Vector3(0,2.0,-0.25),3.6,"cloth")
 
 func _building(origin: Vector3, width: float, rng: RandomNumberGenerator) -> void:
 	if _order in [1,2] and _painted_house(origin,width): return

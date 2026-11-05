@@ -46,7 +46,7 @@ const out=process.env.QSE_DESERT_WEB_OUT||'/tmp/reino-web';fs.mkdirSync(out,{rec
  const soldierBefore=roofBefore.soldiers.find(s=>s.id==='web.roof.pursuit');if(!soldierBefore)throw new Error('Roof soldier missing');
  await page.waitForFunction(before=>{window.qseDesertProbe('state');const soldier=window.qseDesertState.soldiers?.find(s=>s.id==='web.roof.pursuit');return soldier&&soldier.x<before-0.8;},soldierBefore.x,{timeout:15000,polling:100});const roofAfter=await state();const soldierAfter=roofAfter.soldiers.find(s=>s.id==='web.roof.pursuit');
  if(roofAfter.y<7.8||!soldierAfter||soldierAfter.y<7.8||soldierAfter.x>=soldierBefore.x-0.8)throw new Error('Web rooftop pursuit stopped or used street floor');
- if(!roofAfter.skyline||roofAfter.palace_pool!==3||roofAfter.rooftop_terraces<1||roofAfter.roof_surfaces<1)throw new Error('Rooftop or distant capital layers missing');
+ if(!roofAfter.skyline||roofAfter.palace_pool!==3||roofAfter.house_roofs<1||roofAfter.rooftop_terraces!==0||roofAfter.roof_surfaces!==0)throw new Error('Rooftop or distant capital layers missing');
  await page.screenshot({path:out+'/roof_pursuit.png',scale:'css'});
  const stageArt=[{order:1,art_ids:game.art_ids},{order:2,art_ids:roofAfter.art_ids}];
  for(let order=3;order<=10;order++){

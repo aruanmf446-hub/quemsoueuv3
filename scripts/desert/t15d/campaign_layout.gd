@@ -39,7 +39,7 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 	var surfaces: Array = []
 	var tasks: Array = []
 	var prefix := "p%02d" % order
-	var modules: int = [48,72,56,48,48,56,48,56,48,48][order-1]
+	var modules: int = [48,120,56,48,48,56,48,56,48,48][order-1]
 	var sector_modules := modules/8
 	var module_length := (distance+(6.0 if order == 2 else 26.0))/modules
 	var origin := spawn_x-(2.0 if order == 2 else 8.0)
@@ -65,12 +65,12 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 			holes.append({"id":"%s.gap.%02d" % [prefix,index],"start":end,"end":right,"width":gap,"from_y":top,"to_y":next_top,"stepping":false,"ferry":false,"crumble_bridge":crumble,"earth_bridge":false})
 		# Guarda e itens pertencem à mesma laje. Recargas antecipam desafios;
 		# nenhuma é colocada em abismo, sobre obstáculo ou na peça destrutível.
-		var guard_x := left+(12.0 if order == 2 else (23.0 if index == 0 else 13.0))
-		if index%(6 if order == 2 else 2) == 0 and not (order == 2 and index == 0):
+		var guard_x := left+(6.0 if order == 2 else (23.0 if index == 0 else 13.0))
+		if index%(10 if order == 2 else 2) == 0 and not (order == 2 and index == 0):
 			enemies.append({"id":"%s.cactus.%02d" % [prefix,index],"type":"cactus","pos":[guard_x,top+0.02,0],"patrol":[left+1,end-1],"district":district,"challenger":order<10,"elite":order in [3,5,7,8,9] and index%12==6})
-		var supply_index := index/3 if order == 2 else index
+		var supply_index := index/5 if order == 2 else index
 		var kind: String = ["attack","defense","attack","health"][supply_index%4]
-		if order != 2 or index%3 == 0:
+		if order != 2 or index%5 == 0:
 			pickups.append({"id":"%s.supply.%02d" % [prefix,index],"kind":kind,"pos":[spawn_x+2 if index == 0 and order == 2 else (spawn_x+4 if index == 0 else left+(7.0 if order == 2 else 8)),top,0],"surface":index})
 		for ability: String in ["rupture","amber","dash"]:
 			if order < ABILITY_PHASE[ability]: continue
@@ -78,12 +78,13 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 				pickups.append({"id":"%s.%s.%02d" % [prefix,ability,index],"kind":ability,"pos":[left+(3.6 if order == 2 else 12),top,0],"surface":index})
 		# Patamares e obstáculos apoiados na mesma superfície do módulo.
 		var stair_run := index%sector_modules == (4 if order==2 else 3)
+		if order==2: stair_run=false # O teto da própria casa é a rota, sem plataforma sobreposta.
 		if order==10 and index>=modules/2: stair_run=false # Arena final preservada.
 		if stair_run:
 			var route_width := 5.6
 			var route_x := left+module_length*0.5
 			platforms.append({"id":"%s.route.%02d" % [prefix,index],"kind":"route","pos":[route_x,top+1.0,0],"size":[route_width,0.20,3.8],"span_start":route_x-route_width*0.5,"span_end":route_x+route_width*0.5,"module":index,"architecture":THEMES[order-1],"surface_top":top,"parkour_route":true})
-		if not stair_run and index > 0 and ((order == 2 and index%9 == 5) or (order != 2 and index%3 == 2)):
+		if not stair_run and index > 0 and order != 2 and index%3 == 2:
 			var height := 0.5 if order == 2 else 0.6
 			platforms.append({"id":"%s.obstacle.%02d" % [prefix,index],"kind":"ledge","pos":[left+module_length*0.55,top+height*0.5,0],"size":[0.9,height,2.6],"span_start":left+module_length*0.55-0.45,"span_end":left+module_length*0.55+0.45,"chunk":floori(left/64),"architecture":THEMES[order-1],"surface_top":top})
 	for index in range(8):

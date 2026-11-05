@@ -61,6 +61,7 @@ func _probe(args: Array) -> void:
 		state.order = phase._order
 		state.skyline = is_instance_valid(phase._scenery._skyline)
 		state.palace_pool = phase._scenery._skyline._palaces.size() if state.skyline else 0
+		state.house_roofs = get_tree().get_nodes_in_group("playable_house_roofs").size()
 		state.rooftop_terraces = get_tree().get_nodes_in_group("rooftop_terraces").size()
 		state.roof_surfaces = phase._world.find_children("City_roof","MeshInstance3D",true,false).size()
 		state.bridge_task = rect(phase._hud._bridge_task) if phase._hud._bridge_task.visible else []

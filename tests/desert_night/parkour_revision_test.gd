@@ -21,7 +21,7 @@ func run() -> void:
 		var heights: Array = stage.surfaces.map(func(s: Dictionary) -> float:return float(s.height))
 		check(heights.max()-heights.min()>2.5,"fase%d: diferenças de nível visíveis" % order)
 		check(stage.holes.all(func(g: Dictionary) -> bool:return absf(float(g.from_y)-float(g.to_y))<0.56 and float(g.width)<=3.2),"fase%d: retorno por salto continua alcançável" % order)
-		check(stage.platforms.filter(func(p: Dictionary) -> bool:return p.get("parkour_route",false)).size()==8,"fase%d: oito obstáculos com topo percorrível" % order)
+		check(stage.platforms.filter(func(p: Dictionary) -> bool:return p.get("parkour_route",false)).size()==(0 if order==2 else 8),"fase%d: rota de teto real ou obstáculo conforme a fase" % order)
 		check(stage.holes.filter(func(g: Dictionary) -> bool:return g.get("crumble_bridge",false)).size()==2,"fase%d: duas pontes frágeis" % order)
 	check(tasks==19,"dezenove tarefas de cenário, sem habilidades permanentes")
 	var phase: Node3D = load("res://scenes/desert/phase_04.tscn").instantiate()

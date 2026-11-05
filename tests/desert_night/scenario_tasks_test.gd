@@ -19,7 +19,7 @@ func run() -> void:
 		phase.set_physics_process(false)
 		check(phase._phase.tasks.size()==(1 if order==10 else 2),"fase%d: quantidade de tarefas contextualizadas" % order)
 		check(not phase._phase.platforms.any(func(p: Dictionary) -> bool:return p.get("parkour_step",false)),"fase%d: pilhas rejeitadas removidas" % order)
-		check(phase._phase.platforms.filter(func(p: Dictionary) -> bool:return p.get("parkour_route",false) and float(p.size[0])>5 and float(p.size[1])<=0.21).size()==(4 if order==10 else 8),"fase%d: obstáculos longos com topo jogável" % order)
+		check(phase._phase.platforms.filter(func(p: Dictionary) -> bool:return p.get("parkour_route",false) and float(p.size[0])>5 and float(p.size[1])<=0.21).size()==(0 if order==2 else (4 if order==10 else 8)),"fase%d: tetos próprios e obstáculos apenas nas fases adequadas" % order)
 		for task: Dictionary in phase._phase.tasks:
 			check(not titles.has(str(task.task_text)),"tarefa própria: "+str(task.task_text))
 			titles[str(task.task_text)]=true

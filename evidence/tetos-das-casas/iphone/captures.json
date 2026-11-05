@@ -1,0 +1,30 @@
+[
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"house": 0,
+		"name": "casa_00",
+		"on_floor": true
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"house": 1,
+		"name": "casa_01",
+		"on_floor": true
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"house": 2,
+		"name": "casa_02",
+		"on_floor": true
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"house": 4,
+		"name": "casa_04",
+		"on_floor": true
+	}
+]

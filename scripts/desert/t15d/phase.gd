@@ -424,7 +424,7 @@ func _build_chunk_details(chunk: Node3D, index: int) -> void:
 		var x0 := maxf(float(hole.start),left)
 		var x1 := minf(float(hole.end),right)
 		for edge in [float(hole.start),float(hole.end)]:
-			if _in_chunk(edge,index): _build_pit_lip(chunk,edge,edge == float(hole.start))
+			if _order!=2 and _in_chunk(edge,index): _build_pit_lip(chunk,edge,edge == float(hole.start))
 func _in_chunk(x: float, index: int) -> bool:
 	return floori(x/CHUNK_SIZE) == index
 func _near_bridge(hole: Dictionary, distance := 4.0) -> bool:

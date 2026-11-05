@@ -1,0 +1,26 @@
+[
+  {
+    "test": "import",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 8.34,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "reino10",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 9.24,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "route-02",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 21.12,
+    "graphical": false,
+    "fixed_physics_step": true
+  }
+]

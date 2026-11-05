@@ -2,7 +2,8 @@
 
 Esta revisão remove o piso empilhado rejeitado pelo proprietário. **Não reintroduzir a sequência de cinco blocos como solução de parkour.** Os percursos usam objetos únicos com topo jogável: coberturas, toldos, trechos do aqueduto, troncos/colunas caídas, cargas e passarelas.
 
-- `campaign_layout.gd`: oito objetos por fase 1–9 e quatro antes da arena na fase 10. Cada objeto tem 5,6m de extensão, topo de colisão fino e espaço para aterrissagem antes dos vãos.
+- **Fase 2 revisada:** cada casa inteira fornece o próprio teto jogável; não há faixa de piso, cobertura extra ou objeto suspenso sobre a casa. 120 casas separadas por vãos, com as artes existentes de casa residencial e varanda.
+- `campaign_layout.gd`: oito objetos nas fases 1 e 3–9 e quatro antes da arena na fase 10. Cada objeto tem 5,6m de extensão, topo de colisão fino e espaço para aterrissagem antes dos vãos.
 - `modular_architecture.gd`: visual do objeto conforme a fase; suportes não viram novas paredes de colisão.
 - `tasks`: duas tarefas locais por fase 1–9 e uma na fase 10. IDs estáveis por fase. Configuração contém tipo (`gate`, `bridge`, `lift`), título e margens/alturas reais.
 - `earth_bridge.gd`: nome legado do mecanismo compartilhado; não representa um poder. Portão sobe, plataforma é içada e passagem gira. Usam o mesmo evento de conclusão.

@@ -136,7 +136,9 @@ func _commit() -> void:
 		queue_free()
 		return
 	_saving=false
-	if result.ok and str(services.profile.data.get("nickname",""))==nickname:
+	# O servidor preserva a grafia canônica (NFC). Confirmar o perfil da conta,
+	# sem exigir igualdade byte a byte com a entrada antes da normalização.
+	if result.ok and services.profile.has_nickname():
 		saved.emit()
 		queue_free()
 		return

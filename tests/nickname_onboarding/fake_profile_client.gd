@@ -1,6 +1,7 @@
 extends SupabaseClient
 ## Fixture local: nenhuma requisição real, nem acesso ao Supabase.
 var nickname: Variant=null
+var canonical_nickname := ""
 var user_id := "00000000-0000-4000-8000-000000000011"
 var update_calls := 0
 var next_code := ""
@@ -20,5 +21,5 @@ func call_rpc(rpc: String, params: Dictionary={}) -> Dictionary:
 	if during_update.is_valid(): during_update.call()
 	if not next_code.is_empty(): return ServiceResult.failure(next_code)
 	if str(params.get("p_nickname","")).strip_edges().to_lower()=="ocupado": return ServiceResult.failure("nickname_taken")
-	nickname=params.p_nickname
+	nickname=canonical_nickname if not canonical_nickname.is_empty() else params.p_nickname
 	return ServiceResult.success(profile())

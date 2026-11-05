@@ -1,5 +1,12 @@
 # Pendências de backend — 05/11/2026
 
+> Atualização recebida: a [PR #99](https://github.com/aruanmf446-hub/quemsoueuv3/pull/99)
+> registra a implantação relatada de nickname, ordem antecipada e bots online.
+> T21/T22 já têm estruturas implantadas segundo a auditoria. A lista abaixo é
+> o pedido histórico; não reexecutar as migrations. Permanecem os testes de
+> integração reais. [Revisão do cliente e limites](REVISAO_CLIENTE_PR99.md).
+
+
 Pedido do dono: publicar as melhorias do Mata-Mata e exigir nickname único e
 imutável para contas cadastradas. **O modo local sem conta continua disponível.**
 
@@ -23,7 +30,7 @@ As migrations do repositório são referência histórica, não prova da versão
 **A unicidade global e a trava contra chamadas diretas dependem do backend.**
 Não há como comprová-las no banco a partir de um teste com respostas simuladas.
 
-## Prompt para o ChatGPT com plugin Supabase
+## Pedido histórico enviado ao ChatGPT com plugin Supabase
 
 Projeto Quem Sou Eu V3 (`aruanmf446-hub/quemsoueuv3`), Godot 4.7.2 / Web-PWA.
 GAME: `shuzporktifgiotvnpbz`; CHAT: `wurkpjgnbqklivjhcvxk`.

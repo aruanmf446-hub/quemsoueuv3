@@ -140,3 +140,5 @@ obrigatório e o cliente bloqueia sua troca; convidados mantêm o modo local.
 A unicidade/trava no banco, a ordem online e o chat de bots dependem do responsável
 pelo backend: [prompt consolidado e pendências](docs/backend/PENDENCIAS_2026_11_05.md).
 O Codex não modifica Supabase.
+
+Retorno do backend registrado na PR #99: [compatibilidade do cliente e validações restantes](docs/backend/REVISAO_CLIENTE_PR99.md). As migrations já implantadas não devem ser reexecutadas.

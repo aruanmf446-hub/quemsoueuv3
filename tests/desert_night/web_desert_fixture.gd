@@ -37,8 +37,8 @@ func _probe(args: Array) -> void:
 		for kind in ["rupture","amber","dash"]:
 			for index in range(3): phase._player.restore_charge(kind)
 	# TEST ONLY: aproxima o ator de uma recarga real; a física realiza a coleta.
-	if args.size() and str(args[0]) == "bridge" and is_instance_valid(phase) and _order==4:
-		var hole: Dictionary=phase._phase.holes.filter(func(g: Dictionary) -> bool:return g.get("earth_bridge",false))[0]
+	if args.size() and str(args[0]) in ["bridge","task"] and is_instance_valid(phase):
+		var hole: Dictionary=phase._phase.tasks[0] if str(args[0])=="task" else phase._phase.tasks.filter(func(g: Dictionary) -> bool:return g.task_kind=="bridge")[0]
 		phase._player.position=Vector3(float(hole.start)-1.6,float(hole.from_y)+0.1,0)
 		phase._player.velocity=Vector3.ZERO
 		phase._player._invulnerable=999
@@ -66,7 +66,7 @@ func _probe(args: Array) -> void:
 		state.bridge_task = rect(phase._hud._bridge_task) if phase._hud._bridge_task.visible else []
 		state.bridges = []
 		for bridge in get_tree().get_nodes_in_group("earth_bridges"):
-			state.bridges.append({"raised":bridge.raised,"solid":not bridge._shape.disabled,"end":bridge.hole.end,"start":bridge.hole.start})
+			state.bridges.append({"raised":bridge.raised,"solid":not bridge._shape.disabled,"end":bridge.hole.end,"start":bridge.hole.start,"kind":bridge.hole.task_kind})
 		state.defense_charge = phase._player.defense_charges
 		state.pedestal_fixture = not _pedestal_fixture_id.is_empty()
 		state.pedestal_collected = phase._collected_ids.has(_pedestal_fixture_id)

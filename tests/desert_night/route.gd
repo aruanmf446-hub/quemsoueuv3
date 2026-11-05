@@ -88,6 +88,15 @@ func run() -> void:
 			if (tick-last_tick)/1000.0 > 33: print("ROUTE_SLOW step=",step," ms=",(tick-last_tick)/1000.0," x=",player.position.x," time_scale=",Engine.time_scale," active=",phase._troops.get_child_count()," queue=",phase._build_queue.size())
 		last_tick = tick
 		if phase.completed or deaths > 0: break
+		# As tarefas novas são acionadas pela entrada física F, como no jogo.
+		if phase._hud._bridge_task.visible and player.is_on_floor():
+			var use := InputEventKey.new()
+			use.physical_keycode=KEY_F
+			use.pressed=true
+			Input.parse_input_event(use)
+			var release := InputEventKey.new()
+			release.physical_keycode=KEY_F
+			Input.parse_input_event(release)
 		if step == _jump_release_at: Input.action_release("jump")
 		if step == _attack_release_at: Input.action_release("attack")
 		if step == _rupture_release_at: Input.action_release("rupture")

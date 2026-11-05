@@ -1,0 +1,180 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS fase1: quantidade de tarefas contextualizadas
+PASS fase1: pilhas rejeitadas removidas
+PASS fase1: obstáculos longos com topo jogável
+PASS tarefa própria: Abrir portão da capital
+PASS aviso acessível antes de p01.task.0
+PASS mecanismo instanciado uma vez: p01.task.0
+PASS interação física conclui e devolve comandos: p01.task.0
+PASS sem custo de poder: p01.task.0
+PASS passagem real após tarefa: p01.task.0
+PASS retorno após tarefa: p01.task.0
+PASS tarefa própria: Baixar ponte da muralha
+PASS aviso acessível antes de p01.gap.27
+PASS mecanismo instanciado uma vez: p01.gap.27
+PASS interação física conclui e devolve comandos: p01.gap.27
+PASS sem custo de poder: p01.gap.27
+PASS passagem real após tarefa: p01.gap.27
+PASS retorno após tarefa: p01.gap.27
+PASS fase1: mecanismos limpos ao sair
+PASS fase2: quantidade de tarefas contextualizadas
+PASS fase2: pilhas rejeitadas removidas
+PASS fase2: obstáculos longos com topo jogável
+PASS tarefa própria: Estender passarela dos telhados
+PASS aviso acessível antes de p02.gap.07
+PASS mecanismo instanciado uma vez: p02.gap.07
+PASS interação física conclui e devolve comandos: p02.gap.07
+PASS sem custo de poder: p02.gap.07
+PASS passagem real após tarefa: p02.gap.07
+PASS retorno após tarefa: p02.gap.07
+PASS tarefa própria: Içar plataforma de manutenção
+PASS aviso acessível antes de p02.gap.41
+PASS mecanismo instanciado uma vez: p02.gap.41
+PASS interação física conclui e devolve comandos: p02.gap.41
+PASS sem custo de poder: p02.gap.41
+PASS passagem real após tarefa: p02.gap.41
+PASS retorno após tarefa: p02.gap.41
+PASS fase2: mecanismos limpos ao sair
+PASS fase3: quantidade de tarefas contextualizadas
+PASS fase3: pilhas rejeitadas removidas
+PASS fase3: obstáculos longos com topo jogável
+PASS tarefa própria: Estender toldo do mercado
+PASS aviso acessível antes de p03.gap.07
+PASS mecanismo instanciado uma vez: p03.gap.07
+PASS interação física conclui e devolve comandos: p03.gap.07
+PASS sem custo de poder: p03.gap.07
+PASS passagem real após tarefa: p03.gap.07
+PASS retorno após tarefa: p03.gap.07
+PASS tarefa própria: Liberar depósito de especiarias
+PASS aviso acessível antes de p03.task.1
+PASS mecanismo instanciado uma vez: p03.task.1
+PASS interação física conclui e devolve comandos: p03.task.1
+PASS sem custo de poder: p03.task.1
+PASS passagem real após tarefa: p03.task.1
+PASS retorno após tarefa: p03.task.1
+PASS fase3: mecanismos limpos ao sair
+PASS fase4: quantidade de tarefas contextualizadas
+PASS fase4: pilhas rejeitadas removidas
+PASS fase4: obstáculos longos com topo jogável
+PASS tarefa própria: Abrir comporta do aqueduto
+PASS aviso acessível antes de p04.task.0
+PASS mecanismo instanciado uma vez: p04.task.0
+PASS interação física conclui e devolve comandos: p04.task.0
+PASS sem custo de poder: p04.task.0
+PASS passagem real após tarefa: p04.task.0
+PASS retorno após tarefa: p04.task.0
+PASS tarefa própria: Reconstruir passagem do canal
+PASS aviso acessível antes de p04.gap.27
+PASS mecanismo instanciado uma vez: p04.gap.27
+PASS interação física conclui e devolve comandos: p04.gap.27
+PASS sem custo de poder: p04.gap.27
+PASS passagem real após tarefa: p04.gap.27
+PASS retorno após tarefa: p04.gap.27
+PASS fase4: mecanismos limpos ao sair
+PASS fase5: quantidade de tarefas contextualizadas
+PASS fase5: pilhas rejeitadas removidas
+PASS fase5: obstáculos longos com topo jogável
+PASS tarefa própria: Reposicionar tronco do oásis
+PASS aviso acessível antes de p05.gap.07
+PASS mecanismo instanciado uma vez: p05.gap.07
+PASS interação física conclui e devolve comandos: p05.gap.07
+PASS sem custo de poder: p05.gap.07
+PASS passagem real após tarefa: p05.gap.07
+PASS retorno após tarefa: p05.gap.07
+PASS tarefa própria: Abrir passagem dos jardins
+PASS aviso acessível antes de p05.task.1
+PASS mecanismo instanciado uma vez: p05.task.1
+PASS interação física conclui e devolve comandos: p05.task.1
+PASS sem custo de poder: p05.task.1
+PASS passagem real após tarefa: p05.task.1
+PASS retorno após tarefa: p05.task.1
+PASS fase5: mecanismos limpos ao sair
+PASS fase6: quantidade de tarefas contextualizadas
+PASS fase6: pilhas rejeitadas removidas
+PASS fase6: obstáculos longos com topo jogável
+PASS tarefa própria: Alinhar laje das ruínas
+PASS aviso acessível antes de p06.gap.07
+PASS mecanismo instanciado uma vez: p06.gap.07
+PASS interação física conclui e devolve comandos: p06.gap.07
+PASS sem custo de poder: p06.gap.07
+PASS passagem real após tarefa: p06.gap.07
+PASS retorno após tarefa: p06.gap.07
+PASS tarefa própria: Abrir portal antigo
+PASS aviso acessível antes de p06.task.1
+PASS mecanismo instanciado uma vez: p06.task.1
+PASS interação física conclui e devolve comandos: p06.task.1
+PASS sem custo de poder: p06.task.1
+PASS passagem real após tarefa: p06.task.1
+PASS retorno após tarefa: p06.task.1
+PASS fase6: mecanismos limpos ao sair
+PASS fase7: quantidade de tarefas contextualizadas
+PASS fase7: pilhas rejeitadas removidas
+PASS fase7: obstáculos longos com topo jogável
+PASS tarefa própria: Acionar plataforma de carga
+PASS aviso acessível antes de p07.gap.07
+PASS mecanismo instanciado uma vez: p07.gap.07
+PASS interação física conclui e devolve comandos: p07.gap.07
+PASS sem custo de poder: p07.gap.07
+PASS passagem real após tarefa: p07.gap.07
+PASS retorno após tarefa: p07.gap.07
+PASS tarefa própria: Baixar viga do desfiladeiro
+PASS aviso acessível antes de p07.gap.27
+PASS mecanismo instanciado uma vez: p07.gap.27
+PASS interação física conclui e devolve comandos: p07.gap.27
+PASS sem custo de poder: p07.gap.27
+PASS passagem real após tarefa: p07.gap.27
+PASS retorno após tarefa: p07.gap.27
+PASS fase7: mecanismos limpos ao sair
+PASS fase8: quantidade de tarefas contextualizadas
+PASS fase8: pilhas rejeitadas removidas
+PASS fase8: obstáculos longos com topo jogável
+PASS tarefa própria: Abrir portão do posto
+PASS aviso acessível antes de p08.task.0
+PASS mecanismo instanciado uma vez: p08.task.0
+PASS interação física conclui e devolve comandos: p08.task.0
+PASS sem custo de poder: p08.task.0
+PASS passagem real após tarefa: p08.task.0
+PASS retorno após tarefa: p08.task.0
+PASS tarefa própria: Baixar passarela de vigia
+PASS aviso acessível antes de p08.gap.32
+PASS mecanismo instanciado uma vez: p08.gap.32
+PASS interação física conclui e devolve comandos: p08.gap.32
+PASS sem custo de poder: p08.gap.32
+PASS passagem real após tarefa: p08.gap.32
+PASS retorno após tarefa: p08.gap.32
+PASS fase8: mecanismos limpos ao sair
+PASS fase9: quantidade de tarefas contextualizadas
+PASS fase9: pilhas rejeitadas removidas
+PASS fase9: obstáculos longos com topo jogável
+PASS tarefa própria: Acionar guindaste de minério
+PASS aviso acessível antes de p09.gap.07
+PASS mecanismo instanciado uma vez: p09.gap.07
+PASS interação física conclui e devolve comandos: p09.gap.07
+PASS sem custo de poder: p09.gap.07
+PASS passagem real após tarefa: p09.gap.07
+PASS retorno após tarefa: p09.gap.07
+PASS tarefa própria: Liberar portão de serviço
+PASS aviso acessível antes de p09.task.1
+PASS mecanismo instanciado uma vez: p09.task.1
+PASS interação física conclui e devolve comandos: p09.task.1
+PASS sem custo de poder: p09.task.1
+PASS passagem real após tarefa: p09.task.1
+PASS retorno após tarefa: p09.task.1
+PASS fase9: mecanismos limpos ao sair
+PASS fase10: quantidade de tarefas contextualizadas
+PASS fase10: pilhas rejeitadas removidas
+PASS fase10: obstáculos longos com topo jogável
+PASS tarefa própria: Içar passarela da galeria
+PASS aviso acessível antes de p10.gap.07
+PASS mecanismo instanciado uma vez: p10.gap.07
+PASS interação física conclui e devolve comandos: p10.gap.07
+PASS sem custo de poder: p10.gap.07
+PASS passagem real após tarefa: p10.gap.07
+PASS retorno após tarefa: p10.gap.07
+PASS fase10: mecanismos limpos ao sair
+PASS cacto persegue saltando e correndo sobre o obstáculo
+PASS guarda resistente mantém perfil próprio
+PASS guarda resiste ao primeiro soco, sem invulnerabilidade artificial
+PASS segundo soco derrota o guarda
+SCENARIO_TASKS checks=177 failures=0

@@ -331,6 +331,8 @@ func _build_collision(chunk: Node3D, platforms: Array) -> void:
 		box.size = dimensions
 		shape.shape = box
 		body.add_child(shape)
+		if part.get("parkour_route",false): body.set_meta("parkour_route",true)
+		if part.kind=="ground": body.set_meta("walkable_floor",true)
 		chunk.add_child(body)
 		if part.get("breakable",false):
 			var id := str(part.id)
@@ -393,16 +395,17 @@ func _build_chunk_details(chunk: Node3D, index: int) -> void:
 				bridge.stone_size = Vector3(float(hole.width)+0.12,0.22,3.8)
 				bridge.position = Vector3(middle,minf(float(hole.from_y),float(hole.to_y))-0.11,0)
 				chunk.add_child(bridge)
-			if hole.get("earth_bridge",false):
-				var earth := preload("res://scripts/desert/t15d/earth_bridge.gd").new()
-				earth.configure(hole)
-				chunk.add_child(earth)
-				if _raised_bridges.has(str(hole.id)): earth.raise_bridge(false)
 		if hole.get("ferry",false) and _in_chunk(middle,index):
 			var ferry := preload("res://scripts/desert/t15d/parkour.gd").Ferry.new()
 			ferry.from_x = float(hole.start)+1.9
 			ferry.to_x = float(hole.end)-1.9
 			chunk.add_child(ferry)
+	for task: Dictionary in _phase.get("tasks",[]):
+		if _in_chunk((float(task.start)+float(task.end))*0.5,index):
+			var device := preload("res://scripts/desert/t15d/earth_bridge.gd").new()
+			device.configure(task)
+			chunk.add_child(device)
+			if _raised_bridges.has(str(task.id)): device.raise_bridge(false)
 	for geyser: Dictionary in _phase.get("geysers",[]):
 		if _in_chunk(float(geyser.pos[0]),index):
 			var pad := preload("res://scripts/desert/t15d/parkour.gd").Geyser.new()
@@ -429,13 +432,17 @@ func _near_bridge(hole: Dictionary, distance := 4.0) -> bool:
 	return (absf(x-float(hole.start))<distance and absf(_player.position.y-float(hole.from_y))<0.7) or (absf(x-float(hole.end))<distance and absf(_player.position.y-float(hole.to_y))<0.7)
 func _update_bridge_hint() -> void:
 	var task_available := false
+	var caption := ""
 	for hole: Dictionary in _phase.holes:
 		if hole.get("crumble_bridge",false) and _near_bridge(hole,6.0) and not _bridge_hints.has(str(hole.id)):
 			_bridge_hints[str(hole.id)] = true
 			_hud.notify("Ponte frágil • atravesse antes que desabe; ela se recompõe")
-		elif hole.get("earth_bridge",false) and not _raised_bridges.has(str(hole.id)) and _near_bridge(hole) and _player.is_on_floor():
-			task_available = true
-	_hud.set_bridge_task(task_available and not _player.is_dead and not completed)
+	for device in get_tree().get_nodes_in_group("earth_bridges"):
+		if is_ancestor_of(device) and not device.raised and _near_bridge(device.hole) and _player.is_on_floor():
+			task_available=true
+			caption=str(device.hole.get("task_text","Montar ponte"))+" · F"
+			break
+	_hud.set_bridge_task(task_available and not _player.is_dead and not completed,caption)
 func _raise_earth_bridge() -> void:
 	if _player.is_dead or not _player.is_on_floor() or completed or _paused: return
 	for bridge in get_tree().get_nodes_in_group("earth_bridges"):
@@ -449,7 +456,7 @@ func _raise_earth_bridge() -> void:
 		bridge.raise_bridge()
 		_raised_bridges[str(bridge.hole.id)] = true
 		_hud.set_bridge_task(false)
-		_hud.notify("Passagem reconstruída • siga pelo aqueduto")
+		_hud.notify("Tarefa concluída • passagem liberada")
 		return
 func _is_pit_edge(x: float, left: bool) -> bool:
 	for hole: Dictionary in _phase.holes:
@@ -489,7 +496,9 @@ func _spawn_enemy(_chunk: Node3D, spawn: Dictionary) -> void:
 	enemy.set_meta("spawn_id",id)
 	_enemy_live[id] = enemy
 	enemy.persistent_follow = bool(spawn.get("troop",false))
-	enemy.setup(_enemy_catalog.cactus,spawn)
+	var encounter := spawn.duplicate(true)
+	encounter.challenger=_order<10
+	enemy.setup(_enemy_catalog.cactus,encounter)
 	enemy.add_to_group("enemies")
 	enemy.show()
 	enemy.set_physics_process(true)

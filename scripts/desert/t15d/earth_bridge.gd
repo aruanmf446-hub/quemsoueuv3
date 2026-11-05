@@ -1,5 +1,6 @@
 extends Node3D
-## Tarefa de cenário única: usa a aparência da terra, sem habilidade nem carga.
+## Mecanismos pontuais do cenário: passagem giratória, portão e plataforma de carga.
+## Mesma interação contextual, sem adicionar habilidade nem consumir cargas.
 signal assembled
 var hole: Dictionary
 var raised := false
@@ -7,8 +8,10 @@ var _deck: StaticBody3D
 var _shape: CollisionShape3D
 var _hinge: Node3D
 var _angle := 0.0
+var _kind := "bridge"
 func configure(data: Dictionary) -> void:
 	hole = data
+	_kind = str(data.get("task_kind","bridge"))
 func _ready() -> void:
 	add_to_group("earth_bridges")
 	var start := Vector3(float(hole.start)-0.12,float(hole.from_y),0)
@@ -41,6 +44,32 @@ func _ready() -> void:
 	mesh.material_override = earth
 	_deck.add_child(mesh)
 	_deck.hide()
+	if _kind=="gate":
+		_hinge.position=Vector3((start.x+finish.x)*0.5,start.y,0)
+		_hinge.rotation=Vector3.ZERO
+		_deck.position=Vector3(0,1.2,0)
+		box.size=Vector3(2.4,2.4,3.6)
+		slab.size=box.size
+		earth.albedo_texture=null
+		earth.albedo_color=Color("#795739")
+		_deck.show()
+		_shape.disabled=false
+	elif _kind=="lift":
+		_deck.show()
+		_deck.position.y-=1.6
+	if int(hole.get("theme",4)) in [2,3,5,7,9,10] and _kind!="gate":
+		earth.albedo_texture=null
+		earth.albedo_color=Color("#6b1018") if int(hole.theme)==3 else Color("#816044")
+	# Estrutura do mecanismo, fora da pista; o piso e a porta têm seus próprios colisores.
+	var props := preload("res://scripts/desert/t15d/city_props.gd").new()
+	add_child(props)
+	if _kind=="gate":
+		props.place_asset("capital_archway",Vector3((start.x+finish.x)*0.5,start.y,-3.5),5.0)
+	elif _kind=="lift":
+		for x in [start.x,finish.x]:
+			props._box(Vector3(x,start.y+1.9,-2),Vector3(0.18,3.8,0.18),"wood")
+		props._box(Vector3((start.x+finish.x)*0.5,start.y+3.8,-2),Vector3(span.length()+0.4,0.2,0.2),"wood")
+	props._flush()
 	# Marcas sobre o piso das duas margens. Nunca ficam flutuando sobre o vão.
 	for point in [start-Vector3(0.65,0,0),finish+Vector3(0.65,0,0)]:
 		var mark := MeshInstance3D.new()
@@ -62,12 +91,20 @@ func raise_bridge(animated := true) -> void:
 	raised = true
 	_deck.show()
 	if not animated:
+		if _kind=="gate": _hinge.position.y+=3.2
+		elif _kind=="lift": _deck.position.y=-0.13
 		_shape.set_deferred("disabled",false)
 		return
 	# A peça sobe como parede e gira pela margem até virar passagem.
-	_hinge.rotation.z = _angle+PI*0.5
 	var tween := create_tween()
-	tween.tween_property(_hinge,"rotation:z",_angle,0.8).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_shape.set_deferred("disabled",true)
+	if _kind=="gate":
+		tween.tween_property(_hinge,"position:y",_hinge.position.y+3.2,0.8)
+	elif _kind=="lift":
+		tween.tween_property(_deck,"position:y",-0.13,0.8)
+	else:
+		_hinge.rotation.z = _angle+PI*0.5
+		tween.tween_property(_hinge,"rotation:z",_angle,0.8)
 	tween.tween_callback(func() -> void:
 		_shape.set_deferred("disabled",false)
 		assembled.emit())

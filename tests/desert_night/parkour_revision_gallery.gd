@@ -42,7 +42,7 @@ func run() -> void:
 			stone._crumble()
 			for i in 7:await process_frame
 			await save_frame("ponte_fragil_caindo",out)
-			gap=phase._phase.holes.filter(func(g: Dictionary) -> bool:return g.get("earth_bridge",false))[0]
+			gap=phase._phase.tasks.filter(func(g: Dictionary) -> bool:return g.task_kind=="bridge")[0]
 			await shot(phase,float(gap.start)-1.6,float(gap.from_y),"tarefa_ponte_antes",out)
 			phase._player.set_physics_process(true)
 			for i in 12: await physics_frame

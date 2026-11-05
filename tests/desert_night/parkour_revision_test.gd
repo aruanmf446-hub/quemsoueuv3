@@ -16,20 +16,20 @@ func run() -> void:
 	var tasks := 0
 	for order in range(1,11):
 		var stage := Layout.build(order)
-		tasks += stage.holes.filter(func(g: Dictionary) -> bool:return g.get("earth_bridge",false)).size()
+		tasks += stage.tasks.size()
 		if order == 10: continue
 		var heights: Array = stage.surfaces.map(func(s: Dictionary) -> float:return float(s.height))
 		check(heights.max()-heights.min()>2.5,"fase%d: diferenças de nível visíveis" % order)
 		check(stage.holes.all(func(g: Dictionary) -> bool:return absf(float(g.from_y)-float(g.to_y))<0.56 and float(g.width)<=3.2),"fase%d: retorno por salto continua alcançável" % order)
-		check(stage.platforms.filter(func(p: Dictionary) -> bool:return p.get("parkour_step",false)).size()==40,"fase%d: oito conjuntos de patamares" % order)
+		check(stage.platforms.filter(func(p: Dictionary) -> bool:return p.get("parkour_route",false)).size()==8,"fase%d: oito obstáculos com topo percorrível" % order)
 		check(stage.holes.filter(func(g: Dictionary) -> bool:return g.get("crumble_bridge",false)).size()==2,"fase%d: duas pontes frágeis" % order)
-	check(tasks==1,"uma única tarefa de ponte em toda a campanha; nenhuma habilidade nova")
+	check(tasks==19,"dezenove tarefas de cenário, sem habilidades permanentes")
 	var phase: Node3D = load("res://scenes/desert/phase_04.tscn").instantiate()
 	root.add_child(phase)
 	current_scene = phase
 	await frames(10)
 	phase.set_physics_process(false)
-	var hole: Dictionary = phase._phase.holes.filter(func(g: Dictionary) -> bool:return g.get("earth_bridge",false))[0]
+	var hole: Dictionary = phase._phase.tasks.filter(func(g: Dictionary) -> bool:return g.task_kind=="bridge")[0]
 	var player: Node3D = phase._player
 	player.position = Vector3(float(hole.start)-1.6,float(hole.from_y)+0.1,0)
 	player.velocity = Vector3.ZERO

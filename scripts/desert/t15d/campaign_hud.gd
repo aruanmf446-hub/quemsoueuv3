@@ -111,7 +111,7 @@ func _ready() -> void:
 	_root.add_child(_actions)
 	_bridge_task = Button.new()
 	_bridge_task.text = "Montar ponte · F"
-	_bridge_task.custom_minimum_size = Vector2(280,64)
+	_bridge_task.custom_minimum_size = Vector2(520,64)
 	_bridge_task.focus_mode = Control.FOCUS_NONE
 	PlayerUI.style_button(_bridge_task,true)
 	_bridge_task.pressed.connect(bridge_requested.emit)
@@ -129,8 +129,11 @@ func label(text: String, size: int, color: Color) -> Label:
 	return node
 func box() -> StyleBoxFlat:
 	return PlayerUI.plate()
-func set_bridge_task(available: bool) -> void:
+func set_bridge_task(available: bool,caption := "Montar ponte · F") -> void:
 	_bridge_task.visible = available
+	if _bridge_task.text!=caption:
+		_bridge_task.text=caption
+		_layout()
 func _layout() -> void:
 	var viewport_size := get_viewport().get_visible_rect().size
 	var compact := UIScale.is_iphone()

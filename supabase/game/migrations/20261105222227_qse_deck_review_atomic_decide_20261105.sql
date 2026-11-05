@@ -87,7 +87,7 @@ begin
     'status',case when p_approved then 'published' else 'rejected' end,
     'review_note',v_note);
 end
-$function$
+$function$;
 
 revoke all on function public.qse_deck_review_decide(uuid,boolean,text) from public,anon,authenticated;
 grant execute on function public.qse_deck_review_decide(uuid,boolean,text) to authenticated;

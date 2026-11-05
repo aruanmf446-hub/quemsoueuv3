@@ -60,7 +60,7 @@ CHAT: migration `20261105191616_qse_chat_bot_identity_dedupe_cooldown_20261105`.
 - **SQL CHAT em transação com rollback:** conversa temporária, primeira emissão, mesma emissão duplicada, segunda emissão sujeita a cooldown, leitura com membro BOT e reversão de todos os dados temporários.
 - **Grants:** `anon` e `authenticated` não executam `qse_chat_room_bot_emit`; somente `service_role`.
 - **Postflight:** Auth 10, profiles 8, stats 8, wallets 8, favoritos 3, música 1, partidas 17. CHAT 0 conversas/0 mensagens/0 emissões depois dos testes.
-- **Edge:** gateway v10 ACTIVE, código idêntico à branch, mantendo a configuração de JWT existente.
+- **Edge:** gateway v11 ACTIVE, código idêntico à branch, mantendo a configuração de JWT existente.
 
 **Não executados / não afirmar aprovação:** chamadas HTTP simultâneas com dois JWTs reais, testes de OAuth Google/Discord/e-mail e restauração de sessão, Godot real/CI com dois clientes, integração cruzada real GAME→CHAT com mensagens em sala, teste de desconexão e timeout em tempo real.
 

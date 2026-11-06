@@ -2,6 +2,8 @@
 
 Entrega para avaliação visual. Main/Pages não foram alterados nesta rodada.
 
+**Revisão posterior:** o proprietário aprovou a textura e pediu formato de diamante e tom laranja. [Capturas atuais do âmbar](../ambar-laranja/README.md). As imagens douradas abaixo são o registro anterior.
+
 ## O que muda no jogo
 
 - Na primeira recarga de defesa da fase 1, o jogo pausa e mostra uma ilustração do encontro real. O soldado espera essa coleta antes de arremessar.

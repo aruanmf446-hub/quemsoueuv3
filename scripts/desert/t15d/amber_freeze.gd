@@ -1,5 +1,5 @@
 extends Node3D
-## Casulo de âmbar facetado: formação dos pés à cabeça, rosto legível e quebra curta.
+## Cristal pontudo de âmbar laranja: textura transparente e quebra curta preservadas.
 ## Só apresentação: duração, alcance e imobilização pertencem ao Cactus/Player.
 const SHELL_SHADER=preload("res://scripts/desert/t15d/shaders/amber_crystal.gdshader")
 const FROST_SHADER=preload("res://scripts/desert/t15d/shaders/amber_frost.gdshader")
@@ -44,7 +44,7 @@ func _ready() -> void:
 	resin.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED
 	resin.cull_mode=BaseMaterial3D.CULL_DISABLED
 	resin.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA
-	resin.albedo_color=Color("#efbd60")
+	resin.albedo_color=Color("#f07825")
 	_chips.material_override=resin
 	add_child(_chips)
 	_chips.hide()
@@ -117,9 +117,9 @@ func _process(delta: float) -> void:
 		set_process(false)
 static func _ring(level: int,index: int) -> Vector3:
 	var angle:=TAU*(index%SIDES)/SIDES+PI/8.0
-	var rx: float=[0.44,0.52,0.50,0.34][level]
-	var rz: float=[0.32,0.40,0.38,0.27][level]
-	return Vector3(cos(angle)*rx,[0.025,0.20,1.52,1.82][level],sin(angle)*rz)
+	var rx: float=[0.0,0.43,0.66,0.43][level]
+	var rz: float=[0.0,0.33,0.48,0.32][level]
+	return Vector3(cos(angle)*rx,[-0.12,0.18,1.05,1.70][level],sin(angle)*rz)
 static func _vertex(st: SurfaceTool,p: Vector3,u: float,edge: bool,shade:=1.0) -> void:
 	st.set_color(Color(shade,shade,shade,1.0 if edge else 0.0))
 	st.set_uv(Vector2(u,p.y/1.90))
@@ -137,16 +137,17 @@ static func _build_shell() -> ArrayMesh:
 			var c:=_ring(level+1,i+1)
 			var d:=_ring(level+1,i)
 			var shade:=0.78+float(i%3)*0.10
-			_vertex(st,a,0.0,false,shade)
-			_vertex(st,b,1.0,false,shade)
-			_vertex(st,c,1.0,false,shade)
+			if level>0:
+				_vertex(st,a,0.0,false,shade)
+				_vertex(st,b,1.0,false,shade)
+				_vertex(st,c,1.0,false,shade)
 			_vertex(st,a,0.0,false,shade)
 			_vertex(st,c,1.0,false,shade)
 			_vertex(st,d,0.0,false,shade)
 			if i in [0,3]:_line(st,a,d)
-			# Friso só na base e no ombro: poucas arestas, sem grade sobre o rosto.
+			# Arestas discretas preservam a textura aprovada e marcam os planos do cristal.
 			if level==0:_line(st,a,b)
 	for i in SIDES:
-		for p: Vector3 in [_ring(3,i),_ring(3,i+1),Vector3(0,1.90,0)]:_vertex(st,p,0.0,false)
+		for p: Vector3 in [_ring(3,i),_ring(3,i+1),Vector3(0,2.38,0)]:_vertex(st,p,0.0,false)
 	st.generate_normals()
 	return st.commit()

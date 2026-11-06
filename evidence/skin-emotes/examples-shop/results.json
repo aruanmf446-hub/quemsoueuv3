@@ -1,0 +1,50 @@
+[
+  {
+    "width": 640,
+    "height": 360,
+    "iphone": true,
+    "reactions": [
+      "lobby",
+      "victory",
+      "defeat"
+    ],
+    "dancePreview": true,
+    "purchasePrice": 100,
+    "purchaseConfirmed": true,
+    "controlsVisible": true,
+    "realThumbnails": 4,
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "iphone": true,
+    "reactions": [
+      "lobby",
+      "victory",
+      "defeat"
+    ],
+    "dancePreview": true,
+    "purchasePrice": 100,
+    "purchaseConfirmed": true,
+    "controlsVisible": true,
+    "realThumbnails": 4,
+    "errors": []
+  },
+  {
+    "width": 1672,
+    "height": 941,
+    "iphone": false,
+    "reactions": [
+      "lobby",
+      "victory",
+      "defeat"
+    ],
+    "dancePreview": true,
+    "purchasePrice": 100,
+    "purchaseConfirmed": true,
+    "controlsVisible": true,
+    "realThumbnails": 4,
+    "errors": []
+  }
+]

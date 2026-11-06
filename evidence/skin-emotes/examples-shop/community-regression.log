@@ -1,0 +1,29 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS contrato de versão usa IDs estáveis de cartas
+PASS referência arbitrária não entra no catálogo
+PASS conta sem resgate não recebe deck jogável
+PASS resgate só fica confirmado após resposta do servidor
+PASS deck resgatado aparece no inventário da conta
+PASS resgate repetido não duplica coleção
+PASS resgate prepara apenas a capa da coleção antes de jogar
+PASS cinco prévias do duelo são baixadas sem originais
+PASS imagens em cache não são baixadas novamente
+PASS batalha resolve nome e textura da carta comunitária
+PASS seletor do duelo reutiliza a capa da versão resgatada
+PASS sala com bots aceita o deck resgatado
+PASS bot entra na sala com deck comunitário
+PASS partida local inicia usando o catálogo existente
+PASS pool da partida contém as cartas comunitárias, sem substituição
+PASS seleção de cartas funciona com o mesmo motor de partida
+PASS biblioteca abre o deck salvo na conta
+PASS coleção identifica posse e criador real do contrato
+PASS galeria mostra Resgatar grátis para conta elegível
+PASS ação nativa confirma o resgate e troca o botão pelo estado da conta
+PASS Meus Decks inclui o resgate uma única vez, com o criador
+PASS coleção é recuperável após reabrir a sessão no aparelho
+PASS resposta antiga do inventário não apaga um resgate confirmado
+PASS logout remove posse e cartas da memória ativa
+PASS outra conta não herda a coleção local
+PASS resposta atrasada de resgate não afeta outra sessão
+COMMUNITY_CLAIMS checks=26 failures=0

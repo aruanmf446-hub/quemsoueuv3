@@ -1,0 +1,24 @@
+{
+  "owners": 0,
+  "products": [
+    {
+      "id": "dance_01",
+      "active": false,
+      "asset_ready": false,
+      "price_coins": "100"
+    }
+  ],
+  "migration_hash": "83fbf5c2c95bdfd08aed63558c8a3f6c0ca291b95ec1cfa03ff6dfdb98175e9d",
+  "anonymous_cannot_buy": true,
+  "authenticated_cannot_write": true,
+  "anonymous_http": {
+    "qse_emote_shop": {
+      "status": 401,
+      "code": "42501"
+    },
+    "qse_emote_purchase": {
+      "status": 401,
+      "code": "42501"
+    }
+  }
+}

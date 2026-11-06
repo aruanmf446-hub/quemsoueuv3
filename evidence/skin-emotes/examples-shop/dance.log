@@ -1,0 +1,35 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS cowboy não altera o modelo original
+PASS cowboy prepara uma única dança demonstrativa
+PASS cowboy dança com seu esqueleto original
+PASS cowboy retorna à pose anterior
+PASS michelly não altera o modelo original
+PASS michelly prepara uma única dança demonstrativa
+PASS michelly dança com seu esqueleto original
+PASS michelly retorna à pose anterior
+PASS rodrigo não altera o modelo original
+PASS rodrigo prepara uma única dança demonstrativa
+PASS rodrigo dança com seu esqueleto original
+PASS rodrigo retorna à pose anterior
+PASS lorena não altera o modelo original
+PASS lorena prepara uma única dança demonstrativa
+PASS lorena dança com seu esqueleto original
+PASS lorena retorna à pose anterior
+PASS gus não altera o modelo original
+PASS gus prepara uma única dança demonstrativa
+PASS gus dança com seu esqueleto original
+PASS gus retorna à pose anterior
+PASS lana não altera o modelo original
+PASS lana prepara uma única dança demonstrativa
+PASS lana dança com seu esqueleto original
+PASS lana retorna à pose anterior
+PASS halloween não altera o modelo original
+PASS halloween prepara uma única dança demonstrativa
+PASS halloween dança com seu esqueleto original
+PASS halloween retorna à pose anterior
+PASS el_fuego não altera o modelo original
+PASS el_fuego prepara uma única dança demonstrativa
+PASS el_fuego dança com seu esqueleto original
+PASS el_fuego retorna à pose anterior
+DANCE_PREVIEW checks=32 failures=0

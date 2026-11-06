@@ -1,0 +1,23 @@
+[
+  {
+    "result": {
+      "areas": [
+        "auth",
+        "price100",
+        "asset_unavailable",
+        "purchase",
+        "coins_only",
+        "owned",
+        "idempotency",
+        "insufficient_funds",
+        "isolation",
+        "acl",
+        "rls",
+        "account_cleanup",
+        "atomic_rollback"
+      ],
+      "passed": true,
+      "transaction": "rollback"
+    }
+  }
+]

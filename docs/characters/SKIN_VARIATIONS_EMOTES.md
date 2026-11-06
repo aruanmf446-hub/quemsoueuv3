@@ -1,33 +1,27 @@
-# Prévia visual de skins e emotes
+# Skins, reações e emotes — prévia
 
-Branch: `work/skin-variations-emotes`.
+Branch `work/skin-variations-emotes`.
 
-Personagens possui abas Skins e Emotes. A aba Emotes mostra três cartões com
-poses capturadas do modelo real. Tocar/clicar no cartão reproduz o movimento
-no personagem maior, à direita. Mouse, toque e foco por teclado usam botões
-nativos e o estilo existente de PlayerUI.
+As abas separam Skins, Reações e Emotes. Os exemplos gratuitos de reação são
+Lobby (`anim_2`), Vitória (`anim_4`) e Derrota (`anim_3`). Os cartões reproduzem
+cada contexto no personagem maior, sem alterar partidas ou resultados reais.
 
-Os clipes são os FBX originais: Apresentação (`2.fbx`), Comemoração (`4.fbx`) e
-Reação de derrota (`3.fbx`), nos sete personagens iniciais. El Fuego mantém o
-estado sem emotes disponíveis. Cada prévia toca uma vez e restaura a pose ou
-animação anterior. As reações automáticas continuam tendo prioridade.
+A loja é separada. Tem prévia do movimento, preço de **100 moedas** e confirmação
+de compra. O saldo, o débito e a posse vêm do GAME; o cliente não escreve saldos.
+Uma resposta perdida reutiliza o identificador da compra. Posse já confirmada
+impede uma segunda cobrança, inclusive com outro identificador de requisição.
+O histórico da carteira identifica o lançamento como compra de emote.
 
-Um palco temporário captura três miniaturas da skin selecionada, enquadrando
-os ossos da pose. Depois é liberado. Os cartões usam texturas estáticas em cache;
-o personagem maior é o único que continua animado. Não há imagem gerada por IA:
-as miniaturas e capturas foram renderizadas pelo Godot com os assets existentes.
+A dancinha atual é uma animação original demonstrativa feita em GDScript sobre
+os ossos dos modelos existentes. Não foi extraída do YouTube. As imagens e o
+vídeo foram capturados no Godot, sem geração de imagens por IA. As miniaturas
+usam um palco temporário e ficam em cache como texturas estáticas.
 
-O escopo atual é uma prévia na coleção. Estilos alternativos de roupa/cor,
-seleção salva na conta e emotes compartilhados no lobby/sala/partida continuam
-como próximas etapas, dependentes da definição dos visuais e do uso desejado.
+O movimento real será anexado pelo dono. O produto `dance_01` foi registrado no
+GAME por 100 moedas, mas **continua inativo e sem asset aprovado**. A demonstração
+não está à venda. A compra só é habilitada com disponibilidade no servidor e
+movimento correspondente carregado no cliente. Os exemplos de lobby/vitória/
+derrota não são vendidos como dancinhas. A interface permanece apenas na branch.
 
-Validação no Godot oficial 4.7.2: dez verificações da galeria visual, 26 do
-controle dos emotes e 69 de regressão das reações automáticas, sem falhas.
-`tools/player_ui/check_design.py`: OK. Godot Web/Chromium aprovado em desktop
-1672×941 e iPhone UA/DPR3 em 844×390 e 640×360: três miniaturas carregadas com
-altura visível, cartões dentro da tela, clique/toque, reprodução e retorno à
-pose, sem erros de script. O ajuste de altura preserva o tamanho dos cartões
-sem aplicar a regra dos retratos de skins a eles.
-
-Capturas em `evidence/skin-emotes`. São fixtures isoladas, sem acesso ao backend.
-Não houve teste em iPhone físico; o ambiente não possui Xvfb.
+[Contrato, implantação e testes da compra](../backend/EMOTE_SHOP.md).
+[Capturas e gravação atuais](../../evidence/skin-emotes/examples-shop/README.md).

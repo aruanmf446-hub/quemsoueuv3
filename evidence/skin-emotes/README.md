@@ -1,3 +1,6 @@
+Prévia atual com exemplos de lobby, vitória, derrota e loja de 100 moedas:
+[Capturas e movimento](examples-shop/README.md).
+
 # Prévia visual dos emotes
 
 Capturas reais do Godot Web 4.7.2, com FBX originais e fixture isolada.

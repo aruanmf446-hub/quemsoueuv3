@@ -1,0 +1,66 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS vitrine inicial carrega uma página com cursor
+PASS pesquisa completa as páginas sem ficar limitada aos primeiros 48
+PASS envio pendente não aparece na pesquisa pública
+PASS deck reprovado não aparece na Comunidade
+PASS após aprovação, busca pelo nickname encontra deck além da primeira página
+PASS cartão da pesquisa mostra o nickname do criador retornado pelo servidor
+PASS identificação do criador cabe no cartão
+PASS pesquisa também encontra o nome do deck sem distinguir maiúsculas
+PASS filtro pelo criador não mistura autoria diferente
+PASS detalhe do deck mantém a atribuição ao mesmo criador
+PASS nickname ausente não é substituído por e-mail ou nome do Google
+PASS falha de paginação conserva o catálogo anterior
+PASS cursor repetido termina com erro em vez de repetir para sempre
+PASS falha informa resultados possivelmente incompletos e permite tentar novamente
+PASS tentar novamente recupera pesquisa e autoria
+PASS usa apenas a RPC existente e paginação de metadados
+COMMUNITY_ATTRIBUTION checks=16 failures=0 1672x941
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS vitrine inicial carrega uma página com cursor
+PASS pesquisa completa as páginas sem ficar limitada aos primeiros 48
+PASS envio pendente não aparece na pesquisa pública
+PASS deck reprovado não aparece na Comunidade
+PASS após aprovação, busca pelo nickname encontra deck além da primeira página
+PASS cartão da pesquisa mostra o nickname do criador retornado pelo servidor
+PASS identificação do criador cabe no cartão
+PASS pesquisa também encontra o nome do deck sem distinguir maiúsculas
+PASS filtro pelo criador não mistura autoria diferente
+PASS detalhe do deck mantém a atribuição ao mesmo criador
+PASS nickname ausente não é substituído por e-mail ou nome do Google
+PASS falha de paginação conserva o catálogo anterior
+PASS cursor repetido termina com erro em vez de repetir para sempre
+PASS falha informa resultados possivelmente incompletos e permite tentar novamente
+PASS tentar novamente recupera pesquisa e autoria
+PASS usa apenas a RPC existente e paginação de metadados
+COMMUNITY_ATTRIBUTION checks=16 failures=0 844x390
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS vitrine inicial carrega uma página com cursor
+PASS pesquisa completa as páginas sem ficar limitada aos primeiros 48
+PASS envio pendente não aparece na pesquisa pública
+PASS deck reprovado não aparece na Comunidade
+PASS após aprovação, busca pelo nickname encontra deck além da primeira página
+PASS cartão da pesquisa mostra o nickname do criador retornado pelo servidor
+PASS identificação do criador cabe no cartão
+PASS pesquisa também encontra o nome do deck sem distinguir maiúsculas
+PASS filtro pelo criador não mistura autoria diferente
+PASS detalhe do deck mantém a atribuição ao mesmo criador
+PASS nickname ausente não é substituído por e-mail ou nome do Google
+PASS falha de paginação conserva o catálogo anterior
+PASS cursor repetido termina com erro em vez de repetir para sempre
+PASS falha informa resultados possivelmente incompletos e permite tentar novamente
+PASS tentar novamente recupera pesquisa e autoria
+PASS usa apenas a RPC existente e paginação de metadados
+COMMUNITY_ATTRIBUTION checks=16 failures=0 640x360

@@ -39,6 +39,27 @@ func _run() -> void:
 	if not prompt.is_visible_in_tree() or not Rect2(Vector2.ZERO,fixture.ui.size).encloses(prompt.get_global_rect()): failures+=1
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(output+"/"+dimensions+"_review.png")
+	# Composição válida de cinco cartas reais, sem publicação nem chamadas de backend.
+	fixture.ui._draft.name="[TESTE] Lendas em cartas"
+	fixture.ui._draft.category="Lendas e terror"
+	fixture.ui._draft.cards[0].name="Momo"
+	var assets := ["loira_do_banheiro","homem_do_saco","cobra_grande","dama_de_branco"]
+	var names := ["Loira do banheiro","Homem do saco","Cobra grande","Dama de branco"]
+	for i in assets.size():
+		var art := (load("res://assets/duel/decks/oficial/lendas_urbanas/"+assets[i]+".png") as Texture2D).get_image()
+		var card := {"id":"visual_"+str(i),"name":names[i],"crops":{}}
+		card.image_file=fixture.ui._store().store_original(str(fixture.ui._draft.id),str(card.id),art.save_png_to_buffer(),"png")
+		fixture.ui._store().store_previews(str(fixture.ui._draft.id),card,art)
+		fixture.ui._draft.cards.append(card)
+	fixture.ui._render_review()
+	for frame in 12: await process_frame
+	prompt=fixture.ui.find_child("CopyDeckStylePrompt",true,false)
+	var visible: Rect2=fixture.ui.get_node("Margin/Column/Scroll").get_global_rect()
+	if not visible.encloses(prompt.get_global_rect()): failures+=1
+	var publish: Button=fixture.ui.find_child("PublishDeck",true,false)
+	if not Rect2(Vector2.ZERO,fixture.ui.size).encloses(publish.get_global_rect()): failures+=1
+	await RenderingServer.frame_post_draw
+	root.get_texture().get_image().save_png(output+"/"+dimensions+"_review_ready.png")
 	fixture.queue_free()
 	for frame in 4: await process_frame
 	print("IPHONE_DECK_LAYOUT failures=",failures," ",dimensions)

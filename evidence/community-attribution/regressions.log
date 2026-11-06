@@ -1,0 +1,26 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS vitrine buscada no GAME
+PASS deck da Comunidade aparece na Biblioteca
+PASS capa baixada (prévia autenticada)
+PASS abrir deck publicado mostra as 5 cartas
+PASS botão Denunciar
+PASS denúncia enviada
+PASS Publicar na Comunidade habilitado
+PASS deck enviado para revisão
+PASS deck e cartas enviados antes do pedido
+PASS clique repetido não duplica pedido de revisão
+PASS Meus Decks mostra EM REVISÃO
+PASS recusa e motivo atualizados do servidor
+PASS deck publicado não é editável
+PASS retirar da Comunidade libera a edição
+T27_COMUNIDADE checks=14 failures=0
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+DECK_STORAGE_REVIEW checks=25 failures=0 1672x941

@@ -35,6 +35,9 @@ const server=spawn('python3',['-m','http.server','8136','--bind','127.0.0.1'],{c
   fs.writeFileSync(out+'/nickname-results.json',JSON.stringify(results,null,2));
   await load('deck');await page.evaluate(()=>qseDeckInputProbe('bottom'));await page.waitForTimeout(400);
   let state=await report();results.deck=state;
+  await page.waitForFunction(()=>document.querySelector('.qse-image-input'),null,{timeout:10000});
+  state=await report();results.deck=state;
+  results.fileInputs=await page.locator('.qse-image-input').evaluateAll(nodes=>nodes.map(n=>({label:n.getAttribute('aria-label'),rect:n.getBoundingClientRect().toJSON()})));
   const button=state.controls.find(c=>c.name==='AddCard');
   const canvas=await page.locator('#canvas').boundingBox();
   const chooser=page.waitForEvent('filechooser',{timeout:2500}).catch(()=>null);
@@ -42,7 +45,7 @@ const server=spawn('python3',['-m','http.server','8136','--bind','127.0.0.1'],{c
   await page.touchscreen.tap(canvas.x+(x+w/2)*canvas.width/state.size[0],canvas.y+(y+h/2)*canvas.height/state.size[1]);
   const file=await chooser;results.fileChooser=!!file;
   if(file){await file.setFiles(require('path').join(__dirname,'../../assets/duel/decks/oficial/lendas_urbanas/momo.png'));await page.waitForTimeout(1000);results.afterFile=await report();}
-  fs.writeFileSync(out+'/file-results.json',JSON.stringify(results.afterFile,null,2));
+  fs.writeFileSync(out+'/file-results.json',JSON.stringify(results.afterFile||{fileChooser:results.fileChooser,deck:results.deck,fileInputs:results.fileInputs},null,2));
   await page.screenshot({path:out+'/frame.png',scale:'css'});
   if(fixed){
    assert.equal(results.nicknameInitial.fields.NicknameInput,'');
@@ -78,7 +81,13 @@ const server=spawn('python3',['-m','http.server','8136','--bind','127.0.0.1'],{c
    await page.evaluate(()=>document.activeElement.blur());
    results.name=await report();assert.equal(results.name.name,'Meu deck mobile');
    const attach=async(name)=>{
-    const pending=page.waitForEvent('filechooser',{timeout:5000});await tap(name);
+    await page.evaluate(n=>qseDeckInputProbe('focus:'+n),name);
+    const expected=name==='ReplaceImage'?'Trocar imagem':'Enviar imagem';
+    await page.waitForFunction(label=>Array.from(document.querySelectorAll('.qse-image-input')).some(n=>n.getAttribute('aria-label')===label),expected,{timeout:10000});
+    const r=await report(),control=r.controls.find(c=>c.name===name);
+    const canvas=await page.locator('#canvas').boundingBox(),[x,y,w,h]=control.rect;
+    const pending=page.waitForEvent('filechooser',{timeout:5000});
+    await page.touchscreen.tap(canvas.x+(x+w/2)*canvas.width/r.size[0],canvas.y+(y+h/2)*canvas.height/r.size[1]);
     const chooser=await pending;await chooser.setFiles(require('path').join(__dirname,'../../assets/duel/decks/oficial/lendas_urbanas/momo.png'));
     await page.waitForTimeout(800);assert.ok((await report()).controls.some(c=>c.name==='ConfirmFrame'));
     await tap('ConfirmFrame',false);await page.waitForTimeout(600);

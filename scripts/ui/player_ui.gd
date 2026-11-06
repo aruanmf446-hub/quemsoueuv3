@@ -541,3 +541,95 @@ static func decision_controls(parent: Control,confirm: Callable,cancel: Callable
 		button.custom_minimum_size=Vector2(44,44)
 		row.add_child(button)
 	return overlay
+
+
+## Criador de decks: componentes nativos, com a mesma fonte/controles do PlayerUI.
+## A variação de superfície organiza o conteúdo sem alterar os outros menus.
+static func creator_panel(parent: Node, kind: String = "normal", padding: int = 20) -> VBoxContainer:
+	var panel := PanelContainer.new()
+	panel.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	var edge := Color("#444566")
+	var background := Color("#191d31")
+	if kind=="accent": edge=Color("#a77a47")
+	elif kind=="warning":
+		edge=Color("#bd586a")
+		background=Color("#2a1d2d")
+	var box := _flat(background,edge,12,Color.WHITE)
+	_pad(box,padding,padding)
+	panel.add_theme_stylebox_override("panel",box)
+	parent.add_child(panel)
+	var content := column(panel)
+	content.add_theme_constant_override("separation",12)
+	return content
+
+static func creator_action(button: Button, icon_name: String, primary: bool = false) -> void:
+	editor_control(button,primary)
+	button.icon=PremiumUI.icon(icon_name,INK if primary else GOLD,48)
+	button.add_theme_constant_override("icon_max_width",26)
+	button.add_theme_constant_override("h_separation",10)
+	if icon_name=="x":
+		var warning := Color("#ffb1bc")
+		button.icon=PremiumUI.icon(icon_name,warning,48)
+		for state in ["font_color","font_hover_color","font_focus_color"]: button.add_theme_color_override(state,warning)
+
+static func creator_heading(parent: Node, title: String, subtitle: String, icon_name: String) -> void:
+	var line := row(parent)
+	line.add_child(PremiumUI.icon_rect(icon_name,GOLD,44))
+	var words := column(line)
+	words.add_theme_constant_override("separation",4)
+	words.add_child(label(title,26))
+	if not subtitle.is_empty(): words.add_child(label(subtitle,20,MUTED))
+
+static func creator_badge(parent: Node, text: String, state: String = "") -> Label:
+	var ink := MUTED
+	var edge := Color("#444566")
+	var bg := Color("#20253b")
+	if state in ["rejected","removed"]:
+		ink=Color("#ffb1bc"); edge=Color("#bd586a"); bg=Color("#35202e")
+	elif state=="published":
+		ink=Color("#a4e5c2"); edge=Color("#4a9874"); bg=Color("#1b352f")
+	elif state in ["pending_review","revision"]:
+		ink=GOLD_BRIGHT; edge=Color("#a77a47"); bg=Color("#352c29")
+	var panel := PanelContainer.new()
+	panel.size_flags_horizontal=Control.SIZE_SHRINK_BEGIN
+	var box := _flat(bg,edge,7,Color.WHITE)
+	_pad(box,8,5)
+	panel.add_theme_stylebox_override("panel",box)
+	parent.add_child(panel)
+	var value := label(text,20,ink)
+	value.autowrap_mode=TextServer.AUTOWRAP_OFF
+	panel.add_child(value)
+	return value
+
+static func creator_picture(parent: Node, texture: Texture2D, dimensions: Vector2) -> Control:
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size=dimensions
+	panel.size_flags_horizontal=Control.SIZE_SHRINK_BEGIN
+	panel.size_flags_vertical=Control.SIZE_SHRINK_BEGIN
+	var box := _flat(Color("#101426"),Color("#a77a47"),9,Color.WHITE)
+	_pad(box,5,5)
+	panel.add_theme_stylebox_override("panel",box)
+	parent.add_child(panel)
+	if texture!=null:
+		var art := TextureRect.new()
+		art.texture=texture
+		art.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+		art.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		art.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		panel.add_child(art)
+	else:
+		var center := CenterContainer.new()
+		panel.add_child(center)
+		center.add_child(PremiumUI.icon_rect("cards",GOLD,60))
+	return panel
+
+static func creator_progress(parent: Node, count: int, maximum: int) -> void:
+	var bar := ProgressBar.new()
+	bar.custom_minimum_size.y=8
+	bar.show_percentage=false
+	bar.max_value=maximum
+	bar.value=count
+	bar.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	bar.add_theme_stylebox_override("background",_flat(Color("#101426"),Color("#444566"),4,Color.WHITE))
+	bar.add_theme_stylebox_override("fill",_flat(GOLD,Color.TRANSPARENT,4,Color.WHITE))
+	parent.add_child(bar)

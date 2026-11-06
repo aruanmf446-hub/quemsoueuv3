@@ -41,3 +41,18 @@ funcionalidade ou corrigir um bug.
 
 `python3 tools/player_ui/check_design.py` continua impedindo imagens como moldura
 nas telas do jogador. A verificação funcional não substitui a conferência visual.
+
+## Criador e acompanhamento de decks — referência de composição de 06/11/2026
+
+O dono enviou novas referências específicas para Criar deck, Revisar deck e
+Status dos decks, pedindo adaptação da interface existente. Nessas telas,
+`PlayerUI.creator_*` agrupa metadados e cartas em superfícies azul-violeta,
+com molduras discretas, capa real, ícones e acentos dourados. O motivo da
+reprovação tem destaque próprio; reprovado usa vermelho, aprovado usa verde.
+A revisão se organiza para a tela deitada, com resumo e prompt ao lado das
+cartas, e ações persistentes no rodapé. Fontes, limites reais, controles nativos,
+identidade da conta e fluxos existentes permanecem os mesmos.
+
+A arte de referência não vira fundo/hotspots; não há tema paralelo nem
+alteração global nas demais telas. Capturas e validação em
+[evidence/deck-creator-polish](../../evidence/deck-creator-polish/README.md).

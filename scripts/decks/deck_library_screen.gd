@@ -180,6 +180,9 @@ func _page(title: String, view: String) -> void:
 	back.custom_minimum_size.x = 0
 	PlayerUI.standard_back(back, "Voltar" if view == "library" else ("Biblioteca" if view == "deck" else "Galeria"))
 	_layout_changed()
+	if view in ["editor","review","submissions"]:
+		PlayerUI.standard_back(back,"Editar" if view=="review" else "Meus Decks")
+		heading.add_theme_font_size_override("font_size",34)
 	_refit_margin.call_deferred()
 
 func _render_library() -> void:
@@ -447,20 +450,51 @@ func _submission_text(parent: Node, value: String, node_name: String, color:=Pla
 func _is_revision(draft: Dictionary) -> bool:
 	return _moderation(draft)=="rejected" or (_moderation(draft)=="draft" and not str(draft.get("review_note", "")).strip_edges().is_empty())
 
+func _draft_picture(draft: Dictionary) -> Texture2D:
+	var cover := DeckCover.resolve_draft(_store(),draft)
+	return DeckCover.load_texture(str(cover.get("path","")))
+
+func _draft_summary(parent: Node, draft: Dictionary) -> void:
+	var panel := PlayerUI.creator_panel(parent)
+	panel.name="DeckSummary"
+	var line := PlayerUI.row(panel)
+	PlayerUI.creator_picture(line,_draft_picture(draft),Vector2(76,106))
+	var words := PlayerUI.column(line)
+	words.add_theme_constant_override("separation",12)
+	var title := _submission_text(words,str(draft.get("name","")) if not str(draft.get("name", "")).is_empty() else tr("Sem nome"),"DeckSummaryName",PlayerUI.TEXT,26)
+	title.tooltip_text=title.text
+	words.add_theme_constant_override("separation",8)
+	if not str(draft.get("category", "")).is_empty(): _submission_text(words,str(draft.category),"DeckSummaryCategory",PlayerUI.MUTED,20)
+	var facts := HFlowContainer.new()
+	facts.add_theme_constant_override("h_separation",8)
+	facts.add_theme_constant_override("v_separation",8)
+	words.add_child(facts)
+	PlayerUI.creator_badge(facts,tr({"private":"Privado","unlisted":"Não listado","public":"Público"}.get(str(draft.get("visibility","private")),"Privado")))
+	PlayerUI.creator_badge(facts,tr("%d carta%s") % [draft.get("cards",[]).size(),"" if draft.get("cards",[]).size()==1 else "s"])
+
 func _review_feedback(parent: Node, draft: Dictionary) -> void:
 	if not _is_revision(draft): return
-	_submission_text(parent,tr("Motivo da reprovação"),"RejectionHeading",PlayerUI.GOLD)
+	var warning := PlayerUI.creator_panel(parent,"warning",16)
+	var line := PlayerUI.row(warning)
+	line.add_child(PremiumUI.icon_rect("info",Color("#ffb1bc"),30))
+	var text := PlayerUI.column(line)
+	text.add_theme_constant_override("separation",6)
+	_submission_text(text,tr("Motivo da reprovação"),"RejectionHeading",Color("#ffb1bc"))
 	var reason := str(draft.get("review_note", "")).strip_edges()
-	_submission_text(parent,reason if not reason.is_empty() else tr("A revisão não informou um motivo. Atualize o status para consultar novamente."),"RejectionReason")
+	_submission_text(text,reason if not reason.is_empty() else tr("A revisão não informou um motivo. Atualize o status para consultar novamente."),"RejectionReason")
 
 func _render_submissions() -> void:
 	_page("Status dos decks","submissions")
-	$Margin/Column/Header/Back.text=tr("‹ Meus Decks")
+	PlayerUI.standard_back($Margin/Column/Header/Back,"Meus Decks")
+	var intro := PlayerUI.row(body)
+	var caption := PlayerUI.column(intro)
+	PlayerUI.creator_heading(caption,"Acompanhe seus decks","Veja o resultado da revisão e o próximo passo.","cards")
 	var refresh := _action("Atualizar status",_refresh_moderation)
 	refresh.name="RefreshDeckStatuses"
 	refresh.disabled=_moderation_busy
-	PlayerUI.editor_control(refresh)
-	body.add_child(refresh)
+	PlayerUI.creator_action(refresh,"refresh")
+	refresh.custom_minimum_size.x=260
+	intro.add_child(refresh)
 	var messages := {
 		"idle":"Mostrando o último status salvo. Atualize para consultar a revisão.",
 		"loading":"Consultando o status dos seus decks…",
@@ -475,12 +509,16 @@ func _render_submissions() -> void:
 	if drafts.is_empty():
 		_submission_text(body,tr("Nenhum deck neste aparelho. Seus envios aparecem aqui após a sincronização da conta."),"NoSubmissions",PlayerUI.MUTED)
 	for draft: Dictionary in drafts:
-		var row := PlayerUI.card(body)
-		row.name="Submission_"+str(draft.id)
+		var panel := PlayerUI.creator_panel(body,"accent")
+		panel.name="Submission_"+str(draft.id)
+		var layout := PlayerUI.row(panel)
+		PlayerUI.creator_picture(layout,_draft_picture(draft),Vector2(138,194))
+		var row := PlayerUI.column(layout)
 		_submission_text(row,str(draft.get("name","")) if not str(draft.get("name", "")).is_empty() else tr("Sem nome"),"SubmissionName",PlayerUI.TEXT,28)
 		var state := "revision" if _is_revision(draft) and _moderation(draft)=="draft" else _moderation(draft)
 		var titles := {"draft":"Rascunho · ainda não enviado", "pending_review":"Em revisão", "rejected":"Reprovado · precisa de ajustes", "revision":"Em correção · aguardando reenvio", "published":"Aprovado · publicado", "removed":"Removido pela moderação"}
-		_submission_text(row,tr(titles.get(state,"Status indisponível · atualize")),"SubmissionState",PlayerUI.GOLD)
+		var badge := PlayerUI.creator_badge(row,tr(titles.get(state,"Status indisponível · atualize")),state)
+		badge.name="SubmissionState"
 		var help := {"revision":"Suas alterações estão em rascunho. Conclua a correção e reenvie para nova revisão.", "draft":"Conclua as cartas e envie o deck para revisão.", "pending_review":"Seu envio aguarda a decisão da moderação. A aprovação libera o deck na Comunidade.", "rejected":"Corrija o conteúdo conforme o motivo abaixo e reenvie. O deck passará por uma nova revisão.", "published":"O deck foi aprovado e está disponível na Comunidade.", "removed":"Este deck foi removido e não pode ser reenviado por esta tela."}
 		_submission_text(row,tr(help.get(state,"Consulte novamente antes de enviar.")),"SubmissionHelp",PlayerUI.MUTED)
 		_review_feedback(row,draft)
@@ -489,7 +527,7 @@ func _render_submissions() -> void:
 			if _moderation(draft) in ["draft","rejected"]: _render_editor()
 			else: _render_review())
 		action.name="SubmissionAction"
-		PlayerUI.editor_control(action,state in ["rejected","revision"])
+		PlayerUI.creator_action(action,"pencil" if state in ["rejected","revision","draft"] else "eye",state in ["rejected","revision"])
 		row.add_child(action)
 	_reveal()
 
@@ -1294,6 +1332,9 @@ func _render_deck(item: Dictionary) -> void:
 
 func _fit_grid() -> void:
 	if not is_instance_valid(_grid): return
+	if _view=="review":
+		_grid.columns=clampi(floori((_physical_size().x-480)/130),2,8)
+		return
 	var available := _physical_size().x - (56 if _compact() else 96)
 	_grid.columns = clampi(floori((available + 16) / (148 if _compact() else 236)), 1, 6)
 	var width := floorf((available - (_grid.columns - 1) * 16) / _grid.columns)
@@ -1546,7 +1587,7 @@ func _render_editor() -> void:
 	if _draft.is_empty(): _draft = _store().new_draft()
 	if _moderation(_draft) in ["pending_review", "published"]:
 		_page(str(_draft.name), "editor")
-		$Margin/Column/Header/Back.text = tr("‹ Meus Decks")
+		PlayerUI.standard_back($Margin/Column/Header/Back,"Meus Decks")
 		var locked := _text("Este deck está %s. Para editar, retire-o da Comunidade primeiro." % (tr("em revisão") if _moderation(_draft) == "pending_review" else tr("publicado")), 18)
 		locked.name = "EditorLocked"
 		body.add_child(locked)
@@ -1557,25 +1598,35 @@ func _render_editor() -> void:
 		_reveal()
 		return
 	_page("Criar deck" if str(_draft.name).is_empty() else str(_draft.name), "editor")
-	$Margin/Column/Header/Back.text=tr("‹ Meus Decks")
+	PlayerUI.standard_back($Margin/Column/Header/Back,"Meus Decks")
 	body.add_theme_constant_override("separation",12)
 	_review_feedback(body,_draft)
-	_add_prompt_action()
-	var form := PlayerUI.row(body)
+	var metadata := PlayerUI.creator_panel(body)
+	var form := PlayerUI.row(metadata)
 	form.name="DeckForm"
 	var identity := PlayerUI.column(form)
-	identity.add_child(_text("NOME DO DECK",20,PlayerUI.MUTED))
+	var identity_label := PlayerUI.row(identity)
+	identity_label.add_child(_text("NOME DO DECK *",20,PlayerUI.TEXT))
+	var name_count := _text("%d/%d" % [str(_draft.name).length(),DeckDrafts.NAME_MAX],18,PlayerUI.MUTED)
+	name_count.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
+	identity_label.add_child(name_count)
 	var name_field := _field(str(_draft.name),"Dê um nome ao seu deck",DeckDrafts.NAME_MAX)
 	name_field.name="DeckName"
 	PlayerUI.editor_control(name_field)
-	name_field.text_changed.connect(func(value: String)->void:_draft.name=value)
+	name_field.text_changed.connect(func(value: String)->void:
+		_draft.name=value
+		name_count.text="%d/%d" % [value.length(),DeckDrafts.NAME_MAX])
 	identity.add_child(name_field)
 	var category := PlayerUI.column(form)
-	category.add_child(_text("CATEGORIA",20,PlayerUI.MUTED))
+	category.add_child(_text("CATEGORIA *",20,PlayerUI.TEXT))
 	var select := _options("DeckCategory",DeckDrafts.CATEGORIES,DeckDrafts.CATEGORIES,"category")
 	PlayerUI.editor_control(select)
 	category.add_child(select)
-	body.add_child(_text("DESCRIÇÃO · OPCIONAL",20,PlayerUI.MUTED))
+	var description_label := PlayerUI.row(metadata)
+	description_label.add_child(_text("DESCRIÇÃO · OPCIONAL",20,PlayerUI.MUTED))
+	var description_count := _text("%d/%d" % [str(_draft.description).length(),DeckDrafts.DESCRIPTION_MAX],18,PlayerUI.MUTED)
+	description_count.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
+	description_label.add_child(description_count)
 	var description := TextEdit.new()
 	description.name="DeckDescription"
 	description.text=str(_draft.description)
@@ -1583,14 +1634,16 @@ func _render_editor() -> void:
 	description.wrap_mode=TextEdit.LINE_WRAPPING_BOUNDARY
 	description.set_meta("qse_max_length",DeckDrafts.DESCRIPTION_MAX)
 	PlayerUI.editor_control(description)
-	description.text_changed.connect(func()->void:_draft.description=description.text.left(DeckDrafts.DESCRIPTION_MAX))
-	body.add_child(description)
+	description.text_changed.connect(func()->void:
+		_draft.description=description.text.left(DeckDrafts.DESCRIPTION_MAX)
+		description_count.text="%d/%d" % [str(_draft.description).length(),DeckDrafts.DESCRIPTION_MAX])
+	metadata.add_child(description)
 	WebTextBridge.attach(description)
 	var details := _action(("▾" if _editor_details_open else "▸")+" Capa e referência visual · opcional",func()->void:
 		_editor_details_open=not _editor_details_open
 		_render_editor())
 	details.name="DeckDetails"
-	PlayerUI.editor_control(details)
+	PlayerUI.creator_action(details,"eye")
 	body.add_child(details)
 	var extra := PlayerUI.column(body)
 	extra.name="DeckOptionalDetails"
@@ -1604,18 +1657,17 @@ func _render_editor() -> void:
 	extra.add_child(_options("DeckStyleReference",references.map(func(item: Dictionary)->String:return str(item.name)),references.map(func(item: Dictionary)->String:return str(item.id)),"style_reference"))
 	for node: Control in extra.find_children("*","Control",true,false):
 		if node is BaseButton or node is LineEdit: PlayerUI.editor_control(node)
-	body.add_child(_text("CARTAS · %d de %d" % [_draft.cards.size(),Catalog.MAX_CARDS],22,PlayerUI.GOLD))
-	if _draft.cards.is_empty():
-		var hint := _text("Adicione as imagens e dê um nome a cada carta. Mínimo de 5 cartas para enviar à revisão gratuita.",20,PlayerUI.MUTED)
-		hint.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-		body.add_child(hint)
+	var card_intro := PlayerUI.creator_panel(body)
+	PlayerUI.creator_heading(card_intro,"CARTAS · %d de %d" % [_draft.cards.size(),Catalog.MAX_CARDS],"Adicione suas imagens e dê um nome a cada carta. Mínimo de 5 para revisão.","cards")
+	PlayerUI.creator_progress(card_intro,_draft.cards.size(),Catalog.MAX_CARDS)
+	_add_prompt_action()
 	var list := PlayerUI.column(body)
 	list.name="DraftCards"
 	for i in range(_draft.cards.size()): list.add_child(_card_row(i))
 	var actions := PlayerUI.row($Margin/Column)
 	actions.name="DeckEditorActions"
 	actions.size_flags_vertical=Control.SIZE_SHRINK_END
-	var add := _action("+ Adicionar imagem",func()->void:
+	var add := _action("Adicionar imagem",func()->void:
 		_pending_card=-1
 		_picker.pick())
 	add.name="AddCard"
@@ -1632,7 +1684,7 @@ func _render_editor() -> void:
 	actions.add_child(review)
 	for button: Button in [add,save,review]:
 		button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-		PlayerUI.editor_control(button,button==review)
+		PlayerUI.creator_action(button,"plus" if button==add else ("inbox" if button==save else "chevron"),button==review)
 	_reveal()
 
 
@@ -1665,18 +1717,12 @@ func _card_row(index: int) -> Control:
 	var wrapper := VBoxContainer.new()
 	wrapper.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	wrapper.name="DraftCard_%d" % index
-	var row := PlayerUI.row(wrapper)
-	row.add_theme_constant_override("separation", 10)
-	var thumb := TextureRect.new()
-	thumb.name = "Thumb"
-	thumb.custom_minimum_size = Vector2(120, 168)
-	thumb.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	thumb.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	var preview := _store().preview_path(str(_draft.id), card)
-	if FileAccess.file_exists(preview):
-		var image := Image.load_from_file(preview)
-		if image != null: thumb.texture = ImageTexture.create_from_image(image)
-	row.add_child(thumb)
+	var surface := PlayerUI.creator_panel(wrapper)
+	var row := PlayerUI.row(surface)
+	row.add_theme_constant_override("separation",20)
+	var preview := _store().preview_path(str(_draft.id),card)
+	var thumb := PlayerUI.creator_picture(row,DeckCover.load_texture(preview),Vector2(126,176))
+	thumb.name="Thumb"
 	var fields := PlayerUI.column(row)
 	fields.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var name_field := _field(str(card.get("name", "")), "Nome da carta", DeckDrafts.CARD_NAME_MAX)
@@ -1689,7 +1735,7 @@ func _card_row(index: int) -> Control:
 	PlayerUI.editor_control(description)
 	description.text_changed.connect(func(value: String) -> void: card.description = value)
 	fields.add_child(description)
-	var tools := PlayerUI.row(wrapper)
+	var tools := PlayerUI.row(surface)
 	tools.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	tools.custom_minimum_size.x = 0
 	tools.add_theme_constant_override("separation", 6)
@@ -1719,7 +1765,11 @@ func _card_row(index: int) -> Control:
 		_render_editor())
 	remove.name = "RemoveCard"
 	tools.add_child(remove)
-	for button: Button in tools.find_children("*","Button",true,false): PlayerUI.editor_control(button)
+	for button: Button in tools.find_children("*","Button",true,false):
+		PlayerUI.editor_control(button)
+		if button not in [up,down]:
+			button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+			PlayerUI.creator_action(button,"target" if button==frame else ("cards" if button==replace else "x"))
 	return wrapper
 
 
@@ -1887,61 +1937,77 @@ func _report(result: Dictionary) -> void:
 func _render_review() -> void:
 	_page("Revisar deck", "review")
 	$Margin/Column/Scroll.scroll_vertical=0
-	$Margin/Column/Header/Back.text = tr("‹ Editar")
+	PlayerUI.standard_back($Margin/Column/Header/Back,"Editar")
 	var problems := DeckDrafts.problems(_draft)
-	_review_feedback(body,_draft)
-	_add_prompt_action()
-	body.add_child(_data_text(str(_draft.name) if not str(_draft.name).is_empty() else tr("Sem nome"), 30))
-	body.add_child(_data_text("%s  ·  %s  ·  %d cartas" % [str(_draft.category), {"private": "Privado", "unlisted": "Não listado", "public": "Público"}.get(str(_draft.visibility), "—"), _draft.cards.size()], 16, PlayerUI.MUTED))
+	var layout := PlayerUI.row(body)
+	layout.add_theme_constant_override("separation",20)
+	var sidebar := PlayerUI.column(layout)
+	sidebar.custom_minimum_size.x=340
+	sidebar.size_flags_horizontal=Control.SIZE_FILL
+	_draft_summary(sidebar,_draft)
+	_add_prompt_action(sidebar,true)
+	_review_feedback(sidebar,_draft)
 	if not problems.is_empty():
-		body.add_child(_text("ANTES DE PUBLICAR", 12, PlayerUI.GOLD))
-		for problem: String in problems: body.add_child(_data_text("•  " + problem, 16, Color("#ff9797")))
+		var warning := PlayerUI.creator_panel(sidebar,"warning",16)
+		PlayerUI.creator_heading(warning,"Antes de publicar","Complete os itens abaixo.","info")
+		for problem: String in problems: _submission_text(warning,"• "+problem,"DeckValidationIssue",Color("#ffb1bc"),20)
+	var gallery := PlayerUI.creator_panel(layout)
+	PlayerUI.creator_heading(gallery,"Confira as cartas do seu deck","Revise imagens, nomes e tema antes de enviar.","eye")
 	_grid = GridContainer.new()
 	_grid.name = "ReviewGallery"
 	_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_grid.add_theme_constant_override("h_separation", 12)
 	_grid.add_theme_constant_override("v_separation", 12)
-	body.add_child(_grid)
-	_grid.columns = clampi(floori((_physical_size().x - 96) / 150), 2, 8)
+	gallery.add_child(_grid)
+	_grid.columns=clampi(floori((_physical_size().x-480)/130),2,8)
 	for card: Dictionary in _draft.cards:
 		var column := PlayerUI.column(_grid)
-		var image := TextureRect.new()
-		image.custom_minimum_size = Vector2(130, 182)
-		image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		var preview := _store().preview_path(str(_draft.id), card)
-		if FileAccess.file_exists(preview): image.texture = ImageTexture.create_from_image(Image.load_from_file(preview))
-		column.add_child(image)
-		column.add_child(_data_text(str(card.get("name", "")), 14))
+		column.add_theme_constant_override("separation",8)
+		var preview := _store().preview_path(str(_draft.id),card)
+		PlayerUI.creator_picture(column,DeckCover.load_texture(preview),Vector2(118,166))
+		var title := _submission_text(column,str(card.get("name","")),"ReviewCardName",PlayerUI.TEXT,20)
+		title.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+		title.custom_minimum_size.x=118
 	var moderation := _moderation(_draft)
 	var publish := _action("Reenviar para revisão · grátis" if _is_revision(_draft) else "Enviar para revisão · grátis", _publish_draft.bind(_draft))
 	publish.name = "PublishDeck"
 	publish.disabled = not problems.is_empty() or moderation in ["pending_review", "published", "removed"] or not _sync().available()
-	PlayerUI.style_button(publish, true)
-	publish.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	publish.custom_minimum_size.x = 200
-	body.add_child(publish)
+	var footer := PlayerUI.column($Margin/Column)
+	footer.name="DeckEditorActions"
+	footer.add_theme_constant_override("separation",8)
+	var actions := PlayerUI.row(footer)
+	PlayerUI.creator_action(publish,"send",true)
+	publish.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	actions.add_child(publish)
 	var note: String = {"pending_review": "Em revisão pela moderação. Ele aparece na Comunidade quando for aprovado.",
 		"published": "Publicado na Comunidade.", "removed": "Removido pela moderação."}.get(moderation,
 		"Ao publicar, o deck vai para revisão antes de aparecer para outros jogadores." if _sync().available() else "Entre na conta para publicar na Comunidade.")
-	var note_label := _text(note, 14, PlayerUI.MUTED)
+	var note_label := _text(note,20,PlayerUI.MUTED)
 	note_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	note_label.name = "PublishNote"
-	body.add_child(note_label)
+	footer.add_child(note_label)
 	var track := _action("Acompanhar envio",_open_submissions)
 	track.name="TrackDeckSubmission"
-	PlayerUI.editor_control(track)
-	body.add_child(track)
+	PlayerUI.creator_action(track,"clock")
+	actions.add_child(track)
 	_reveal()
 
-func _add_prompt_action() -> void:
-	var prompt := _action("Copiar prompt para IA",_copy_style_prompt)
+func _add_prompt_action(parent: Node=null, stacked:=false) -> void:
+	var panel := PlayerUI.creator_panel(parent if parent!=null else body,"accent",14)
+	panel.name="DeckPromptPanel"
+	var line := PlayerUI.row(panel)
+	var caption := PlayerUI.column(line)
+	if stacked:
+		caption.add_theme_constant_override("separation",4)
+		caption.add_child(_text("Prompt para IA",22))
+		caption.add_child(_text("3D · 9:16",20,PlayerUI.MUTED))
+	else:
+		PlayerUI.creator_heading(caption,"Prompt para IA","Gere suas imagens em 3D cinematográfico · vertical 9:16.","bolt")
+	var prompt := _action("Copiar" if stacked else "Copiar prompt",_copy_style_prompt)
 	prompt.name="CopyDeckStylePrompt"
-	PlayerUI.editor_control(prompt)
-	body.add_child(prompt)
-	var hint := _text("Cole na sua IA para gerar as imagens em 3D cinematográfico · vertical 9:16.",20,PlayerUI.MUTED)
-	hint.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	body.add_child(hint)
+	PlayerUI.creator_action(prompt,"copy")
+	prompt.custom_minimum_size.x=144 if stacked else 232
+	line.add_child(prompt)
 
 func _copy_style_prompt() -> void:
 	DisplayServer.clipboard_set(StylePrompt.build(_draft))

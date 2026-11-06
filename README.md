@@ -161,3 +161,10 @@ pelo Codex. [Revisão do PR #100 e próximos testes](docs/backend/REVISAO_CLIENT
 
 Veja [passos manuais, contrato e prompt para o plugin](docs/backend/DECKS_STORAGE_REVISAO_MANUAL.md)
 e [testes e capturas](evidence/deck-storage-review/README.md).
+
+## Comunidade: denúncias e decks salvos — 06/11/2026
+
+Denunciar deck está na galeria da Comunidade; Denunciar jogador está no perfil
+público acessível por Amizades. Resgatar grátis salva o deck na conta e libera
+para o Mata-Mata. GAME/CATALOG e os testes reais estão descritos no
+[relatório da entrega](docs/backend/DENUNCIAS_E_DECKS_ENTREGA.md).

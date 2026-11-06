@@ -8,5 +8,7 @@
     "a97aa445-5e93-4e37-a639-49cdb45ed044"
   ],
   "tag": "QSE QA REPORT 42278875103-1",
-  "owner_marker": "f6483c603d2ab3e75794326eafeed02f9ab72e00951bd0b17069b4e69ce1c100"
+  "owner_marker": "f6483c603d2ab3e75794326eafeed02f9ab72e00951bd0b17069b4e69ce1c100",
+  "state": "cleaned",
+  "verification_run": "42279184807"
 }

@@ -1,0 +1,29 @@
+[
+  {
+    "width": 1672,
+    "height": 941,
+    "iphone": false,
+    "errors": [],
+    "feedback": true,
+    "reasonPreserved": true,
+    "confirmed": true
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "iphone": true,
+    "errors": [],
+    "feedback": true,
+    "reasonPreserved": true,
+    "confirmed": true
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "iphone": true,
+    "errors": [],
+    "feedback": true,
+    "reasonPreserved": true,
+    "confirmed": true
+  }
+]

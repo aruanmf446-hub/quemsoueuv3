@@ -1,4 +1,6 @@
-# Âmbar laranja e pontudo
+# Âmbar laranja e pontudo — formato anterior
+
+**Formato reprovado e substituído:** [agrupamento de cristais com várias pontas](../ambar-cristais/README.md). A textura foi mantida.
 
 Ajuste solicitado após aprovação da textura: cristal com ponta superior alongada, base afunilada e planos de diamante. Paleta laranja no cristal, no contorno do corpo e nas lascas. Transparência, facetas e rachaduras preservadas; duração, alcance, imobilização e animações não mudam.
 

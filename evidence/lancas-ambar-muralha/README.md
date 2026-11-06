@@ -2,7 +2,7 @@
 
 Entrega para avaliação visual. Main/Pages não foram alterados nesta rodada.
 
-**Revisão posterior:** o proprietário aprovou a textura e pediu formato de diamante e tom laranja. [Capturas atuais do âmbar](../ambar-laranja/README.md). As imagens douradas abaixo são o registro anterior.
+**Revisão posterior:** o proprietário aprovou a textura e pediu formato de diamante e tom laranja. [Capturas atuais do âmbar com várias pontas](../ambar-cristais/README.md). As imagens douradas abaixo são o registro anterior.
 
 ## O que muda no jogo
 

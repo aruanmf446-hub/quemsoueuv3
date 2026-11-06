@@ -499,6 +499,7 @@ func _select(character_id: String) -> void:
 	_description.custom_minimum_size.y = 0
 	_description.hide()
 	_preview.add_child(_description)
+	_add_emote_controls(entry)
 	if not unlocked:
 		var lock_label := PlayerUI.label(PlayerProgress.lock_label(entry), 14 if compact else 17, Color("#ffcf8a"))
 		_preview.add_child(lock_label)
@@ -514,6 +515,29 @@ func _select(character_id: String) -> void:
 	var back := _button("VOLTAR", close)
 	back.custom_minimum_size.y = 36 if compact else PlayerUI.CONTROL_HEIGHT
 	actions.add_child(back)
+
+
+func _add_emote_controls(entry: Dictionary) -> void:
+	var emotes := CharacterCatalog.emotes_for(entry)
+	if emotes.is_empty(): return
+	var row := PlayerUI.row(_preview)
+	row.name="EmoteControls"
+	var choices := OptionButton.new()
+	choices.name="EmoteChoice"
+	choices.tooltip_text=tr("Escolha um emote para visualizar")
+	choices.fit_to_longest_item=false
+	choices.clip_text=true
+	choices.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	PlayerUI.style_field(choices)
+	choices.custom_minimum_size.y=52
+	for emote: Dictionary in emotes: choices.add_item(tr(str(emote.name)))
+	row.add_child(choices)
+	var play := _button("VER",func()->void:
+		if is_instance_valid(_stage) and choices.selected>=0:
+			_stage.character.play_emote(StringName(emotes[choices.selected].animation)))
+	play.name="PreviewEmote"
+	play.tooltip_text=tr("Visualizar emote")
+	row.add_child(play)
 
 
 func _equip(character_id: String) -> void:

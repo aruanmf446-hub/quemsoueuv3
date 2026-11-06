@@ -64,6 +64,8 @@ var _anim_player: AnimationPlayer
 var _skeleton: Skeleton3D
 var _sockets: Dictionary = {}
 var _framing: Dictionary = {}
+var _emote_restore: Dictionary = {}
+var _pose_time := 0.0
 
 
 ## Substitui o personagem atual pelo descrito em `entry`. Libera o anterior antes de carregar.
@@ -79,6 +81,7 @@ func load_entry(entry: Dictionary) -> void:
 	_model_root = model.instantiate() as Node3D
 	add_child(_model_root)
 	_anim_player = _find_node_of_type(_model_root, AnimationPlayer) as AnimationPlayer
+	if _anim_player: _anim_player.animation_finished.connect(_emote_finished)
 	_skeleton = _find_node_of_type(_model_root, Skeleton3D) as Skeleton3D
 
 	_tune_materials()
@@ -91,6 +94,7 @@ func load_entry(entry: Dictionary) -> void:
 
 ## Remove o personagem atual e libera seus recursos da cena.
 func unload() -> void:
+	_cancel_emote()
 	if _model_root:
 		remove_child(_model_root)
 		_model_root.queue_free()
@@ -99,6 +103,7 @@ func unload() -> void:
 	_skeleton = null
 	_sockets.clear()
 	_framing.clear()
+	_pose_time=0.0
 	is_static_pose = false
 
 
@@ -111,6 +116,7 @@ func get_framing() -> Dictionary:
 func play_animation(anim_name: StringName, loop: bool = true) -> void:
 	if _anim_player == null or not _anim_player.has_animation(anim_name):
 		return
+	_cancel_emote()
 	var clip := _anim_player.get_animation(anim_name)
 	clip.loop_mode = Animation.LOOP_LINEAR if loop else Animation.LOOP_NONE
 	is_static_pose = false
@@ -124,10 +130,52 @@ func play_animation(anim_name: StringName, loop: bool = true) -> void:
 func set_pose(anim_name: StringName, time: float = 0.0) -> void:
 	if _anim_player == null or not _anim_player.has_animation(anim_name):
 		return
+	_cancel_emote()
 	_anim_player.play(anim_name)
 	_anim_player.seek(time, true)
 	_anim_player.pause()
+	_pose_time=time
 	is_static_pose = true
+
+
+## Um emote usa o clipe já carregado e retorna à pose/animação anterior.
+## Ações automáticas que chamam play_animation/set_pose interrompem esse retorno.
+func play_emote(anim_name: StringName) -> bool:
+	if not has_animation(anim_name): return false
+	if not _emote_restore.is_empty(): _emote_finished(StringName(_emote_restore.target))
+	var clip := _anim_player.get_animation(anim_name)
+	var previous := _anim_player.assigned_animation
+	var position := _pose_time if is_static_pose else animation_length(StringName(previous))
+	if not _anim_player.current_animation.is_empty(): position=_anim_player.current_animation_position
+	_emote_restore={"target":String(anim_name),"loop":clip.loop_mode,
+		"previous":previous,"position":position,
+		"playing":_anim_player.is_playing(),"static":is_static_pose}
+	clip.loop_mode=Animation.LOOP_NONE
+	is_static_pose=false
+	_anim_player.play(anim_name,0.16)
+	_anim_player.seek(0.0,true)
+	return true
+
+
+func _cancel_emote() -> void:
+	if _emote_restore.is_empty(): return
+	if has_animation(StringName(_emote_restore.target)):
+		_anim_player.get_animation(_emote_restore.target).loop_mode=_emote_restore.loop
+	_emote_restore={}
+
+
+func _emote_finished(anim_name: StringName) -> void:
+	if _emote_restore.is_empty() or String(anim_name)!=str(_emote_restore.target): return
+	var restore := _emote_restore.duplicate()
+	_cancel_emote()
+	var previous := StringName(restore.previous)
+	if not has_animation(previous):
+		_anim_player.stop()
+		return
+	_anim_player.play(previous,0.16 if restore.playing else 0.0)
+	_anim_player.seek(float(restore.position),true)
+	if not restore.playing: _anim_player.pause()
+	is_static_pose=bool(restore.static)
 
 
 func has_animation(anim_name: StringName) -> bool:
@@ -262,6 +310,7 @@ func _play_idle(entry: Dictionary) -> void:
 		_anim_player.play(pose)
 		_anim_player.seek(float(entry.get("pose_time", 0.0)), true)
 		_anim_player.pause()
+		_pose_time=float(entry.get("pose_time",0.0))
 		is_static_pose = true
 
 

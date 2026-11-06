@@ -1,0 +1,25 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS falha de rede marca erro sem apagar o rascunho
+PASS UUID definitivo gravado antes do envio
+PASS tentar novamente conclui o envio
+PASS repetir não duplica deck nem cartas
+PASS deck com owner da sessão; visibilidade só como pedido
+PASS crops.library/duel → colunas portrait_*/duel_*
+PASS caminho do original <user>/<deck>/<card>_original
+PASS prévias de Biblioteca e Duelo enviadas
+PASS original já confirmado não é reenviado na nova tentativa
+PASS conta B não recebe rascunhos da conta A
+PASS conta B não altera o deck da conta A
+PASS reabrir recupera deck e cartas do servidor
+PASS dois enquadramentos recuperados
+PASS original baixado e prévias refeitas
+PASS favorito oficial sincronizado como official:<id>
+PASS deck próprio vira creator:<uuid>
+PASS remover favorito confirma no servidor
+PASS favoritos de A não aparecem para B
+PASS playlist de A não aparece para B
+PASS playlist de A preservada após B salvar
+PASS excluir remove no servidor e depois aqui
+PASS imagens do deck removidas do Storage
+T21_SYNC checks=22 failures=0

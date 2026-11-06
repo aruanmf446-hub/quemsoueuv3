@@ -81,10 +81,12 @@ func _run() -> void:
 	var publish := screen.find_child("PublishDeck", true, false) as Button
 	check(publish != null and not publish.disabled, "Publicar na Comunidade habilitado")
 	publish.pressed.emit()
+	publish.pressed.emit()
 	await _frames(40)
 	var saved := store.load_draft(str(draft.id))
 	check(str(saved.get("server_status", "")) == "pending_review", "deck enviado para revisão")
 	check(fake.db.qse_creator_decks.size() == 1 and fake.db.qse_creator_cards.size() == 5, "deck e cartas enviados antes do pedido")
+	check(fake.rpc_calls.filter(func(c: Array)->bool:return c[0]=="qse_deck_publish_request").size()==1,"clique repetido não duplica pedido de revisão")
 	screen._select_tab("Meus Decks")
 	await _frames(20)
 	var mine := screen.find_child("Deck_draft_" + str(draft.id), true, false)

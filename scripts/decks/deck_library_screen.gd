@@ -2,6 +2,8 @@ extends PlayerScreen
 ## Descoberta pública dos decks, favoritos e rascunhos do dono atual (neste aparelho).
 ## Publicar depende do backend: o fluxo existe até a revisão e avisa quando não há servidor.
 const Catalog = preload("res://scripts/decks/deck_library_catalog.gd")
+const StylePrompt = preload("res://scripts/decks/deck_style_prompt.gd")
+var _publish_busy := false
 const TABS := ["Descobrir", "Populares", "Recentes", "Favoritos", "Meus Decks"]
 var _query := ""
 var _tab := "Descobrir"
@@ -177,6 +179,10 @@ func _render_library() -> void:
 	# Ao (re)abrir a Biblioteca o header começa no destaque de maior prioridade.
 	_featured = 0
 	_page("BIBLIOTECA DE DECKS", "library")
+	if services.session.authenticated():
+		var review := _action("Revisão manual",_open_manual_review)
+		review.name="OpenManualReview"
+		body.add_child(review)
 	_search.text = _query
 	_search.editable = true
 	var compact := _compact()
@@ -330,6 +336,13 @@ func _moderation(draft: Dictionary) -> String:
 
 ## Envia para a conta e pede publicação (moderação). Erros do servidor viram mensagens claras.
 func _publish_draft(draft: Dictionary) -> void:
+	if _publish_busy: return
+	_publish_busy=true
+	await _send_draft_for_review(draft)
+	_publish_busy=false
+
+func _send_draft_for_review(draft: Dictionary) -> void:
+	if _moderation(draft) in ["pending_review","published","removed"]: return
 	var sync := _sync()
 	if not sync.available():
 		banner.show_state("error", CommunityService.message("unauthorized"))
@@ -1459,6 +1472,15 @@ func _render_editor() -> void:
 	right.add_child(_text("VISIBILIDADE", 12, PlayerUI.GOLD))
 	right.add_child(_options("DeckVisibility", ["Privado", "Não listado", "Público"], DeckDrafts.VISIBILITY, "visibility"))
 	right.add_child(_cover_section())
+	right.add_child(_text("REFERÊNCIA VISUAL",12,PlayerUI.GOLD))
+	var references := StylePrompt.references()
+	right.add_child(_options("DeckStyleReference",references.map(func(item: Dictionary)->String:return str(item.name)),references.map(func(item: Dictionary)->String:return str(item.id)),"style_reference"))
+	var prompt := _action("Copiar prompt dos oficiais",_copy_style_prompt)
+	prompt.name="CopyDeckStylePrompt"
+	right.add_child(prompt)
+	var free := _text("Criar é gratuito. Adicione suas imagens; a publicação passa por revisão manual.",14,PlayerUI.MUTED)
+	free.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	right.add_child(free)
 	body.add_child(_text("CARTAS  ·  %d (mínimo %d, máximo %d)" % [_draft.cards.size(), Catalog.MIN_CARDS, Catalog.MAX_CARDS], 12, PlayerUI.GOLD))
 	var list := PlayerUI.column(body)
 	list.name = "DraftCards"
@@ -1750,7 +1772,7 @@ func _render_review() -> void:
 	var moderation := _moderation(_draft)
 	if moderation == "rejected" and not str(_draft.get("review_note", "")).is_empty():
 		body.add_child(_data_text(tr("Recusado pela moderação: ") + str(_draft.review_note), 16, Color("#ff9797")))
-	var publish := _action("Publicar na Comunidade", _publish_draft.bind(_draft))
+	var publish := _action("Enviar para revisão · grátis", _publish_draft.bind(_draft))
 	publish.name = "PublishDeck"
 	publish.disabled = not problems.is_empty() or moderation in ["pending_review", "published", "removed"] or not _sync().available()
 	PlayerUI.style_button(publish, true)
@@ -1761,9 +1783,20 @@ func _render_review() -> void:
 		"published": "Publicado na Comunidade.", "removed": "Removido pela moderação."}.get(moderation,
 		"Ao publicar, o deck vai para revisão antes de aparecer para outros jogadores." if _sync().available() else "Entre na conta para publicar na Comunidade.")
 	var note_label := _text(note, 14, PlayerUI.MUTED)
+	note_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	note_label.name = "PublishNote"
 	body.add_child(note_label)
 	_reveal()
+
+func _copy_style_prompt() -> void:
+	DisplayServer.clipboard_set(StylePrompt.build(_draft))
+	banner.show_state("success","Prompt copiado. Anexe referências do deck oficial escolhido na sua ferramenta de imagens.")
+
+func _open_manual_review() -> void:
+	if get_node_or_null("DeckManualReview")!=null: return
+	var review := preload("res://scripts/decks/deck_review_screen.gd").new()
+	review.setup(preload("res://scripts/decks/deck_review_service.gd").new())
+	add_child(review)
 
 
 ## A posse oficial pertence à conta GAME, não aos favoritos ou ao cache local.

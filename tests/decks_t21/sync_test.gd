@@ -74,6 +74,20 @@ func _run() -> void:
 	check(server.files.has("%s/%s/%s_library.png" % [A, deck_id, card.id]) and server.files.has("%s/%s/%s_duel.png" % [A, deck_id, card.id]), "prévias de Biblioteca e Duelo enviadas")
 	var uploads: Array = server.log.filter(func(line: String) -> bool: return line.contains(first_card + "_original."))
 	check(uploads.is_empty(), "original já confirmado não é reenviado na nova tentativa")
+	# Correção após reprovação: mesmos UUIDs, nome do arquivo e recortes, pixels novos.
+	var replacement := Image.create(400,560,false,Image.FORMAT_RGB8)
+	replacement.fill(Color.ORANGE_RED)
+	var updated: Dictionary=saved.cards[0]
+	var old_path := str(updated.uploaded_original)
+	updated.image_file=a.store.store_original(saved.id,updated.id,replacement.save_png_to_buffer(),"png")
+	a.store.store_previews(saved.id,updated,replacement)
+	server.log.clear()
+	var corrected: Dictionary=await a.push(saved)
+	check(corrected.ok and server.files[old_path]==replacement.save_png_to_buffer(),"imagem corrigida substitui o original mesmo no mesmo caminho")
+	check(server.files[a.storage_path(deck_id,first_card,"library.png")]==a.store.preview_bytes(saved.id,updated,"library") and server.files[a.storage_path(deck_id,first_card,"duel.png")]==a.store.preview_bytes(saved.id,updated,"duel"),"correção reenvia os dois recortes mesmo mantendo o enquadramento")
+	server.log.clear()
+	await a.push(saved)
+	check(server.log.filter(func(line: String)->bool:return line.contains("/storage/v1/object/")).is_empty(),"conteúdo idêntico continua sem reenviar imagens")
 	# Conta B: não vê nem altera o deck da conta A.
 	var b := _as(B)
 	var pulled: Dictionary = await b.pull()

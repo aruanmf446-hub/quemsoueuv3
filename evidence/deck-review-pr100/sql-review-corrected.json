@@ -1,0 +1,33 @@
+{
+  "pr": 100,
+  "previous_head": "4f858b6e6dda1c5e47b8b6c871c01771c2ad9b53",
+  "head": "d96d0ecbe9e56a0eeb3b3d93fdb63ee8be7870c9",
+  "tool": "pglast v8.7",
+  "database_access": false,
+  "sql_executed": false,
+  "files": [
+    {
+      "path": "supabase/game/migrations/20261105222130_qse_deck_review_acl_and_storage_20261105.sql",
+      "valid": true,
+      "terminators_added": 2,
+      "statements": 15,
+      "only_terminators_changed": true
+    },
+    {
+      "path": "supabase/game/migrations/20261105222157_qse_deck_review_read_rpcs_20261105.sql",
+      "valid": true,
+      "terminators_added": 3,
+      "statements": 9,
+      "only_terminators_changed": true
+    },
+    {
+      "path": "supabase/game/migrations/20261105222227_qse_deck_review_atomic_decide_20261105.sql",
+      "valid": true,
+      "terminators_added": 1,
+      "statements": 3,
+      "only_terminators_changed": true
+    }
+  ],
+  "total_terminators_added": 6,
+  "total_statements": 27
+}

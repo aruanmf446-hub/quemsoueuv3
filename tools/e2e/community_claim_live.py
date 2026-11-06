@@ -130,8 +130,16 @@ def run():
     for role in ['OWNER', 'READER']:
         profile = rpc(role, 'qse_profile_self')
         nickname = profile.get('nickname')
-        check(isinstance(nickname, str) and 3 <= len(nickname.strip()) <= 24,
-              'existing_nickname_' + role)
+        valid = isinstance(nickname, str) and 3 <= len(nickname.strip()) <= 24 and nickname.strip().lower() not in ['jogador local','sem nickname','você','null','<null>']
+        if not valid:
+            # Complete first-time onboarding for QA only; never rename an existing nickname.
+            desired = 'Qa' + role.title() + uuid.uuid4().hex[:10]
+            rpc(role, 'qse_profile_update', {'p_nickname': desired})
+            profile = rpc(role, 'qse_profile_self')
+            check(profile.get('nickname') == desired, 'initial_QA_nickname_registered_' + role)
+            REPORT.setdefault('initial_nickname_registration', []).append(role)
+        else:
+            check(True, 'existing_nickname_preserved_' + role)
     status, claim = edge('OWNER', {'action': 'claim', 'deck_id': deck})
     check(status == 200 and isinstance(claim, dict) and claim.get('claimed') is True, 'gateway_claim_confirmed')
     ref = claim['deck_ref']

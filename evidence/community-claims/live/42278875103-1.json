@@ -1,0 +1,128 @@
+{
+  "status": "passed",
+  "run_id": "42278875103",
+  "attempt": "1",
+  "checks": [
+    {
+      "name": "existing_credentials_OWNER",
+      "passed": true
+    },
+    {
+      "name": "login_OWNER",
+      "passed": true
+    },
+    {
+      "name": "existing_credentials_READER",
+      "passed": true
+    },
+    {
+      "name": "login_READER",
+      "passed": true
+    },
+    {
+      "name": "existing_credentials_R1",
+      "passed": true
+    },
+    {
+      "name": "login_R1",
+      "passed": true
+    },
+    {
+      "name": "three_distinct_qa_accounts",
+      "passed": true
+    },
+    {
+      "name": "author_creates_private_deck",
+      "passed": true
+    },
+    {
+      "name": "author_upload_card_1_original",
+      "passed": true
+    },
+    {
+      "name": "author_upload_card_1_library",
+      "passed": true
+    },
+    {
+      "name": "author_upload_card_1_duel",
+      "passed": true
+    },
+    {
+      "name": "author_upload_card_2_original",
+      "passed": true
+    },
+    {
+      "name": "author_upload_card_2_library",
+      "passed": true
+    },
+    {
+      "name": "author_upload_card_2_duel",
+      "passed": true
+    },
+    {
+      "name": "author_upload_card_3_original",
+      "passed": true
+    },
+    {
+      "name": "author_upload_card_3_library",
+      "passed": true
+    },
+    {
+      "name": "author_upload_card_3_duel",
+      "passed": true
+    },
+    {
+      "name": "author_upload_card_4_original",
+      "passed": true
+    },
+    {
+      "name": "author_upload_card_4_library",
+      "passed": true
+    },
+    {
+      "name": "author_upload_card_4_duel",
+      "passed": true
+    },
+    {
+      "name": "author_upload_card_5_original",
+      "passed": true
+    },
+    {
+      "name": "author_upload_card_5_library",
+      "passed": true
+    },
+    {
+      "name": "author_upload_card_5_duel",
+      "passed": true
+    },
+    {
+      "name": "author_saves_five_named_cards",
+      "passed": true
+    },
+    {
+      "name": "saved_cards_read_back_from_account",
+      "passed": true
+    },
+    {
+      "name": "other_account_cannot_read_private_draft",
+      "passed": true
+    },
+    {
+      "name": "author_submits_saved_deck_to_review",
+      "passed": true
+    }
+  ],
+  "rooms": [],
+  "skipped": [],
+  "accounts_created_or_deleted": false,
+  "stage": "prepare",
+  "fixture_tag": "QSE QA REPORT 42278875103-1",
+  "fixture_deck_id": "e1f606e5-d451-4547-9cc1-f7e62cae4037",
+  "sessions_logged_out": {
+    "OWNER": true,
+    "READER": true,
+    "R1": true
+  },
+  "passed": 27,
+  "total": 27
+}

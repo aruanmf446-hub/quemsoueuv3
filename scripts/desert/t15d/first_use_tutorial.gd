@@ -5,7 +5,7 @@ signal closed(kind: String)
 const SAVE_PATH := "user://desert_first_use_v1.cfg"
 const LESSONS := {
  "attack":["Seu primeiro ataque","Você começa sem cargas de ataque ou defesa. Pegue uma recarga de fogo e toque no botão de chama para dar um soco nos cactos. Cada golpe usa uma carga. No teclado: J."],
- "defense":["Sua primeira defesa","Você pegou uma recarga de defesa. Toque no escudo para levantar a parede de terra e bloquear um golpe. Cada defesa usa uma carga. No teclado: Shift."],
+ "defense":["Sua primeira defesa","O soldado à frente vai arremessar uma lança. Toque no escudo quando ela vier para bloquear (Shift). Cada defesa usa uma carga.\nVocê também pode pular ou agachar para desviar. Ele só persegue depois de acertar você ou o escudo."],
  "task":["Sua primeira Task","Este caminho depende de uma tarefa do cenário. Toque em TASK, acima do ataque, para executar a ação indicada. O botão só aparece perto das tarefas e some depois. Não usa cargas de ataque ou defesa. No teclado: F."],
  "amber":["Âmbar · congele quem vem atrás","Imobilize os cactos atrás de você por alguns segundos. Toque no botão de Âmbar ou use E.\nCada uso gasta 1 carga. Pegue outra recarga para usar de novo."],
  "dash":["Relâmpago · avance com choque","Corra mais rápido e dê choque nos cactos que tocar. Toque no botão de Relâmpago ou use R.\nCada uso gasta 1 carga. Pegue outra recarga para usar de novo."],
@@ -21,8 +21,10 @@ var _illustration: TextureRect
 var _panel: PanelContainer
 var _section := "guest"
 var _seen := {}
+func _save_key(lesson: String) -> String:
+	return "defense_spear_v1" if lesson=="defense" else lesson
 func _web_key(lesson: String) -> String:
-	return JSON.stringify("qse-desert-first-use-v1:"+_section+":"+lesson)
+	return JSON.stringify("qse-desert-first-use-v1:"+_section+":"+_save_key(lesson))
 func _ready() -> void:
 	layer=100
 	process_mode=Node.PROCESS_MODE_ALWAYS
@@ -75,7 +77,7 @@ func _ready() -> void:
 func seen(lesson: String) -> bool:
 	if _seen.has(lesson):return bool(_seen[lesson])
 	var config:=ConfigFile.new()
-	var value:=config.load(SAVE_PATH)==OK and bool(config.get_value(_section,lesson,false))
+	var value:=config.load(SAVE_PATH)==OK and bool(config.get_value(_section,_save_key(lesson),false))
 	if OS.has_feature("web"):
 		value=value or bool(JavaScriptBridge.eval("(()=>{try{return localStorage.getItem("+_web_key(lesson)+")==='1';}catch(e){return false;}})()"))
 	_seen[lesson]=value
@@ -88,7 +90,7 @@ func present(lesson: String,context := "") -> void:
 	_title.text=LESSONS[lesson][0]
 	_body.text=LESSONS[lesson][1]
 	var art_path:="res://assets/desert/tutorial/"+lesson+".res"
-	_illustration.texture=load(art_path) if lesson in ["amber","dash","rupture"] and ResourceLoader.exists(art_path) else null
+	_illustration.texture=load(art_path) if lesson in ["defense","amber","dash","rupture"] and ResourceLoader.exists(art_path) else null
 	_illustration.visible=_illustration.texture!=null
 	_panel.custom_minimum_size.y=540 if _illustration.visible else 380
 	_panel.reset_size()
@@ -101,7 +103,7 @@ func dismiss() -> void:
 	if not active:return
 	var config:=ConfigFile.new()
 	config.load(SAVE_PATH)
-	config.set_value(_section,kind,true)
+	config.set_value(_section,_save_key(kind),true)
 	config.save(SAVE_PATH)
 	_seen[kind]=true
 	if OS.has_feature("web"):

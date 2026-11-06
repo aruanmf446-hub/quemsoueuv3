@@ -30,6 +30,8 @@ targets=[
  ('import',engine+['--headless','--editor','--import','--quit','--','--godot-mcp-no-bridge']),
  ('reino-v3',engine+headless+['--script','res://tests/desert_night/reino_v3_test.gd']),
  ('reino10',engine+headless+['--script','res://tests/desert_night/reino10_test.gd']),
+ ('spears',engine+headless+['--script','res://tests/desert_night/spear_encounter_test.gd']),
+ ('spear-intro',engine+headless+['--script','res://tests/desert_night/spear_intro_test.gd']),
  ('actions',engine+window+['--script','res://tests/desert_night/action_controls.gd']),
  ('layout',engine+headless+['--script','res://tests/desert_night/layout_test.gd']),
  ('legacy10',engine+headless+['--script','res://tests/desert_night/legacy10_test.gd']),

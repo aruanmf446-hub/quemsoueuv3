@@ -1,0 +1,398 @@
+{
+  "fixture_teleport": true,
+  "amber_pose_fixture": true,
+  "viewport": "844x390",
+  "dpr": 3,
+  "physical_device": false,
+  "gpu": "SwiftShader software",
+  "lesson": {
+    "amber_showcase": false,
+    "art_ids": [
+      "capital_watchtower",
+      "capital_house",
+      "capital_merchant",
+      "capital_archway",
+      "capital_balcony_house",
+      "capital_palm_garden"
+    ],
+    "attack_charge": 0,
+    "bridge_task": [],
+    "bridges": [],
+    "buttons": {
+      "attack": [
+        1174,
+        595,
+        52
+      ],
+      "defend": [
+        1294,
+        475,
+        52
+      ],
+      "jump": [
+        1294,
+        595,
+        52
+      ]
+    },
+    "ceiling": false,
+    "charges": {
+      "amber": 0,
+      "dash": 0,
+      "rupture": 0
+    },
+    "defense_charge": 1,
+    "first_use": {
+      "active": true,
+      "continue": [
+        388,
+        537,
+        600,
+        64
+      ],
+      "illustration": true,
+      "kind": "defense"
+    },
+    "grounded": true,
+    "health": 3,
+    "house_roofs": 0,
+    "iphone": true,
+    "jumps_used": 0,
+    "order": 1,
+    "palace_pool": 3,
+    "paused": true,
+    "pedestal_collected": false,
+    "pedestal_count": 0,
+    "pedestal_fixture": false,
+    "pickup_count": 0,
+    "player_dash": 0,
+    "read": true,
+    "roof_surfaces": 0,
+    "rooftop_terraces": 0,
+    "size": [
+      1376,
+      675
+    ],
+    "skyline": true,
+    "soldiers": [
+      {
+        "id": "p01.spear.1",
+        "vx": 0,
+        "x": 28.2916660308838,
+        "y": 0.550000011920929
+      },
+      {
+        "id": "p01.cactus.02",
+        "vx": 0,
+        "x": 58.5833320617676,
+        "y": 1.12000000476837
+      }
+    ],
+    "spears": [
+      {
+        "enabled": true,
+        "last_hit": "",
+        "pursuit": false,
+        "state": "watch",
+        "throws": 0
+      }
+    ],
+    "stage": "play",
+    "vy": 0,
+    "x": 22.7916660308838,
+    "y": 0.55098956823349
+  },
+  "impact": {
+    "amber_showcase": false,
+    "art_ids": [
+      "capital_watchtower",
+      "capital_house",
+      "capital_merchant",
+      "capital_archway",
+      "capital_balcony_house",
+      "capital_palm_garden"
+    ],
+    "attack_charge": 0,
+    "bridge_task": [],
+    "bridges": [],
+    "buttons": {
+      "attack": [
+        1174,
+        595,
+        52
+      ],
+      "defend": [
+        1294,
+        475,
+        52
+      ],
+      "jump": [
+        1294,
+        595,
+        52
+      ]
+    },
+    "ceiling": false,
+    "charges": {
+      "amber": 0,
+      "dash": 0,
+      "rupture": 0
+    },
+    "defense_charge": 0,
+    "first_use": {
+      "active": false,
+      "continue": [
+        388,
+        537,
+        600,
+        64
+      ],
+      "illustration": true,
+      "kind": "defense"
+    },
+    "grounded": true,
+    "health": 3,
+    "house_roofs": 0,
+    "iphone": true,
+    "jumps_used": 0,
+    "order": 1,
+    "palace_pool": 3,
+    "paused": false,
+    "pedestal_collected": false,
+    "pedestal_count": 0,
+    "pedestal_fixture": false,
+    "pickup_count": 0,
+    "player_dash": 0,
+    "read": true,
+    "roof_surfaces": 0,
+    "rooftop_terraces": 0,
+    "size": [
+      1376,
+      675
+    ],
+    "skyline": true,
+    "soldiers": [
+      {
+        "id": "p01.spear.1",
+        "vx": -5.59999990463257,
+        "x": 26.2858467102051,
+        "y": 0.550883531570435
+      },
+      {
+        "id": "p01.cactus.02",
+        "vx": 2,
+        "x": 60.9835586547852,
+        "y": 1.10093891620636
+      }
+    ],
+    "spears": [
+      {
+        "enabled": true,
+        "last_hit": "shield",
+        "pursuit": true,
+        "state": "pursue",
+        "throws": 1
+      }
+    ],
+    "stage": "play",
+    "vy": 0,
+    "x": 22.7916660308838,
+    "y": 0.55098956823349
+  },
+  "reloaded": {
+    "amber_showcase": false,
+    "art_ids": [
+      "capital_watchtower",
+      "capital_house",
+      "capital_merchant",
+      "capital_archway",
+      "capital_balcony_house",
+      "capital_palm_garden"
+    ],
+    "attack_charge": 0,
+    "bridge_task": [],
+    "bridges": [],
+    "buttons": {
+      "attack": [
+        1174,
+        595,
+        52
+      ],
+      "defend": [
+        1294,
+        475,
+        52
+      ],
+      "jump": [
+        1294,
+        595,
+        52
+      ]
+    },
+    "ceiling": false,
+    "charges": {
+      "amber": 0,
+      "dash": 0,
+      "rupture": 0
+    },
+    "defense_charge": 1,
+    "first_use": {
+      "active": false,
+      "continue": [
+        0,
+        0,
+        292,
+        64
+      ],
+      "illustration": false,
+      "kind": ""
+    },
+    "grounded": true,
+    "health": 3,
+    "house_roofs": 0,
+    "iphone": true,
+    "jumps_used": 0,
+    "order": 1,
+    "palace_pool": 3,
+    "paused": false,
+    "pedestal_collected": false,
+    "pedestal_count": 0,
+    "pedestal_fixture": false,
+    "pickup_count": 0,
+    "player_dash": 0,
+    "read": true,
+    "roof_surfaces": 0,
+    "rooftop_terraces": 0,
+    "size": [
+      1376,
+      675
+    ],
+    "skyline": true,
+    "soldiers": [
+      {
+        "id": "p01.spear.1",
+        "vx": 0,
+        "x": 28.2916660308838,
+        "y": 0.550000011920929
+      },
+      {
+        "id": "p01.cactus.02",
+        "vx": 2,
+        "x": 59.3500633239746,
+        "y": 1.10093891620636
+      }
+    ],
+    "spears": [
+      {
+        "enabled": true,
+        "last_hit": "",
+        "pursuit": false,
+        "state": "windup",
+        "throws": 0
+      }
+    ],
+    "stage": "play",
+    "vy": 0,
+    "x": 22.7916660308838,
+    "y": 0.55098956823349
+  },
+  "amber": {
+    "amber_showcase": true,
+    "art_ids": [
+      "capital_watchtower",
+      "capital_house",
+      "capital_merchant",
+      "capital_archway",
+      "capital_palm_garden",
+      "capital_market_stall"
+    ],
+    "attack_charge": 1,
+    "bridge_task": [],
+    "bridges": [
+      {
+        "end": 221.535714285714,
+        "kind": "bridge",
+        "raised": false,
+        "solid": false,
+        "start": 192.662857142857
+      }
+    ],
+    "buttons": {
+      "amber": [
+        934,
+        595,
+        52
+      ],
+      "attack": [
+        1174,
+        595,
+        52
+      ],
+      "defend": [
+        1294,
+        475,
+        52
+      ],
+      "jump": [
+        1294,
+        595,
+        52
+      ]
+    },
+    "ceiling": false,
+    "charges": {
+      "amber": 0,
+      "dash": 0,
+      "rupture": 0
+    },
+    "defense_charge": 1,
+    "first_use": {
+      "active": false,
+      "continue": [
+        0,
+        0,
+        292,
+        64
+      ],
+      "illustration": false,
+      "kind": ""
+    },
+    "grounded": true,
+    "health": 3,
+    "house_roofs": 0,
+    "iphone": true,
+    "jumps_used": 0,
+    "order": 3,
+    "palace_pool": 3,
+    "paused": false,
+    "pedestal_collected": false,
+    "pedestal_count": 0,
+    "pedestal_fixture": false,
+    "pickup_count": 0,
+    "player_dash": 0,
+    "read": true,
+    "roof_surfaces": 0,
+    "rooftop_terraces": 0,
+    "size": [
+      1376,
+      675
+    ],
+    "skyline": true,
+    "soldiers": [
+      {
+        "id": "",
+        "vx": 0,
+        "x": 152.557144165039,
+        "y": 2.77999997138977
+      }
+    ],
+    "spears": [],
+    "stage": "play",
+    "vy": 0,
+    "x": 155.357147216797,
+    "y": 2.77999997138977
+  },
+  "errors": [],
+  "blocked": [],
+  "engineErrors": []
+}

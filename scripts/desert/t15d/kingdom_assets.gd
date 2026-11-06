@@ -69,6 +69,8 @@ static func paths(order: int) -> Array[String]:
 		if not path.is_empty() and not result.has(path): result.append(path)
 	if order in [4,5]:result.append("res://assets/desert/modular/riverbank_context.res")
 	if order in [1,3]:result.append("res://assets/desert/modular/city_supplies_context.res")
+	if order in [1,6,8]:result.append("res://assets/desert/weapons/cactus_spear.res")
+	if order==1:result.append("res://assets/desert/tutorial/defense.res")
 	for lesson: String in ["amber","dash","rupture"]:
 		if order>=int(Layout.ABILITY_PHASE[lesson]):
 			result.append("res://assets/desert/tutorial/"+lesson+".res")

@@ -1,0 +1,7 @@
+{
+	"checks": 75,
+	"failures": 0,
+	"fixture_teleport": true,
+	"physical_device": false,
+	"real_jump_input": true
+}

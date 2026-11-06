@@ -1,0 +1,36 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS fase01: distribuição pontual dos lanceiros
+PASS fase02: distribuição pontual dos lanceiros
+PASS fase03: distribuição pontual dos lanceiros
+PASS fase04: distribuição pontual dos lanceiros
+PASS fase05: distribuição pontual dos lanceiros
+PASS fase06: distribuição pontual dos lanceiros
+PASS fase07: distribuição pontual dos lanceiros
+PASS fase08: distribuição pontual dos lanceiros
+PASS fase09: distribuição pontual dos lanceiros
+PASS fase10: distribuição pontual dos lanceiros
+PASS primeiro soldado espera a recarga, sem arremessar nem perseguir
+PASS coleta real habilita escudo e encontro
+PASS escudo real bloqueia a lança, consome uma carga e preserva três vidas
+PASS impacto no escudo libera perseguição
+PASS soldado corre na direção do jogador após o impacto
+PASS cacto usa o ataque existente para arremessar
+PASS agachar desvia; erro permite outro arremesso
+PASS errar a lança não libera perseguição
+PASS lança ativa para o salto
+PASS pulo real deixa a lança passar sem dano nem perseguição
+PASS lança sem defesa remove exatamente uma vida
+PASS acerto no corpo libera perseguição
+PASS última vida atingida pela lança causa morte real
+PASS morte apresenta a derrota existente
+PASS derrota oferece recomeçar
+PASS recomeçar restaura vida e a regra de começar sem defesa: dead=false hp=3 defense=0 checkpoint=-1 pos=(-8.0, 0.000521, 0.0)
+PASS lança ativa para colisão com cenário
+PASS parede fina intercepta a lança sem dano e sem liberar perseguição
+PASS âmbar pausa o arremesso junto com o soldado
+PASS sair/recomeçar limpa lanças e callbacks
+SPEAR_ENCOUNTERS checks=30 failures=0

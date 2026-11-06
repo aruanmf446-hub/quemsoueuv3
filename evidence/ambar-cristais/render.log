@@ -1,0 +1,25 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS 01_antes: captura real
+PASS comando real consome uma carga
+PASS mesmos 3,5 segundos, somente atrás, até 8m
+PASS 02_formando: captura real
+PASS posição e pose imobilizadas
+PASS uma superfície compartilhada e doze lascas, sem luzes novas
+PASS 03_congelado_no_jogo: captura real
+PASS 04_detalhe: captura real
+PASS reaplicação conserva maior duração e reutiliza efeito sem piscar
+PASS flash de dano restaura a cristalização, sem apagar nem substituir texturas
+PASS 05_fissuras: captura real
+PASS animação liberada ao final da duração original
+PASS descongelar restaura todos os materiais originais
+PASS 06_quebrando: captura real
+PASS lascas ficam no local da quebra, sem seguir o Cactus
+PASS efeito finaliza e para de processar
+PASS nova ativação reutiliza e reposiciona corretamente
+PASS reciclagem limpa o efeito e a imobilização
+PASS morte limpa o cristal
+AMBER_FREEZE checks=19 failures=0

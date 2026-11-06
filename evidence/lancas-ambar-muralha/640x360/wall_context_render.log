@@ -1,0 +1,81 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS ator pousado no teto real do trecho 0
+PASS fundação continua abaixo da tela: DistantWall0
+PASS fundação continua abaixo da tela: DistantWall1
+PASS fundação continua abaixo da tela: DistantWall2
+PASS fundação continua abaixo da tela: DistantPalace0
+PASS fundação continua abaixo da tela: DistantPalace1
+PASS fundação continua abaixo da tela: DistantPalace2
+PASS salto duplo real para conferir a base ao subir
+PASS cidade não acompanha a subida da câmera como plataforma suspensa
+PASS fundação continua abaixo da tela: DistantWall0
+PASS fundação continua abaixo da tela: DistantWall1
+PASS fundação continua abaixo da tela: DistantWall2
+PASS fundação continua abaixo da tela: DistantPalace0
+PASS fundação continua abaixo da tela: DistantPalace1
+PASS fundação continua abaixo da tela: DistantPalace2
+PASS ator pousado no teto real do trecho 12
+PASS fundação continua abaixo da tela: DistantWall0
+PASS fundação continua abaixo da tela: DistantWall1
+PASS fundação continua abaixo da tela: DistantWall2
+PASS fundação continua abaixo da tela: DistantPalace0
+PASS fundação continua abaixo da tela: DistantPalace1
+PASS fundação continua abaixo da tela: DistantPalace2
+PASS salto duplo real para conferir a base ao subir
+PASS cidade não acompanha a subida da câmera como plataforma suspensa
+PASS fundação continua abaixo da tela: DistantWall0
+PASS fundação continua abaixo da tela: DistantWall1
+PASS fundação continua abaixo da tela: DistantWall2
+PASS fundação continua abaixo da tela: DistantPalace0
+PASS fundação continua abaixo da tela: DistantPalace1
+PASS fundação continua abaixo da tela: DistantPalace2
+PASS ator pousado no teto real do trecho 31
+PASS fundação continua abaixo da tela: DistantWall0
+PASS fundação continua abaixo da tela: DistantWall1
+PASS fundação continua abaixo da tela: DistantWall2
+PASS fundação continua abaixo da tela: DistantPalace0
+PASS fundação continua abaixo da tela: DistantPalace1
+PASS fundação continua abaixo da tela: DistantPalace2
+PASS salto duplo real para conferir a base ao subir
+PASS cidade não acompanha a subida da câmera como plataforma suspensa
+PASS fundação continua abaixo da tela: DistantWall0
+PASS fundação continua abaixo da tela: DistantWall1
+PASS fundação continua abaixo da tela: DistantWall2
+PASS fundação continua abaixo da tela: DistantPalace0
+PASS fundação continua abaixo da tela: DistantPalace1
+PASS fundação continua abaixo da tela: DistantPalace2
+PASS ator pousado no teto real do trecho 69
+PASS fundação continua abaixo da tela: DistantWall0
+PASS fundação continua abaixo da tela: DistantWall1
+PASS fundação continua abaixo da tela: DistantWall2
+PASS fundação continua abaixo da tela: DistantPalace0
+PASS fundação continua abaixo da tela: DistantPalace1
+PASS fundação continua abaixo da tela: DistantPalace2
+PASS salto duplo real para conferir a base ao subir
+PASS cidade não acompanha a subida da câmera como plataforma suspensa
+PASS fundação continua abaixo da tela: DistantWall0
+PASS fundação continua abaixo da tela: DistantWall1
+PASS fundação continua abaixo da tela: DistantWall2
+PASS fundação continua abaixo da tela: DistantPalace0
+PASS fundação continua abaixo da tela: DistantPalace1
+PASS fundação continua abaixo da tela: DistantPalace2
+PASS ator pousado no teto real do trecho 106
+PASS fundação continua abaixo da tela: DistantWall0
+PASS fundação continua abaixo da tela: DistantWall1
+PASS fundação continua abaixo da tela: DistantWall2
+PASS fundação continua abaixo da tela: DistantPalace0
+PASS fundação continua abaixo da tela: DistantPalace1
+PASS fundação continua abaixo da tela: DistantPalace2
+PASS salto duplo real para conferir a base ao subir
+PASS cidade não acompanha a subida da câmera como plataforma suspensa
+PASS fundação continua abaixo da tela: DistantWall0
+PASS fundação continua abaixo da tela: DistantWall1
+PASS fundação continua abaixo da tela: DistantWall2
+PASS fundação continua abaixo da tela: DistantPalace0
+PASS fundação continua abaixo da tela: DistantPalace1
+PASS fundação continua abaixo da tela: DistantPalace2
+WALL_CONTEXT checks=75 failures=0

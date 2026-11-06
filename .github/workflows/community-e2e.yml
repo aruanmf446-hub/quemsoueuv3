@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       stage:
-        description: "access (login/consultas) | claim (produção QA) | publish | community | finish | cleanup"
+        description: "access (login/consultas) | claim | report_prepare | report_verify | publish | community | finish | cleanup"
         required: true
         default: access
       upload_order:
@@ -58,7 +58,7 @@ jobs:
             python3 tools/e2e/community_e2e.py "$STAGE" "$DECK_ID"
           fi
 
-      - name: Registrar resultado sanitizado da etapa claim
+      - name: Registrar resultado sanitizado da etapa QA
         if: always() && github.ref == 'refs/heads/work/deck-runtime-corrections'
         env:
           QA_REPORT_BRANCH: ${{ github.ref_name }}

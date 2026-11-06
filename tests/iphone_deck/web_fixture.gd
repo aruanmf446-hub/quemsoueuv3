@@ -48,6 +48,7 @@ func _run() -> void:
 		ui.show_screen({"public_id":fake.target.public_id})
 		await get_tree().process_frame
 		ui._open_report(fake.target.public_id)
+		fake.report_code="cannot_report_self"
 	elif mode=="nickname":
 		services.profile.state="loading"
 		ui=preload("res://scripts/ui/nickname_onboarding.gd").new()

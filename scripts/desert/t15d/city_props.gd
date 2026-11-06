@@ -4,6 +4,7 @@ extends Node3D
 ## Bordas artificiais de chunk NÃO recebem lanternas: para isso o chamador marca
 ## pit_left/pit_right somente nas extremidades que realmente tocam um buraco.
 const Assets = preload("res://scripts/desert/t15d/kingdom_assets.gd")
+const Context=preload("res://scripts/desert/t15d/regional_context.gd")
 const BUILDING_SPACING := 19.0
 static var _house_texture: Texture2D
 var _builders := {}
@@ -75,6 +76,7 @@ func _build_slot(slot: int, left: float, right: float, top: float,_at_x := INF) 
 			art.set_meta("surface_right",right)
 			building_count += 1
 		piece += 1
+	Context.build(self,_order,slot,left,right,top)
 
 func _building(origin: Vector3, width: float, rng: RandomNumberGenerator) -> void:
 	if _order in [1,2] and _painted_house(origin,width): return
@@ -344,8 +346,8 @@ func _flush() -> void:
 		var mesh := MeshInstance3D.new()
 		mesh.name = "City_"+key
 		mesh.mesh = st.commit()
-		mesh.material_override = _material(key)
-		if key in ["window","cloth","cloth_alt","recess","lantern_glass"]:
+		mesh.material_override = Context.material(key) if key.begins_with("context_") else _material(key)
+		if key.begins_with("context_") or key in ["window","cloth","cloth_alt","recess","lantern_glass"]:
 			mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		add_child(mesh)
 	_builders.clear()

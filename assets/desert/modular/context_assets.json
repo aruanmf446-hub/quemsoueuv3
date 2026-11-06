@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "max_dimension": 1024,
+  "assets": [
+    {
+      "id": "riverbank_context",
+      "role": "margem baixa de rio com pedras, vegetação e cerâmica",
+      "source": "res://assets/desert/modular/source/riverbank_context.png",
+      "texture": "res://assets/desert/modular/riverbank_context.res",
+      "content_pixel_rect": [32, 149, 2108, 435],
+      "phases": [4, 5]
+    },
+    {
+      "id": "city_supplies_context",
+      "role": "cerâmicas, cesta, tecidos e caixa de abastecimento urbano",
+      "source": "res://assets/desert/modular/source/city_supplies_context.png",
+      "texture": "res://assets/desert/modular/city_supplies_context.res",
+      "content_pixel_rect": [18, 163, 1733, 598],
+      "phases": [1, 3]
+    }
+  ]
+}

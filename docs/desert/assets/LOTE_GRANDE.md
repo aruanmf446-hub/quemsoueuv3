@@ -1,6 +1,7 @@
 # Biblioteca visual — lote grande
 
 Dez módulos novos; quinze módulos no catálogo contando os anteriores.
+O catálogo original continua preservado. Dois complementos de contexto — margem de rio e abastecimento urbano — estão separados em `context_assets.json`, com fontes e procedência em `PROVENANCE.md`. A fase carrega somente o complemento necessário: margem nas fases4/5; abastecimento nas fases1/3. Carrinhos de mineração reutilizam a arte aprovada do guindaste.
 **Assets aprovados integrados às dez fases pelo controlador existente. Capturas e validação da integração em `evidence/ten-approved`.**
 As imagens desta página são assets isolados, não capturas de fases.
 

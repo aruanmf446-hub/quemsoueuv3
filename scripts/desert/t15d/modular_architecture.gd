@@ -128,13 +128,14 @@ func _mine_cart(at: Vector3) -> void:
 
 func _underground(at: Vector3,index: int) -> void:
 	var top := at+Vector3(0,4.4,-1.5)
-	_box(top,Vector3(5.2,0.35,3.8),"wood" if _theme == 10 else "stone")
-	for side: float in [-1,1]:
-		_box(top+Vector3(side*2.35,-2.2,0),Vector3(0.35,4.4,0.35),"wood" if _theme == 10 else "stone")
 	if _theme == 10:
-		for side: float in [-1,1]:
-			_dome(at+Vector3(side*1.4,0.0,-2.6),0.45,1.2,"crystal")
+		Context._box(self,top,Vector3(5.2,0.35,3.8),"context_wood",Color("#b2a38e"))
+		for side: float in [-1,1]:Context._box(self,top+Vector3(side*2.35,-2.2,0),Vector3(0.35,4.4,0.35),"context_wood",Color("#b2a38e"))
+		# Veio aprovado substitui as antigas cápsulas laranjas; arena fica livre.
+		if at.x<_length*0.78:place_asset("desert_mine_crystals",at+Vector3(1.4,-0.60,-3.0),1.6)
 	else:
+		_box(top,Vector3(5.2,0.35,3.8),"stone")
+		for side: float in [-1,1]:_box(top+Vector3(side*2.35,-2.2,0),Vector3(0.35,4.4,0.35),"stone")
 		_arch_frame(at+Vector3(0,0,-1.9),2.3,3.0,0.3)
 
 func _water_strip(at: Vector3,dimensions: Vector2,vertical: bool) -> void:

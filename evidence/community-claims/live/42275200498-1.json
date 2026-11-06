@@ -1,0 +1,241 @@
+{
+  "status": "checks_passed_cleanup_pending",
+  "run_id": "42275200498",
+  "attempt": "1",
+  "room_tag": "QSE QA CLAIM 42275200498-1",
+  "checks": [
+    {
+      "name": "existing_credentials_OWNER",
+      "passed": true
+    },
+    {
+      "name": "login_OWNER",
+      "passed": true
+    },
+    {
+      "name": "existing_credentials_READER",
+      "passed": true
+    },
+    {
+      "name": "login_READER",
+      "passed": true
+    },
+    {
+      "name": "existing_credentials_R1",
+      "passed": true
+    },
+    {
+      "name": "login_R1",
+      "passed": true
+    },
+    {
+      "name": "three_distinct_existing_accounts",
+      "passed": true
+    },
+    {
+      "name": "inventory_contract_OWNER",
+      "passed": true
+    },
+    {
+      "name": "inventory_contract_READER",
+      "passed": true
+    },
+    {
+      "name": "inventory_contract_R1",
+      "passed": true
+    },
+    {
+      "name": "published_deck_available",
+      "passed": true
+    },
+    {
+      "name": "initial_QA_nickname_registered_OWNER",
+      "passed": true
+    },
+    {
+      "name": "initial_QA_nickname_registered_READER",
+      "passed": true
+    },
+    {
+      "name": "gateway_claim_confirmed",
+      "passed": true
+    },
+    {
+      "name": "stable_version_reference",
+      "passed": true
+    },
+    {
+      "name": "repeated_claim_idempotent",
+      "passed": true
+    },
+    {
+      "name": "inventory_contract_OWNER",
+      "passed": true
+    },
+    {
+      "name": "exactly_one_owner_entitlement",
+      "passed": true
+    },
+    {
+      "name": "inventory_contract_READER",
+      "passed": true
+    },
+    {
+      "name": "unchanged_collection_READER",
+      "passed": true
+    },
+    {
+      "name": "inventory_contract_R1",
+      "passed": true
+    },
+    {
+      "name": "unchanged_collection_R1",
+      "passed": true
+    },
+    {
+      "name": "nonmember_manifest_refused",
+      "passed": true
+    },
+    {
+      "name": "unowned_deck_hidden_from_selector",
+      "passed": true
+    },
+    {
+      "name": "unowned_room_settings_refused",
+      "passed": true
+    },
+    {
+      "name": "authorized_catalog_manifest",
+      "passed": true
+    },
+    {
+      "name": "approved_cards_and_creator_preserved",
+      "passed": true
+    },
+    {
+      "name": "signed_catalog_url_library",
+      "passed": true
+    },
+    {
+      "name": "real_private_png_download_library",
+      "passed": true
+    },
+    {
+      "name": "signed_catalog_url_duel",
+      "passed": true
+    },
+    {
+      "name": "real_private_png_download_duel",
+      "passed": true
+    },
+    {
+      "name": "unsigned_private_preview_refused",
+      "passed": true
+    },
+    {
+      "name": "claimed_deck_in_online_selector",
+      "passed": true
+    },
+    {
+      "name": "private_test_room_created",
+      "passed": true
+    },
+    {
+      "name": "second_QA_player_joins",
+      "passed": true
+    },
+    {
+      "name": "opponent_authorized_manifest",
+      "passed": true
+    },
+    {
+      "name": "inventory_contract_READER",
+      "passed": true
+    },
+    {
+      "name": "room_access_does_not_gift_deck",
+      "passed": true
+    },
+    {
+      "name": "bot_in_online_room",
+      "passed": true
+    },
+    {
+      "name": "real_community_match_started",
+      "passed": true
+    },
+    {
+      "name": "match_uses_immutable_community_cards",
+      "passed": true
+    },
+    {
+      "name": "owner_selects_three_cards",
+      "passed": true
+    },
+    {
+      "name": "opponent_selects_three_cards",
+      "passed": true
+    },
+    {
+      "name": "turn_order_preserved_through_reveal",
+      "passed": true
+    },
+    {
+      "name": "community_card_reveal_over_real_HTTP",
+      "passed": true
+    },
+    {
+      "name": "leaving_revokes_future_manifest_access",
+      "passed": true
+    },
+    {
+      "name": "inventory_contract_READER",
+      "passed": true
+    },
+    {
+      "name": "opponent_collection_preserved_after_match",
+      "passed": true
+    },
+    {
+      "name": "inventory_contract_R1",
+      "passed": true
+    },
+    {
+      "name": "third_QA_collection_preserved",
+      "passed": true
+    }
+  ],
+  "rooms": [
+    {
+      "id": "32e58514-2442-4927-9104-c120fa5094a3",
+      "match_id": "3258497a-b7d9-4218-9b55-574d65f681a0"
+    }
+  ],
+  "skipped": [],
+  "accounts_created_or_deleted": false,
+  "started_at": "2026-11-06T18:56:54Z",
+  "owner_marker": "229462ac9cc0093233b3fd314a5c444ce7238e29a064b7d0b0e7bc11b7ef1268",
+  "source_deck_id": "c60869a7-2fac-40b8-8520-acd649640bcf",
+  "initial_nickname_registration": [
+    "OWNER",
+    "READER"
+  ],
+  "deck_ref": "community_7515e9ff59234aea9a46fc69cf8798f3",
+  "leave_requests": [
+    {
+      "role": "READER",
+      "http_status": 200
+    },
+    {
+      "role": "OWNER",
+      "http_status": 200
+    }
+  ],
+  "sessions_logged_out": {
+    "OWNER": true,
+    "READER": true,
+    "R1": true
+  },
+  "passed": 50,
+  "total": 50
+}

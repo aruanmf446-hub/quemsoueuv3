@@ -1,8 +1,10 @@
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
 OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
 
 PASS tendas existentes recebem apoio na lona
-PASS lona alcançável com os saltos aprovados: 2.86m
+PASS lona alcançável com os saltos aprovados: 2.54m
 PASS parte do piso real abaixo da tenda
 PASS salto insuficiente não bate a cabeça nem se prende à lona
 PASS desce normalmente para o balcão, sem subir por teleporte
@@ -12,10 +14,9 @@ PASS corre apoiado em cima da tenda
 PASS consegue saltar novamente de cima da lona
 PASS sai pela borda e cai sem travar
 PASS obstáculos de parkour existentes usam a mesma passagem por baixo
+PASS levanta após agachar por baixo do balcão, sem ficar preso
 PASS balcão de parkour atravessável por baixo, mantendo apoio por cima
 PASS caixas do cenário também oferecem apoio
 PASS pisa de verdade na caixa, sem flutuar
 PASS sair da fase remove todos os apoios
-PROP_LANDINGS checks=15 failures=0
-WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
-     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+PROP_LANDINGS checks=16 failures=0

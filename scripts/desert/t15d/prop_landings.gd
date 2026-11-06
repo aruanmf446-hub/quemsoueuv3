@@ -5,7 +5,7 @@ const GROUP:=&"campaign_one_way"
 const Support=preload("res://scripts/desert/t15d/one_way_support.gd")
 # Frações do recorte visível: esquerda, direita, altura desde o topo da imagem.
 const LEDGES:={
- "capital_market_stall":[[0.10,0.89,0.115],[0.12,0.88,0.705]],
+ "capital_market_stall":[[0.18,0.82,0.23],[0.12,0.88,0.705]],
  "capital_merchant":[[0.07,0.93,0.135],[0.105,0.475,0.575],[0.145,0.445,0.815]],
  "capital_house":[[0.07,0.93,0.105]],
  "capital_balcony_house":[[0.06,0.94,0.145],[0.645,0.915,0.405],[0.12,0.46,0.525]],

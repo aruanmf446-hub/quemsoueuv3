@@ -38,7 +38,7 @@
       "test": "route-03",
       "passed": true,
       "exit_code": 0,
-      "wall_seconds": 21.19,
+      "wall_seconds": 18.11,
       "graphical": false,
       "fixed_physics_step": true
     },
@@ -130,5 +130,6 @@
     "blocked": []
   },
   "scope_check": true,
-  "design_check": true
+  "design_check": true,
+  "canopy_contact": "red fabric, inset from poles"
 }

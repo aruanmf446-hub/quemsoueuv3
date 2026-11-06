@@ -2,7 +2,7 @@
 
 Sobre a main `5ebf63e`, preservando o trabalho paralelo de decks/comunidade. Nenhum asset foi substituído nem criado. Mantém força/quantidade dos saltos, controles, combate, Tasks, cenário e interface.
 
-- As lonas e balcões das tendas agora sustentam o personagem. Superfícies adequadas das lojas próximas, fontes, ruínas, estruturas de mineração, caixas de mantimentos e carrinhos também recebem apoio.
+- O apoio da tenda acompanha a área central do tecido vermelho, com folga nas bordas: os pés ficam sobre a lona. As lonas e balcões das tendas agora sustentam o personagem. Superfícies adequadas das lojas próximas, fontes, ruínas, estruturas de mineração, caixas de mantimentos e carrinhos também recebem apoio.
 - O personagem atravessa esses apoios ao subir; só colide quando desce com os pés acima do topo. Não bate a cabeça, não fica preso por baixo e pode levantar após agachar sob um balcão. Ao pousar, o Godot reconhece o chão e recupera os saltos normalmente.
 - Passarelas dos obstáculos de parkour existentes também recebem a passagem por baixo. Piso principal, telhados aprovados da fase 2, pedras que caem e pontes de Tasks mantêm suas regras.
 - Apoios acompanham os limites visuais, o recorte e o espelhamento das imagens. A altura física compensa a projeção da câmera; não há plataformas visíveis adicionadas nem peças flutuantes.
@@ -43,3 +43,5 @@ python3 tests/desert_night/run.py --godot "$GODOT" --only route-01 route-02 rout
 # Export isolado de staging com feature iphone_layout_fixture, servido na porta 8135:
 node tests/desert_night/web_prop_landings_probe.cjs
 ```
+
+Ajuste do encaixe sobre a lona: repetidas as 134 verificações, as capturas nas três janelas e o percurso físico da fase 3. [Captura atual dos pés sobre o tecido](844x390/05_pes_sobre_a_lona.jpg).

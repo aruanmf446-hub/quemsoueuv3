@@ -10,6 +10,7 @@ signal strike_window
 signal hurt
 const ActorSlot = preload("res://scripts/desert/t15d/actor_slot.gd")
 const SandFx = preload("res://scripts/desert/t15d/sand_fx.gd")
+const PropLandings=preload("res://scripts/desert/t15d/prop_landings.gd")
 const RUN_MAX_HEALTH := 3
 const CHARGE_CAP := 3
 const UNLOCK_FILE := "user://desert_abilities_v3.cfg"
@@ -40,7 +41,7 @@ var _actor: ActorSlot:
 func _ready() -> void:
 	super._ready()
 	collision_layer = 2
-	collision_mask = 1
+	collision_mask = 1|PropLandings.LAYER
 	floor_snap_length = 0.18
 	floor_max_angle = deg_to_rad(48)
 	health = RUN_MAX_HEALTH
@@ -72,6 +73,7 @@ func _physics_process(delta: float) -> void:
 	if is_dead:
 		_dash_left = 0.0
 		velocity.y = maxf(velocity.y - GRAVITY * delta, MAX_FALL_SPEED)
+		PropLandings.sync(self)
 		move_and_slide()
 		return
 	_knockback_timer = maxf(_knockback_timer - delta, 0.0)
@@ -128,6 +130,7 @@ func _physics_process(delta: float) -> void:
 		if _attack_timer > 0.0: target *= 0.0 if is_on_floor() else 0.7
 		velocity.x = move_toward(velocity.x, target, (48.0 if is_on_floor() else 24.0) * delta)
 	velocity.z = 0.0
+	PropLandings.sync(self)
 	move_and_slide()
 	_shock_nearby()
 	_separate_actors()
@@ -263,7 +266,9 @@ func _set_crouched(value: bool) -> void:
 		query.shape = capsule
 		query.transform = Transform3D(Basis.IDENTITY, global_position + Vector3.UP * (STAND_HEIGHT * 0.5 + 0.03))
 		query.collision_mask = 1
-		query.exclude = [get_rid()]
+		var exclusions: Array[RID]=[get_rid()]
+		for body: PhysicsBody3D in get_collision_exceptions():exclusions.append(body.get_rid())
+		query.exclude = exclusions
 		if not get_world_3d().direct_space_state.intersect_shape(query, 1).is_empty(): return
 	super._set_crouched(value)
 

@@ -1,10 +1,11 @@
 extends RefCounted
 ## Infraestrutura e margens, em lotes de material do próprio chunk.
-## Ilustrações limitadas por laje; sem colisores, luzes ou processamento contínuo.
+## Ilustrações limitadas por laje; caixas e carrinhos recebem apoio opcional por cima.
 static var _materials: Dictionary={}
 static var _textures: Dictionary={}
 const ROOT="res://assets/desert/modular/"
 const WATER=preload("res://scripts/desert/t15d/regional_water.gdshader")
+const Landings=preload("res://scripts/desert/t15d/prop_landings.gd")
 
 static func build(props: Node3D,order: int,slot: int,left: float,right: float,top: float) -> void:
 	if order==2 or right-left<7.0 or (order==10 and slot>=40):return
@@ -19,7 +20,7 @@ static func build(props: Node3D,order: int,slot: int,left: float,right: float,to
 			kind="city_courtyard" if order==1 else "market_delivery"
 			_apron(props,a,b,top)
 			var fraction: float=[0.50,0.43,0.65][slot%3] if order==3 else 0.34+float(slot%3)*0.06
-			_decoration(props,"city_supplies_context",Vector3(lerpf(a,b,fraction),top-0.60,-6.6),3.3 if order==1 else 3.6,slot%3==1,Vector2(a,b))
+			_decoration(props,"city_supplies_context",Vector3(lerpf(a,b,fraction),top-0.60,-6.6),3.3 if order==1 else 3.6,slot%3==1,Vector2(a,b),top)
 		6:
 			kind="buried_courtyard"
 			_apron(props,a,b,top,true)
@@ -31,7 +32,7 @@ static func build(props: Node3D,order: int,slot: int,left: float,right: float,to
 			kind="ore_road" if order==7 else ("loading_yard" if order==9 else "mine_railway")
 			_apron(props,a,b,top,true)
 			_railway(props,a,b,top-0.60)
-			if slot%2==0:_decoration(props,"ore_cart_context",Vector3(lerpf(a,b,0.45),top-0.49,-5.6),2.5,false,Vector2(a,b))
+			if slot%2==0:_decoration(props,"ore_cart_context",Vector3(lerpf(a,b,0.45),top-0.49,-5.6),2.5,false,Vector2(a,b),top)
 		8:
 			kind="guard_supplies"
 			_apron(props,a,b,top)
@@ -47,7 +48,7 @@ static func build(props: Node3D,order: int,slot: int,left: float,right: float,to
 	records.append({"id":"p%02d.context.%03d" % [order,slot],"order":order,"slot":slot,"left":a,"right":b,"top":top,"kind":kind})
 	props.set_meta("regional_context",records)
 
-static func _decoration(props: Node3D,id: String,at: Vector3,width: float,flip:=false,bounds:=Vector2(-INF,INF)) -> void:
+static func _decoration(props: Node3D,id: String,at: Vector3,width: float,flip:=false,bounds:=Vector2(-INF,INF),floor_top:=INF) -> void:
 	at.x=clampf(at.x,bounds.x+width*0.5,bounds.y-width*0.5)
 	if not _textures.has(id):
 		if id=="ore_cart_context":
@@ -66,6 +67,7 @@ static func _decoration(props: Node3D,id: String,at: Vector3,width: float,flip:=
 	sprite.set_meta("context_asset",id)
 	sprite.set_meta("ground_y",at.y)
 	sprite.set_meta("context_span",bounds)
+	if is_finite(floor_top):Landings.attach(sprite,id,props._order,bounds.x,bounds.y,floor_top)
 
 static func _apron(props: Node3D,left: float,right: float,top: float,earth:=false) -> void:
 	var key:="context_earth" if earth else "context_masonry"

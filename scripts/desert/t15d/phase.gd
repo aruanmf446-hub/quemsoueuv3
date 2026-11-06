@@ -334,7 +334,7 @@ func _chunk_platforms(index: int) -> Array:
 	return platforms
 func _build_collision(chunk: Node3D, platforms: Array) -> void:
 	for part: Dictionary in platforms:
-		var body := StaticBody3D.new()
+		var body: StaticBody3D=preload("res://scripts/desert/t15d/one_way_support.gd").new() if part.get("parkour_route",false) else StaticBody3D.new()
 		body.collision_layer = 1
 		body.position = _vec3(part.pos)
 		var shape := CollisionShape3D.new()
@@ -346,7 +346,10 @@ func _build_collision(chunk: Node3D, platforms: Array) -> void:
 		box.size = dimensions
 		shape.shape = box
 		body.add_child(shape)
-		if part.get("parkour_route",false): body.set_meta("parkour_route",true)
+		if part.get("parkour_route",false):
+			body.set_meta("parkour_route",true)
+			body.set_meta("one_way_top",body.position.y+dimensions.y*0.5)
+			body.add_to_group(preload("res://scripts/desert/t15d/prop_landings.gd").GROUP)
 		if part.kind=="ground": body.set_meta("walkable_floor",true)
 		chunk.add_child(body)
 		if part.get("breakable",false):

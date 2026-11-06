@@ -46,6 +46,8 @@ func _run() -> void:
 		services.progression.data={"unlocked_character_ids":PlayerContracts.initial_ids(),"equipped_character_id":"cowboy"}
 		ui=load("res://scenes/skins/skins_panel.tscn").instantiate()
 		add_child(ui)
+		# Os retratos distribuídos já cobrem a galeria. Testar só as novas prévias.
+		ui._generating=true
 		ui.open("cowboy")
 	elif mode=="player_report":
 		services.profile.client=fake
@@ -126,7 +128,7 @@ func _probe(args: Array) -> void:
 		var scroll: ScrollContainer=ui.get_node("Margin/Column/Scroll")
 		scroll.scroll_vertical=int(scroll.get_v_scroll_bar().max_value)
 	report_sequence+=1
-	var result := {"sequence":report_sequence,"size":[ui.size.x,ui.size.y],"controls":[],"fields":{},"cards":0,"labels":[]}
+	var result := {"sequence":report_sequence,"size":[ui.size.x,ui.size.y],"controls":[],"fields":{},"cards":0,"labels":[],"emote_thumbnails":[]}
 	if ui.get("_stage") is LobbyStage and is_instance_valid(ui.get("_stage")):
 		var stage: LobbyStage=ui.get("_stage")
 		var player: AnimationPlayer=stage.character.get("_anim_player")
@@ -134,6 +136,8 @@ func _probe(args: Array) -> void:
 	for node: Control in ui.find_children("*","Control",true,false):
 		if not node.is_visible_in_tree(): continue
 		if node is Label: result.labels.append(node.text)
+		if node is TextureRect and str(node.name).begins_with("EmoteThumbnail_"):
+			result.emote_thumbnails.append({"name":str(node.name),"ready":node.texture!=null,"height":node.size.y})
 		if node is LineEdit or node is TextEdit: result.fields[str(node.name)]=str(node.text)
 		if node is BaseButton or node is LineEdit or node is TextEdit:
 			var r := node.get_global_rect()

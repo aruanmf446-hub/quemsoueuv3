@@ -6,6 +6,7 @@
     "emoteStarted": true,
     "poseRestored": true,
     "controlsVisible": true,
+    "realThumbnails": 3,
     "errors": []
   },
   {
@@ -15,6 +16,7 @@
     "emoteStarted": true,
     "poseRestored": true,
     "controlsVisible": true,
+    "realThumbnails": 3,
     "errors": []
   },
   {
@@ -24,6 +26,7 @@
     "emoteStarted": true,
     "poseRestored": true,
     "controlsVisible": true,
+    "realThumbnails": 3,
     "errors": []
   }
 ]

@@ -1,32 +1,33 @@
-# Skins e emotes — desenvolvimento
+# Prévia visual de skins e emotes
 
 Branch: `work/skin-variations-emotes`.
 
-A primeira etapa acrescenta um seletor de prévia em Personagens, reutilizando os
-FBX existentes: Apresentação (`2.fbx`), Comemoração (`4.fbx`) e Reação de derrota
-(`3.fbx`). São três animações por personagem inicial. El Fuego não recebe emotes
-inventados a partir dos ataques e ações de plataforma.
+Personagens possui abas Skins e Emotes. A aba Emotes mostra três cartões com
+poses capturadas do modelo real. Tocar/clicar no cartão reproduz o movimento
+no personagem maior, à direita. Mouse, toque e foco por teclado usam botões
+nativos e o estilo existente de PlayerUI.
 
-Cada prévia toca uma vez e restaura a pose ou o loop anterior. Uma reação
-automática interrompe a prévia e cancela o retorno pendente. Repetir/trocar o
-emote e liberar o modelo também limpa esse estado. Nenhum modelo, textura ou
-animação original foi substituído; não há novos assets, cobrança ou alterações
-de autenticação/backend nesta etapa.
+Os clipes são os FBX originais: Apresentação (`2.fbx`), Comemoração (`4.fbx`) e
+Reação de derrota (`3.fbx`), nos sete personagens iniciais. El Fuego mantém o
+estado sem emotes disponíveis. Cada prévia toca uma vez e restaura a pose ou
+animação anterior. As reações automáticas continuam tendo prioridade.
 
-O catálogo atual não contém estilos de cor/roupa alternativos. Foram perguntados
-ao dono o tipo de variação (novas cores ou modelos/texturas já prontos) e o alcance
-dos emotes (lobby/sala ou também partida). Essas escolhas seguem pendentes.
-Ainda não há estilos alternativos equipáveis, seleção de emote salva na conta
-ou transmissão de emotes para os demais jogadores. A interface implementada
-nesta etapa é uma prévia na coleção, não a conclusão de todo esse fluxo.
+Um palco temporário captura três miniaturas da skin selecionada, enquadrando
+os ossos da pose. Depois é liberado. Os cartões usam texturas estáticas em cache;
+o personagem maior é o único que continua animado. Não há imagem gerada por IA:
+as miniaturas e capturas foram renderizadas pelo Godot com os assets existentes.
 
-Validação: Godot oficial 4.7.2, teste `tests/skin_emotes/preview.gd` com 26
-verificações e regressão `tests/duel_avatars/animations.gd` com 69, sem falhas.
-`tools/player_ui/check_design.py`: OK. O ambiente não possui Xvfb; a conferência
-visual usa uma exportação real do Godot Web com fixtures isoladas e rede externa
-bloqueada. Não se trata de teste em iPhone físico.
+O escopo atual é uma prévia na coleção. Estilos alternativos de roupa/cor,
+seleção salva na conta e emotes compartilhados no lobby/sala/partida continuam
+como próximas etapas, dependentes da definição dos visuais e do uso desejado.
 
-Web: aprovado em 1672×941, 844×390/DPR3 e 640×360/DPR3, com clique/toque,
-reprodução e retorno à pose sem erros. O primeiro teste em 640×360 identificou
-um excesso de largura; seletor com texto recortável e botão curto corrigiram
-o encaixe sem reduzir as fontes. Capturas em `evidence/skin-emotes`.
+Validação no Godot oficial 4.7.2: dez verificações da galeria visual, 26 do
+controle dos emotes e 69 de regressão das reações automáticas, sem falhas.
+`tools/player_ui/check_design.py`: OK. Godot Web/Chromium aprovado em desktop
+1672×941 e iPhone UA/DPR3 em 844×390 e 640×360: três miniaturas carregadas com
+altura visível, cartões dentro da tela, clique/toque, reprodução e retorno à
+pose, sem erros de script. O ajuste de altura preserva o tamanho dos cartões
+sem aplicar a regra dos retratos de skins a eles.
+
+Capturas em `evidence/skin-emotes`. São fixtures isoladas, sem acesso ao backend.
+Não houve teste em iPhone físico; o ambiente não possui Xvfb.

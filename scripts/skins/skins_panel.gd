@@ -47,6 +47,9 @@ var _back_button: Button
 var _images: Dictionary = {}
 var _cards: Dictionary = {}
 var _was_compact := false
+var _cosmetic_mode := "skins"
+var _cosmetic_tabs: Dictionary = {}
+var _emote_previews := preload("res://scripts/skins/emote_preview_cache.gd").new()
 
 
 func _ready() -> void:
@@ -58,6 +61,7 @@ func _ready() -> void:
 	_thumbnails = ThumbnailCache.new(preload("res://scenes/lobby/lobby_stage.tscn"))
 	_load_favorites()
 	_split_layout()
+	_build_cosmetic_tabs()
 	get_viewport().size_changed.connect(_responsive_layout)
 	_responsive_layout()
 	services.inventory.changed.connect(func() -> void:
@@ -197,7 +201,7 @@ func _responsive_layout() -> void:
 	_side.size_flags_stretch_ratio = 1.0
 	# Barra de coleções só quando sobra largura; em telas estreitas a coleção atual
 	# continua no topo ("COMEÇO · 7/8") e a prévia não é empurrada para fora.
-	_collection_sidebar.visible = not compact and get_viewport().get_visible_rect().size.x >= 1200.0
+	_collection_sidebar.visible = _cosmetic_mode=="skins" and not compact and get_viewport().get_visible_rect().size.x >= 1200.0
 	_toolbar.add_theme_constant_override("separation", 4 if compact else 8)
 	_fav_button.text = "Favoritos" if not compact else "FAV"
 	_fav_button.add_theme_color_override("font_color", ACCENT if _favorite_only else PlayerUI.TEXT)
@@ -209,9 +213,10 @@ func _responsive_layout() -> void:
 	_sort_button.custom_minimum_size.y = 44 if compact else PlayerUI.CONTROL_HEIGHT
 	_sort_button.custom_minimum_size.x = 68 if compact else 130
 	if _grid != null:
-		_grid.columns = _columns()
-		for item in _grid.get_children():
-			_style_card_height(item, compact)
+		_grid.columns = _columns() if _cosmetic_mode=="skins" else 3
+		if _cosmetic_mode=="skins":
+			for item in _grid.get_children():
+				_style_card_height(item, compact)
 	if _stage != null and is_instance_valid(_stage):
 		_stage.custom_minimum_size = Vector2.ZERO
 	if _description != null and is_instance_valid(_description):
@@ -252,6 +257,9 @@ func _rebuild_gallery() -> void:
 	_grid.add_theme_constant_override("h_separation", 10)
 	_grid.add_theme_constant_override("v_separation", 10)
 	body.add_child(_grid)
+	if _cosmetic_mode=="emotes":
+		_build_emote_gallery(services.inventory.entry(_selected))
+		return
 	var entries: Array = services.inventory.entries.duplicate()
 	entries.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return str(a.get("name", "")).nocasecmp_to(str(b.get("name", ""))) > 0 if _reverse_sort else str(a.get("name", "")).nocasecmp_to(str(b.get("name", ""))) < 0)
@@ -469,6 +477,8 @@ func _select(character_id: String) -> void:
 	favorite.custom_minimum_size = Vector2(36, 34)
 	heading_row.add_child(favorite)
 	var arrows := HBoxContainer.new()
+	arrows.name="CharacterArrows"
+	arrows.visible=_cosmetic_mode=="skins"
 	_preview.add_child(arrows)
 	var left_arrow := _button("‹", _select_neighbor.bind(-1))
 	left_arrow.custom_minimum_size = Vector2(56, 56)
@@ -499,7 +509,6 @@ func _select(character_id: String) -> void:
 	_description.custom_minimum_size.y = 0
 	_description.hide()
 	_preview.add_child(_description)
-	_add_emote_controls(entry)
 	if not unlocked:
 		var lock_label := PlayerUI.label(PlayerProgress.lock_label(entry), 14 if compact else 17, Color("#ffcf8a"))
 		_preview.add_child(lock_label)
@@ -515,29 +524,78 @@ func _select(character_id: String) -> void:
 	var back := _button("VOLTAR", close)
 	back.custom_minimum_size.y = 36 if compact else PlayerUI.CONTROL_HEIGHT
 	actions.add_child(back)
+	if _cosmetic_mode=="emotes": _rebuild_gallery()
 
 
-func _add_emote_controls(entry: Dictionary) -> void:
+func _build_cosmetic_tabs() -> void:
+	var tabs := PlayerUI.row(_gallery_section)
+	_gallery_section.move_child(tabs,0)
+	for mode: String in ["skins","emotes"]:
+		var button := _button("SKINS" if mode=="skins" else "EMOTES",_choose_cosmetic_mode.bind(mode),mode==_cosmetic_mode)
+		button.name="CosmeticTab_"+mode
+		button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		tabs.add_child(button)
+		_cosmetic_tabs[mode]=button
+
+
+func _choose_cosmetic_mode(mode: String) -> void:
+	_cosmetic_mode=mode
+	_toolbar.visible=mode=="skins"
+	var arrows := _preview.get_node_or_null("CharacterArrows") as Control
+	if arrows!=null: arrows.visible=mode=="skins"
+	for key: String in _cosmetic_tabs: PlayerUI.style_button(_cosmetic_tabs[key],key==mode)
+	_rebuild_gallery()
+	_responsive_layout()
+
+
+func _build_emote_gallery(entry: Dictionary) -> void:
 	var emotes := CharacterCatalog.emotes_for(entry)
-	if emotes.is_empty(): return
-	var row := PlayerUI.row(_preview)
-	row.name="EmoteControls"
-	var choices := OptionButton.new()
-	choices.name="EmoteChoice"
-	choices.tooltip_text=tr("Escolha um emote para visualizar")
-	choices.fit_to_longest_item=false
-	choices.clip_text=true
-	choices.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-	PlayerUI.style_field(choices)
-	choices.custom_minimum_size.y=52
-	for emote: Dictionary in emotes: choices.add_item(tr(str(emote.name)))
-	row.add_child(choices)
-	var play := _button("VER",func()->void:
-		if is_instance_valid(_stage) and choices.selected>=0:
-			_stage.character.play_emote(StringName(emotes[choices.selected].animation)))
-	play.name="PreviewEmote"
-	play.tooltip_text=tr("Visualizar emote")
-	row.add_child(play)
+	_collection_count.text="EMOTES · %d" % emotes.size()
+	var hint := PlayerUI.label("Toque em uma miniatura para ver o emote.",20,PlayerUI.MUTED)
+	body.add_child(hint)
+	body.move_child(hint,0)
+	if emotes.is_empty():
+		body.add_child(PlayerUI.label("Este personagem ainda não possui emotes."))
+		return
+	_grid.columns=3
+	var images := {}
+	var group := ButtonGroup.new()
+	for emote: Dictionary in emotes:
+		var button := _button("",func()->void:
+			if is_instance_valid(_stage): _stage.character.play_emote(StringName(emote.animation)))
+		button.name="EmotePreview_"+str(emote.id)
+		button.tooltip_text=tr(str(emote.name))+" · "+tr("Toque para visualizar")
+		button.toggle_mode=true
+		button.button_group=group
+		button.custom_minimum_size=Vector2(0,260)
+		button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		_grid.add_child(button)
+		var content := VBoxContainer.new()
+		button.add_child(content)
+		content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		content.offset_left=10;content.offset_right=-10
+		content.offset_top=10;content.offset_bottom=-10
+		content.mouse_filter=Control.MOUSE_FILTER_IGNORE
+		var image := TextureRect.new()
+		image.name="EmoteThumbnail_"+str(emote.id)
+		image.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+		image.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		image.size_flags_vertical=Control.SIZE_EXPAND_FILL
+		image.mouse_filter=Control.MOUSE_FILTER_IGNORE
+		content.add_child(image)
+		images[emote.id]=image
+		var label := PlayerUI.label(str(emote.name),20,PlayerUI.TEXT)
+		label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+		label.mouse_filter=Control.MOUSE_FILTER_IGNORE
+		content.add_child(label)
+	_load_emote_previews(entry,_grid,images)
+
+
+func _load_emote_previews(entry: Dictionary,watch: Control,images: Dictionary) -> void:
+	var textures: Dictionary=await _emote_previews.capture(self,entry,watch)
+	if not is_instance_valid(watch) or watch.is_queued_for_deletion(): return
+	for id: String in images:
+		if is_instance_valid(images[id]) and textures.has(id): images[id].texture=textures[id]
 
 
 func _equip(character_id: String) -> void:

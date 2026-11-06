@@ -1,0 +1,13 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS aba Emotes disponível
+PASS prévia não usa lista suspensa
+PASS três cartões selecionáveis
+PASS layout preserva altura das prévias
+PASS filtros de skins não competem com as prévias
+PASS setas de skins ficam fora da prévia de emotes
+PASS cartão de comemoração inicia seu clipe
+PASS El Fuego não exibe cartões de clipes ausentes
+PASS voltar à galeria preserva o personagem selecionado
+PASS navegação de skins restaurada
+EMOTE_GALLERY checks=10 failures=0

@@ -20,7 +20,8 @@ func _run() -> void:
 	if mode=="community": fake=preload("res://tests/community_attribution/fake_game.gd").new()
 	elif mode=="claim": fake=preload("res://tests/community_claims/visual_game.gd").new()
 	elif mode=="report": fake=preload("res://tests/deck_runtime_corrections/fake_game.gd").new()
-	elif mode in ["player_report","emotes"]: fake=preload("res://tests/player_reports/fake_game.gd").new()
+	elif mode=="emotes": fake=preload("res://tests/skin_emotes/fake_game.gd").new()
+	elif mode=="player_report": fake=preload("res://tests/player_reports/fake_game.gd").new()
 	else: fake=preload("res://tests/community_t27/fake_game.gd").new()
 	add_child(fake)
 	fixture_game=fake
@@ -41,6 +42,8 @@ func _run() -> void:
 	services.profile.data=profile.profile()
 	services.profile.state="success"
 	services.friends.client=fake
+	services.emote_shop.client=fake
+	services.wallet.client=fake
 	if mode=="emotes":
 		services.progression.state="success"
 		services.progression.data={"unlocked_character_ids":PlayerContracts.initial_ids(),"equipped_character_id":"cowboy"}
@@ -129,6 +132,9 @@ func _probe(args: Array) -> void:
 		scroll.scroll_vertical=int(scroll.get_v_scroll_bar().max_value)
 	report_sequence+=1
 	var result := {"sequence":report_sequence,"size":[ui.size.x,ui.size.y],"controls":[],"fields":{},"cards":0,"labels":[],"emote_thumbnails":[]}
+	if services.emote_shop!=null and services.emote_shop.state=="success":
+		result.shop={"coins":services.emote_shop.data.get("coins",""),"owned":services.emote_shop.product("dance_01").get("owned",false)}
+	if services.wallet.state=="success": result.wallet_coins=services.wallet.data.get("coins","")
 	if ui.get("_stage") is LobbyStage and is_instance_valid(ui.get("_stage")):
 		var stage: LobbyStage=ui.get("_stage")
 		var player: AnimationPlayer=stage.character.get("_anim_player")

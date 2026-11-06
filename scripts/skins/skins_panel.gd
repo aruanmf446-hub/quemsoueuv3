@@ -50,6 +50,10 @@ var _was_compact := false
 var _cosmetic_mode := "skins"
 var _cosmetic_tabs: Dictionary = {}
 var _emote_previews := preload("res://scripts/skins/emote_preview_cache.gd").new()
+var _context_title: Label
+var _context_hint: Label
+var _buy_dialog: Control
+const DANCE_PREVIEW = preload("res://scripts/skins/dance_preview.gd")
 
 
 func _ready() -> void:
@@ -66,6 +70,9 @@ func _ready() -> void:
 	_responsive_layout()
 	services.inventory.changed.connect(func() -> void:
 		if is_visible_in_tree(): render())
+	services.session.changed.connect(_close_purchase)
+	visibility_changed.connect(func()->void:
+		if not is_visible_in_tree(): _close_purchase())
 
 
 ## Separa a galeria (rolável, à esquerda) da prévia (fixa, à direita).
@@ -213,7 +220,7 @@ func _responsive_layout() -> void:
 	_sort_button.custom_minimum_size.y = 44 if compact else PlayerUI.CONTROL_HEIGHT
 	_sort_button.custom_minimum_size.x = 68 if compact else 130
 	if _grid != null:
-		_grid.columns = _columns() if _cosmetic_mode=="skins" else 3
+		_grid.columns = _columns() if _cosmetic_mode=="skins" else (1 if _cosmetic_mode=="shop" else 3)
 		if _cosmetic_mode=="skins":
 			for item in _grid.get_children():
 				_style_card_height(item, compact)
@@ -257,7 +264,7 @@ func _rebuild_gallery() -> void:
 	_grid.add_theme_constant_override("h_separation", 10)
 	_grid.add_theme_constant_override("v_separation", 10)
 	body.add_child(_grid)
-	if _cosmetic_mode=="emotes":
+	if _cosmetic_mode in ["emotes","shop"]:
 		_build_emote_gallery(services.inventory.entry(_selected))
 		return
 	var entries: Array = services.inventory.entries.duplicate()
@@ -476,6 +483,13 @@ func _select(character_id: String) -> void:
 	var favorite := _favorite_button(character_id)
 	favorite.custom_minimum_size = Vector2(36, 34)
 	heading_row.add_child(favorite)
+	_context_title=PlayerUI.label("",24,PlayerUI.GOLD)
+	_context_title.name="ReactionPreviewTitle"
+	_context_hint=PlayerUI.label("",20,PlayerUI.MUTED)
+	_preview.add_child(_context_title)
+	_preview.add_child(_context_hint)
+	_context_title.visible=_cosmetic_mode!="skins"
+	_context_hint.visible=_cosmetic_mode!="skins"
 	var arrows := HBoxContainer.new()
 	arrows.name="CharacterArrows"
 	arrows.visible=_cosmetic_mode=="skins"
@@ -513,6 +527,8 @@ func _select(character_id: String) -> void:
 		var lock_label := PlayerUI.label(PlayerProgress.lock_label(entry), 14 if compact else 17, Color("#ffcf8a"))
 		_preview.add_child(lock_label)
 	var actions := HBoxContainer.new()
+	actions.name="SkinEquipActions"
+	actions.visible=_cosmetic_mode!="shop"
 	actions.add_theme_constant_override("separation", 10)
 	_preview.add_child(actions)
 	var equip := _button("EQUIPADO" if equipped else ("EQUIPAR" if unlocked else "BLOQUEADO"), _equip.bind(character_id), true)
@@ -524,14 +540,27 @@ func _select(character_id: String) -> void:
 	var back := _button("VOLTAR", close)
 	back.custom_minimum_size.y = 36 if compact else PlayerUI.CONTROL_HEIGHT
 	actions.add_child(back)
-	if _cosmetic_mode=="emotes": _rebuild_gallery()
+	var shop_actions := PlayerUI.row(_preview)
+	shop_actions.name="EmoteShopActions"
+	shop_actions.visible=_cosmetic_mode=="shop"
+	var preview := _button("VER DANÇA",_preview_dance)
+	preview.name="PreviewDanceMovement"
+	preview.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	preview.clip_text=true
+	shop_actions.add_child(preview)
+	var buy := _button("COMPRAR",_preview_purchase,true)
+	buy.name="BuyEmotePreview"
+	buy.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	buy.clip_text=true
+	shop_actions.add_child(buy)
+	if _cosmetic_mode in ["emotes","shop"]: _rebuild_gallery()
 
 
 func _build_cosmetic_tabs() -> void:
 	var tabs := PlayerUI.row(_gallery_section)
 	_gallery_section.move_child(tabs,0)
-	for mode: String in ["skins","emotes"]:
-		var button := _button("SKINS" if mode=="skins" else "EMOTES",_choose_cosmetic_mode.bind(mode),mode==_cosmetic_mode)
+	for mode: String in ["skins","emotes","shop"]:
+		var button := _button({"skins":"SKINS","emotes":"REAÇÕES","shop":"EMOTES"}[mode],_choose_cosmetic_mode.bind(mode),mode==_cosmetic_mode)
 		button.name="CosmeticTab_"+mode
 		button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 		tabs.add_child(button)
@@ -541,28 +570,46 @@ func _build_cosmetic_tabs() -> void:
 func _choose_cosmetic_mode(mode: String) -> void:
 	_cosmetic_mode=mode
 	_toolbar.visible=mode=="skins"
+	_context_title.visible=mode!="skins"
+	_context_hint.visible=mode!="skins"
+	_preview.get_node("SkinEquipActions").visible=mode!="shop"
+	_preview.get_node("EmoteShopActions").visible=mode=="shop"
+	_context_title.text=tr("Exemplos de reações") if mode=="emotes" else tr("Loja de emotes · prévia")
+	_context_hint.text=tr("Lobby, vitória e derrota") if mode=="emotes" else tr("Dancinha demonstrativa · compra separada")
+	if _stage.character.has_animation(&"base"): _stage.character.set_pose(&"base",0.0)
 	var arrows := _preview.get_node_or_null("CharacterArrows") as Control
 	if arrows!=null: arrows.visible=mode=="skins"
 	for key: String in _cosmetic_tabs: PlayerUI.style_button(_cosmetic_tabs[key],key==mode)
 	_rebuild_gallery()
 	_responsive_layout()
+	if mode=="shop": _refresh_emote_shop()
 
 
 func _build_emote_gallery(entry: Dictionary) -> void:
-	var emotes := CharacterCatalog.emotes_for(entry)
-	_collection_count.text="EMOTES · %d" % emotes.size()
-	var hint := PlayerUI.label("Toque em uma miniatura para ver o emote.",20,PlayerUI.MUTED)
+	var shop := _cosmetic_mode=="shop"
+	var owned: bool=services.emote_shop.product("dance_01").get("owned",false)
+	var emotes: Array=[{"id":"dance","name":"Dancinha","context":"ADQUIRIDO" if owned else "100 moedas","animation":"dance_preview"}] if shop else CharacterCatalog.emotes_for(entry)
+	var buy := _preview.find_child("BuyEmotePreview",true,false) as Button
+	if shop and buy!=null:
+		buy.text=tr("ADQUIRIDO" if owned else "COMPRAR")
+		buy.disabled=owned
+	_collection_count.text="LOJA · PRÉVIA" if shop else "REAÇÕES · %d" % emotes.size()
+	var hint := PlayerUI.label("Emotes de dança · prévia da loja" if shop else "Exemplos de lobby, vitória e derrota",20,PlayerUI.MUTED)
 	body.add_child(hint)
 	body.move_child(hint,0)
 	if emotes.is_empty():
 		body.add_child(PlayerUI.label("Este personagem ainda não possui emotes."))
 		return
-	_grid.columns=3
+	_grid.columns=1 if shop else 3
 	var images := {}
 	var group := ButtonGroup.new()
 	for emote: Dictionary in emotes:
 		var button := _button("",func()->void:
-			if is_instance_valid(_stage): _stage.character.play_emote(StringName(emote.animation)))
+			if shop: _preview_dance()
+			elif is_instance_valid(_stage):
+				_context_title.text={"Lobby":"No lobby","Vitória":"Você venceu!","Derrota":"Fim de partida"}.get(str(emote.context),str(emote.context))
+				_context_hint.text=tr("Exemplo da reação de ")+str(emote.context).to_lower()
+				_stage.character.play_emote(StringName(emote.animation)))
 		button.name="EmotePreview_"+str(emote.id)
 		button.tooltip_text=tr(str(emote.name))+" · "+tr("Toque para visualizar")
 		button.toggle_mode=true
@@ -588,14 +635,125 @@ func _build_emote_gallery(entry: Dictionary) -> void:
 		label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 		label.mouse_filter=Control.MOUSE_FILTER_IGNORE
 		content.add_child(label)
-	_load_emote_previews(entry,_grid,images)
+		var context := PlayerUI.label(str(emote.context),20,PlayerUI.GOLD)
+		context.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+		context.mouse_filter=Control.MOUSE_FILTER_IGNORE
+		content.add_child(context)
+	_load_emote_previews(entry,_grid,images,shop)
 
 
-func _load_emote_previews(entry: Dictionary,watch: Control,images: Dictionary) -> void:
-	var textures: Dictionary=await _emote_previews.capture(self,entry,watch)
+func _load_emote_previews(entry: Dictionary,watch: Control,images: Dictionary,dance := false) -> void:
+	var textures: Dictionary=await _emote_previews.capture(self,entry,watch,dance)
 	if not is_instance_valid(watch) or watch.is_queued_for_deletion(): return
 	for id: String in images:
 		if is_instance_valid(images[id]) and textures.has(id): images[id].texture=textures[id]
+
+
+func _preview_dance() -> void:
+	if not is_instance_valid(_stage): return
+	if _stage.character.has_animation(&"emote_dance_01"):
+		_context_title.text=tr("Dancinha · prévia do movimento")
+		_context_hint.text=tr("Emote da loja")
+		_stage.character.play_emote(&"emote_dance_01")
+		return
+	if not DANCE_PREVIEW.install(_stage.character): return
+	_context_title.text=tr("Dancinha · prévia do movimento")
+	_context_hint.text=tr("Movimento demonstrativo original")
+	_stage.character.play_emote(DANCE_PREVIEW.ALIAS)
+
+
+func _preview_purchase() -> void:
+	if is_instance_valid(_buy_dialog): return
+	_buy_dialog=Control.new()
+	_buy_dialog.name="EmotePurchasePreview"
+	var panel := PlayerUI.deck_modal(self,_buy_dialog)
+	panel.add_child(PlayerUI.label("Comprar emote",30,PlayerUI.TEXT))
+	var details := PlayerUI.label("Dancinha · 100 moedas",22,PlayerUI.GOLD)
+	details.name="EmotePurchasePrice"
+	panel.add_child(details)
+	var feedback := PlayerUI.label("Consultando saldo e disponibilidade…",20,PlayerUI.MUTED)
+	feedback.name="EmotePurchaseFeedback"
+	panel.add_child(feedback)
+	var confirm := PlayerUI.button("COMPRAR POR 100 MOEDAS",func()->void:
+		if is_instance_valid(_buy_dialog):
+			await _buy_emote(_buy_dialog,_buy_dialog.find_child("ConfirmEmotePurchase",true,false) as Button,feedback))
+	confirm.name="ConfirmEmotePurchase"
+	confirm.disabled=true
+	PlayerUI.editor_control(confirm,true)
+	panel.add_child(confirm)
+	var close := PlayerUI.button("Cancelar",_close_purchase)
+	close.name="CloseEmotePurchase"
+	PlayerUI.editor_control(close)
+	panel.add_child(close)
+	close.grab_focus.call_deferred()
+	var dialog := _buy_dialog
+	if not services.session.authenticated():
+		feedback.text=tr("Entre na conta para comprar emotes com moedas.")
+		return
+	var result := await services.emote_shop.refresh()
+	if not is_instance_valid(dialog) or dialog!=_buy_dialog: return
+	if not result.ok:
+		feedback.text=EmoteShopService.message(str(result.code))
+		return
+	var item := services.emote_shop.product("dance_01")
+	if item.is_empty():
+		feedback.text=EmoteShopService.message("emote_not_found")
+		return
+	dialog.set_meta("price",str(item.price_coins).to_int())
+	details.text=tr("Dancinha · %s moedas") % str(item.price_coins)
+	confirm.text=tr("COMPRAR POR %s MOEDAS") % str(item.price_coins)
+	var coins := str(services.emote_shop.data.coins).to_int()
+	if item.owned:
+		feedback.text=tr("Este emote já está na sua conta.")
+		confirm.text=tr("ADQUIRIDO")
+	elif not item.available:
+		feedback.text=tr("100 moedas. Venda aguardando o movimento real; a prévia continua disponível.")
+	elif not _stage.character.has_animation(StringName(item.animation_key)):
+		feedback.text=tr("O movimento real ainda não está disponível nesta versão.")
+	elif coins<str(item.price_coins).to_int():
+		feedback.text=tr("Saldo: %s moedas. Você não tem moedas suficientes.") % str(coins)
+	else:
+		feedback.text=tr("Saldo: %s moedas. Confirme para adquirir este emote na sua conta.") % str(coins)
+		confirm.disabled=false
+
+
+func _refresh_emote_shop() -> void:
+	if not services.session.authenticated(): return
+	var result := await services.emote_shop.refresh()
+	if is_inside_tree() and is_visible_in_tree() and _cosmetic_mode=="shop" and result.ok: _rebuild_gallery()
+
+
+func _buy_emote(dialog: Control,confirm: Button,feedback: Label) -> void:
+	if dialog!=_buy_dialog or confirm.disabled: return
+	confirm.disabled=true
+	feedback.text=tr("Processando compra…")
+	var close := dialog.find_child("CloseEmotePurchase",true,false) as Button
+	if close!=null: close.text=tr("Fechar")
+	var owner := str(services.session.user.get("id",""))
+	var result := await services.emote_shop.buy("dance_01",int(dialog.get_meta("price",100)))
+	if owner!=str(services.session.user.get("id","")): return
+	if result.ok: await services.wallet.refresh()
+	if not is_instance_valid(dialog) or dialog!=_buy_dialog or owner!=str(services.session.user.get("id","")): return
+	if result.ok:
+		feedback.text=tr("Compra confirmada. O emote foi salvo na sua conta.")
+		confirm.text=tr("ADQUIRIDO")
+		_rebuild_gallery()
+	else:
+		feedback.text=EmoteShopService.message(str(result.code))
+		confirm.disabled=false
+
+
+func _close_purchase() -> void:
+	if is_instance_valid(_buy_dialog):
+		_buy_dialog.hide()
+		_buy_dialog.queue_free()
+	_buy_dialog=null
+
+
+func handle_back() -> bool:
+	if not is_instance_valid(_buy_dialog): return false
+	_close_purchase()
+	return true
 
 
 func _equip(character_id: String) -> void:

@@ -49,9 +49,9 @@ static func emotes_for(entry: Dictionary) -> Array[Dictionary]:
 	var result: Array[Dictionary]=[]
 	var animations: Dictionary=entry.get("animations",{})
 	for emote: Dictionary in [
-		{"id":"presentation","name":"Apresentação","animation":"anim_2"},
-		{"id":"celebrate","name":"Comemoração","animation":"anim_4"},
-		{"id":"disappointed","name":"Reação de derrota","animation":"anim_3"},
+		{"id":"presentation","name":"Apresentação","animation":"anim_2","context":"Lobby"},
+		{"id":"celebrate","name":"Comemoração","animation":"anim_4","context":"Vitória"},
+		{"id":"disappointed","name":"Reação de derrota","animation":"anim_3","context":"Derrota"},
 	]:
 		if animations.has(emote.animation): result.append(emote)
 	return result

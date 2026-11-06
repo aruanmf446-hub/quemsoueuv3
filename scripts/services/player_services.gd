@@ -16,6 +16,7 @@ var profile: ProfileService
 var progression: ProgressionService
 var inventory: InventoryService
 var wallet: WalletService
+var emote_shop: EmoteShopService
 var friends: FriendsService
 var presence: FriendPresence
 var duel: DuelService
@@ -87,6 +88,10 @@ func _ready() -> void:
 	wallet = WalletService.new()
 	wallet.client = client
 	add_child(wallet)
+	emote_shop=EmoteShopService.new()
+	emote_shop.client=client
+	emote_shop.session=session
+	add_child(emote_shop)
 	friends = FriendsService.new()
 	friends.client = client
 	add_child(friends)
@@ -156,6 +161,7 @@ func _session_changed() -> void:
 	profile.clear()
 	progression.clear()
 	wallet.clear()
+	emote_shop.clear()
 	friends.clear()
 	chat.clear()
 	chat.me_id = str(session.user.get("id", "")) if session.authenticated() else ""

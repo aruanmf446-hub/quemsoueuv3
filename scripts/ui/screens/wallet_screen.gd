@@ -28,8 +28,9 @@ func render() -> void:
 	if services.wallet.transactions.is_empty():
 		history.add_child(PlayerUI.label("Nenhuma transação registrada."))
 	for item: Dictionary in services.wallet.transactions:
+		var reason := tr("Compra de emote") if str(item.reason).begins_with("emote:") else str(item.reason)
 		history.add_child(PlayerUI.label("%s · %s %s · %s" % [item.created_at,
 			DevicePreferences.number(item.amount, services.preferences.values.locale),
-			tr("moedas" if item.currency == "coins" else "gemas"), item.reason]))
+			tr("moedas" if item.currency == "coins" else "gemas"), reason]))
 	if services.wallet.next_cursor != null:
 		history.add_child(PlayerUI.button("Carregar mais", func() -> void: status(await services.wallet.load_more())))

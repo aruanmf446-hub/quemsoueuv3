@@ -3,9 +3,9 @@ extends RefCounted
 ## os cartões reutilizam texturas estáticas, sem três avatares animados extras.
 var _cache: Dictionary = {}
 
-func capture(host: Control,entry: Dictionary,watch: Control) -> Dictionary:
-	var id := str(entry.id)
-	var emotes := CharacterCatalog.emotes_for(entry)
+func capture(host: Control,entry: Dictionary,watch: Control,dance := false) -> Dictionary:
+	var id := str(entry.id)+("_dance" if dance else "")
+	var emotes: Array=[{"id":"dance","animation":"dance_preview"}] if dance else CharacterCatalog.emotes_for(entry)
 	if _cache.get(id,{}).size()==emotes.size(): return _cache[id]
 	if DisplayServer.get_name()=="headless": return {}
 	var stage: LobbyStage=preload("res://scenes/lobby/lobby_stage.tscn").instantiate()
@@ -14,6 +14,7 @@ func capture(host: Control,entry: Dictionary,watch: Control) -> Dictionary:
 	host.add_child(stage)
 	stage.apply_profile("medio")
 	stage.show_character(entry)
+	if dance: preload("res://scripts/skins/dance_preview.gd").install(stage.character)
 	stage.set_zoom(1.08)
 	var viewport: SubViewport=stage.get_node("Viewport")
 	viewport.size=Vector2i(384,480)

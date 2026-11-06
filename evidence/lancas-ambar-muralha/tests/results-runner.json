@@ -1,0 +1,18 @@
+[
+  {
+    "test": "spears",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 9.18,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "spear-intro",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 5.15,
+    "graphical": false,
+    "fixed_physics_step": false
+  }
+]

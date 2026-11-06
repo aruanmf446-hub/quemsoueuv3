@@ -42,7 +42,9 @@ func run() -> void:
 					if phase._build_queue.is_empty():break
 					phase._process(0)
 				for enemy in phase._troops.get_children():phase._retire_enemy(enemy)
-				await ticks(15)
+				# Deixa terminar também a transição de aterrissagem do trecho anterior.
+				await ticks(45)
+				for i in 4:await process_frame
 				check(phase._player.is_on_floor(),"ator pousado no teto real do trecho %d" % slot)
 			else:
 				Input.action_press("jump")

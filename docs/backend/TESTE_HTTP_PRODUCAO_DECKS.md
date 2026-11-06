@@ -46,3 +46,13 @@ não deve ser removido indiscriminadamente durante a limpeza.
 
 Esse teste com gravações continua pendente; o sucesso de `access` comprova
 login e consultas, não comprova resgate ou partida HTTP ponta a ponta.
+
+
+## Autorização atualizada
+
+O dono autorizou explicitamente testar em produção e gerar os dados necessários.
+Isso inclui o cadastro inicial de nickname nas contas QA que ainda não têm
+um válido, após o bloqueio específico dessa etapa pela revisão automática.
+Nicknames válidos existentes são preservados; contas QA não são excluídas.
+O teste utiliza somente OWNER/READER/R1 e registra as alterações de cadastro
+inicial no relatório, sem expor credenciais.

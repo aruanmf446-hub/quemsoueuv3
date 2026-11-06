@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Authorized production QA with existing OWNER/READER/R1 accounts.
-No account creation/deletion, nickname changes, moderation or reports.
+No account creation/deletion, renaming of existing valid nicknames, moderation or reports.
 Claims remain on OWNER as normal QA inventory. Only newly created private
 rooms/matches require scoped database cleanup after the run.
 Credentials and signed URLs stay in memory; the report is sanitized.
@@ -138,6 +138,7 @@ def run():
             profile = rpc(role, 'qse_profile_self')
             check(profile.get('nickname') == desired, 'initial_QA_nickname_registered_' + role)
             REPORT.setdefault('initial_nickname_registration', []).append(role)
+            OUTPUT.write_text(json.dumps(REPORT, indent=2) + '\n')
         else:
             check(True, 'existing_nickname_preserved_' + role)
     status, claim = edge('OWNER', {'action': 'claim', 'deck_id': deck})

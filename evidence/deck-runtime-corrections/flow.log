@@ -1,0 +1,36 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS denúncia usa modal no viewport do jogo, compatível com teclado Web
+PASS ações da denúncia cabem na tela
+PASS motivo vazio não envia nem fecha o formulário
+PASS impedimento por autoria mostra o motivo correto
+PASS erro preserva o texto para correção
+PASS denúncia repetida tem mensagem específica
+PASS função ausente aparece como serviço de denúncia indisponível
+PASS resposta vazia não é tratada como registro confirmado
+PASS cliques repetidos enviam apenas uma denúncia
+PASS formulário só confirma depois da resposta de sucesso
+PASS voltar fecha o modal antes de mudar de tela
+PASS modal removido após voltar
+PASS abertura 1 mantém status completo, não edição bloqueada
+PASS voltar de Ver envio retorna ao status, ciclo 1
+PASS abertura 2 mantém status completo, não edição bloqueada
+PASS voltar de Ver envio retorna ao status, ciclo 2
+PASS abertura 3 mantém status completo, não edição bloqueada
+PASS voltar de Ver envio retorna ao status, ciclo 3
+PASS abertura 4 mantém status completo, não edição bloqueada
+PASS voltar de Ver envio retorna ao status, ciclo 4
+PASS abertura 5 mantém status completo, não edição bloqueada
+PASS voltar de Ver envio retorna ao status, ciclo 5
+PASS abertura 6 mantém status completo, não edição bloqueada
+PASS voltar de Ver envio retorna ao status, ciclo 6
+PASS abertura 7 mantém status completo, não edição bloqueada
+PASS voltar de Ver envio retorna ao status, ciclo 7
+PASS abertura 8 mantém status completo, não edição bloqueada
+PASS voltar de Ver envio retorna ao status, ciclo 8
+PASS abertura 9 mantém status completo, não edição bloqueada
+PASS voltar de Ver envio retorna ao status, ciclo 9
+PASS abertura 10 mantém status completo, não edição bloqueada
+PASS voltar de Ver envio retorna ao status, ciclo 10
+PASS Editar explícito continua bloqueado durante a revisão
+DECK_RUNTIME_FIXES checks=33 failures=0 1672x941

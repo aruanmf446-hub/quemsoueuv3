@@ -1,0 +1,12 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS HTTP/RPC preserva own como cannot_report_own (recebido: cannot_report_own)
+PASS HTTP/RPC preserva repeat como already_reported (recebido: already_reported)
+PASS HTTP/RPC preserva reason como invalid_reason (recebido: invalid_reason)
+PASS HTTP/RPC preserva forbidden_rpc como forbidden (recebido: forbidden)
+PASS HTTP/RPC preserva forbidden_http como forbidden (recebido: forbidden)
+PASS HTTP/RPC preserva unauthorized como not_authenticated (recebido: not_authenticated)
+PASS HTTP/RPC preserva missing como PGRST202 (recebido: PGRST202)
+PASS erro de login mantém o contrato de autenticação
+PASS sucesso exige resposta confirmada pelo servidor
+DECK_RPC_HTTP checks=9 failures=0

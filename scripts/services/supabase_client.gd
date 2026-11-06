@@ -124,9 +124,13 @@ func request(path: String, method: HTTPClient.Method, body: Dictionary = {}, aut
 		if code.is_empty():
 			code = "invalid_credentials" if path.begins_with("/auth/v1/token") else ("auth_request_failed" if path.begins_with("/auth/") else "request_failed")
 		if (status == 401 or status == 403) and not path.begins_with("/auth/"):
-			code = "not_authenticated"
+			code = "not_authenticated" if status==401 else "forbidden"
 		return ServiceResult.failure(code, "unauthorized" if status == 401 or status == 403 else "error")
 	if data is Dictionary and data.has("error"):
+		# Uma RPC pode responder HTTP 200 com erro de negócio. Não transformá-lo
+		# em erro de login: a tela precisa distinguir autoria, duplicidade etc.
+		if path.begins_with("/rest/v1/rpc/") and data.error is String:
+			return ServiceResult.failure(str(data.error))
 		return ServiceResult.failure(str(data.get("error_code", "auth_request_failed")))
 	return ServiceResult.success(data)
 

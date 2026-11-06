@@ -56,9 +56,9 @@ func _run() -> void:
 	check(screen.find_child("ReportDeck", true, false) != null, "botão Denunciar")
 	screen._report_deck(fake.PUBLISHED)
 	await _frames(3)
-	var dialog := screen.find_child("ReportDialog", true, false) as ConfirmationDialog
+	var dialog := screen.find_child("ReportDialog", true, false) as Control
 	(dialog.find_child("ReportReason", true, false) as LineEdit).text = "Teste"
-	dialog.confirmed.emit()
+	dialog.find_child("SubmitReport",true,false).pressed.emit()
 	await _frames(6)
 	check(fake.reports.size() == 1, "denúncia enviada")
 	# Publicar pelo Meus Decks.

@@ -633,3 +633,22 @@ static func creator_progress(parent: Node, count: int, maximum: int) -> void:
 	bar.add_theme_stylebox_override("background",_flat(Color("#101426"),Color("#444566"),4,Color.WHITE))
 	bar.add_theme_stylebox_override("fill",_flat(GOLD,Color.TRANSPARENT,4,Color.WHITE))
 	parent.add_child(bar)
+
+
+## Modal de formulário no mesmo viewport do jogo, compatível com WebTextBridge.
+static func deck_modal(parent: Control, root: Control) -> VBoxContainer:
+	parent.add_child(root)
+	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	root.mouse_filter=Control.MOUSE_FILTER_STOP
+	root.add_to_group("qse_web_input_modal")
+	apply_theme(root)
+	var shade := ColorRect.new()
+	shade.color=Color(0.02,0.03,0.055,0.88)
+	root.add_child(shade)
+	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var center := CenterContainer.new()
+	root.add_child(center)
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var panel := creator_panel(center,"accent",24)
+	panel.get_parent().custom_minimum_size.x=660
+	return panel

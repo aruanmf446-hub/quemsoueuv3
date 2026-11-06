@@ -19,6 +19,14 @@ const ERRORS := {
 	"invalid_reason": "Escreva o motivo (até 280 caracteres).",
 	"deck_not_published": "Este deck não está publicado.",
 	"unauthorized": "Entre na conta para usar a Comunidade.",
+	"not_authenticated": "Entre novamente na conta para continuar.",
+	"session_changed": "A conta mudou. Abra o deck novamente para continuar.",
+	"network": "Sem conexão com o serviço. Tente novamente.",
+	"timeout": "O serviço demorou a responder. Tente novamente.",
+	"rate_limit": "Muitas tentativas. Aguarde um pouco e tente novamente.",
+	"report_unavailable": "O serviço de denúncias está indisponível no momento.",
+	"forbidden": "Sua conta não tem permissão para esta ação.",
+	"report_invalid_response": "Não foi possível confirmar o registro da denúncia. Atualize e tente novamente.",
 }
 
 ## Itens da última vitrine (compartilhados entre telas) e quando foram buscados.
@@ -146,7 +154,14 @@ func unpublish(server_id: String) -> Dictionary:
 
 
 func report(deck_id: String, reason: String) -> Dictionary:
-	return _unwrap(await client.call_rpc("qse_deck_report", {"p_deck": deck_id, "p_reason": reason.strip_edges().left(280)}))
+	if not available(): return ServiceResult.failure("unauthorized")
+	var value := reason.strip_edges()
+	if value.is_empty() or value.length()>280: return ServiceResult.failure("invalid_reason")
+	if not CreatorSync.is_uuid(deck_id): return ServiceResult.failure("deck_not_found")
+	var result := _unwrap(await client.call_rpc("qse_deck_report",{"p_deck":deck_id,"p_reason":value}))
+	if not result.ok and str(result.code) in ["PGRST202","42883","unknown_rpc"]: return ServiceResult.failure("report_unavailable")
+	if result.ok and (not result.data is Dictionary or result.data.get("reported")!=true): return ServiceResult.failure("report_invalid_response")
+	return result
 
 
 ## Situação de moderação dos decks do dono (status/review_note), sem baixar cartas.

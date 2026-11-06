@@ -4,6 +4,8 @@ extends PlayerScreen
 const Catalog = preload("res://scripts/decks/deck_library_catalog.gd")
 const StylePrompt = preload("res://scripts/decks/deck_style_prompt.gd")
 var _publish_busy := false
+var _report_dialog: Control
+var _report_busy := false
 const TABS := ["Descobrir", "Populares", "Recentes", "Favoritos", "Meus Decks"]
 var _query := ""
 var _tab := "Descobrir"
@@ -90,6 +92,7 @@ func _ready() -> void:
 	_picker.picked.connect(_image_picked)
 	_picker.failed.connect(func(message: String) -> void: banner.show_state("error", message))
 	if services != null: services.session.changed.connect(func() -> void:
+		_close_report()
 		# Trocar de conta troca também os rascunhos e favoritos visíveis.
 		_drafts = null
 		_pulled_decks = false
@@ -357,25 +360,68 @@ func _open_community(deck_id: String) -> void:
 	_render_deck(result.data)
 
 
+func _close_report() -> void:
+	if is_instance_valid(_report_dialog): _report_dialog.queue_free()
+	_report_dialog=null
+	_report_busy=false
+
 func _report_deck(deck_id: String) -> void:
-	var dialog := ConfirmationDialog.new()
-	dialog.name = "ReportDialog"
-	dialog.title = tr("Denunciar deck")
-	dialog.ok_button_text = tr("Denunciar")
-	dialog.cancel_button_text = tr("Cancelar")
-	var reason := LineEdit.new()
-	reason.name = "ReportReason"
-	reason.max_length = 280
-	reason.placeholder_text = tr("Motivo (ex.: conteúdo impróprio)")
-	reason.custom_minimum_size = Vector2(420, 44)
-	dialog.add_child(reason)
-	add_child(dialog)
-	dialog.confirmed.connect(func() -> void:
-		var result: Dictionary = await CommunityService.for_current().report(deck_id, reason.text)
-		if result.ok: banner.show_state("success", tr("Denúncia enviada. Obrigado por ajudar a moderação."))
-		else: banner.show_state("error", CommunityService.message(str(result.get("code", "")))))
-	dialog.visibility_changed.connect(func() -> void: if not dialog.visible: dialog.queue_free())
-	dialog.popup_centered()
+	if is_instance_valid(_report_dialog): return
+	banner.hide()
+	var dialog := Control.new()
+	dialog.name="ReportDialog"
+	_report_dialog=dialog
+	var panel := PlayerUI.deck_modal(self,dialog)
+	panel.add_child(_text("Denunciar deck",30))
+	panel.add_child(_text("Informe o motivo. A denúncia será enviada à moderação.",20,PlayerUI.MUTED))
+	var reason := _field("","Motivo da denúncia",280)
+	reason.name="ReportReason"
+	PlayerUI.editor_control(reason)
+	panel.add_child(reason)
+	WebTextBridge.attach(reason)
+	var feedback := _text("",20,PlayerUI.MUTED)
+	feedback.name="ReportFeedback"
+	feedback.visible=false
+	panel.add_child(feedback)
+	var actions := PlayerUI.row(panel)
+	var cancel := _action("Cancelar",_close_report)
+	cancel.name="CancelReport"
+	var confirm := _action("Enviar denúncia",func()->void:
+		await _submit_report(deck_id,dialog,reason,feedback))
+	confirm.name="SubmitReport"
+	for button: Button in [cancel,confirm]:
+		PlayerUI.editor_control(button,button==confirm)
+		button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		actions.add_child(button)
+	reason.text_submitted.connect(func(_text:String)->void:confirm.pressed.emit())
+	# No celular Web, o toque precisa focar primeiro o input HTML. Dar foco
+	# ao LineEdit ao abrir ativa o IME do motor e rouba o foco do teclado nativo.
+	if not WebTextBridge.enabled(): reason.grab_focus.call_deferred()
+
+func _submit_report(deck_id: String,dialog: Control,reason: LineEdit,feedback: Label) -> void:
+	if _report_busy or dialog!=_report_dialog: return
+	if reason.text.strip_edges().is_empty():
+		feedback.text=tr("Escreva o motivo antes de enviar.")
+		feedback.show()
+		if not WebTextBridge.enabled(): reason.grab_focus()
+		return
+	_report_busy=true
+	var confirm := dialog.find_child("SubmitReport",true,false) as Button
+	confirm.disabled=true
+	reason.editable=false
+	feedback.text=tr("Enviando denúncia…")
+	feedback.show()
+	var result: Dictionary=await CommunityService.for_current().report(deck_id,reason.text)
+	if not is_inside_tree() or not is_instance_valid(dialog) or dialog!=_report_dialog: return
+	_report_busy=false
+	confirm.disabled=false
+	reason.editable=true
+	if result.ok:
+		_close_report()
+		banner.show_state("success",tr("Denúncia registrada. Obrigado por ajudar a moderação."))
+	else:
+		feedback.text=tr("Denúncia não enviada: ")+CommunityService.message(str(result.code))
+		banner.show_state("error",tr("Denúncia não enviada. Confira o motivo informado na janela."))
 
 
 ## Situação de moderação de um rascunho já enviado ("" = nunca pediu publicação).
@@ -1005,7 +1051,8 @@ func _open_entry(entry: Dictionary) -> void:
 	if entry.has("item") and not entry.item.is_empty(): _render_deck(entry.item)
 	elif entry.has("draft"):
 		_draft = entry.draft
-		_render_editor()
+		if _moderation(_draft) in ["pending_review","published","rejected","removed"] or _is_revision(_draft): _open_submissions()
+		else: _render_editor()
 
 
 ## Cartão de deck: capa horizontal enquadrada, selo, nome, cartas e coração (ou menu ⋯).
@@ -1135,7 +1182,7 @@ func _deck_menu(entry: Dictionary) -> Control:
 	menu.add_theme_font_size_override("font_size", 22)
 	menu.add_theme_color_override("font_color", Color.WHITE)
 	var popup := menu.get_popup()
-	popup.add_item(tr("Abrir / Editar"), 0)
+	popup.add_item(tr("Editar"),0)
 	popup.add_item(tr("Duplicar"), 1)
 	popup.add_item(tr("Acompanhar revisão"),6)
 	var moderation := _moderation(entry.draft)
@@ -1152,7 +1199,9 @@ func _deck_menu(entry: Dictionary) -> Control:
 func _menu_action(id: int, entry: Dictionary) -> void:
 	var draft: Dictionary = entry.draft
 	match id:
-		0: _open_entry(entry)
+		0:
+			_draft=draft
+			_render_editor()
 		1: _duplicate_draft(draft)
 		2:
 			_draft = draft
@@ -1445,6 +1494,9 @@ func _render_card(index: int) -> void:
 	_reveal()
 
 func handle_back() -> bool:
+	if is_instance_valid(_report_dialog):
+		_close_report()
+		return true
 	if is_instance_valid(_editor_overlay):
 		_close_framer()
 		return true
@@ -1453,7 +1505,8 @@ func handle_back() -> bool:
 		_render_library()
 		return true
 	if _view == "review":
-		_render_editor()
+		if _moderation(_draft) in ["pending_review","published","removed"]: _open_submissions()
+		else: _render_editor()
 		return true
 	if _view == "editor":
 		_draft = {}
@@ -1641,6 +1694,13 @@ func _confirm_delete(draft: Dictionary) -> void:
 
 func _render_editor() -> void:
 	if _draft.is_empty(): _draft = _store().new_draft()
+	if _moderation(_draft)=="removed":
+		_page(str(_draft.name),"editor")
+		var locked := _text("Este deck foi removido pela moderação. Consulte o status do envio.",22,PlayerUI.MUTED)
+		locked.name="EditorLocked"
+		body.add_child(locked)
+		_reveal()
+		return
 	if _moderation(_draft) in ["pending_review", "published"]:
 		_page(str(_draft.name), "editor")
 		PlayerUI.standard_back($Margin/Column/Header/Back,"Meus Decks")

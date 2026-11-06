@@ -1,0 +1,49 @@
+{
+  "catalog": {
+    "migration": {
+      "name": "community_versions",
+      "sha256": "4274ee39adabf774bcf66ad81d9e0463e1ffb2a2b05e6316257849b79a83be89",
+      "version": "20261106160000"
+    },
+    "source_hash_verified": true,
+    "preview_bucket_private": true
+  },
+  "game": {
+    "migration": {
+      "name": "community_claims",
+      "sha256": "51e8041c4c26de3574f1bb40ff62f6faf9c3aa4e31d310c0752bbdd7cdbd3209",
+      "version": "20261106160100"
+    },
+    "source_hash_verified": true
+  },
+  "function": {
+    "name": "qse-deck-catalog",
+    "status": "ACTIVE",
+    "version": 1,
+    "verify_jwt": false,
+    "bundle_sha256": "13acb008ae23e40ddbbd35c083a1b7fec763d72db132e64f43127c01bf799478"
+  },
+  "http_readonly_checks": [
+    {
+      "check": "missing session",
+      "http_status": 401,
+      "code": "unauthorized",
+      "passed": true
+    },
+    {
+      "check": "forged session",
+      "http_status": 401,
+      "code": "unauthorized",
+      "passed": true
+    },
+    {
+      "check": "browser CORS preflight",
+      "http_status": 204,
+      "passed": true
+    }
+  ],
+  "mutating_http_test": {
+    "executed": false,
+    "reason": "automatic approval review rejected production test accounts, claims and matches; cleanup of derived data not established"
+  }
+}

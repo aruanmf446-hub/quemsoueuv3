@@ -1,6 +1,7 @@
 # Resgate de decks — GAME e CATALOG
 
-Implementado na branch `work/deck-runtime-corrections`, **ainda não implantado**.
+Migrations e gateway implantados em **06/11/2026**, após autorização do dono.
+Cliente preparado para publicação no main/Pages.
 O dono definiu: resgatar deve guardar na conta e liberar no Mata-Mata.
 As credenciais dos dois projetos estão disponíveis; os acessos à Management API
 foram confirmados. O bloqueio anterior do ambiente foi resolvido.
@@ -58,13 +59,21 @@ revelação continua usando os sistemas existentes.
   verificadas pelo servidor. Uma consulta antiga não sobrescreve o resultado
   de um resgate mais recente.
 
-## Implantação pendente
+## Implantação realizada e validação restante
 
-As migrations e a função estão no repositório para revisão. Os testes SQL foram
-executados em transações com **ROLLBACK**: nenhuma migration foi aplicada em
-produção e nenhuma conta/deck temporário permaneceu.
+Os testes anteriores rodaram com **ROLLBACK**. Após aprovação, foram aplicadas
+somente as duas migrations novas e registradas, na mesma transação, com as
+versões dos arquivos. Os hashes registrados foram comparados ao código.
+`qse-deck-catalog` está ACTIVE, versão 1. Sessão ausente/falsa retorna HTTP 401;
+o preflight CORS retorna 204. O bucket novo foi confirmado privado.
 
-Ordem de implantação:
+A revisão automática bloqueou o teste HTTP que criaria contas, resgates e
+partidas temporárias em produção, por falta de comprovação suficiente da
+limpeza dos efeitos derivados e de autorização específica para esse teste.
+Ele não foi executado. Não foram criadas contas de teste por essa etapa.
+A validação completa com sessões reais permanece pendente.
+
+Roteiro de implantação (etapas 1–3 executadas; não reaplicar):
 
 1. Aplicar somente `supabase/catalog/migrations/20261106160000_community_versions.sql`
    no CATALOG e `supabase/game/migrations/20261106160100_community_claims.sql` no
@@ -88,7 +97,8 @@ A migração não registra o deck de produção como resgatado por nenhuma conta
 A geração da versão ocorre sob demanda, pelo fluxo real de resgate.
 
 Os contratos públicos da Management API para migrations, secrets e deploy de
-funções foram consultados. Nenhum deploy foi disparado por essa consulta.
+funções foram consultados. A implantação ocorreu somente após a autorização explícita do dono,
+registrada na conversa. Evidências em `evidence/community-claims/deployment.json`.
 
 ## Validação
 

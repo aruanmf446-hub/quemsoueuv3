@@ -1,6 +1,9 @@
 # Resgate de decks da Comunidade
 
-Implementação na branch; servidor e Pages ainda não atualizados por esta etapa.
+Migrations e função implantadas após autorização do dono. Cliente preparado
+para publicação no main/Pages; o resultado do workflow será registrado após
+sua conclusão. `deployment.json` registra os hashes das migrations, a função
+ACTIVE e os três testes HTTP sem gravação.
 
 - Resgate confirmado pelo servidor, sem duplicar a coleção.
 - Meus Decks mostra o deck e seu criador.
@@ -34,8 +37,9 @@ remoção do membro. As contagens reais foram conferidas após os rollbacks.
 
 O gateway testa autenticação negada, cópia restrita a prévias, falha de upload,
 retirada durante cópia, repetição, autorização de manifestos e separação entre
-JWT do jogador e credenciais do CATALOG. Não foi implantado nem testado por
-HTTP com uma sessão real nesta etapa.
+JWT do jogador e credenciais do CATALOG. Foi implantado após esses testes. As verificações HTTP de sessão ausente,
+falsa e CORS passaram; o teste mutante com sessões reais foi bloqueado pela
+revisão automática e não foi executado.
 
 O teste Godot monta uma sala com bot, inicia a partida e seleciona cartas do
 deck comunitário; confere nomes/texturas, cache, coleção, controles nativos,
@@ -81,7 +85,11 @@ o `COMMIT` final por `ROLLBACK`. Não executar os testes como implantação.
 
 ## Limites
 
-Não houve implantação de função/migration, merge na main ou publicação no Pages.
+Migrations e função foram implantadas após autorização; as evidências de
+rollback acima pertencem à etapa anterior à implantação. O teste completo
+com contas temporárias em produção foi rejeitado pela revisão automática
+por falta de comprovação suficiente da limpeza dos efeitos derivados.
+Nenhuma conta foi criada por esse teste.
 Partida online com duas contas reais, Storage físico das novas versões, downloads
 com URLs reais e Safari/iPhone físico continuam pendentes da implantação.
 O primeiro limite de 60 s encerrou prematuramente o teste de revelação, que roda

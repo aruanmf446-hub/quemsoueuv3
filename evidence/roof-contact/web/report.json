@@ -1,0 +1,468 @@
+{
+  "viewport": "844x390",
+  "dpr": 3,
+  "physical_device": false,
+  "renderer": "Chromium WebGL2 SwiftShader",
+  "fixture": "isolated loading scene; movement uses real input",
+  "records": [
+    {
+      "name": "apoio_inicial",
+      "state": {
+        "art_ids": [
+          "capital_watchtower",
+          "capital_house",
+          "capital_merchant",
+          "capital_archway",
+          "capital_balcony_house"
+        ],
+        "attack_charge": 2,
+        "bridge_task": [],
+        "bridges": [
+          {
+            "end": 111.5,
+            "kind": "bridge",
+            "raised": false,
+            "solid": false,
+            "start": 84.72
+          }
+        ],
+        "buttons": {
+          "attack": [
+            1174,
+            595,
+            52
+          ],
+          "defend": [
+            1294,
+            475,
+            52
+          ],
+          "jump": [
+            1294,
+            595,
+            52
+          ]
+        },
+        "charges": {
+          "amber": 0,
+          "dash": 0,
+          "rupture": 0
+        },
+        "defense_charge": 1,
+        "first_use": {
+          "active": false,
+          "continue": [
+            0,
+            0,
+            292,
+            64
+          ],
+          "kind": ""
+        },
+        "health": 3,
+        "house_roofs": 30,
+        "iphone": true,
+        "order": 2,
+        "palace_pool": 3,
+        "paused": false,
+        "pedestal_collected": false,
+        "pedestal_count": 0,
+        "pedestal_fixture": false,
+        "pickup_count": 0,
+        "player_dash": 0,
+        "read": true,
+        "roof": {
+          "grounded": true,
+          "height": 8,
+          "lead": 0,
+          "samples": [
+            [
+              193.904052734375,
+              359.726776123047
+            ],
+            [
+              249.310317993164,
+              359.726776123047
+            ],
+            [
+              304.716583251953,
+              359.726776123047
+            ]
+          ]
+        },
+        "roof_surfaces": 0,
+        "rooftop_terraces": 0,
+        "size": [
+          1376,
+          675
+        ],
+        "skyline": true,
+        "soldiers": [],
+        "stage": "play",
+        "x": -4.80074453353882,
+        "y": 8.00094223022461
+      },
+      "samples": [
+        [
+          163,
+          204
+        ],
+        [
+          192,
+          204
+        ],
+        [
+          221,
+          204
+        ]
+      ]
+    },
+    {
+      "name": "apos_direita",
+      "state": {
+        "art_ids": [
+          "capital_watchtower",
+          "capital_house",
+          "capital_merchant",
+          "capital_archway",
+          "capital_balcony_house"
+        ],
+        "attack_charge": 2,
+        "bridge_task": [],
+        "bridges": [
+          {
+            "end": 111.5,
+            "kind": "bridge",
+            "raised": false,
+            "solid": false,
+            "start": 84.72
+          }
+        ],
+        "buttons": {
+          "attack": [
+            1174,
+            595,
+            52
+          ],
+          "defend": [
+            1294,
+            475,
+            52
+          ],
+          "jump": [
+            1294,
+            595,
+            52
+          ]
+        },
+        "charges": {
+          "amber": 0,
+          "dash": 0,
+          "rupture": 0
+        },
+        "defense_charge": 1,
+        "first_use": {
+          "active": false,
+          "continue": [
+            0,
+            0,
+            292,
+            64
+          ],
+          "kind": ""
+        },
+        "health": 3,
+        "house_roofs": 30,
+        "iphone": true,
+        "order": 2,
+        "palace_pool": 3,
+        "paused": false,
+        "pedestal_collected": false,
+        "pedestal_count": 0,
+        "pedestal_fixture": false,
+        "pickup_count": 0,
+        "player_dash": 0,
+        "read": true,
+        "roof": {
+          "grounded": true,
+          "height": 8,
+          "lead": 0,
+          "samples": [
+            [
+              43.928337097168,
+              359.726776123047
+            ],
+            [
+              99.3346099853516,
+              359.726776123047
+            ],
+            [
+              154.740798950195,
+              359.726776123047
+            ]
+          ]
+        },
+        "roof_surfaces": 0,
+        "rooftop_terraces": 0,
+        "size": [
+          1376,
+          675
+        ],
+        "skyline": true,
+        "soldiers": [],
+        "stage": "play",
+        "x": -2.40013074874878,
+        "y": 7.99952077865601
+      },
+      "samples": [
+        [
+          85,
+          204
+        ],
+        [
+          114,
+          204
+        ],
+        [
+          143,
+          204
+        ]
+      ]
+    },
+    {
+      "name": "apos_esquerda",
+      "state": {
+        "art_ids": [
+          "capital_watchtower",
+          "capital_house",
+          "capital_merchant",
+          "capital_archway",
+          "capital_balcony_house"
+        ],
+        "attack_charge": 2,
+        "bridge_task": [],
+        "bridges": [
+          {
+            "end": 111.5,
+            "kind": "bridge",
+            "raised": false,
+            "solid": false,
+            "start": 84.72
+          }
+        ],
+        "buttons": {
+          "attack": [
+            1174,
+            595,
+            52
+          ],
+          "defend": [
+            1294,
+            475,
+            52
+          ],
+          "jump": [
+            1294,
+            595,
+            52
+          ]
+        },
+        "charges": {
+          "amber": 0,
+          "dash": 0,
+          "rupture": 0
+        },
+        "defense_charge": 1,
+        "first_use": {
+          "active": false,
+          "continue": [
+            0,
+            0,
+            292,
+            64
+          ],
+          "kind": ""
+        },
+        "health": 3,
+        "house_roofs": 30,
+        "iphone": true,
+        "order": 2,
+        "palace_pool": 3,
+        "paused": false,
+        "pedestal_collected": false,
+        "pedestal_count": 0,
+        "pedestal_fixture": false,
+        "pickup_count": 0,
+        "player_dash": 0,
+        "read": true,
+        "roof": {
+          "grounded": true,
+          "height": 8,
+          "lead": 0,
+          "samples": [
+            [
+              405.160888671875,
+              359.726776123047
+            ],
+            [
+              460.567169189453,
+              359.726776123047
+            ],
+            [
+              515.973449707031,
+              359.726776123047
+            ]
+          ]
+        },
+        "roof_surfaces": 0,
+        "rooftop_terraces": 0,
+        "size": [
+          1376,
+          675
+        ],
+        "skyline": true,
+        "soldiers": [],
+        "stage": "play",
+        "x": -6.39864778518677,
+        "y": 8.00094223022461
+      },
+      "samples": [
+        [
+          274,
+          204
+        ],
+        [
+          303,
+          204
+        ],
+        [
+          332,
+          204
+        ]
+      ]
+    }
+  ],
+  "errors": [],
+  "engineErrors": [],
+  "blocked": [],
+  "pixel_checks": [
+    {
+      "name": "apoio_inicial",
+      "point": [
+        163,
+        204
+      ],
+      "rgb": [
+        135,
+        122,
+        200
+      ],
+      "pavement": true
+    },
+    {
+      "name": "apoio_inicial",
+      "point": [
+        192,
+        204
+      ],
+      "rgb": [
+        146,
+        146,
+        232
+      ],
+      "pavement": true
+    },
+    {
+      "name": "apoio_inicial",
+      "point": [
+        221,
+        204
+      ],
+      "rgb": [
+        143,
+        147,
+        234
+      ],
+      "pavement": true
+    },
+    {
+      "name": "apos_direita",
+      "point": [
+        85,
+        204
+      ],
+      "rgb": [
+        148,
+        154,
+        238
+      ],
+      "pavement": true
+    },
+    {
+      "name": "apos_direita",
+      "point": [
+        114,
+        204
+      ],
+      "rgb": [
+        150,
+        157,
+        239
+      ],
+      "pavement": true
+    },
+    {
+      "name": "apos_direita",
+      "point": [
+        143,
+        204
+      ],
+      "rgb": [
+        157,
+        156,
+        236
+      ],
+      "pavement": true
+    },
+    {
+      "name": "apos_esquerda",
+      "point": [
+        274,
+        204
+      ],
+      "rgb": [
+        144,
+        143,
+        225
+      ],
+      "pavement": true
+    },
+    {
+      "name": "apos_esquerda",
+      "point": [
+        303,
+        204
+      ],
+      "rgb": [
+        149,
+        146,
+        228
+      ],
+      "pavement": true
+    },
+    {
+      "name": "apos_esquerda",
+      "point": [
+        332,
+        204
+      ],
+      "rgb": [
+        149,
+        147,
+        229
+      ],
+      "pavement": true
+    }
+  ],
+  "pixels_passed": true
+}

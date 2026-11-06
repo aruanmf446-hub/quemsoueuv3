@@ -1,0 +1,244 @@
+{
+	"checks": 30,
+	"failures": 0,
+	"graphical": true,
+	"legacy_fixture": false,
+	"physical_device": false,
+	"records": [
+		{
+			"clip": "pronto",
+			"clip_time": 0.133762,
+			"fixture_teleport": true,
+			"grounded": true,
+			"house": 0,
+			"name": "parado",
+			"pixels": [
+				{
+					"pavement": true,
+					"rgb": [
+						0.5686274766922,
+						0.584313750267029,
+						0.921568632125854
+					],
+					"screen": [
+						230,
+						208
+					]
+				},
+				{
+					"pavement": true,
+					"rgb": [
+						0.596078455448151,
+						0.600000023841858,
+						0.91372549533844
+					],
+					"screen": [
+						582,
+						208
+					]
+				},
+				{
+					"pavement": true,
+					"rgb": [
+						0.584313750267029,
+						0.517647087574005,
+						0.792156875133514
+					],
+					"screen": [
+						646,
+						208
+					]
+				}
+			],
+			"sole_above_roof": -0.038569450378418
+		},
+		{
+			"clip": "base",
+			"clip_time": 0.194093715661287,
+			"fixture_teleport": true,
+			"grounded": true,
+			"house": 1,
+			"name": "correndo_direita",
+			"pixels": [
+				{
+					"pavement": true,
+					"rgb": [
+						0.501960813999176,
+						0.537254929542542,
+						0.909803926944733
+					],
+					"screen": [
+						34,
+						208
+					]
+				},
+				{
+					"pavement": true,
+					"rgb": [
+						0.509803950786591,
+						0.572549045085907,
+						0.921568632125854
+					],
+					"screen": [
+						380,
+						208
+					]
+				},
+				{
+					"pavement": true,
+					"rgb": [
+						0.486274510622025,
+						0.450980395078659,
+						0.807843148708344
+					],
+					"screen": [
+						443,
+						208
+					]
+				}
+			],
+			"sole_above_roof": -0.000638771057129617
+		},
+		{
+			"clip": "base",
+			"clip_time": 0.202167720553597,
+			"fixture_teleport": true,
+			"grounded": true,
+			"house": 2,
+			"name": "correndo_esquerda",
+			"pixels": [
+				{
+					"pavement": true,
+					"rgb": [
+						0.5686274766922,
+						0.584313750267029,
+						0.917647063732147
+					],
+					"screen": [
+						385,
+						208
+					]
+				},
+				{
+					"pavement": true,
+					"rgb": [
+						0.596078455448151,
+						0.592156887054443,
+						0.909803926944733
+					],
+					"screen": [
+						724,
+						208
+					]
+				},
+				{
+					"pavement": true,
+					"rgb": [
+						0.588235318660736,
+						0.517647087574005,
+						0.792156875133514
+					],
+					"screen": [
+						786,
+						208
+					]
+				}
+			],
+			"sole_above_roof": -0.00753078460693324
+		},
+		{
+			"clip": "pronto",
+			"clip_time": 0.1,
+			"fixture_teleport": true,
+			"grounded": true,
+			"house": 4,
+			"name": "borda",
+			"pixels": [
+				{
+					"pavement": true,
+					"rgb": [
+						0.619607865810394,
+						0.603921592235565,
+						0.890196084976196
+					],
+					"screen": [
+						108,
+						208
+					]
+				},
+				{
+					"pavement": true,
+					"rgb": [
+						0.635294139385223,
+						0.576470613479614,
+						0.850980401039124
+					],
+					"screen": [
+						197,
+						208
+					]
+				},
+				{
+					"pavement": true,
+					"rgb": [
+						0.627451002597809,
+						0.588235318660736,
+						0.874509811401367
+					],
+					"screen": [
+						286,
+						208
+					]
+				}
+			],
+			"sole_above_roof": -0.0382911682128899
+		},
+		{
+			"clip": "pulo",
+			"clip_time": 0.210833328962326,
+			"fixture_teleport": true,
+			"grounded": false,
+			"house": 0,
+			"name": "salto",
+			"pixels": [
+				{
+					"pavement": true,
+					"rgb": [
+						0.5686274766922,
+						0.584313750267029,
+						0.921568632125854
+					],
+					"screen": [
+						229,
+						208
+					]
+				},
+				{
+					"pavement": true,
+					"rgb": [
+						0.596078455448151,
+						0.600000023841858,
+						0.91372549533844
+					],
+					"screen": [
+						581,
+						208
+					]
+				},
+				{
+					"pavement": true,
+					"rgb": [
+						0.584313750267029,
+						0.517647087574005,
+						0.792156875133514
+					],
+					"screen": [
+						645,
+						208
+					]
+				}
+			],
+			"sole_above_roof": 1.00946617126465
+		}
+	]
+}

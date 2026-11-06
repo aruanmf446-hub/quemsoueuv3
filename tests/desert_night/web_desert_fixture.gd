@@ -95,6 +95,23 @@ func _probe(args: Array) -> void:
 				var id: String=node.get_meta("asset_id","")
 				if not state.art_ids.has(id): state.art_ids.append(id)
 		state.y = phase._player.position.y
+		if _order==2:
+			var support:=preload("res://scripts/desert/t15d/campaign_layout.gd").floor_at(phase._phase,phase._player.position.x)
+			if not support.is_empty():
+				var samples: Array=[]
+				for i in range(2,19):
+					var fraction:=i/20.0
+					var x:=lerpf(float(support.left),float(support.right),fraction)
+					if absf(x-phase._player.position.x)<1.3:continue
+					var screen: Vector2=phase._camera.unproject_position(Vector3(x,float(support.height),0))
+					if screen.x<16 or screen.x>size.x-16:continue
+					var occupied:=false
+					for pedestal: Node3D in get_tree().get_nodes_in_group("campaign_pedestals"):
+						if absf(pedestal.global_position.x-x)<0.8:occupied=true
+					if occupied:continue
+					samples.append([screen.x,screen.y])
+					if samples.size()==3:break
+				state.roof={"samples":samples,"lead":phase._lead,"grounded":phase._player.is_on_floor(),"height":support.height}
 		state.soldiers = []
 		for enemy in phase._troops.get_children():
 			state.soldiers.append({"id":str(enemy.get_meta("spawn_id","")),"x":enemy.position.x,"y":enemy.position.y,"vx":enemy.velocity.x})

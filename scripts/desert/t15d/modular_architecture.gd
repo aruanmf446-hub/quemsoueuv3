@@ -72,8 +72,14 @@ func _house_roof_slice(platform: Dictionary) -> void:
 	var left := float(platform.pos[0])-float(platform.size[0])*0.5
 	var right := float(platform.pos[0])+float(platform.size[0])*0.5
 	var slice := AtlasTexture.new()
-	slice.atlas=texture
 	slice.region=Rect2((left-float(house.left))/pixels,0,(right-left)/pixels,texture.get_height())
+	# Sprite3D precisa de um recorte direto na imagem: aninhar o AtlasTexture do
+	# catálogo perdia seu deslocamento UV e desenhava o piso abaixo da colisão.
+	if texture is AtlasTexture:
+		slice.atlas=texture.atlas
+		slice.region.position+=texture.region.position
+	else:
+		slice.atlas=texture
 	slice.filter_clip=true
 	# O piso pintado no asset está a 10,5% do recorte. Compensa a câmera 2,2/14.
 	var walk_y := float(house.height)-0.4*(2.2/14.0)

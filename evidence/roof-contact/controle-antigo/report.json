@@ -1,0 +1,244 @@
+{
+	"checks": 30,
+	"failures": 12,
+	"graphical": true,
+	"legacy_fixture": true,
+	"physical_device": false,
+	"records": [
+		{
+			"clip": "pronto",
+			"clip_time": 0.13495,
+			"fixture_teleport": true,
+			"grounded": true,
+			"house": 0,
+			"name": "parado",
+			"pixels": [
+				{
+					"pavement": false,
+					"rgb": [
+						0.431372553110123,
+						0.250980406999588,
+						0.278431385755539
+					],
+					"screen": [
+						230,
+						208
+					]
+				},
+				{
+					"pavement": false,
+					"rgb": [
+						0.486274510622025,
+						0.278431385755539,
+						0.290196090936661
+					],
+					"screen": [
+						582,
+						208
+					]
+				},
+				{
+					"pavement": false,
+					"rgb": [
+						0.560784339904785,
+						0.345098048448563,
+						0.309803932905197
+					],
+					"screen": [
+						646,
+						208
+					]
+				}
+			],
+			"sole_above_roof": -0.0385713577270508
+		},
+		{
+			"clip": "base",
+			"clip_time": 0.15439874975582,
+			"fixture_teleport": true,
+			"grounded": true,
+			"house": 1,
+			"name": "correndo_direita",
+			"pixels": [
+				{
+					"pavement": true,
+					"rgb": [
+						0.458823531866074,
+						0.384313732385635,
+						0.729411780834198
+					],
+					"screen": [
+						34,
+						208
+					]
+				},
+				{
+					"pavement": true,
+					"rgb": [
+						0.517647087574005,
+						0.513725519180298,
+						0.866666674613953
+					],
+					"screen": [
+						380,
+						208
+					]
+				},
+				{
+					"pavement": true,
+					"rgb": [
+						0.458823531866074,
+						0.352941185235977,
+						0.670588254928589
+					],
+					"screen": [
+						443,
+						208
+					]
+				}
+			],
+			"sole_above_roof": 0.0182878494262688
+		},
+		{
+			"clip": "base",
+			"clip_time": 0.168243171123266,
+			"fixture_teleport": true,
+			"grounded": true,
+			"house": 2,
+			"name": "correndo_esquerda",
+			"pixels": [
+				{
+					"pavement": false,
+					"rgb": [
+						0.427450984716415,
+						0.250980406999588,
+						0.274509817361832
+					],
+					"screen": [
+						385,
+						208
+					]
+				},
+				{
+					"pavement": false,
+					"rgb": [
+						0.486274510622025,
+						0.278431385755539,
+						0.294117659330368
+					],
+					"screen": [
+						724,
+						208
+					]
+				},
+				{
+					"pavement": false,
+					"rgb": [
+						0.560784339904785,
+						0.345098048448563,
+						0.309803932905197
+					],
+					"screen": [
+						786,
+						208
+					]
+				}
+			],
+			"sole_above_roof": 0.0232805252075199
+		},
+		{
+			"clip": "pronto",
+			"clip_time": 0.0833333333333333,
+			"fixture_teleport": true,
+			"grounded": true,
+			"house": 4,
+			"name": "borda",
+			"pixels": [
+				{
+					"pavement": false,
+					"rgb": [
+						0.513725519180298,
+						0.333333343267441,
+						0.364705890417099
+					],
+					"screen": [
+						108,
+						208
+					]
+				},
+				{
+					"pavement": false,
+					"rgb": [
+						0.552941203117371,
+						0.341176480054855,
+						0.345098048448563
+					],
+					"screen": [
+						197,
+						208
+					]
+				},
+				{
+					"pavement": false,
+					"rgb": [
+						0.486274510622025,
+						0.301960796117783,
+						0.325490206480026
+					],
+					"screen": [
+						286,
+						208
+					]
+				}
+			],
+			"sole_above_roof": -0.0383064270019524
+		},
+		{
+			"clip": "pulo",
+			"clip_time": 0.188073040545305,
+			"fixture_teleport": true,
+			"grounded": false,
+			"house": 0,
+			"name": "salto",
+			"pixels": [
+				{
+					"pavement": false,
+					"rgb": [
+						0.427450984716415,
+						0.24705882370472,
+						0.274509817361832
+					],
+					"screen": [
+						229,
+						208
+					]
+				},
+				{
+					"pavement": false,
+					"rgb": [
+						0.490196079015732,
+						0.278431385755539,
+						0.290196090936661
+					],
+					"screen": [
+						581,
+						208
+					]
+				},
+				{
+					"pavement": false,
+					"rgb": [
+						0.564705908298492,
+						0.34901961684227,
+						0.317647069692612
+					],
+					"screen": [
+						645,
+						208
+					]
+				}
+			],
+			"sole_above_roof": 0.987319946289062
+		}
+	]
+}

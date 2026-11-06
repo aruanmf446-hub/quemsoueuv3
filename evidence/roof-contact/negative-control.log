@@ -1,0 +1,36 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS parado: contato físico ou salto real
+FAIL parado: piso visível coincide com colisão em 0.20
+FAIL parado: piso visível coincide com colisão em 0.75
+FAIL parado: piso visível coincide com colisão em 0.85
+PASS parado: sola real apoiada ou elevada no salto
+PASS parado: captura real salva
+PASS correndo_direita: contato físico ou salto real
+PASS correndo_direita: piso visível coincide com colisão em 0.20
+PASS correndo_direita: piso visível coincide com colisão em 0.75
+PASS correndo_direita: piso visível coincide com colisão em 0.85
+PASS correndo_direita: sola real apoiada ou elevada no salto
+PASS correndo_direita: captura real salva
+PASS correndo_esquerda: contato físico ou salto real
+FAIL correndo_esquerda: piso visível coincide com colisão em 0.20
+FAIL correndo_esquerda: piso visível coincide com colisão em 0.75
+FAIL correndo_esquerda: piso visível coincide com colisão em 0.85
+PASS correndo_esquerda: sola real apoiada ou elevada no salto
+PASS correndo_esquerda: captura real salva
+PASS borda: contato físico ou salto real
+FAIL borda: piso visível coincide com colisão em 0.35
+FAIL borda: piso visível coincide com colisão em 0.50
+FAIL borda: piso visível coincide com colisão em 0.65
+PASS borda: sola real apoiada ou elevada no salto
+PASS borda: captura real salva
+PASS salto: contato físico ou salto real
+FAIL salto: piso visível coincide com colisão em 0.20
+FAIL salto: piso visível coincide com colisão em 0.75
+FAIL salto: piso visível coincide com colisão em 0.85
+PASS salto: sola real apoiada ou elevada no salto
+PASS salto: captura real salva
+ROOF_CONTACT_RENDER checks=30 failures=12

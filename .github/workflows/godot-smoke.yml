@@ -25,6 +25,35 @@ jobs:
           "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --version | grep -E '^4[.]7[.]2[.]stable[.]official'
       - name: Import and open actual scenes
         run: python3 tools/godot/run_smoke.py --godot "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --output "$RUNNER_TEMP/results"
+      - name: Roof contact with real rendered pavement (three resolutions)
+        if: always()
+        env:
+          LP_NUM_THREADS: "2"
+          XDG_DATA_HOME: ${{ runner.temp }}/roof-contact/data
+          XDG_CONFIG_HOME: ${{ runner.temp }}/roof-contact/config
+          XDG_CACHE_HOME: ${{ runner.temp }}/roof-contact/cache
+        shell: bash
+        run: |
+          set -euo pipefail
+          engine="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
+          mkdir -p "$XDG_DATA_HOME" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME"
+          for size in 1920x1080 844x390 640x360; do
+            iphone=0
+            if [ "$size" = "844x390" ]; then iphone=1; fi
+            QSE_TEST_IPHONE="$iphone" timeout 180 xvfb-run -a "$engine" --path . \
+              --audio-driver Dummy --max-fps 30 --script res://tests/desert_night/roof_contact_render.gd \
+              -- "$RUNNER_TEMP/roof-contact/$size" "$size" --touch-controls
+          done
+      - name: Roof contact screenshots and pixel measurements
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roof-contact-real-render
+          path: |
+            ${{ runner.temp }}/roof-contact/**/*.png
+            ${{ runner.temp }}/roof-contact/**/report.json
+          if-no-files-found: ignore
+          retention-days: 14
       - name: Live content editor regression (offline)
         run: |
           "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --script res://tests/editor_content/verify.gd

@@ -41,6 +41,7 @@ var _first_use: CanvasLayer
 var _shield: Node3D
 var _saved := false
 var _handoff := false
+var _advancing := false
 var _actor_resources: Array[PackedScene] = []
 var _lead := 0.0
 var _build_queue: Array[Dictionary] = []
@@ -224,7 +225,7 @@ func _build_player() -> void:
 	_player.blocked.connect(func() -> void: _impact(_player.position+Vector3(_player.facing*0.45,0.9,0),Color("#9cdeff")))
 	_player.ability_used.connect(_on_ability_used)
 	_player.setup(_find_protagonist())
-	_apply_starting_resources()
+	_apply_starting_resources(true)
 	# Luz de recorte que acompanha o protagonista: o traje escuro não some na muralha.
 	_key_light = OmniLight3D.new()
 	_key_light.name = "PlayerKeyLight"
@@ -237,7 +238,7 @@ func _build_player() -> void:
 	_shield.name = "SandShield"
 	add_child(_shield)
 	_player.blocked.connect(func() -> void: _shield.absorb(-_player.facing))
-func _apply_starting_resources() -> void:
+func _apply_starting_resources(use_carry:=false) -> void:
 	if _order==1:
 		_player.attack_charges=0
 		_player.defense_charges=0
@@ -245,11 +246,18 @@ func _apply_starting_resources() -> void:
 	# O tutorial por perfil agora é a fonte da apresentação, sem apagar progresso.
 	for ability: String in Layout.ABILITY_PHASE:
 		_player.abilities[ability]=0
+	if use_carry:
+		var carry: Dictionary=get_meta("carry_charges",Progress.carry_for(_order,OwnerStorage.owner_id()))
+		if not carry.is_empty():
+			_player.attack_charges=clampi(int(carry.get("attack",0)),0,3)
+			_player.defense_charges=clampi(int(carry.get("defense",0)),0,3)
+			for ability: String in Layout.ABILITY_PHASE:
+				if _order>=int(Layout.ABILITY_PHASE[ability]):_player.abilities[ability]=clampi(int(carry.get(ability,0)),0,3)
 	_restore_ability_buttons()
 func _restore_ability_buttons() -> void:
 	for ability: String in Layout.ABILITY_PHASE:
 		_player.discovered.erase(ability)
-		if _order>=int(Layout.ABILITY_PHASE[ability]) and is_instance_valid(_first_use) and _first_use.seen(ability):
+		if _order>=int(Layout.ABILITY_PHASE[ability]) and is_instance_valid(_first_use) and (_first_use.seen(ability) or _player.charges(ability)>0):
 			_player.discovered[ability]=true
 func _stream_world(x: float, force := false) -> void:
 	var center := floori(x/CHUNK_SIZE)
@@ -661,8 +669,9 @@ func _warm_pickup_shaders() -> void:
 	medal.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	warm.add_child(medal)
 	_camera.add_child(warm)
-	for frame in range(3): await get_tree().process_frame
-	if is_instance_valid(warm): warm.queue_free()
+	# Callback pertence ao objeto aquecido: sair da fase cancela a conexão sem
+	# retomar uma coroutine cujo dono já foi liberado.
+	get_tree().create_timer(0.1,true).timeout.connect(warm.queue_free)
 func _follow_camera(delta: float) -> void:
 	# Telas baixas (844×390) aproximam mais: o personagem não pode virar um ícone.
 	_camera.size = 6.0 if UIScale.is_iphone() else 7.0
@@ -763,6 +772,7 @@ func _on_goal_entered(body: Node3D) -> void:
 		return
 	completed = true
 	_saved = Progress.complete(_order) == OK
+	if _order<10:Progress.store_carry(_order+1,_charge_snapshot(),OwnerStorage.owner_id())
 	_player.velocity = Vector3.ZERO
 	_player.set_physics_process(false)
 	_player._model.play_animation("pronto",true)
@@ -919,10 +929,15 @@ func _restart_level() -> void:
 	_follow_camera(1.0)
 	_hud.set_completed(false)
 	_sync_resources()
+func _charge_snapshot() -> Dictionary:
+	return {"attack":_player.attack_charges,"defense":_player.defense_charges,"amber":_player.charges("amber"),"dash":_player.charges("dash"),"rupture":_player.charges("rupture")}
 func _advance(path: String) -> void:
+	if _advancing:return
+	_advancing=true
 	var loading := CampaignLoading.new()
 	loading.name = "CampaignLoading"
 	get_tree().root.add_child(loading)
+	loading.cancelled.connect(func() -> void:_advancing=false)
 	loading.begin(path, _present_next_phase.bind(path))
 
 func _present_next_phase(packed: PackedScene, path: String) -> void:
@@ -936,6 +951,8 @@ func _present_next_phase(packed: PackedScene, path: String) -> void:
 func _finish_advance(packed: PackedScene) -> void:
 	_resume()
 	var next := packed.instantiate()
+	next.set_meta("carry_charges",_charge_snapshot())
+	next.set_meta("from_previous_phase",true)
 	if next.has_signal("return_requested"):
 		_handoff = true
 		next.set_meta("previous_go_back",_previous_go_back)
@@ -998,6 +1015,7 @@ func _sync_game_checkpoint(index: int) -> void:
 
 
 func _restore_game_checkpoint() -> void:
+	if bool(get_meta("from_previous_phase",false)):return
 	if PlayerServices.current == null or not PlayerServices.current.session.authenticated():
 		return
 	var progress := PlayerServices.current.progression

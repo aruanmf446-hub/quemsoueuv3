@@ -1,0 +1,26 @@
+[
+  {
+    "test": "account-merge",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 3.64,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "story-transitions",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 8.04,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "story-platforms",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 8.85,
+    "graphical": false,
+    "fixed_physics_step": false
+  }
+]

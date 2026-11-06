@@ -20,6 +20,9 @@ var _retry_button: Button
 var _story_mode := false
 var _story_done := false
 var _phase_order := 0
+var _progress: ProgressBar
+var _completed_reads:=0
+var _total_reads:=1
 var _status: Label
 var _inflight := ""
 var _cancelling := false
@@ -44,6 +47,20 @@ func _ready() -> void:
 	PlayerUI.apply_theme(_status)
 	add_child(_status)
 	_status.hide()
+	_progress=ProgressBar.new()
+	_progress.show_percentage=false
+	_progress.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	PlayerUI.apply_theme(_progress)
+	var track:=PlayerUI.plate(false)
+	track.set_content_margin_all(0)
+	var fill:=PlayerUI.button_plate(true)
+	fill.set_content_margin_all(0)
+	_progress.add_theme_stylebox_override("background",track)
+	_progress.add_theme_stylebox_override("fill",fill)
+	add_child(_progress)
+	_progress.hide()
+	get_viewport().size_changed.connect(_layout_progress)
+	_layout_progress()
 
 func begin(path: String, callback: Callable, is_opening := false) -> void:
 	opening = is_opening
@@ -66,21 +83,34 @@ func begin(path: String, callback: Callable, is_opening := false) -> void:
 	_carousel.allow_skip = opening
 	_carousel.manual_story = _story_mode
 	_carousel.allow_skip = opening or _story_mode
+	_carousel.show_counter=opening or _story_mode or _phase_order==0
 	if _story_mode:
 		_carousel.set_cards_data(PhaseStory.cards_for(_phase_order))
 	elif _phase_order >= 1 and _phase_order <= 10:
 		var entries := PhaseStory.cards_for(_phase_order)
 		var cover: Dictionary = entries[0].duplicate() if not entries.is_empty() else {}
-		cover.title = "Preparando fase"
+		cover.title = "Carregando fase %02d" % _phase_order
 		cover.message = ""
 		cover.eyebrow = "REINO DO DESERTO"
 		_carousel.set_cards_data([cover])
 	else:
 		_carousel.set_cards("opening" if opening else "transition")
 	_status.visible = _phase_order >= 1 and _phase_order <= 10
-	_status.text = "Preparando fase…"
+	_status.text = "Carregando fase %02d…" % _phase_order
+	_completed_reads=0
+	_total_reads=1
+	_progress.value=0
+	_progress.visible=_phase_order>=1 and _phase_order<=10
 	_error_panel.hide()
 	_begin_read.call_deferred(_ticket)
+
+func _layout_progress() -> void:
+	if not is_instance_valid(_progress):return
+	var size:=get_viewport().get_visible_rect().size
+	_progress.position=Vector2(size.x*0.25,size.y-48)
+	_progress.size=Vector2(size.x*0.5,10)
+func _update_progress() -> void:
+	_progress.value=100.0*_completed_reads/maxi(_total_reads,1)
 
 func _begin_read(ticket: int) -> void:
 	await get_tree().process_frame
@@ -111,6 +141,9 @@ func _begin_read(ticket: int) -> void:
 		for entry: Dictionary in entries:
 			paths[str(entry.model)] = true
 			for source in entry.animations.values(): paths[str(source)] = true
+		_total_reads=paths.size()+1
+		_completed_reads=1
+		_update_progress()
 		var held: Array[Resource] = []
 		for source: String in paths:
 			await get_tree().process_frame
@@ -133,7 +166,10 @@ func _begin_read(ticket: int) -> void:
 				_fail(ticket)
 				return
 			held.append(resource)
+			_completed_reads+=1
+			_update_progress()
 		_packed.set_meta("campaign_warm_resources", held)
+	_progress.value=100
 	_can_skip = true
 	_status.text = "Fase pronta • leia no seu ritmo" if _story_mode and not _story_done else ""
 	if _story_done and _carousel.advances >= _min_advances: _finish_after_card(ticket)
@@ -163,7 +199,7 @@ func _story_completed() -> void:
 	if _can_skip:
 		_finish(_ticket)
 	else:
-		_status.text = "Preparando fase…"
+		_status.text = "Carregando fase %02d…" % _phase_order
 		_carousel.manual_story = false
 		_carousel.allow_skip = false
 		_carousel._layout()
@@ -181,12 +217,18 @@ func _skip() -> void:
 func _fail(ticket: int) -> void:
 	if ticket != _ticket: return
 	load_failed.emit()
+	_status.text="Não foi possível carregar a fase."
+	_progress.hide()
 	_error_panel.show()
 	_retry_button.grab_focus()
 
 func _retry() -> void:
 	_ticket += 1
 	_error_panel.hide()
+	_completed_reads=0
+	_progress.value=0
+	_progress.show()
+	_status.text="Carregando fase %02d…" % _phase_order
 	_begin_read.call_deferred(_ticket)
 
 func _cancel() -> void:
@@ -195,6 +237,7 @@ func _cancel() -> void:
 	_ticket += 1
 	_carousel.hide()
 	_status.hide()
+	_progress.hide()
 	var was_failed := _error_panel.visible
 	_error_panel.hide()
 	cancelled.emit()

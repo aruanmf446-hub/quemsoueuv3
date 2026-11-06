@@ -40,6 +40,7 @@ static func build(props: Node3D,order: int,slot: int,left: float,right: float,to
 			for i in 2:
 				var center:=at+Vector3(float(i)*1.06,0.43,0)
 				_box(props,center,Vector3(0.94,0.86,0.86),"context_wood",Color("#d3c6b0"))
+				Landings.attach_box(props,center,Vector3(0.94,0.86,0.86),top)
 				for y: float in [-0.32,0.32]:_box(props,center+Vector3(0,y,0.46),Vector3(0.98,0.075,0.06),"context_props",Color("#4a4b49"))
 				for x: float in [-0.35,0.35]:_box(props,center+Vector3(x,0,0.46),Vector3(0.065,0.88,0.06),"context_props",Color("#4a4b49"))
 		_:return

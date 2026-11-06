@@ -1,0 +1,26 @@
+[
+  {
+    "test": "t18_auth/flow_test",
+    "passed": true
+  },
+  {
+    "test": "persistence/flow_test",
+    "passed": true
+  },
+  {
+    "test": "ui_session_music/flow_test",
+    "passed": true
+  },
+  {
+    "test": "desert_night/first_use_tutorial_test",
+    "passed": true
+  },
+  {
+    "test": "desert_night/spear_encounter_test",
+    "passed": true
+  },
+  {
+    "test": "desert_night/regional_context_test",
+    "passed": true
+  }
+]

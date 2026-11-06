@@ -24,6 +24,8 @@ Na fase2, fachadas ficam abaixo da laje e o bazar aparece na rua inferior. O por
 
 ## Assets
 
+As imagens abaixo documentam os arquivos originais. Nas pontes e nos guindastes, o jogo usa o acabamento de `scripts/desert/t15d/industrial_finish.gd`: **sem bandeiras repetidas nas treliças, no pilar ou no carrinho**, conforme revisão do dono. Os sprites e recortes passam por `CityProps._house_sprite()` para manter esse acabamento. Ver [capturas atuais](../../../evidence/composicao-fases-tasks/industrial-sem-bandeiras/README.md); as bandeiras das fontes originais não representam a direção visual atual dessas peças.
+
 ### Casa residencial
 
 Fases: 01, 02. Largura sugerida: 6.0m. Recurso: `capital_house.res`.

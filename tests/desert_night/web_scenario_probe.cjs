@@ -17,7 +17,8 @@ const out=process.env.QSE_PARKOUR_WEB_OUT||'/tmp/qse-scenario-web';fs.mkdirSync(
  let s=await state();await tap(s.skip,s);
  await page.waitForFunction(()=>{window.qseDesertProbe('state');return window.qseDesertState.stage==='play';});
  const results=[];
- for(const order of [1,3,7]) {
+ const orders=process.env.QSE_SCENARIO_ORDERS?process.env.QSE_SCENARIO_ORDERS.split(',').map(Number):[1,3,7];
+ for(const order of orders) {
  await page.evaluate(n=>window.qseExpectedOrder=n,order);
  if(order!==1) {
  await page.evaluate(n=>window.qseDesertProbe('phase:'+n),order);
@@ -45,6 +46,6 @@ const out=process.env.QSE_PARKOUR_WEB_OUT||'/tmp/qse-scenario-web';fs.mkdirSync(
  const report={fixture_teleport:true,viewport:'844x390',dpr:3,physical_device:false,results,errors,blocked,engineErrors:logs.filter(s=>/SCRIPT ERROR:|Parse Error:|^ERROR:/.test(s))};
  fs.writeFileSync(out+'/report.json',JSON.stringify(report,null,2));
  if(errors.length||report.engineErrors.length||blocked.length)throw new Error('Web error; see report');
- console.log('WEB_SCENARIO PASS: gate, canopy and lift; touch with zero charges; walked both directions');
+ console.log('WEB_SCENARIO PASS: phases '+orders.join(',')+'; touch with zero charges; walked both directions');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

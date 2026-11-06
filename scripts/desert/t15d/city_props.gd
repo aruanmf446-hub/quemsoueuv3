@@ -175,6 +175,7 @@ func _house_sprite(texture: Texture2D,at: Vector3,pixels: float) -> Sprite3D:
 	sprite.modulate=Color(0.82,0.84,0.94)
 	sprite.texture_filter=BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	sprite.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	preload("res://scripts/desert/t15d/industrial_finish.gd").apply_to(sprite)
 	add_child(sprite)
 	return sprite
 

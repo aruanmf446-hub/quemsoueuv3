@@ -12,6 +12,7 @@ func check(ok: bool, message: String) -> void:
 func frames(count: int) -> void:
 	for index in range(count): await physics_frame
 func run() -> void:
+	preload("res://tests/desert_night/tutorial_fixture.gd").experienced()
 	for order in range(1,10):
 		var stage := Layout.build(order)
 		check(stage.districts.size() == 8,"fase %d: oito distritos" % order)
@@ -41,7 +42,7 @@ func run() -> void:
 	pad.queue_free()
 	unlearned.free()
 	var player: Node3D = phase._player
-	check(player.discovered.has("dash"),"capítulo6 garante descoberta do Relâmpago")
+	check(player.discovered.has("dash") and player.charges("dash")==0,"poder já apresentado mantém botão, sem ganhar carga ao entrar no capítulo6")
 	player._invulnerable = 999
 	player.set_physics_process(false)
 	for kind in ["attack","defense","rupture","amber","dash"]:
@@ -185,8 +186,9 @@ func run() -> void:
 	for enemy in phase._troops.get_children():
 		if enemy.velocity.x > 4.5: moving += 1
 	check(moving >= 3,"três ou mais Cactus perseguem simultaneamente")
+	var living_before_stream: Array=phase._troops.get_children()
 	phase._stream_world(220,true)
-	check(phase._troops.get_child_count() == 8,"descarregar chunks preserva perseguidores vivos")
+	check(not living_before_stream.is_empty() and phase._troops.get_children()==living_before_stream,"descarregar chunks preserva os mesmos perseguidores que estavam vivos")
 	phase._reset_remaster_state()
 	check(phase._troops.get_child_count() == 0 and phase._ruptured.is_empty(),"reset limpa tropas e ruptura")
 	player.setup(phase._find_protagonist())

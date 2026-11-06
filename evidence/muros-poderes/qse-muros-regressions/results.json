@@ -1,0 +1,14 @@
+[
+  {
+    "test": "pedestal_test",
+    "passed": false
+  },
+  {
+    "test": "scenario_tasks_test",
+    "passed": true
+  },
+  {
+    "test": "regional_context_test",
+    "passed": true
+  }
+]

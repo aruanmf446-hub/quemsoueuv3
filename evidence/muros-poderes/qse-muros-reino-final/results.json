@@ -1,0 +1,10 @@
+[
+  {
+    "test": "reino-v3",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 9.46,
+    "graphical": false,
+    "fixed_physics_step": false
+  }
+]

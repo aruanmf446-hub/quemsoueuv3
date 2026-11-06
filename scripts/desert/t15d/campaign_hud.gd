@@ -101,9 +101,9 @@ func _ready() -> void:
 	PlayerUI.style_story_action(_pause)
 	_pause.pressed.connect(pause_requested.emit)
 	_root.add_child(_pause)
-	_toast = label("",22,Color("#f1dfb4"))
+	_toast = label("",20,Color("#f1dfb4"))
 	_toast.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_toast.add_theme_stylebox_override("normal",box())
 	_toast.hide()
 	_root.add_child(_toast)
@@ -160,8 +160,8 @@ func _layout() -> void:
 	_pause.size = Vector2.ONE*pause_size
 	_pause.position = Vector2(screen.x-64-pause_size*0.5,64-pause_size*0.5)
 	_actions.position = Vector2(maxf(14,screen.x-_actions.get_combined_minimum_size().x-24),screen.y-104)
-	_toast.position = Vector2(maxf(14,(screen.x-760)*0.5),92 if compact else 128)
-	_toast.size = Vector2(minf(screen.x-28,760),76)
+	_toast.position = Vector2(14,maxf(120,_identity.size.y+28))
+	_toast.size = Vector2(minf(screen.x-28,460),64)
 	_position_task(screen)
 func _position_task(screen: Vector2) -> void:
 	var area: Rect2=preload("res://scripts/desert/t15d/touch.gd").task_area(screen)
@@ -192,6 +192,8 @@ func _icon(texture: Texture2D, center: Vector2, size: float, alpha := 1.0) -> vo
 	_icons.draw_texture_rect(texture,Rect2(center-Vector2.ONE*size*0.5,Vector2.ONE*size),false,Color(1,1,1,alpha))
 func update_resources(player: Node) -> void:
 	if is_instance_valid(_actions):
+		for known: String in _action_buttons:
+			(_action_buttons[known] as Button).visible=known=="jump" or player.discovered.has(known)
 		var action_index := 0
 		for kind in ["attack","rupture","amber","dash","defense","jump"]:
 			if kind != "jump" and not player.discovered.has(kind): continue
@@ -218,6 +220,7 @@ func update_resources(player: Node) -> void:
 				_actions.add_child(button)
 				_action_buttons[kind] = button
 			var node: Button = _action_buttons[kind]
+			node.show()
 			_actions.move_child(node,action_index)
 			action_index += 1
 			node.text = "↑" if kind == "jump" else ""

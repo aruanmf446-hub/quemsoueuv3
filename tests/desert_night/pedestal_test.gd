@@ -39,6 +39,7 @@ func run() -> void:
 		if items.size()!=1 or bases.size()!=1: continue
 		var item: Area3D = items[0]
 		var base: MeshInstance3D = bases[0]
+		if kind=="attack":check(base.mesh.get_aabb().end.y<0.04,"estação embutida no piso, sem torrão elevado")
 		check(item.get_parent()==base.get_parent(),kind+": base pertence ao chunk e não ao item")
 		var collected := [0]
 		var full := [0]
@@ -48,10 +49,12 @@ func run() -> void:
 		item._try_collect(phase._player)
 		item._try_collect(phase._player)
 		check(not item.is_queued_for_deletion() and collected[0]==0 and full[0]==1,kind+": cheia preserva item, capacidade e aviso único")
+		check(not bool(base.get_meta("spent",true)),kind+": estação cheia continua visualmente disponível")
 		capacity(phase._player,kind,2)
 		item._try_collect(phase._player)
 		item._try_collect(phase._player)
 		check(collected[0]==1 and phase._collected_ids.has(id),kind+": coleta uma vez e persiste ID")
+		check(bool(base.get_meta("spent",false)),kind+": coleta apaga o acento da estação sem removê-la")
 		check((phase._player.health if kind=="health" else phase._player.charges(kind))==3,kind+": repõe exatamente uma carga")
 		await frames()
 		check(matching("campaign_pickups",id).is_empty() and is_instance_valid(base) and base.is_inside_tree(),kind+": coletável removido, pedestal permanece")
@@ -61,6 +64,8 @@ func run() -> void:
 		phase._stream_world(float(spawn.pos[0]),true)
 		await frames()
 		check(matching("campaign_pedestals",id).size()==1 and matching("campaign_pickups",id).is_empty(),kind+": revisitar recupera só a base, sem duplicar ou reaparecer item")
+		var restored:=matching("campaign_pedestals",id)
+		check(restored.size()==1 and bool(restored[0].get_meta("spent",false)),kind+": aparência consumida é restaurada ao revisitar")
 	for x in [0.0,350.0,700.0,1100.0,0.0]:
 		phase._stream_world(x,true)
 		await frames()

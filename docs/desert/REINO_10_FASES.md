@@ -64,6 +64,8 @@ limitações em `evidence/ambientes-pedestais/README.md`. O proprietário aprovo
 
 ## Gameplay e continuidade
 
+A revisão de contexto em `regional_context.gd` adiciona pátios de abastecimento na cidade, canais de alvenaria no aqueduto, margens com água e vegetação no oásis, terreno de apoio nas ruínas e trilhos/carrinhos nos núcleos de mineração. Geometria nova fica atrás da pista e é agrupada nos materiais do mesmo chunk, sem novos colisores ou luzes. Telhados da fase2 permanecem iguais e os complementos de mineração param antes da arena. Dois sprites de apoio acompanham a biblioteca ilustrada existente; não são imagens de fase inteira. Ver `evidence/contexto-regioes/README.md`.
+
 O percurso existente conserva saltos, obstáculos, perseguição e retorno das
 fases. Soldados usam a altura real da laje e saltam os vãos, inclusive nos
 telhados. Vida/ataque/defesa e os poderes mantêm capacidade3 e recargas apoiadas.

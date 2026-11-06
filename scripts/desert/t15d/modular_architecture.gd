@@ -18,7 +18,7 @@ func build_surface(platform: Dictionary, order: int) -> void:
 		_house_roof_slice(platform)
 		return
 	if platform.get("parkour_route",false):
-		_build_running_obstacle(x,width,float(platform.surface_top),top,order)
+		_build_running_obstacle(x,width,float(platform.surface_top),top,order,int(platform.get("module",0)))
 		_flush()
 		return
 	if platform.kind != "ground":
@@ -71,16 +71,7 @@ func _house_roof_slice(platform: Dictionary) -> void:
 	var pixels := width/texture.get_width()
 	var left := float(platform.pos[0])-float(platform.size[0])*0.5
 	var right := float(platform.pos[0])+float(platform.size[0])*0.5
-	var slice := AtlasTexture.new()
-	slice.region=Rect2((left-float(house.left))/pixels,0,(right-left)/pixels,texture.get_height())
-	# Sprite3D precisa de um recorte direto na imagem: aninhar o AtlasTexture do
-	# catálogo perdia seu deslocamento UV e desenhava o piso abaixo da colisão.
-	if texture is AtlasTexture:
-		slice.atlas=texture.atlas
-		slice.region.position+=texture.region.position
-	else:
-		slice.atlas=texture
-	slice.filter_clip=true
+	var slice:=Assets.crop(texture,Rect2((left-float(house.left))/pixels,0,(right-left)/pixels,texture.get_height()))
 	# O piso pintado no asset está a 10,5% do recorte. Compensa a câmera 2,2/14.
 	var walk_y := float(house.height)-0.4*(2.2/14.0)
 	var art := _house_sprite(slice,Vector3((left+right)*0.5,walk_y-(0.5-0.105)*texture.get_height()*pixels,-0.4),pixels)
@@ -92,34 +83,11 @@ func _house_roof_slice(platform: Dictionary) -> void:
 	art.add_to_group("playable_house_roofs")
 	art.add_to_group("kingdom_art")
 
-func _build_running_obstacle(x: float,width: float,base: float,top: float,order: int) -> void:
-	# Um objeto reconhecível com topo percorrível, nunca outra pilha de pisos.
-	var material := "cloth" if order==3 else ("wood" if order in [5,7,9,10] else "stone")
-	if order in [5,6]:
-		var log := MeshInstance3D.new()
-		var cylinder := CylinderMesh.new()
-		cylinder.top_radius=0.54
-		cylinder.bottom_radius=0.54
-		cylinder.height=width
-		cylinder.radial_segments=12
-		log.mesh=cylinder
-		log.position=Vector3(x,base+0.55,0)
-		log.rotation.z=PI*0.5
-		log.material_override=_material(material)
-		add_child(log)
-	elif order in [7,9]:
-		_crate(Vector3(x,base+0.22,0),width,0.88)
-		for side in [-1.0,1.0]:
-			for end in [-1.0,1.0]: _dome(Vector3(x+side*(width*0.5-0.65),base+0.20,end*1.40),0.25,0.24,"metal")
-	else:
-		_box(Vector3(x,top-0.10,0),Vector3(width,0.20,3.8),"roof" if order==2 else material)
-		for side in [-1.0,1.0]:
-			for end in [-1.0,1.0]:
-				_box(Vector3(x+side*(width*0.5-0.16),base+0.48,end*1.65),Vector3(0.16,0.96,0.16),"wood" if order in [3,10] else "stone")
-		if order==3:
-			for stripe in range(ceili(width/0.7)):
-				_box(Vector3(x-width*0.5+stripe*0.7+0.12,top+0.006,0),Vector3(0.16,0.015,3.8),"cloth_alt")
-		elif order in [1,4,8]: _arch_frame(Vector3(x,base,1.7),width-1.0,1.02,0.12)
+func _build_running_obstacle(x: float,width: float,base: float,top: float,order: int,module:=0) -> void:
+	var art:=preload("res://scripts/desert/t15d/obstacle_art.gd").new()
+	art.position=Vector3(x,base,0)
+	add_child(art)
+	art.build_obstacle(width,top-base,order,module)
 
 func _facade(left: float,right: float,top: float,bottom: float) -> void:
 	_box(Vector3((left+right)*0.5,(top+bottom)*0.5,-0.25),Vector3(right-left,top-bottom,3.4),"stone")
@@ -160,13 +128,14 @@ func _mine_cart(at: Vector3) -> void:
 
 func _underground(at: Vector3,index: int) -> void:
 	var top := at+Vector3(0,4.4,-1.5)
-	_box(top,Vector3(5.2,0.35,3.8),"wood" if _theme == 10 else "stone")
-	for side: float in [-1,1]:
-		_box(top+Vector3(side*2.35,-2.2,0),Vector3(0.35,4.4,0.35),"wood" if _theme == 10 else "stone")
 	if _theme == 10:
-		for side: float in [-1,1]:
-			_dome(at+Vector3(side*1.4,0.0,-2.6),0.45,1.2,"crystal")
+		Context._box(self,top,Vector3(5.2,0.35,3.8),"context_wood",Color("#b2a38e"))
+		for side: float in [-1,1]:Context._box(self,top+Vector3(side*2.35,-2.2,0),Vector3(0.35,4.4,0.35),"context_wood",Color("#b2a38e"))
+		# Veio aprovado substitui as antigas cápsulas laranjas; arena fica livre.
+		if at.x<_length*0.78:place_asset("desert_mine_crystals",at+Vector3(1.4,-0.60,-3.0),1.6)
 	else:
+		_box(top,Vector3(5.2,0.35,3.8),"stone")
+		for side: float in [-1,1]:_box(top+Vector3(side*2.35,-2.2,0),Vector3(0.35,4.4,0.35),"stone")
 		_arch_frame(at+Vector3(0,0,-1.9),2.3,3.0,0.3)
 
 func _water_strip(at: Vector3,dimensions: Vector2,vertical: bool) -> void:

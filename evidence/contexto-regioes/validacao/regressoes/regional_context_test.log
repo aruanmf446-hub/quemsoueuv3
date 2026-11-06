@@ -1,0 +1,75 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS riverbank_context: tamanho limitado, transparência e mipmaps
+PASS city_supplies_context: tamanho limitado, transparência e mipmaps
+PASS fase01: aquece somente o complemento da região
+PASS fase01 x12: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase01 x350: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase01 x700: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase01 x1100: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase01 x12: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase01: descarrega toda a decoração
+PASS fase02: aquece somente o complemento da região
+PASS fase02 x12: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase02 x350: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase02 x700: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase02 x1100: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase02 x12: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase02: descarrega toda a decoração
+PASS fase03: aquece somente o complemento da região
+PASS fase03 x12: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase03 x350: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase03 x700: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase03 x1100: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase03 x12: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase03: descarrega toda a decoração
+PASS fase04: aquece somente o complemento da região
+PASS fase04 x12: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase04 x350: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase04 x700: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase04 x1100: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase04 x12: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase04: descarrega toda a decoração
+PASS fase05: aquece somente o complemento da região
+PASS fase05 x12: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase05 x350: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase05 x700: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase05 x1100: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase05 x12: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase05: descarrega toda a decoração
+PASS fase06: aquece somente o complemento da região
+PASS fase06 x12: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase06 x350: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase06 x700: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase06 x1100: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase06 x12: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase06: descarrega toda a decoração
+PASS fase07: aquece somente o complemento da região
+PASS fase07 x12: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase07 x350: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase07 x700: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase07 x1100: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase07 x12: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase07: descarrega toda a decoração
+PASS fase08: aquece somente o complemento da região
+PASS fase08 x12: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase08 x350: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase08 x700: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase08 x1100: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase08 x12: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase08: descarrega toda a decoração
+PASS fase09: aquece somente o complemento da região
+PASS fase09 x12: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase09 x350: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase09 x700: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase09 x1100: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase09 x12: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase09: descarrega toda a decoração
+PASS fase10: aquece somente o complemento da região
+PASS fase10 x12: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase10 x350: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase10 x700: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase10 x1100: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase10 x12: tema correto, sem invasão da pista/vãos, até três lotes por chunk, materiais compartilhados
+PASS fase10: descarrega toda a decoração
+REGIONAL_CONTEXT checks=72 failures=0

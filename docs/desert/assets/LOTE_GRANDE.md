@@ -1,6 +1,7 @@
 # Biblioteca visual — lote grande
 
 Dez módulos novos; quinze módulos no catálogo contando os anteriores.
+O catálogo original continua preservado. Dois complementos de contexto — margem de rio e abastecimento urbano — estão separados em `context_assets.json`, com fontes e procedência em `PROVENANCE.md`. A fase carrega somente o complemento necessário: margem nas fases4/5; abastecimento nas fases1/3. Carrinhos de mineração reutilizam a arte aprovada do guindaste.
 **Assets aprovados integrados às dez fases pelo controlador existente. Capturas e validação da integração em `evidence/ten-approved`.**
 As imagens desta página são assets isolados, não capturas de fases.
 
@@ -23,6 +24,8 @@ Os percentuais medem a jornada; o arquivo de posições resolve cada âncora no 
 Na fase2, fachadas ficam abaixo da laje e o bazar aparece na rua inferior. O portal da mineradora só aparece no final da fase9. Na fase10, guindastes, passarelas e cristais compõem o ambiente subterrâneo.
 
 ## Assets
+
+As imagens abaixo documentam os arquivos originais. Nas pontes e nos guindastes, o jogo usa o acabamento de `scripts/desert/t15d/industrial_finish.gd`: **sem bandeiras repetidas nas treliças, no pilar ou no carrinho**, conforme revisão do dono. Os sprites e recortes passam por `CityProps._house_sprite()` para manter esse acabamento. Ver [capturas atuais](../../../evidence/composicao-fases-tasks/industrial-sem-bandeiras/README.md); as bandeiras das fontes originais não representam a direção visual atual dessas peças.
 
 ### Casa residencial
 

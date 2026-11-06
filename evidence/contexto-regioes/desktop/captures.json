@@ -1,0 +1,56 @@
+[
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_01_regiao_02",
+		"on_floor": true,
+		"order": 1,
+		"physical_device": false,
+		"surface": 2
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_03_regiao_09",
+		"on_floor": true,
+		"order": 3,
+		"physical_device": false,
+		"surface": 9
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_04_regiao_09",
+		"on_floor": true,
+		"order": 4,
+		"physical_device": false,
+		"surface": 9
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_05_regiao_38",
+		"on_floor": true,
+		"order": 5,
+		"physical_device": false,
+		"surface": 38
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_07_regiao_09",
+		"on_floor": true,
+		"order": 7,
+		"physical_device": false,
+		"surface": 9
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_10_regiao_10",
+		"on_floor": true,
+		"order": 10,
+		"physical_device": false,
+		"surface": 10
+	}
+]

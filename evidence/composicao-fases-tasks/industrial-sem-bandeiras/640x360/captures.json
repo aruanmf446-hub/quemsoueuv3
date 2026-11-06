@@ -1,0 +1,14 @@
+[
+  {
+    "error": 0,
+    "fixture_teleport": true,
+    "name": "fase_07_lift_antes",
+    "on_floor": true
+  },
+  {
+    "error": 0,
+    "fixture_teleport": true,
+    "name": "fase_07_lift_depois",
+    "on_floor": true
+  }
+]

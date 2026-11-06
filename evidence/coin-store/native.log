@@ -1,0 +1,11 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS carteira oferece Comprar moedas
+PASS recarga mostra saldo da conta
+PASS pacotes ainda não definidos não ganham preços fictícios
+PASS voltar da seção interna retorna à carteira
+PASS entrada direta permite voltar à loja anterior
+PASS saldo insuficiente bloqueia compra do item
+PASS comprar moedas abre a recarga, separada da compra de emotes
+PASS abrir recarga não credita nem debita moedas
+COIN_STORE checks=8 failures=0

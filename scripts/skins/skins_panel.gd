@@ -681,6 +681,12 @@ func _preview_purchase() -> void:
 	confirm.disabled=true
 	PlayerUI.editor_control(confirm,true)
 	panel.add_child(confirm)
+	var coins := PlayerUI.button("COMPRAR MOEDAS",func()->void:
+		_close_purchase()
+		navigate_requested.emit("wallet",{"tab":"coins"}))
+	coins.name="BuyCoinsFromEmote"
+	PlayerUI.editor_control(coins)
+	panel.add_child(coins)
 	var close := PlayerUI.button("Cancelar",_close_purchase)
 	close.name="CloseEmotePurchase"
 	PlayerUI.editor_control(close)
@@ -702,7 +708,7 @@ func _preview_purchase() -> void:
 	dialog.set_meta("price",str(item.price_coins).to_int())
 	details.text=tr("Dancinha · %s moedas") % str(item.price_coins)
 	confirm.text=tr("COMPRAR POR %s MOEDAS") % str(item.price_coins)
-	var coins := str(services.emote_shop.data.coins).to_int()
+	var balance_coins := str(services.emote_shop.data.coins).to_int()
 	if item.owned:
 		feedback.text=tr("Este emote já está na sua conta.")
 		confirm.text=tr("ADQUIRIDO")
@@ -710,10 +716,10 @@ func _preview_purchase() -> void:
 		feedback.text=tr("100 moedas. Venda aguardando o movimento real; a prévia continua disponível.")
 	elif not _stage.character.has_animation(StringName(item.animation_key)):
 		feedback.text=tr("O movimento real ainda não está disponível nesta versão.")
-	elif coins<str(item.price_coins).to_int():
-		feedback.text=tr("Saldo: %s moedas. Você não tem moedas suficientes.") % str(coins)
+	elif balance_coins<str(item.price_coins).to_int():
+		feedback.text=tr("Saldo: %s moedas. Você não tem moedas suficientes.") % str(balance_coins)
 	else:
-		feedback.text=tr("Saldo: %s moedas. Confirme para adquirir este emote na sua conta.") % str(coins)
+		feedback.text=tr("Saldo: %s moedas. Confirme para adquirir este emote na sua conta.") % str(balance_coins)
 		confirm.disabled=false
 
 

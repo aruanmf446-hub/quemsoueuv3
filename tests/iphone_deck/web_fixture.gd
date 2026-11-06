@@ -20,7 +20,7 @@ func _run() -> void:
 	if mode=="community": fake=preload("res://tests/community_attribution/fake_game.gd").new()
 	elif mode=="claim": fake=preload("res://tests/community_claims/visual_game.gd").new()
 	elif mode=="report": fake=preload("res://tests/deck_runtime_corrections/fake_game.gd").new()
-	elif mode=="emotes": fake=preload("res://tests/skin_emotes/fake_game.gd").new()
+	elif mode in ["emotes","coins"]: fake=preload("res://tests/skin_emotes/fake_game.gd").new()
 	elif mode=="player_report": fake=preload("res://tests/player_reports/fake_game.gd").new()
 	else: fake=preload("res://tests/community_t27/fake_game.gd").new()
 	add_child(fake)
@@ -44,7 +44,12 @@ func _run() -> void:
 	services.friends.client=fake
 	services.emote_shop.client=fake
 	services.wallet.client=fake
-	if mode=="emotes":
+	if mode=="coins":
+		await services.wallet.refresh()
+		ui=load("res://scenes/player/wallet.tscn").instantiate()
+		add_child(ui)
+		ui.show_screen({"tab":"coins"})
+	elif mode=="emotes":
 		services.progression.state="success"
 		services.progression.data={"unlocked_character_ids":PlayerContracts.initial_ids(),"equipped_character_id":"cowboy"}
 		ui=load("res://scenes/skins/skins_panel.tscn").instantiate()

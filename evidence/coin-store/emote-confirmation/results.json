@@ -1,0 +1,18 @@
+[
+  {
+    "width": 844,
+    "height": 390,
+    "iphone": true,
+    "reactions": [
+      "lobby",
+      "victory",
+      "defeat"
+    ],
+    "dancePreview": true,
+    "purchasePrice": 100,
+    "purchaseConfirmed": true,
+    "controlsVisible": true,
+    "realThumbnails": 4,
+    "errors": []
+  }
+]

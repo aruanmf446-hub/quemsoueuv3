@@ -16,6 +16,7 @@ func setup(player_services: PlayerServices) -> void:
 
 func _ready() -> void:
 	name="NicknameOnboarding"
+	add_to_group("qse_web_input_modal")
 	PlayerUI.apply_theme(self)
 	mouse_filter=Control.MOUSE_FILTER_STOP
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -49,7 +50,7 @@ func _ready() -> void:
 	_entry.placeholder_text="Seu nickname (3 a 24 caracteres)"
 	_entry.max_length=24
 	_entry.custom_minimum_size.y=52
-	_entry.text=_suggest()
+	_entry.text=""
 	_entry.set_meta("qse_autocomplete","nickname")
 	PlayerUI.style_field(_entry)
 	content.add_child(_entry)
@@ -102,13 +103,7 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 func _suggest() -> String:
-	if services==null: return ""
-	var metadata: Variant=services.session.user.get("user_metadata",{})
-	if not metadata is Dictionary: return ""
-	var value: Variant=metadata.get("name",metadata.get("full_name",metadata.get("preferred_username","")))
-	if not value is String: return ""
-	var suggestion: String=value.strip_edges().left(24)
-	return suggestion if ProfileService.valid_nickname(suggestion) else ""
+	return ""
 
 func _retry() -> void:
 	if services==null or not services.session.authenticated(): return

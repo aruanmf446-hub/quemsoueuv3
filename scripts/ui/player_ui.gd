@@ -209,6 +209,14 @@ static func pill(text: String, kind: String) -> PanelContainer:
 
 
 ## Campo de texto e seletores (pesquisa, filtros).
+static func editor_control(node: Control, primary := false) -> void:
+	## Formulários de criação: altura de toque legível na base comum do jogo.
+	node.custom_minimum_size.y=maxf(node.custom_minimum_size.y,80)
+	node.add_theme_font_size_override("font_size",24)
+	if node is Button and not node is OptionButton: style_button(node,primary)
+	else: style_field(node)
+
+
 static func style_field(node: Control) -> void:
 	if node is OptionButton:
 		node.get_popup().canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_LINEAR_WITH_MIPMAPS

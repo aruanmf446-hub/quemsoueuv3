@@ -19,12 +19,14 @@ var _crops := {}
 var _format := "library"
 var _tabs := {}
 var _previews := {}
+var _preview_labels := {}
 var _slider: HSlider
 var _zoom_label: Label
 var _syncing := false
 
 
 func open(image: Image, crops: Dictionary = {}, use_formats: Dictionary = FORMATS) -> void:
+	add_to_group("qse_web_input_modal")
 	formats = use_formats
 	_image = image
 	_texture = ImageTexture.create_from_image(image)
@@ -71,7 +73,9 @@ func _build() -> void:
 	side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	side.add_child(PlayerUI.label("PRÉVIA", 13, PlayerUI.GOLD))
 	for key: String in formats:
-		side.add_child(PlayerUI.label(formats[key].title, 14, PlayerUI.MUTED))
+		var label := PlayerUI.label(formats[key].title,14,PlayerUI.MUTED)
+		side.add_child(label)
+		_preview_labels[key]=label
 		var preview := TextureRect.new()
 		preview.name = "Preview_" + key
 		preview.custom_minimum_size = Vector2(120, 120 / formats[key].aspect) if formats[key].aspect < 1.0 else Vector2(200, 200 / formats[key].aspect)
@@ -80,10 +84,13 @@ func _build() -> void:
 		preview.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 		side.add_child(preview)
 		_previews[key] = preview
-	side.add_child(PlayerUI.label("Arraste para posicionar. Roda do mouse, pinça ou +/− para ampliar. Reduza o zoom para mover a imagem inteira dentro da carta.", 13, PlayerUI.MUTED))
+	var hint := PlayerUI.label("Arraste para posicionar. Use a pinça ou +/− para ampliar." if UIScale.is_iphone() else "Arraste para posicionar. Roda do mouse, pinça ou +/− para ampliar. Reduza o zoom para mover a imagem inteira dentro da carta.",13,PlayerUI.MUTED)
+	hint.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	side.add_child(hint)
 	# Direções acessíveis (toque) — movem a imagem, não a moldura.
 	var pad := GridContainer.new()
 	pad.name = "NudgePad"
+	pad.visible=not UIScale.is_iphone()
 	pad.columns = 3
 	pad.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	for cell: Array in [["", Vector2.ZERO], ["↑", Vector2.UP], ["", Vector2.ZERO], ["←", Vector2.LEFT], ["◎", Vector2.INF], ["→", Vector2.RIGHT], ["", Vector2.ZERO], ["↓", Vector2.DOWN], ["", Vector2.ZERO]]:
@@ -156,6 +163,9 @@ func crops() -> Dictionary:
 
 func _select(key: String) -> void:
 	_format = key
+	for other: String in _previews:
+		_previews[other].visible=not UIScale.is_iphone() or other==key
+		_preview_labels[other].visible=not UIScale.is_iphone() or other==key
 	for other: String in _tabs: (_tabs[other] as Button).set_pressed_no_signal(other == key)
 	framer.setup(_texture, formats[key].aspect, _crops[key])
 	_crops[key] = framer.crop.duplicate()

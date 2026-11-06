@@ -1,0 +1,14 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS teclado de e-mail vira campo de e-mail
+PASS campo secreto vira senha
+PASS senha visível (olho) continua sendo senha
+PASS confirmação não mistura com a senha do login
+PASS campo comum continua texto
+PASS fora do navegador a ponte fica desligada
+PASS attach não faz nada no desktop
+PASS evento nativo atualiza o modelo do formulário
+PASS apagar e fechar o campo também emite a alteração
+PASS descrição preserva linhas no campo nativo
+PASS fechar textarea salva a última edição
+WEB_TEXT_TEST failures=0

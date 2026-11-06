@@ -111,6 +111,8 @@ function assemble(build) { execSync(`python3 tests/web_pwa/assemble.py ${site}/q
   check(await phone.evaluate(() => { try { window.qseNativeInput.remember(); return true; } catch (e) { return false; } }), 'pedido para salvar a senha não quebra');
   check(await phone.evaluate(() => { window.qseSetStoryPlaying(true); window.qseShowInstall(); return getComputedStyle(document.getElementById('qse-install')).display; }) === 'none', 'convite de instalação oculto durante a campanha');
   check(await phone.evaluate(() => { window.qseSetStoryPlaying(false); return getComputedStyle(document.getElementById('qse-install')).display; }) === 'block', 'convite de instalação restaurado ao sair da campanha');
+  check(await phone.evaluate(() => { window.qseSetInternalScreen(true); return getComputedStyle(document.getElementById('qse-install')).display; }) === 'none', 'convite de instalação não cobre formulários internos');
+  check(await phone.evaluate(() => { window.qseSetInternalScreen(false); return getComputedStyle(document.getElementById('qse-install')).display; }) === 'block', 'convite de instalação continua disponível no lobby');
   await browser.close();
   server.kill();
   console.log(`PWA_TEST checks=${checks} failures=${failures}`);

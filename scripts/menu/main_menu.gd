@@ -357,6 +357,8 @@ func _refresh_friends() -> void:
 
 
 func _route_changed(route: String) -> void:
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("window.qseSetInternalScreen && window.qseSetInternalScreen("+("false" if route.is_empty() else "true")+")")
 	var hero_active := is_instance_valid(_hero_carousel) and bool(_hero_carousel.get("using_art"))
 	var show_legacy_stage := route.is_empty() and not hero_active
 	$LobbyArea/Stage/Viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS if show_legacy_stage else SubViewport.UPDATE_DISABLED

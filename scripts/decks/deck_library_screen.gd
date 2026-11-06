@@ -25,6 +25,7 @@ var _draft: Dictionary = {}
 var _drafts: DeckDrafts
 var _picker: ImagePicker
 var _pending_card := -1
+var _editor_details_open := false
 var _editor_overlay: CardFrameEditor
 ## Uma busca no servidor por visita à aba (evita repetir a cada redesenho).
 var _pulled_decks := false
@@ -157,6 +158,10 @@ func _layout_changed() -> void:
 		elif is_instance_valid(_grid): _fit_grid()
 
 func _page(title: String, view: String) -> void:
+	var footer := get_node_or_null("Margin/Column/DeckEditorActions")
+	if footer!=null:
+		footer.get_parent().remove_child(footer)
+		footer.queue_free()
 	_view = view
 	_grid = null
 	PlayerUI.clear(body)
@@ -1446,65 +1451,83 @@ func _render_editor() -> void:
 		_reveal()
 		return
 	_page("Criar deck" if str(_draft.name).is_empty() else str(_draft.name), "editor")
-	var back: Button = $Margin/Column/Header/Back
-	back.text = tr("‹ Meus Decks")
-	var form := PlayerUI.split(body)
-	form.name = "DeckForm"
-	var left := PlayerUI.column(form)
-	left.add_child(_text("NOME", 12, PlayerUI.GOLD))
-	var name_field := _field(str(_draft.name), "Nome do deck", DeckDrafts.NAME_MAX)
-	name_field.name = "DeckName"
-	name_field.text_changed.connect(func(value: String) -> void: _draft.name = value)
-	left.add_child(name_field)
-	left.add_child(_text("DESCRIÇÃO", 12, PlayerUI.GOLD))
+	$Margin/Column/Header/Back.text=tr("‹ Meus Decks")
+	body.add_theme_constant_override("separation",12)
+	var form := PlayerUI.row(body)
+	form.name="DeckForm"
+	var identity := PlayerUI.column(form)
+	identity.add_child(_text("NOME DO DECK",20,PlayerUI.MUTED))
+	var name_field := _field(str(_draft.name),"Dê um nome ao seu deck",DeckDrafts.NAME_MAX)
+	name_field.name="DeckName"
+	PlayerUI.editor_control(name_field)
+	name_field.text_changed.connect(func(value: String)->void:_draft.name=value)
+	identity.add_child(name_field)
+	var category := PlayerUI.column(form)
+	category.add_child(_text("CATEGORIA",20,PlayerUI.MUTED))
+	var select := _options("DeckCategory",DeckDrafts.CATEGORIES,DeckDrafts.CATEGORIES,"category")
+	PlayerUI.editor_control(select)
+	category.add_child(select)
+	body.add_child(_text("DESCRIÇÃO · OPCIONAL",20,PlayerUI.MUTED))
 	var description := TextEdit.new()
-	description.name = "DeckDescription"
-	description.text = str(_draft.description)
-	description.placeholder_text = tr("Do que trata este deck?")
-	description.custom_minimum_size.y = 90
-	description.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
-	PlayerUI.style_field(description)
-	description.text_changed.connect(func() -> void: _draft.description = description.text.left(DeckDrafts.DESCRIPTION_MAX))
-	left.add_child(description)
-	var right := PlayerUI.column(form)
-	right.add_child(_text("CATEGORIA", 12, PlayerUI.GOLD))
-	right.add_child(_options("DeckCategory", DeckDrafts.CATEGORIES, DeckDrafts.CATEGORIES, "category"))
-	right.add_child(_text("VISIBILIDADE", 12, PlayerUI.GOLD))
-	right.add_child(_options("DeckVisibility", ["Privado", "Não listado", "Público"], DeckDrafts.VISIBILITY, "visibility"))
-	right.add_child(_cover_section())
-	right.add_child(_text("REFERÊNCIA VISUAL",12,PlayerUI.GOLD))
+	description.name="DeckDescription"
+	description.text=str(_draft.description)
+	description.placeholder_text=tr("Conte em poucas palavras o tema do deck")
+	description.wrap_mode=TextEdit.LINE_WRAPPING_BOUNDARY
+	description.set_meta("qse_max_length",DeckDrafts.DESCRIPTION_MAX)
+	PlayerUI.editor_control(description)
+	description.text_changed.connect(func()->void:_draft.description=description.text.left(DeckDrafts.DESCRIPTION_MAX))
+	body.add_child(description)
+	WebTextBridge.attach(description)
+	var details := _action(("▾" if _editor_details_open else "▸")+" Capa e referência visual · opcional",func()->void:
+		_editor_details_open=not _editor_details_open
+		_render_editor())
+	details.name="DeckDetails"
+	PlayerUI.editor_control(details)
+	body.add_child(details)
+	var extra := PlayerUI.column(body)
+	extra.name="DeckOptionalDetails"
+	extra.visible=_editor_details_open
+	var cover := _cover_section()
+	extra.add_child(cover)
+	extra.add_child(_text("VISIBILIDADE",20,PlayerUI.MUTED))
+	extra.add_child(_options("DeckVisibility",["Privado","Não listado","Público"],DeckDrafts.VISIBILITY,"visibility"))
+	extra.add_child(_text("REFERÊNCIA VISUAL",20,PlayerUI.MUTED))
 	var references := StylePrompt.references()
-	right.add_child(_options("DeckStyleReference",references.map(func(item: Dictionary)->String:return str(item.name)),references.map(func(item: Dictionary)->String:return str(item.id)),"style_reference"))
+	extra.add_child(_options("DeckStyleReference",references.map(func(item: Dictionary)->String:return str(item.name)),references.map(func(item: Dictionary)->String:return str(item.id)),"style_reference"))
 	var prompt := _action("Copiar prompt dos oficiais",_copy_style_prompt)
 	prompt.name="CopyDeckStylePrompt"
-	right.add_child(prompt)
-	var free := _text("Criar é gratuito. Adicione suas imagens; a publicação passa por revisão manual.",14,PlayerUI.MUTED)
-	free.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	right.add_child(free)
-	body.add_child(_text("CARTAS  ·  %d (mínimo %d, máximo %d)" % [_draft.cards.size(), Catalog.MIN_CARDS, Catalog.MAX_CARDS], 12, PlayerUI.GOLD))
+	extra.add_child(prompt)
+	for node: Control in extra.find_children("*","Control",true,false):
+		if node is BaseButton or node is LineEdit: PlayerUI.editor_control(node)
+	body.add_child(_text("CARTAS · %d de %d" % [_draft.cards.size(),Catalog.MAX_CARDS],22,PlayerUI.GOLD))
+	if _draft.cards.is_empty():
+		var hint := _text("Adicione as imagens e dê um nome a cada carta. Mínimo de 5 cartas para enviar à revisão gratuita.",20,PlayerUI.MUTED)
+		hint.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+		body.add_child(hint)
 	var list := PlayerUI.column(body)
-	list.name = "DraftCards"
+	list.name="DraftCards"
 	for i in range(_draft.cards.size()): list.add_child(_card_row(i))
-	var add := _action("+  Adicionar carta", func() -> void:
-		if _draft.cards.size() >= Catalog.MAX_CARDS:
-			banner.show_state("error", "O deck já tem o máximo de %d cartas." % Catalog.MAX_CARDS)
-			return
-		_pending_card = -1
+	var actions := PlayerUI.row($Margin/Column)
+	actions.name="DeckEditorActions"
+	actions.size_flags_vertical=Control.SIZE_SHRINK_END
+	var add := _action("+ Adicionar imagem",func()->void:
+		_pending_card=-1
 		_picker.pick())
-	add.name = "AddCard"
-	add.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	add.custom_minimum_size.x = 220
-	body.add_child(add)
-	var actions := PlayerUI.row(body)
-	var save := _action("Salvar rascunho", _save_draft)
-	save.name = "SaveDraft"
+	add.name="AddCard"
+	add.disabled=_draft.cards.size()>=Catalog.MAX_CARDS
+	actions.add_child(add)
+	_picker.bind_button(add,func()->void:_pending_card=-1)
+	var save := _action("Salvar rascunho",_save_draft)
+	save.name="SaveDraft"
 	actions.add_child(save)
-	var review := _action("Revisar e publicar  →", func() -> void:
+	var review := _action("Revisar deck →",func()->void:
 		await _save_draft()
 		_render_review())
-	review.name = "ReviewDeck"
-	PlayerUI.style_button(review, true)
+	review.name="ReviewDeck"
 	actions.add_child(review)
+	for button: Button in [add,save,review]:
+		button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		PlayerUI.editor_control(button,button==review)
 	_reveal()
 
 
@@ -1534,13 +1557,14 @@ func _options(node_name: String, labels: Array, values: Array, key: String) -> O
 
 func _card_row(index: int) -> Control:
 	var card: Dictionary = _draft.cards[index]
-	var row := HBoxContainer.new()
-	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.name = "DraftCard_%d" % index
+	var wrapper := VBoxContainer.new()
+	wrapper.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	wrapper.name="DraftCard_%d" % index
+	var row := PlayerUI.row(wrapper)
 	row.add_theme_constant_override("separation", 10)
 	var thumb := TextureRect.new()
 	thumb.name = "Thumb"
-	thumb.custom_minimum_size = Vector2(50, 70)
+	thumb.custom_minimum_size = Vector2(120, 168)
 	thumb.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	thumb.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	var preview := _store().preview_path(str(_draft.id), card)
@@ -1552,25 +1576,27 @@ func _card_row(index: int) -> Control:
 	fields.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var name_field := _field(str(card.get("name", "")), "Nome da carta", DeckDrafts.CARD_NAME_MAX)
 	name_field.name = "CardName"
+	PlayerUI.editor_control(name_field)
 	name_field.text_changed.connect(func(value: String) -> void: card.name = value)
 	fields.add_child(name_field)
 	var description := _field(str(card.get("description", "")), "Descrição (opcional)", DeckDrafts.CARD_DESCRIPTION_MAX)
 	description.name = "CardDescription"
+	PlayerUI.editor_control(description)
 	description.text_changed.connect(func(value: String) -> void: card.description = value)
 	fields.add_child(description)
-	var tools := PlayerUI.column(row)
-	tools.size_flags_horizontal = Control.SIZE_SHRINK_END
-	tools.custom_minimum_size.x = 170
+	var tools := PlayerUI.row(wrapper)
+	tools.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tools.custom_minimum_size.x = 0
 	tools.add_theme_constant_override("separation", 6)
 	var arrows := PlayerUI.row(tools)
 	var up := _action("↑", _move_card.bind(index, -1))
 	up.name = "MoveUp"
-	up.custom_minimum_size.x = 44
+	up.custom_minimum_size.x = 80
 	up.disabled = index == 0
 	arrows.add_child(up)
 	var down := _action("↓", _move_card.bind(index, 1))
 	down.name = "MoveDown"
-	down.custom_minimum_size.x = 44
+	down.custom_minimum_size.x = 80
 	down.disabled = index == _draft.cards.size() - 1
 	arrows.add_child(down)
 	var frame := _action("Enquadrar", _open_framer.bind(index))
@@ -1582,12 +1608,14 @@ func _card_row(index: int) -> Control:
 		_picker.pick())
 	replace.name = "ReplaceImage"
 	tools.add_child(replace)
+	_picker.bind_button(replace,func()->void:_pending_card=index)
 	var remove := _action("Remover", func() -> void:
 		_draft.cards.remove_at(index)
 		_render_editor())
 	remove.name = "RemoveCard"
 	tools.add_child(remove)
-	return row
+	for button: Button in tools.find_children("*","Button",true,false): PlayerUI.editor_control(button)
+	return wrapper
 
 
 func _move_card(index: int, direction: int) -> void:
@@ -1635,6 +1663,7 @@ func _cover_section() -> Control:
 		_picker.pick())
 	upload.name = "CoverUpload"
 	row.add_child(upload)
+	_picker.bind_button(upload,func()->void:_pending_card=-2)
 	var cards: Array = _draft.get("cards", [])
 	var pick := OptionButton.new()
 	pick.name = "CoverCardPick"
@@ -1712,7 +1741,8 @@ func _open_framer(index: int, image: Image = null) -> void:
 		_store().store_previews(str(_draft.id), card, image)
 		_close_framer()
 		await _save_draft()
-		_render_editor())
+		_render_editor()
+		_show_editor_card.call_deferred(index))
 	_editor_overlay.cancelled.connect(func() -> void:
 		_close_framer()
 		_render_editor())
@@ -1721,6 +1751,12 @@ func _open_framer(index: int, image: Image = null) -> void:
 func _close_framer() -> void:
 	if is_instance_valid(_editor_overlay): _editor_overlay.queue_free()
 	_editor_overlay = null
+
+func _show_editor_card(index: int) -> void:
+	await get_tree().process_frame
+	if _view!="editor" or not is_inside_tree(): return
+	var card := find_child("DraftCard_%d" % index,true,false) as Control
+	if card!=null: ($Margin/Column/Scroll as ScrollContainer).ensure_control_visible(card)
 
 
 func _save_draft() -> void:

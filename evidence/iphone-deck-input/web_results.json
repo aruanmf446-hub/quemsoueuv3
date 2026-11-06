@@ -1,0 +1,1424 @@
+{
+  "errors": [],
+  "nicknameInitial": {
+    "cards": 0,
+    "controls": [
+      {
+        "name": "NicknameInput",
+        "rect": [
+          469,
+          289,
+          437,
+          52
+        ]
+      },
+      {
+        "name": "ConfirmNickname",
+        "rect": [
+          469,
+          387,
+          437,
+          64
+        ]
+      },
+      {
+        "name": "LeaveNicknameAccount",
+        "rect": [
+          469,
+          462,
+          437,
+          64
+        ]
+      }
+    ],
+    "fields": {
+      "NicknameInput": ""
+    },
+    "labels": [
+      "BEM-VINDO AO QUEM SOU EU!",
+      "Como quer ser chamado?",
+      "Escolha um nickname único. Ele será definitivo e aparecerá nas partidas.",
+      "Carregando seu perfil…"
+    ],
+    "sequence": 2,
+    "size": [
+      1376,
+      675
+    ]
+  },
+  "nicknameTyped": {
+    "cards": 0,
+    "controls": [
+      {
+        "name": "NicknameInput",
+        "rect": [
+          469,
+          289,
+          437,
+          52
+        ]
+      },
+      {
+        "name": "ConfirmNickname",
+        "rect": [
+          469,
+          387,
+          437,
+          64
+        ]
+      },
+      {
+        "name": "LeaveNicknameAccount",
+        "rect": [
+          469,
+          462,
+          437,
+          64
+        ]
+      }
+    ],
+    "fields": {
+      "NicknameInput": "NovoNick"
+    },
+    "labels": [
+      "BEM-VINDO AO QUEM SOU EU!",
+      "Como quer ser chamado?",
+      "Escolha um nickname único. Ele será definitivo e aparecerá nas partidas.",
+      ""
+    ],
+    "sequence": 3,
+    "size": [
+      1376,
+      675
+    ]
+  },
+  "nicknameTypedDOM": {
+    "tag": "CANVAS",
+    "trace": [
+      [
+        "dom",
+        "NovoNick",
+        "insertText",
+        false
+      ]
+    ],
+    "regions": [
+      "f55448700356:text"
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "value": "",
+        "on": "qse-field"
+      },
+      {
+        "tag": "INPUT",
+        "value": "",
+        "on": "qse-field"
+      },
+      {
+        "tag": "INPUT",
+        "value": "NovoNick",
+        "on": "qse-field qse-on"
+      }
+    ]
+  },
+  "nicknameDeleted": {
+    "cards": 0,
+    "controls": [
+      {
+        "name": "NicknameInput",
+        "rect": [
+          469,
+          289,
+          437,
+          52
+        ]
+      },
+      {
+        "name": "ConfirmNickname",
+        "rect": [
+          469,
+          387,
+          437,
+          64
+        ]
+      },
+      {
+        "name": "LeaveNicknameAccount",
+        "rect": [
+          469,
+          462,
+          437,
+          64
+        ]
+      }
+    ],
+    "fields": {
+      "NicknameInput": ""
+    },
+    "labels": [
+      "BEM-VINDO AO QUEM SOU EU!",
+      "Como quer ser chamado?",
+      "Escolha um nickname único. Ele será definitivo e aparecerá nas partidas.",
+      ""
+    ],
+    "sequence": 4,
+    "size": [
+      1376,
+      675
+    ]
+  },
+  "nicknameKeys": {
+    "cards": 0,
+    "controls": [
+      {
+        "name": "NicknameInput",
+        "rect": [
+          469,
+          289,
+          437,
+          52
+        ]
+      },
+      {
+        "name": "ConfirmNickname",
+        "rect": [
+          469,
+          387,
+          437,
+          64
+        ]
+      },
+      {
+        "name": "LeaveNicknameAccount",
+        "rect": [
+          469,
+          462,
+          437,
+          64
+        ]
+      }
+    ],
+    "fields": {
+      "NicknameInput": "Digitado"
+    },
+    "labels": [
+      "BEM-VINDO AO QUEM SOU EU!",
+      "Como quer ser chamado?",
+      "Escolha um nickname único. Ele será definitivo e aparecerá nas partidas.",
+      ""
+    ],
+    "sequence": 5,
+    "size": [
+      1376,
+      675
+    ]
+  },
+  "nicknameBackspace": {
+    "cards": 0,
+    "controls": [
+      {
+        "name": "NicknameInput",
+        "rect": [
+          469,
+          289,
+          437,
+          52
+        ]
+      },
+      {
+        "name": "ConfirmNickname",
+        "rect": [
+          469,
+          387,
+          437,
+          64
+        ]
+      },
+      {
+        "name": "LeaveNicknameAccount",
+        "rect": [
+          469,
+          462,
+          437,
+          64
+        ]
+      }
+    ],
+    "fields": {
+      "NicknameInput": "Digita"
+    },
+    "labels": [
+      "BEM-VINDO AO QUEM SOU EU!",
+      "Como quer ser chamado?",
+      "Escolha um nickname único. Ele será definitivo e aparecerá nas partidas.",
+      ""
+    ],
+    "sequence": 6,
+    "size": [
+      1376,
+      675
+    ]
+  },
+  "deck": {
+    "card_names": [],
+    "cards": 0,
+    "category": "",
+    "controls": [
+      {
+        "name": "Back",
+        "rect": [
+          40,
+          28,
+          226,
+          68
+        ]
+      },
+      {
+        "name": "DeckName",
+        "rect": [
+          40,
+          156,
+          637,
+          80
+        ]
+      },
+      {
+        "name": "DeckCategory",
+        "rect": [
+          691,
+          156,
+          637,
+          80
+        ]
+      },
+      {
+        "name": "DeckDescription",
+        "rect": [
+          40,
+          284,
+          1288,
+          80
+        ]
+      },
+      {
+        "name": "DeckDetails",
+        "rect": [
+          40,
+          376,
+          1288,
+          80
+        ]
+      },
+      {
+        "name": "AddCard",
+        "rect": [
+          40,
+          567,
+          422,
+          80
+        ]
+      },
+      {
+        "name": "SaveDraft",
+        "rect": [
+          476,
+          567,
+          423,
+          80
+        ]
+      },
+      {
+        "name": "ReviewDeck",
+        "rect": [
+          913,
+          567,
+          423,
+          80
+        ]
+      }
+    ],
+    "cover": {},
+    "description": "",
+    "fields": {
+      "DeckDescription": "",
+      "DeckName": ""
+    },
+    "labels": [
+      "Criar deck",
+      "NOME DO DECK",
+      "CATEGORIA",
+      "DESCRIÇÃO · OPCIONAL",
+      "CARTAS · 0 de 30",
+      "Adicione as imagens e dê um nome a cada carta. Mínimo de 5 cartas para enviar à revisão gratuita."
+    ],
+    "name": "",
+    "sequence": 3,
+    "size": [
+      1376,
+      675
+    ]
+  },
+  "fileChooser": true,
+  "afterFile": {
+    "card_names": [
+      ""
+    ],
+    "cards": 1,
+    "category": "",
+    "controls": [
+      {
+        "name": "Back",
+        "rect": [
+          40,
+          28,
+          226,
+          68
+        ]
+      },
+      {
+        "name": "DeckName",
+        "rect": [
+          40,
+          156,
+          637,
+          80
+        ]
+      },
+      {
+        "name": "DeckCategory",
+        "rect": [
+          691,
+          156,
+          637,
+          80
+        ]
+      },
+      {
+        "name": "DeckDescription",
+        "rect": [
+          40,
+          284,
+          1288,
+          80
+        ]
+      },
+      {
+        "name": "DeckDetails",
+        "rect": [
+          40,
+          376,
+          1288,
+          80
+        ]
+      },
+      {
+        "name": "AddCard",
+        "rect": [
+          40,
+          567,
+          422,
+          80
+        ]
+      },
+      {
+        "name": "SaveDraft",
+        "rect": [
+          476,
+          567,
+          423,
+          80
+        ]
+      },
+      {
+        "name": "ReviewDeck",
+        "rect": [
+          913,
+          567,
+          423,
+          80
+        ]
+      },
+      {
+        "name": "Format_library",
+        "rect": [
+          744,
+          18,
+          275,
+          64
+        ]
+      },
+      {
+        "name": "Format_duel",
+        "rect": [
+          1033,
+          18,
+          325,
+          64
+        ]
+      },
+      {
+        "name": "ZoomOut",
+        "rect": [
+          18,
+          593,
+          144,
+          64
+        ]
+      },
+      {
+        "name": "ZoomIn",
+        "rect": [
+          410,
+          593,
+          144,
+          64
+        ]
+      },
+      {
+        "name": "ResetFrame",
+        "rect": [
+          707,
+          593,
+          167,
+          64
+        ]
+      },
+      {
+        "name": "CancelFrame",
+        "rect": [
+          1027,
+          593,
+          147,
+          64
+        ]
+      },
+      {
+        "name": "ConfirmFrame",
+        "rect": [
+          1188,
+          593,
+          170,
+          64
+        ]
+      }
+    ],
+    "cover": {},
+    "description": "",
+    "fields": {
+      "DeckDescription": "",
+      "DeckName": ""
+    },
+    "labels": [
+      "Criar deck",
+      "NOME DO DECK",
+      "CATEGORIA",
+      "DESCRIÇÃO · OPCIONAL",
+      "CARTAS · 0 de 30",
+      "Adicione as imagens e dê um nome a cada carta. Mínimo de 5 cartas para enviar à revisão gratuita.",
+      "Ajustar enquadramento",
+      "PRÉVIA",
+      "Biblioteca · retrato",
+      "Arraste para posicionar. Use a pinça ou +/− para ampliar.",
+      "100%"
+    ],
+    "name": "",
+    "sequence": 4,
+    "size": [
+      1376,
+      675
+    ]
+  },
+  "cardEdit": {
+    "card_names": [
+      "ABxCDE"
+    ],
+    "cards": 1,
+    "category": "",
+    "controls": [
+      {
+        "name": "Back",
+        "rect": [
+          40,
+          28,
+          245,
+          68
+        ]
+      },
+      {
+        "name": "DeckName",
+        "rect": [
+          40,
+          -66,
+          637,
+          80
+        ]
+      },
+      {
+        "name": "DeckCategory",
+        "rect": [
+          691,
+          -66,
+          637,
+          80
+        ]
+      },
+      {
+        "name": "DeckDescription",
+        "rect": [
+          40,
+          62,
+          1288,
+          80
+        ]
+      },
+      {
+        "name": "DeckDetails",
+        "rect": [
+          40,
+          154,
+          1288,
+          80
+        ]
+      },
+      {
+        "name": "CardName",
+        "rect": [
+          170,
+          285,
+          1158,
+          80
+        ]
+      },
+      {
+        "name": "CardDescription",
+        "rect": [
+          170,
+          379,
+          1158,
+          80
+        ]
+      },
+      {
+        "name": "MoveUp",
+        "rect": [
+          40,
+          463,
+          80,
+          80
+        ]
+      },
+      {
+        "name": "MoveDown",
+        "rect": [
+          134,
+          463,
+          80,
+          80
+        ]
+      },
+      {
+        "name": "FrameCard",
+        "rect": [
+          783,
+          463,
+          166,
+          80
+        ]
+      },
+      {
+        "name": "ReplaceImage",
+        "rect": [
+          955,
+          463,
+          219,
+          80
+        ]
+      },
+      {
+        "name": "RemoveCard",
+        "rect": [
+          1180,
+          463,
+          148,
+          80
+        ]
+      },
+      {
+        "name": "AddCard",
+        "rect": [
+          40,
+          567,
+          422,
+          80
+        ]
+      },
+      {
+        "name": "SaveDraft",
+        "rect": [
+          476,
+          567,
+          423,
+          80
+        ]
+      },
+      {
+        "name": "ReviewDeck",
+        "rect": [
+          913,
+          567,
+          423,
+          80
+        ]
+      }
+    ],
+    "cover": {},
+    "description": "",
+    "fields": {
+      "CardDescription": "",
+      "CardName": "ABxCDE",
+      "DeckDescription": "",
+      "DeckName": ""
+    },
+    "labels": [
+      "Criar deck",
+      "NOME DO DECK",
+      "CATEGORIA",
+      "DESCRIÇÃO · OPCIONAL",
+      "CARTAS · 1 de 30"
+    ],
+    "name": "",
+    "sequence": 8,
+    "size": [
+      1376,
+      675
+    ]
+  },
+  "description": {
+    "card_names": [
+      "ABxCDE"
+    ],
+    "cards": 1,
+    "category": "",
+    "controls": [
+      {
+        "name": "Back",
+        "rect": [
+          40,
+          28,
+          245,
+          68
+        ]
+      },
+      {
+        "name": "DeckName",
+        "rect": [
+          40,
+          -8,
+          637,
+          80
+        ]
+      },
+      {
+        "name": "DeckCategory",
+        "rect": [
+          691,
+          -8,
+          637,
+          80
+        ]
+      },
+      {
+        "name": "DeckDescription",
+        "rect": [
+          40,
+          120,
+          1288,
+          80
+        ]
+      },
+      {
+        "name": "DeckDetails",
+        "rect": [
+          40,
+          212,
+          1288,
+          80
+        ]
+      },
+      {
+        "name": "CardName",
+        "rect": [
+          170,
+          343,
+          1158,
+          80
+        ]
+      },
+      {
+        "name": "CardDescription",
+        "rect": [
+          170,
+          437,
+          1158,
+          80
+        ]
+      },
+      {
+        "name": "MoveUp",
+        "rect": [
+          40,
+          521,
+          80,
+          80
+        ]
+      },
+      {
+        "name": "MoveDown",
+        "rect": [
+          134,
+          521,
+          80,
+          80
+        ]
+      },
+      {
+        "name": "FrameCard",
+        "rect": [
+          783,
+          521,
+          166,
+          80
+        ]
+      },
+      {
+        "name": "ReplaceImage",
+        "rect": [
+          955,
+          521,
+          219,
+          80
+        ]
+      },
+      {
+        "name": "RemoveCard",
+        "rect": [
+          1180,
+          521,
+          148,
+          80
+        ]
+      },
+      {
+        "name": "AddCard",
+        "rect": [
+          40,
+          567,
+          422,
+          80
+        ]
+      },
+      {
+        "name": "SaveDraft",
+        "rect": [
+          476,
+          567,
+          423,
+          80
+        ]
+      },
+      {
+        "name": "ReviewDeck",
+        "rect": [
+          913,
+          567,
+          423,
+          80
+        ]
+      }
+    ],
+    "cover": {},
+    "description": "Primeira\nSegunda",
+    "fields": {
+      "CardDescription": "",
+      "CardName": "ABxCDE",
+      "DeckDescription": "Primeira\nSegunda",
+      "DeckName": ""
+    },
+    "labels": [
+      "Criar deck",
+      "NOME DO DECK",
+      "CATEGORIA",
+      "DESCRIÇÃO · OPCIONAL",
+      "CARTAS · 1 de 30"
+    ],
+    "name": "",
+    "sequence": 11,
+    "size": [
+      1376,
+      675
+    ]
+  },
+  "descriptionBlur": {
+    "card_names": [
+      "ABxCDE"
+    ],
+    "cards": 1,
+    "category": "",
+    "controls": [
+      {
+        "name": "Back",
+        "rect": [
+          40,
+          28,
+          245,
+          68
+        ]
+      },
+      {
+        "name": "DeckName",
+        "rect": [
+          40,
+          -8,
+          637,
+          80
+        ]
+      },
+      {
+        "name": "DeckCategory",
+        "rect": [
+          691,
+          -8,
+          637,
+          80
+        ]
+      },
+      {
+        "name": "DeckDescription",
+        "rect": [
+          40,
+          120,
+          1288,
+          80
+        ]
+      },
+      {
+        "name": "DeckDetails",
+        "rect": [
+          40,
+          212,
+          1288,
+          80
+        ]
+      },
+      {
+        "name": "CardName",
+        "rect": [
+          170,
+          343,
+          1158,
+          80
+        ]
+      },
+      {
+        "name": "CardDescription",
+        "rect": [
+          170,
+          437,
+          1158,
+          80
+        ]
+      },
+      {
+        "name": "MoveUp",
+        "rect": [
+          40,
+          521,
+          80,
+          80
+        ]
+      },
+      {
+        "name": "MoveDown",
+        "rect": [
+          134,
+          521,
+          80,
+          80
+        ]
+      },
+      {
+        "name": "FrameCard",
+        "rect": [
+          783,
+          521,
+          166,
+          80
+        ]
+      },
+      {
+        "name": "ReplaceImage",
+        "rect": [
+          955,
+          521,
+          219,
+          80
+        ]
+      },
+      {
+        "name": "RemoveCard",
+        "rect": [
+          1180,
+          521,
+          148,
+          80
+        ]
+      },
+      {
+        "name": "AddCard",
+        "rect": [
+          40,
+          567,
+          422,
+          80
+        ]
+      },
+      {
+        "name": "SaveDraft",
+        "rect": [
+          476,
+          567,
+          423,
+          80
+        ]
+      },
+      {
+        "name": "ReviewDeck",
+        "rect": [
+          913,
+          567,
+          423,
+          80
+        ]
+      }
+    ],
+    "cover": {},
+    "description": "Alterado ao fechar",
+    "fields": {
+      "CardDescription": "",
+      "CardName": "ABxCDE",
+      "DeckDescription": "Alterado ao fechar",
+      "DeckName": ""
+    },
+    "labels": [
+      "Criar deck",
+      "NOME DO DECK",
+      "CATEGORIA",
+      "DESCRIÇÃO · OPCIONAL",
+      "CARTAS · 1 de 30"
+    ],
+    "name": "",
+    "sequence": 12,
+    "size": [
+      1376,
+      675
+    ]
+  },
+  "name": {
+    "card_names": [
+      "ABxCDE"
+    ],
+    "cards": 1,
+    "category": "",
+    "controls": [
+      {
+        "name": "Back",
+        "rect": [
+          40,
+          28,
+          245,
+          68
+        ]
+      },
+      {
+        "name": "DeckName",
+        "rect": [
+          40,
+          120,
+          637,
+          80
+        ]
+      },
+      {
+        "name": "DeckCategory",
+        "rect": [
+          691,
+          120,
+          637,
+          80
+        ]
+      },
+      {
+        "name": "DeckDescription",
+        "rect": [
+          40,
+          248,
+          1288,
+          80
+        ]
+      },
+      {
+        "name": "DeckDetails",
+        "rect": [
+          40,
+          340,
+          1288,
+          80
+        ]
+      },
+      {
+        "name": "CardName",
+        "rect": [
+          170,
+          471,
+          1158,
+          80
+        ]
+      },
+      {
+        "name": "CardDescription",
+        "rect": [
+          170,
+          565,
+          1158,
+          80
+        ]
+      },
+      {
+        "name": "MoveUp",
+        "rect": [
+          40,
+          649,
+          80,
+          80
+        ]
+      },
+      {
+        "name": "MoveDown",
+        "rect": [
+          134,
+          649,
+          80,
+          80
+        ]
+      },
+      {
+        "name": "FrameCard",
+        "rect": [
+          783,
+          649,
+          166,
+          80
+        ]
+      },
+      {
+        "name": "ReplaceImage",
+        "rect": [
+          955,
+          649,
+          219,
+          80
+        ]
+      },
+      {
+        "name": "RemoveCard",
+        "rect": [
+          1180,
+          649,
+          148,
+          80
+        ]
+      },
+      {
+        "name": "AddCard",
+        "rect": [
+          40,
+          567,
+          422,
+          80
+        ]
+      },
+      {
+        "name": "SaveDraft",
+        "rect": [
+          476,
+          567,
+          423,
+          80
+        ]
+      },
+      {
+        "name": "ReviewDeck",
+        "rect": [
+          913,
+          567,
+          423,
+          80
+        ]
+      }
+    ],
+    "cover": {},
+    "description": "Alterado ao fechar",
+    "fields": {
+      "CardDescription": "",
+      "CardName": "ABxCDE",
+      "DeckDescription": "Alterado ao fechar",
+      "DeckName": "Meu deck mobile"
+    },
+    "labels": [
+      "Criar deck",
+      "NOME DO DECK",
+      "CATEGORIA",
+      "DESCRIÇÃO · OPCIONAL",
+      "CARTAS · 1 de 30"
+    ],
+    "name": "Meu deck mobile",
+    "sequence": 15,
+    "size": [
+      1376,
+      675
+    ]
+  },
+  "cover": {
+    "card_names": [
+      "ABxCDE"
+    ],
+    "cards": 1,
+    "category": "",
+    "controls": [
+      {
+        "name": "Back",
+        "rect": [
+          40,
+          28,
+          245,
+          68
+        ]
+      },
+      {
+        "name": "DeckName",
+        "rect": [
+          40,
+          -66,
+          637,
+          80
+        ]
+      },
+      {
+        "name": "DeckCategory",
+        "rect": [
+          691,
+          -66,
+          637,
+          80
+        ]
+      },
+      {
+        "name": "DeckDescription",
+        "rect": [
+          40,
+          62,
+          1288,
+          80
+        ]
+      },
+      {
+        "name": "DeckDetails",
+        "rect": [
+          40,
+          154,
+          1288,
+          80
+        ]
+      },
+      {
+        "name": "CoverAuto",
+        "rect": [
+          40,
+          462,
+          178,
+          80
+        ]
+      },
+      {
+        "name": "CoverUpload",
+        "rect": [
+          224,
+          462,
+          222,
+          80
+        ]
+      },
+      {
+        "name": "CoverCardPick",
+        "rect": [
+          40,
+          548,
+          1288,
+          80
+        ]
+      },
+      {
+        "name": "DeckVisibility",
+        "rect": [
+          40,
+          680,
+          1288,
+          80
+        ]
+      },
+      {
+        "name": "DeckStyleReference",
+        "rect": [
+          40,
+          812,
+          1288,
+          80
+        ]
+      },
+      {
+        "name": "CopyDeckStylePrompt",
+        "rect": [
+          40,
+          906,
+          1288,
+          80
+        ]
+      },
+      {
+        "name": "CardName",
+        "rect": [
+          170,
+          1037,
+          1158,
+          80
+        ]
+      },
+      {
+        "name": "CardDescription",
+        "rect": [
+          170,
+          1131,
+          1158,
+          80
+        ]
+      },
+      {
+        "name": "MoveUp",
+        "rect": [
+          40,
+          1215,
+          80,
+          80
+        ]
+      },
+      {
+        "name": "MoveDown",
+        "rect": [
+          134,
+          1215,
+          80,
+          80
+        ]
+      },
+      {
+        "name": "FrameCard",
+        "rect": [
+          783,
+          1215,
+          166,
+          80
+        ]
+      },
+      {
+        "name": "ReplaceImage",
+        "rect": [
+          955,
+          1215,
+          219,
+          80
+        ]
+      },
+      {
+        "name": "RemoveCard",
+        "rect": [
+          1180,
+          1215,
+          148,
+          80
+        ]
+      },
+      {
+        "name": "AddCard",
+        "rect": [
+          40,
+          567,
+          422,
+          80
+        ]
+      },
+      {
+        "name": "SaveDraft",
+        "rect": [
+          476,
+          567,
+          423,
+          80
+        ]
+      },
+      {
+        "name": "ReviewDeck",
+        "rect": [
+          913,
+          567,
+          423,
+          80
+        ]
+      }
+    ],
+    "cover": {
+      "crop": {
+        "x": 0.5,
+        "y": 0.5,
+        "zoom": 1
+      },
+      "mode": "upload"
+    },
+    "description": "Alterado ao fechar",
+    "fields": {
+      "CardDescription": "",
+      "CardName": "ABxCDE",
+      "DeckDescription": "Alterado ao fechar",
+      "DeckName": "Meu deck mobile"
+    },
+    "labels": [
+      "Meu deck mobile",
+      "NOME DO DECK",
+      "CATEGORIA",
+      "DESCRIÇÃO · OPCIONAL",
+      "CAPA",
+      "Imagem enviada por você.",
+      "VISIBILIDADE",
+      "REFERÊNCIA VISUAL",
+      "CARTAS · 1 de 30"
+    ],
+    "name": "Meu deck mobile",
+    "sequence": 27,
+    "size": [
+      1376,
+      675
+    ]
+  },
+  "installHidden": true
+}

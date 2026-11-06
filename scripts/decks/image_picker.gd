@@ -10,6 +10,15 @@ const EXTENSIONS := ["png", "jpg", "jpeg", "webp"]
 var _callback: JavaScriptObject
 var _dialog: FileDialog
 
+func bind_button(button: Button,prepare: Callable) -> void:
+	if not OS.has_feature("web"): return
+	var region := preload("res://scripts/decks/image_picker_region.gd").new()
+	region.button=button
+	region.picker=self
+	region.maximum=MAX_BYTES
+	region.prepare=prepare
+	button.add_child(region)
+
 
 func pick() -> void:
 	if OS.has_feature("web"):
@@ -50,7 +59,8 @@ func _pick_web() -> void:
 
 func _web_result(args: Array) -> void:
 	if args.size() < 2 or str(args[0]).is_empty():
-		failed.emit("Imagem muito grande (máx. 12 MB)." if args.size() > 1 and str(args[1]) == "too_big" else "Não foi possível ler a imagem.")
+		var reason := str(args[1]) if args.size()>1 else "read_error"
+		failed.emit("Imagem muito grande (máx. 12 MB)." if reason=="too_big" else ("Use uma imagem PNG, JPG ou WEBP. HEIC não é suportado." if reason=="format" else "Não foi possível ler a imagem. Tente selecioná-la novamente."))
 		return
 	_decode(Marshalls.base64_to_raw(str(args[0])), str(args[1]))
 

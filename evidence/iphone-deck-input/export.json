@@ -1,0 +1,7 @@
+{
+  "godot": "4.7.2.stable.official",
+  "production_errors": [],
+  "fixture_included_in_production": false,
+  "web_test": "Chromium / iPhone UA / 844x390 / DPR3",
+  "webkit_available": false
+}

@@ -50,6 +50,7 @@ html,body{overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjus
 .qse-field.qse-on{display:block}
 .qse-field.qse-typing{color:#f6f3e9;caret-color:#e9b975;background:#162230;border:2px solid #e9b975;box-shadow:0 0 0 3px rgba(233,185,117,.18)}
 .qse-field.qse-docked{border-radius:12px;box-shadow:0 -6px 24px rgba(0,0,0,.55)}
+textarea.qse-field{resize:none;line-height:1.35}
 </style>
 $GODOT_HEAD_INCLUDE
 </head>
@@ -95,8 +96,9 @@ $GODOT_HEAD_INCLUDE
 	const DISMISS = "qse_pwa_install_dismissed";
 	function dismissed(){ try { return localStorage.getItem(DISMISS) === "1"; } catch (e) { return false; } }
 	window.qseShowInstall = function(){
-		installButton.style.display = ios && !standalone && !dismissed() && !window.qseStoryPlaying ? "block" : "none";
+		installButton.style.display = ios && !standalone && !dismissed() && !window.qseStoryPlaying && !window.qseInternalScreen ? "block" : "none";
 	};
+	window.qseSetInternalScreen = function(active){ window.qseInternalScreen=!!active; window.qseShowInstall(); };
 	window.qseSetStoryPlaying = function(active){
 		window.qseStoryPlaying = !!active;
 		window.qseShowInstall();
@@ -168,9 +170,9 @@ $GODOT_HEAD_INCLUDE
 	function elementFor(region){
 		if (region.kind === "email") return emailInput;
 		if (region.kind === "password") return passwordInput;
-		const el = document.createElement("input");
+		const el = document.createElement(region.kind === "multiline" ? "textarea" : "input");
 		el.className = "qse-field";
-		el.type = "text";
+		if (region.kind !== "multiline") el.type = "text";
 		el.setAttribute("autocorrect", "on");
 		document.body.appendChild(el);
 		return el;
@@ -213,8 +215,19 @@ $GODOT_HEAD_INCLUDE
 			if (region.kind === "password") el.type = region.secret === false ? "text" : "password";
 			place(region);
 		};
-		el.oninput = function(){ if (region.onInput) region.onInput(el.value); };
+		let composing = false;
+		const notify = function(){ if (region.onInput) region.onInput(el.value); };
+		el.oncompositionstart = function(e){ composing = true; e.stopPropagation(); };
+		el.oncompositionend = function(e){ composing = false; e.stopPropagation(); notify(); };
+		el.oninput = function(e){ e.stopPropagation(); if (!composing) notify(); };
+		el.onchange = notify;
+		el.onkeyup = function(e){ e.stopPropagation(); };
+		el.onbeforeinput = function(e){ e.stopPropagation(); };
 		el.onkeydown = function(e){
+			if(e.key === "Tab") { e.preventDefault(); return; }
+			e.stopPropagation();
+			if(e.key === "Escape") { e.preventDefault(); el.blur(); return; }
+			if (region.kind === "multiline" || composing) return;
 			if (e.key !== "Enter") return;
 			e.preventDefault();
 			if (region.kind === "email") { for (const id in regions) if (regions[id].kind === "password" && regions[id].el) { regions[id].el.focus(); return; } }
@@ -256,7 +269,7 @@ $GODOT_HEAD_INCLUDE
 			el.maxLength = maxLength > 0 ? maxLength : 500;
 			if (region.kind === "password") el.autocomplete = autocomplete || "current-password";
 			else if (region.kind === "confirm") { el.type = region.secret ? "password" : "text"; el.autocomplete = "new-password"; }
-			else if (region.kind === "text") { el.autocomplete = "off"; el.enterKeyHint = "send"; }
+			else if (region.kind === "text" || region.kind === "multiline") { el.autocomplete = autocomplete || "off"; el.enterKeyHint = region.kind === "multiline" ? "enter" : "done"; }
 			if (active !== id && el.value !== (text || "")) el.value = text || "";
 			el.classList.add("qse-on");
 			place(region);
@@ -272,7 +285,7 @@ $GODOT_HEAD_INCLUDE
 			const region = regions[id] || (regions[id] = {id: id, x: -1, y: -1, w: 0, h: 0});
 			region.onInput = onInput; region.onSubmit = onSubmit; region.onClose = onClose;
 		},
-		setText: function(id, text){ const r = regions[id]; if (r && r.el && active === id) r.el.value = text; },
+		setText: function(id, text){ const r = regions[id]; if (r && r.el && active === id && r.el.value !== text) r.el.value = text; },
 		isActive: function(id){ return active === id; },
 		debug: function(){ return Object.keys(regions).map(function(id){ const r = regions[id]; return id + ":" + r.kind + (r.el ? "" : " SEM_INPUT"); }).concat(active ? ["aberto=" + active] : []); },
 		remember: function(){
@@ -281,6 +294,40 @@ $GODOT_HEAD_INCLUDE
 			try { if (window.PasswordCredential) navigator.credentials.store(new PasswordCredential({id: email, password: password, name: email})).catch(function(){}); } catch (e) {}
 			setTimeout(function(){ passwordInput.value = ""; }, 1500);
 		}
+	};
+	// File inputs receive the trusted browser tap directly. Godot's frame-delayed
+	// button callback cannot reliably open the iOS file picker.
+	const fileRegions = {};
+	function readImage(input, done, maximum){
+		const f = input.files && input.files[0];
+		if (!f) return;
+		if (!f.size || f.size > maximum) { done('', 'too_big'); return; }
+		const ext = ({'image/jpeg':'jpg','image/png':'png','image/webp':'webp'})[f.type] || (f.name.split('.').pop() || '').toLowerCase();
+		if (!['png','jpg','jpeg','webp'].includes(ext)) { done('', 'format'); return; }
+		const reader = new FileReader();
+		reader.onload = function(){ const s = String(reader.result); done(s.slice(s.indexOf(',')+1), ext); input.value=''; };
+		reader.onerror = function(){ done('', 'read_error'); };
+		reader.readAsDataURL(f);
+	}
+	window.qseImageInputs = {
+		setRegion: function(id,x,y,w,h,onOpen,onResult,maximum,label){
+			let r=fileRegions[id];
+			if (!r) {
+				const el=document.createElement('input'); el.type='file'; el.accept='image/png,image/jpeg,image/webp';
+				el.className='qse-image-input';
+				el.style.cssText='position:fixed;z-index:45;opacity:0;cursor:pointer;margin:0;padding:0;border:0;box-sizing:border-box';
+				r=fileRegions[id]={el:el}; document.body.appendChild(el);
+				el.onclick=function(e){ e.stopPropagation(); if(document.activeElement && document.activeElement.classList.contains('qse-field')) document.activeElement.blur(); r.onOpen(); };
+				el.onkeydown=function(e){ e.stopPropagation(); };
+				el.onkeyup=function(e){ e.stopPropagation(); };
+				el.onchange=function(){ readImage(el,r.onResult,r.maximum); };
+			}
+			r.onOpen=onOpen; r.onResult=onResult; r.maximum=maximum;
+			const c=document.getElementById('canvas'), cr=canvasRect(), rx=c.width/c.clientWidth, ry=c.height/c.clientHeight;
+			r.el.style.left=(cr.left+x/rx)+'px'; r.el.style.top=(cr.top+y/ry)+'px';
+			r.el.style.width=(w/rx)+'px'; r.el.style.height=(h/ry)+'px'; r.el.setAttribute('aria-label',label || 'Adicionar imagem');
+		},
+		clearRegion: function(id){ const r=fileRegions[id]; if(r){r.el.remove();delete fileRegions[id];} }
 	};
 	// Preenchimento automático (Chaves do iCloud) pode completar e-mail e senha de uma vez.
 	[emailInput, passwordInput].forEach(function(el){

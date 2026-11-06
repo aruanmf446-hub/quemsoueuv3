@@ -56,6 +56,7 @@ func _run() -> void:
 		check(ProfileService.valid_nickname(valid),"aceita nickname próprio de 3–24 caracteres")
 	reset()
 	check(not services.profile.has_nickname(),"null não vira nickname textual")
+	services.session.user.user_metadata={"name":"Nome do Google"}
 	menu.call("_nickname_offer")
 	await settle()
 	var prompt: Control=menu.get("_nickname_modal")
@@ -64,6 +65,7 @@ func _run() -> void:
 	var entry: LineEdit=prompt.find_child("NicknameInput",true,false)
 	var save: Button=prompt.find_child("ConfirmNickname",true,false)
 	check(save.disabled and entry.max_length==24,"campo vazio bloqueia confirmação")
+	check(entry.text.is_empty(),"nome do Google não preenche nem confirma o nickname")
 	entry.text="Ocupado"
 	entry.text_changed.emit(entry.text)
 	await prompt.call("_commit")

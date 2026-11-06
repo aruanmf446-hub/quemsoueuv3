@@ -27,8 +27,9 @@ func _process(delta: float) -> void:
 	var count := 0
 	var attached := 0
 	if UIScale.js_true(has_bridge):
-		for node in get_tree().root.find_children("*", "LineEdit", true, false):
-			var field := node as LineEdit
+		var fields := get_tree().root.find_children("*","LineEdit",true,false)+get_tree().root.find_children("*","TextEdit",true,false)
+		for node in fields:
+			var field := node as Control
 			if field.has_meta("qse_native_off") or not field.is_visible_in_tree(): continue
 			count += 1
 			if field.get_node_or_null("WebTextBridge") == null: WebTextBridge.attach(field, true)

@@ -1,12 +1,17 @@
 name: Comunidade E2E (contas de teste)
 
 on:
+  push:
+    branches: [work/deck-runtime-corrections]
+    paths:
+      - '.github/workflows/community-e2e.yml'
+      - 'tools/e2e/community_access.py'
   workflow_dispatch:
     inputs:
       stage:
-        description: "publish | community | finish | cleanup"
+        description: "access (login/consultas) | publish | community | finish | cleanup"
         required: true
-        default: publish
+        default: access
       upload_order:
         description: "files_first (como o jogo) | cards_first"
         required: false
@@ -22,6 +27,7 @@ permissions:
 jobs:
   e2e:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - name: Etapa ${{ inputs.stage }}
@@ -32,7 +38,12 @@ jobs:
           QSE_TEST_READER_PASSWORD: ${{ secrets.QSE_TEST_READER_PASSWORD }}
           QSE_TEST_R1_EMAIL: ${{ secrets.QSE_TEST_R1_EMAIL }}
           QSE_TEST_R1_PASSWORD: ${{ secrets.QSE_TEST_R1_PASSWORD }}
-          STAGE: ${{ inputs.stage }}
+          STAGE: ${{ github.event_name == 'workflow_dispatch' && inputs.stage || 'access' }}
           DECK_ID: ${{ inputs.deck_id }}
           UPLOAD_ORDER: ${{ inputs.upload_order }}
-        run: python3 tools/e2e/community_e2e.py "$STAGE" "$DECK_ID"
+        run: |
+          if [ "$STAGE" = access ]; then
+            python3 tools/e2e/community_access.py
+          else
+            python3 tools/e2e/community_e2e.py "$STAGE" "$DECK_ID"
+          fi

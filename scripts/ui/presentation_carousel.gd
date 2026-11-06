@@ -12,6 +12,7 @@ var dwell_seconds := 2.1
 var show_close := false
 var allow_skip := true
 var manual_story := false
+var show_counter := true
 var index := 0
 var advances := 0
 var _front: Control
@@ -204,7 +205,7 @@ func _layout() -> void:
 	_dots.position = Vector2(size.x*0.43,24)
 	_dots.size = Vector2(size.x*0.14,40)
 	_dots.add_theme_font_size_override("font_size",22)
-	_dots.visible = not cards.is_empty()
+	_dots.visible = show_counter and not cards.is_empty()
 
 func _button(caption: String, action: Callable) -> Button:
 	var button := Button.new()

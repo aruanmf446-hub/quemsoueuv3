@@ -142,8 +142,11 @@ func _screen_flow() -> void:
 	await process_frame
 	check(screen._view == "editor" and screen.find_child("DeckName", true, false) != null, "abre o editor de deck")
 	check(screen.find_child("DeckStyleReference",true,false)!=null and screen.find_child("CopyDeckStylePrompt",true,false)!=null,"editor oferece referência oficial e prompt manual")
+	check(screen.find_child("CopyDeckStylePrompt",true,false).is_visible_in_tree(),"copiar prompt fica visível sem abrir opções")
 	var prompt: String=preload("res://scripts/decks/deck_style_prompt.gd").build({"name":"Teste","description":"Tema","style_reference":"lendas_urbanas","cards":[{"name":"Carta A"}]})
 	check(prompt.contains("Carta A") and prompt.contains("5:7") and prompt.contains("16:5"),"prompt inclui assuntos e formatos reais")
+	check(prompt.contains("3D cinematográfica") and prompt.contains("4K") and prompt.contains("vertical 9:16"),"prompt segue o estilo e o formato pedidos")
+	check(preload("res://scripts/decks/deck_style_prompt.gd").build({}).contains("[PERSONAGEM OU CENA]"),"rascunho vazio tem assunto substituível")
 	var png := _fixture(900, 1200)
 	screen._pending_card = -1
 	screen._image_picked(png, png.save_png_to_buffer(), "png")
@@ -156,6 +159,7 @@ func _screen_flow() -> void:
 	check(FileAccess.file_exists(screen._store().preview_path(screen._draft.id, screen._draft.cards[0], "duel")), "prévia do Duelo gerada")
 	screen._render_review()
 	await process_frame
+	check(screen.find_child("CopyDeckStylePrompt",true,false).is_visible_in_tree(),"revisão também oferece copiar prompt")
 	var publish := screen.find_child("PublishDeck", true, false) as Button
 	check(publish != null and publish.disabled, "revisão bloqueia publicar com pendências")
 	heart = null

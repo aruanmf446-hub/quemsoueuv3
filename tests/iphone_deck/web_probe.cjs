@@ -9,6 +9,7 @@ const server=spawn('python3',['-m','http.server','8136','--bind','127.0.0.1'],{c
  const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});
  const context=await browser.newContext({viewport:{width:844,height:390},deviceScaleFactor:3,hasTouch:true,isMobile:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1'});
  await context.route('**/*',route=>new URL(route.request().url()).hostname==='127.0.0.1'?route.continue():route.abort());
+ if(process.argv.includes('--prompt'))await context.grantPermissions(['clipboard-read','clipboard-write']);
  const page=await context.newPage(),errors=[];
  page.on('console',m=>{fs.appendFileSync(out+'/console.log',m.text()+'\n');if(/SCRIPT ERROR|Parse Error|^ERROR:/.test(m.text()))errors.push(m.text());});
  page.on('pageerror',e=>errors.push(e.message));
@@ -86,6 +87,23 @@ const server=spawn('python3',['-m','http.server','8136','--bind','127.0.0.1'],{c
    await tap('DeckDetails');await page.waitForTimeout(300);
    await attach('CoverUpload');results.cover=await report();assert.equal(results.cover.cover.mode,'upload');
    results.installHidden=await page.evaluate(()=>getComputedStyle(document.getElementById('qse-install')).display==='none');assert.ok(results.installHidden);
+   if(process.argv.includes('--prompt')){
+    const copied=async()=>{
+     await page.evaluate(()=>navigator.clipboard.writeText('before-copy'));
+     await tap('CopyDeckStylePrompt');
+     await page.waitForFunction(async()=> (await navigator.clipboard.readText()).includes('vertical 9:16'));
+     const text=await page.evaluate(()=>navigator.clipboard.readText());
+     assert.ok(text.includes('Meu deck mobile')&&text.includes('ABxCDE')&&text.includes('3D cinematográfica')&&text.includes('4K'));
+     return text;
+    };
+    results.editorPrompt=await copied();
+    await page.screenshot({path:out+'/editor-prompt.png',scale:'css'});
+    await tap('ReviewDeck',false);await page.waitForTimeout(700);
+    results.reviewPrompt=await copied();
+    assert.equal(results.editorPrompt,results.reviewPrompt);
+    await page.screenshot({path:out+'/review-prompt.png',scale:'css'});
+    console.log('DECK_AI_PROMPT_WEB_PASS real clipboard in editor and review');
+   }
    assert.deepEqual(errors,[]);
    console.log('IPHONE_DECK_WEB_PASS text/delete/caret/textarea/blur/add/replace/cover/modal/install');
   }

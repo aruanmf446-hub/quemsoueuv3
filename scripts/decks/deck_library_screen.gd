@@ -1453,6 +1453,7 @@ func _render_editor() -> void:
 	_page("Criar deck" if str(_draft.name).is_empty() else str(_draft.name), "editor")
 	$Margin/Column/Header/Back.text=tr("‹ Meus Decks")
 	body.add_theme_constant_override("separation",12)
+	_add_prompt_action()
 	var form := PlayerUI.row(body)
 	form.name="DeckForm"
 	var identity := PlayerUI.column(form)
@@ -1494,9 +1495,6 @@ func _render_editor() -> void:
 	extra.add_child(_text("REFERÊNCIA VISUAL",20,PlayerUI.MUTED))
 	var references := StylePrompt.references()
 	extra.add_child(_options("DeckStyleReference",references.map(func(item: Dictionary)->String:return str(item.name)),references.map(func(item: Dictionary)->String:return str(item.id)),"style_reference"))
-	var prompt := _action("Copiar prompt dos oficiais",_copy_style_prompt)
-	prompt.name="CopyDeckStylePrompt"
-	extra.add_child(prompt)
 	for node: Control in extra.find_children("*","Control",true,false):
 		if node is BaseButton or node is LineEdit: PlayerUI.editor_control(node)
 	body.add_child(_text("CARTAS · %d de %d" % [_draft.cards.size(),Catalog.MAX_CARDS],22,PlayerUI.GOLD))
@@ -1781,8 +1779,10 @@ func _report(result: Dictionary) -> void:
 
 func _render_review() -> void:
 	_page("Revisar deck", "review")
+	$Margin/Column/Scroll.scroll_vertical=0
 	$Margin/Column/Header/Back.text = tr("‹ Editar")
 	var problems := DeckDrafts.problems(_draft)
+	_add_prompt_action()
 	body.add_child(_data_text(str(_draft.name) if not str(_draft.name).is_empty() else tr("Sem nome"), 30))
 	body.add_child(_data_text("%s  ·  %s  ·  %d cartas" % [str(_draft.category), {"private": "Privado", "unlisted": "Não listado", "public": "Público"}.get(str(_draft.visibility), "—"), _draft.cards.size()], 16, PlayerUI.MUTED))
 	if not problems.is_empty():
@@ -1824,9 +1824,18 @@ func _render_review() -> void:
 	body.add_child(note_label)
 	_reveal()
 
+func _add_prompt_action() -> void:
+	var prompt := _action("Copiar prompt para IA",_copy_style_prompt)
+	prompt.name="CopyDeckStylePrompt"
+	PlayerUI.editor_control(prompt)
+	body.add_child(prompt)
+	var hint := _text("Cole na sua IA para gerar as imagens em 3D cinematográfico · vertical 9:16.",20,PlayerUI.MUTED)
+	hint.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	body.add_child(hint)
+
 func _copy_style_prompt() -> void:
 	DisplayServer.clipboard_set(StylePrompt.build(_draft))
-	banner.show_state("success","Prompt copiado. Anexe referências do deck oficial escolhido na sua ferramenta de imagens.")
+	banner.show_state("success","Prompt copiado! Cole na sua IA para gerar as imagens das cartas.")
 
 func _open_manual_review() -> void:
 	if get_node_or_null("DeckManualReview")!=null: return

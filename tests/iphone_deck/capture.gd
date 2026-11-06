@@ -33,6 +33,12 @@ func _run() -> void:
 	root.get_texture().get_image().save_png(output+"/"+dimensions+"_card.png")
 	add=fixture.ui.find_child("AddCard",true,false)
 	if not Rect2(Vector2.ZERO,fixture.ui.size).encloses(add.get_global_rect()): failures+=1
+	fixture.ui._render_review()
+	for frame in 12: await process_frame
+	var prompt: Button=fixture.ui.find_child("CopyDeckStylePrompt",true,false)
+	if not prompt.is_visible_in_tree() or not Rect2(Vector2.ZERO,fixture.ui.size).encloses(prompt.get_global_rect()): failures+=1
+	await RenderingServer.frame_post_draw
+	root.get_texture().get_image().save_png(output+"/"+dimensions+"_review.png")
 	fixture.queue_free()
 	for frame in 4: await process_frame
 	print("IPHONE_DECK_LAYOUT failures=",failures," ",dimensions)

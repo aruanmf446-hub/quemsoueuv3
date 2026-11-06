@@ -25,3 +25,8 @@ verificações e regressão `tests/duel_avatars/animations.gd` com 69, sem falha
 `tools/player_ui/check_design.py`: OK. O ambiente não possui Xvfb; a conferência
 visual usa uma exportação real do Godot Web com fixtures isoladas e rede externa
 bloqueada. Não se trata de teste em iPhone físico.
+
+Web: aprovado em 1672×941, 844×390/DPR3 e 640×360/DPR3, com clique/toque,
+reprodução e retorno à pose sem erros. O primeiro teste em 640×360 identificou
+um excesso de largura; seletor com texto recortável e botão curto corrigiram
+o encaixe sem reduzir as fontes. Capturas em `evidence/skin-emotes`.

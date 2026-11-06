@@ -1,0 +1,29 @@
+[
+  {
+    "width": 640,
+    "height": 360,
+    "iphone": true,
+    "emoteStarted": true,
+    "poseRestored": true,
+    "controlsVisible": true,
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "iphone": true,
+    "emoteStarted": true,
+    "poseRestored": true,
+    "controlsVisible": true,
+    "errors": []
+  },
+  {
+    "width": 1672,
+    "height": 941,
+    "iphone": false,
+    "emoteStarted": true,
+    "poseRestored": true,
+    "controlsVisible": true,
+    "errors": []
+  }
+]

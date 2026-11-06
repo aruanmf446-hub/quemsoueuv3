@@ -1,0 +1,29 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS cowboy expõe os três FBX existentes
+PASS michelly expõe os três FBX existentes
+PASS rodrigo expõe os três FBX existentes
+PASS lorena expõe os três FBX existentes
+PASS gus expõe os três FBX existentes
+PASS lana expõe os três FBX existentes
+PASS halloween expõe os três FBX existentes
+PASS ações de El Fuego não viram emotes
+PASS clipe ausente não altera a pose
+PASS inicia Apresentação
+PASS emote em reprodução
+PASS terminar restaura a pose inicial
+PASS ossos retornam à pose anterior ao emote
+PASS inicia Comemoração
+PASS emote em reprodução
+PASS terminar restaura a pose inicial
+PASS ossos retornam à pose anterior ao emote
+PASS inicia Reação de derrota
+PASS emote em reprodução
+PASS terminar restaura a pose inicial
+PASS ossos retornam à pose anterior ao emote
+PASS mesmo clipe do lobby toca uma única vez
+PASS retorno restaura o loop do lobby
+PASS reação automática interrompe emote sem retorno atrasado
+PASS troca de emote não deixa restauração pendente
+PASS liberação limpa o estado do emote
+SKIN_EMOTES checks=26 failures=0

@@ -6,10 +6,11 @@ on:
     paths:
       - '.github/workflows/community-e2e.yml'
       - 'tools/e2e/community_access.py'
+      - 'tools/e2e/community_claim_live.py'
   workflow_dispatch:
     inputs:
       stage:
-        description: "access (login/consultas) | publish | community | finish | cleanup"
+        description: "access (login/consultas) | claim (produção QA) | publish | community | finish | cleanup"
         required: true
         default: access
       upload_order:
@@ -27,7 +28,9 @@ permissions:
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 12
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: Etapa ${{ inputs.stage }}
@@ -38,12 +41,28 @@ jobs:
           QSE_TEST_READER_PASSWORD: ${{ secrets.QSE_TEST_READER_PASSWORD }}
           QSE_TEST_R1_EMAIL: ${{ secrets.QSE_TEST_R1_EMAIL }}
           QSE_TEST_R1_PASSWORD: ${{ secrets.QSE_TEST_R1_PASSWORD }}
-          STAGE: ${{ github.event_name == 'workflow_dispatch' && inputs.stage || 'access' }}
+          STAGE: ${{ github.event_name == 'workflow_dispatch' && inputs.stage || (contains(github.event.head_commit.message, '[qa-claims]') && 'claim' || 'access') }}
           DECK_ID: ${{ inputs.deck_id }}
           UPLOAD_ORDER: ${{ inputs.upload_order }}
         run: |
           if [ "$STAGE" = access ]; then
             python3 tools/e2e/community_access.py
+          elif [ "$STAGE" = claim ]; then
+            python3 tools/e2e/community_claim_live.py
           else
             python3 tools/e2e/community_e2e.py "$STAGE" "$DECK_ID"
           fi
+
+      - name: Registrar resultado sanitizado da etapa claim
+        if: always() && github.ref == 'refs/heads/work/deck-runtime-corrections'
+        env:
+          QA_REPORT_BRANCH: ${{ github.ref_name }}
+        run: |
+          report="evidence/community-claims/live/${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.json"
+          if [ ! -f "$report" ]; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$report"
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Registra resultado QA ${GITHUB_RUN_ID}"
+          git push origin "HEAD:$QA_REPORT_BRANCH"

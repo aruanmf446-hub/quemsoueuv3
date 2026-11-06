@@ -1,0 +1,2 @@
+{"project": "GAME", "function": "qse-coin-checkout", "status": "ACTIVE", "version": 1, "verify_jwt": false, "sha256": "f77a7fe6aa0bf395eca6da6d440c43f131097b8dcef6c534d30284f3a87f555a"}
+{"project": "GAME", "function": "qse-stripe-webhook", "status": "ACTIVE", "version": 1, "verify_jwt": false, "sha256": "2988771d9bcb51b1ea359b4b954d8c403a065d7239d1949abf40fa8cf0a1b08a"}

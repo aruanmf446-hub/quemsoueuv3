@@ -17,6 +17,7 @@ func run() -> void:
 	fake.access_token="fixture-not-real";fake.coins=50
 	services.client=fake;services.session.client=fake
 	services.wallet.client=fake;services.emote_shop.client=fake
+	services.coin_store.client=fake
 	services.session.user={"id":"00000000-0000-4000-8000-000000000011"}
 	services.session._expires_at=Time.get_unix_time_from_system()+86400
 	services.session.set_process(false)

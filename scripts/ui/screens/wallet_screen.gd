@@ -1,5 +1,7 @@
 extends PlayerScreen
 var _coin_store := false
+var _checkout_dialog: Control
+var _refreshing := false
 
 
 func _ready() -> void:
@@ -7,6 +9,16 @@ func _ready() -> void:
 	heading.text = tr("Minha carteira")
 	services.wallet.changed.connect(func() -> void:
 		if is_visible_in_tree(): render())
+	services.coin_store.changed.connect(func()->void:
+		if is_visible_in_tree() and _coin_store: render())
+	services.session.changed.connect(_close_checkout)
+	visibility_changed.connect(func()->void:
+		if not is_visible_in_tree(): _close_checkout())
+
+
+func show_screen(params: Dictionary={}) -> void:
+	super.show_screen(params)
+	if _coin_store: _refresh_store.call_deferred()
 
 
 func render() -> void:
@@ -25,7 +37,8 @@ func render() -> void:
 	body.add_child(PlayerUI.button("Atualizar saldo", func() -> void: services.wallet.refresh()))
 	var buy := PlayerUI.button("COMPRAR MOEDAS",func()->void:
 		_coin_store=true
-		render())
+		render()
+		_refresh_store())
 	buy.name="BuyCoins"
 	PlayerUI.style_button(buy,true)
 	body.add_child(buy)
@@ -40,7 +53,7 @@ func render() -> void:
 	if services.wallet.transactions.is_empty():
 		history.add_child(PlayerUI.label("Nenhuma transação registrada."))
 	for item: Dictionary in services.wallet.transactions:
-		var reason := tr("Compra de emote") if str(item.reason).begins_with("emote:") else str(item.reason)
+		var reason := tr("Compra de emote") if str(item.reason).begins_with("emote:") else (tr("Compra de moedas") if str(item.reason).begins_with("coin_topup:") else str(item.reason))
 		history.add_child(PlayerUI.label("%s · %s %s · %s" % [item.created_at,
 			DevicePreferences.number(item.amount, services.preferences.values.locale),
 			tr("moedas" if item.currency == "coins" else "gemas"), reason]))
@@ -56,16 +69,116 @@ func _render_coin_store() -> void:
 	var balance := PlayerUI.label("Saldo: %s moedas" % DevicePreferences.number(services.wallet.balance("coins"),services.preferences.values.locale),30,PlayerUI.TEXT)
 	balance.name="CoinStoreBalance"
 	body.add_child(balance)
-	if not services.session.authenticated(): account_button(body)
-	var empty := PlayerUI.card(body)
-	empty.add_child(PlayerUI.label("Pacotes de moedas",26,PlayerUI.TEXT))
-	var notice := PlayerUI.label("Os pacotes de moedas estarão disponíveis em breve.",22,PlayerUI.MUTED)
-	notice.name="CoinPackagesPending"
-	empty.add_child(notice)
-	body.add_child(PlayerUI.button("Atualizar saldo",func()->void:services.wallet.refresh()))
+	if not services.session.authenticated():
+		account_button(body)
+		return
+	var store := services.coin_store
+	var packages: Array=store.data.get("packages",[])
+	if not store.data.get("enabled",false) or packages.is_empty():
+		var empty := PlayerUI.card(body)
+		empty.add_child(PlayerUI.label("Pacotes de moedas",26,PlayerUI.TEXT))
+		var notice := PlayerUI.label("Os pacotes de moedas estarão disponíveis em breve.",22,PlayerUI.MUTED)
+		notice.name="CoinPackagesPending"
+		empty.add_child(notice)
+	else:
+		if not store.data.live_mode:
+			body.add_child(PlayerUI.label("Modo de teste · sem cobrança ou crédito de moedas reais.",22,PlayerUI.GOLD))
+		var row := PlayerUI.flow(body)
+		for pack: Dictionary in packages:
+			var card := PlayerUI.card(row)
+			card.custom_minimum_size.x=300
+			card.add_child(PlayerUI.label(pack.name,24))
+			card.add_child(PlayerUI.label("%s moedas" % pack.coins,32,PlayerUI.GOLD))
+			var buy := PlayerUI.button("%s · COMPRAR" % _brl(int(pack.price_brl_cents)),_prepare_checkout.bind(pack))
+			buy.name="CoinPack_"+str(pack.id)
+			PlayerUI.editor_control(buy,true)
+			card.add_child(buy)
+	if store.state=="error" or store.state=="offline":
+		body.add_child(PlayerUI.label("Não foi possível atualizar os pacotes. Tente novamente.",22,PlayerUI.MUTED))
+	var refresh := PlayerUI.button("Atualizar pagamentos e saldo",_refresh_store)
+	refresh.name="RefreshCoinPayments"
+	refresh.disabled=_refreshing
+	body.add_child(refresh)
+	var orders: Array=store.data.get("orders",[])
+	if not orders.is_empty():
+		body.add_child(PlayerUI.label("Seus pagamentos",26))
+		for order: Dictionary in orders:
+			var item := PlayerUI.card(body)
+			item.add_child(PlayerUI.label("%s moedas · %s" % [order.coins,CoinStoreService.order_message(order.status)],22))
+			item.add_child(PlayerUI.label("Pedido %s · %s" % [str(order.id).left(8),str(order.created_at).left(16).replace("T"," ")],20,PlayerUI.MUTED))
+
+
+func _refresh_store() -> void:
+	if _refreshing or not services.session.authenticated(): return
+	_refreshing=true
+	await services.coin_store.refresh()
+	await services.wallet.refresh()
+	_refreshing=false
+	if is_visible_in_tree(): render()
+
+
+func _notification(what: int) -> void:
+	if what==NOTIFICATION_APPLICATION_FOCUS_IN and is_node_ready() and is_visible_in_tree() and _coin_store:
+		_refresh_store.call_deferred()
+
+
+func _prepare_checkout(pack: Dictionary) -> void:
+	if is_instance_valid(_checkout_dialog): return
+	_checkout_dialog=Control.new()
+	_checkout_dialog.name="CoinCheckoutPanel"
+	var panel := PlayerUI.deck_modal(self,_checkout_dialog)
+	panel.add_child(PlayerUI.label("Comprar moedas",30))
+	panel.add_child(PlayerUI.label("%s moedas · %s" % [pack.coins,_brl(int(pack.price_brl_cents))],28,PlayerUI.GOLD))
+	var feedback := PlayerUI.label("Preparando pagamento seguro…",22,PlayerUI.MUTED)
+	feedback.name="CoinCheckoutFeedback"
+	panel.add_child(feedback)
+	var open := PlayerUI.button("CONTINUAR NA STRIPE",func()->void:pass)
+	open.name="OpenStripeCheckout"
+	open.disabled=true
+	PlayerUI.editor_control(open,true)
+	panel.add_child(open)
+	var close := PlayerUI.button("Voltar",_close_checkout)
+	close.name="CloseCoinCheckout"
+	PlayerUI.editor_control(close)
+	panel.add_child(close)
+	close.grab_focus.call_deferred()
+	var dialog := _checkout_dialog
+	var result := await services.coin_store.create_checkout(pack)
+	if not is_instance_valid(dialog) or dialog!=_checkout_dialog: return
+	if not result.ok:
+		feedback.text=CoinStoreService.message(result.code)
+		return
+	var url := str(result.data.url)
+	feedback.text="Pague na Stripe. Depois, volte ao jogo e atualize o saldo."
+	open.disabled=false
+	open.pressed.connect(func()->void:
+		if not CoinStoreService.safe_checkout(url): return
+		# The second, direct gesture prevents Safari/PWA popup blocking after HTTP.
+		if OS.has_feature("web"):
+			JavaScriptBridge.eval("window.open("+JSON.stringify(url)+", '_blank', 'noopener')")
+			# noopener may return null even when a new tab opens. Never infer payment.
+			feedback.text="Confira a aba da Stripe. Volte ao jogo após pagar."
+		else:
+			OS.shell_open(url)
+			feedback.text="Confira a janela da Stripe. Volte ao jogo após pagar.")
+	open.grab_focus()
+
+
+func _close_checkout() -> void:
+	if is_instance_valid(_checkout_dialog):
+		_checkout_dialog.hide()
+		_checkout_dialog.queue_free()
+	_checkout_dialog=null
+
+
+static func _brl(cents: int) -> String:
+	return "R$ %d,%02d" % [cents/100,cents%100]
 
 
 func handle_back() -> bool:
+	if is_instance_valid(_checkout_dialog):
+		_close_checkout()
+		return true
 	if not _coin_store: return false
 	var direct := str(parameters.get("tab",""))=="coins"
 	_coin_store=false

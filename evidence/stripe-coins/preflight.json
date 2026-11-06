@@ -1,0 +1,29 @@
+[
+  {
+    "result": {
+      "areas": [
+        "disabled_by_default",
+        "no_invented_products",
+        "auth",
+        "quote",
+        "expected_price",
+        "mode_isolation",
+        "test_no_credit",
+        "idempotent_order",
+        "idempotent_credit",
+        "coins_only",
+        "repeat_purchase",
+        "ownership_isolation",
+        "refund_hold",
+        "late_event",
+        "rls",
+        "acl",
+        "account_cleanup",
+        "atomic_rollback",
+        "refund_before_payment"
+      ],
+      "passed": true,
+      "transaction": "rollback"
+    }
+  }
+]

@@ -20,6 +20,7 @@ func _run() -> void:
 	if mode=="community": fake=preload("res://tests/community_attribution/fake_game.gd").new()
 	elif mode=="claim": fake=preload("res://tests/community_claims/visual_game.gd").new()
 	elif mode=="report": fake=preload("res://tests/deck_runtime_corrections/fake_game.gd").new()
+	elif mode=="stripe": fake=preload("res://tests/coin_store/fake_game.gd").new()
 	elif mode in ["emotes","coins"]: fake=preload("res://tests/skin_emotes/fake_game.gd").new()
 	elif mode=="player_report": fake=preload("res://tests/player_reports/fake_game.gd").new()
 	else: fake=preload("res://tests/community_t27/fake_game.gd").new()
@@ -44,7 +45,8 @@ func _run() -> void:
 	services.friends.client=fake
 	services.emote_shop.client=fake
 	services.wallet.client=fake
-	if mode=="coins":
+	services.coin_store.client=fake
+	if mode in ["coins","stripe"]:
 		await services.wallet.refresh()
 		ui=load("res://scenes/player/wallet.tscn").instantiate()
 		add_child(ui)

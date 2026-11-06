@@ -8,6 +8,8 @@ var lose_response := false
 var hold_purchase := false
 var purchase_calls: Array = []
 func call_rpc(rpc: String,params: Dictionary={}) -> Dictionary:
+	if rpc=="qse_coin_store":
+		return ServiceResult.success({"enabled":false,"live_mode":false,"packages":[],"orders":[]})
 	if rpc=="qse_emote_shop":
 		await get_tree().process_frame
 		if not shop_code.is_empty(): return ServiceResult.failure(shop_code)

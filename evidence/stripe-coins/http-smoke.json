@@ -1,0 +1,26 @@
+[
+  {
+    "path": "/functions/v1/qse-coin-checkout",
+    "status": 503,
+    "code": "payments_unavailable",
+    "passed": true
+  },
+  {
+    "path": "/functions/v1/qse-stripe-webhook",
+    "status": 503,
+    "code": "payments_unavailable",
+    "passed": true
+  },
+  {
+    "path": "/rest/v1/rpc/qse_coin_store",
+    "status": 401,
+    "code": "42501",
+    "passed": true
+  },
+  {
+    "path": "/rest/v1/rpc/qse_coin_order_complete",
+    "status": 401,
+    "code": "42501",
+    "passed": true
+  }
+]

@@ -14,9 +14,17 @@ var _initial_login_pending := true
 var _startup_cover: TextureRect
 var _nickname_modal: Control
 var _hero_carousel: Control
+var _coin_return_order := ""
+var _coin_return_opening := false
 
 
 func _ready() -> void:
+	if OS.has_feature("web"):
+		var order := str(JavaScriptBridge.eval("(()=>{const q=new URLSearchParams(location.search).get('coin_order');try{return q||sessionStorage.getItem('qse_coin_return')||''}catch{return q||''}})()"))
+		if CoinStoreService.uuid_valid(order): _coin_return_order=order
+		if not _coin_return_order.is_empty():
+			JavaScriptBridge.eval("try{sessionStorage.setItem('qse_coin_return',"+JSON.stringify(_coin_return_order)+")}catch{}")
+	_services.profile.changed.connect(_resume_coin_checkout)
 	for child in _menu_buttons.get_children():
 		if child is MenuCardButton:
 			child.activated.connect(_on_menu_button_activated)
@@ -114,6 +122,7 @@ func _initial_auth_resolved() -> void:
 	_startup_cover = null
 	_resume_web_invite()
 	_nickname_profile_changed.call_deferred()
+	_resume_coin_checkout.call_deferred()
 	_maybe_show_news.call_deferred()
 
 
@@ -135,6 +144,7 @@ func _nickname_offer() -> void:
 			_nickname_modal.queue_free()
 			_nickname_modal = null
 		_maybe_show_news.call_deferred()
+		_resume_coin_checkout.call_deferred()
 		return
 	if _services.session.needs_password_reset or is_instance_valid(_nickname_modal):
 		return
@@ -157,6 +167,7 @@ func _check_web_invite() -> void:
 
 
 func _auth_redirect_ready() -> void:
+	_resume_coin_checkout.call_deferred()
 	if _initial_login_pending:
 		return
 	# Um retorno de recovery conclui a senha antes de qualquer convite.
@@ -254,6 +265,7 @@ func _rewards_changed() -> void:
 
 
 func _maybe_show_news() -> void:
+	if not _coin_return_order.is_empty(): return
 	if not is_inside_tree() or _initial_login_pending or OS.get_cmdline_args().has("--script"): return
 	if not _services.session.authenticated() or _services.session.needs_password_reset: return
 	if _web_invite_intent.pending or _navigation.get("_active") != null: return
@@ -267,6 +279,23 @@ func _maybe_show_news() -> void:
 	if _news_auto_shown.has(key): return
 	_news_auto_shown[key] = true
 	_open_news()
+
+
+## The return query only opens the wallet. Only the verified webhook credits coins.
+func _resume_coin_checkout() -> void:
+	if _coin_return_order.is_empty() or _coin_return_opening or _initial_login_pending: return
+	if not _services.session.authenticated() or _services.session.needs_password_reset: return
+	if _web_invite_intent.pending or not _services.profile.has_nickname() or is_instance_valid(_nickname_modal): return
+	_coin_return_opening=true
+	var owner := str(_services.session.user.get("id",""))
+	while bool(_navigation.get("_busy")):
+		await get_tree().create_timer(0.2).timeout
+	_coin_return_opening=false
+	if owner!=str(_services.session.user.get("id","")) or not _services.session.authenticated(): return
+	_coin_return_order=""
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("(()=>{const u=new URL(location.href);u.searchParams.delete('coin_order');history.replaceState(null,'',u.href);try{sessionStorage.removeItem('qse_coin_return')}catch{}})()")
+	_navigation.open("wallet",{"tab":"coins"})
 
 
 func _hero_route_selected(route: String) -> void:

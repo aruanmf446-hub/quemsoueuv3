@@ -15,6 +15,7 @@ ACTIVE e os três testes HTTP sem gravação.
 
 | Verificação | Resultado |
 | --- | --- |
+| HTTP em produção com QA existentes | 50 verificações, 0 falhas; limpeza verificada |
 | SQL no GAME, transação com rollback | 47 verificações, 0 falhas |
 | SQL no CATALOG, transação com rollback | 6 verificações, 0 falhas |
 | Gateway com transporte simulado | 14 testes, 0 falhas |
@@ -38,8 +39,9 @@ remoção do membro. As contagens reais foram conferidas após os rollbacks.
 O gateway testa autenticação negada, cópia restrita a prévias, falha de upload,
 retirada durante cópia, repetição, autorização de manifestos e separação entre
 JWT do jogador e credenciais do CATALOG. Foi implantado após esses testes. As verificações HTTP de sessão ausente,
-falsa e CORS passaram; o teste mutante com sessões reais foi bloqueado pela
-revisão automática e não foi executado.
+falsa e CORS passaram; o teste original com criação de contas foi bloqueado. Após autorização
+explícita, foi executado o teste adaptado com contas QA existentes: 50/50
+verificações aprovadas, sem criar ou excluir contas, e limpeza verificada.
 
 O teste Godot monta uma sala com bot, inicia a partida e seleciona cartas do
 deck comunitário; confere nomes/texturas, cache, coleção, controles nativos,
@@ -86,12 +88,11 @@ o `COMMIT` final por `ROLLBACK`. Não executar os testes como implantação.
 ## Limites
 
 Migrations e função foram implantadas após autorização; as evidências de
-rollback acima pertencem à etapa anterior à implantação. O teste completo
-com contas temporárias em produção foi rejeitado pela revisão automática
-por falta de comprovação suficiente da limpeza dos efeitos derivados.
-Nenhuma conta foi criada por esse teste.
-Partida online com duas contas reais, Storage físico das novas versões, downloads
-com URLs reais e Safari/iPhone físico continuam pendentes da implantação.
+rollback acima pertencem à etapa anterior à implantação. A proposta original de criar contas temporárias em produção foi rejeitada
+pela revisão automática e não foi executada. O procedimento posterior usou
+as contas QA existentes e concluiu 50/50 verificações HTTP e a limpeza.
+Partida online, Storage das versões e downloads com URLs reais foram
+validados pelo run de produção. Safari/iPhone físico continua pendente.
 O primeiro limite de 60 s encerrou prematuramente o teste de revelação, que roda
 por cerca de 90 s; ele foi repetido até concluir, sem alterar seu código.
 O T27 registra um aviso de duas instâncias ObjectDB no encerramento.
@@ -109,5 +110,17 @@ Em seguida, a execução [42271709687](https://github.com/aruanmf446-hub/quemsou
 terminou com Success para a etapa `access`, usando OWNER, READER e R1 já
 configuradas nos GitHub Secrets. Login e consultas passaram nas três contas.
 Não houve criação de contas, resgates, denúncias ou salas. Ver `qa_access.json`.
-O teste com gravações será feito nessas contas existentes, não criando outras,
-e continua separado dessa verificação de acesso.
+O teste com gravações foi posteriormente executado nessas contas existentes,
+sem criar outras, e é separado dessa verificação de acesso.
+
+
+## Produção: 50/50 verificações e limpeza concluída
+
+[Run 42275200498](https://github.com/aruanmf446-hub/quemsoueuv3/actions/runs/42275200498),
+Success, 1m 1s. Detalhes em [verificação consolidada](live/42275200498-verification.json)
+e [procedimento](../../docs/backend/TESTE_HTTP_PRODUCAO_DECKS.md).
+A sala, partida, três jogadores, nove cartas e três eventos do teste foram
+removidos; uma nova consulta confirmou zero registros e nenhum convite restante.
+As contas QA foram preservadas; apenas o cadastro inicial de nickname de
+OWNER/READER e o resgate normal de OWNER permaneceram, conforme autorizado.
+Não foram feitas alterações em moderação, denúncias ou arquivos do autor.

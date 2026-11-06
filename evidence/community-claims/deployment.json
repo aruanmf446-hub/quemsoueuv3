@@ -43,8 +43,11 @@
     }
   ],
   "mutating_http_test": {
-    "executed": false,
-    "reason": "automatic approval review rejected production test accounts, claims and matches; cleanup of derived data not established"
+    "executed": true,
+    "uses_existing_QA_accounts": true,
+    "creates_or_deletes_accounts": false,
+    "original_account_creation_proposal_rejected": true,
+    "authorization_explicitly_granted": true
   },
   "pages": {
     "run_id": 42262100661,
@@ -63,5 +66,26 @@
         "result": "network_failure"
       }
     ]
+  },
+  "live_http_verification": {
+    "run_id": "42275200498",
+    "url": "https://github.com/aruanmf446-hub/quemsoueuv3/actions/runs/42275200498",
+    "workflow_status": "Success",
+    "duration": "1m 1s",
+    "status": "passed",
+    "checks": 50,
+    "passed": 50,
+    "skipped": 0,
+    "accounts": "existing OWNER, READER, R1 preserved",
+    "initial_nickname_registration": [
+      "OWNER",
+      "READER"
+    ],
+    "cleanup_verified": true,
+    "qa_owner_claim_retained": true,
+    "source_published_and_unchanged": true,
+    "ci_report": "42275200498-1.json",
+    "cleanup_report": "42275200498-cleanup.json",
+    "readback_report": "42275200498-readback.json"
   }
 }

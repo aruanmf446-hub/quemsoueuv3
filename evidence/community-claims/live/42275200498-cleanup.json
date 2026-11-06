@@ -1,0 +1,22 @@
+{
+  "after": {
+    "rooms": 0,
+    "matches": 0,
+    "members": 0,
+    "match_cards": 0,
+    "match_events": 0,
+    "match_players": 0
+  },
+  "before": {
+    "rooms": 1,
+    "matches": 1,
+    "members": 1,
+    "match_cards": 9,
+    "match_events": 3,
+    "match_players": 3
+  },
+  "run_id": "42275200498",
+  "verified": true,
+  "qa_claim_retained": true,
+  "owner_account_preserved": true
+}

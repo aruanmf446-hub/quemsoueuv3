@@ -68,13 +68,14 @@ versões dos arquivos. Os hashes registrados foram comparados ao código.
 `qse-deck-catalog` está ACTIVE, versão 1. Sessão ausente/falsa retorna HTTP 401;
 o preflight CORS retorna 204. O bucket novo foi confirmado privado.
 
-A revisão automática bloqueou o teste HTTP que criaria contas, resgates e
-partidas temporárias em produção, por falta de comprovação suficiente da
-limpeza dos efeitos derivados e de autorização específica para esse teste.
-Ele não foi executado. Não foram criadas contas de teste por essa etapa.
-A validação completa com sessões reais permanece pendente.
+O teste HTTP com sessões reais foi concluído após autorização explícita:
+[run 42275200498](https://github.com/aruanmf446-hub/quemsoueuv3/actions/runs/42275200498),
+**50/50 verificações aprovadas**, com OWNER/READER/R1 existentes. Houve
+resgate real, download privado assinado, sala com adversário e bot, seleção
+e revelação de cartas. A sala e seus registros derivados foram removidos e
+conferidos por leitura independente; contas e resgate QA foram preservados.
 
-Roteiro de implantação (etapas 1–3 e 5 executadas; não reaplicar):
+Roteiro de implantação (executado; não reaplicar migrations):
 
 1. Aplicar somente `supabase/catalog/migrations/20261106160000_community_versions.sql`
    no CATALOG e `supabase/game/migrations/20261106160100_community_claims.sql` no
@@ -104,7 +105,8 @@ registrada na conversa. Evidências em `evidence/community-claims/deployment.jso
 ## Validação
 
 [Relatório, capturas e comandos](../../evidence/community-claims/README.md).
-Testes com identidades simuladas no banco e fixtures Web não substituem contas
-reais, chamadas HTTP ao gateway implantado ou validação no Safari/iPhone físico.
+Os testes HTTP usaram sessões reais do gateway implantado. Testes do banco
+com rollback e capturas Web com fixtures são evidências distintas. Não houve
+validação no Safari/iPhone físico.
 
-O teste HTTP com contas reais requer [autorização específica e limpeza verificada](TESTE_HTTP_PRODUCAO_DECKS.md).
+O teste HTTP com contas reais está [concluído, com autorização e limpeza verificadas](TESTE_HTTP_PRODUCAO_DECKS.md).

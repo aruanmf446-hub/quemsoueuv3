@@ -1,0 +1,71 @@
+{
+  "status": "failed",
+  "run_id": "42274423042",
+  "attempt": "1",
+  "room_tag": "QSE QA CLAIM 42274423042-1",
+  "checks": [
+    {
+      "name": "existing_credentials_OWNER",
+      "passed": true
+    },
+    {
+      "name": "login_OWNER",
+      "passed": true
+    },
+    {
+      "name": "existing_credentials_READER",
+      "passed": true
+    },
+    {
+      "name": "login_READER",
+      "passed": true
+    },
+    {
+      "name": "existing_credentials_R1",
+      "passed": true
+    },
+    {
+      "name": "login_R1",
+      "passed": true
+    },
+    {
+      "name": "three_distinct_existing_accounts",
+      "passed": true
+    },
+    {
+      "name": "inventory_contract_OWNER",
+      "passed": true
+    },
+    {
+      "name": "inventory_contract_READER",
+      "passed": true
+    },
+    {
+      "name": "inventory_contract_R1",
+      "passed": true
+    },
+    {
+      "name": "published_deck_available",
+      "passed": true
+    },
+    {
+      "name": "existing_nickname_OWNER",
+      "passed": false
+    }
+  ],
+  "rooms": [],
+  "skipped": [],
+  "accounts_created_or_deleted": false,
+  "started_at": "2026-11-06T18:51:34Z",
+  "owner_marker": "bdbf48e08499b827eecd34a230121eb733910149a8cc9dda0380f391693b0f88",
+  "source_deck_id": "c60869a7-2fac-40b8-8520-acd649640bcf",
+  "failure": "existing_nickname_OWNER",
+  "leave_requests": [],
+  "sessions_logged_out": {
+    "OWNER": true,
+    "READER": true,
+    "R1": true
+  },
+  "passed": 11,
+  "total": 12
+}

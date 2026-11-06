@@ -39,9 +39,6 @@ func _arcade(width: float,height: float,order: int) -> void:
 	if order==4:
 		_lower_art("desert_aqueduct",width,0.17,height-0.08,1.96)
 		_box(Vector3(0,height-0.04,-1.30),Vector3(width-0.4,0.025,0.48),"water")
-	if order==8:
-		_box(Vector3(0,0.55,1.88),Vector3(0.60,0.65,0.025),"cloth")
-		_box(Vector3(0,0.22,1.91),Vector3(0.60,0.035,0.025),"gold")
 
 func _market_counter(width: float,height: float) -> void:
 	_box(Vector3(0,(height-0.14)*0.5,0),Vector3(width,height-0.14,3.5),"wood_dark")

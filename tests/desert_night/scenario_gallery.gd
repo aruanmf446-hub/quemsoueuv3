@@ -59,6 +59,10 @@ func run() -> void:
 			var dimensions:=arg.trim_prefix("--size=").split("x")
 			root.size=Vector2i(int(dimensions[0]),int(dimensions[1]))
 	var orders: Array=range(1,11) if profile=="iphone" else ([1,2,3,7] if profile=="desktop" else [2,7])
+	for arg: String in args:
+		if arg.begins_with("--orders="):
+			orders.clear()
+			for order: String in arg.trim_prefix("--orders=").split(","):orders.append(int(order))
 	for order: int in orders:
 		var phase: Node3D=load("res://scenes/desert/phase_%02d.tscn" % order).instantiate()
 		root.add_child(phase)

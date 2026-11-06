@@ -2,6 +2,8 @@
 
 Base: `main` em `87a29c1`. Revisão visual na branch `codex/composicao-fases-tasks`.
 
+**Correção após reprovação das bandeiras:** retirado o estandarte solto de todos os checkpoints, o retângulo de tecido aplicado no obstáculo da fase 8 e os enfeites adicionais dos elevadores. O checkpoint agora usa uma pequena lanterna baixa de ferro e pedra, no recuo da pista. A ativação e o retorno após morrer permanecem iguais. Fotos nativas e folhas de contato atualizadas; bandeiras que fazem parte das fachadas e estruturas ilustradas originais continuam nos seus suportes.
+
 As fotos são capturas do Godot 4.7.2 Compatibility. As galerias posicionam o jogador por fixture para inspecionar cada peça; não são prova de travessia. Os percursos completos foram executados separadamente com comandos físicos, sem teleporte ou invulnerabilidade. As duas folhas de contato apenas reúnem essas capturas.
 
 ## Galeria
@@ -27,11 +29,11 @@ As fotos são capturas do Godot 4.7.2 Compatibility. As galerias posicionam o jo
 | 05 — Oásis | Tronco com madeira, amarras e galhos; jardins junto ao mecanismo do portão. |
 | 06 — Ruínas | Coluna caída com capitéis; molduras de ruínas nos mecanismos, substituindo o arco da capital. |
 | 07 — Estrada | Caixotes com tábuas, travessas e ferragens; guindaste com pilares completamente na margem. |
-| 08 — Posto | Passagem de pedra com estandarte e torre ao fundo; moldura do portão militar aprovado. |
+| 08 — Posto | Passagem de pedra sem bandeira aplicada, torre ao fundo e moldura do portão militar aprovado. |
 | 09 — Mineradora | Caixotes e minério atrás da pista; portão de serviço e guindastes da mineração. Entrada monumental preservada no final. |
 | 10 — Interior | Passarela ilustrada de madeira e pedra e guindaste apoiado; arena e combate de Malagueta preservados. |
 
-Em todas as fases, os postes agora usam ferro escuro e pequenas lanternas âmbar; checkpoints usam o estandarte de fogo existente. As recargas mantêm uma base embutida no piso, sem o cone bege elevado. A base permanece após a coleta, perde o acento e mantém esse estado ao descarregar/recarregar o trecho. Capacidade cheia continua preservando o item.
+Em todas as fases, os postes usam ferro escuro e pequenas lanternas âmbar; checkpoints usam uma lanterna baixa que acende ao ativar, sem poste ou bandeira. As recargas mantêm uma base embutida no piso, sem o cone bege elevado. A base permanece após a coleta, perde o acento e mantém esse estado ao descarregar/recarregar o trecho. Capacidade cheia continua preservando o item.
 
 O recorte de texturas agora resolve o atlas até a imagem original. Isso preserva a correção dos telhados e evita o mesmo deslocamento em fachadas e peças das Tasks. Os guindastes mantêm cabos e pontos de animação originais, com a estrutura visual recuada para a margem.
 
@@ -49,7 +51,8 @@ Alterados no produto: `kingdom_assets.gd`, `modular_architecture.gd`, `city_prop
 - Regressões: coleta/capacidade/persistência, Tasks, barreiras, parkour, checkpoints, tutorial, composição e descarregamento dos trechos.
 - Contato dos pés/telhado: 30 verificações gráficas aprovadas em cada resolução: 844×390, 1920×1080 e 640×360.
 - `check_design.py`, `scope_test.py --base 87a29c1` e `git diff --check` aprovados.
-- Web exportado: portão da fase 1, toldo da fase 3 e ponte da fase 7 ativados pelo toque com cargas zeradas; cada passagem percorrida nos dois sentidos. Sem erros JavaScript ou do motor. Aproximação dos mecanismos feita por fixture, ativação e deslocamento por entradas reais.
+- Web exportado do commit `13a6f77`: portão da fase 1, toldo da fase 3 e ponte da fase 7 ativados pelo toque com cargas zeradas; cada passagem percorrida nos dois sentidos. Sem erros JavaScript ou do motor. Aproximação dos mecanismos feita por fixture, ativação e deslocamento por entradas reais. A revisão posterior das bandeiras foi conferida no render nativo nas três resoluções, sem repetir o navegador; suas fotos Web anteriores não mostram essa última revisão.
+- Após retirar as bandeiras: checkpoints (21), Tasks (182) e composição/streaming (110) novamente aprovados. Logs em `validacao/sem-bandeiras/`.
 - `approved_assets_test.gd`: quatro verificações de âncoras das fachadas da fase 2 falham também na base, antes desta mudança. Teste preservado; comparação registrada nos logs. As verificações gráficas específicas dos telhados passam.
 - As galerias nativas usam Linux/Mesa llvmpipe. A emulação Web usa Chromium/WebGL via SwiftShader, viewport 844×390, DPR 3 e user-agent de iPhone. Não equivale a Safari, aparelho físico ou medição de desempenho em GPU real.
 - Alguns processos do Godot avisam sobre recursos `ObjectDB` no encerramento; não se afirma ausência de vazamentos. Os testes de descarregamento verificam especificamente os nós das peças e estações.

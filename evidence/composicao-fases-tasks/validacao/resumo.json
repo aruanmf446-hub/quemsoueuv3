@@ -34,6 +34,18 @@
     "crossed_both_directions": true,
     "javascript_errors": [],
     "engine_errors": [],
-    "physical_device": false
+    "physical_device": false,
+    "source_commit": "13a6f77"
+  },
+  "revisao_sem_bandeiras": {
+    "native_graphical_sizes": [
+      "844x390",
+      "1920x1080",
+      "640x360"
+    ],
+    "checkpoint_checks": 21,
+    "scenario_task_checks": 182,
+    "composition_checks": 110,
+    "web_rerun": false
   }
 }

@@ -138,9 +138,6 @@ func _passage_section(width: float,theme: int,lift: bool,index: int) -> void:
 		for x in [-width*0.4,width*0.4]:
 			_box(Vector3(x,-0.36,0),Vector3(0.21,0.22,3.95),"iron")
 			for z in [-1.7,1.7]:_ring(Vector3(x,-0.15,z),0.11,0.03,"iron")
-		if theme in [7,9,10] and index%2 == 0:
-			_quad("cloth",Vector3(-0.31,-0.40,1.82),Vector3(-0.31,-0.92,1.82),Vector3(0.31,-0.92,1.82),Vector3(0.31,-0.40,1.82))
-			_triangle("gold",Vector3(-0.31,-0.92,1.83),Vector3(0,-1.12,1.83),Vector3(0.31,-0.92,1.83))
 	_flush()
 
 func _lower_art(id: String,width: float,from_v: float,top: float,z: float) -> void:

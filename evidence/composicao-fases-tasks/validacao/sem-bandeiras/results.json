@@ -1,0 +1,14 @@
+[
+  {
+    "test": "checkpoint_test",
+    "passed": true
+  },
+  {
+    "test": "scenario_tasks_test",
+    "passed": true
+  },
+  {
+    "test": "composition_test",
+    "passed": true
+  }
+]

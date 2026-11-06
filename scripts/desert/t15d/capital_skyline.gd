@@ -7,6 +7,8 @@ var _palaces: Array[Node3D] = []
 var _order := 1
 var _last_fade := -1.0
 const WALL_SPAN := 28.0
+const WALL_TOP := 1.20
+const WALL_BOTTOM := -14.0
 const PALACE_SPAN := 20.0
 func configure(order: int) -> void:
 	_order = order
@@ -16,7 +18,7 @@ func _ready() -> void:
 		var wall := Props.new()
 		wall.name = "DistantWall%d" % i
 		add_child(wall)
-		wall._box(Vector3(0,0.60,0),Vector3(WALL_SPAN,1.20,0.4),"stone")
+		wall._box(Vector3(0,(WALL_TOP+WALL_BOTTOM)*0.5,0),Vector3(WALL_SPAN,WALL_TOP-WALL_BOTTOM,0.4),"stone")
 		wall._box(Vector3(0,1.22,0.04),Vector3(WALL_SPAN,0.12,0.48),"trim")
 		for tooth in range(-28,28):
 			wall._box(Vector3(tooth*0.5+0.25,1.44,0),Vector3(0.28,0.34,0.40),"stone")

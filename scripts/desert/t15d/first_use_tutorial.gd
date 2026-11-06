@@ -6,7 +6,10 @@ const SAVE_PATH := "user://desert_first_use_v1.cfg"
 const LESSONS := {
  "attack":["Seu primeiro ataque","Você começa sem cargas de ataque ou defesa. Pegue uma recarga de fogo e toque no botão de chama para dar um soco nos cactos. Cada golpe usa uma carga. No teclado: J."],
  "defense":["Sua primeira defesa","Você pegou uma recarga de defesa. Toque no escudo para levantar a parede de terra e bloquear um golpe. Cada defesa usa uma carga. No teclado: Shift."],
- "task":["Sua primeira Task","Este caminho depende de uma tarefa do cenário. Toque em TASK, acima do ataque, para executar a ação indicada. O botão só aparece perto das tarefas e some depois. Não usa cargas de ataque ou defesa. No teclado: F."]}
+ "task":["Sua primeira Task","Este caminho depende de uma tarefa do cenário. Toque em TASK, acima do ataque, para executar a ação indicada. O botão só aparece perto das tarefas e some depois. Não usa cargas de ataque ou defesa. No teclado: F."],
+ "amber":["Âmbar · congele quem vem atrás","Imobilize os cactos atrás de você por alguns segundos. Toque no botão de Âmbar ou use E.\nCada uso gasta 1 carga. Pegue outra recarga para usar de novo."],
+ "dash":["Relâmpago · avance com choque","Corra mais rápido e dê choque nos cactos que tocar. Toque no botão de Relâmpago ou use R.\nCada uso gasta 1 carga. Pegue outra recarga para usar de novo."],
+ "rupture":["Ruptura · abra caminho atrás","Rompa o piso marcado atrás de você para atrasar os cactos. Toque no botão de Ruptura ou use Q.\nCada uso gasta 1 carga; o piso se recompõe após 8 segundos."]}
 var active := false
 var kind := ""
 var _was_paused := false
@@ -14,6 +17,8 @@ var _root: Control
 var _title: Label
 var _body: Label
 var _continue: Button
+var _illustration: TextureRect
+var _panel: PanelContainer
 var _section := "guest"
 var _seen := {}
 func _web_key(lesson: String) -> String:
@@ -36,6 +41,7 @@ func _ready() -> void:
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_root.add_child(center)
 	var panel:=PanelContainer.new()
+	_panel=panel
 	panel.custom_minimum_size=Vector2(660,380)
 	panel.add_theme_stylebox_override("panel",PlayerUI.plate())
 	center.add_child(panel)
@@ -48,6 +54,14 @@ func _ready() -> void:
 	_title=Label.new()
 	_title.add_theme_font_size_override("font_size",32)
 	column.add_child(_title)
+	_illustration=TextureRect.new()
+	_illustration.custom_minimum_size=Vector2(600,180)
+	_illustration.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+	_illustration.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_illustration.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	_illustration.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	_illustration.hide()
+	column.add_child(_illustration)
 	_body=Label.new()
 	_body.custom_minimum_size=Vector2(600,0)
 	_body.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
@@ -73,6 +87,11 @@ func present(lesson: String,context := "") -> void:
 	_was_paused=get_tree().paused
 	_title.text=LESSONS[lesson][0]
 	_body.text=LESSONS[lesson][1]
+	var art_path:="res://assets/desert/tutorial/"+lesson+".res"
+	_illustration.texture=load(art_path) if lesson in ["amber","dash","rupture"] and ResourceLoader.exists(art_path) else null
+	_illustration.visible=_illustration.texture!=null
+	_panel.custom_minimum_size.y=540 if _illustration.visible else 380
+	_panel.reset_size()
 	if not context.is_empty():_body.text+="\n\n"+context
 	_root.show()
 	opened.emit(lesson)

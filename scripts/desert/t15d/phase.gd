@@ -10,7 +10,6 @@ const Pickup = preload("res://scripts/desert/t15d/charge_pickup.gd")
 const CHUNK_SIZE := 64.0
 const AHEAD := 2
 signal return_requested
-var _new_ability := ""
 var _boss: Node3D
 var _order := 1
 var _scenery: Node3D
@@ -103,12 +102,13 @@ func _ready() -> void:
 	_build_hud()
 	_first_use=preload("res://scripts/desert/t15d/first_use_tutorial.gd").new()
 	add_child(_first_use)
+	_restore_ability_buttons()
+	_sync_resources()
 	_first_use.opened.connect(func(_kind: String) -> void:
 		_release_input()
 		_player._model.visible=true)
 	_first_use.closed.connect(func(_kind: String) -> void: _release_input())
 	if _order==1:_first_use.present.call_deferred("attack")
-	_hud.notify({"rupture":"Ruptura descoberta • Q ou botão: rompa o piso marcado atrás de você", "amber":"Âmbar descoberto • E ou botão: congele os perseguidores atrás de você", "dash":"Relâmpago descoberto • R ou botão: avance com mais velocidade"}.get(_new_ability,"Vida 3/3 • guarde até três cargas de cada poder"))
 func _physics_process(delta: float) -> void:
 	if not is_instance_valid(_player): return
 	if not completed and not _respawning:
@@ -225,15 +225,6 @@ func _build_player() -> void:
 	_player.ability_used.connect(_on_ability_used)
 	_player.setup(_find_protagonist())
 	_apply_starting_resources()
-	# Desbloqueio garantido ao alcançar o capítulo; recargas do mapa são opcionais.
-	for ability: String in Layout.ABILITY_PHASE:
-		var first_phase: int = Layout.ABILITY_PHASE[ability]
-		if _order < first_phase:
-			_player.discovered.erase(ability)
-			continue
-		if not _player.discovered.has(ability):
-			_player.restore_charge(ability)
-			if _order == first_phase: _new_ability = ability
 	# Luz de recorte que acompanha o protagonista: o traje escuro não some na muralha.
 	_key_light = OmniLight3D.new()
 	_key_light.name = "PlayerKeyLight"
@@ -250,6 +241,16 @@ func _apply_starting_resources() -> void:
 	if _order==1:
 		_player.attack_charges=0
 		_player.defense_charges=0
+	# O arquivo antigo misturava descoberta por coleta com concessões automáticas.
+	# O tutorial por perfil agora é a fonte da apresentação, sem apagar progresso.
+	for ability: String in Layout.ABILITY_PHASE:
+		_player.abilities[ability]=0
+	_restore_ability_buttons()
+func _restore_ability_buttons() -> void:
+	for ability: String in Layout.ABILITY_PHASE:
+		_player.discovered.erase(ability)
+		if _order>=int(Layout.ABILITY_PHASE[ability]) and is_instance_valid(_first_use) and _first_use.seen(ability):
+			_player.discovered[ability]=true
 func _stream_world(x: float, force := false) -> void:
 	var center := floori(x/CHUNK_SIZE)
 	if center == _stream_center and not force: return
@@ -572,8 +573,9 @@ func _on_pickup_collected(id: String, kind: String) -> void:
 			Pickup.mark_pedestal_spent(pedestal)
 	if _order==1 and kind=="defense" and is_instance_valid(_first_use):
 		_first_use.present.call_deferred("defense")
+	if Layout.ABILITY_PHASE.has(kind) and is_instance_valid(_first_use):
+		_first_use.present.call_deferred(kind)
 	_sfx.play("pickup",1.0 if kind == "attack" else 1.25)
-	_hud.notify({"attack":"Fogo +1","defense":"Defesa +1","health":"Vida +1","rupture":"Ruptura +1 • Q: quebre o piso marcado atrás de você","amber":"Âmbar +1 • E: congele os perseguidores atrás de você","dash":"Relâmpago +1 • R: corra mais rápido"}.get(kind,"+1"))
 func _build_goal() -> void:
 	_goal = Area3D.new()
 	_goal.name = "ExitGate"
@@ -852,6 +854,7 @@ func _respawn_at_checkpoint() -> void:
 	_player.facing = 1
 	_player.setup(_find_protagonist())
 	# Penalidade do checkpoint: volta com 1 vida e sem cargas de ataque/defesa.
+	_apply_starting_resources()
 	_player.health = 1
 	_player.health_changed.emit(_player.health,_player.RUN_MAX_HEALTH)
 	_player.attack_charges = 0

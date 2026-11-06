@@ -1,0 +1,46 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS amber: inicia zerado e oculto, inclusive com save antigo de concessão automática
+PASS amber: nenhum botão fantasma no toque ou teclado
+PASS amber: fase começa sem explicação prematura
+PASS amber: primeira coleta pausa e apresenta a lição correta
+PASS amber: uma carga real e ilustração presente
+PASS amber: ilustração pausa movimento, relógio e uso do poder
+PASS amber: continuar salva e limpa os comandos
+PASS amber: poder coletado funciona
+PASS amber: após usar, botão permanece e contador mostra zero
+PASS amber: explicação não se repete depois de confirmada
+PASS amber: reinício mantém conhecimento, sem fabricar cargas
+PASS amber: fogo atualiza o contador sem texto no centro
+PASS amber: avisos excepcionais ficam na lateral
+PASS dash: inicia zerado e oculto, inclusive com save antigo de concessão automática
+PASS dash: nenhum botão fantasma no toque ou teclado
+PASS dash: fase começa sem explicação prematura
+PASS dash: primeira coleta pausa e apresenta a lição correta
+PASS dash: uma carga real e ilustração presente
+PASS dash: ilustração pausa movimento, relógio e uso do poder
+PASS dash: continuar salva e limpa os comandos
+PASS dash: poder coletado funciona
+PASS dash: após usar, botão permanece e contador mostra zero
+PASS dash: explicação não se repete depois de confirmada
+PASS dash: reinício mantém conhecimento, sem fabricar cargas
+PASS dash: fogo atualiza o contador sem texto no centro
+PASS dash: avisos excepcionais ficam na lateral
+PASS rupture: inicia zerado e oculto, inclusive com save antigo de concessão automática
+PASS rupture: nenhum botão fantasma no toque ou teclado
+PASS rupture: fase começa sem explicação prematura
+PASS rupture: primeira coleta pausa e apresenta a lição correta
+PASS rupture: uma carga real e ilustração presente
+PASS rupture: ilustração pausa movimento, relógio e uso do poder
+PASS rupture: continuar salva e limpa os comandos
+PASS rupture: poder coletado funciona
+PASS rupture: após usar, botão permanece e contador mostra zero
+PASS rupture: explicação não se repete depois de confirmada
+PASS rupture: reinício mantém conhecimento, sem fabricar cargas
+PASS rupture: fogo atualiza o contador sem texto no centro
+PASS rupture: avisos excepcionais ficam na lateral
+PASS reentrada conserva só o poder já apresentado e permitido no capítulo
+POWER_INTRODUCTIONS checks=40 failures=0
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)

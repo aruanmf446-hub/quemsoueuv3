@@ -1,0 +1,26 @@
+[
+  {
+    "test": "power_introductions_test-844x390",
+    "passed": true
+  },
+  {
+    "test": "skyline_depth_render-844x390",
+    "passed": true
+  },
+  {
+    "test": "power_introductions_test-640x360",
+    "passed": true
+  },
+  {
+    "test": "skyline_depth_render-640x360",
+    "passed": true
+  },
+  {
+    "test": "power_introductions_test-1920x1080",
+    "passed": true
+  },
+  {
+    "test": "skyline_depth_render-1920x1080",
+    "passed": true
+  }
+]

@@ -2,6 +2,7 @@ extends CharacterSlot
 ## Clipes exclusivos desta fase: remove deslocamento de raiz que afastava o visual da cápsula.
 var _flash_left := 0.0
 var _flash_material: StandardMaterial3D
+var _status_material: Material
 var _meshes: Array[MeshInstance3D] = []
 var _ground_offsets := {}
 static var _processed := {}
@@ -162,6 +163,11 @@ func flash(color: Color) -> void:
 	for mesh in _meshes:
 		mesh.material_overlay = _flash_material
 
+func set_status_overlay(material: Material) -> void:
+	_status_material=material
+	if _flash_left<=0.0:
+		for mesh in _meshes:mesh.material_overlay=material
+
 func _process(delta: float) -> void:
 	if is_instance_valid(_model_root) and is_instance_valid(_anim_player):
 		var target := float(_ground_offsets.get(_anim_player.assigned_animation,0.0))
@@ -170,5 +176,5 @@ func _process(delta: float) -> void:
 	_flash_left -= delta
 	if _flash_left <= 0.0:
 		for mesh in _meshes:
-			mesh.material_overlay = null
+			mesh.material_overlay = _status_material
 		_flash_material = null

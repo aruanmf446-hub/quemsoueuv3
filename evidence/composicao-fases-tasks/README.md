@@ -2,6 +2,8 @@
 
 Base: `main` em `87a29c1`. Revisão visual na branch `codex/composicao-fases-tasks`.
 
+**Revisão posterior de contexto:** [galeria atual de cidade, rio, aqueduto e mineração](../contexto-regioes/README.md). As fotos desta pasta preservam a rodada anterior de obstáculos e Tasks; a galeria nova mostra os complementos regionais.
+
 **Feedback esclarecido: principalmente pontes e guindastes.** O acabamento atual também retira as bandeiras desenhadas nas próprias artes da ponte, do pilar e do carrinho do guindaste. A correção alcança todos os sprites/recortes desses módulos. [Antes/depois e validação específica](industrial-sem-bandeiras/README.md).
 
 **Correção dos demais enfeites soltos:** retirado o estandarte de todos os checkpoints, o retângulo de tecido aplicado no obstáculo da fase 8 e os enfeites adicionais dos elevadores. O checkpoint agora usa uma pequena lanterna baixa de ferro e pedra, no recuo da pista. A ativação e o retorno após morrer permanecem iguais. Fotos nativas e folhas de contato atualizadas. As fachadas da cidade preservam seus estandartes; pontes e guindastes usam o acabamento sem repetição descrito acima.

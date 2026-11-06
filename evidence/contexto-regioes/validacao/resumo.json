@@ -1,0 +1,33 @@
+{
+  "base": "4d7a022",
+  "source_commit": "173ac719359282ddfcfac12d25eb3a380a7867d5",
+  "functional_checks_passed": 491,
+  "full_routes_passed": [
+    4,
+    5,
+    7,
+    10
+  ],
+  "native_captures": 21,
+  "native_sizes": [
+    "844x390",
+    "1920x1080",
+    "640x360"
+  ],
+  "physical_device_tested": false,
+  "web": {
+    "passed": true,
+    "viewport": "844x390",
+    "dpr": 3,
+    "phases": [
+      3,
+      5,
+      7
+    ],
+    "touch_activation_with_zero_charges": true,
+    "walked_both_directions": true,
+    "javascript_errors": [],
+    "engine_errors": [],
+    "physical_device": false
+  }
+}

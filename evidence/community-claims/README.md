@@ -101,3 +101,13 @@ O T27 registra um aviso de duas instâncias ObjectDB no encerramento.
 O acesso HTTP direto ao domínio Pages não ficou disponível neste ambiente;
 a conclusão da publicação foi confirmada pela execução pública do GitHub Actions.
 Ver [plano do teste HTTP em produção](../../docs/backend/TESTE_HTTP_PRODUCAO_DECKS.md).
+
+
+## Contas QA existentes
+
+Em seguida, a execução [42271709687](https://github.com/aruanmf446-hub/quemsoueuv3/actions/runs/42271709687)
+terminou com Success para a etapa `access`, usando OWNER, READER e R1 já
+configuradas nos GitHub Secrets. Login e consultas passaram nas três contas.
+Não houve criação de contas, resgates, denúncias ou salas. Ver `qa_access.json`.
+O teste com gravações será feito nessas contas existentes, não criando outras,
+e continua separado dessa verificação de acesso.

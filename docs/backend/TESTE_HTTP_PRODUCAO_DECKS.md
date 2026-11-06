@@ -1,43 +1,48 @@
-# Teste HTTP de decks em produção — autorização específica pendente
+# Teste HTTP de decks — contas QA existentes
 
-A revisão automática rejeitou o teste que criaria contas, resgates e partidas
-em produção. Nenhuma conta foi criada e o teste não foi executado. A publicação
-do código e as verificações sem gravação foram concluídas separadamente.
+O repositório já tem o workflow `.github/workflows/community-e2e.yml`, com as
+contas OWNER, READER e R1 por GitHub Secrets. As contas existentes devem ser
+preservadas: não criar substitutas, redefinir senhas ou excluir essas contas.
+As credenciais ficam no Actions e não devem ser exportadas para esta conversa.
 
-## Escopo proposto
+## Verificação executada
 
-- Criar exatamente duas contas temporárias pelo Auth Admin do GAME, sem enviar
-  e-mails. Usar nomes únicos e registrar seus UUIDs para a limpeza.
-- Usar um deck que já está aprovado. Não alterar o autor, seus arquivos,
-  decisões, visibilidade ou denúncias. Não conceder moderação às contas de teste.
-- Resgatar pela primeira conta e conferir duplicidade e isolamento da coleção.
-- Criar uma sala privada com as duas contas e um bot, iniciar e selecionar
-  cartas. Conferir as permissões do adversário e a perda de acesso ao sair.
-- Conferir download de prévias assinadas e recusa de acesso sem assinatura.
+A etapa `access` foi executada na branch `work/deck-runtime-corrections`:
+[run 42271709687](https://github.com/aruanmf446-hub/quemsoueuv3/actions/runs/42271709687),
+commit `8efcda2`, **Success**, duração 31 s.
 
-O primeiro resgate pode preparar uma versão aprovada e suas prévias privadas
-no CATALOG. Essa versão é um cache de conteúdo real aprovado, compartilhável
-com os jogadores; não deve ser apagada caso outros usuários já a estejam usando.
-O teste não deve tocar na revisão manual nem registrar denúncias reais.
+O script `tools/e2e/community_access.py` exige login bem-sucedido de OWNER,
+READER e R1 e valida, para cada uma, os contratos de `qse_community_inventory`,
+`qse_community_decks` e `qse_duel_decks`. A execução falha se faltar qualquer
+credencial, se o login falhar ou se uma consulta retornar contrato inválido.
+Não imprime e-mails, senhas, tokens ou conteúdo privado dos decks.
 
-## Limpeza e comprovação necessárias antes de executar
+Essa etapa não cria contas, decks, resgates, denúncias ou salas. É a etapa
+padrão do workflow; as etapas antigas que gravam dados continuam manuais.
+A etapa antiga `community` registra denúncias e não deve ser confundida com
+uma consulta sem gravação.
 
-1. Capturar os IDs das contas, salas e partidas criadas pelo próprio teste,
-   inclusive quando uma requisição expirar depois de ser aceita no servidor.
-2. Encerrar as participações. Excluir somente as salas capturadas, conferindo
-   também seu nome de teste e criador temporário, antes de excluir as contas.
-3. As constraints foram inspecionadas por leitura: a exclusão de uma conta
-   pode apenas colocar NULL em referências de sala/jogador. Portanto, excluir
-   somente as contas não comprova limpeza das partidas e dos efeitos derivados.
-4. Verificar ausência das salas, membros, partidas, cartas, eventos e jogadores
-   pelos IDs capturados; verificar ausência dos resgates vinculados às contas.
-5. Excluir as duas contas pelo Auth Admin e conferir a remoção, incluindo os
-   dados pessoais dependentes. Executar a limpeza em `finally`, registrar seu
-   resultado e não declarar sucesso se alguma verificação falhar.
-6. Manter senhas, tokens e URLs assinadas somente em memória; não gravá-los no
-   repositório, em evidências ou logs. Relatórios públicos usam apenas nomes
-   dos testes, contagens e resultados, sem UUIDs privados das contas.
+## Próximo teste: resgate e partida nas contas QA
 
-A autorização anterior abrangeu migrations, função e publicação. A revisão
-automática pediu autorização específica para este teste mutante em produção,
-além de comprovação da limpeza. Não repetir o teste até resolver esses pontos.
+O teste anterior com criação de contas temporárias foi rejeitado pela revisão
+automática e não foi executado. O plano corrigido reutiliza OWNER/READER:
+
+- Confirmar com o dono o resgate e a partida de teste nessas contas existentes.
+- Registrar a coleção anterior; não apagar resgates que já existiam.
+- Resgatar um deck já aprovado, conferir idempotência e isolamento da coleção.
+  O novo resgate ficará na conta QA como um resgate normal, salvo decisão
+  explícita de restaurar a coleção anterior.
+- Criar somente uma sala privada de teste, com UUID e criador registrados,
+  incluir adversário/bot e conferir início e seleção de cartas.
+- Encerrar e limpar somente a sala/partida criadas por esse teste. Verificar
+  ausência dos membros, cartas, eventos e jogadores derivados pelos IDs
+  capturados, inclusive após erros de rede.
+- Não excluir contas QA, alterar seus nicknames, conceder moderação, modificar
+  o autor/deck aprovado ou registrar denúncias reais.
+
+O primeiro resgate pode gerar uma versão aprovada e prévias privadas no
+CATALOG. Esse cache legítimo pode ser compartilhado com outros jogadores e
+não deve ser removido indiscriminadamente durante a limpeza.
+
+Esse teste com gravações continua pendente; o sucesso de `access` comprova
+login e consultas, não comprova resgate ou partida HTTP ponta a ponta.

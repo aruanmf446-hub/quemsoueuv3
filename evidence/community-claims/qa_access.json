@@ -1,0 +1,21 @@
+{
+  "workflow": "Comunidade E2E (contas de teste)",
+  "stage": "access",
+  "run_id": 42271709687,
+  "url": "https://github.com/aruanmf446-hub/quemsoueuv3/actions/runs/42271709687",
+  "commit": "8efcda2",
+  "status": "Success",
+  "duration": "31s",
+  "roles_required_by_script": [
+    "OWNER",
+    "READER",
+    "R1"
+  ],
+  "operations": [
+    "password login",
+    "qse_community_inventory",
+    "qse_community_decks",
+    "qse_duel_decks"
+  ],
+  "creates_accounts_decks_claims_reports_or_rooms": false
+}

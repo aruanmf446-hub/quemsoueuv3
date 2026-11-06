@@ -1,0 +1,65 @@
+[
+  {
+    "test": "pedestal_test",
+    "passed": true,
+    "exit_code": 0,
+    "seconds": 2.35,
+    "summary": "m res\u00edduos\nPASS rupture: revisitar recupera s\u00f3 a base, sem duplicar ou reaparecer item\nPASS rupture: apar\u00eancia consumida \u00e9 restaurada ao revisitar\nPASS stream 0: bases \u00fanicas em at\u00e9 cinco chunks\nPASS stream 350: bases \u00fanicas em at\u00e9 cinco chunks\nPASS stream 700: bases \u00fanicas em at\u00e9 cinco chunks\nPASS stream 1100: bases \u00fanicas em at\u00e9 cinco chunks\nPASS stream 0: bases \u00fanicas em at\u00e9 cinco chunks\nPASS sair da fase remove todos os pedestais\nPEDESTALS checks=79 failures=0\nWARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details).\n   at: cleanup (core/object/object.cpp:2536)\n"
+  },
+  {
+    "test": "scenario_tasks_test",
+    "passed": true,
+    "exit_code": 0,
+    "seconds": 10.52,
+    "summary": " cacto persegue saltando e correndo sobre o obst\u00e1culo\nPASS guarda resistente mant\u00e9m perfil pr\u00f3prio\nPASS guarda resiste ao primeiro soco, sem invulnerabilidade artificial\nPASS segundo soco derrota o guarda\nSCENARIO_TASKS checks=182 failures=0\nWARNING: Jolt Physics job system exceeded the maximum number of jobs. This should not happen. Please report this. Waiting for jobs to become available...\n     at: CreateJob (modules/jolt_physics/spaces/jolt_job_system.cpp:123)\nWARNING: 3 ObjectDB instances were leaked at exit (run with `--verbose` for details).\n   at: cleanup (core/object/object.cpp:2536)\n"
+  },
+  {
+    "test": "parkour_revision_test",
+    "passed": true,
+    "exit_code": 0,
+    "seconds": 2.22,
+    "summary": "a recursos\nPASS bot\u00e3o contextual some ap\u00f3s concluir\nPASS ponte atravess\u00e1vel andando para a direita\nPASS ponte atravess\u00e1vel andando para a esquerda\nPASS descarregar e voltar preserva ponte sem duplicar\nPASS ponte fr\u00e1gil usa a pe\u00e7a f\u00edsica de desmoronamento\nPASS pisar inicia aviso antes da queda\nPASS ponte perde colis\u00e3o e deixa cair de verdade\nPASS ponte se recomp\u00f5e para retorno ou nova tentativa\nPASS sa\u00edda limpa pontes e tarefas\nPARKOUR_REVISION checks=52 failures=0\nWARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).\n   at: cleanup (core/object/object.cpp:2536)\n"
+  },
+  {
+    "test": "checkpoint_test",
+    "passed": true,
+    "exit_code": 0,
+    "seconds": 2.03,
+    "summary": "ase e abre o painel\nPASS painel oferece checkpoint, recome\u00e7ar e menu (Voltar ao checkpoint, Recome\u00e7ar fase, Voltar ao menu)\nPASS checkpoint volta com 1 vida\nPASS jogador reaparece na bandeira\nPASS checkpoint volta sem cargas de ataque e defesa\nPASS Cactus derrotado depois do checkpoint volta\nPASS checkpoint continua ativo depois de voltar\nPASS Recome\u00e7ar fase volta ao in\u00edcio e apaga o checkpoint\nPASS Voltar ao menu sai da fase\nCHECKPOINT_RESULT checks=21 failures=0\nWARNING: 6 ObjectDB instances were leaked at exit (run with `--verbose` for details).\n   at: cleanup (core/object/object.cpp:2536)\n"
+  },
+  {
+    "test": "skyline_roofs_test",
+    "passed": true,
+    "exit_code": 0,
+    "seconds": 5.66,
+    "summary": "a o fundo e os terra\u00e7os\nPASS fase09: camada de muralhas/pal\u00e1cios presente\nPASS fase09: dunas aprovadas mantidas\nPASS fase09: pool fixo de tr\u00eas muros e tr\u00eas pal\u00e1cios\nPASS fase09: fundo n\u00e3o adiciona colis\u00e3o nem luz\nPASS fase09: avan\u00e7ar e voltar n\u00e3o cria objetos\nPASS fase09: fundo sem sombras novas\nPASS fase09: decora\u00e7\u00e3o de cobertura n\u00e3o invade outras fases\nPASS fase09: sair limpa o fundo e os terra\u00e7os\nPASS fase10: subterr\u00e2neo preservado sem c\u00e9u ou pal\u00e1cios\nPASS fase10: decora\u00e7\u00e3o de cobertura n\u00e3o invade outras fases\nPASS fase10: sair limpa o fundo e os terra\u00e7os\nSKYLINE_ROOFS checks=75 failures=0\n"
+  },
+  {
+    "test": "first_use_tutorial_test",
+    "passed": true,
+    "exit_code": 0,
+    "seconds": 4.82,
+    "summary": "extual\nPASS bot\u00e3o contextual est\u00e1 dispon\u00edvel durante a explica\u00e7\u00e3o\nPASS Task fica acima do ataque no toque\nPASS bot\u00e3o some depois de executar a Task\nPASS Task preserva a carga de defesa recebida\nPASS controles voltam ap\u00f3s a montagem\nPASS li\u00e7\u00e3o n\u00e3o reaparece ao reabrir a fase 1\nPASS reabrir fase1 mant\u00e9m invent\u00e1rio inicial zerado\nPASS defesa n\u00e3o repete explica\u00e7\u00e3o j\u00e1 lida\nPASS Task seguinte funciona sem repetir a li\u00e7\u00e3o\nPASS fase2 n\u00e3o apresenta as li\u00e7\u00f5es da fase1\nPASS invent\u00e1rio inicial das outras fases preservado\nPASS sair das cenas n\u00e3o deixa o jogo pausado\nFIRST_USE_TUTORIAL checks=21 failures=0\n"
+  },
+  {
+    "test": "composition_test",
+    "passed": true,
+    "exit_code": 0,
+    "seconds": 13.29,
+    "summary": "tado\nPASS fase 10 x61: sem duplica\u00e7\u00e3o e streaming limitado\nPASS fase 10 x65: sem duplica\u00e7\u00e3o e streaming limitado\nPASS fase 10 x350: sem duplica\u00e7\u00e3o e streaming limitado\nPASS fase 10 x700: sem duplica\u00e7\u00e3o e streaming limitado\nPASS fase 10 x1100: sem duplica\u00e7\u00e3o e streaming limitado\nPASS fase 10 x30: sem duplica\u00e7\u00e3o e streaming limitado\nPASS fase 10: recortes vis\u00edveis n\u00e3o perdem UV em atlas aninhados\nPASS fase 10: descarte remove a arte\nCOMPOSITION checks=110 failures=0\nWARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).\n   at: cleanup (core/object/object.cpp:2536)\n"
+  },
+  {
+    "test": "task_barriers_test",
+    "passed": true,
+    "exit_code": 0,
+    "seconds": 3.73,
+    "summary": "da\nPASS p08.gap.32: sem piso ou obst\u00e1culo para contornar a Task\nPASS p09.gap.07: v\u00e3o excede alcance de pulo duplo e corrida\nPASS p09.gap.07: sem piso ou obst\u00e1culo para contornar a Task\nPASS p10.gap.07: v\u00e3o excede alcance de pulo duplo e corrida\nPASS p10.gap.07: sem piso ou obst\u00e1culo para contornar a Task\nPASS fase1: n\u00e3o atravessa Task fechada com pulo duplo e corrida\nPASS fase2: n\u00e3o atravessa Task fechada com pulo duplo e corrida\nTASK_BARRIERS checks=26 failures=0\nWARNING: 3 ObjectDB instances were leaked at exit (run with `--verbose` for details).\n   at: cleanup (core/object/object.cpp:2536)\n"
+  },
+  {
+    "test": "approved_assets_test",
+    "passed": false,
+    "exit_code": 1,
+    "seconds": 14.0,
+    "summary": "nt\u00e9m arte aprovada no mundo\nPASS fase10 instala p10.art.00 desert_mining_gantry\nPASS fase10 instala p10.art.01 desert_mine_crystals\nPASS fase10 instala p10.art.02 desert_timber_bridge\nPASS fase10 instala p10.art.03 desert_mining_gantry\nPASS fase10 instala p10.art.04 desert_mine_crystals\nPASS fase10 instala p10.art.05 desert_mining_gantry\nPASS fase10 instala p10.art.06 desert_mine_crystals\nPASS fase10 preserva apoio do percurso\nPASS fase10 subterr\u00e2nea sem c\u00e9u\nPASS fase10 cont\u00e9m arte aprovada no mundo\nPASS quinze m\u00f3dulos aprovados usados nas dez fases\nAPPROVED_ASSETS_RESULT checks=86 failures=4\n"
+  }
+]

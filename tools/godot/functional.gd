@@ -8,6 +8,9 @@ func check(ok: bool, label: String) -> void:
 func frames(count: int) -> void:
 	for i in range(count): await physics_frame
 func _run() -> void:
+	# Este smoke exercita movimento e combate após as lições. As três pausas e o
+	# inventário inicial zerado são verificados em first_use_tutorial_test.gd.
+	preload("res://tests/desert_night/tutorial_fixture.gd").experienced()
 	var phase := load("res://scenes/desert/phase_01.tscn").instantiate() as Node3D
 	root.add_child(phase)
 	current_scene = phase
@@ -64,6 +67,9 @@ func _run() -> void:
 	enemy.set_physics_process(false)
 	player.facing = 1
 	var enemy_health := enemy.health
+	# O retorno ao checkpoint da fase1 mantém as cargas zeradas por regra.
+	# Preparar uma carga por golpe usando a mesma reposição dos coletáveis.
+	player.call("restore_charge", "attack")
 	Input.action_press("attack")
 	await frames(2)
 	Input.action_release("attack")
@@ -71,6 +77,7 @@ func _run() -> void:
 	await frames(16)
 	check(enemy.health == enemy_health - SidePlayer.ATTACK_DAMAGE, "attack_first_contact")
 	await frames(32)
+	player.call("restore_charge", "attack")
 	Input.action_press("attack")
 	await frames(2)
 	Input.action_release("attack")

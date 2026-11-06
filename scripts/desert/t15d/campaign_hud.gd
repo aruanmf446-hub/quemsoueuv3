@@ -34,6 +34,7 @@ var _flash_peak := 0.0
 var _last_health := 3
 var _actions: HBoxContainer
 var _bridge_task: Button
+var _task_caption: Label
 var _action_buttons := {}
 var _stage: Dictionary
 func configure(stage: Dictionary) -> void:
@@ -110,13 +111,18 @@ func _ready() -> void:
 	_actions.add_theme_constant_override("separation",8)
 	_root.add_child(_actions)
 	_bridge_task = Button.new()
-	_bridge_task.text = "Montar ponte · F"
-	_bridge_task.custom_minimum_size = Vector2(520,64)
+	_bridge_task.text = "TASK"
+	_bridge_task.custom_minimum_size = Vector2(88,88)
 	_bridge_task.focus_mode = Control.FOCUS_NONE
-	PlayerUI.style_button(_bridge_task,true)
+	PlayerUI.style_story_action(_bridge_task)
 	_bridge_task.pressed.connect(bridge_requested.emit)
 	_bridge_task.hide()
 	_root.add_child(_bridge_task)
+	_task_caption=label("",20,PlayerUI.TEXT)
+	_task_caption.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	_task_caption.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	_task_caption.hide()
+	_root.add_child(_task_caption)
 	_actions.visible = not (DisplayServer.is_touchscreen_available() or OS.has_feature("android") or OS.has_feature("web") or UIScale.is_handheld() or "--touch-controls" in OS.get_cmdline_user_args())
 	get_viewport().size_changed.connect(_layout)
 	_layout()
@@ -131,9 +137,10 @@ func box() -> StyleBoxFlat:
 	return PlayerUI.plate()
 func set_bridge_task(available: bool,caption := "Montar ponte · F") -> void:
 	_bridge_task.visible = available
-	if _bridge_task.text!=caption:
-		_bridge_task.text=caption
-		_layout()
+	_bridge_task.tooltip_text=caption
+	_task_caption.text=caption.trim_suffix(" · F")
+	_task_caption.visible=available
+	if available:_position_task(_root.size)
 func _layout() -> void:
 	var viewport_size := get_viewport().get_visible_rect().size
 	var compact := UIScale.is_iphone()
@@ -155,8 +162,16 @@ func _layout() -> void:
 	_actions.position = Vector2(maxf(14,screen.x-_actions.get_combined_minimum_size().x-24),screen.y-104)
 	_toast.position = Vector2(maxf(14,(screen.x-760)*0.5),92 if compact else 128)
 	_toast.size = Vector2(minf(screen.x-28,760),76)
-	_bridge_task.size = _bridge_task.custom_minimum_size
-	_bridge_task.position = Vector2((screen.x-_bridge_task.size.x)*0.5,screen.y-182)
+	_position_task(screen)
+func _position_task(screen: Vector2) -> void:
+	var area: Rect2=preload("res://scripts/desert/t15d/touch.gd").task_area(screen)
+	if _actions.visible and _action_buttons.has("attack"):
+		var attack: Button=_action_buttons.attack
+		area=Rect2(attack.global_position-Vector2(0,104),Vector2(88,88))
+	_bridge_task.size=area.size
+	_bridge_task.position=area.position
+	_task_caption.size=Vector2(240,56)
+	_task_caption.position=Vector2(area.get_center().x-120,area.position.y-58)
 ## Corações para a vida e dois medalhões (espada em chamas = ataque, escudo = defesa), os
 ## mesmos dos itens no mapa. Sem carga, o medalhão fica cinza.
 func _draw_resources() -> void:
@@ -311,6 +326,7 @@ func set_completed(value: bool) -> void:
 	_pause.visible = not value
 	_toast.hide()
 func _process(delta: float) -> void:
+	if _bridge_task.visible:_position_task(_root.size)
 	for child in get_children():
 		if child is Control and child.has_method("_button_at"):
 			_actions.visible = not child.visible

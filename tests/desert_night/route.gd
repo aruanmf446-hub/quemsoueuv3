@@ -38,6 +38,7 @@ func snap(label: String) -> void:
 	var error := root.get_texture().get_image().save_png(output+"_"+label+".png")
 	check(error == OK,"captura nativa "+label)
 func run() -> void:
+	preload("res://tests/desert_night/tutorial_fixture.gd").experienced()
 	var args := OS.get_cmdline_user_args()
 	if args.size() > 0: output = args[0]
 	if args.size() > 1: order = int(args[1])
@@ -61,7 +62,7 @@ func run() -> void:
 	player.died.connect(func() -> void: deaths += 1)
 	await frames(30)
 	check(phase._phase.get("order",0) == order,"cena carrega o mapa correto %02d" % order)
-	check(player.health == 3 and player.attack_charges == 1 and player.defense_charges == 1,"vida e recursos iniciais 3/3, 1/1 e 1/1")
+	check(player.health == 3 and player.attack_charges == (0 if order==1 else 1) and player.defense_charges == (0 if order==1 else 1),"vida e recursos iniciais conforme a fase")
 	check(phase._phase.get("checkpoints",[]).size() == 7,"sete checkpoints de distrito")
 	var origin := player.position.x
 	var goal := float(phase._phase.goal.pos[0])
@@ -88,8 +89,20 @@ func run() -> void:
 			if (tick-last_tick)/1000.0 > 33: print("ROUTE_SLOW step=",step," ms=",(tick-last_tick)/1000.0," x=",player.position.x," time_scale=",Engine.time_scale," active=",phase._troops.get_child_count()," queue=",phase._build_queue.size())
 		last_tick = tick
 		if phase.completed or deaths > 0: break
+		var wait_for_task := false
+		for task: Dictionary in phase._phase.tasks:
+			if not phase._raised_bridges.has(str(task.id)) and player.position.x>=float(task.start)-3.0 and player.position.x<float(task.start) and not player.is_on_floor():
+				wait_for_task=true
+		if wait_for_task:
+			# Pousa na margem para interagir; não tenta atravessar o bloqueio como vão comum.
+			Input.action_release("move_right")
+			Input.action_release("jump")
+			await physics_frame
+			continue
 		# As tarefas novas são acionadas pela entrada física F, como no jogo.
 		if phase._hud._bridge_task.visible and player.is_on_floor():
+			Input.action_release("move_right")
+			Input.action_release("jump")
 			var use := InputEventKey.new()
 			use.physical_keycode=KEY_F
 			use.pressed=true
@@ -97,6 +110,11 @@ func run() -> void:
 			var release := InputEventKey.new()
 			release.physical_keycode=KEY_F
 			Input.parse_input_event(release)
+			await physics_frame
+			continue
+		if not player.is_physics_processing():
+			await physics_frame
+			continue
 		if step == _jump_release_at: Input.action_release("jump")
 		if step == _attack_release_at: Input.action_release("attack")
 		if step == _rupture_release_at: Input.action_release("rupture")

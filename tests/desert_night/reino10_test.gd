@@ -24,7 +24,7 @@ func run() -> void:
 			for other: Dictionary in stage.pickups:
 				if item.id != other.id and absf(float(item.pos[0])-float(other.pos[0]))<2.0: separate=false
 		check(safe and separate,"fase%d: recargas sustentadas pelo piso e separadas" % order)
-		check(stage.holes.all(func(g: Dictionary)->bool:return g.width<=3.2 and absf(g.from_y-g.to_y)<=0.65),"fase%d: saltos alcançáveis por soldados" % order)
+		check(stage.holes.all(func(g: Dictionary)->bool:return g.get("requires_task",false) or (g.width<=3.2 and absf(g.from_y-g.to_y)<=0.65)),"fase%d: saltos alcançáveis por soldados" % order)
 		if order == 2:check(stage.surfaces.all(func(s: Dictionary)->bool:return s.height>=8),"fase2: toda rota sobre edifícios, sem rua como piso")
 		var phase = load("res://scenes/desert/phase_%02d.tscn" % order).instantiate()
 		root.add_child(phase)

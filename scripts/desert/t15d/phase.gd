@@ -38,6 +38,7 @@ var _paused := false
 var _previous_go_back := true
 var _goal: Area3D
 var _tutorial_pit := false
+var _first_use: CanvasLayer
 var _shield: Node3D
 var _saved := false
 var _handoff := false
@@ -100,6 +101,13 @@ func _ready() -> void:
 	_stream_world(_player.position.x,true)
 	_build_camera()
 	_build_hud()
+	_first_use=preload("res://scripts/desert/t15d/first_use_tutorial.gd").new()
+	add_child(_first_use)
+	_first_use.opened.connect(func(_kind: String) -> void:
+		_release_input()
+		_player._model.visible=true)
+	_first_use.closed.connect(func(_kind: String) -> void: _release_input())
+	if _order==1:_first_use.present.call_deferred("attack")
 	_hud.notify({"rupture":"Ruptura descoberta • Q ou botão: rompa o piso marcado atrás de você", "amber":"Âmbar descoberto • E ou botão: congele os perseguidores atrás de você", "dash":"Relâmpago descoberto • R ou botão: avance com mais velocidade"}.get(_new_ability,"Vida 3/3 • guarde até três cargas de cada poder"))
 func _physics_process(delta: float) -> void:
 	if not is_instance_valid(_player): return
@@ -193,6 +201,7 @@ func _build_player() -> void:
 	_player.position = _vec3(_phase.player_spawn)
 	var model := ActorSlot.new()
 	model.name = "Model"
+	model.position.y=-0.06
 	_player.add_child(model)
 	add_child(_player)
 	_player.health_changed.connect(_on_player_health_changed)
@@ -215,6 +224,7 @@ func _build_player() -> void:
 	_player.blocked.connect(func() -> void: _impact(_player.position+Vector3(_player.facing*0.45,0.9,0),Color("#9cdeff")))
 	_player.ability_used.connect(_on_ability_used)
 	_player.setup(_find_protagonist())
+	_apply_starting_resources()
 	# Desbloqueio garantido ao alcançar o capítulo; recargas do mapa são opcionais.
 	for ability: String in Layout.ABILITY_PHASE:
 		var first_phase: int = Layout.ABILITY_PHASE[ability]
@@ -236,6 +246,10 @@ func _build_player() -> void:
 	_shield.name = "SandShield"
 	add_child(_shield)
 	_player.blocked.connect(func() -> void: _shield.absorb(-_player.facing))
+func _apply_starting_resources() -> void:
+	if _order==1:
+		_player.attack_charges=0
+		_player.defense_charges=0
 func _stream_world(x: float, force := false) -> void:
 	var center := floori(x/CHUNK_SIZE)
 	if center == _stream_center and not force: return
@@ -443,6 +457,8 @@ func _update_bridge_hint() -> void:
 			caption=str(device.hole.get("task_text","Montar ponte"))+" · F"
 			break
 	_hud.set_bridge_task(task_available and not _player.is_dead and not completed,caption)
+	if task_available and _order==1 and is_instance_valid(_first_use) and not _first_use.seen("task"):
+		_first_use.present.call_deferred("task","Nesta passagem: "+caption.trim_suffix(" · F")+".")
 func _raise_earth_bridge() -> void:
 	if _player.is_dead or not _player.is_on_floor() or completed or _paused: return
 	for bridge in get_tree().get_nodes_in_group("earth_bridges"):
@@ -551,6 +567,8 @@ func _pit_material(key: String) -> StandardMaterial3D:
 	return material
 func _on_pickup_collected(id: String, kind: String) -> void:
 	_collected_ids[id] = true
+	if _order==1 and kind=="defense" and is_instance_valid(_first_use):
+		_first_use.present.call_deferred("defense")
 	_sfx.play("pickup",1.0 if kind == "attack" else 1.25)
 	_hud.notify({"attack":"Fogo +1","defense":"Defesa +1","health":"Vida +1","rupture":"Ruptura +1 • Q: quebre o piso marcado atrás de você","amber":"Âmbar +1 • E: congele os perseguidores atrás de você","dash":"Relâmpago +1 • R: corra mais rápido"}.get(kind,"+1"))
 func _build_goal() -> void:
@@ -748,6 +766,7 @@ func _release_input() -> void:
 	if is_instance_valid(_touch_pad): _touch_pad.release_all()
 	for action in ["move_left","move_right","jump","attack","defend","crouch","rupture","amber","dash"]: Input.action_release(action)
 func _pause() -> void:
+	if is_instance_valid(_first_use) and _first_use.active:return
 	if completed or _paused or _respawning: return
 	_release_input()
 	_player.cancel_dash()
@@ -875,6 +894,7 @@ func _restart_level() -> void:
 	_player.velocity = Vector3.ZERO
 	_player.facing = 1
 	_player.setup(_find_protagonist())
+	_apply_starting_resources()
 	_player._invulnerable = 0.6
 	_player.set_physics_process(true)
 	_touch_pad.set_process(true)

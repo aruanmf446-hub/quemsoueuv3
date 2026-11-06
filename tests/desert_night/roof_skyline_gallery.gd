@@ -19,6 +19,7 @@ func shot(phase: Node3D, x: float, y: float, name: String, out: String) -> void:
 	records.append({"name":name,"fixture_teleport":true,"x":x,"y":y,"error":error,"iphone":UIScale.is_iphone()})
 	print("SKYLINE_CAPTURE ",name," error=",error)
 func run() -> void:
+	preload("res://tests/desert_night/tutorial_fixture.gd").experienced()
 	var args := OS.get_cmdline_user_args()
 	var out := args[0]
 	DirAccess.make_dir_recursive_absolute(out)

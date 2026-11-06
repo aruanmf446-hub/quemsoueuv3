@@ -2,6 +2,7 @@ extends SceneTree
 var records: Array=[]
 func _initialize() -> void:call_deferred("run")
 func run() -> void:
+	preload("res://tests/desert_night/tutorial_fixture.gd").experienced()
 	var args:=OS.get_cmdline_user_args()
 	var out:=args[0]
 	var dims:=args[1].split("x")

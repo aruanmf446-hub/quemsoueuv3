@@ -46,10 +46,12 @@ static func paths(order: int) -> Array[String]:
 	for slot: Dictionary in _plan.stages[order-1].slots: ids.append(slot.asset)
 	ids.append_array(composition_ids(order))
 	ids.append("capital_archway") # Moldura das tarefas de portão, inclusive nas ruínas.
+	ids.append("desert_timber_bridge") # Madeira e módulos das Tasks; recurso compartilhado.
+	if order in [1,3,7,8,9,10]:ids.append("capital_market_stall") # Tecido só nos mecanismos que o usam.
+	if order in [2,7,9,10]:ids.append("desert_mining_gantry")
 	if order not in [6,10]: ids.append_array(["capital_house","capital_merchant","capital_watchtower","capital_archway"])
 	if order==2: ids.append_array(["capital_house","capital_balcony_house","capital_merchant"])
-	if order==4: ids.append("desert_aqueduct")
-	if order in [7,10]: ids.append("desert_timber_bridge")
+	if order in [4,6]: ids.append("desert_aqueduct")
 	for id: String in ids:
 		var path := String(entry(id).get("texture",""))
 		if not path.is_empty() and not result.has(path): result.append(path)
@@ -71,6 +73,7 @@ static func placements(order: int) -> Array:
 		var chosen: Dictionary={}
 		var x := desired
 		for floor: Dictionary in stage.surfaces:
+			if floor.get("task_void",false):continue
 			var left := float(floor.left)+width*0.5+0.3
 			var right := float(floor.right)-width*0.5-0.3
 			if left>right: continue
@@ -87,6 +90,7 @@ static func placements(order: int) -> Array:
 ## Conjuntos decorativos ancorados em uma laje real. Nunca alteram a física.
 ## Posições relativas e duas profundidades formam ruas e praças, em vez de uma grade.
 static func composition(order: int, slot: int, left: float, right: float, top: float) -> Array[Dictionary]:
+	if surface(order,slot).get("task_void",false):return []
 	var variants: Array
 	match order:
 		1:

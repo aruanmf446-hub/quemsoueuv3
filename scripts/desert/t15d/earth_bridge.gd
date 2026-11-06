@@ -9,6 +9,10 @@ var _shape: CollisionShape3D
 var _hinge: Node3D
 var _angle := 0.0
 var _kind := "bridge"
+var _art: Node3D
+var _cables: Array[MeshInstance3D] = []
+var _cable_anchors: Array[Vector3] = []
+var _cable_ends: Array[Vector3] = []
 func configure(data: Dictionary) -> void:
 	hole = data
 	_kind = str(data.get("task_kind","bridge"))
@@ -34,42 +38,50 @@ func _ready() -> void:
 	_shape.shape = box
 	_shape.disabled = true
 	_deck.add_child(_shape)
-	var mesh := MeshInstance3D.new()
-	var slab := BoxMesh.new()
-	slab.size = size
-	mesh.mesh = slab
-	var earth := StandardMaterial3D.new()
-	earth.albedo_texture = preload("res://assets/desert/phase01/sandstone.png")
-	earth.albedo_color = Color("#bd8e60")
-	mesh.material_override = earth
-	_deck.add_child(mesh)
+	_art = preload("res://scripts/desert/t15d/task_art.gd").new()
+	_deck.add_child(_art)
+	var theme := int(hole.get("theme",4))
 	_deck.hide()
 	if _kind=="gate":
 		_hinge.position=Vector3((start.x+finish.x)*0.5,start.y,0)
 		_hinge.rotation=Vector3.ZERO
-		_deck.position=Vector3(0,1.2,0)
-		box.size=Vector3(2.4,2.4,3.6)
-		slab.size=box.size
-		earth.albedo_texture=null
-		earth.albedo_color=Color("#795739")
+		_deck.position=Vector3(0,2.6,0)
+		box.size=Vector3(2.4,5.2,3.6)
 		_deck.show()
 		_shape.disabled=false
+		_art.gate(theme)
 	elif _kind=="lift":
 		_deck.show()
 		_deck.position.y-=1.6
-	if int(hole.get("theme",4)) in [2,3,5,7,9,10] and _kind!="gate":
-		earth.albedo_texture=null
-		earth.albedo_color=Color("#6b1018") if int(hole.theme)==3 else Color("#816044")
+	if _kind!="gate":_art.passage(span.length(),theme,_kind=="lift")
 	# Estrutura do mecanismo, fora da pista; o piso e a porta têm seus próprios colisores.
-	var props := preload("res://scripts/desert/t15d/city_props.gd").new()
+	var props := preload("res://scripts/desert/t15d/task_art.gd").new()
 	add_child(props)
 	if _kind=="gate":
-		props.place_asset("capital_archway",Vector3((start.x+finish.x)*0.5,start.y,-3.5),5.0)
+		props.gate_frame(theme,Vector3((start.x+finish.x)*0.5,start.y,0))
 	elif _kind=="lift":
-		for x in [start.x,finish.x]:
-			props._box(Vector3(x,start.y+1.9,-2),Vector3(0.18,3.8,0.18),"wood")
-		props._box(Vector3((start.x+finish.x)*0.5,start.y+3.8,-2),Vector3(span.length()+0.4,0.2,0.2),"wood")
-	props._flush()
+		props.supports(start,finish,theme)
+		for side in [-1.0,1.0]:
+			var anchor: Vector3 = (start if side<0 else finish)+Vector3(side*0.85,2.9,-2.3)
+			for fraction in [0.08,0.27]:
+				var cable := MeshInstance3D.new()
+				var rope := CylinderMesh.new()
+				rope.top_radius=0.015
+				rope.bottom_radius=0.015
+				rope.height=1.0
+				rope.radial_segments=6
+				rope.rings=1
+				cable.mesh=rope
+				cable.material_override=props._material("rope")
+				cable.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+				add_child(cable)
+				_cables.append(cable)
+				_cable_anchors.append(anchor)
+				_cable_ends.append(Vector3(side*span.length()*(0.5-fraction),0,-1.7))
+		_update_cables()
+	else:
+		for point in [start-Vector3(0.75,0,0),finish+Vector3(0.75,0,0)]:props.winch(point+Vector3(0,0,-1.2),theme)
+		props._flush()
 	# Marcas sobre o piso das duas margens. Nunca ficam flutuando sobre o vão.
 	for point in [start-Vector3(0.65,0,0),finish+Vector3(0.65,0,0)]:
 		var mark := MeshInstance3D.new()
@@ -91,20 +103,32 @@ func raise_bridge(animated := true) -> void:
 	raised = true
 	_deck.show()
 	if not animated:
-		if _kind=="gate": _hinge.position.y+=3.2
+		if _kind=="gate": _hinge.position.y+=5.5
 		elif _kind=="lift": _deck.position.y=-0.13
+		_update_cables()
 		_shape.set_deferred("disabled",false)
 		return
-	# A peça sobe como parede e gira pela margem até virar passagem.
+	# A física continua com a mesma duração. Só a arte se monta em módulos curtos.
 	var tween := create_tween()
 	_shape.set_deferred("disabled",true)
 	if _kind=="gate":
-		tween.tween_property(_hinge,"position:y",_hinge.position.y+3.2,0.8)
+		tween.tween_property(_hinge,"position:y",_hinge.position.y+5.5,0.8)
 	elif _kind=="lift":
+		tween.set_parallel(true)
 		tween.tween_property(_deck,"position:y",-0.13,0.8)
+		tween.tween_method(func(_progress: float) -> void:_update_cables(),0.0,1.0,0.8)
+		tween.set_parallel(false)
 	else:
-		_hinge.rotation.z = _angle+PI*0.5
-		tween.tween_property(_hinge,"rotation:z",_angle,0.8)
+		_art.deploy()
+		tween.tween_interval(0.8)
 	tween.tween_callback(func() -> void:
 		_shape.set_deferred("disabled",false)
 		assembled.emit())
+
+func _update_cables() -> void:
+	# Atualizado só ao montar/restaurar e durante os 0,8s de içamento.
+	for index in _cables.size():
+		var from := _cable_anchors[index]
+		var to := to_local(_deck.to_global(_cable_ends[index]))
+		var direction := to-from
+		_cables[index].transform=Transform3D(Basis(Quaternion(Vector3.UP,direction.normalized())).scaled_local(Vector3(1,direction.length(),1)),(from+to)*0.5)

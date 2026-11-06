@@ -10,6 +10,10 @@ func _ready() -> void:
 	if not OS.has_feature("iphone_layout_fixture"):
 		push_error("Use only the isolated Web fixture export")
 		return
+	if bool(JavaScriptBridge.eval("new URLSearchParams(location.search).has('firstUse')")):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path("user://desert_first_use_v1.cfg"))
+	else:
+		preload("res://tests/desert_night/tutorial_fixture.gd").experienced()
 	_callback = JavaScriptBridge.create_callback(_probe)
 	JavaScriptBridge.get_interface("window").qseDesertProbe = _callback
 	loading = CampaignLoading.new()
@@ -25,6 +29,13 @@ func rect(control: Control) -> Array:
 	var area := control.get_global_rect()
 	return [area.position.x,area.position.y,area.size.x,area.size.y]
 func _probe(args: Array) -> void:
+	if args.size() and str(args[0])=="tutorial:defense" and is_instance_valid(phase):
+		for item in get_tree().get_nodes_in_group("campaign_pickups"):
+			if phase.is_ancestor_of(item) and item.kind=="defense":
+				phase._player.position=item.global_position+Vector3.UP*0.05
+				phase._player.velocity=Vector3.ZERO
+				phase._player._invulnerable=999
+				break
 	if args.size() and str(args[0]) == "rooftops" and not _switching:
 		_switching=true
 		_switch_to.call_deferred(2)
@@ -37,13 +48,14 @@ func _probe(args: Array) -> void:
 		for kind in ["rupture","amber","dash"]:
 			for index in range(3): phase._player.restore_charge(kind)
 	# TEST ONLY: aproxima o ator de uma recarga real; a física realiza a coleta.
-	if args.size() and str(args[0]) in ["bridge","task"] and is_instance_valid(phase):
-		var hole: Dictionary=phase._phase.tasks[0] if str(args[0])=="task" else phase._phase.tasks.filter(func(g: Dictionary) -> bool:return g.task_kind=="bridge")[0]
+	if args.size() and str(args[0]) in ["bridge","task","tutorial:task"] and is_instance_valid(phase):
+		var hole: Dictionary=phase._phase.tasks[0] if str(args[0]) in ["task","tutorial:task"] else phase._phase.tasks.filter(func(g: Dictionary) -> bool:return g.task_kind=="bridge")[0]
 		phase._player.position=Vector3(float(hole.start)-1.6,float(hole.from_y)+0.1,0)
 		phase._player.velocity=Vector3.ZERO
 		phase._player._invulnerable=999
-		phase._player.attack_charges=0
-		phase._player.defense_charges=0
+		if str(args[0])!="tutorial:task":
+			phase._player.attack_charges=0
+			phase._player.defense_charges=0
 		phase._stream_world(phase._player.position.x,true)
 	if args.size() and str(args[0]) == "pedestal" and is_instance_valid(phase):
 		for item: Node3D in get_tree().get_nodes_in_group("campaign_pickups"):
@@ -58,6 +70,9 @@ func _probe(args: Array) -> void:
 	var state := {"size":[size.x,size.y],"iphone":UIScale.is_iphone(),"stage":"loading","read":PhaseStory.was_read(_order)}
 	if is_instance_valid(phase):
 		state.stage = "play"
+		state.paused=get_tree().paused
+		state.first_use={"active":phase._first_use.active,"kind":phase._first_use.kind,"continue":rect(phase._first_use._continue)}
+		state.attack_charge=phase._player.attack_charges
 		state.order = phase._order
 		state.skyline = is_instance_valid(phase._scenery._skyline)
 		state.palace_pool = phase._scenery._skyline._palaces.size() if state.skyline else 0

@@ -1,0 +1,122 @@
+[
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_01_gate_antes",
+		"on_floor": true
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_01_gate_depois",
+		"on_floor": true
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_02_bridge_antes",
+		"on_floor": true
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_02_bridge_depois",
+		"on_floor": true
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_03_bridge_antes",
+		"on_floor": true
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_03_bridge_depois",
+		"on_floor": true
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_04_bridge_antes",
+		"on_floor": true
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_04_bridge_depois",
+		"on_floor": true
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_05_bridge_antes",
+		"on_floor": true
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_05_bridge_depois",
+		"on_floor": true
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_06_lift_antes",
+		"on_floor": true
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_06_lift_depois",
+		"on_floor": true
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_06_gate_antes",
+		"on_floor": true
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_06_gate_depois",
+		"on_floor": true
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_07_lift_antes",
+		"on_floor": true
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_07_lift_depois",
+		"on_floor": true
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_09_gate_antes",
+		"on_floor": true
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_09_gate_depois",
+		"on_floor": true
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_10_lift_antes",
+		"on_floor": true
+	},
+	{
+		"error": 0,
+		"fixture_teleport": true,
+		"name": "fase_10_lift_depois",
+		"on_floor": true
+	}
+]

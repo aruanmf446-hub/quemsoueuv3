@@ -1,0 +1,129 @@
+{
+  "status": "passed",
+  "run_id": "42279184807",
+  "attempt": "1",
+  "checks": [
+    {
+      "name": "existing_credentials_OWNER",
+      "passed": true
+    },
+    {
+      "name": "login_OWNER",
+      "passed": true
+    },
+    {
+      "name": "existing_credentials_READER",
+      "passed": true
+    },
+    {
+      "name": "login_READER",
+      "passed": true
+    },
+    {
+      "name": "existing_credentials_R1",
+      "passed": true
+    },
+    {
+      "name": "login_R1",
+      "passed": true
+    },
+    {
+      "name": "three_distinct_qa_accounts",
+      "passed": true
+    },
+    {
+      "name": "fixture_belongs_to_qa_author",
+      "passed": true
+    },
+    {
+      "name": "approved_fixture_has_five_cards",
+      "passed": true
+    },
+    {
+      "name": "community_credits_public_creator",
+      "passed": true
+    },
+    {
+      "name": "deck_report_persisted_READER",
+      "passed": true
+    },
+    {
+      "name": "deck_report_persisted_R1",
+      "passed": true
+    },
+    {
+      "name": "duplicate_deck_report_refused",
+      "passed": true
+    },
+    {
+      "name": "own_deck_report_refused",
+      "passed": true
+    },
+    {
+      "name": "empty_deck_report_refused",
+      "passed": true
+    },
+    {
+      "name": "anonymous_qse_deck_report_refused",
+      "passed": true
+    },
+    {
+      "name": "anonymous_qse_player_report_refused",
+      "passed": true
+    },
+    {
+      "name": "player_report_confirmed_without_private_ids",
+      "passed": true
+    },
+    {
+      "name": "duplicate_player_report_refused",
+      "passed": true
+    },
+    {
+      "name": "self_player_report_refused",
+      "passed": true
+    },
+    {
+      "name": "short_player_reason_refused",
+      "passed": true
+    },
+    {
+      "name": "missing_player_refused",
+      "passed": true
+    },
+    {
+      "name": "reporter_cannot_read_private_reports",
+      "passed": true
+    },
+    {
+      "name": "author_removes_qa_image_objects",
+      "passed": true
+    },
+    {
+      "name": "author_removes_qa_cards",
+      "passed": true
+    },
+    {
+      "name": "author_removes_qa_deck",
+      "passed": true
+    },
+    {
+      "name": "qa_deck_removal_read_back",
+      "passed": true
+    }
+  ],
+  "rooms": [],
+  "skipped": [],
+  "accounts_created_or_deleted": false,
+  "stage": "verify",
+  "fixture_tag": "QSE QA REPORT 42278875103-1",
+  "fixture_deck_id": "e1f606e5-d451-4547-9cc1-f7e62cae4037",
+  "player_report_cleanup": "pending_scoped_admin_verification",
+  "sessions_logged_out": {
+    "OWNER": true,
+    "READER": true,
+    "R1": true
+  },
+  "passed": 27,
+  "total": 27
+}

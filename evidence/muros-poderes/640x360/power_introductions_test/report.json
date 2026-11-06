@@ -1,0 +1,60 @@
+{
+	"captures": [
+		{
+			"error": 0,
+			"fixture_teleport": true,
+			"name": "amber_antes_sem_carga",
+			"physical_device": false
+		},
+		{
+			"error": 0,
+			"fixture_teleport": true,
+			"name": "amber_primeira_recarga_licao",
+			"physical_device": false
+		},
+		{
+			"error": 0,
+			"fixture_teleport": true,
+			"name": "amber_usado_botao_zero",
+			"physical_device": false
+		},
+		{
+			"error": 0,
+			"fixture_teleport": true,
+			"name": "dash_antes_sem_carga",
+			"physical_device": false
+		},
+		{
+			"error": 0,
+			"fixture_teleport": true,
+			"name": "dash_primeira_recarga_licao",
+			"physical_device": false
+		},
+		{
+			"error": 0,
+			"fixture_teleport": true,
+			"name": "dash_usado_botao_zero",
+			"physical_device": false
+		},
+		{
+			"error": 0,
+			"fixture_teleport": true,
+			"name": "rupture_antes_sem_carga",
+			"physical_device": false
+		},
+		{
+			"error": 0,
+			"fixture_teleport": true,
+			"name": "rupture_primeira_recarga_licao",
+			"physical_device": false
+		},
+		{
+			"error": 0,
+			"fixture_teleport": true,
+			"name": "rupture_usado_botao_zero",
+			"physical_device": false
+		}
+	],
+	"checks": 40,
+	"failures": 0
+}

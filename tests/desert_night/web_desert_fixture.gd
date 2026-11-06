@@ -29,6 +29,25 @@ func rect(control: Control) -> Array:
 	var area := control.get_global_rect()
 	return [area.position.x,area.position.y,area.size.x,area.size.y]
 func _probe(args: Array) -> void:
+	if args.size() and str(args[0]).begins_with("collect_power:") and is_instance_valid(phase):
+		var kind:=str(args[0]).trim_prefix("collect_power:")
+		var item: Dictionary=phase._phase.pickups.filter(func(p: Dictionary) -> bool:return p.kind==kind)[0]
+		phase._player.position=Vector3(float(item.pos[0]),float(item.pos[1])+0.05,0)
+		phase._player.velocity=Vector3.ZERO
+		phase._player._invulnerable=999
+		phase._stream_world(phase._player.position.x,true)
+		for i in 2400:
+			if phase._build_queue.is_empty():break
+			phase._process(0)
+		for enemy in phase._troops.get_children():phase._retire_enemy(enemy)
+	if args.size() and str(args[0])=="rupture_floor" and is_instance_valid(phase):
+		var floor: Dictionary=phase._phase.platforms.filter(func(p: Dictionary) -> bool:return p.get("breakable",false))[0]
+		phase._player.position=Vector3(float(floor.span_end)+3,float(floor.surface_top)+0.05,0)
+		phase._player.velocity=Vector3.ZERO
+		phase._stream_world(phase._player.position.x,true)
+		for i in 2400:
+			if phase._build_queue.is_empty():break
+			phase._process(0)
 	if args.size() and str(args[0])=="tutorial:defense" and is_instance_valid(phase):
 		for item in get_tree().get_nodes_in_group("campaign_pickups"):
 			if phase.is_ancestor_of(item) and item.kind=="defense":
@@ -71,7 +90,7 @@ func _probe(args: Array) -> void:
 	if is_instance_valid(phase):
 		state.stage = "play"
 		state.paused=get_tree().paused
-		state.first_use={"active":phase._first_use.active,"kind":phase._first_use.kind,"continue":rect(phase._first_use._continue)}
+		state.first_use={"active":phase._first_use.active,"kind":phase._first_use.kind,"continue":rect(phase._first_use._continue),"illustration":phase._first_use._illustration.visible}
 		state.attack_charge=phase._player.attack_charges
 		state.order = phase._order
 		state.skyline = is_instance_valid(phase._scenery._skyline)

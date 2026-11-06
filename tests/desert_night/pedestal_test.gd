@@ -18,6 +18,7 @@ func capacity(player: Node, kind: String, amount: int) -> void:
 		"defense": player.defense_charges = amount
 		_: player.abilities[kind] = amount
 func run() -> void:
+	preload("res://tests/desert_night/tutorial_fixture.gd").experienced()
 	var phase: Node3D = load("res://scenes/desert/phase_05.tscn").instantiate()
 	root.add_child(phase)
 	current_scene = phase

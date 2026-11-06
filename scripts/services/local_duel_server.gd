@@ -33,6 +33,7 @@ var rng := RandomNumberGenerator.new()
 var clock_offset := 0.0
 
 var _decks: Array = []
+var community_decks: Array = []
 var _room: Dictionary = {}
 var _members: Array = []
 var _match: Dictionary = {}
@@ -77,7 +78,7 @@ func now() -> float:
 
 # --- Decks (assets/duel/decks, mesmas regras de tools/duel/sync_decks.py) ------------------
 func decks() -> Array:
-	if not _decks.is_empty(): return _decks
+	if not _decks.is_empty(): return _decks+community_decks
 	var valid := RegEx.create_from_string(VALID_ID)
 	var folders := Array(DirAccess.get_directories_at(DECKS_ROOT))
 	folders.sort()
@@ -102,7 +103,7 @@ func decks() -> Array:
 			"order": int(info.get("order", 99)), "cards": cards})
 	_decks.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return a.id < b.id if a.order == b.order else a.order < b.order)
-	return _decks
+	return _decks+community_decks
 
 
 func default_settings() -> Dictionary:

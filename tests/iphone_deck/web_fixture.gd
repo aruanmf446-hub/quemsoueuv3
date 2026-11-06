@@ -18,10 +18,15 @@ func _run() -> void:
 	var mode := str(JavaScriptBridge.eval("new URLSearchParams(location.search).get('fixture')||'nickname'")) if OS.has_feature("web") else fixture_mode
 	var fake: SupabaseClient
 	if mode=="community": fake=preload("res://tests/community_attribution/fake_game.gd").new()
+	elif mode=="claim": fake=preload("res://tests/community_claims/visual_game.gd").new()
 	elif mode=="report": fake=preload("res://tests/deck_runtime_corrections/fake_game.gd").new()
 	else: fake=preload("res://tests/community_t27/fake_game.gd").new()
 	add_child(fake)
 	fixture_game=fake
+	if mode=="claim":
+		services.community_decks.queue_free()
+		services.community_decks=preload("res://tests/community_claims/visual_service.gd").new()
+		services.add_child(services.community_decks)
 	var profile := preload("res://tests/nickname_onboarding/fake_profile_client.gd").new()
 	add_child(profile)
 	fake.user=profile.user_id
@@ -45,7 +50,8 @@ func _run() -> void:
 	else:
 		ui=load("res://scenes/player/deck_library.tscn").instantiate()
 		add_child(ui)
-		if mode=="status": await _seed_submission()
+		if mode=="claim": ui._render_deck(fake.gallery())
+		elif mode=="status": await _seed_submission()
 		elif mode=="report":
 			await ui._open_community(fake.PUBLISHED)
 			fake.report_code="cannot_report_own"
@@ -90,6 +96,7 @@ func _seed_submission() -> void:
 	ui._open_submissions()
 
 func _probe(args: Array) -> void:
+	if args.size() and str(args[0])=="owned_collection": ui._select_tab("Meus Decks")
 	if args.size() and str(args[0])=="report_success" and is_instance_valid(fixture_game):
 		fixture_game.report_code=""
 	if args.size() and str(args[0])=="approve_fixture" and is_instance_valid(fixture_game):

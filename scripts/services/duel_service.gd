@@ -88,6 +88,10 @@ func _rpc(name: String, params: Dictionary = {}) -> Dictionary:
 
 
 func load_decks() -> Dictionary:
+	var community := _community()
+	if community!=null:
+		await community.refresh()
+		if local_server!=null: local_server.community_decks=community.local_entries()
 	var result := await _rpc("qse_duel_decks")
 	if result.ok and result.data is Dictionary:
 		decks = result.data.get("decks", [])
@@ -100,11 +104,15 @@ func list_rooms(term: String, only_open: bool) -> Dictionary:
 
 
 func create(name: String, public: bool, settings: Dictionary) -> Dictionary:
-	return _apply(await _rpc("qse_duel_create", {"p_name": name.strip_edges(), "p_public": public, "p_settings": settings}))
+	var community := _community()
+	if community!=null:
+		var assets := await community.ensure_ready(settings.get("deck_ids",[]))
+		if not assets.ok: return assets
+	return await _apply(await _rpc("qse_duel_create", {"p_name": name.strip_edges(), "p_public": public, "p_settings": settings}))
 
 
 func join(code: String) -> Dictionary:
-	return _apply(await _rpc("qse_duel_join", {"p_code": code}))
+	return await _apply(await _rpc("qse_duel_join", {"p_code": code}))
 
 
 ## Convite temporário (T16D): só o ADM gera; um novo invalida o anterior. O token só
@@ -116,7 +124,7 @@ func create_invite(minutes := 60) -> Dictionary:
 
 ## Entrada por convite: mesma resposta de join (lobby = jogador; partida = espectador).
 func join_invite(token: String) -> Dictionary:
-	return _apply(await _rpc("qse_duel_invite_join", {"p_token": token.strip_edges().to_lower()}))
+	return await _apply(await _rpc("qse_duel_invite_join", {"p_token": token.strip_edges().to_lower()}))
 
 
 ## Link do convite. Web: o endereço real da página atual (origem + caminho), sem domínio
@@ -139,16 +147,16 @@ static func invite_token(text: String) -> String:
 
 
 func configure(name: Variant, public: Variant, settings: Dictionary) -> Dictionary:
-	return _apply(await _rpc("qse_duel_configure", {"p_room": room_id(), "p_name": name, "p_public": public, "p_settings": settings}))
+	return await _apply(await _rpc("qse_duel_configure", {"p_room": room_id(), "p_name": name, "p_public": public, "p_settings": settings}))
 
 
 func add_bot() -> Dictionary:
-	return _apply(await _rpc("qse_duel_add_bot", {"p_room": room_id()}))
+	return await _apply(await _rpc("qse_duel_add_bot", {"p_room": room_id()}))
 
 
 func kick(member_id: String) -> Dictionary:
 	var previous_room := room_id()
-	var result := _apply(await _rpc("qse_duel_kick", {"p_room": previous_room, "p_member": member_id}))
+	var result := await _apply(await _rpc("qse_duel_kick", {"p_room": previous_room, "p_member": member_id}))
 	# After the authoritative GAME kick succeeds, revoke LiveKit access even
 	# when the admin is not personally connected to the optional voice chat.
 	if result.ok and not is_local() and room_id() == previous_room \
@@ -159,27 +167,29 @@ func kick(member_id: String) -> Dictionary:
 
 
 func start() -> Dictionary:
-	return _apply(await _rpc("qse_duel_start", {"p_room": room_id()}))
+	return await _apply(await _rpc("qse_duel_start", {"p_room": room_id()}))
 
 
 ## Seleção secreta: exatamente N cartas distintas dos decks da sala.
 func select_cards(cards: Array) -> Dictionary:
-	return _apply(await _rpc("qse_duel_select", {"p_room": room_id(), "p_cards": cards}))
+	return await _apply(await _rpc("qse_duel_select", {"p_room": room_id(), "p_cards": cards}))
 
 
 ## Voto do jogador da vez.
 func pick(card_id: String) -> Dictionary:
-	return _apply(await _rpc("qse_duel_pick", {"p_room": room_id(), "p_card": card_id}))
+	return await _apply(await _rpc("qse_duel_pick", {"p_room": room_id(), "p_card": card_id}))
 
 
 ## Imagem e nome de uma carta "<deck>/<arquivo>" (assets/duel/decks/<deck>/<arquivo>.png).
 static var _deck_info := {}
 static func card_texture(card_id: String) -> Texture2D:
+	if CommunityDecksService.is_ref(card_id.get_slice("/",0)): return CommunityDecksService.texture(card_id)
 	var path := "res://assets/duel/decks/oficial/%s.png" % card_id
 	return load(path) as Texture2D if ResourceLoader.exists(path) else null
 
 
 static func card_name(card_id: String) -> String:
+	if CommunityDecksService.cards.has(card_id): return str(CommunityDecksService.cards[card_id].name)
 	var deck := card_id.get_slice("/", 0)
 	var file := card_id.get_slice("/", 1)
 	if not _deck_info.has(deck):
@@ -228,7 +238,7 @@ static func _timestamp(text: String) -> float:
 
 func refresh() -> Dictionary:
 	if not in_room(): return ServiceResult.failure("not_member")
-	return _apply(await _rpc("qse_duel_room", {"p_room": room_id()}))
+	return await _apply(await _rpc("qse_duel_room", {"p_room": room_id()}))
 
 
 func leave() -> Dictionary:
@@ -239,10 +249,20 @@ func leave() -> Dictionary:
 
 
 ## Toda resposta com sala vira o estado atual; o sinal de vida começa/continua.
+func _community() -> CommunityDecksService:
+	var services := PlayerServices.current
+	return services.community_decks if services!=null else null
+
 func _apply(result: Dictionary) -> Dictionary:
+	var epoch := client.generation if client!=null else 0
 	if result.ok:
 		if not result.data is Dictionary or not result.data.get("room") is Dictionary:
 			return ServiceResult.failure("invalid_contract")
+		var community := _community()
+		if community!=null:
+			var assets := await community.ensure_ready(result.data.get("room",{}).get("settings",{}).get("deck_ids",[]))
+			if not assets.ok: result.data["asset_error"]=str(assets.code)
+		if client!=null and epoch!=client.generation: return ServiceResult.failure("session_changed")
 		room = result.data
 		_received_at = Time.get_ticks_msec() / 1000.0
 		# Durante a partida o sinal de vida é mais frequente: turnos e revelações têm prazo curto.
@@ -265,7 +285,13 @@ func _count_play() -> void:
 	if client == null or client.access_token.is_empty(): return
 	for deck: Variant in room.room.get("settings", {}).get("deck_ids", []):
 		if deck is String and (deck as String).is_valid_filename():
-			client.call_rpc("qse_deck_record_play", {"p_deck_ref": "official:" + deck})
+			var ref := "official:"+str(deck)
+			var community := _community()
+			if CommunityDecksService.is_ref(str(deck)) and community!=null:
+				var source := community.source_deck_id(str(deck))
+				if source.is_empty(): continue
+				ref="creator:"+source
+			client.call_rpc("qse_deck_record_play", {"p_deck_ref":ref})
 
 
 func _heartbeat() -> void:
@@ -300,6 +326,7 @@ static func message(code: String) -> String:
 		"cannot_kick_self": return "Você não pode remover a si mesmo."
 		"not_member": return "Você não está mais nesta sala."
 		"invalid_selection": return "Escolha a quantidade certa de cartas diferentes."
+		"deck_unavailable", "deck_not_owned", "preview_unavailable": return CommunityService.message(code)
 		"no_decks": return "Nenhum deck de cartas foi publicado no servidor ainda."
 		"not_selection_phase": return "A seleção de cartas já terminou."
 		"not_in_match": return "Você não está participando desta partida."

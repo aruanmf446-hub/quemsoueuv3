@@ -9,6 +9,12 @@ const BUCKET := "qse-deck-originals"
 const CACHE := "user://community_cache"
 const LIST_TTL := 120.0
 const ERRORS := {
+	"deck_unavailable":"Este deck não está disponível para resgate ou novas partidas.",
+	"deck_changed":"O deck foi atualizado. Abra-o novamente e tente resgatar.",
+	"deck_not_owned":"Resgate este deck na Comunidade antes de usá-lo.",
+	"catalog_unavailable":"Não foi possível preparar as cartas. Tente novamente.",
+	"backend_unavailable":"O serviço de decks não respondeu. Tente novamente.",
+	"preview_unavailable":"Não foi possível carregar as imagens do deck. Tente novamente.",
 	"min_cards": "O deck precisa de pelo menos 5 cartas com imagem e nome.",
 	"missing_images_or_previews": "Envie o deck para a sua conta (com todas as imagens) antes de publicar.",
 	"invalid_status": "Este deck já está em revisão ou publicado.",

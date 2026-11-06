@@ -4,6 +4,8 @@ extends PlayerScreen
 const Catalog = preload("res://scripts/decks/deck_library_catalog.gd")
 const StylePrompt = preload("res://scripts/decks/deck_style_prompt.gd")
 var _publish_busy := false
+var _claim_busy := false
+var _owned_pulled := false
 var _report_dialog: Control
 var _report_busy := false
 const TABS := ["Descobrir", "Populares", "Recentes", "Favoritos", "Meus Decks"]
@@ -96,6 +98,8 @@ func _ready() -> void:
 		# Trocar de conta troca também os rascunhos e favoritos visíveis.
 		_drafts = null
 		_pulled_decks = false
+		_owned_pulled=false
+		_claim_busy=false
 		_pulled_favorites = false
 		_remote_error.clear()
 		_community_cover_attempts.clear()
@@ -262,6 +266,9 @@ func _select_tab(tab: String) -> void:
 
 ## Entradas reais. Decks de demonstração só existem quando um TESTE preenche _demo_entries.
 func _entries() -> Array[Dictionary]:
+	if not _owned_pulled and services.session.authenticated():
+		_owned_pulled=true
+		_pull_owned.call_deferred()
 	var result: Array[Dictionary] = []
 	for item in _catalog:
 		var images: Array = (item.cards as Array).map(func(card: Dictionary) -> String: return str(card.image))
@@ -290,6 +297,16 @@ func _entries() -> Array[Dictionary]:
 			"cover": cover, "focus": DeckCover.PORTRAIT_FOCUS, "images": [cover] if not cover.is_empty() else [],
 			"ref": "creator:" + str(row.id), "score": float(row.get("score", 0)),
 			"published": PlayerContracts.iso_seconds(str(row.get("published_at", "")) if row.get("published_at") != null else "")})
+	if services.community_decks!=null:
+		for own: Dictionary in services.community_decks.library_entries():
+			var found := false
+			for entry: Dictionary in result:
+				if str(entry.id)==str(own.id) and str(entry.origin)=="community":
+					entry.owned=true
+					entry.owned_ref=own.owned_ref
+					found=true
+					break
+			if not found: result.append(own)
 	for demo: Dictionary in _demo_entries: result.append(demo)
 	return result
 
@@ -613,7 +630,7 @@ func _render_submissions() -> void:
 
 func _matches(entry: Dictionary) -> bool:
 	if not _types.is_empty() and not _types.has(str(entry.origin)):
-		if not (_types.has("mine") and str(entry.origin) == "official" and bool(entry.get("owned", false))): return false
+		if not (_types.has("mine") and bool(entry.get("owned", false))): return false
 	if not _themes.is_empty() and not _themes.has(str(entry.category)): return false
 	var term := Catalog.search_key(_query)
 	return term.is_empty() or Catalog.search_key("%s %s" % [entry.name, entry.creator]).contains(term)
@@ -1045,6 +1062,9 @@ func _banner(slide: Dictionary, total: int) -> Control:
 
 
 func _open_entry(entry: Dictionary) -> void:
+	if entry.has("owned_ref"):
+		_open_owned(str(entry.owned_ref))
+		return
 	if entry.get("community", false):
 		_open_community(str(entry.id))
 		return
@@ -1387,6 +1407,14 @@ func _render_deck(item: Dictionary) -> void:
 	metadata.add_child(_heart(str(item.id)))
 	if item.get("community", false):
 		metadata.add_child(PlayerUI.pill("COMUNIDADE", "available"))
+		if services.community_decks.is_claimed(str(item.id)):
+			metadata.add_child(PlayerUI.pill("NA SUA CONTA", "equipped"))
+		elif services.session.authenticated():
+			var redeem := _action("RESGATAR GRÁTIS",func()->void:await _claim_community(str(item.id)))
+			PlayerUI.editor_control(redeem,true)
+			redeem.name="RedeemCommunityDeck"
+			redeem.disabled=_claim_busy
+			metadata.add_child(redeem)
 		var report := _action("Denunciar", _report_deck.bind(str(item.id)))
 		report.name = "ReportDeck"
 		metadata.add_child(report)
@@ -2148,3 +2176,38 @@ func _open_rewards() -> void:
 	var overlay := NewsOverlay.new()
 	overlay.name = "OfficialRewardsOverlay"
 	add_child(overlay)
+
+
+func _pull_owned() -> void:
+	var result := await services.community_decks.refresh()
+	if is_inside_tree() and result.ok and _view=="library": _update_results()
+
+func _claim_community(id: String) -> void:
+	var epoch := _moderation_generation
+	if _claim_busy: return
+	_claim_busy=true
+	var button := find_child("RedeemCommunityDeck",true,false) as Button
+	if button!=null:
+		button.disabled=true
+		button.text=tr("Resgatando…")
+	banner.show_state("loading",tr("Preparando seu deck. Aguarde a confirmação."))
+	var result := await services.community_decks.claim(id)
+	if epoch!=_moderation_generation: return
+	_claim_busy=false
+	if not is_inside_tree(): return
+	if is_instance_valid(button):
+		button.disabled=false
+		button.text=tr("RESGATAR GRÁTIS")
+	if result.ok:
+		if _view=="deck" and str(_deck.get("id",""))==id: _render_deck(_deck)
+		banner.show_state("success",tr("Deck guardado na sua conta e liberado no Mata-Mata.") if result.data.inventory_refreshed else tr("Resgate confirmado. Atualize Meus Decks para carregar as cartas."))
+	else: banner.show_state("error",tr("Resgate não concluído: ")+CommunityService.message(str(result.code)))
+
+func _open_owned(ref: String) -> void:
+	banner.show_state("loading",tr("Carregando as cartas do seu deck…"))
+	var result := await services.community_decks.open_owned(ref)
+	if not is_inside_tree(): return
+	if result.ok:
+		_render_deck(result.data)
+		banner.hide()
+	else: banner.show_state("error",CommunityService.message(str(result.code)))

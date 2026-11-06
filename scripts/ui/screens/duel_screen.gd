@@ -100,6 +100,7 @@ func render() -> void:
 			_room_stage_skin=""
 	PlayerUI.clear(body)
 	banner.show_state("success")
+	if duel.room.has("asset_error"): banner.show_state("error",CommunityService.message(str(duel.room.asset_error)))
 	_header_extras(_view == "browse" and _online() and not duel.in_room())
 	# A partida local permanece acessível ao sair da sala, sem exigir login.
 	if (not services.session.authenticated() and not duel.is_local()) or (duel.is_local() and not duel.in_room() and _view != "form"):
@@ -995,9 +996,10 @@ func _deck_entries() -> Array:
 	for deck: Dictionary in list:
 		var id := str(deck.get("id", ""))
 		var item := LibraryCatalog.find_deck(id)
+		var cover := services.community_decks.cover_image(id) if CommunityDecksService.is_ref(id) else str(deck.get("cover",""))
 		result.append({"id": id, "name": str(deck.get("name", id)), "size": int(deck.get("size", 0)),
-			"cover": DeckCover.resolve_item(item) if not item.is_empty() else str(deck.get("cover", "")), "favorite": store.is_favorite(id),
-			"ref": "official:" + id})
+			"cover": DeckCover.resolve_item(item) if not item.is_empty() else cover, "favorite": store.is_favorite(id),
+			"ref": ("creator:"+services.community_decks.source_deck_id(id)) if CommunityDecksService.is_ref(id) else "official:"+id, "community":CommunityDecksService.is_ref(id)})
 	return result
 
 
@@ -1007,7 +1009,8 @@ func _deck_visible(entry: Dictionary) -> bool:
 	match _deck_tab:
 		"Favoritos": return bool(entry.favorite)
 		"Bombando": return float(_deck_stats.get(str(entry.ref), {}).get("score", 0.0)) > 0.0
-		"Meus decks", "Comprados": return false
+		"Meus decks": return bool(entry.get("community",false))
+		"Comprados": return false
 	return true
 
 

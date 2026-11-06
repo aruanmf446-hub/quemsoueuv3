@@ -9,6 +9,7 @@ var client: SupabaseClient
 var chat_client: SupabaseClient
 var catalog_client: SupabaseClient
 var session: SessionService
+var community_decks: CommunityDecksService
 var rewards: OfficialRewardsService
 var preferences: DevicePreferences
 var profile: ProfileService
@@ -100,6 +101,8 @@ func _ready() -> void:
 	presence.friends = friends
 	presence.session = session
 	add_child(presence)
+	community_decks = CommunityDecksService.new()
+	add_child(community_decks)
 	duel = DuelService.new()
 	duel.client = client
 	duel.session = session
@@ -142,6 +145,12 @@ func _exit_tree() -> void:
 
 
 func _session_changed() -> void:
+	community_decks.clear()
+	# Community decks belong to the signed-in account; official local play stays independent.
+	if duel.local_server!=null: duel.local_server.community_decks=[]
+	duel.decks=[]
+	if duel.is_local() and duel.in_room() and (duel.room.room.get("settings",{}).get("deck_ids",[]) as Array).any(func(id:Variant)->bool:return CommunityDecksService.is_ref(str(id))):
+		duel.leave()
 	rewards.clear()
 	presence.stop()
 	profile.clear()

@@ -56,6 +56,8 @@ func setup(entry: Dictionary, spawn: Dictionary) -> void:
 	_cooldown = 0.0
 	crystallized_left = 0.0
 	if is_instance_valid(_crystal): _crystal.queue_free()
+	_crystal=null
+	_model.set_status_overlay(null)
 	_model.set_rate(1.0)
 	_model.play_animation("base",true)
 	collision_layer = 4
@@ -78,7 +80,7 @@ func _physics_process(delta: float) -> void:
 		velocity = Vector3.ZERO
 		_model.set_rate(0.0)
 		if crystallized_left <= 0.0:
-			if is_instance_valid(_crystal): _crystal.queue_free()
+			if is_instance_valid(_crystal): _crystal.finish()
 			_model.set_rate(1.0)
 		return
 	_cooldown = maxf(_cooldown - delta, 0.0)
@@ -206,6 +208,7 @@ func _die() -> void:
 	crystallized_left = 0.0
 	_model.set_rate(1.0)
 	if is_instance_valid(_crystal): _crystal.queue_free()
+	_model.set_status_overlay(null)
 	defeated.emit()
 	remove_from_group("enemies")
 	velocity = Vector3.ZERO
@@ -240,27 +243,17 @@ func _can_jump_route(direction: float) -> bool:
 	return not hit.is_empty() and hit.collider.get_meta("parkour_route",false) and float(hit.position.y)-global_position.y<=1.3
 
 func crystallize(seconds: float) -> void:
-	if _state == State.DEAD: return
+	if _state == State.DEAD or seconds<=0.0:return
+	var already_frozen:=crystallized_left>0.0
 	crystallized_left = maxf(crystallized_left,seconds)
 	_windup = 0.0
 	velocity = Vector3.ZERO
-	if is_instance_valid(_crystal): return
-	_crystal = Node3D.new()
-	add_child(_crystal)
-	var material := StandardMaterial3D.new()
-	material.albedo_color = Color(1.0,0.77,0.30,0.35)
-	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	for index in range(3):
-		var mesh := MeshInstance3D.new()
-		var crystal := CylinderMesh.new()
-		crystal.top_radius = 0.0
-		crystal.bottom_radius = 0.38
-		crystal.height = 1.6+index*0.2
-		crystal.radial_segments = 5
-		mesh.mesh = crystal
-		mesh.material_override = material
-		mesh.position = Vector3((index-1)*0.35,0.9,0.25)
-		_crystal.add_child(mesh)
+	if not is_instance_valid(_crystal):
+		_crystal=preload("res://scripts/desert/t15d/amber_freeze.gd").new()
+		_crystal.actor_model=_model
+		add_child(_crystal)
+	if already_frozen:_crystal.extend(crystallized_left)
+	else:_crystal.begin(crystallized_left)
 
 ## Procura uma laje real de aterrissagem; não pula abismo sem destino nem muro alto.
 func can_jump_gap(direction: float) -> bool:

@@ -17,7 +17,8 @@ const out=process.env.QSE_POWER_WEB_OUT||'/tmp/qse-web-powers';fs.mkdirSync(out,
  await page.goto('http://127.0.0.1:8135/quemsoueuv3/?firstUse=1',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>typeof window.qseDesertProbe==='function');let s=await state();await tap(s.skip,s);
  console.log('Opening lesson');s=await wait(s=>s.stage==='play'&&s.first_use.active);await tap(s.first_use.continue,s);await wait(s=>!s.paused);
- for(const [order,kind] of [[3,'amber'],[4,'dash'],[5,'rupture']]){
+ const selected=process.env.QSE_POWER_WEB_KINDS?.split(',');
+ for(const [order,kind] of [[3,'amber'],[4,'dash'],[5,'rupture']].filter(pair=>!selected||selected.includes(pair[1]))){
   const before=await launch(order);if(before.charges[kind]!==0||before.buttons[kind]||before.paused)throw Error(kind+': premature charge/button/lesson');
   await page.evaluate(k=>window.qseDesertProbe('collect_power:'+k),kind);
   const lesson=await wait((s,k)=>s.first_use.active&&s.first_use.kind===k,kind);
@@ -29,6 +30,7 @@ const out=process.env.QSE_POWER_WEB_OUT||'/tmp/qse-web-powers';fs.mkdirSync(out,
   const b=s.buttons[kind];if(!b)throw Error(kind+': missing power touch button');await tap([b[0]-b[2],b[1]-b[2],b[2]*2,b[2]*2],s);
   const used=await wait((s,k)=>s.charges[k]===0,kind);if(!used.buttons[kind]||used.paused)throw Error(kind+': zero button disappeared');
   await page.screenshot({path:out+'/'+kind+'_zero.png',scale:'css'});results.push({kind,before,lesson,used});console.log('PASS '+kind);
+  if(kind==='amber'&&process.env.QSE_FREEZE_SHOWCASE){await page.evaluate(()=>window.qseDesertProbe('amber_showcase'));await wait(s=>s.amber_showcase);await page.waitForTimeout(700);await page.screenshot({path:out+'/amber_showcase.png',scale:'css'});}
  }
  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>typeof window.qseDesertProbe==='function');s=await state();if(s.stage==='loading'){await tap(s.skip,s);await wait(s=>s.stage==='play');}
  const replay=await launch(3);if(replay.charges.amber!==0||!replay.buttons.amber||replay.buttons.dash||replay.paused)throw Error('Profile/reload persistence incorrect');

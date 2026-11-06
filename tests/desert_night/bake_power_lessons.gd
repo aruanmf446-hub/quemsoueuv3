@@ -11,6 +11,8 @@ func run() -> void:
 	DirAccess.make_dir_recursive_absolute(directory+"/source")
 	FileAccess.open(directory+"/source/.gdignore",FileAccess.WRITE).store_string("")
 	for spec: Array in [[3,"amber"],[4,"dash"],[5,"rupture"]]:
+		var selected:=OS.get_cmdline_user_args()
+		if not selected.is_empty() and not str(spec[1]) in selected:continue
 		var phase: Node3D=load("res://scenes/desert/phase_%02d.tscn" % spec[0]).instantiate()
 		root.add_child(phase)
 		current_scene=phase

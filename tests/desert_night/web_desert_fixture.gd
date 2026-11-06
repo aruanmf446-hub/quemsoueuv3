@@ -6,6 +6,7 @@ var _callback: JavaScriptObject
 var _order := 1
 var _switching := false
 var _pedestal_fixture_id := ""
+var _amber_showcase: Node3D
 func _ready() -> void:
 	if not OS.has_feature("iphone_layout_fixture"):
 		push_error("Use only the isolated Web fixture export")
@@ -29,6 +30,35 @@ func rect(control: Control) -> Array:
 	var area := control.get_global_rect()
 	return [area.position.x,area.position.y,area.size.x,area.size.y]
 func _probe(args: Array) -> void:
+	# Fixture de acabamento: pose mantida para conferir o shader WebGL, sem medir gameplay.
+	if args.size() and str(args[0])=="amber_showcase" and is_instance_valid(phase):
+		phase.set_physics_process(false)
+		phase._player.set_physics_process(false)
+		phase._player._invulnerable=0.0
+		phase._player._model.show()
+		var floor: Dictionary=phase._phase.surfaces[6]
+		var x:=float(floor.left)+13.0
+		var y:=float(floor.height)
+		phase._player.position=Vector3(x,y+0.03,0)
+		phase._player.velocity=Vector3.ZERO
+		phase._player.facing=1.0
+		phase._stream_world(x,true)
+		for i in 2400:
+			if phase._build_queue.is_empty():break
+			phase._process(0)
+		for enemy in phase._troops.get_children():phase._retire_enemy(enemy)
+		_amber_showcase=phase._create_enemy()
+		_amber_showcase.reparent(phase._troops)
+		_amber_showcase.setup(phase._enemy_catalog.cactus,{"patrol":[x-8.0,x+8.0]})
+		_amber_showcase.position=Vector3(x-2.8,y+0.03,0)
+		_amber_showcase.add_to_group("enemies")
+		_amber_showcase.show()
+		_amber_showcase.set_physics_process(false)
+		phase._player.restore_charge("amber")
+		phase._player.use_ability("amber")
+		_amber_showcase._model.set_rate(0.0)
+		for i in 3:phase._follow_camera(1.0)
+		phase._scenery.follow(phase._camera,x)
 	if args.size() and str(args[0]).begins_with("collect_power:") and is_instance_valid(phase):
 		var kind:=str(args[0]).trim_prefix("collect_power:")
 		var item: Dictionary=phase._phase.pickups.filter(func(p: Dictionary) -> bool:return p.kind==kind)[0]
@@ -143,6 +173,7 @@ func _probe(args: Array) -> void:
 		state.health = phase._player.health
 		state.x = phase._player.position.x
 		state.player_dash = phase._player._dash_left
+		state.amber_showcase=is_instance_valid(_amber_showcase) and _amber_showcase.is_visible_in_tree() and _amber_showcase.crystallized_left>0 and is_instance_valid(_amber_showcase._crystal) and _amber_showcase._crystal.is_visible_in_tree()
 	elif is_instance_valid(loading) and is_instance_valid(loading._carousel):
 		state.index = loading._carousel.index
 		state.cards = loading._carousel.cards.size()

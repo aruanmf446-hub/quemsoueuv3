@@ -15,6 +15,7 @@ var _remaining:=0.0
 var _release_age:=-1.0
 var actor_model: Node3D
 var _frost: ShaderMaterial
+var _fit_scale:=Vector3.ONE
 func _ready() -> void:
 	name="AmberFreeze"
 	if _shell_geometry==null:_shell_geometry=_build_shell()
@@ -56,13 +57,31 @@ func begin(seconds: float) -> void:
 	_release_age=-1.0
 	show()
 	_shell.show()
-	_shell.scale=Vector3.ONE
+	_fit_pose()
 	_chips.hide()
 	_material.set_shader_parameter("formation",0.0)
 	_material.set_shader_parameter("opacity",1.0)
 	_frost.set_shader_parameter("strength",0.0)
 	if is_instance_valid(actor_model):actor_model.set_status_overlay(_frost)
 	set_process(true)
+func _fit_pose() -> void:
+	_fit_scale=Vector3.ONE
+	_shell.position=Vector3.ZERO
+	if not is_instance_valid(actor_model) or not is_instance_valid(actor_model._skeleton):return
+	var skeleton: Skeleton3D=actor_model._skeleton
+	var low:=Vector3(INF,INF,INF)
+	var high:=Vector3(-INF,-INF,-INF)
+	for i in skeleton.get_bone_count():
+		var point: Vector3=actor_model.get_parent().to_local(skeleton.to_global(skeleton.get_bone_global_pose(i).origin))
+		low=low.min(point)
+		high=high.max(point)
+	low-=Vector3(0.10,0.04,0.10)
+	high+=Vector3(0.10,0.22,0.10)
+	_fit_scale=Vector3(clampf((high.x-low.x)/1.04,0.95,1.8),clampf((high.y-low.y)/1.90,0.85,1.35),clampf((high.z-low.z)/0.80,0.95,1.5))
+	_shell.position=Vector3((low.x+high.x)*0.5,low.y,(low.z+high.z)*0.5)
+	_shell.scale=_fit_scale
+	_chips.position=_shell.position
+	_chips.scale=_fit_scale
 func extend(seconds: float) -> void:
 	_remaining=maxf(_remaining,seconds)
 func finish() -> void:
@@ -84,7 +103,7 @@ func _process(delta: float) -> void:
 	_release_age+=delta
 	var fade:=clampf(1.0-_release_age/RELEASE_TIME,0,1)
 	_material.set_shader_parameter("opacity",fade*fade)
-	_shell.scale=Vector3.ONE*(1.0+_release_age*0.18)
+	_shell.scale=_fit_scale*(1.0+_release_age*0.18)
 	var resin:=_chips.material_override as StandardMaterial3D
 	resin.albedo_color.a=fade
 	for i in 12:
@@ -98,9 +117,9 @@ func _process(delta: float) -> void:
 		set_process(false)
 static func _ring(level: int,index: int) -> Vector3:
 	var angle:=TAU*(index%SIDES)/SIDES+PI/8.0
-	var rx: float=[0.34,0.54,0.49,0.27][level]
-	var rz: float=[0.29,0.41,0.37,0.23][level]
-	return Vector3(cos(angle)*rx,[0.035,0.60,1.38,1.83][level],sin(angle)*rz)
+	var rx: float=[0.44,0.52,0.50,0.34][level]
+	var rz: float=[0.32,0.40,0.38,0.27][level]
+	return Vector3(cos(angle)*rx,[0.025,0.20,1.52,1.82][level],sin(angle)*rz)
 static func _vertex(st: SurfaceTool,p: Vector3,u: float,edge: bool,shade:=1.0) -> void:
 	st.set_color(Color(shade,shade,shade,1.0 if edge else 0.0))
 	st.set_uv(Vector2(u,p.y/1.90))
@@ -117,7 +136,7 @@ static func _build_shell() -> ArrayMesh:
 			var b:=_ring(level,i+1)
 			var c:=_ring(level+1,i+1)
 			var d:=_ring(level+1,i)
-			var shade:=0.70+float(i%3)*0.15
+			var shade:=0.78+float(i%3)*0.10
 			_vertex(st,a,0.0,false,shade)
 			_vertex(st,b,1.0,false,shade)
 			_vertex(st,c,1.0,false,shade)

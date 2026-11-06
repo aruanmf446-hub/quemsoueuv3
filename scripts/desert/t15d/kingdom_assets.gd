@@ -39,6 +39,18 @@ static func texture(id: String) -> Texture2D:
 			_textures[id]=clipped
 		else: _textures[id]=base
 	return _textures[id] as Texture2D
+## Recortes de Sprite3D sempre apontam para a imagem base. Atlas aninhado perde
+## deslocamento UV no Compatibility, afastando a arte de seu apoio físico.
+static func crop(source: Texture2D,region: Rect2) -> AtlasTexture:
+	var base:=source
+	while base is AtlasTexture:
+		region.position+=(base as AtlasTexture).region.position
+		base=(base as AtlasTexture).atlas
+	var result:=AtlasTexture.new()
+	result.atlas=base
+	result.region=region
+	result.filter_clip=true
+	return result
 static func paths(order: int) -> Array[String]:
 	_read()
 	var result: Array[String]=[]

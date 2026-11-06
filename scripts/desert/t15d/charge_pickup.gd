@@ -3,6 +3,7 @@ extends Area3D
 signal collected(id: String, kind: String)
 signal full_touched(kind: String)
 const Icons = preload("res://scripts/desert/t15d/resource_icons.gd")
+const PedestalArt=preload("res://scripts/desert/t15d/pedestal_art.gd")
 static var _halo_texture: GradientTexture2D
 var pickup_id := ""
 var kind := "attack"
@@ -66,20 +67,10 @@ func _try_collect(body: Node3D) -> void:
 	collected.emit(pickup_id,kind)
 	queue_free()
 ## A base pertence ao chunk, nunca ao Area3D descartável do item.
-static func create_pedestal() -> MeshInstance3D:
-	var pedestal := MeshInstance3D.new()
-	var base := CylinderMesh.new()
-	base.top_radius = 0.28
-	base.bottom_radius = 0.36
-	base.height = 0.25
-	base.radial_segments = 12
-	pedestal.mesh = base
-	pedestal.position.y = 0.125
-	var stone := StandardMaterial3D.new()
-	stone.albedo_texture = preload("res://assets/desert/phase01/sandstone.png")
-	stone.albedo_color = Color("#857467")
-	pedestal.material_override = stone
-	return pedestal
+static func create_pedestal(kind_name:="attack",theme:=1,spent:=false) -> MeshInstance3D:
+	return PedestalArt.create(kind_name,theme,spent)
+static func mark_pedestal_spent(pedestal: MeshInstance3D) -> void:
+	PedestalArt.set_spent(pedestal,true)
 
 static func _halo_material(color: Color) -> StandardMaterial3D:
 	if _halo_texture == null:

@@ -383,7 +383,7 @@ func _build_chunk_details(chunk: Node3D, index: int) -> void:
 	for spawn: Dictionary in _phase.pickups:
 		if _in_chunk(float(spawn.pos[0]),index):
 			# Uma base por estação, inclusive ao revisitar um trecho já coletado.
-			var pedestal := Pickup.create_pedestal()
+			var pedestal := Pickup.create_pedestal(str(spawn.kind),_order,_collected_ids.has(str(spawn.id)))
 			pedestal.name = "RechargePedestal"
 			pedestal.position += _vec3(spawn.pos)
 			pedestal.set_meta("pickup_id",str(spawn.id))
@@ -567,6 +567,9 @@ func _pit_material(key: String) -> StandardMaterial3D:
 	return material
 func _on_pickup_collected(id: String, kind: String) -> void:
 	_collected_ids[id] = true
+	for pedestal: MeshInstance3D in get_tree().get_nodes_in_group("campaign_pedestals"):
+		if is_ancestor_of(pedestal) and str(pedestal.get_meta("pickup_id",""))==id:
+			Pickup.mark_pedestal_spent(pedestal)
 	if _order==1 and kind=="defense" and is_instance_valid(_first_use):
 		_first_use.present.call_deferred("defense")
 	_sfx.play("pickup",1.0 if kind == "attack" else 1.25)

@@ -30,6 +30,7 @@ func run() -> void:
 			variety[signature] = true
 		check(bounded,"fase %02d: grupos no piso, atrás da pista, aquecidos, até cinco módulos" % order)
 		check(variety.size()>=3,"fase %02d: conjuntos e profundidades variados" % order)
+		var flat_crops:=true
 		for x in [30.0,61.0,65.0,350.0,700.0,1100.0,30.0]:
 			phase._player.position.x = x
 			phase._stream_world(x,true)
@@ -47,6 +48,9 @@ func run() -> void:
 				if art.position.x-half_width < float(art.get_meta("surface_left"))+0.59 or art.position.x+half_width > float(art.get_meta("surface_right"))-0.59: valid=false
 				ids[id] = true
 			check(valid and not ids.is_empty(),"fase %02d x%.0f: sem duplicação e streaming limitado" % [order,x])
+			for art: Sprite3D in phase._world.find_children("*","Sprite3D",true,false):
+				if art.texture is AtlasTexture and (art.texture as AtlasTexture).atlas is AtlasTexture:flat_crops=false
+		check(flat_crops,"fase %02d: recortes visíveis não perdem UV em atlas aninhados" % order)
 		phase.free()
 		for i in 2: await process_frame
 		check(get_nodes_in_group("kingdom_art").is_empty(),"fase %02d: descarte remove a arte" % order)

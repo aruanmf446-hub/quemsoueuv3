@@ -17,6 +17,15 @@ func gate(theme: int) -> void:
 		for index in 6:
 			var a := TAU*index/6.0
 			_box(Vector3(cos(a)*0.24,-0.2+sin(a)*0.24,face+0.10),Vector3(0.065,0.065,0.04),"gold")
+	elif theme==4:
+		# Comporta de metal patinado, em vez de outra porta de madeira da cidade.
+		for i in 6:
+			var x:=-1.0+i*0.40
+			_box(Vector3(x,0.30,face-0.12),Vector3(0.34,4.55,0.25),"iron")
+			_box(Vector3(x,-2.22,face-0.12),Vector3(0.34,0.72,0.25),"patina")
+		for y in [-2.12,-0.60,1.05,2.35]:
+			_box(Vector3(0,y,face+0.04),Vector3(2.40,0.14,0.12),"rust")
+			for x in [-1.0,-0.2,0.2,1.0]:_bolt(Vector3(x,y,face+0.12),0.035)
 	else:
 		# Tábuas separadas, com ferragens. A profundidade física não vira um caixote.
 		for index in 8:
@@ -39,16 +48,25 @@ func gate(theme: int) -> void:
 	# Retorno lateral escuro, sem a superfície bege lisa do protótipo.
 	for side in [-1.0,1.0]:
 		for row in 10:
-			_box(Vector3(side*1.11,-2.32+row*0.51,0),Vector3(0.16,0.48,3.5),"stone" if stone else "wood_dark")
+			_box(Vector3(side*1.11,-2.32+row*0.51,0),Vector3(0.16,0.48,3.5),"stone" if stone else ("iron" if theme==4 else "wood_dark"))
 	_flush()
 
 func gate_frame(theme: int,at: Vector3) -> void:
 	# O portal já aprovado permanece atrás da pista. Guias e guincho dão função à peça.
-	place_asset("capital_archway",at+Vector3(0,0,-3.5),6.5)
+	var frame_id:="capital_archway"
+	var frame_width:=6.5
+	if theme==6:frame_id="desert_ancient_ruins"
+	elif theme==8:
+		frame_id="desert_military_gate"
+		frame_width=10.8
+	elif theme==9:frame_id="desert_mining_gantry"
+	place_asset(frame_id,at+Vector3(0,0,-3.5),frame_width)
+	if theme==3:place_asset("capital_market_stall",at+Vector3(-3.55,0,-4.0),3.2)
+	if theme==5:place_asset("capital_palm_garden",at+Vector3(3.0,0,-4.0),3.0)
 	for side in [-1.0,1.0]:
 		var x: float = side*1.46
-		_box(at+Vector3(x,2.76,1.72),Vector3(0.36,5.52,0.46),"stone")
-		for y in [0.16,1.5,3.1,5.48]:_box(at+Vector3(x,y,1.75),Vector3(0.48,0.18,0.55),"trim")
+		_box(at+Vector3(x,2.76,1.72),Vector3(0.36,5.52,0.46),"wood_dark" if theme==9 else "stone")
+		for y in [0.16,1.5,3.1,5.48]:_box(at+Vector3(x,y,1.75),Vector3(0.48,0.18,0.55),"iron" if theme==9 else "trim")
 		_rope(at+Vector3(side*1.23,0.18,1.66),at+Vector3(side*1.23,5.55,1.66),0.025)
 	_box(at+Vector3(0,5.53,1.70),Vector3(3.50,0.23,0.48),"trim")
 	winch(at+Vector3(-2.06,0,-1.0),theme)
@@ -127,20 +145,27 @@ func _passage_section(width: float,theme: int,lift: bool,index: int) -> void:
 
 func _lower_art(id: String,width: float,from_v: float,top: float,z: float) -> void:
 	var texture := Assets.texture(id)
-	var lower := AtlasTexture.new()
-	lower.atlas=texture
-	lower.region=Rect2(0,texture.get_height()*from_v,texture.get_width(),texture.get_height()*(1.0-from_v))
-	lower.filter_clip=true
+	var lower:=Assets.crop(texture,Rect2(0,texture.get_height()*from_v,texture.get_width(),texture.get_height()*(1.0-from_v)))
 	var pixels := width/texture.get_width()
 	_house_sprite(lower,Vector3(0,top-lower.get_height()*pixels*0.5,z),pixels)
 
 func supports(start: Vector3,finish: Vector3,theme: int) -> void:
-	for point in [start-Vector3(0.85,0,0),finish+Vector3(0.85,0,0)]:
-		if theme != 6:
-			place_asset("desert_mining_gantry",point+Vector3(0,0,-4.3),4.3)
-		else:
-			place_asset("capital_archway",point+Vector3(0,0,-4.3),4.0)
-		winch(point+Vector3(0,0,-1.35),theme)
+	for side in 2:
+		var direction:=-1.0 if side==0 else 1.0
+		var edge:=start if side==0 else finish
+		# A instalação inteira cabe na margem. Antes a perna interior do asset
+		# ultrapassava o início do abismo e parecia ficar suspensa.
+		var point:=edge+Vector3(direction*2.3,0,0)
+		place_asset("desert_mining_gantry" if theme!=6 else "desert_ancient_ruins",point+Vector3(0,0,-4.3),4.3)
+		for x: float in [-1.85,1.85]:
+			_box(point+Vector3(x,1.58,-2.3),Vector3(0.22,3.16,0.24),"wood_dark" if theme!=6 else "stone")
+			_box(point+Vector3(x,0.08,-2.3),Vector3(0.42,0.16,0.50),"iron" if theme!=6 else "trim")
+		_box(point+Vector3(0,3.16,-2.3),Vector3(4.0,0.22,0.26),"wood" if theme!=6 else "trim")
+		var guide:=edge+Vector3(direction*0.85,2.9,-2.3)
+		_beam(guide+Vector3(0,0.30,0),guide+Vector3(0,0.12,0),0.065,"iron")
+		_ring(guide,0.13,0.030,"iron")
+		_bolt(guide+Vector3(0,0,0.035),0.04)
+		winch(edge+Vector3(direction*0.85,0,-1.35),theme)
 	_flush()
 
 func winch(at: Vector3,theme: int) -> void:
@@ -237,9 +262,10 @@ func _material(key: String) -> StandardMaterial3D:
 	mat.roughness=0.88
 	mat.metallic_specular=0.12
 	mat.cull_mode=BaseMaterial3D.CULL_DISABLED
-	var palette := {"wood":"#b7a491","wood_top":"#e8d2ad","wood_light":"#d1b89b","wood_dark":"#806954","iron":"#3e3630","gold":"#ba8e50","stone":"#b2a092","trim":"#c6b39a","rope":"#aa8150","cloth":"#7c2627","cloth_light":"#a94437"}
+	var palette := {"wood":"#b7a491","wood_top":"#e8d2ad","wood_light":"#d1b89b","wood_dark":"#806954","iron":"#3e3630","gold":"#ba8e50","stone":"#b2a092","trim":"#c6b39a","rope":"#aa8150","cloth":"#7c2627","cloth_light":"#a94437","water":"#376f7a","rust":"#765e4c","patina":"#476b65"}
 	mat.albedo_color=Color(palette.get(key,"#9a8068"))
 	mat.texture_filter=BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	if key=="water":mat.roughness=0.35
 	if key.begins_with("wood"):
 		mat.albedo_texture=load("res://assets/desert/modular/desert_timber_bridge.res")
 		mat.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED

@@ -45,5 +45,23 @@
   "mutating_http_test": {
     "executed": false,
     "reason": "automatic approval review rejected production test accounts, claims and matches; cleanup of derived data not established"
+  },
+  "pages": {
+    "run_id": 42262100661,
+    "sha": "5d1262995acc253e136920f4356d904342fc1355",
+    "status": "Success",
+    "duration": "3m 31s",
+    "url": "https://github.com/aruanmf446-hub/quemsoueuv3/actions/runs/42262100661",
+    "url_public": "https://aruanmf446-hub.github.io/quemsoueuv3/",
+    "direct_http_probe": [
+      {
+        "file": "index.html",
+        "result": "network_failure"
+      },
+      {
+        "file": "sw.js",
+        "result": "network_failure"
+      }
+    ]
   }
 }

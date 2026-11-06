@@ -1,8 +1,8 @@
 # Resgate de decks da Comunidade
 
-Migrations e função implantadas após autorização do dono. Cliente preparado
-para publicação no main/Pages; o resultado do workflow será registrado após
-sua conclusão. `deployment.json` registra os hashes das migrations, a função
+Migrations e função implantadas após autorização do dono. Cliente publicado
+no main/Pages pela execução 42262100661, concluída com Success para o commit
+`5d1262995acc253e136920f4356d904342fc1355`. `deployment.json` registra os hashes das migrations, a função
 ACTIVE e os três testes HTTP sem gravação.
 
 - Resgate confirmado pelo servidor, sem duplicar a coleção.
@@ -97,3 +97,7 @@ por cerca de 90 s; ele foi repetido até concluir, sem alterar seu código.
 O T27 registra um aviso de duas instâncias ObjectDB no encerramento.
 
 [Arquitetura e passos restantes](../../docs/backend/DECKS_GAME_CATALOG_INTEGRACAO.md).
+
+O acesso HTTP direto ao domínio Pages não ficou disponível neste ambiente;
+a conclusão da publicação foi confirmada pela execução pública do GitHub Actions.
+Ver [plano do teste HTTP em produção](../../docs/backend/TESTE_HTTP_PRODUCAO_DECKS.md).

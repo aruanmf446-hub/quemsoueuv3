@@ -1,7 +1,8 @@
 # Resgate de decks — GAME e CATALOG
 
 Migrations e gateway implantados em **06/11/2026**, após autorização do dono.
-Cliente preparado para publicação no main/Pages.
+Cliente publicado no main/Pages: execução [42262100661](https://github.com/aruanmf446-hub/quemsoueuv3/actions/runs/42262100661),
+commit `5d1262995acc253e136920f4356d904342fc1355`, resultado **Success**.
 O dono definiu: resgatar deve guardar na conta e liberar no Mata-Mata.
 As credenciais dos dois projetos estão disponíveis; os acessos à Management API
 foram confirmados. O bloqueio anterior do ambiente foi resolvido.
@@ -73,7 +74,7 @@ limpeza dos efeitos derivados e de autorização específica para esse teste.
 Ele não foi executado. Não foram criadas contas de teste por essa etapa.
 A validação completa com sessões reais permanece pendente.
 
-Roteiro de implantação (etapas 1–3 executadas; não reaplicar):
+Roteiro de implantação (etapas 1–3 e 5 executadas; não reaplicar):
 
 1. Aplicar somente `supabase/catalog/migrations/20261106160000_community_versions.sql`
    no CATALOG e `supabase/game/migrations/20261106160100_community_claims.sql` no
@@ -105,3 +106,5 @@ registrada na conversa. Evidências em `evidence/community-claims/deployment.jso
 [Relatório, capturas e comandos](../../evidence/community-claims/README.md).
 Testes com identidades simuladas no banco e fixtures Web não substituem contas
 reais, chamadas HTTP ao gateway implantado ou validação no Safari/iPhone físico.
+
+O teste HTTP com contas reais requer [autorização específica e limpeza verificada](TESTE_HTTP_PRODUCAO_DECKS.md).

@@ -1,0 +1,27 @@
+[
+  {
+    "test": "regional_context_test",
+    "passed": true,
+    "exit_code": 0
+  },
+  {
+    "test": "composition_test",
+    "passed": true,
+    "exit_code": 0
+  },
+  {
+    "test": "scenario_tasks_test",
+    "passed": true,
+    "exit_code": 0
+  },
+  {
+    "test": "parkour_revision_test",
+    "passed": true,
+    "exit_code": 0
+  },
+  {
+    "test": "skyline_roofs_test",
+    "passed": true,
+    "exit_code": 0
+  }
+]

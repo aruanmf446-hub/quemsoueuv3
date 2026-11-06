@@ -1,0 +1,23 @@
+[
+  {
+    "profile": "iphone",
+    "size": "844x390",
+    "passed": true,
+    "exit_code": 0,
+    "physical_device": false
+  },
+  {
+    "profile": "desktop",
+    "size": "1920x1080",
+    "passed": true,
+    "exit_code": 0,
+    "physical_device": false
+  },
+  {
+    "profile": "standard",
+    "size": "640x360",
+    "passed": true,
+    "exit_code": 0,
+    "physical_device": false
+  }
+]

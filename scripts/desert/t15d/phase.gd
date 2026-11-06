@@ -383,7 +383,7 @@ func _build_chunk_details(chunk: Node3D, index: int) -> void:
 	for spawn: Dictionary in _phase.pickups:
 		if _in_chunk(float(spawn.pos[0]),index):
 			# Uma base por estação, inclusive ao revisitar um trecho já coletado.
-			var pedestal := Pickup.create_pedestal()
+			var pedestal := Pickup.create_pedestal(str(spawn.kind),_order,_collected_ids.has(str(spawn.id)))
 			pedestal.name = "RechargePedestal"
 			pedestal.position += _vec3(spawn.pos)
 			pedestal.set_meta("pickup_id",str(spawn.id))
@@ -429,11 +429,11 @@ func _build_chunk_details(chunk: Node3D, index: int) -> void:
 	var points: Array = _phase.get("checkpoints",[])
 	for point_index in range(points.size()):
 		if _in_chunk(float(points[point_index].pos[0]),index):
-			var banner := preload("res://scripts/desert/t15d/checkpoint_banner.gd").new()
-			banner.index = point_index
-			banner.position = _vec3(points[point_index].pos)+Vector3(-0.9,0,-1.6)
-			chunk.add_child(banner)
-			banner.refresh_lit(_checkpoint_index)
+			var marker := preload("res://scripts/desert/t15d/checkpoint_banner.gd").new()
+			marker.index = point_index
+			marker.position = _vec3(points[point_index].pos)+Vector3(-0.9,0,-1.6)
+			chunk.add_child(marker)
+			marker.refresh_lit(_checkpoint_index)
 	for hole: Dictionary in _phase.holes:
 		var x0 := maxf(float(hole.start),left)
 		var x1 := minf(float(hole.end),right)
@@ -567,6 +567,9 @@ func _pit_material(key: String) -> StandardMaterial3D:
 	return material
 func _on_pickup_collected(id: String, kind: String) -> void:
 	_collected_ids[id] = true
+	for pedestal: MeshInstance3D in get_tree().get_nodes_in_group("campaign_pedestals"):
+		if is_ancestor_of(pedestal) and str(pedestal.get_meta("pickup_id",""))==id:
+			Pickup.mark_pedestal_spent(pedestal)
 	if _order==1 and kind=="defense" and is_instance_valid(_first_use):
 		_first_use.present.call_deferred("defense")
 	_sfx.play("pickup",1.0 if kind == "attack" else 1.25)
@@ -812,7 +815,7 @@ func _on_player_died() -> void:
 		_session.show_death(fell,"checkpoint %d" % (_checkpoint_index+1) if _checkpoint_index >= 0 else "")
 		_paused = true
 		get_tree().paused = true)
-## Checkpoints: ao passar pela bandeira de um distrito, guarda posição, cargas, Cactus
+## Checkpoints: ao passar pelo marcador de um distrito, guarda posição, cargas, Cactus
 ## derrotados e itens coletados. Voltar a ele restaura esse estado com 1 vida e sem cargas.
 func _check_checkpoints() -> void:
 	var points: Array = _phase.get("checkpoints",[])

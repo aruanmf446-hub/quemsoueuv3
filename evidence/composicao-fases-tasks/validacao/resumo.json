@@ -1,0 +1,74 @@
+{
+  "base": "87a29c1",
+  "native_godot": "4.7.2.stable.official.ed1daf0bf",
+  "graphical_sizes": [
+    "844x390",
+    "1920x1080",
+    "640x360"
+  ],
+  "functional_checks_passed": 566,
+  "roof_graphical_checks_passed": 90,
+  "completed_routes": 10,
+  "physical_device_tested": false,
+  "legacy_approved_assets_test": {
+    "passed": false,
+    "failures": [
+      "FAIL fase02 instala p02.art.00 capital_house",
+      "FAIL fase02 instala p02.art.01 capital_balcony_house",
+      "FAIL fase02 instala p02.art.02 capital_merchant",
+      "FAIL fase02 instala p02.art.04 capital_balcony_house"
+    ],
+    "same_failures_on_base": true
+  },
+  "web": {
+    "passed": true,
+    "viewport": "844x390",
+    "dpr": 3,
+    "engine": "Chromium WebGL2 SwiftShader",
+    "phase_tasks": [
+      1,
+      3,
+      7
+    ],
+    "touch_activation": true,
+    "crossed_both_directions": true,
+    "javascript_errors": [],
+    "engine_errors": [],
+    "physical_device": false,
+    "source_commit": "13a6f77"
+  },
+  "revisao_sem_bandeiras": {
+    "native_graphical_sizes": [
+      "844x390",
+      "1920x1080",
+      "640x360"
+    ],
+    "checkpoint_checks": 21,
+    "scenario_task_checks": 182,
+    "composition_checks": 110,
+    "web_rerun": false
+  },
+  "revisao_industrial": {
+    "source_commit": "400ed1a5936673a5fd1c373bdf0aef6ecdce7233",
+    "graphical_asset_checks_passed": 22,
+    "scenario_task_checks_passed": 182,
+    "composition_checks_passed": 110,
+    "native_sizes": [
+      "844x390",
+      "1920x1080",
+      "640x360"
+    ],
+    "all_task_state_captures": 38,
+    "web": {
+      "passed": true,
+      "viewport": "844x390",
+      "dpr": 3,
+      "phase": 7,
+      "touch_activation_with_zero_charges": true,
+      "walked_both_directions": true,
+      "js_errors": [],
+      "engine_errors": [],
+      "physical_device": false
+    }
+  }
+}

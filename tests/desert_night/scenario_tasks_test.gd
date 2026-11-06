@@ -40,6 +40,15 @@ func run() -> void:
 			for node in get_nodes_in_group("earth_bridges"):
 				if str(node.hole.id)==str(task.id):device=node
 			check(device!=null,"mecanismo instanciado uma vez: "+str(task.id))
+			if task.task_kind=="lift" and device!=null:
+				var supports:=0
+				var supported:=true
+				for art: Sprite3D in device.find_children("*","Sprite3D",true,false):
+					if str(art.get_meta("asset_id","")) not in ["desert_mining_gantry","desert_ancient_ruins"]:continue
+					supports+=1
+					var half: float=art.pixel_size*art.texture.get_width()*0.5
+					if not (art.global_position.x+half<float(task.start) or art.global_position.x-half>float(task.end)):supported=false
+				check(supports==2 and supported,"guindastes apoiados inteiramente nas margens: "+str(task.id))
 			var event:=InputEventKey.new()
 			event.physical_keycode=KEY_F
 			event.pressed=true

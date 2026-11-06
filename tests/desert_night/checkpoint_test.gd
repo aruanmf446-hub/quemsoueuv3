@@ -37,11 +37,11 @@ func run() -> void:
 	Input.action_press("move_right")
 	await frames(20)
 	Input.action_release("move_right")
-	check(phase._checkpoint_index == 0,"passar pela bandeira ativa o checkpoint 1")
+	check(phase._checkpoint_index == 0,"passar pelo marcador ativa o checkpoint 1")
 	var lit := false
-	for banner in get_nodes_in_group("campaign_checkpoints"):
-		if banner.index == 0 and banner._light.visible: lit = true
-	check(lit,"bandeira do checkpoint fica acesa")
+	for marker in get_nodes_in_group("campaign_checkpoints"):
+		if marker.index == 0 and marker._light.visible: lit = true
+	check(lit,"lanterna do checkpoint fica acesa")
 	# Estado depois do checkpoint: gasta o ataque e derrota um Cactus mais adiante.
 	var later: Dictionary = {}
 	for spawn: Dictionary in phase._phase.enemies:
@@ -59,7 +59,7 @@ func run() -> void:
 	(buttons(phase)[0] as Button).pressed.emit()
 	await frames(10)
 	check(not paused and not player.is_dead and player.health == 1,"checkpoint volta com 1 vida")
-	check(absf(player.position.x-float(first.pos[0])) < 0.5,"jogador reaparece na bandeira")
+	check(absf(player.position.x-float(first.pos[0])) < 0.5,"jogador reaparece no checkpoint")
 	check(player.attack_charges == 0 and player.defense_charges == 0,"checkpoint volta sem cargas de ataque e defesa")
 	check(not phase._defeated_ids.has(str(later.id)),"Cactus derrotado depois do checkpoint volta")
 	check(phase._checkpoint_index == 0,"checkpoint continua ativo depois de voltar")

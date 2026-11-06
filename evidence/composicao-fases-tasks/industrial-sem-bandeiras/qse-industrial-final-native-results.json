@@ -1,0 +1,10 @@
+[
+  {
+    "size": "1920x1080",
+    "passed": true
+  },
+  {
+    "size": "640x360",
+    "passed": true
+  }
+]

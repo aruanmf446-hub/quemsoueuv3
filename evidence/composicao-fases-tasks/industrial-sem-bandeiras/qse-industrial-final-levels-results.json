@@ -1,0 +1,14 @@
+[
+  {
+    "profile": "iphone",
+    "passed": true
+  },
+  {
+    "profile": "desktop",
+    "passed": true
+  },
+  {
+    "profile": "640",
+    "passed": true
+  }
+]

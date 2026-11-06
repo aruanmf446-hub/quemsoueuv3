@@ -39,6 +39,18 @@ static func texture(id: String) -> Texture2D:
 			_textures[id]=clipped
 		else: _textures[id]=base
 	return _textures[id] as Texture2D
+## Recortes de Sprite3D sempre apontam para a imagem base. Atlas aninhado perde
+## deslocamento UV no Compatibility, afastando a arte de seu apoio físico.
+static func crop(source: Texture2D,region: Rect2) -> AtlasTexture:
+	var base:=source
+	while base is AtlasTexture:
+		region.position+=(base as AtlasTexture).region.position
+		base=(base as AtlasTexture).atlas
+	var result:=AtlasTexture.new()
+	result.atlas=base
+	result.region=region
+	result.filter_clip=true
+	return result
 static func paths(order: int) -> Array[String]:
 	_read()
 	var result: Array[String]=[]
@@ -55,6 +67,8 @@ static func paths(order: int) -> Array[String]:
 	for id: String in ids:
 		var path := String(entry(id).get("texture",""))
 		if not path.is_empty() and not result.has(path): result.append(path)
+	if order in [4,5]:result.append("res://assets/desert/modular/riverbank_context.res")
+	if order in [1,3]:result.append("res://assets/desert/modular/city_supplies_context.res")
 	return result
 static func surface(order: int,index: int) -> Dictionary:
 	if not _surfaces.has(order): placements(order)
@@ -115,9 +129,9 @@ static func composition(order: int, slot: int, left: float, right: float, top: f
 				[["capital_palm_garden",0.18,4.2,-8.0],["capital_archway",0.51,5.8,-11.0],["capital_palm_garden",0.81,4.0,-7.0]]]
 		5:
 			variants = [
-				[["capital_palm_garden",0.18,5.0,-10.5],["desert_oasis_fountain",0.51,3.6,-6.8],["capital_palm_garden",0.83,4.7,-9.5]],
-				[["capital_palm_garden",0.27,5.2,-9.8],["capital_palm_garden",0.76,4.5,-11.0],["desert_oasis_fountain",0.66,3.2,-6.3]],
-				[["capital_palm_garden",0.16,4.6,-10.0],["capital_archway",0.55,5.2,-11.0],["capital_palm_garden",0.84,4.5,-7.6]]]
+				[["capital_palm_garden",0.18,4.4,-5.5],["desert_oasis_fountain",0.51,3.6,-5.4],["capital_palm_garden",0.83,3.6,-20.0]],
+				[["capital_palm_garden",0.27,4.4,-5.5],["capital_palm_garden",0.76,3.8,-20.0],["desert_oasis_fountain",0.66,3.2,-5.4]],
+				[["capital_palm_garden",0.16,3.6,-20.0],["capital_archway",0.55,4.2,-20.0],["capital_palm_garden",0.84,4.5,-5.5]]]
 		6:
 			variants = [
 				[["desert_ancient_ruins",0.24,6.5,-10.8],["desert_ancient_ruins",0.77,5.4,-11.8],["desert_mine_crystals",0.47,3.0,-6.8]],
@@ -151,7 +165,7 @@ static func composition(order: int, slot: int, left: float, right: float, top: f
 		if order in [4,5,6,7,9,10] and not (order == 10 and slot == 47):
 			fraction = 0.48 + (fraction-0.5)*0.55 + (0.035 if slot%3==1 else -0.02)
 		var x := clampf(lerpf(left,right,fraction),left+0.6+width*0.5,right-0.6-width*0.5)
-		result.append({"asset":String(part[0]),"x":x,"y":top-9.0 if order == 2 else (top-0.6 if float(part[3]) < -9.0 else top),"z":float(part[3]),"width":width})
+		result.append({"asset":String(part[0]),"x":x,"y":top-9.0 if order == 2 else (top-0.6 if float(part[3]) < -9.0 and order!=5 else top),"z":float(part[3]),"width":width})
 	return result
 
 ## Aquecimento restrito à região atual, incluindo todas as variantes dos conjuntos.

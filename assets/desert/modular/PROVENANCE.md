@@ -1,5 +1,14 @@
 # Biblioteca modular do Reino do Deserto
 
+## Complementos de contexto — 06/11/2026
+
+- `source/riverbank_context.png`: novo módulo realmente gerado com `image_gen`, usando o jardim de palmeiras e o aqueduto aprovados como referências de estilo. Pedras de arenito, terra, vegetação baixa e cerâmica; fundo transparente, sem personagem, água pintada ou bandeiras. SHA-256 `edab8ecad2e5f4db3a08bec1b61162bc19cb629bc2be4c46ef599bbb0a4f36f5`.
+- `source/city_supplies_context.png`: novo conjunto realmente gerado com `image_gen`, usando o jardim aprovado como referência de estilo. Cerâmicas, cesta de tâmaras, tecidos e caixa; fundo transparente, sem pedestal, personagem ou bandeira. SHA-256 `2c53d5d69111b621e984c40c95daf0ef0c246ee738c5cc2748d96be8f77e690e`.
+- Fontes originais preservadas em `source/`, fora do export. Recortes de conteúdo e fases em `context_assets.json`; a pequena transparência residual da geração não determina a base do objeto. `tests/desert_night/build_context_assets.gd` recorta apenas as margens, conserva a proporção, limita a dimensão maior a1024 e salva RGBA8 com mipmaps nos dois recursos `.res`, reabertos para conferência.
+- O carrinho adicional da mineração é um recorte direto da arte aprovada `desert_mining_gantry.res`; não é outra imagem gerada. Usa o mesmo acabamento sem estandartes. Água, margens, trilhos e apoio de terreno são geometria decorativa agrupada por material do chunk. Colisões, modelos e animações não foram alterados.
+
+## Biblioteca anterior preservada
+
 - `source/stone_masonry.png`: textura de albedo realmente gerada com image_gen em05/11/2026. Pedido: alvenaria de arenito medieval desértico, detalhes de desgaste, sem personagem/interface/perspectiva. Fonte de autoria preservada, excluída da importação pelo .gdignore.
 - `stone_masonry.res`: ImageTexture nativo RGB8 de1024×1024 (~3,6MB), com mipmaps, compressão do ResourceSaver, produzido a partir da fonte pelo Godot4.7.2. Script reprodutível: `tests/desert_night/build_masonry.gd`. Carregável no runtime sem importador do editor. Não é uma imagem de fase.
 - Panorâmicas distantes reutilizadas: `assets/desert/night_city/{citadel,bazaar,outskirts}.png`, com autoria anterior documentada no diretório. Os planos simplificados do ZIP não são usados no novo cenário.

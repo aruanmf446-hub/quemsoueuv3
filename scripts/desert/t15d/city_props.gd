@@ -4,6 +4,7 @@ extends Node3D
 ## Bordas artificiais de chunk NÃO recebem lanternas: para isso o chamador marca
 ## pit_left/pit_right somente nas extremidades que realmente tocam um buraco.
 const Assets = preload("res://scripts/desert/t15d/kingdom_assets.gd")
+const Context=preload("res://scripts/desert/t15d/regional_context.gd")
 const BUILDING_SPACING := 19.0
 static var _house_texture: Texture2D
 var _builders := {}
@@ -75,6 +76,7 @@ func _build_slot(slot: int, left: float, right: float, top: float,_at_x := INF) 
 			art.set_meta("surface_right",right)
 			building_count += 1
 		piece += 1
+	Context.build(self,_order,slot,left,right,top)
 
 func _building(origin: Vector3, width: float, rng: RandomNumberGenerator) -> void:
 	if _order in [1,2] and _painted_house(origin,width): return
@@ -175,6 +177,7 @@ func _house_sprite(texture: Texture2D,at: Vector3,pixels: float) -> Sprite3D:
 	sprite.modulate=Color(0.82,0.84,0.94)
 	sprite.texture_filter=BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	sprite.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	preload("res://scripts/desert/t15d/industrial_finish.gd").apply_to(sprite)
 	add_child(sprite)
 	return sprite
 
@@ -203,10 +206,7 @@ func _painted_facade(left: float,right: float,top: float,z: float,asset_id := "c
 		var a := maxf(left,tile*tile_width)
 		var b := minf(right,(tile+1)*tile_width)
 		if b-a < 0.01: continue
-		var slice := AtlasTexture.new()
-		slice.atlas=texture
-		slice.region=Rect2((a-tile*tile_width)/pixels,0,(b-a)/pixels,texture.get_height())
-		slice.filter_clip=true
+		var slice:=Assets.crop(texture,Rect2((a-tile*tile_width)/pixels,0,(b-a)/pixels,texture.get_height()))
 		var sprite := _house_sprite(slice,Vector3((a+b)*0.5,top-texture.get_height()*pixels*0.5,z),pixels)
 		sprite.set_meta("asset_id",selected)
 		sprite.set_meta("clip_left",a)
@@ -240,14 +240,15 @@ func _awning(origin: Vector3, width: float, key: String) -> void:
 
 func _lantern(origin: Vector3) -> void:
 	lantern_count += 1
-	_box(origin+Vector3(0,0.08,0),Vector3(0.34,0.16,0.34),"trim")
-	_box(origin+Vector3(0,0.71,0),Vector3(0.075,1.40,0.075),"metal")
-	_box(origin+Vector3(0,1.49,0),Vector3(0.34,0.07,0.34),"metal")
-	_box(origin+Vector3(0,1.27,0),Vector3(0.17,0.30,0.17),"window")
-	_box(origin+Vector3(0,1.06,0),Vector3(0.30,0.08,0.30),"metal")
-	for x in [-0.115,0.115]:
-		for z in [-0.115,0.115]:
-			_box(origin+Vector3(x,1.27,z),Vector3(0.025,0.35,0.025),"metal")
+	_box(origin+Vector3(0,0.045,0),Vector3(0.28,0.09,0.28),"trim")
+	_box(origin+Vector3(0,0.69,0),Vector3(0.065,1.30,0.065),"lantern_iron")
+	_box(origin+Vector3(0.13,1.33,0),Vector3(0.32,0.055,0.065),"lantern_iron")
+	_box(origin+Vector3(0.25,1.27,0),Vector3(0.035,0.12,0.035),"lantern_iron")
+	var lamp:=origin+Vector3(0.25,1.08,0)
+	_box(lamp,Vector3(0.16,0.24,0.16),"lantern_glass")
+	for y: float in [-0.15,0.15]:_box(lamp+Vector3(0,y,0),Vector3(0.28,0.055,0.28),"lantern_iron")
+	for x: float in [-0.105,0.105]:
+		for z: float in [-0.105,0.105]:_box(lamp+Vector3(x,0,z),Vector3(0.022,0.30,0.022),"lantern_iron")
 	if not _light_added:
 		_light_added = true
 		var glow := OmniLight3D.new()
@@ -345,8 +346,8 @@ func _flush() -> void:
 		var mesh := MeshInstance3D.new()
 		mesh.name = "City_"+key
 		mesh.mesh = st.commit()
-		mesh.material_override = _material(key)
-		if key in ["window","cloth","cloth_alt","recess"]:
+		mesh.material_override = Context.material(key) if key.begins_with("context_") else _material(key)
+		if key.begins_with("context_") or key in ["window","cloth","cloth_alt","recess","lantern_glass"]:
 			mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		add_child(mesh)
 	_builders.clear()
@@ -355,6 +356,8 @@ func _material(key: String) -> StandardMaterial3D:
 	if _shared_materials.has(key): return _shared_materials[key]
 	var mat := StandardMaterial3D.new()
 	var colors := {"stone":"#b4acbb","trim":"#c8b79b","recess":"#354051","dome":"#9d292e","metal":"#344054","cloth":"#6b1018","cloth_alt":"#59151c","window":"#d5a667","leaf":"#396d50","water":"#286f85","wood":"#816044","crystal":"#e9a84e","roof":"#b88669"}
+	colors.lantern_iron="#49372d"
+	colors.lantern_glass="#e6af63"
 	mat.albedo_color = Color(colors.get(key,"#72849a"))
 	mat.roughness = 0.15 if key == "water" else 0.92
 	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
@@ -367,6 +370,7 @@ func _material(key: String) -> StandardMaterial3D:
 		mat.emission_enabled = true
 		mat.emission = Color("#c88a42").srgb_to_linear()
 		mat.emission_energy_multiplier = 0.18
+	if key=="lantern_glass":mat.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED
 	_shared_materials[key] = mat
 	return mat
 

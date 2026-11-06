@@ -1,0 +1,114 @@
+[
+  {
+    "error": 0,
+    "fixture_teleport": true,
+    "name": "corrida_fase_01",
+    "on_floor": true,
+    "x": 91.1442413330078,
+    "y": 2.75088381767273
+  },
+  {
+    "error": 0,
+    "fixture_teleport": true,
+    "name": "tarefa_01_antes",
+    "on_floor": true,
+    "x": 220.351257324219,
+    "y": 2.20052075386047
+  },
+  {
+    "error": 0,
+    "fixture_teleport": true,
+    "name": "tarefa_01_depois",
+    "on_floor": true,
+    "x": 220.351257324219,
+    "y": 2.20052075386047
+  },
+  {
+    "error": 0,
+    "fixture_teleport": true,
+    "name": "corrida_fase_02",
+    "on_floor": true,
+    "x": -7.32666921615601,
+    "y": 8.00088405609131
+  },
+  {
+    "error": 0,
+    "fixture_teleport": true,
+    "name": "corrida_fase_03",
+    "on_floor": true,
+    "x": 75.748405456543,
+    "y": 2.75088381767273
+  },
+  {
+    "error": 0,
+    "fixture_teleport": true,
+    "name": "tarefa_03_antes",
+    "on_floor": true,
+    "x": 190.962860107422,
+    "y": 2.20052075386047
+  },
+  {
+    "error": 0,
+    "fixture_teleport": true,
+    "name": "tarefa_03_depois",
+    "on_floor": true,
+    "x": 190.962860107422,
+    "y": 2.20052075386047
+  },
+  {
+    "error": 0,
+    "fixture_teleport": true,
+    "name": "estacao_disponivel",
+    "on_floor": true,
+    "x": -2.20000004768372,
+    "y": 0.000442706048488617
+  },
+  {
+    "error": 0,
+    "fixture_teleport": true,
+    "name": "estacao_consumida",
+    "on_floor": true,
+    "x": -2.20000004768372,
+    "y": 0.000442706048488617
+  },
+  {
+    "error": 0,
+    "fixture_teleport": true,
+    "name": "checkpoint_apagado",
+    "on_floor": true,
+    "x": 171.550003051758,
+    "y": 2.20044279098511
+  },
+  {
+    "error": 0,
+    "fixture_teleport": true,
+    "name": "checkpoint_aceso",
+    "on_floor": true,
+    "x": 171.550003051758,
+    "y": 2.20044279098511
+  },
+  {
+    "error": 0,
+    "fixture_teleport": true,
+    "name": "corrida_fase_07",
+    "on_floor": true,
+    "x": 91.1442413330078,
+    "y": 2.75088381767273
+  },
+  {
+    "error": 0,
+    "fixture_teleport": true,
+    "name": "tarefa_07_antes",
+    "on_floor": true,
+    "x": 226.153335571289,
+    "y": 2.20052075386047
+  },
+  {
+    "error": 0,
+    "fixture_teleport": true,
+    "name": "tarefa_07_depois",
+    "on_floor": true,
+    "x": 226.153335571289,
+    "y": 2.20052075386047
+  }
+]

@@ -28,6 +28,7 @@ var _challenger := false
 var _elite := false
 var _windup_duration := 0.36
 var readout_pips := 1
+var _spear_guard: Node
 func _ready() -> void:
 	super._ready()
 	collision_layer = 4
@@ -68,6 +69,12 @@ func setup(entry: Dictionary, spawn: Dictionary) -> void:
 		health=3 if _elite else 2
 	attack_range = 1.25 if str(entry.get("id","cactus")) == "cactus" else float(entry.get("attack_range",1.7))
 	_model.rotation.y = _yaw_target
+	if bool(spawn.get("spear",false)):
+		if not is_instance_valid(_spear_guard):
+			_spear_guard=preload("res://scripts/desert/t15d/spear_guard.gd").new()
+			add_child(_spear_guard)
+		_spear_guard.configure(self,spawn)
+	elif is_instance_valid(_spear_guard):_spear_guard.shutdown()
 func _physics_process(delta: float) -> void:
 	if _state == State.DEAD: return
 	if global_position.y < KILL_PLANE_Y:
@@ -89,6 +96,7 @@ func _physics_process(delta: float) -> void:
 	_pursue = maxf(_pursue - delta, 0.0)
 	velocity.y = maxf(velocity.y - GRAVITY * delta, -26.0)
 	var offset := _player.global_position - global_position if is_instance_valid(_player) and not _player.is_dead else Vector3(INF, INF, 0)
+	if is_instance_valid(_spear_guard) and _spear_guard.handle(delta,offset):return
 	_watch_pass(offset)
 	if is_finite(offset.x) and offset.x > 1.5 and offset.x < 16.0 and absf(offset.y) < 2.5:
 		persistent_follow = true
@@ -197,6 +205,7 @@ func _face(direction: float) -> void:
 	if direction != 0.0: _yaw_target = PI*0.5*direction
 func take_damage(amount: int) -> void:
 	if _state == State.DEAD: return
+	if is_instance_valid(_spear_guard):_spear_guard.interrupt()
 	_model.flash(Color("#fff4c6"))
 	_windup = 0.0
 	_stagger = 0.18
@@ -205,6 +214,7 @@ func take_damage(amount: int) -> void:
 	super.take_damage(amount)
 func _die() -> void:
 	_state = State.DEAD
+	if is_instance_valid(_spear_guard):_spear_guard.shutdown()
 	crystallized_left = 0.0
 	_model.set_rate(1.0)
 	if is_instance_valid(_crystal): _crystal.queue_free()

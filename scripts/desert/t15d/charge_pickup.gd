@@ -46,7 +46,11 @@ func _ready() -> void:
 	medal.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	_visual.add_child(medal)
 	body_entered.connect(func(body: Node3D) -> void:
-		if body.is_in_group("player"): _try_collect(body))
+		# Ao recomeçar, o Jolt pode entregar um contato do transform anterior.
+		# Valida a posição atual antes de consumir uma recarga distante do novo spawn.
+		if not body.is_in_group("player") or not is_inside_tree() or is_queued_for_deletion():return
+		var offset:=body.global_position-global_position
+		if absf(offset.x)<1.1 and absf(offset.y)<1.6:_try_collect(body))
 func _physics_process(delta: float) -> void:
 	_time += delta
 	_visual.position.y = 0.70

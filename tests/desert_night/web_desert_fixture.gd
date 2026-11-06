@@ -31,6 +31,20 @@ func rect(control: Control) -> Array:
 	var area := control.get_global_rect()
 	return [area.position.x,area.position.y,area.size.x,area.size.y]
 func _probe(args: Array) -> void:
+	if args.size() and str(args[0])=="spear_approach" and is_instance_valid(phase) and _order==1:
+		var item: Dictionary=phase._phase.pickups.filter(func(p: Dictionary) -> bool:return p.kind=="defense")[0]
+		phase._player.position=Vector3(float(item.pos[0]),float(item.pos[1])+0.04,0)
+		phase._player.velocity=Vector3.ZERO
+		phase._player.facing=1.0
+		phase._player._invulnerable=0.0
+		phase._stream_world(phase._player.position.x,true)
+		for i in 2400:
+			if phase._build_queue.is_empty():break
+			phase._process(0)
+		for enemy in phase._troops.get_children():
+			if not is_instance_valid(enemy._spear_guard) or not enemy._spear_guard.active:phase._retire_enemy(enemy)
+		for i in 3:phase._follow_camera(1.0)
+		phase._scenery.follow(phase._camera,phase._player.position.x)
 	if args.size() and str(args[0])=="prop_approach" and is_instance_valid(phase):
 		phase.set_physics_process(false)
 		for i in 2400:
@@ -175,8 +189,12 @@ func _probe(args: Array) -> void:
 					if samples.size()==3:break
 				state.roof={"samples":samples,"lead":phase._lead,"grounded":phase._player.is_on_floor(),"height":support.height}
 		state.soldiers = []
+		state.spears = []
 		for enemy in phase._troops.get_children():
 			state.soldiers.append({"id":str(enemy.get_meta("spawn_id","")),"x":enemy.position.x,"y":enemy.position.y,"vx":enemy.velocity.x})
+			if is_instance_valid(enemy._spear_guard) and enemy._spear_guard.active:
+				var guard: Node=enemy._spear_guard
+				state.spears.append({"enabled":guard.enabled,"state":guard.state,"throws":guard.throws,"pursuit":guard.pursuit_allowed,"last_hit":guard.last_hit})
 		state.charges = phase._player.abilities
 		phase._touch_pad._layout()
 		state.buttons = {}

@@ -518,12 +518,15 @@ func _spawn_enemy(_chunk: Node3D, spawn: Dictionary) -> void:
 	enemy.persistent_follow = bool(spawn.get("troop",false))
 	var encounter := spawn.duplicate(true)
 	encounter.challenger=_order<10
+	if not str(encounter.get("spear_supply","")).is_empty():
+		encounter.spear_enabled=_collected_ids.has(str(encounter.spear_supply))
 	enemy.setup(_enemy_catalog.cactus,encounter)
 	enemy.add_to_group("enemies")
 	enemy.show()
 	enemy.set_physics_process(true)
 
 func _retire_enemy(enemy: Node3D) -> void:
+	if is_instance_valid(enemy._spear_guard):enemy._spear_guard.shutdown()
 	_enemy_live.erase(str(enemy.get_meta("spawn_id","")))
 	enemy.remove_from_group("enemies")
 	enemy.set_physics_process(false)
@@ -570,6 +573,8 @@ func _pit_material(key: String) -> StandardMaterial3D:
 	_pit_materials[key] = material
 	return material
 func _on_pickup_collected(id: String, kind: String) -> void:
+	for enemy in _troops.get_children():
+		if is_instance_valid(enemy._spear_guard):enemy._spear_guard.enable_for(id)
 	_collected_ids[id] = true
 	for pedestal: MeshInstance3D in get_tree().get_nodes_in_group("campaign_pedestals"):
 		if is_ancestor_of(pedestal) and str(pedestal.get_meta("pickup_id",""))==id:

@@ -78,3 +78,11 @@ QSE_TEST_IPHONE=1 godot --audio-driver Dummy --path . \
 ```
 
 Para desktop, retirar `QSE_TEST_IPHONE=1` e usar `1920x1080`; para a janela menor padrão, retirar a variável e usar `640x360 --touch-controls`.
+
+## Integração na main
+
+A versão aprovada foi integrada preservando a main `ff2222a` no commit `c1ed996`. Importação sem erros e as 276 verificações foram repetidas após a integração.
+
+O smoke funcional antigo precisava preparar um jogador que já leu as lições e repor uma carga antes de cada golpe: o novo tutorial pausa intencionalmente a fase1, que agora começa sem ataque/defesa, inclusive após morrer. A fixture de `tools/godot/functional.gd` foi ajustada, mantendo todas as verificações. O log `functional_publish.log` mostra movimento, colisões, saltos, dano, checkpoint e combate aprovados; resta somente a falha anterior `actual_malagueta_model`. As pausas e o inventário inicial permanecem cobertos pelo teste específico de 21 verificações.
+
+A execução geral do CI anterior à publicação já falhava em nove transições, no modelo de Malagueta e em oito verificações da apresentação da batalha. Essas pendências não foram apagadas nem tratadas como aprovadas nesta publicação.

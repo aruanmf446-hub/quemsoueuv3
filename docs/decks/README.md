@@ -1,5 +1,17 @@
 # Decks — problemas observados no app (06/11/2026)
 
+## Andamento das correções do cliente
+
+Na branch `work/deck-runtime-corrections`, o commit `a20d1b4` corrige a navegação
+do status e o formulário/mensagens de denúncia. Os testes e capturas Web com
+backend simulado estão em [evidências](../../evidence/deck-runtime-corrections/README.md).
+Isso não confirma uma denúncia real em produção.
+
+O dono definiu DECK-03: resgatar deve **guardar na conta e liberar no Mata-Mata**.
+A integração GAME/CATALOG e o resgate real permanecem pendentes, conforme
+[estado técnico e bloqueio de acesso](../backend/DECKS_GAME_CATALOG_INTEGRACAO.md).
+O relato original abaixo é preservado como histórico.
+
 > **Natureza:** registro de defeitos e requisitos baseado em três capturas enviadas pelo responsável pelo projeto, feitas no Safari/iPhone em modo horizontal, usando o GitHub Pages. **Não é uma correção implementada nem uma validação do backend.** Nenhum arquivo de gameplay, interface, Supabase ou configuração deve ser alterado por esta documentação.
 
 ## Evidências recebidas

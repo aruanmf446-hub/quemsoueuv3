@@ -31,11 +31,22 @@ func _run() -> void:
 			scene.call("_advance", next_path)
 			var replacement: Node = null
 			var story_skipped := false
+			var expected_story := PhaseStory.cards_for(int(next_path.get_file().get_basename().trim_prefix("phase_")))
 			var deadline := Time.get_ticks_msec() + 12000
 			while Time.get_ticks_msec() < deadline:
+				# A história já é apresentada pela capa de carregamento, antes da
+				# instanciação. Exercita esse botão real em vez de esperar outra tela.
+				var loading := root.get_node_or_null("CampaignLoading") as CampaignLoading
+				if loading != null and loading._story_mode and not story_skipped:
+					if not loading._carousel.manual_story or expected_story.is_empty() or loading._carousel.cards != expected_story:
+						push_error("SMOKE_STORY_FAILED " + next_path)
+						quit(1)
+						return
+					story_skipped = true
+					loading._carousel.skip_requested.emit()
 				var story := root.get_node_or_null("PhaseStory") as PhaseStory
 				if story != null and not story_skipped:
-					if not story._carousel.manual_story or story._carousel.cards.size() < 2:
+					if not story._carousel.manual_story or expected_story.is_empty() or story._carousel.cards != expected_story:
 						push_error("SMOKE_STORY_FAILED " + next_path)
 						quit(1)
 						return

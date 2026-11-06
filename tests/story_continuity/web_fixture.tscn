@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://tests/story_continuity/web_fixture.gd" id="1_jb0av"]
+
+[node name="StoryContinuityFixture" type="Node" unique_id=1329341005]
+script = ExtResource("1_jb0av")

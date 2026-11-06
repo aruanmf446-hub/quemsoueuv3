@@ -1,0 +1,49 @@
+{
+  "fixture_rpc_mock": true,
+  "real_backend_test": "tests/story_continuity/backend.sql, transaction rollback",
+  "viewport": "844x390",
+  "dpr": 3,
+  "physical_device": false,
+  "gpu": "SwiftShader software",
+  "guestHigher": {
+    "cloud_mock": true,
+    "completed": 5,
+    "highest": 6,
+    "notice": "Avanços diferentes encontrados. Mantida automaticamente a fase 6.",
+    "stage": "menu",
+    "sync": "success"
+  },
+  "cloudHigher": {
+    "cloud_mock": true,
+    "completed": 7,
+    "highest": 8,
+    "notice": "Progresso da conta recuperado: fase 8.",
+    "stage": "menu",
+    "sync": "success"
+  },
+  "arrival": {
+    "attack": 2,
+    "cloud_mock": true,
+    "completed": 5,
+    "defense": 3,
+    "highest": 6,
+    "notice": "",
+    "order": 2,
+    "stage": "play",
+    "sync": "success"
+  },
+  "restored": {
+    "attack": 2,
+    "cloud_mock": true,
+    "completed": 5,
+    "defense": 3,
+    "highest": 6,
+    "notice": "",
+    "order": 2,
+    "stage": "play",
+    "sync": "success"
+  },
+  "errors": [],
+  "engineErrors": [],
+  "blocked": []
+}

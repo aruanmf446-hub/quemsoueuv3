@@ -1,0 +1,10 @@
+[
+  {
+    "migration_registered": true,
+    "rls_enabled": true,
+    "anon_execute": false,
+    "authenticated_execute": true,
+    "direct_select": false,
+    "direct_update": false
+  }
+]

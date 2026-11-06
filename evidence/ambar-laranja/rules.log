@@ -1,0 +1,16 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS comando real consome uma carga
+PASS mesmos 3,5 segundos, somente atrás, até 8m
+PASS posição e pose imobilizadas
+PASS uma superfície compartilhada e doze lascas, sem luzes novas
+PASS reaplicação conserva maior duração e reutiliza efeito sem piscar
+PASS flash de dano restaura a cristalização, sem apagar nem substituir texturas
+PASS animação liberada ao final da duração original
+PASS descongelar restaura todos os materiais originais
+PASS lascas ficam no local da quebra, sem seguir o Cactus
+PASS efeito finaliza e para de processar
+PASS nova ativação reutiliza e reposiciona corretamente
+PASS reciclagem limpa o efeito e a imobilização
+PASS morte limpa o cristal
+AMBER_FREEZE checks=13 failures=0

@@ -1,0 +1,37 @@
+[
+  {
+    "test": "spear_encounter_test",
+    "passed": true,
+    "seconds": 4.93
+  },
+  {
+    "test": "spear_intro_test",
+    "passed": true,
+    "seconds": 2.3
+  },
+  {
+    "test": "first_use_tutorial_test",
+    "passed": true,
+    "seconds": 2.68
+  },
+  {
+    "test": "amber_freeze_render",
+    "passed": true,
+    "seconds": 1.65
+  },
+  {
+    "test": "pedestal_test",
+    "passed": true,
+    "seconds": 2.22
+  },
+  {
+    "test": "regional_context_test",
+    "passed": true,
+    "seconds": 7.53
+  },
+  {
+    "test": "prop_landings_test",
+    "passed": true,
+    "seconds": 7.53
+  }
+]

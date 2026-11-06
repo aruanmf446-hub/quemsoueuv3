@@ -7,6 +7,7 @@ var _order := 1
 var _switching := false
 var _pedestal_fixture_id := ""
 var _amber_showcase: Node3D
+var _prop_fixture: StaticBody3D
 func _ready() -> void:
 	if not OS.has_feature("iphone_layout_fixture"):
 		push_error("Use only the isolated Web fixture export")
@@ -30,6 +31,32 @@ func rect(control: Control) -> Array:
 	var area := control.get_global_rect()
 	return [area.position.x,area.position.y,area.size.x,area.size.y]
 func _probe(args: Array) -> void:
+	if args.size() and str(args[0])=="spear_approach" and is_instance_valid(phase) and _order==1:
+		var item: Dictionary=phase._phase.pickups.filter(func(p: Dictionary) -> bool:return p.kind=="defense")[0]
+		phase._player.position=Vector3(float(item.pos[0]),float(item.pos[1])+0.04,0)
+		phase._player.velocity=Vector3.ZERO
+		phase._player.facing=1.0
+		phase._player._invulnerable=0.0
+		phase._stream_world(phase._player.position.x,true)
+		for i in 2400:
+			if phase._build_queue.is_empty():break
+			phase._process(0)
+		for enemy in phase._troops.get_children():
+			if not is_instance_valid(enemy._spear_guard) or not enemy._spear_guard.active:phase._retire_enemy(enemy)
+		for i in 3:phase._follow_camera(1.0)
+		phase._scenery.follow(phase._camera,phase._player.position.x)
+	if args.size() and str(args[0])=="prop_approach" and is_instance_valid(phase):
+		phase.set_physics_process(false)
+		for i in 2400:
+			if phase._build_queue.is_empty():break
+			phase._process(0)
+		_prop_fixture=get_tree().get_nodes_in_group("campaign_one_way").filter(func(n: Node) -> bool:return n.get_meta("prop_asset","")=="capital_market_stall" and n.get_meta("prop_ledge",-1)==0)[0]
+		phase._player.position=Vector3(_prop_fixture.position.x,float(_prop_fixture.get_meta("source_floor"))+0.04,0)
+		phase._player.velocity=Vector3.ZERO
+		for enemy in phase._troops.get_children():phase._retire_enemy(enemy)
+		phase._player._invulnerable=0.0
+		for i in 3:phase._follow_camera(1.0)
+		phase._scenery.follow(phase._camera,phase._player.position.x)
 	# Fixture de acabamento: pose mantida para conferir o shader WebGL, sem medir gameplay.
 	if args.size() and str(args[0])=="amber_showcase" and is_instance_valid(phase):
 		phase.set_physics_process(false)
@@ -162,8 +189,12 @@ func _probe(args: Array) -> void:
 					if samples.size()==3:break
 				state.roof={"samples":samples,"lead":phase._lead,"grounded":phase._player.is_on_floor(),"height":support.height}
 		state.soldiers = []
+		state.spears = []
 		for enemy in phase._troops.get_children():
 			state.soldiers.append({"id":str(enemy.get_meta("spawn_id","")),"x":enemy.position.x,"y":enemy.position.y,"vx":enemy.velocity.x})
+			if is_instance_valid(enemy._spear_guard) and enemy._spear_guard.active:
+				var guard: Node=enemy._spear_guard
+				state.spears.append({"enabled":guard.enabled,"state":guard.state,"throws":guard.throws,"pursuit":guard.pursuit_allowed,"last_hit":guard.last_hit})
 		state.charges = phase._player.abilities
 		phase._touch_pad._layout()
 		state.buttons = {}
@@ -173,6 +204,12 @@ func _probe(args: Array) -> void:
 		state.health = phase._player.health
 		state.x = phase._player.position.x
 		state.player_dash = phase._player._dash_left
+		state.grounded=phase._player.is_on_floor()
+		state.ceiling=phase._player.is_on_ceiling()
+		state.vy=phase._player.velocity.y
+		state.jumps_used=phase._player.jumps_used
+		if is_instance_valid(_prop_fixture):
+			state.prop={"top":_prop_fixture.get_meta("one_way_top"),"base":_prop_fixture.get_meta("source_floor"),"span":_prop_fixture.get_meta("landing_span")}
 		state.amber_showcase=is_instance_valid(_amber_showcase) and _amber_showcase.is_visible_in_tree() and _amber_showcase.crystallized_left>0 and is_instance_valid(_amber_showcase._crystal) and _amber_showcase._crystal.is_visible_in_tree()
 	elif is_instance_valid(loading) and is_instance_valid(loading._carousel):
 		state.index = loading._carousel.index

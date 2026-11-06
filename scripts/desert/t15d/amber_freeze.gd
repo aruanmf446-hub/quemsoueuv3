@@ -1,9 +1,9 @@
 extends Node3D
-## Casulo de âmbar facetado: formação dos pés à cabeça, rosto legível e quebra curta.
+## Quatro cristais de âmbar laranja: pontas distintas, textura e quebra preservadas.
 ## Só apresentação: duração, alcance e imobilização pertencem ao Cactus/Player.
 const SHELL_SHADER=preload("res://scripts/desert/t15d/shaders/amber_crystal.gdshader")
 const FROST_SHADER=preload("res://scripts/desert/t15d/shaders/amber_frost.gdshader")
-const SIDES:=8
+const SIDES:=6
 const RELEASE_TIME:=0.38
 static var _shell_geometry: ArrayMesh
 static var _chip_geometry: ArrayMesh
@@ -15,6 +15,7 @@ var _remaining:=0.0
 var _release_age:=-1.0
 var actor_model: Node3D
 var _frost: ShaderMaterial
+var _fit_scale:=Vector3.ONE
 func _ready() -> void:
 	name="AmberFreeze"
 	if _shell_geometry==null:_shell_geometry=_build_shell()
@@ -43,7 +44,7 @@ func _ready() -> void:
 	resin.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED
 	resin.cull_mode=BaseMaterial3D.CULL_DISABLED
 	resin.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA
-	resin.albedo_color=Color("#efbd60")
+	resin.albedo_color=Color("#f07825")
 	_chips.material_override=resin
 	add_child(_chips)
 	_chips.hide()
@@ -56,13 +57,31 @@ func begin(seconds: float) -> void:
 	_release_age=-1.0
 	show()
 	_shell.show()
-	_shell.scale=Vector3.ONE
+	_fit_pose()
 	_chips.hide()
 	_material.set_shader_parameter("formation",0.0)
 	_material.set_shader_parameter("opacity",1.0)
 	_frost.set_shader_parameter("strength",0.0)
 	if is_instance_valid(actor_model):actor_model.set_status_overlay(_frost)
 	set_process(true)
+func _fit_pose() -> void:
+	_fit_scale=Vector3.ONE
+	_shell.position=Vector3.ZERO
+	if not is_instance_valid(actor_model) or not is_instance_valid(actor_model._skeleton):return
+	var skeleton: Skeleton3D=actor_model._skeleton
+	var low:=Vector3(INF,INF,INF)
+	var high:=Vector3(-INF,-INF,-INF)
+	for i in skeleton.get_bone_count():
+		var point: Vector3=actor_model.get_parent().to_local(skeleton.to_global(skeleton.get_bone_global_pose(i).origin))
+		low=low.min(point)
+		high=high.max(point)
+	low-=Vector3(0.10,0.04,0.10)
+	high+=Vector3(0.10,0.22,0.10)
+	_fit_scale=Vector3(clampf((high.x-low.x)/1.04,0.95,1.8),clampf((high.y-low.y)/1.90,0.85,1.35),clampf((high.z-low.z)/0.80,0.95,1.5))
+	_shell.position=Vector3((low.x+high.x)*0.5,low.y,(low.z+high.z)*0.5)
+	_shell.scale=_fit_scale
+	_chips.position=_shell.position
+	_chips.scale=_fit_scale
 func extend(seconds: float) -> void:
 	_remaining=maxf(_remaining,seconds)
 func finish() -> void:
@@ -84,7 +103,7 @@ func _process(delta: float) -> void:
 	_release_age+=delta
 	var fade:=clampf(1.0-_release_age/RELEASE_TIME,0,1)
 	_material.set_shader_parameter("opacity",fade*fade)
-	_shell.scale=Vector3.ONE*(1.0+_release_age*0.18)
+	_shell.scale=_fit_scale*(1.0+_release_age*0.18)
 	var resin:=_chips.material_override as StandardMaterial3D
 	resin.albedo_color.a=fade
 	for i in 12:
@@ -96,11 +115,12 @@ func _process(delta: float) -> void:
 	if _release_age>=RELEASE_TIME:
 		hide()
 		set_process(false)
-static func _ring(level: int,index: int) -> Vector3:
-	var angle:=TAU*(index%SIDES)/SIDES+PI/8.0
-	var rx: float=[0.34,0.54,0.49,0.27][level]
-	var rz: float=[0.29,0.41,0.37,0.23][level]
-	return Vector3(cos(angle)*rx,[0.035,0.60,1.38,1.83][level],sin(angle)*rz)
+static func _crystal_ring(base: Vector3,crown: Vector3,radius: Vector2,level: int,index: int) -> Vector3:
+	var angle:=TAU*(index%SIDES)/SIDES+PI/6.0
+	var center:=base if level<2 else crown
+	var bevel:=0.72 if level==0 else 1.0
+	if level==1:center+=Vector3.UP*0.14
+	return center+Vector3(cos(angle)*radius.x*bevel,0,sin(angle)*radius.y*bevel)
 static func _vertex(st: SurfaceTool,p: Vector3,u: float,edge: bool,shade:=1.0) -> void:
 	st.set_color(Color(shade,shade,shade,1.0 if edge else 0.0))
 	st.set_uv(Vector2(u,p.y/1.90))
@@ -108,26 +128,32 @@ static func _vertex(st: SurfaceTool,p: Vector3,u: float,edge: bool,shade:=1.0) -
 static func _line(st: SurfaceTool,a: Vector3,b: Vector3) -> void:
 	var normal:=(b-a).cross(Vector3.FORWARD).normalized()*0.006
 	for p: Vector3 in [a-normal,b-normal,b+normal,a-normal,b+normal,a+normal]:_vertex(st,p,0.0,true)
+static func _add_crystal(st: SurfaceTool,base: Vector3,crown: Vector3,tip: Vector3,radius: Vector2,tint: float) -> void:
+	# Prismas de seis faces com terminação piramidal; a haste tem arestas retas.
+	for level in 2:
+		for i in SIDES:
+			var a:=_crystal_ring(base,crown,radius,level,i)
+			var b:=_crystal_ring(base,crown,radius,level,i+1)
+			var c:=_crystal_ring(base,crown,radius,level+1,i+1)
+			var d:=_crystal_ring(base,crown,radius,level+1,i)
+			var shade:=tint+float(i%3)*0.10
+			for point: Vector3 in [a,b,c,a,c,d]:_vertex(st,point,float(i)/SIDES,false,shade)
+			if level==1 and i==3:_line(st,a,d)
+	for i in SIDES:
+		var a:=_crystal_ring(base,crown,radius,2,i)
+		var b:=_crystal_ring(base,crown,radius,2,i+1)
+		_vertex(st,a,0.0,false,tint+float(i%3)*0.10)
+		_vertex(st,b,1.0,false,tint+float(i%3)*0.10)
+		_vertex(st,tip,0.5,false,tint+float(i%3)*0.10)
+		if i in [0,3]:_line(st,a,tip)
 static func _build_shell() -> ArrayMesh:
 	var st:=SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	for level in 3:
-		for i in SIDES:
-			var a:=_ring(level,i)
-			var b:=_ring(level,i+1)
-			var c:=_ring(level+1,i+1)
-			var d:=_ring(level+1,i)
-			var shade:=0.70+float(i%3)*0.15
-			_vertex(st,a,0.0,false,shade)
-			_vertex(st,b,1.0,false,shade)
-			_vertex(st,c,1.0,false,shade)
-			_vertex(st,a,0.0,false,shade)
-			_vertex(st,c,1.0,false,shade)
-			_vertex(st,d,0.0,false,shade)
-			if i in [0,3]:_line(st,a,d)
-			# Friso só na base e no ombro: poucas arestas, sem grade sobre o rosto.
-			if level==0:_line(st,a,b)
-	for i in SIDES:
-		for p: Vector3 in [_ring(3,i),_ring(3,i+1),Vector3(0,1.90,0)]:_vertex(st,p,0.0,false)
+	# Um conjunto mineral com quatro terminações visíveis, em alturas e ângulos diferentes.
+	# Fundidos numa única superfície compartilhada; nenhuma luz ou nó adicional.
+	_add_crystal(st,Vector3(0.12,0.02,-0.23),Vector3(0.25,1.91,-0.23),Vector3(0.29,2.38,-0.23),Vector2(0.21,0.23),0.78)
+	_add_crystal(st,Vector3(0,0.015,0),Vector3(-0.03,1.76,0),Vector3(-0.14,2.22,0),Vector2(0.44,0.37),0.80)
+	_add_crystal(st,Vector3(-0.25,0.02,0.03),Vector3(-0.52,1.51,0.02),Vector3(-0.77,1.98,0.02),Vector2(0.24,0.25),0.76)
+	_add_crystal(st,Vector3(0.23,0.02,0.12),Vector3(0.48,1.60,0.10),Vector3(0.73,2.08,0.10),Vector2(0.23,0.24),0.82)
 	st.generate_normals()
 	return st.commit()

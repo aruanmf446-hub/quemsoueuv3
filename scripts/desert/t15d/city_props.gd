@@ -1,10 +1,11 @@
 extends Node3D
 ## Arquitetura de fundo próxima, exclusiva da campanha noturna 01–09.
-## Coordenadas mundiais como as plataformas clipadas do chunk; nunca cria colisores.
+## Apoios opcionais só nos objetos próximos; descarregam com a própria arte do chunk.
 ## Bordas artificiais de chunk NÃO recebem lanternas: para isso o chamador marca
 ## pit_left/pit_right somente nas extremidades que realmente tocam um buraco.
 const Assets = preload("res://scripts/desert/t15d/kingdom_assets.gd")
 const Context=preload("res://scripts/desert/t15d/regional_context.gd")
+const Landings=preload("res://scripts/desert/t15d/prop_landings.gd")
 const BUILDING_SPACING := 19.0
 static var _house_texture: Texture2D
 var _builders := {}
@@ -75,6 +76,7 @@ func _build_slot(slot: int, left: float, right: float, top: float,_at_x := INF) 
 			art.set_meta("surface_left",left)
 			art.set_meta("surface_right",right)
 			building_count += 1
+			Landings.attach(art,part.asset,_order,left,right,top)
 		piece += 1
 	Context.build(self,_order,slot,left,right,top)
 
@@ -160,7 +162,10 @@ func place_asset(id: String,base: Vector3,width: float,landmark_id := "") -> Spr
 func _planned_asset(point: Dictionary) -> void:
 	var base := Vector3(float(point.x),float(point.y),-5.0)
 	if point.anchor=="street_below": base.y-=8.0
-	place_asset(point.asset,base,float(point.width),point.id)
+	var art:=place_asset(point.asset,base,float(point.width),point.id)
+	var floor:=Assets.surface(_order,int(point.surface))
+	if not floor.get("task_void",false):
+		Landings.attach(art,point.asset,_order,float(floor.left),float(floor.right),float(floor.height))
 
 func _house_art() -> Texture2D:
 	if _house_texture == null and ResourceLoader.exists("res://assets/desert/modular/capital_house.res"):

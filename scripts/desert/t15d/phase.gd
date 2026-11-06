@@ -334,7 +334,7 @@ func _chunk_platforms(index: int) -> Array:
 	return platforms
 func _build_collision(chunk: Node3D, platforms: Array) -> void:
 	for part: Dictionary in platforms:
-		var body := StaticBody3D.new()
+		var body: StaticBody3D=preload("res://scripts/desert/t15d/one_way_support.gd").new() if part.get("parkour_route",false) else StaticBody3D.new()
 		body.collision_layer = 1
 		body.position = _vec3(part.pos)
 		var shape := CollisionShape3D.new()
@@ -346,7 +346,10 @@ func _build_collision(chunk: Node3D, platforms: Array) -> void:
 		box.size = dimensions
 		shape.shape = box
 		body.add_child(shape)
-		if part.get("parkour_route",false): body.set_meta("parkour_route",true)
+		if part.get("parkour_route",false):
+			body.set_meta("parkour_route",true)
+			body.set_meta("one_way_top",body.position.y+dimensions.y*0.5)
+			body.add_to_group(preload("res://scripts/desert/t15d/prop_landings.gd").GROUP)
 		if part.kind=="ground": body.set_meta("walkable_floor",true)
 		chunk.add_child(body)
 		if part.get("breakable",false):
@@ -515,12 +518,15 @@ func _spawn_enemy(_chunk: Node3D, spawn: Dictionary) -> void:
 	enemy.persistent_follow = bool(spawn.get("troop",false))
 	var encounter := spawn.duplicate(true)
 	encounter.challenger=_order<10
+	if not str(encounter.get("spear_supply","")).is_empty():
+		encounter.spear_enabled=_collected_ids.has(str(encounter.spear_supply))
 	enemy.setup(_enemy_catalog.cactus,encounter)
 	enemy.add_to_group("enemies")
 	enemy.show()
 	enemy.set_physics_process(true)
 
 func _retire_enemy(enemy: Node3D) -> void:
+	if is_instance_valid(enemy._spear_guard):enemy._spear_guard.shutdown()
 	_enemy_live.erase(str(enemy.get_meta("spawn_id","")))
 	enemy.remove_from_group("enemies")
 	enemy.set_physics_process(false)
@@ -567,6 +573,8 @@ func _pit_material(key: String) -> StandardMaterial3D:
 	_pit_materials[key] = material
 	return material
 func _on_pickup_collected(id: String, kind: String) -> void:
+	for enemy in _troops.get_children():
+		if is_instance_valid(enemy._spear_guard):enemy._spear_guard.enable_for(id)
 	_collected_ids[id] = true
 	for pedestal: MeshInstance3D in get_tree().get_nodes_in_group("campaign_pedestals"):
 		if is_ancestor_of(pedestal) and str(pedestal.get_meta("pickup_id",""))==id:

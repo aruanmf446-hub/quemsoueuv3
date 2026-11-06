@@ -1,0 +1,7 @@
+{
+	"checks": 19,
+	"detail_camera_fixture": true,
+	"failures": 0,
+	"fixture_teleport": true,
+	"physical_device": false
+}

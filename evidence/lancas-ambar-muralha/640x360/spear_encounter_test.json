@@ -1,0 +1,7 @@
+{
+	"capture_freezes_frame": true,
+	"checks": 30,
+	"failures": 0,
+	"fixture_teleport": true,
+	"physical_device": false
+}

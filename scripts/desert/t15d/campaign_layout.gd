@@ -158,6 +158,21 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 		enemies=enemies.filter(func(p: Dictionary) -> bool:return float(p.pos[0])<=float(task.start) or float(p.pos[0])>=float(task.end))
 		holes=holes.filter(func(h: Dictionary) -> bool:return float(h.start)<=float(task.start) or float(h.start)>=float(task.end))
 	var goal_top: float = surfaces[-1].height
+	# Encontros de defesa pontuais: ausência nas fases 2/3 e retorno nas ruínas/posto militar.
+	if order in [1,6,8]:
+		var defense_index:=0
+		for item: Dictionary in pickups:
+			if item.kind!="defense":continue
+			var chosen:=defense_index==0 or (order in [6,8] and defense_index==4)
+			defense_index+=1
+			if not chosen:continue
+			var floor: Dictionary=surfaces[int(item.surface)]
+			var sx:=float(item.pos[0])+(5.5 if order==1 and defense_index==1 else 8.0)
+			if floor.get("task_void",false) or sx>float(floor.right)-1.2:continue
+			var tutorial:=order==1 and defense_index==1
+			if tutorial:
+				enemies=enemies.filter(func(e: Dictionary) -> bool:return absf(float(e.pos[0])-float(item.pos[0]))>18.0)
+			enemies.append({"id":prefix+".spear."+str(defense_index),"type":"cactus","pos":[sx,float(floor.height)+0.02,0],"patrol":[sx-0.2,sx+0.2],"spear":true,"spear_supply":str(item.id) if tutorial else "","spear_tutorial":tutorial,"district":int(item.surface)/sector_modules})
 	stage.merge({"protagonist":"el_fuego","player_spawn":[spawn_x,_height(order,0)+0.1,0],"length":distance,"total_length":distance,"minimum_seconds":180.0,"minimum_traversal_seconds":(distance-1)/MAX_HORIZONTAL_SPEED,"transport_allowance":0.0,"maximum_horizontal_speed":MAX_HORIZONTAL_SPEED,"tasks":tasks,"platforms":platforms,"enemies":enemies,"pickups":pickups,"holes":holes,"signs":[],"districts":districts,"landmarks":landmarks,"checkpoints":checkpoints,"geysers":[],"storms":[],"surfaces":surfaces,"goal":{"pos":[goal_x,goal_top+1.5,0]},"kill_plane_y":-10.0 if order == 2 else -12.0,"boss_id":"malagueta" if order == 10 else null,"legacy_placeholder_visuals":false,"bounds":{"min_x":origin,"max_x":goal_x+10.0},"next_scene":"res://scenes/desert/phase_%02d.tscn" % (order+1) if order < 10 else "","reach":{"max_gap":3.2,"single_jump_max_step_top":0.65,"double_jump_max_step_top":1.3}},true)
 	if order == 10:
 		stage.boss = {"id":"p10.malagueta","pos":[goal_x-4.0,goal_top+0.02,0],"patrol":[goal_x-8.0,goal_x+8.0]}

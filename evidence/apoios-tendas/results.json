@@ -1,0 +1,135 @@
+{
+  "native_captures": [
+    {
+      "size": "844x390",
+      "passed": true
+    },
+    {
+      "size": "1920x1080",
+      "passed": true
+    },
+    {
+      "size": "640x360",
+      "passed": true
+    }
+  ],
+  "rules": {
+    "checks": 134,
+    "failures": 0
+  },
+  "routes": [
+    {
+      "test": "route-01",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 19.37,
+      "graphical": false,
+      "fixed_physics_step": true
+    },
+    {
+      "test": "route-02",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 26.9,
+      "graphical": false,
+      "fixed_physics_step": true
+    },
+    {
+      "test": "route-03",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 18.11,
+      "graphical": false,
+      "fixed_physics_step": true
+    },
+    {
+      "test": "route-04",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 19.05,
+      "graphical": false,
+      "fixed_physics_step": true
+    },
+    {
+      "test": "route-05",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 19.43,
+      "graphical": false,
+      "fixed_physics_step": true
+    },
+    {
+      "test": "route-06",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 19.06,
+      "graphical": false,
+      "fixed_physics_step": true
+    },
+    {
+      "test": "route-07",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 16.66,
+      "graphical": false,
+      "fixed_physics_step": true
+    },
+    {
+      "test": "route-08",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 30.04,
+      "graphical": false,
+      "fixed_physics_step": true
+    },
+    {
+      "test": "route-09",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 19.85,
+      "graphical": false,
+      "fixed_physics_step": true
+    },
+    {
+      "test": "route-10",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 27.06,
+      "graphical": false,
+      "fixed_physics_step": true
+    }
+  ],
+  "other_regressions": [
+    {
+      "test": "checkpoints",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 5.14,
+      "graphical": false,
+      "fixed_physics_step": false
+    },
+    {
+      "test": "reino-v3",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 7.23,
+      "graphical": false,
+      "fixed_physics_step": false
+    }
+  ],
+  "regional_context": {
+    "checks": 72,
+    "failures": 0
+  },
+  "web": {
+    "viewport": "844x390",
+    "dpr": 3,
+    "physical_device": false,
+    "errors": [],
+    "engineErrors": [],
+    "blocked": []
+  },
+  "scope_check": true,
+  "design_check": true,
+  "canopy_contact": "red fabric, inset from poles"
+}

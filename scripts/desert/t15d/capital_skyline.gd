@@ -10,6 +10,7 @@ const WALL_SPAN := 28.0
 const WALL_TOP := 1.20
 const WALL_BOTTOM := -14.0
 const PALACE_SPAN := 20.0
+const PALACE_BASE_DEPTH := 36.0
 func configure(order: int) -> void:
 	_order = order
 func _ready() -> void:
@@ -31,7 +32,7 @@ func _ready() -> void:
 		palace.name = "DistantPalace%d" % i
 		add_child(palace)
 		# Embasamento liga o palácio elevado à muralha distante, sem peças suspensas.
-		palace._box(Vector3(0,-3.65,-0.3),Vector3(27.0,7.3,2.0),"stone")
+		palace._box(Vector3(0,-PALACE_BASE_DEPTH*0.5,-0.3),Vector3(27.0,PALACE_BASE_DEPTH,2.0),"stone")
 		# Alas unidas ao salão central; torres sobrepostas atrás das cornijas.
 		palace.place_asset("capital_watchtower",Vector3(0,5.7,-0.8),5.0)
 		for side in [-1.0,1.0]:
@@ -58,6 +59,11 @@ func _tint(part: Node3D) -> void:
 func follow(camera: Camera3D, x: float, travel: float) -> void:
 	var scale_factor := camera.size/7.0
 	global_transform = Transform3D(camera.global_basis,camera.global_position-camera.global_basis.z*36.0)
+	if _order==2:
+		# A cidade abaixo dos telhados acompanha só uma fração da subida da câmera.
+		# Seguir a câmera em Y na proporção 1:1 fazia o muro parecer suspenso no salto.
+		var city_camera_y:=8.0+(0.20 if UIScale.is_iphone() else 0.50)+2.2
+		global_position.y-=(camera.global_position.y-city_camera_y)*0.80
 	var wall_offset := fposmod(x*0.18,WALL_SPAN*scale_factor)
 	var palace_offset := fposmod(x*0.08+_order*2.0,PALACE_SPAN*scale_factor)
 	for i in 3:

@@ -47,5 +47,28 @@
     "scenario_task_checks": 182,
     "composition_checks": 110,
     "web_rerun": false
+  },
+  "revisao_industrial": {
+    "source_commit": "400ed1a5936673a5fd1c373bdf0aef6ecdce7233",
+    "graphical_asset_checks_passed": 22,
+    "scenario_task_checks_passed": 182,
+    "composition_checks_passed": 110,
+    "native_sizes": [
+      "844x390",
+      "1920x1080",
+      "640x360"
+    ],
+    "all_task_state_captures": 38,
+    "web": {
+      "passed": true,
+      "viewport": "844x390",
+      "dpr": 3,
+      "phase": 7,
+      "touch_activation_with_zero_charges": true,
+      "walked_both_directions": true,
+      "js_errors": [],
+      "engine_errors": [],
+      "physical_device": false
+    }
   }
 }

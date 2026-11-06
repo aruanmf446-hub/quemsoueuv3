@@ -5,6 +5,7 @@ var ui: Control
 var callback: JavaScriptObject
 var fixture_mode := "deck"
 var report_sequence := 0
+var fixture_game: SupabaseClient
 func _ready() -> void:
 	if OS.has_feature("web") and not OS.has_feature("iphone_layout_fixture"):
 		push_error("Use only the isolated fixture export")
@@ -16,6 +17,7 @@ func _run() -> void:
 	await get_tree().process_frame
 	var fake := preload("res://tests/community_t27/fake_game.gd").new()
 	add_child(fake)
+	fixture_game=fake
 	var profile := preload("res://tests/nickname_onboarding/fake_profile_client.gd").new()
 	add_child(profile)
 	fake.user=profile.user_id
@@ -40,7 +42,8 @@ func _run() -> void:
 	else:
 		ui=load("res://scenes/player/deck_library.tscn").instantiate()
 		add_child(ui)
-		ui._create_deck()
+		if mode=="status": await _seed_submission()
+		else: ui._create_deck()
 	if OS.has_feature("web"):
 		JavaScriptBridge.eval("window.qseSetInternalScreen && window.qseSetInternalScreen(true)")
 		callback=JavaScriptBridge.create_callback(_probe)
@@ -48,7 +51,33 @@ func _run() -> void:
 		await get_tree().create_timer(1.0).timeout
 		_probe([])
 		JavaScriptBridge.eval("window.qseDeckInputReady=true")
+func _seed_submission() -> void:
+	var store := DeckDrafts.for_current()
+	for old in store.list(): store.delete(str(old.id))
+	var draft := store.new_draft()
+	draft.name="[TESTE] Rappers"
+	draft.description="Artistas do rap em cartas. Fixture local sem rede."
+	draft.category="Personagens"
+	store.save(draft)
+	var image := (load("res://assets/duel/decks/oficial/lendas_urbanas/momo.png") as Texture2D).get_image()
+	for i in 5:
+		var card := {"id":"test_"+str(i),"name":"Artista "+str(i+1),"crops":{}}
+		card.image_file=store.store_original(str(draft.id),str(card.id),image.save_png_to_buffer(),"png")
+		store.store_previews(str(draft.id),card,image)
+		draft.cards.append(card)
+	await CreatorSync.for_current(store).push(draft)
+	fixture_game.db.qse_creator_decks[0].status="rejected"
+	fixture_game.db.qse_creator_decks[0].review_note="As imagens não correspondem aos artistas de rap descritos. Corrija as cartas e envie novamente."
+	draft.server_status="pending_review"
+	store.save(draft)
+	ui._pulled_decks=true
+	ui._draft=draft
+	ui._open_submissions()
+
 func _probe(args: Array) -> void:
+	if args.size() and str(args[0])=="approve_fixture" and is_instance_valid(fixture_game):
+		fixture_game.db.qse_creator_decks[0].status="published"
+		fixture_game.db.qse_creator_decks[0].review_note=null
 	if args.size() and str(args[0]).begins_with("focus:"):
 		var target := ui.find_child(str(args[0]).trim_prefix("focus:"),true,false) as Control
 		var scroll := ui.get_node_or_null("Margin/Column/Scroll") as ScrollContainer

@@ -95,7 +95,11 @@ func _ready() -> void:
 		_pulled_decks = false
 		_pulled_favorites = false
 		_remote_error.clear()
-		if is_visible_in_tree() and _view in ["library", "editor", "review"]:
+		_moderation_checked=false
+		_moderation_busy=false
+		_moderation_generation+=1
+		_moderation_state="idle"
+		if is_visible_in_tree() and _view in ["library", "editor", "review", "submissions"]:
 			_draft = {}
 			_render_library())
 
@@ -237,7 +241,9 @@ func _render_library() -> void:
 func _select_tab(tab: String) -> void:
 	_tab = tab
 	# "Meus Decks" mostra os próprios; nas outras abas o filtro de tipo continua o do jogador.
-	if tab == "Meus Decks": _types = {"mine": true}
+	if tab == "Meus Decks":
+		_types = {"mine": true}
+		_moderation_checked=false
 	elif _types.size() == 1 and _types.has("mine"): _types = {}
 	for i in range(_tabs.size()): if is_instance_valid(_tabs[i]): _tabs[i].button_pressed = TABS[i] == tab
 	_sort = ""
@@ -284,6 +290,9 @@ func _entries() -> Array[Dictionary]:
 ## Busca a vitrine da Comunidade (com cache de 2 min) e baixa as capas que faltam.
 var _community_busy := false
 var _moderation_checked := false
+var _moderation_busy := false
+var _moderation_generation := 0
+var _moderation_state := "idle"
 func _load_community() -> void:
 	if _community_busy or not _demo_entries.is_empty(): return
 	var service := CommunityService.for_current()
@@ -366,7 +375,9 @@ func _send_draft_for_review(draft: Dictionary) -> void:
 	draft.review_note = ""
 	_store().save(draft)
 	banner.show_state("success", tr("Deck enviado para revisão. Ele aparece na Comunidade quando for aprovado."))
-	if _view == "review": _render_review()
+	if _view == "review":
+		_render_review()
+		banner.show_state("success",tr("Deck enviado para revisão. Acompanhe a decisão em Meus Decks → Acompanhar envios."))
 	elif _view == "library": _update_results()
 
 
@@ -384,22 +395,103 @@ func _unpublish_draft(draft: Dictionary) -> void:
 	elif _view == "library": _update_results()
 
 
-## Atualiza status/motivo de recusa dos decks enviados, sem baixar cartas.
+## Consulta leve: preserva as cartas e alterações locais, atualiza só status/motivo.
 func _refresh_moderation() -> void:
+	if _moderation_busy: return
 	var service := CommunityService.for_current()
-	if not service.available(): return
+	if not service.available():
+		_moderation_state="offline"
+		if _view=="submissions": _render_submissions()
+		return
+	var store := _store()
+	var owner := store.owner
+	_moderation_generation+=1
+	var generation := _moderation_generation
+	_moderation_busy=true
+	_moderation_state="loading"
+	if _view=="submissions": _render_submissions()
 	var result: Dictionary = await service.statuses()
-	if not result.ok: return
+	if not is_inside_tree() or generation!=_moderation_generation or _store().owner!=owner: return
+	_moderation_busy=false
+	_moderation_state="fresh" if result.ok else "error"
 	var changed := false
-	for draft: Dictionary in _store().list():
-		var info: Dictionary = result.data.get(str(draft.get("server_id", "")), {})
-		if info.is_empty(): continue
-		if str(draft.get("server_status", "")) != info.status or str(draft.get("review_note", "")) != info.review_note:
-			draft.server_status = info.status
-			draft.review_note = info.review_note
-			_store().save(draft)
-			changed = true
-	if changed and is_inside_tree() and _view == "library" and _tab == "Meus Decks": _update_results()
+	if result.ok:
+		for draft: Dictionary in store.list():
+			var info: Dictionary = result.data.get(str(draft.get("server_id", "")), {})
+			if info.is_empty(): continue
+			if str(draft.get("server_status", "")) != info.status or str(draft.get("review_note", "")) != info.review_note:
+				draft.server_status = info.status
+				draft.review_note = info.review_note
+				store.save(draft)
+				changed = true
+			# O editor pode ter alterações ainda não salvas: não substituir o rascunho.
+			if str(_draft.get("id", ""))==str(draft.id):
+				_draft.server_status=info.status
+				_draft.review_note=info.review_note
+	if _view=="submissions": _render_submissions()
+	elif changed and _view=="library" and _tab=="Meus Decks": _update_results()
+
+func _open_submissions() -> void:
+	_render_submissions()
+	$Margin/Column/Scroll.scroll_vertical=0
+	_refresh_moderation.call_deferred()
+
+func _submission_text(parent: Node, value: String, node_name: String, color:=PlayerUI.TEXT, font_size:=22) -> Label:
+	var label := _data_text(value,font_size,color)
+	label.name=node_name
+	label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	label.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	parent.add_child(label)
+	return label
+
+func _is_revision(draft: Dictionary) -> bool:
+	return _moderation(draft)=="rejected" or (_moderation(draft)=="draft" and not str(draft.get("review_note", "")).strip_edges().is_empty())
+
+func _review_feedback(parent: Node, draft: Dictionary) -> void:
+	if not _is_revision(draft): return
+	_submission_text(parent,tr("Motivo da reprovação"),"RejectionHeading",PlayerUI.GOLD)
+	var reason := str(draft.get("review_note", "")).strip_edges()
+	_submission_text(parent,reason if not reason.is_empty() else tr("A revisão não informou um motivo. Atualize o status para consultar novamente."),"RejectionReason")
+
+func _render_submissions() -> void:
+	_page("Status dos decks","submissions")
+	$Margin/Column/Header/Back.text=tr("‹ Meus Decks")
+	var refresh := _action("Atualizar status",_refresh_moderation)
+	refresh.name="RefreshDeckStatuses"
+	refresh.disabled=_moderation_busy
+	PlayerUI.editor_control(refresh)
+	body.add_child(refresh)
+	var messages := {
+		"idle":"Mostrando o último status salvo. Atualize para consultar a revisão.",
+		"loading":"Consultando o status dos seus decks…",
+		"fresh":"Status atualizado. Depois de corrigir um deck reprovado, envie para uma nova revisão.",
+		"error":"Não foi possível atualizar agora. Mostrando o último status salvo; tente novamente.",
+		"offline":"Entre na sua conta para atualizar. Mostrando os decks salvos neste aparelho."}
+	_submission_text(body,tr(messages.get(_moderation_state,messages.idle)),"DeckStatusNotice",PlayerUI.MUTED)
+	if _remote_busy: _submission_text(body,tr("Sincronizando os decks da sua conta…"),"DeckStatusSync",PlayerUI.MUTED)
+	elif _remote_error.has("decks"):
+		_submission_text(body,tr("Alguns decks da conta podem não aparecer. Volte a Meus Decks e toque em Tentar novamente."),"DeckStatusSyncError",PlayerUI.MUTED)
+	var drafts := _store().list()
+	if drafts.is_empty():
+		_submission_text(body,tr("Nenhum deck neste aparelho. Seus envios aparecem aqui após a sincronização da conta."),"NoSubmissions",PlayerUI.MUTED)
+	for draft: Dictionary in drafts:
+		var row := PlayerUI.card(body)
+		row.name="Submission_"+str(draft.id)
+		_submission_text(row,str(draft.get("name","")) if not str(draft.get("name", "")).is_empty() else tr("Sem nome"),"SubmissionName",PlayerUI.TEXT,28)
+		var state := "revision" if _is_revision(draft) and _moderation(draft)=="draft" else _moderation(draft)
+		var titles := {"draft":"Rascunho · ainda não enviado", "pending_review":"Em revisão", "rejected":"Reprovado · precisa de ajustes", "revision":"Em correção · aguardando reenvio", "published":"Aprovado · publicado", "removed":"Removido pela moderação"}
+		_submission_text(row,tr(titles.get(state,"Status indisponível · atualize")),"SubmissionState",PlayerUI.GOLD)
+		var help := {"revision":"Suas alterações estão em rascunho. Conclua a correção e reenvie para nova revisão.", "draft":"Conclua as cartas e envie o deck para revisão.", "pending_review":"Seu envio aguarda a decisão da moderação. A aprovação libera o deck na Comunidade.", "rejected":"Corrija o conteúdo conforme o motivo abaixo e reenvie. O deck passará por uma nova revisão.", "published":"O deck foi aprovado e está disponível na Comunidade.", "removed":"Este deck foi removido e não pode ser reenviado por esta tela."}
+		_submission_text(row,tr(help.get(state,"Consulte novamente antes de enviar.")),"SubmissionHelp",PlayerUI.MUTED)
+		_review_feedback(row,draft)
+		var action := _action("Corrigir e reenviar" if state in ["rejected","revision"] else ("Continuar edição" if state=="draft" else "Ver envio"),func()->void:
+			_draft=draft
+			if _moderation(draft) in ["draft","rejected"]: _render_editor()
+			else: _render_review())
+		action.name="SubmissionAction"
+		PlayerUI.editor_control(action,state in ["rejected","revision"])
+		row.add_child(action)
+	_reveal()
 
 
 func _matches(entry: Dictionary) -> bool:
@@ -472,6 +564,11 @@ func _update_results() -> void:
 	if _tab == "Recentes" and shown.all(func(e: Dictionary) -> bool: return float(e.get("published", 0)) <= 0.0):
 		_notice("Nenhum deck com data de publicação disponível.")
 	if _tab == "Meus Decks":
+		var refused := all.filter(func(entry:Dictionary)->bool:return str(entry.get("origin",""))=="mine" and _moderation(entry.draft)=="rejected").size()
+		var track := _action("Acompanhar envios"+(" · %d reprovado%s" % [refused,"" if refused==1 else "s"] if refused>0 else ""),_open_submissions)
+		track.name="OpenDeckSubmissions"
+		PlayerUI.editor_control(track)
+		_results.add_child(track)
 		_remote_section.call_deferred("decks")
 		if not _moderation_checked:
 			_moderation_checked = true
@@ -907,7 +1004,8 @@ func _deck_tile(entry: Dictionary) -> Control:
 		var pill_text: String = {"synced": "NA CONTA", "pending": "ENVIANDO", "error": "ERRO AO ENVIAR"}.get(state, "RASCUNHO")
 		var moderation := _moderation(entry.draft)
 		if moderation in ["pending_review", "published", "rejected", "removed"]:
-			pill_text = {"pending_review": "EM REVISÃO", "published": "PUBLICADO", "rejected": "RECUSADO", "removed": "REMOVIDO"}[moderation]
+			pill_text = {"pending_review": "EM REVISÃO", "published": "PUBLICADO", "rejected": "REPROVADO", "removed": "REMOVIDO"}[moderation]
+		if moderation=="draft" and _is_revision(entry.draft): pill_text="EM CORREÇÃO"
 		var pill := PlayerUI.pill(pill_text, "equipped" if state == "synced" or moderation == "published" else "available")
 		if moderation == "rejected" and not str(entry.draft.get("review_note", "")).is_empty(): pill.tooltip_text = tr("Motivo: ") + str(entry.draft.review_note)
 		pill.name = "SyncState"
@@ -949,6 +1047,7 @@ func _deck_menu(entry: Dictionary) -> Control:
 	var popup := menu.get_popup()
 	popup.add_item(tr("Abrir / Editar"), 0)
 	popup.add_item(tr("Duplicar"), 1)
+	popup.add_item(tr("Acompanhar revisão"),6)
 	var moderation := _moderation(entry.draft)
 	if moderation in ["pending_review", "published"]: popup.add_item(tr("Retirar da Comunidade"), 5)
 	else: popup.add_item(tr("Revisar e publicar"), 2)
@@ -971,6 +1070,7 @@ func _menu_action(id: int, entry: Dictionary) -> void:
 		3: _confirm_delete(draft)
 		4: _retry_draft(draft)
 		5: _unpublish_draft(draft)
+		6: _open_submissions()
 
 
 ## Mantém o retry de rascunhos individuais, existente antes do redesign T23.
@@ -1251,6 +1351,10 @@ func handle_back() -> bool:
 	if is_instance_valid(_editor_overlay):
 		_close_framer()
 		return true
+	if _view == "submissions":
+		_tab="Meus Decks"
+		_render_library()
+		return true
 	if _view == "review":
 		_render_editor()
 		return true
@@ -1415,7 +1519,9 @@ func _remote_section(kind: String) -> void:
 	if kind == "decks": _pulled_decks = true
 	else: _pulled_favorites = true
 	if not result.ok: _remote_error[kind] = str(result.get("code", "erro"))
-	if is_inside_tree() and _view == "library": _update_results()
+	if is_inside_tree():
+		if _view == "library": _update_results()
+		elif _view == "submissions": _render_submissions()
 
 
 func _confirm_delete(draft: Dictionary) -> void:
@@ -1453,6 +1559,7 @@ func _render_editor() -> void:
 	_page("Criar deck" if str(_draft.name).is_empty() else str(_draft.name), "editor")
 	$Margin/Column/Header/Back.text=tr("‹ Meus Decks")
 	body.add_theme_constant_override("separation",12)
+	_review_feedback(body,_draft)
 	_add_prompt_action()
 	var form := PlayerUI.row(body)
 	form.name="DeckForm"
@@ -1518,7 +1625,7 @@ func _render_editor() -> void:
 	var save := _action("Salvar rascunho",_save_draft)
 	save.name="SaveDraft"
 	actions.add_child(save)
-	var review := _action("Revisar deck →",func()->void:
+	var review := _action("Revisar reenvio →" if _is_revision(_draft) else "Revisar deck →",func()->void:
 		await _save_draft()
 		_render_review())
 	review.name="ReviewDeck"
@@ -1782,6 +1889,7 @@ func _render_review() -> void:
 	$Margin/Column/Scroll.scroll_vertical=0
 	$Margin/Column/Header/Back.text = tr("‹ Editar")
 	var problems := DeckDrafts.problems(_draft)
+	_review_feedback(body,_draft)
 	_add_prompt_action()
 	body.add_child(_data_text(str(_draft.name) if not str(_draft.name).is_empty() else tr("Sem nome"), 30))
 	body.add_child(_data_text("%s  ·  %s  ·  %d cartas" % [str(_draft.category), {"private": "Privado", "unlisted": "Não listado", "public": "Público"}.get(str(_draft.visibility), "—"), _draft.cards.size()], 16, PlayerUI.MUTED))
@@ -1806,9 +1914,7 @@ func _render_review() -> void:
 		column.add_child(image)
 		column.add_child(_data_text(str(card.get("name", "")), 14))
 	var moderation := _moderation(_draft)
-	if moderation == "rejected" and not str(_draft.get("review_note", "")).is_empty():
-		body.add_child(_data_text(tr("Recusado pela moderação: ") + str(_draft.review_note), 16, Color("#ff9797")))
-	var publish := _action("Enviar para revisão · grátis", _publish_draft.bind(_draft))
+	var publish := _action("Reenviar para revisão · grátis" if _is_revision(_draft) else "Enviar para revisão · grátis", _publish_draft.bind(_draft))
 	publish.name = "PublishDeck"
 	publish.disabled = not problems.is_empty() or moderation in ["pending_review", "published", "removed"] or not _sync().available()
 	PlayerUI.style_button(publish, true)
@@ -1822,6 +1928,10 @@ func _render_review() -> void:
 	note_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	note_label.name = "PublishNote"
 	body.add_child(note_label)
+	var track := _action("Acompanhar envio",_open_submissions)
+	track.name="TrackDeckSubmission"
+	PlayerUI.editor_control(track)
+	body.add_child(track)
 	_reveal()
 
 func _add_prompt_action() -> void:

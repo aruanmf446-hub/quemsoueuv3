@@ -1,0 +1,173 @@
+{
+  "errors": [],
+  "rejected": {
+    "card_names": [
+      "Artista 1",
+      "Artista 2",
+      "Artista 3",
+      "Artista 4",
+      "Artista 5"
+    ],
+    "cards": 5,
+    "category": "Personagens",
+    "controls": [
+      {
+        "name": "Back",
+        "rect": [
+          40,
+          28,
+          245,
+          68
+        ]
+      },
+      {
+        "name": "RefreshDeckStatuses",
+        "rect": [
+          40,
+          120,
+          1296,
+          80
+        ]
+      },
+      {
+        "name": "SubmissionAction",
+        "rect": [
+          62,
+          497,
+          1252,
+          80
+        ]
+      }
+    ],
+    "cover": {},
+    "description": "Artistas do rap em cartas. Fixture local sem rede.",
+    "fields": {},
+    "labels": [
+      "Status dos decks",
+      "Status atualizado. Depois de corrigir um deck reprovado, envie para uma nova revisão.",
+      "[TESTE] Rappers",
+      "Reprovado · precisa de ajustes",
+      "Corrija o conteúdo conforme o motivo abaixo e reenvie. O deck passará por uma nova revisão.",
+      "Motivo da reprovação",
+      "As imagens não correspondem aos artistas de rap descritos. Corrija as cartas e envie novamente."
+    ],
+    "name": "[TESTE] Rappers",
+    "sequence": 2,
+    "size": [
+      1376,
+      675
+    ]
+  },
+  "pending": {
+    "card_names": [
+      "Artista 1",
+      "Artista 2",
+      "Artista 3",
+      "Artista 4",
+      "Artista 5"
+    ],
+    "cards": 5,
+    "category": "Personagens",
+    "controls": [
+      {
+        "name": "Back",
+        "rect": [
+          40,
+          28,
+          245,
+          68
+        ]
+      },
+      {
+        "name": "RefreshDeckStatuses",
+        "rect": [
+          40,
+          120,
+          1296,
+          80
+        ]
+      },
+      {
+        "name": "SubmissionAction",
+        "rect": [
+          62,
+          415,
+          1252,
+          80
+        ]
+      }
+    ],
+    "cover": {},
+    "description": "Artistas do rap em cartas. Fixture local sem rede.",
+    "fields": {},
+    "labels": [
+      "Status dos decks",
+      "Status atualizado. Depois de corrigir um deck reprovado, envie para uma nova revisão.",
+      "[TESTE] Rappers corrigido no celular",
+      "Em revisão",
+      "Seu envio aguarda a decisão da moderação. A aprovação libera o deck na Comunidade."
+    ],
+    "name": "[TESTE] Rappers corrigido no celular",
+    "sequence": 17,
+    "size": [
+      1376,
+      675
+    ]
+  },
+  "approved": {
+    "card_names": [
+      "Artista 1",
+      "Artista 2",
+      "Artista 3",
+      "Artista 4",
+      "Artista 5"
+    ],
+    "cards": 5,
+    "category": "Personagens",
+    "controls": [
+      {
+        "name": "Back",
+        "rect": [
+          40,
+          28,
+          245,
+          68
+        ]
+      },
+      {
+        "name": "RefreshDeckStatuses",
+        "rect": [
+          40,
+          120,
+          1296,
+          80
+        ]
+      },
+      {
+        "name": "SubmissionAction",
+        "rect": [
+          62,
+          415,
+          1252,
+          80
+        ]
+      }
+    ],
+    "cover": {},
+    "description": "Artistas do rap em cartas. Fixture local sem rede.",
+    "fields": {},
+    "labels": [
+      "Status dos decks",
+      "Status atualizado. Depois de corrigir um deck reprovado, envie para uma nova revisão.",
+      "[TESTE] Rappers corrigido no celular",
+      "Aprovado · publicado",
+      "O deck foi aprovado e está disponível na Comunidade."
+    ],
+    "name": "[TESTE] Rappers corrigido no celular",
+    "sequence": 21,
+    "size": [
+      1376,
+      675
+    ]
+  }
+}

@@ -87,6 +87,26 @@ func push(draft: Dictionary) -> Dictionary:
 		draft.sync_state = "local"
 		store.save(draft)
 		return ServiceResult.failure("deck_incomplete")
+	# As políticas existentes só permitem editar/enviar imagens em draft.
+	# Reabrir a reprovação pela RPC do dono, preservando o motivo até o novo envio.
+	if str(draft.get("server_status","")) in ["pending_review","published","removed"]:
+		return ServiceResult.failure("deck_locked")
+	if str(draft.get("server_status",""))=="rejected":
+		var service := CommunityService.new()
+		service.client=client
+		var current: Dictionary=await service.statuses()
+		if not current.ok: return _failed(draft,current)
+		var info: Dictionary=current.data.get(str(draft.get("server_id","")),{})
+		if info.is_empty(): return _failed(draft,ServiceResult.failure("deck_not_found"))
+		draft.server_status=info.status
+		draft.review_note=info.review_note
+		store.save(draft)
+		if info.status not in ["draft","rejected"]: return ServiceResult.failure("deck_locked")
+		if info.status=="rejected":
+			var reopened: Dictionary=await service.unpublish(str(draft.get("server_id","")))
+			if not reopened.ok: return _failed(draft,reopened)
+			draft.server_status="draft"
+			store.save(draft)
 	# 1. UUIDs definitivos gravados antes do envio (mapeamento local → servidor).
 	if not is_uuid(str(draft.get("server_id", ""))): draft.server_id = uuid_v4()
 	for card: Dictionary in draft.cards:

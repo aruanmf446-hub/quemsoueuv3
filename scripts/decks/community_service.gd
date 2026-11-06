@@ -124,9 +124,11 @@ func report(deck_id: String, reason: String) -> Dictionary:
 
 ## Situação de moderação dos decks do dono (status/review_note), sem baixar cartas.
 func statuses() -> Dictionary:
+	if not available(): return ServiceResult.failure("unauthorized")
 	var result := await client.send("/rest/v1/qse_creator_decks?select=id,status,review_note", HTTPClient.METHOD_GET)
 	if not result.ok: return result
 	var rows: Variant = result.data.data if result.data is Dictionary else null
+	if not rows is Array: return ServiceResult.failure("invalid_contract")
 	var map := {}
 	for row: Variant in rows if rows is Array else []:
 		if row is Dictionary: map[str(row.get("id", ""))] = {"status": str(row.get("status", "draft")), "review_note": str(row.get("review_note", "")) if row.get("review_note") != null else ""}

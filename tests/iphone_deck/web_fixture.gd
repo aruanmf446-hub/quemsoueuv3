@@ -20,6 +20,7 @@ func _run() -> void:
 	if mode=="community": fake=preload("res://tests/community_attribution/fake_game.gd").new()
 	elif mode=="claim": fake=preload("res://tests/community_claims/visual_game.gd").new()
 	elif mode=="report": fake=preload("res://tests/deck_runtime_corrections/fake_game.gd").new()
+	elif mode=="player_report": fake=preload("res://tests/player_reports/fake_game.gd").new()
 	else: fake=preload("res://tests/community_t27/fake_game.gd").new()
 	add_child(fake)
 	fixture_game=fake
@@ -39,7 +40,15 @@ func _run() -> void:
 	services.profile.client=profile
 	services.profile.data=profile.profile()
 	services.profile.state="success"
-	if mode=="nickname":
+	services.friends.client=fake
+	if mode=="player_report":
+		services.profile.client=fake
+		ui=load("res://scenes/player/public_profile.tscn").instantiate()
+		add_child(ui)
+		ui.show_screen({"public_id":fake.target.public_id})
+		await get_tree().process_frame
+		ui._open_report(fake.target.public_id)
+	elif mode=="nickname":
 		services.profile.state="loading"
 		ui=preload("res://scripts/ui/nickname_onboarding.gd").new()
 		ui.setup(services)

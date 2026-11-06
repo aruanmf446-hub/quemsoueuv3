@@ -7,6 +7,7 @@ on:
       - '.github/workflows/community-e2e.yml'
       - 'tools/e2e/community_access.py'
       - 'tools/e2e/community_claim_live.py'
+      - 'tools/e2e/reports_live.py'
   workflow_dispatch:
     inputs:
       stage:
@@ -41,7 +42,7 @@ jobs:
           QSE_TEST_READER_PASSWORD: ${{ secrets.QSE_TEST_READER_PASSWORD }}
           QSE_TEST_R1_EMAIL: ${{ secrets.QSE_TEST_R1_EMAIL }}
           QSE_TEST_R1_PASSWORD: ${{ secrets.QSE_TEST_R1_PASSWORD }}
-          STAGE: ${{ github.event_name == 'workflow_dispatch' && inputs.stage || (contains(github.event.head_commit.message, '[qa-claims]') && 'claim' || 'access') }}
+          STAGE: ${{ github.event_name == 'workflow_dispatch' && inputs.stage || (contains(github.event.head_commit.message, '[qa-report-prepare]') && 'report_prepare' || contains(github.event.head_commit.message, '[qa-reports]') && 'report_verify' || contains(github.event.head_commit.message, '[qa-claims]') && 'claim' || 'access') }}
           DECK_ID: ${{ inputs.deck_id }}
           UPLOAD_ORDER: ${{ inputs.upload_order }}
         run: |
@@ -49,6 +50,10 @@ jobs:
             python3 tools/e2e/community_access.py
           elif [ "$STAGE" = claim ]; then
             python3 tools/e2e/community_claim_live.py
+          elif [ "$STAGE" = report_prepare ]; then
+            python3 tools/e2e/reports_live.py prepare
+          elif [ "$STAGE" = report_verify ]; then
+            python3 tools/e2e/reports_live.py verify
           else
             python3 tools/e2e/community_e2e.py "$STAGE" "$DECK_ID"
           fi
@@ -63,6 +68,9 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add "$report"
+          if [ -f evidence/community-claims/live/report-fixture.json ]; then
+            git add evidence/community-claims/live/report-fixture.json
+          fi
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "Registra resultado QA ${GITHUB_RUN_ID}"
           git push origin "HEAD:$QA_REPORT_BRANCH"

@@ -27,6 +27,30 @@ func search(term: String) -> Dictionary:
 	return result
 
 
+func report_player(public_id: String, reason: String) -> Dictionary:
+	if client == null or client.access_token.is_empty(): return ServiceResult.failure("not_authenticated")
+	var value := reason.strip_edges()
+	if value.length()<3 or value.length()>280: return ServiceResult.failure("invalid_reason")
+	if public_id.strip_edges().is_empty(): return ServiceResult.failure("player_not_found")
+	var result := await client.call_rpc("qse_player_report",{"p_public_id":public_id,"p_reason":value})
+	if result.ok and result.data is Dictionary and result.data.has("error"):
+		return ServiceResult.failure(str(result.data.error))
+	if not result.ok and str(result.code) in ["PGRST202","42883","unknown_rpc"]:
+		return ServiceResult.failure("report_unavailable")
+	if result.ok and (not result.data is Dictionary or result.data.get("reported")!=true):
+		return ServiceResult.failure("report_invalid_response")
+	return result
+
+
+static func report_message(code: String) -> String:
+	match code:
+		"invalid_reason": return "Descreva o motivo com 3 a 280 caracteres."
+		"cannot_report_self": return "Você não pode denunciar a própria conta."
+		"already_reported": return "Você já denunciou este jogador. A denúncia aguarda análise."
+		"player_not_found": return "Jogador não encontrado. Abra o perfil novamente."
+	return CommunityService.message(code)
+
+
 func act(action: String, target_id: String, request_id: String = "", message: String = "") -> Dictionary:
 	if action not in ["send", "accept", "decline", "cancel", "remove"]:
 		return ServiceResult.failure("invalid_action")

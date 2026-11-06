@@ -1,0 +1,15 @@
+{
+  "areas": [
+    "auth",
+    "reason",
+    "self",
+    "missing",
+    "stored",
+    "duplicate",
+    "rate",
+    "acl",
+    "rls"
+  ],
+  "passed": true,
+  "transaction": "rollback"
+}

@@ -58,3 +58,13 @@ resgates legítimos e o deck real da validação anterior foram preservados.
 
 Evidências: [capturas e resultados](../../evidence/player-reports/README.md),
 [limpeza](../../evidence/player-reports/production-cleanup.json).
+
+## Publicação
+
+A implementação está na main, commit `92dfb4e`. O [deploy Pages/PWA
+42279692646](https://github.com/aruanmf446-hub/quemsoueuv3/actions/runs/42279692646)
+terminou com **Success**. O build preserva também as mudanças do modo História
+que entraram pelo PR #103 durante a validação.
+
+Abra https://aruanmf446-hub.github.io/quemsoueuv3/ e feche/reabra o PWA para
+receber a atualização; se aparecer “Reiniciar para atualizar”, aceite no lobby.

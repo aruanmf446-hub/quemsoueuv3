@@ -1,4 +1,5 @@
--- Executar após a migration, dentro de BEGIN/ROLLBACK. Todos os dados abaixo são revertidos.
+-- Executar após a migration. Todos os dados abaixo são revertidos.
+begin;
 do $test$
 declare a uuid:=gen_random_uuid(); b uuid:=gen_random_uuid(); c uuid; pub text; own text; v jsonb;
 begin

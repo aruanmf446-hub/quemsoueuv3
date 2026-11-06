@@ -1,0 +1,172 @@
+{
+  "landed": {
+    "amber_showcase": false,
+    "art_ids": [
+      "capital_watchtower",
+      "capital_house",
+      "capital_merchant",
+      "capital_archway",
+      "capital_market_stall",
+      "capital_palm_garden"
+    ],
+    "attack_charge": 1,
+    "bridge_task": [],
+    "bridges": [],
+    "buttons": {
+      "amber": [
+        934,
+        595,
+        52
+      ],
+      "attack": [
+        1174,
+        595,
+        52
+      ],
+      "defend": [
+        1294,
+        475,
+        52
+      ],
+      "jump": [
+        1294,
+        595,
+        52
+      ]
+    },
+    "ceiling": false,
+    "charges": {
+      "amber": 0,
+      "dash": 0,
+      "rupture": 0
+    },
+    "defense_charge": 1,
+    "first_use": {
+      "active": false,
+      "continue": [
+        0,
+        0,
+        292,
+        64
+      ],
+      "illustration": false,
+      "kind": ""
+    },
+    "grounded": true,
+    "health": 3,
+    "house_roofs": 0,
+    "iphone": true,
+    "jumps_used": 0,
+    "order": 3,
+    "palace_pool": 3,
+    "paused": false,
+    "pedestal_collected": false,
+    "pedestal_count": 0,
+    "pedestal_fixture": false,
+    "pickup_count": 0,
+    "player_dash": 0,
+    "prop": {
+      "base": 0,
+      "span": "(-9.038428, -6.273428)",
+      "top": 2.85533537753924
+    },
+    "read": true,
+    "roof_surfaces": 0,
+    "rooftop_terraces": 0,
+    "size": [
+      1376,
+      675
+    ],
+    "skyline": true,
+    "soldiers": [],
+    "stage": "play",
+    "vy": 0,
+    "x": -7.65592861175537,
+    "y": 2.85537314414978
+  },
+  "walked": {
+    "amber_showcase": false,
+    "art_ids": [
+      "capital_watchtower",
+      "capital_house",
+      "capital_merchant",
+      "capital_archway",
+      "capital_market_stall",
+      "capital_palm_garden"
+    ],
+    "attack_charge": 1,
+    "bridge_task": [],
+    "bridges": [],
+    "buttons": {
+      "amber": [
+        934,
+        595,
+        52
+      ],
+      "attack": [
+        1174,
+        595,
+        52
+      ],
+      "defend": [
+        1294,
+        475,
+        52
+      ],
+      "jump": [
+        1294,
+        595,
+        52
+      ]
+    },
+    "ceiling": false,
+    "charges": {
+      "amber": 0,
+      "dash": 0,
+      "rupture": 0
+    },
+    "defense_charge": 1,
+    "first_use": {
+      "active": false,
+      "continue": [
+        0,
+        0,
+        292,
+        64
+      ],
+      "illustration": false,
+      "kind": ""
+    },
+    "grounded": true,
+    "health": 3,
+    "house_roofs": 0,
+    "iphone": true,
+    "jumps_used": 0,
+    "order": 3,
+    "palace_pool": 3,
+    "paused": false,
+    "pedestal_collected": false,
+    "pedestal_count": 0,
+    "pedestal_fixture": false,
+    "pickup_count": 0,
+    "player_dash": 0,
+    "prop": {
+      "base": 0,
+      "span": "(-9.038428, -6.273428)",
+      "top": 2.85533537753924
+    },
+    "read": true,
+    "roof_surfaces": 0,
+    "rooftop_terraces": 0,
+    "size": [
+      1376,
+      675
+    ],
+    "skyline": true,
+    "soldiers": [],
+    "stage": "play",
+    "vy": 0,
+    "x": -6.85592889785767,
+    "y": 2.85627675056458
+  }
+}

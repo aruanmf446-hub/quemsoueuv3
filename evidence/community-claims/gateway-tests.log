@@ -1,0 +1,22 @@
+✔ anonymous request never reaches source or CATALOG (39.724112ms)
+✔ invalid GAME session cannot publish or claim (1.612442ms)
+✔ claim copies only approved previews and confirms entitlement as player (9.362549ms)
+✔ already prepared version does not download/upload again (1.457568ms)
+✔ upload failure never confirms ownership (2.145405ms)
+✔ withdrawal during copy cannot finalize or claim stale version (3.335029ms)
+✔ concurrent immutable upload collision is safe (2.735966ms)
+✔ private original/path traversal cannot be copied (0.990965ms)
+✔ signed previews require GAME entitlement/room authorization (0.949762ms)
+✔ authorized manifest gets only version-scoped signed URLs (2.801674ms)
+✔ arbitrary and duplicate deck refs refused (1.139098ms)
+✔ caller supplied metadata cannot replace authoritative source (2.10209ms)
+✔ oversized request cannot trigger distribution (0.722179ms)
+✔ unsupported action cannot trigger writes (0.346793ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 78.717532

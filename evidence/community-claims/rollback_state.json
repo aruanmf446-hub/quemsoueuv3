@@ -1,0 +1,14 @@
+{
+  "game": {
+    "counts": {
+      "cards": 5,
+      "published": 1,
+      "creator_decks": 1
+    },
+    "new_versions_table_present": false
+  },
+  "catalog": {
+    "new_versions_table_present": false,
+    "new_preview_buckets": 0
+  }
+}

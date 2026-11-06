@@ -1,0 +1,32 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS envio inicial aguarda revisão
+PASS Meus Decks oferece acompanhamento visível
+PASS autor acompanha envio pendente
+PASS envio pendente não mostra motivo antigo
+PASS atualizar repetidamente não duplica a consulta
+PASS reprovação vem da resposta do servidor
+PASS motivo completo legível, inclusive no celular
+PASS ação corrigir e reenviar cabe após rolagem
+PASS abrir correção mantém o motivo acima do formulário
+PASS imagem corrigida é reenviada sem reutilizar o original antigo
+PASS correção usa a retirada existente antes de editar o deck travado
+PASS motivo preservado durante a correção
+PASS alterações salvas sem perder o deck
+PASS rascunho corrigido aguarda reenvio explícito
+PASS reenvio fica disponível após revisar as correções
+PASS falha de rede preserva correções e motivo para tentar novamente
+PASS reenviar mantém o mesmo deck sem duplicar
+PASS novo envio aguarda decisão e limpa o motivo anterior
+PASS um único reenvio apesar de dois cliques
+PASS segunda reprovação apresenta o novo motivo
+PASS aprovação aparece sem o motivo antigo
+PASS cópia desatualizada não retira um deck já aprovado
+PASS falha informa que os dados exibidos são os últimos salvos
+PASS falha não inventa uma decisão nova
+PASS consulta iniciada antes da troca de conta
+PASS resposta atrasada não atualiza outra conta
+PASS troca de conta não mostra motivo privado anterior
+PASS conta sem decks tem estado vazio
+PASS voltar retorna a Meus Decks
+DECK_SUBMISSION_STATUS checks=29 failures=0 1672x941

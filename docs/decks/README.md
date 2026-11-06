@@ -8,8 +8,9 @@ backend simulado estão em [evidências](../../evidence/deck-runtime-corrections
 Isso não confirma uma denúncia real em produção.
 
 O dono definiu DECK-03: resgatar deve **guardar na conta e liberar no Mata-Mata**.
-A integração GAME/CATALOG e o resgate real permanecem pendentes, conforme
-[estado técnico e bloqueio de acesso](../backend/DECKS_GAME_CATALOG_INTEGRACAO.md).
+A implementação de resgate e integração GAME/CATALOG está na branch, com
+[testes e capturas](../../evidence/community-claims/README.md). A implantação
+ainda está pendente; ver [contrato e ordem de implantação](../backend/DECKS_GAME_CATALOG_INTEGRACAO.md).
 O relato original abaixo é preservado como histórico.
 
 > **Natureza:** registro de defeitos e requisitos baseado em três capturas enviadas pelo responsável pelo projeto, feitas no Safari/iPhone em modo horizontal, usando o GitHub Pages. **Não é uma correção implementada nem uma validação do backend.** Nenhum arquivo de gameplay, interface, Supabase ou configuração deve ser alterado por esta documentação.

@@ -15,7 +15,8 @@ func _run() -> void:
 	services=PlayerServices.new()
 	add_child(services)
 	await get_tree().process_frame
-	var fake := preload("res://tests/community_t27/fake_game.gd").new()
+	var mode := str(JavaScriptBridge.eval("new URLSearchParams(location.search).get('fixture')||'nickname'")) if OS.has_feature("web") else fixture_mode
+	var fake: SupabaseClient=preload("res://tests/community_attribution/fake_game.gd").new() if mode=="community" else preload("res://tests/community_t27/fake_game.gd").new()
 	add_child(fake)
 	fixture_game=fake
 	var profile := preload("res://tests/nickname_onboarding/fake_profile_client.gd").new()
@@ -30,7 +31,6 @@ func _run() -> void:
 	services.profile.client=profile
 	services.profile.data=profile.profile()
 	services.profile.state="success"
-	var mode := str(JavaScriptBridge.eval("new URLSearchParams(location.search).get('fixture')||'nickname'")) if OS.has_feature("web") else fixture_mode
 	if mode=="nickname":
 		services.profile.state="loading"
 		ui=preload("res://scripts/ui/nickname_onboarding.gd").new()
@@ -43,6 +43,14 @@ func _run() -> void:
 		ui=load("res://scenes/player/deck_library.tscn").instantiate()
 		add_child(ui)
 		if mode=="status": await _seed_submission()
+		elif mode=="community":
+			fake.rows.back().status="published"
+			fake.rows.back().visibility="public"
+			CommunityService.items=[]
+			CommunityService.state="idle"
+			CommunityService.loaded_at=-1000.0
+			CommunityService.next_cursor=""
+			ui._render_library()
 		else: ui._create_deck()
 	if OS.has_feature("web"):
 		JavaScriptBridge.eval("window.qseSetInternalScreen && window.qseSetInternalScreen(true)")

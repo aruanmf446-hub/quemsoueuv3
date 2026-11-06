@@ -25,6 +25,7 @@ const ERRORS := {
 static var items: Array = []
 static var loaded_at := -1000.0
 static var state := "idle"
+static var next_cursor := ""
 var client: SupabaseClient
 
 
@@ -50,22 +51,48 @@ static func _unwrap(result: Dictionary) -> Dictionary:
 	return result
 
 
-func refresh(force := false) -> Dictionary:
+static func creator_name(value: Variant) -> String:
+	if value is Dictionary and value.get("nickname") is String:
+		var nickname := str(value.nickname).strip_edges()
+		if not nickname.is_empty(): return nickname
+	return "Criador não informado"
+
+## A vitrine começa com uma página; a pesquisa completa as páginas de metadados.
+## Assim o filtro local também encontra nicknames fora dos primeiros 48 resultados.
+func refresh(force := false, complete := false) -> Dictionary:
 	if not available():
-		state = "offline"
+		state="offline"
 		return ServiceResult.failure("unauthorized")
-	if not force and state == "ok" and Time.get_ticks_msec() / 1000.0 - loaded_at < LIST_TTL: return ServiceResult.success(items)
-	state = "loading"
-	var result := _unwrap(await client.call_rpc("qse_community_decks", {"p_query": null, "p_theme": null, "p_sort": "recent", "p_limit": 48, "p_cursor": null}))
-	if not result.ok or not result.data is Dictionary:
-		state = "error"
-		return result if not result.ok else ServiceResult.failure("invalid_contract")
-	var valid: Array = []
-	for row: Variant in result.data.get("items", []):
-		if row is Dictionary and CreatorSync.is_uuid(str(row.get("id", ""))): valid.append(row)
-	items = valid
-	loaded_at = Time.get_ticks_msec() / 1000.0
-	state = "ok"
+	var fresh := state=="ok" and Time.get_ticks_msec()/1000.0-loaded_at<LIST_TTL
+	if not force and fresh and (not complete or next_cursor.is_empty()): return ServiceResult.success(items)
+	var valid: Array=items.duplicate(true) if fresh and complete and not force else []
+	var cursor := next_cursor if fresh and complete and not force else ""
+	var seen := {}
+	var ids := {}
+	for row: Dictionary in valid: ids[str(row.id)]=true
+	state="loading"
+	while true:
+		if seen.has(cursor):
+			state="error"
+			return ServiceResult.failure("invalid_cursor")
+		seen[cursor]=true
+		var result := _unwrap(await client.call_rpc("qse_community_decks",{"p_query":null,"p_theme":null,"p_sort":"recent","p_limit":48,"p_cursor":null if cursor.is_empty() else cursor}))
+		if not result.ok or not result.data is Dictionary or not result.data.get("items") is Array or (result.data.get("next_cursor")!=null and not result.data.get("next_cursor") is String):
+			state="error"
+			return result if not result.ok else ServiceResult.failure("invalid_contract")
+		for row: Variant in result.data.items:
+			if not row is Dictionary or not CreatorSync.is_uuid(str(row.get("id",""))): continue
+			if row.has("status") and row.status!="published": continue
+			if row.has("visibility") and row.visibility!="public": continue
+			if not ids.has(str(row.id)):
+				valid.append(row)
+				ids[str(row.id)]=true
+		cursor=str(result.data.get("next_cursor","")) if result.data.get("next_cursor")!=null else ""
+		if not complete or cursor.is_empty(): break
+	items=valid
+	next_cursor=cursor
+	loaded_at=Time.get_ticks_msec()/1000.0
+	state="ok"
 	return ServiceResult.success(items)
 
 
@@ -105,7 +132,7 @@ func open_deck(deck_id: String) -> Dictionary:
 		index += 1
 	var creator: Dictionary = deck.get("creator", {}) if deck.get("creator") is Dictionary else {}
 	return ServiceResult.success({"id": deck_id, "name": str(deck.get("name", "")), "official": false, "community": true,
-		"creator": str(creator.get("nickname", "")) if creator.get("nickname") != null else "", "category": str(deck.get("category", "")) if deck.get("category") != null else "",
+		"creator": creator_name(creator), "category": str(deck.get("category", "")) if deck.get("category") != null else "",
 		"description": str(deck.get("description", "")) if deck.get("description") != null else "", "tags": [], "age_rating": "",
 		"content_warnings": [], "cards": cards, "count": cards.size(), "origin": "community", "visibility": "public"})
 

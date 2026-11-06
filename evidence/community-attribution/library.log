@@ -1,0 +1,64 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS nenhum 'Duelo' visível no lobby PT
+PASS lobby mostra Modo Mata-Mata
+PASS sem texto 'Duelo' em duel_screen.gd
+PASS sem texto 'Duelo' em friends_screen.gd
+PASS sem texto 'Duelo' em card_frame_editor.gd
+PASS sem texto 'Duelo' em lobby_composition.gd
+PASS sem texto 'Duelo' em duel_service.gd
+PASS sem texto 'Duelo' em nickname_onboarding.gd
+PASS tradução EN de Mata-Mata
+PASS busca no cabeçalho
+PASS cinco abas
+PASS painel Filtrar decks
+PASS banner com Explorar coleção
+PASS sem pontos com um único destaque real
+PASS coleções em destaque
+PASS todos os oficiais carregados + cinco fixtures
+PASS busca encontra por nome
+PASS filtro inclui Diva Pop quando suas 10 imagens existem
+PASS filtro Comunidade
+PASS filtro Temática a partir dos metadados
+PASS Limpar filtros
+PASS Ordenar por
+PASS Populares avisa que a métrica não existe
+PASS Recentes avisa que a métrica não existe
+PASS Favoritos vazio com Explorar decks
+PASS coração adiciona aos Favoritos
+PASS remover favorito volta ao vazio
+PASS criar deck sem rascunhos
+PASS + Criar novo deck e bloco tracejado
+PASS cartão próprio com menu ⋯
+PASS Duplicar cria cópia real
+PASS Excluir pede confirmação
+T23_LIBRARY checks=32 failures=0
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS published_at do CATALOG aceito
+PASS published_at inválido descartado
+PASS Populares sem sessão pede login
+PASS sem número inventado sem sessão
+PASS qse_deck_stats com official:<id>
+PASS Populares ordena por score
+PASS score 0 vai depois dos medidos
+PASS mostra jogadores em 30 dias
+PASS mostra favoritos reais
+PASS deck sem dados não ganha número
+PASS estatísticas em cache (sem nova consulta dentro do prazo)
+PASS aviso quando nada foi medido
+PASS falha de rede vira aviso
+PASS Recentes ordena por published_at real
+PASS mostra Publicado há
+PASS sem data, sem rótulo
+PASS uma participação por partida
+PASS sem sessão não registra
+T24_LIBRARY checks=18 failures=0
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)

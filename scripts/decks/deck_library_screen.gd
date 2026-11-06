@@ -95,6 +95,7 @@ func _ready() -> void:
 		_pulled_decks = false
 		_pulled_favorites = false
 		_remote_error.clear()
+		_community_cover_attempts.clear()
 		_moderation_checked=false
 		_moderation_busy=false
 		_moderation_generation+=1
@@ -281,7 +282,7 @@ func _entries() -> Array[Dictionary]:
 		var creator: Dictionary = row.get("creator", {}) if row.get("creator") is Dictionary else {}
 		var cover := CommunityService.cached_image(str(row.get("cover_path", "")) if row.get("cover_path") != null else "")
 		result.append({"id": str(row.id), "name": str(row.get("name", "")), "origin": "community", "community": true,
-			"creator": str(creator.get("nickname", "")) if creator.get("nickname") != null else tr("Jogador"),
+			"creator": CommunityService.creator_name(creator),
 			"category": str(row.get("category", "")) if row.get("category") != null else "", "count": int(row.get("card_count", 0)), "tags": [],
 			"cover": cover, "focus": DeckCover.PORTRAIT_FOCUS, "images": [cover] if not cover.is_empty() else [],
 			"ref": "creator:" + str(row.id), "score": float(row.get("score", 0)),
@@ -292,6 +293,7 @@ func _entries() -> Array[Dictionary]:
 
 ## Busca a vitrine da Comunidade (com cache de 2 min) e baixa as capas que faltam.
 var _community_busy := false
+var _community_cover_attempts := {}
 var _moderation_checked := false
 var _moderation_busy := false
 var _moderation_generation := 0
@@ -299,15 +301,45 @@ var _moderation_state := "idle"
 func _load_community() -> void:
 	if _community_busy or not _demo_entries.is_empty(): return
 	var service := CommunityService.for_current()
-	if not service.available(): return
-	if CommunityService.state == "ok" and Time.get_ticks_msec() / 1000.0 - CommunityService.loaded_at < CommunityService.LIST_TTL: return
-	_community_busy = true
-	var result: Dictionary = await service.refresh()
+	if not service.available() or CommunityService.state=="error": return
+	var complete := not _query.strip_edges().is_empty()
+	var needs_catalog := CommunityService.state!="ok" or Time.get_ticks_msec()/1000.0-CommunityService.loaded_at>=CommunityService.LIST_TTL or (complete and not CommunityService.next_cursor.is_empty())
+	var term := Catalog.search_key(_query)
+	var missing_cover := false
+	for row: Dictionary in CommunityService.items:
+		if not term.is_empty() and not Catalog.search_key(str(row.get("name",""))+" "+CommunityService.creator_name(row.get("creator"))).contains(term): continue
+		var path := str(row.get("cover_path","")) if row.get("cover_path")!=null else ""
+		if not path.is_empty() and not _community_cover_attempts.has(path) and CommunityService.cached_image(path).is_empty(): missing_cover=true
+	if not needs_catalog and not missing_cover: return
+	_community_busy=true
+	if complete and needs_catalog and is_instance_valid(_results):
+		var loading := _text("Pesquisando decks publicados na Comunidade…",20,PlayerUI.MUTED)
+		loading.name="CommunitySearchLoading"
+		_results.add_child(loading)
+		_results.move_child(loading,0)
+	var result := await service.refresh(false,complete) if needs_catalog else ServiceResult.success(CommunityService.items)
 	if result.ok:
+		# Só baixar as capas dos resultados desta pesquisa; nunca os originais/cartas.
+		var covers := 0
+		term=Catalog.search_key(_query)
 		for row: Dictionary in CommunityService.items:
-			if row.get("cover_path") != null: await service.image(str(row.cover_path))
-	_community_busy = false
-	if is_inside_tree() and _view == "library" and _tab != "Meus Decks": _update_results()
+			if not term.is_empty() and not Catalog.search_key(str(row.get("name",""))+" "+CommunityService.creator_name(row.get("creator"))).contains(term): continue
+			if row.get("cover_path")!=null:
+				var path := str(row.cover_path)
+				if not _community_cover_attempts.has(path):
+					_community_cover_attempts[path]=true
+					await service.image(path)
+					covers+=1
+			if covers>=48: break
+	_community_busy=false
+	if is_inside_tree() and _view=="library" and _tab!="Meus Decks": _update_results()
+
+func _retry_community() -> void:
+	if _community_busy: return
+	_community_cover_attempts.clear()
+	CommunityService.state="idle"
+	CommunityService.loaded_at=-1000.0
+	_update_results()
 
 
 func _open_community(deck_id: String) -> void:
@@ -423,6 +455,7 @@ func _refresh_moderation() -> void:
 			var info: Dictionary = result.data.get(str(draft.get("server_id", "")), {})
 			if info.is_empty(): continue
 			if str(draft.get("server_status", "")) != info.status or str(draft.get("review_note", "")) != info.review_note:
+				CommunityService.loaded_at=-1000.0
 				draft.server_status = info.status
 				draft.review_note = info.review_note
 				store.save(draft)
@@ -611,7 +644,13 @@ func _update_results() -> void:
 		if not _moderation_checked:
 			_moderation_checked = true
 			_refresh_moderation.call_deferred()
-	else: _load_community.call_deferred()
+	else:
+		if CommunityService.state=="error":
+			_notice("Não foi possível atualizar a Comunidade. Os resultados podem estar incompletos.")
+			var retry := _action("Tentar novamente",_retry_community)
+			retry.name="RetryCommunity"
+			_results.add_child(retry)
+		_load_community.call_deferred()
 	if _tab == "Favoritos": _remote_section.call_deferred("favorites")
 	if shown.is_empty():
 		_empty_results()
@@ -664,6 +703,11 @@ func _results_header(icon: String, title: String) -> void:
 		_sort = str(modes[index][0])
 		_update_results())
 	row.add_child(options)
+	if _tab!="Meus Decks" and services.session.authenticated():
+		var refresh := PlayerUI.button("Atualizar",_retry_community)
+		refresh.name="RefreshCommunity"
+		refresh.disabled=_community_busy
+		row.add_child(refresh)
 
 
 ## Fatos reais por aba: jogadores/favoritos (Populares) e "Publicado há" (Recentes). Nada inventado.
@@ -928,7 +972,7 @@ func _banner(slide: Dictionary, total: int) -> Control:
 	var title := PremiumUI.plain(str(entry.name), 50, Color.WHITE, false)
 	title.name = "FeaturedTitle"
 	text.add_child(title)
-	text.add_child(PremiumUI.plain("%s  •  %s" % [entry.creator, tr("%d cartas") % int(entry.count)], 24, Color("#d6dbe4"), false))
+	text.add_child(PremiumUI.plain("%s  •  %s" % [tr("Criado por %s") % str(entry.creator) if entry.origin=="community" else entry.creator, tr("%d cartas") % int(entry.count)], 24, Color("#d6dbe4"), false))
 	var explore := PremiumUI.action("Explorar coleção  →", "layers", true, _open_entry.bind(entry), compact)
 	explore.name = "ExploreFeatured"
 	explore.icon = null
@@ -1023,6 +1067,14 @@ func _deck_tile(entry: Dictionary) -> Control:
 	title.clip_text = true
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	lines.add_child(title)
+	if entry.origin=="community":
+		var credit := _data_text(tr("Criado por %s") % str(entry.creator),20,PlayerUI.MUTED)
+		credit.name="DeckCreator"
+		credit.autowrap_mode=TextServer.AUTOWRAP_OFF
+		credit.clip_text=true
+		credit.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
+		credit.tooltip_text=credit.text
+		lines.add_child(credit)
 	var meta := HBoxContainer.new()
 	meta.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	meta.add_theme_constant_override("separation", 6)
@@ -1193,7 +1245,9 @@ func _fit_tiles() -> void:
 	_grid.columns = clampi(floori((width + gap) / (minimum + gap)), 1, 5)
 	var tile_width := floorf((width - (_grid.columns - 1) * gap) / _grid.columns)
 	var text_band := 52.0 if compact else 74.0
-	for tile: Control in _grid.get_children(): tile.custom_minimum_size = Vector2(tile_width, tile_width / DeckCover.ASPECT + text_band)
+	for tile: Control in _grid.get_children():
+		var credit_height := 28.0 if tile.find_child("DeckCreator",true,false)!=null else 0.0
+		tile.custom_minimum_size=Vector2(tile_width,tile_width/DeckCover.ASPECT+text_band+credit_height)
 
 
 # --- Painel "Filtrar decks" --------------------------------------------------------------
@@ -1287,7 +1341,9 @@ func _render_deck(item: Dictionary) -> void:
 		var report := _action("Denunciar", _report_deck.bind(str(item.id)))
 		report.name = "ReportDeck"
 		metadata.add_child(report)
-	metadata.add_child(_data_text(str(item.creator) if not str(item.creator).is_empty() else "Autoria não informada", 16, PlayerUI.MUTED))
+	var credit := _data_text(tr("Criado por %s") % str(item.creator) if item.get("community",false) else (str(item.creator) if not str(item.creator).is_empty() else "Autoria não informada"),20,PlayerUI.MUTED)
+	credit.name="DeckCreator"
+	metadata.add_child(credit)
 	metadata.add_child(_text("%d cartas  ·  A–Z" % item.count, 16, PlayerUI.MUTED))
 	if not str(item.category).is_empty(): metadata.add_child(_data_text(item.category, 16))
 	for tag: String in item.tags: metadata.add_child(PlayerUI.pill(tag, "available"))

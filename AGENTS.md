@@ -8,6 +8,16 @@
 - Check your work: `godot_run_start` (mode "process"), then `godot_run_output` with level "error".
 <!-- END:godot-mcp -->
 
+## Acabamento visual do projeto
+
+- Em tarefas com impacto visual (design, UI/UX, cenários, assets, materiais,
+  efeitos, enquadramento ou responsividade), leia e aplique a habilidade
+  [`qse-design`](.agents/skills/qse-design/SKILL.md).
+- Em mudanças funcionais, preserve o desenho aprovado e confira o impacto visual
+  quando existir; não transforme a correção em uma repaginação não solicitada.
+- Essa habilidade padroniza a qualidade e as evidências. O escopo e a autorização
+  definidos pelo dono continuam prevalecendo, inclusive para publicação.
+
 ## Design dos menus (direção limpa aprovada pelo dono do projeto)
 
 - Leia [`docs/referencias/README.md`](docs/referencias/README.md) e abra [`docs/referencias/menu/DIRECAO_CLEAN_APROVADA.png`](docs/referencias/menu/DIRECAO_CLEAN_APROVADA.png) antes de alterar a interface. O usuário aprovou esse lobby e pediu a continuidade nos demais menus, incluindo batalha.

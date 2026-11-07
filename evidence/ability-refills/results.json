@@ -1,0 +1,35 @@
+[
+  {
+    "width": 1672,
+    "height": 941,
+    "iphone": false,
+    "oneRefillPurchasedFor10Coins": true,
+    "emptyToFull": true,
+    "partialToFull": true,
+    "fullBlockedWithoutRpc": true,
+    "ownedStockOnlyInSettings": true,
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "iphone": true,
+    "oneRefillPurchasedFor10Coins": true,
+    "emptyToFull": true,
+    "partialToFull": true,
+    "fullBlockedWithoutRpc": true,
+    "ownedStockOnlyInSettings": true,
+    "errors": []
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "iphone": true,
+    "oneRefillPurchasedFor10Coins": true,
+    "emptyToFull": true,
+    "partialToFull": true,
+    "fullBlockedWithoutRpc": true,
+    "ownedStockOnlyInSettings": true,
+    "errors": []
+  }
+]

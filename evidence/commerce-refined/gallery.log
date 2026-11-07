@@ -1,0 +1,22 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS aba Emotes disponível
+PASS prévia não usa lista suspensa
+PASS três cartões selecionáveis
+PASS layout preserva altura das prévias
+PASS filtros de skins não competem com as prévias
+PASS setas de skins ficam fora da prévia de emotes
+PASS cartão de comemoração inicia seu clipe
+PASS exemplo de vitória identificado
+PASS exemplo de derrota usa sua reação
+PASS exemplo de lobby usa sua reação
+PASS loja separa dança de vitória e derrota
+PASS prévia do movimento usa uma dancinha própria
+PASS dancinha movimenta os ossos do avatar real
+PASS visitante vê preço, mas precisa entrar para comprar
+PASS voltar fecha a prévia de compra
+PASS modal de compra removido
+PASS El Fuego não exibe cartões de clipes ausentes
+PASS voltar à galeria preserva o personagem selecionado
+PASS navegação de skins restaurada
+EMOTE_GALLERY checks=19 failures=0

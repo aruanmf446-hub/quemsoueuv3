@@ -11,6 +11,12 @@ for name in ['scripts','scenes','data','web','tests']:
     shutil.copytree(root / name, stage / name, dirs_exist_ok=True)
 if (root/'assets/emotes').exists():
     shutil.copytree(root/'assets/emotes',stage/'assets/emotes',dirs_exist_ok=True)
+if (root/'assets/ui/store').exists():
+    shutil.copytree(root/'assets/ui/store',stage/'assets/ui/store',dirs_exist_ok=True)
+shutil.copytree(root/'assets/icons/vector',stage/'assets/icons/vector',dirs_exist_ok=True)
+(stage/'assets/desert/tutorial').mkdir(parents=True,exist_ok=True)
+for art in (root/'assets/desert/tutorial').glob('*.res'):
+    shutil.copy2(art,stage/'assets/desert/tutorial'/art.name)
 project=(root/'project.godot').read_text()
 import re
 project=re.sub(r'run/main_scene=.*', 'run/main_scene="res://tests/iphone_deck/web_fixture.tscn"',project)

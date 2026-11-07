@@ -4,6 +4,14 @@ Não existe loja simulada na produção. A carteira, o preço, o débito, a poss
 o equipamento e os créditos vêm do Supabase GAME. As fixtures em tests/commerce
 são somente testes de transporte/UI e não entram na exportação de produção.
 
+## Nome exibido da segunda unidade
+
+O dono definiu **Carta de criação** no lugar do diamante/gema da interface.
+**1 carta = 1 deck.** O contador lê o saldo real de `deck_credits`, separado
+das moedas. O identificador técnico `deck_credits` permanece no contrato.
+Saldos antigos de gems não são convertidos, apagados ou usados como cartas.
+A exigência de consumo continua desligada até a ativação autorizada.
+
 ## Estado entregue
 
 - GAME: pagamentos `enabled=false`, `live_mode=false`.
@@ -43,6 +51,7 @@ Migrações registradas no GAME:
 - `20261107220000_commerce_catalog_credits`
 - `20261107221500_commerce_availability`
 - `20261107223000_commerce_package_identity`
+- `20261107230000_ability_refills`
 
 RPCs de conta: `qse_cosmetic_shop()`,
 `qse_cosmetic_purchase(p_product,p_request,p_expected_price)` e
@@ -110,3 +119,11 @@ Limite externo atual: `STRIPE_SECRET_KEY` ausente. Checkout/assinatura com
 sessão Stripe real, cartão, concorrência simultânea de clientes e pagamento
 real ainda precisam ser testados após configurar a chave correta.
 Evidências: `evidence/commerce-live/`.
+
+## Recargas de habilidades
+
+[ABILITY_REFILLS.md](ABILITY_REFILLS.md) descreve o consumível real de **10 moedas**
+por recarga completa de uma habilidade até 3/3, guardado na conta e usado apenas
+em Pausa → Configurações. A venda continua inativa. Sua configuração específica
+é `ability_refill_settings.active`; a compra também respeita o bloqueio global
+da loja. Não confundir uma recarga guardada com três itens/recargas parciais.

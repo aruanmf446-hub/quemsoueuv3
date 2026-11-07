@@ -201,6 +201,20 @@ func _deliver_hit() -> void:
 		var point := enemy.global_position + Vector3.UP * 0.8
 		SandFx.SandPunch.impact(get_parent(), point)
 		strike_landed.emit(point)
+func refill_status(kind: String,phase: int) -> String:
+	if is_dead: return "refill_context_changed"
+	if kind not in ["attack","defense","amber","dash","rupture"]: return "invalid_request"
+	var required: Dictionary={"amber":3,"dash":4,"rupture":5}
+	if phase<int(required.get(kind,1)) or not discovered.has(kind): return "ability_locked"
+	if charges(kind)>=CHARGE_CAP: return "ability_full"
+	return ""
+
+func fill_ability(kind: String) -> void:
+	if kind=="attack": attack_charges=CHARGE_CAP
+	elif kind=="defense": defense_charges=CHARGE_CAP
+	elif abilities.has(kind): abilities[kind]=CHARGE_CAP
+	inventory_changed.emit()
+
 func restore_charge(kind: String) -> bool:
 	if is_dead: return false
 	if kind == "health" and health < RUN_MAX_HEALTH:

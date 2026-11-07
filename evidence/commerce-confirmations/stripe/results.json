@@ -1,0 +1,32 @@
+[
+  {
+    "width": 1672,
+    "height": 941,
+    "iphone": false,
+    "serverPackage": true,
+    "touchOrMouse": true,
+    "safeCheckoutOpened": true,
+    "clientCannotCredit": true,
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "iphone": true,
+    "serverPackage": true,
+    "touchOrMouse": true,
+    "safeCheckoutOpened": true,
+    "clientCannotCredit": true,
+    "errors": []
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "iphone": true,
+    "serverPackage": true,
+    "touchOrMouse": true,
+    "safeCheckoutOpened": true,
+    "clientCannotCredit": true,
+    "errors": []
+  }
+]

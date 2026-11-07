@@ -20,7 +20,8 @@ func _run() -> void:
 	await get_tree().process_frame
 	var mode := str(JavaScriptBridge.eval("new URLSearchParams(location.search).get('fixture')||'nickname'")) if OS.has_feature("web") else fixture_mode
 	var fake: SupabaseClient
-	if mode.begins_with("commerce"): fake=preload("res://tests/commerce/fake_game.gd").new()
+	if mode in ["ability_refills","refill_store"]: fake=preload("res://tests/ability_refills/fake_game.gd").new()
+	elif mode.begins_with("commerce"): fake=preload("res://tests/commerce/fake_game.gd").new()
 	elif mode=="community": fake=preload("res://tests/community_attribution/fake_game.gd").new()
 	elif mode=="universal": fake=preload("res://tests/skin_emotes/universal_game.gd").new()
 	elif mode=="claim": fake=preload("res://tests/community_claims/visual_game.gd").new()
@@ -53,12 +54,16 @@ func _run() -> void:
 	services.wallet.client=fake
 	services.coin_store.client=fake
 	services.cosmetic_shop.client=fake
+	services.ability_refills.client=fake
 	if mode.begins_with("commerce"): await services.cosmetic_shop.refresh()
-	if mode in ["coins","stripe","commerce"]:
+	if mode=="ability_refills":
+		ui=preload("res://tests/ability_refills/visual.gd").new()
+		add_child(ui)
+	elif mode in ["coins","stripe","commerce","refill_store"]:
 		await services.wallet.refresh()
 		ui=load("res://scenes/player/wallet.tscn").instantiate()
 		add_child(ui)
-		ui.show_screen({"tab":"coins"})
+		ui.show_screen({"tab":"coins","category":"refills"} if mode=="refill_store" else {"tab":"coins"})
 	elif mode in ["emotes","variations","universal","samba","commerce_skins"]:
 		services.progression.state="success"
 		services.progression.data={"unlocked_character_ids":PlayerContracts.initial_ids(),"equipped_character_id":"cowboy"}
@@ -141,6 +146,10 @@ func _seed_submission() -> void:
 	ui._open_submissions()
 
 func _probe(args: Array) -> void:
+	if args.size() and str(args[0])=="start_refill_phase":
+		ui.hide();ui.queue_free()
+		ui=preload("res://tests/ability_refills/visual.gd").new()
+		add_child(ui)
 	if args.size() and str(args[0]).begins_with("universal_character:"):
 		ui._select(str(args[0]).trim_prefix("universal_character:"))
 		_fixture_universal_motion()
@@ -163,6 +172,8 @@ func _probe(args: Array) -> void:
 	var result := {"sequence":report_sequence,"size":[ui.size.x,ui.size.y],"controls":[],"fields":{},"cards":0,"labels":[],"emote_thumbnails":[]}
 	if ui.get("_selected_styles") is Dictionary:
 		result.variations={"character":ui._selected,"style":ui._selected_styles.get(ui._selected,"original"),"thumbnails":[]}
+	if ui.has_method("_sync_resources") and ui.get("_player")!=null:
+		result.refills={"defense":ui._player.defense_charges,"attack":ui._player.attack_charges,"dash":ui._player.charges("dash"),"count":services.ability_refills.count(),"paused":get_tree().paused,"calls":fixture_game.refill_calls.size()}
 	if services.emote_shop!=null and services.emote_shop.state=="success":
 		result.shop={"coins":services.emote_shop.data.get("coins",""),"owned":services.emote_shop.product("dance_01").get("owned",false)}
 	if services.wallet.state=="success": result.wallet_coins=services.wallet.data.get("coins","")

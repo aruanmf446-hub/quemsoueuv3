@@ -1,0 +1,11 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS a fase real pausa antes de abrir configurações
+PASS configurações oferecem defesa vazia e recarga guardada
+PASS usar pela configuração completa a defesa até 3/3
+PASS a carga cheia participa da continuidade existente entre fases
+PASS defesa cheia fica bloqueada e identificada
+PASS não há consumo nem RPC ao repetir a habilidade cheia
+PASS estoque comprado não aparece no HUD
+PASS retorno fecha as configurações e retoma o jogo
+ABILITY_REFILLS_PAUSE checks=8 failures=0

@@ -4,7 +4,7 @@ extends PlayerScreen
 ## Layout: galeria rolável à esquerda (duas colunas) e prévia 3D fixa à direita, fora da rolagem.
 signal character_selected(character_id: StringName)
 signal progress_changed
-const PREVIEW_FILL_RATIO := 0.80
+const PREVIEW_FILL_RATIO := 0.86
 ## Cada arquivo .json desta pasta vira uma categoria (coleção) na barra lateral.
 const COLLECTIONS_DIR := "res://data/collections/"
 var _collection_title := "Começo"
@@ -141,6 +141,10 @@ func _split_layout() -> void:
 		_rebuild_gallery()
 		PlayerUI.cascade(_grid))
 	filter_row.add_child(_sort_button)
+	# Uma linha de ferramentas deixa a galeria e o personagem respirarem.
+	for item in filter_row.get_children(): item.reparent(search_row)
+	filter_row.queue_free()
+	_fav_button.tooltip_text=tr("Mostrar favoritos")
 	for option: OptionButton in [_filter_button, _sort_button]:
 		option.custom_minimum_size = Vector2(130, PlayerUI.CONTROL_HEIGHT)
 		option.add_theme_font_size_override("font_size", 22)
@@ -176,7 +180,7 @@ func _split_layout() -> void:
 	_side = PanelContainer.new()
 	_side.name = "HeroPreview"
 	_side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_side.size_flags_stretch_ratio = 1.0
+	_side.size_flags_stretch_ratio = 1.1
 	_side.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	# Como na referência, o palco do personagem fica direto sobre o cenário, sem caixa.
 	_side.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
@@ -207,21 +211,21 @@ func _responsive_layout() -> void:
 	$Margin/Column.add_theme_constant_override("separation", 6 if compact else 12)
 	_split.add_theme_constant_override("separation", 8 if compact else 18)
 	_scroll.size_flags_stretch_ratio = 1.0
-	_gallery_section.size_flags_stretch_ratio = 1.25 if compact else 1.4
-	_side.size_flags_stretch_ratio = 1.0
+	_gallery_section.size_flags_stretch_ratio = 1.15
+	_side.size_flags_stretch_ratio = 1.1
 	# Barra de coleções só quando sobra largura; em telas estreitas a coleção atual
 	# continua no topo ("COMEÇO · 7/8") e a prévia não é empurrada para fora.
-	_collection_sidebar.visible = _cosmetic_mode=="skins" and not compact and get_viewport().get_visible_rect().size.x >= 1200.0
+	_collection_sidebar.visible = _cosmetic_mode=="skins" and not UIScale.is_iphone() and not compact and get_viewport().get_visible_rect().size.x >= 1500.0
 	_toolbar.add_theme_constant_override("separation", 4 if compact else 8)
-	_fav_button.text = "Favoritos" if not compact else "FAV"
+	_fav_button.text = "♡"
 	_fav_button.add_theme_color_override("font_color", ACCENT if _favorite_only else PlayerUI.TEXT)
-	_fav_button.custom_minimum_size.x = 34 if compact else 144
+	_fav_button.custom_minimum_size.x = 56
 	_search_field.placeholder_text = "Pesquisar..." if compact else "Pesquisar personagem..."
 	_search_field.custom_minimum_size.x = 116 if compact else 0
 	_search_field.custom_minimum_size.y = 44 if compact else PlayerUI.CONTROL_HEIGHT
-	_filter_button.custom_minimum_size.y = 44 if compact else PlayerUI.CONTROL_HEIGHT
+	_filter_button.custom_minimum_size=Vector2(140,PlayerUI.CONTROL_HEIGHT)
 	_sort_button.custom_minimum_size.y = 44 if compact else PlayerUI.CONTROL_HEIGHT
-	_sort_button.custom_minimum_size.x = 68 if compact else 130
+	_sort_button.custom_minimum_size.x = 90
 	if _grid != null:
 		_grid.columns = _columns() if _cosmetic_mode=="skins" else (1 if _cosmetic_mode=="shop" else 3)
 		if _cosmetic_mode=="skins":
@@ -324,7 +328,7 @@ func _rebuild_gallery() -> void:
 	if count == 0:
 		body.add_child(PlayerUI.label("Nenhum personagem encontrado.", 19))
 	if _fav_button != null:
-		_fav_button.text = "FAV" if UIScale.is_compact() else "Favoritos"
+		_fav_button.text = "♡"
 		_fav_button.add_theme_color_override("font_color", ACCENT if _favorite_only else PlayerUI.TEXT)
 	if _collection_count != null:
 		var obtained := in_collection.filter(func(item: String) -> bool: return services.inventory.is_unlocked(item)).size()
@@ -509,7 +513,7 @@ func _select(character_id: String) -> void:
 	var arrows := HBoxContainer.new()
 	arrows.name="CharacterArrows"
 	arrows.visible=_cosmetic_mode=="skins"
-	_preview.add_child(arrows)
+	heading_row.add_child(arrows)
 	var left_arrow := _button("‹", _select_neighbor.bind(-1))
 	left_arrow.name="PreviousSkinCharacter"
 	left_arrow.custom_minimum_size = Vector2(56, 56)
@@ -535,7 +539,7 @@ func _select(character_id: String) -> void:
 		_stage.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		_stage.fill_ratio = PREVIEW_FILL_RATIO
 		_stage.frame_character()
-		_stage.set_zoom(ThumbnailCache.framing_zoom(character_id))
+		_stage.set_zoom(0.88*ThumbnailCache.framing_zoom(character_id))
 		_stage.frame_character.call_deferred()
 	_description = PlayerUI.label(str(entry.get("description", "")), 16)
 	_description.custom_minimum_size.y = 0
@@ -550,7 +554,8 @@ func _select(character_id: String) -> void:
 	actions.add_theme_constant_override("separation", 10)
 	_preview.add_child(actions)
 	var equip := _button("EQUIPADO" if equipped else ("EQUIPAR" if unlocked else "BLOQUEADO"), _equip.bind(character_id), true)
-	equip.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	equip.name="SkinEquipButton"
+	equip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	equip.custom_minimum_size.x = 300
 	equip.custom_minimum_size.y = 36 if compact else PlayerUI.CONTROL_HEIGHT
 	equip.disabled = not unlocked or equipped
@@ -564,6 +569,7 @@ func _select(character_id: String) -> void:
 			actions.add_child(buy_skin)
 	var back := _button("VOLTAR", close)
 	back.custom_minimum_size.y = 36 if compact else PlayerUI.CONTROL_HEIGHT
+	back.hide()
 	actions.add_child(back)
 	var shop_actions := PlayerUI.row(_preview)
 	shop_actions.name="EmoteShopActions"
@@ -605,8 +611,8 @@ func _choose_cosmetic_mode(mode: String) -> void:
 	_context_hint.visible=mode!="skins"
 	_preview.get_node("SkinEquipActions").visible=mode in ["skins","emotes"]
 	_preview.get_node("EmoteShopActions").visible=mode=="shop"
-	_context_title.text=tr("Exemplos de reações") if mode=="emotes" else tr("Loja de emotes · prévia")
-	_context_hint.text=tr("Lobby, vitória e derrota") if mode=="emotes" else tr("Dancinha demonstrativa · compra separada")
+	_context_title.text=tr("Exemplos de reações") if mode=="emotes" else tr("Emotes")
+	_context_hint.text=tr("Lobby, vitória e derrota") if mode=="emotes" else tr("Escolha um movimento para ver no personagem")
 	VARIATIONS.apply(_stage.character,str(_selected_styles.get(_selected,"original")))
 	var picker := _preview.get_node_or_null("SkinVariantPicker") as Control
 	if picker!=null: picker.visible=mode=="skins"
@@ -619,8 +625,8 @@ func _choose_cosmetic_mode(mode: String) -> void:
 	if _stage.character.has_animation(&"base"): _stage.character.set_pose(&"base",0.0)
 	if mode!="shop":
 		_stage.frame_character()
-		_stage.set_zoom(ThumbnailCache.framing_zoom(_selected))
-	var arrows := _preview.get_node_or_null("CharacterArrows") as Control
+		_stage.set_zoom(0.88*ThumbnailCache.framing_zoom(_selected))
+	var arrows := _preview.find_child("CharacterArrows",true,false) as Control
 	if arrows!=null: arrows.visible=mode=="skins"
 	for key: String in _cosmetic_tabs: PlayerUI.style_button(_cosmetic_tabs[key],key==mode)
 	_rebuild_gallery()
@@ -673,8 +679,7 @@ func _build_variant_picker(entry: Dictionary,actions: Control) -> void:
 	action.name="VariationPurchase"
 	action.clip_text=true
 	action.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-	_preview.add_child(action)
-	_preview.move_child(action,row.get_index()+1)
+	actions.add_child(action)
 	_update_variation_action()
 	if row.visible: _load_variation_previews(entry,row,images)
 
@@ -692,6 +697,8 @@ func _update_variation_action() -> void:
 	var style := str(_selected_styles.get(_selected,"original"))
 	var item := services.cosmetic_shop.product(_selected,style)
 	button.visible=_cosmetic_mode=="skins" and (style!="original" or services.cosmetic_shop.equipped(_selected)!="original")
+	var equip := _preview.find_child("SkinEquipButton",true,false) as Button
+	if equip!=null: equip.visible=not button.visible
 	button.disabled=true
 	button.text=tr("ORIGINAL")
 	if style=="original":
@@ -717,13 +724,24 @@ func _variation_action() -> void:
 	_purchase_cosmetic(item)
 
 
+func _cosmetic_purchase_image() -> Texture2D:
+	if _cosmetic_mode=="shop":
+		var id := "dance" if _shop_item=="dance_01" else _shop_item
+		var thumb := _grid.find_child("EmoteThumbnail_"+id,true,false) as TextureRect
+		if thumb!=null and thumb.texture!=null: return thumb.texture
+	var style := str(_selected_styles.get(_selected,"original"))
+	var thumb := _preview.find_child("VariationThumbnail_"+style,true,false) as TextureRect
+	if thumb!=null and thumb.texture!=null: return thumb.texture
+	var path := "res://assets/portraits/"+_selected+".png"
+	return load(path) as Texture2D if ResourceLoader.exists(path) else null
+
+
 func _purchase_cosmetic(item: Dictionary) -> void:
 	if not item.get("available",false) or is_instance_valid(_buy_dialog): return
 	_buy_dialog=Control.new()
 	_buy_dialog.name="CosmeticPurchase"
 	var panel := PlayerUI.deck_modal(self,_buy_dialog)
-	panel.add_child(PlayerUI.label(str(item.name),28))
-	panel.add_child(PlayerUI.label(str(item.price_coins)+tr(" moedas"),24,PlayerUI.GOLD))
+	PlayerUI.shop_confirmation(panel,tr("Confirmar compra"),str(item.name)+" · "+str(item.price_coins)+tr(" moedas"),_cosmetic_purchase_image())
 	var feedback := PlayerUI.label("",20)
 	panel.add_child(feedback)
 	var dialog := _buy_dialog
@@ -738,8 +756,14 @@ func _purchase_cosmetic(item: Dictionary) -> void:
 			await services.wallet.refresh()
 			await services.progression.refresh()
 		else: confirm.disabled=false)
-	panel.add_child(confirm)
-	panel.add_child(PlayerUI.button("Voltar",_close_purchase))
+	var actions := PlayerUI.row(panel)
+	confirm.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	PlayerUI.style_button(confirm,true)
+	actions.add_child(confirm)
+	var cancel := PlayerUI.button("Cancelar",_close_purchase)
+	cancel.name="CloseCosmeticPurchase"
+	actions.add_child(cancel)
+	cancel.grab_focus.call_deferred()
 
 
 func _build_emote_gallery(entry: Dictionary) -> void:
@@ -788,8 +812,8 @@ func _build_emote_gallery(entry: Dictionary) -> void:
 		button.toggle_mode=true
 		button.button_group=group
 		if shop: button.button_pressed=_shop_item==str(emote.product_id)
-		button.custom_minimum_size=Vector2(0,260)
-		button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		button.custom_minimum_size=Vector2(280,350) if shop else Vector2(0,260)
+		button.size_flags_horizontal=Control.SIZE_SHRINK_BEGIN if shop else Control.SIZE_EXPAND_FILL
 		_grid.add_child(button)
 		var content := VBoxContainer.new()
 		button.add_child(content)
@@ -873,11 +897,9 @@ func _preview_purchase() -> void:
 	_buy_dialog.name="EmotePurchasePreview"
 	_buy_dialog.set_meta("product_id",_shop_item)
 	var panel := PlayerUI.deck_modal(self,_buy_dialog)
-	panel.add_child(PlayerUI.label("Comprar emote",30,PlayerUI.TEXT))
 	var item_name := str(preload("res://scripts/skins/universal_emotes.gd").definition(_shop_item).get("name","Emote"))
-	var details := PlayerUI.label(item_name+" · "+tr("Consultando preço…"),22,PlayerUI.GOLD)
+	var details := PlayerUI.shop_confirmation(panel,tr("Comprar emote"),item_name+" · "+tr("Consultando preço…"),_cosmetic_purchase_image())
 	details.name="EmotePurchasePrice"
-	panel.add_child(details)
 	var feedback := PlayerUI.label("Consultando saldo e disponibilidade…",20,PlayerUI.MUTED)
 	feedback.name="EmotePurchaseFeedback"
 	panel.add_child(feedback)
@@ -887,7 +909,9 @@ func _preview_purchase() -> void:
 	confirm.name="ConfirmEmotePurchase"
 	confirm.disabled=true
 	PlayerUI.editor_control(confirm,true)
-	panel.add_child(confirm)
+	var actions := PlayerUI.row(panel)
+	confirm.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	actions.add_child(confirm)
 	var coins := PlayerUI.button("COMPRAR MOEDAS",func()->void:
 		_close_purchase()
 		navigate_requested.emit("wallet",{"tab":"coins"}))
@@ -897,7 +921,7 @@ func _preview_purchase() -> void:
 	var close := PlayerUI.button("Cancelar",_close_purchase)
 	close.name="CloseEmotePurchase"
 	PlayerUI.editor_control(close)
-	panel.add_child(close)
+	actions.add_child(close)
 	close.grab_focus.call_deferred()
 	var dialog := _buy_dialog
 	if not services.session.authenticated():

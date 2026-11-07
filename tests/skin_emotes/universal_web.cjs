@@ -16,7 +16,7 @@ try{const results=[];
    const [x,y,w,h]=c.rect;assert.ok(x>=0&&y>=0&&x+w<=state.size[0]+1&&y+h<=state.size[1]+1,'outside '+name);
    const canvas=await page.locator('#canvas').boundingBox(),px=canvas.x+(x+w/2)*canvas.width/state.size[0],py=canvas.y+(y+h/2)*canvas.height/state.size[1];
    if(iphone)await page.touchscreen.tap(px,py);else await page.mouse.click(px,py);};
-  await tap('BuyEmotePreview');await page.waitForTimeout(100);await tap('ConfirmEmotePurchase');
+  await tap('BuyEmotePreview');await page.waitForTimeout(100);await page.screenshot({path:out+'/'+width+'x'+height+'_confirmation.png',scale:'css'});await tap('ConfirmEmotePurchase');
   let state;const deadline=Date.now()+10000;
   do{state=await report();if(state.shop?.owned&&state.wallet_coins==='150')break;await page.waitForTimeout(100);}while(Date.now()<deadline);
   assert.equal(state.wallet_coins,'150');assert.equal(state.emote_purchases,1);assert.equal(state.shop.owned,true);

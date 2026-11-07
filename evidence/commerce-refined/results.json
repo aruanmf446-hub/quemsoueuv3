@@ -1,0 +1,44 @@
+[
+  {
+    "width": 1672,
+    "height": 941,
+    "mode": "commerce",
+    "disabledRealPurchases": true,
+    "errors": []
+  },
+  {
+    "width": 1672,
+    "height": 941,
+    "mode": "commerce_skins",
+    "disabledRealPurchases": true,
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "mode": "commerce",
+    "disabledRealPurchases": true,
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "mode": "commerce_skins",
+    "disabledRealPurchases": true,
+    "errors": []
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "mode": "commerce",
+    "disabledRealPurchases": true,
+    "errors": []
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "mode": "commerce_skins",
+    "disabledRealPurchases": true,
+    "errors": []
+  }
+]

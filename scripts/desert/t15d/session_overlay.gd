@@ -60,7 +60,7 @@ func show_pause() -> void:
 	_title(phase_name.to_upper(),12,Color("#d9b778"))
 	_title("Pausa",28,Color.WHITE)
 	_button("Continuar",resume_requested.emit,true)
-	_button("Configurações",show_settings)
+	_button("Recargas compradas",show_refills)
 	_button("Recomeçar fase",restart_requested.emit)
 	_button("Voltar aos reinos",return_requested.emit)
 	_open()
@@ -140,7 +140,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 			return
 		if _page in ["refills","settings"] and not _completion and not _death:
-			if _page=="refills": show_settings()
+			if _page=="refills": show_pause()
 			else: show_pause()
 			get_viewport().set_input_as_handled()
 			return

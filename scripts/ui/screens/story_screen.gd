@@ -59,24 +59,7 @@ func render() -> void:
 	if services.story_progress!=null and not services.story_progress.notice.is_empty():
 		banner.show_state("success",services.story_progress.notice)
 		services.story_progress.dismiss_toast()
-	var tabs := PlayerUI.row(body)
-	tabs.add_theme_constant_override("separation",roundi(_px(2,1)))
-	for realm: Array in [["Deserto","desert"],["Floresta","forest"],["Mar","sea"],["Lunar","lunar"]]:
-		var tab := Button.new()
-		tab.text = realm[0] if realm[1] == "desert" else realm[0]+"  🔒"
-		tab.toggle_mode = true
-		tab.button_pressed = realm[1] == _realm
-		tab.disabled = realm[1] != "desert"
-		if tab.disabled: tab.tooltip_text = "Reino em desenvolvimento"
-		tab.custom_minimum_size = Vector2(170,64)
-		tab.add_theme_font_override("font",_font)
-		tab.add_theme_font_size_override("font_size",PlayerUI.CONTROL_FONT)
-		_style_slanted(tab,realm[1] == _realm)
-		tab.pressed.connect(_select_realm.bind(realm[1]))
-		tabs.add_child(tab)
-	if _realm != "desert":
-		body.add_child(_label("Este reino faz parte de uma aventura futura. Ainda não há fases disponíveis.",22,GOLD))
-		return
+	_realm = "desert"
 	var rules := PlayerContracts.read_json(PlayerContracts.RULES_PATH)
 	var confirmed: Array = services.progression.data.get("completed_phase_ids",[]) if services.progression.state == "success" else []
 	var online_unlocked := _confirmed_unlocked(confirmed)
@@ -93,7 +76,7 @@ func render() -> void:
 	summary.add_theme_constant_override("separation",roundi(_px(18,8)))
 	var info := PlayerUI.column(summary)
 	info.add_theme_constant_override("separation",0)
-	info.add_child(_label("REINO DO DESERTO  ·  CIDADE NOTURNA",_px(15,11)/_unit_or_one(),GOLD))
+	info.add_child(_label("Primeira temporada",_px(15,11)/_unit_or_one(),GOLD))
 	info.add_child(_label(str(TranslationServer.translate("El Fuego  —  %d de 10 fases concluídas")) % local_completed.size(),_px(22,14)/_unit_or_one()))
 	var pips := Control.new()
 	pips.custom_minimum_size = Vector2(_px(300,150),_px(14,10))

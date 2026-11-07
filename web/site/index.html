@@ -34,7 +34,13 @@ if(app||/[?&](invite|coin_order)=/.test(s)||/access_token=/.test(h))location.rep
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
 {"@type":"VideoGame","@id":"https://quemsoueu.cards/#game","name":"Quem Sou Eu","url":"https://quemsoueu.cards/","publisher":{"@type":"Organization","name":"CRM Plus .store"},"image":"https://quemsoueu.cards/img/og.jpg","description":"Jogo de cartas de adivinhação com modo história no Reino do Deserto, duelos com amigos e personagens colecionáveis.","inLanguage":"pt-BR","genre":["Jogo de cartas","Aventura","Adivinhação"],"gamePlatform":["Navegador","iPhone (PWA)","Android","Windows"],"applicationCategory":"Game","operatingSystem":"Web, iOS, Android, Windows","playMode":["SinglePlayer","MultiPlayer"],"offers":{"@type":"Offer","price":"0","priceCurrency":"BRL"}},
-{"@type":"WebSite","@id":"https://quemsoueu.cards/#site","name":"Quem Sou Eu","url":"https://quemsoueu.cards/","inLanguage":"pt-BR"}]}
+{"@type":"WebSite","@id":"https://quemsoueu.cards/#site","name":"Quem Sou Eu","url":"https://quemsoueu.cards/","inLanguage":"pt-BR"},
+{"@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Quem Sou Eu é grátis?","acceptedAnswer":{"@type":"Answer","text":"Sim. Você joga grátis no navegador, sem instalar nada."}},
+{"@type":"Question","name":"Como instalar Quem Sou Eu no iPhone?","acceptedAnswer":{"@type":"Answer","text":"Abra quemsoueu.cards/jogar no Safari, toque em Compartilhar e escolha Adicionar à Tela de Início. O jogo abre em tela cheia como um app."}},
+{"@type":"Question","name":"Em quais navegadores funciona?","acceptedAnswer":{"@type":"Answer","text":"Nas versões atuais do Chrome, Safari, Firefox, Edge e Opera, no computador e no celular."}},
+{"@type":"Question","name":"Tem versão para Android e Windows?","acceptedAnswer":{"@type":"Answer","text":"O APK para Android e o programa para Windows estão a caminho. Enquanto isso, jogue pelo navegador."}}
+]}]}
 </script>
 </head>
 <body>
@@ -55,7 +61,8 @@ if(app||/[?&](invite|coin_order)=/.test(s)||/access_token=/.test(h))location.rep
   <a class="crm" href="./" aria-label="CRM Plus Store"><img src="img/crm-plus.webp" width="700" height="220" alt="CRM Plus Store"></a>
 </header>
 
-<main class="hero">
+<main>
+<section class="hero">
   <img class="logo" src="img/logo-qse.webp" width="900" height="602" alt="Quem Sou Eu" fetchpriority="high">
   <h1>Descubra, adivinhe e se divirta com os amigos!</h1>
   <p class="lede">O jogo de cartas e adivinhação para turbinar a diversão em grupo.</p>
@@ -71,8 +78,95 @@ if(app||/[?&](invite|coin_order)=/.test(s)||/access_token=/.test(h))location.rep
   <p class="hint">iPhone: abra no Safari, toque em Compartilhar e em <b>Adicionar à Tela de Início</b>.</p>
   <p class="hint" id="ios-note" hidden>Você está fora do Safari. Abra este site no Safari para instalar.</p>
 
-  <img class="scene" src="img/deserto.webp" width="1400" height="588" alt="" loading="lazy">
+</section>
+
+<div class="sections">
+  <section class="band" id="plataformas" aria-labelledby="t-plat">
+    <p class="eyebrow">Plataformas</p>
+    <h2 id="t-plat">Escolha onde jogar</h2>
+
+    <div class="platforms">
+      <article class="pcard" data-os="windows">
+        <svg class="pcard-icon" aria-hidden="true"><use href="#i-windows"/></svg>
+        <h3>Windows</h3>
+        <p class="pcard-format">Programa .EXE</p>
+        <span class="btn btn-ghost is-off" aria-disabled="true">Em breve</span>
+      </article>
+
+      <article class="pcard" data-os="android">
+        <svg class="pcard-icon" aria-hidden="true"><use href="#i-android"/></svg>
+        <h3>Android</h3>
+        <p class="pcard-format">Instalador .APK</p>
+        <span class="btn btn-ghost is-off" aria-disabled="true">Em breve</span>
+      </article>
+
+      <article class="pcard" data-os="ios">
+        <svg class="pcard-icon" aria-hidden="true"><use href="#i-apple"/></svg>
+        <h3>iPhone e iPad</h3>
+        <p class="pcard-format">App PWA pelo Safari</p>
+        <a class="btn btn-ghost" href="jogar/">Instalar PWA</a>
+        <ol class="steps">
+          <li>Abra <b>quemsoueu.cards/jogar</b> no Safari.</li>
+          <li>Toque em <svg class="inline" aria-label="Compartilhar"><use href="#i-share"/></svg> Compartilhar.</li>
+          <li>Escolha <b>Adicionar à Tela de Início</b>.</li>
+        </ol>
+        <p class="note" id="ios-note-2" hidden>Você está fora do Safari. Copie o endereço e abra no Safari para instalar.</p>
+      </article>
+
+      <article class="pcard pcard-main" data-os="web">
+        <svg class="pcard-icon" aria-hidden="true"><use href="#i-globe"/></svg>
+        <h3>Navegador</h3>
+        <p class="pcard-format">Sem instalar nada</p>
+        <a class="btn btn-primary" href="jogar/"><svg aria-hidden="true"><use href="#i-play"/></svg>Jogar online</a>
+        <ul class="browsers" aria-label="Navegadores compatíveis">
+          <li><svg aria-hidden="true"><use href="#i-chrome"/></svg>Chrome</li>
+          <li><svg aria-hidden="true"><use href="#i-safari"/></svg>Safari</li>
+          <li><svg aria-hidden="true"><use href="#i-firefox"/></svg>Firefox</li>
+          <li><svg aria-hidden="true"><use href="#i-opera"/></svg>Opera</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="band" id="modos" aria-labelledby="t-modos">
+    <p class="eyebrow">Modos de jogo</p>
+    <h2 id="t-modos">Uma pergunta, muitas partidas</h2>
+    <div class="modes">
+      <article><p class="eyebrow">Modo história</p><h3>Reino do Deserto</h3><p class="muted">Dez fases com mercado, aqueduto, oásis, ruínas e fortificações. Fuja das patrulhas e avance pelo reino.</p></article>
+      <article><p class="eyebrow">Mata-mata</p><h3>Duelo com amigos</h3><p class="muted">Crie uma sala, mande o convite e descubra quem é a carta do rival primeiro, pergunta por pergunta.</p></article>
+      <article><p class="eyebrow">Biblioteca</p><h3>Baralhos e cartas</h3><p class="muted">Explore baralhos temáticos e os criados pela comunidade para variar cada partida.</p></article>
+    </div>
+  </section>
+
+  <section class="band" id="personagens" aria-labelledby="t-pers">
+    <p class="eyebrow">Personagens</p>
+    <h2 id="t-pers">Escolha quem entra em campo</h2>
+    <ul class="cast">
+      <li><img src="img/p-cowboy.webp" width="300" height="286" alt="Cowboy" loading="lazy"><span>Cowboy</span></li>
+      <li><img src="img/p-michelly.webp" width="300" height="286" alt="Michelly" loading="lazy"><span>Michelly</span></li>
+      <li><img src="img/p-el_fuego.webp" width="300" height="286" alt="El Fuego" loading="lazy"><span>El Fuego</span></li>
+      <li><img src="img/p-lana.webp" width="300" height="286" alt="Lana" loading="lazy"><span>Lana</span></li>
+      <li><img src="img/p-lorena.webp" width="300" height="286" alt="Lorena" loading="lazy"><span>Lorena</span></li>
+      <li><img src="img/p-gus.webp" width="300" height="286" alt="Gus" loading="lazy"><span>Gus</span></li>
+    </ul>
+  </section>
+
+  <section class="band" id="perguntas" aria-labelledby="t-faq">
+    <p class="eyebrow">Perguntas</p>
+    <h2 id="t-faq">Perguntas frequentes</h2>
+    <div class="faq">
+      <details><summary>Quem Sou Eu é grátis?</summary><p>Sim. Você joga grátis no navegador, sem instalar nada.</p></details>
+      <details><summary>Como instalar no iPhone?</summary><p>Abra <b>quemsoueu.cards/jogar</b> no Safari, toque em Compartilhar e escolha <b>Adicionar à Tela de Início</b>. O jogo abre em tela cheia, como um app.</p></details>
+      <details><summary>Em quais navegadores funciona?</summary><p>Nas versões atuais do Chrome, Safari, Firefox, Edge e Opera, no computador e no celular.</p></details>
+      <details><summary>Tem versão para Android e Windows?</summary><p>O APK para Android e o programa para Windows estão a caminho. Enquanto isso, jogue pelo navegador.</p></details>
+    </div>
+  </section>
+</div>
 </main>
+
+<div class="scene-wrap">
+  <img class="scene" src="img/deserto.webp" width="1400" height="588" alt="" loading="lazy">
+</div>
 
 <footer class="foot">
   <span class="crm-mark"><i aria-hidden="true">+</i><b>CRM Plus</b> Store</span>

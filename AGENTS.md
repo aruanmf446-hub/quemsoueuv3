@@ -10,6 +10,11 @@
 
 ## Design dos menus (direção limpa aprovada pelo dono do projeto)
 
+- **Habilidade de design:** ao criar ou alterar interfaces, leia e aplique
+  [`.agents/skills/qse-design/SKILL.md`](.agents/skills/qse-design/SKILL.md).
+  Ela reúne a composição visual, a validação em Web real e a entrega de capturas.
+  Testes funcionais aprovados não substituem a conferência visual.
+
 - Leia [`docs/referencias/README.md`](docs/referencias/README.md) e abra [`docs/referencias/menu/DIRECAO_CLEAN_APROVADA.png`](docs/referencias/menu/DIRECAO_CLEAN_APROVADA.png) antes de alterar a interface. O usuário aprovou esse lobby e pediu a continuidade nos demais menus, incluindo batalha.
 - A fonte do estilo é `scripts/ui/player_ui.gd`: use `apply_theme`, `style_button`, `style_row`, `style_back`, `style_field`, `pill`, `plate` e `frame_panel`. Evite temas paralelos e repetição de caixas, filetes, brilhos ou sombras ornamentais.
 - `apply_theme` fornece fonte MSDF e filtragem linear com mipmaps. Preserve a nitidez em telas isoladas, overlays e seletores; não herde o Nearest Mipmap global nos textos.

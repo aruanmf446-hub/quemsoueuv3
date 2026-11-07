@@ -11,6 +11,17 @@ var phase: Node3D
 var loading: CampaignLoading
 var callback: JavaScriptObject
 var obstacle: Dictionary={}
+var motion_samples: Dictionary={}
+func _physics_process(_delta: float) -> void:
+ # Registra eventos de física que um navegador com GPU emulada pode deixar
+ # passar entre duas consultas JS. Não altera velocidade, entrada ou colisão.
+ if not is_instance_valid(phase) or obstacle.is_empty():return
+ var actor: CharacterBody3D=phase._player
+ var on_canopy:=actor.is_on_floor() and absf(actor.position.y-float(obstacle.top))<0.04
+ if on_canopy and actor.velocity.x>0.1 and not motion_samples.has("walking"):
+  motion_samples.walking={"x":actor.position.x,"y":actor.position.y,"floor":true,"vx":actor.velocity.x}
+ if actor.position.x>float(obstacle.right)+0.4 and actor.position.y<float(obstacle.top)-0.2 and not motion_samples.has("edge"):
+  motion_samples.edge={"x":actor.position.x,"y":actor.position.y,"floor":actor.is_on_floor(),"vx":actor.velocity.x}
 func _ready() -> void:
  if not OS.has_feature("story_continuity_fixture"):return
  preload("res://tests/desert_night/tutorial_fixture.gd").experienced()
@@ -36,6 +47,9 @@ func _ready() -> void:
  callback=JavaScriptBridge.create_callback(probe)
  JavaScriptBridge.get_interface("window").qseContinuityProbe=callback
 func launch(packed: PackedScene) -> void:
+ if is_instance_valid(phase):phase.free()
+ obstacle={}
+ motion_samples={}
  phase=packed.instantiate()
  get_tree().root.add_child(phase)
  get_tree().current_scene=phase
@@ -73,9 +87,25 @@ func probe(args: Array) -> void:
  if command=="next" and is_instance_valid(phase):
   PhaseStory.mark_read(phase._order+1)
   phase._session.next_requested.emit()
- if command in ["obstacle","canopy"] and is_instance_valid(phase):
-  if command=="canopy":
-   var roofs:=get_tree().get_nodes_in_group("campaign_one_way").filter(func(n: Node) -> bool:return n.get_meta("canopy",false) and n.get_meta("prop_asset","")=="capital_merchant" and n.position.x>float(phase._phase.player_spawn[0])+1)
+ if command in ["obstacle","canopy","near-canopy","task-canopy"] and is_instance_valid(phase):
+  motion_samples={}
+  if command in ["near-canopy","task-canopy"]:
+   var at: float
+   if command=="task-canopy":
+    var gate: Dictionary=phase._phase.tasks.filter(func(t: Dictionary) -> bool:return t.task_kind=="gate")[0]
+    at=(float(gate.start)+float(gate.end))*0.5
+   else:
+    at=preload("res://scripts/desert/t15d/kingdom_assets.gd").placements(phase._order).filter(func(p: Dictionary) -> bool:return p.asset=="capital_merchant")[0].x
+   phase._player.position.x=at
+   phase._stream_world(at,true)
+   for i in 2400:
+    if phase._build_queue.is_empty():break
+    phase._process(0)
+  if command!="obstacle":
+   var roofs:=get_tree().get_nodes_in_group("campaign_one_way").filter(func(n: Node) -> bool:
+    if not n.get_meta("canopy",false):return false
+    if command=="task-canopy":return n.has_meta("prop_art") and n.get_node(n.get_meta("prop_art")).get_meta("task_canopy",false)
+    return n.get_meta("prop_asset","")=="capital_merchant" and n.position.x>float(phase._phase.player_spawn[0])+1 and (command!="near-canopy" or n.get_node(n.get_meta("prop_art")).global_position.z>=-8.0))
    roofs.sort_custom(func(a: Node3D,b: Node3D) -> bool:return a.position.x<b.position.x)
    var roof: Node3D=roofs[0]
    var span: Vector2=roof.get_meta("landing_span")
@@ -84,7 +114,7 @@ func probe(args: Array) -> void:
    var spec: Dictionary=phase._phase.platforms.filter(func(p: Dictionary) -> bool:return p.get("parkour_route",false))[0]
    obstacle={"left":spec.span_start,"right":spec.span_end,"base":spec.surface_top,"top":spec.pos[1]+spec.size[1]*0.5}
   phase.set_physics_process(false)
-  phase._player.position=Vector3((obstacle.left+obstacle.right)*0.5 if command=="canopy" else obstacle.left-1.4,obstacle.base+0.04,0)
+  phase._player.position=Vector3((obstacle.left+obstacle.right)*0.5 if command!="obstacle" else obstacle.left-1.4,obstacle.base+0.04,0)
   phase._player.velocity=Vector3.ZERO
   phase._player._invulnerable=0
   phase._stream_world((obstacle.left+obstacle.right)*0.5,true)
@@ -114,6 +144,7 @@ func probe(args: Array) -> void:
   state.attack=phase._player.attack_charges
   state.defense=phase._player.defense_charges
   if not obstacle.is_empty():
+   state.motion=motion_samples
    var actor: CharacterBody3D=phase._player
    state.obstacle=obstacle
    state.actor={"x":actor.position.x,"y":actor.position.y,"floor":actor.is_on_floor(),"vx":actor.velocity.x,"vy":actor.velocity.y,"jumps":actor.jumps_used}

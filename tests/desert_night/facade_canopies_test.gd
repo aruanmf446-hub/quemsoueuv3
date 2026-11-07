@@ -45,7 +45,7 @@ func run() -> void:
    if phase._build_queue.is_empty():break
    phase._process(0)
   for enemy in phase._troops.get_children():phase._retire_enemy(enemy)
-  var arts: Array=get_nodes_in_group("kingdom_art").filter(func(n: Node) -> bool:return n.get_meta("asset_id","") in ["capital_house","capital_merchant","capital_balcony_house"] and n.position.z>=-12.5 and n.position.z< -8 and n.position.x>=float(phase._phase.player_spawn[0])+1)
+  var arts: Array=get_nodes_in_group("kingdom_art").filter(func(n: Node) -> bool:return not n.is_in_group("playable_house_roofs") and n.get_meta("asset_id","") in ["capital_house","capital_merchant","capital_balcony_house","capital_market_stall"] and n.global_position.z>=-12.5 and n.global_position.x>=float(phase._phase.player_spawn[0])+1)
   arts.sort_custom(func(a: Node3D,b: Node3D) -> bool:return a.position.x<b.position.x)
   if order==2:
    check(arts.all(func(n: Node3D) -> bool:return n.position.y<float(phase._phase.player_spawn[1])-1),"fase2: lonas da rua inferior permanecem abaixo da rota dos tetos")
@@ -54,8 +54,9 @@ func run() -> void:
   var seen: Dictionary={}
   for art: Sprite3D in arts:
    var id:=str(art.get_meta("asset_id"))
-   if seen.has(id):continue
-   seen[id]=true
+   var variant:=id+("_fachada" if art.position.z< -8.0 else "_proxima")
+   if seen.has(variant):continue
+   seen[variant]=true
    var roofs:=get_nodes_in_group(Landings.GROUP).filter(func(n: Node) -> bool:return n.get_meta("canopy",false) and n.get_meta("prop_art",NodePath())==art.get_path())
    check(roofs.size()==1,"fase%d %s: lona visível da fachada tem exatamente um apoio" % [order,id])
    if roofs.is_empty():continue
@@ -63,6 +64,11 @@ func run() -> void:
    var top: float=roof.get_meta("one_way_top")
    var base: float=roof.get_meta("source_floor")
    var span: Vector2=roof.get_meta("landing_span")
+   var duplicates:=get_nodes_in_group(Landings.GROUP).filter(func(n: Node) -> bool:
+    if n==roof or n.get_meta("prop_art",NodePath())!=art.get_path():return false
+    var other: Vector2=n.get_meta("landing_span")
+    return minf(span.y,other.y)-maxf(span.x,other.x)>0.30 and absf(float(n.get_meta("one_way_top"))-top)<0.45)
+   check(duplicates.is_empty(),"fase%d %s: uma única altura física para o tecido" % [order,variant])
    print("CANOPY ",order," ",id," rise=",top-base," x=",roof.position.x)
    release()
    player.position=Vector3(roof.position.x,base+0.04,0)

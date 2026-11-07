@@ -56,5 +56,17 @@ func run() -> void:
   check(phase._charge_snapshot()=={"attack":3,"defense":1,"amber":2,"dash":3,"rupture":2},"fase 6 conserva os cinco tipos de recarga, incluindo relâmpago e ruptura")
   phase.free()
  check(Local.carry_for(5,"").is_empty(),"não aplica cargas de uma fase em outra")
+ # Todas as passagens da campanha 1–9, incluindo carga zero e capacidade cheia.
+ for order in range(1,9):
+  var charges:={"attack":order%4,"defense":(order+1)%4,"amber":3 if order>=3 else 0,"dash":2 if order>=4 else 0,"rupture":1 if order>=5 else 0}
+  phase=await advance(order,charges)
+  if not is_instance_valid(phase):continue
+  check(phase._charge_snapshot()==charges,"fase %d → %d: preserva exatamente todos os recursos sem usar" % [order,order+1])
+  check(Local.carry_for(order+1,"")==charges,"fase %d: inventário da vitória salvo para reentrada" % (order+1))
+  phase.free()
+  phase=load("res://scenes/desert/phase_%02d.tscn" % (order+1)).instantiate()
+  root.add_child(phase)
+  check(phase._charge_snapshot()==charges,"fase %d: sair e reabrir não zera nem duplica cargas" % (order+1))
+  phase.free()
  print("STORY_TRANSITIONS checks=%d failures=%d" % [checks,failures])
  quit(1 if failures else 0)

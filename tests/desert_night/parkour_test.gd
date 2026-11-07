@@ -38,6 +38,11 @@ func run() -> void:
 	var wall: Dictionary
 	for platform: Dictionary in phase._phase.platforms:
 		if platform.kind == "geyser_wall": wall = platform; break
+	if wall.is_empty():
+		check(false,"roteiro legado exige geyser_wall; campanha atual usa parkour_revision_test.gd")
+		phase.free()
+		quit(1)
+		return
 	var wx := float(wall.pos[0])
 	await place(wx-7.0)
 	var top := await walk("move_right", func() -> bool: return player.position.x > wx+3.0 and player.is_on_floor())

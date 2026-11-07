@@ -37,6 +37,23 @@ func run() -> void:
 				var point := str(catalog[key]).unicode_at(index)
 				if point>=0x3000 and point<=0x9fff: check(font.has_char(point),"missing glyph: "+str(point))
 		check((str(TranslationServer.translate("Começa em %d")) % 5).contains("5"),"dynamic count preserved")
+		var names_catalog = preload("res://scripts/decks/deck_library_catalog.gd")
+		for id: String in names_catalog.OFFICIAL_IDS:
+			var official: Dictionary = names_catalog.find_deck(id)
+			check(not official.is_empty(),"official deck loads: "+id)
+			var source: Dictionary = PlayerContracts.read_json(names_catalog.ROOT+"/"+id+"/deck.json")
+			check(official.name==catalog[source.name],"localized official title: "+id)
+			for card: Dictionary in official.cards:
+				var original: String = source.cards[card.id.get_slice("/",1)].name
+				check(card.name==catalog[original],"localized library card: "+card.id)
+				check(DuelService.card_name(card.id)==card.name,"duel matches library: "+card.id)
+		check(names_catalog.display_name("creator:abc","Pinturas")=="Pinturas","creator title unchanged even when matching official title")
+		CommunityDecksService.cards["community:test/card"]={"name":"Cowboy"}
+		check(DuelService.card_name("community:test/card")=="Cowboy","creator card name unchanged")
+		for character: Dictionary in CharacterCatalog.load_entries():
+			check(catalog.has(character.name),"character has localized display name: "+character.id)
+			for variant: Dictionary in preload("res://scripts/skins/skin_variations.gd").entries(character.id):
+				check(catalog.has(variant.name),"variant has localized name: "+character.id)
 		check(not PlayerContracts.ago(Time.get_unix_time_from_system()-180000).begins_with("há "),"relative time translated")
 	check(not is_equal_approx(widths[0],widths[3]),"existing Label redraws in a different script")
 	TranslationServer.set_locale("pt_BR")

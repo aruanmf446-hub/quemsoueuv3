@@ -434,7 +434,7 @@ func _detail(parent: Control, player: Dictionary, kind: String) -> void:
 	line.add_child(labels)
 	labels.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	labels.add_child(PlayerUI.label("Personagem equipado", 11 if compact else 16, PremiumUI.MUTED))
-	labels.add_child(PremiumUI.plain(str(services.inventory.entry(character_id).get("name", "—")), 16 if compact else 28, Color.WHITE, false))
+	labels.add_child(PremiumUI.plain(tr(str(services.inventory.entry(character_id).get("name", "—"))), 16 if compact else 28, Color.WHITE, false))
 	if kind == "search" and _relation(str(player.user_id)) == "none":
 		var message := LineEdit.new()
 		message.name = "RequestMessage"

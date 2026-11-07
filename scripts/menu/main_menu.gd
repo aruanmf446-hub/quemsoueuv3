@@ -369,7 +369,7 @@ func _refresh_friends() -> void:
 		row.friend_name = str(friend.nickname)
 		row.status_text = _services.friends.presence_label(str(friend.user_id))
 		row.status_color = Color("#3ddc5c") if _services.friends.online_ids.has(str(friend.user_id)) else Color("#b3bfd0")
-		row.tooltip_text = str(_services.inventory.entry(str(friend.equipped_character_id)).get("name", "Skin indisponível"))
+		row.tooltip_text = tr(str(_services.inventory.entry(str(friend.equipped_character_id)).get("name", "Skin indisponível")))
 		list.add_child(row)
 		var avatar: Panel = row.get_node("Avatar")
 		var portrait := PlayerUI.portrait(str(friend.equipped_character_id), 40)

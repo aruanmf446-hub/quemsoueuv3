@@ -5,6 +5,10 @@ const OFFICIAL_IDS := ["lendas_urbanas", "nostalgia_web", "sol_nascente", "pintu
 const MIN_CARDS := 5
 const MAX_CARDS := 30
 
+## Translate only our own catalog. Creator content keeps its author-provided name.
+static func display_name(id: String, source: String) -> String:
+	return str(TranslationServer.translate(source)) if OFFICIAL_IDS.has(id.get_slice("/", 0)) else source
+
 static func search_key(value: String) -> String:
 	var result := value.strip_edges().to_lower()
 	var accents := {"a": "áàâãä", "e": "éèêë", "i": "íìîï", "o": "óòôõö", "u": "úùûü", "c": "ç"}
@@ -38,7 +42,7 @@ static func _parse_deck(id: String, info: Dictionary) -> Dictionary:
 	var remote: Dictionary = PlayerServices.current.catalog.deck(id) if PlayerServices.current != null and PlayerServices.current.catalog != null else {}
 	var live: Dictionary = PlayerServices.current.editor_content.deck(id) if PlayerServices.current != null and PlayerServices.current.editor_content != null else {}
 	return {
-		"id": id, "name": _string(live.get("title", ""), _string(remote.get("name", info.get("name", "")), id.replace("_", " ").capitalize())),
+		"id": id, "name": display_name(id, _string(live.get("title", ""), _string(remote.get("name", info.get("name", "")), id.replace("_", " ").capitalize()))),
 		"official": official, "creator": "Quem Sou Eu" if official else _string(info.get("creator", "")),
 		"category": _string(live.get("subtitle", ""), _string(info.get("category", ""))),
 		"description": _string(live.get("description", ""), _string(remote.get("description", info.get("description", "")))),
@@ -59,7 +63,7 @@ static func cards(folder: String, info: Dictionary) -> Array[Dictionary]:
 		var name := _string(definition.get("name", "")) if definition is Dictionary else _string(definition)
 		var path := "%s/%s/%s.png" % [ROOT, folder, card_id]
 		if name.is_empty() or not ResourceLoader.exists(path, "Texture2D"): continue
-		entries.append({"id": "%s/%s" % [folder, card_id], "name": name, "image": path,
+		entries.append({"id": "%s/%s" % [folder, card_id], "name": display_name(folder, name), "image": path,
 			"description": _string(definition.get("description", "")) if definition is Dictionary else _description(info, card_id)})
 	entries.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		var comparison := search_key(a.name).naturalnocasecmp_to(search_key(b.name))

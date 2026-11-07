@@ -516,7 +516,7 @@ func _room_row(item: Dictionary) -> Control:
 	# 2. Jogadores.
 	line.add_child(_fact("friends", "%d/%d" % [int(item.get("players", 0)), int(item.get("max_players", 0))], widths[1], "Players"))
 	# 3. Deck(s) reais da sala.
-	var decks: Array = (item.get("decks", []) as Array).map(func(d: Variant) -> String: return str(d.get("name", "")) if d is Dictionary else str(d))
+	var decks: Array = (item.get("decks", []) as Array).map(func(d: Variant) -> String: return LibraryCatalog.display_name(str(d.get("id", "")), str(d.get("name", ""))) if d is Dictionary else str(d))
 	var deck_text := tr("Sem deck") if decks.is_empty() else str(decks[0]) + ("  +%d" % (decks.size() - 1) if decks.size() > 1 else "")
 	var deck := _fact("cards", deck_text, 0, "Deck")
 	deck.tooltip_text = ", ".join(decks)
@@ -1000,7 +1000,7 @@ func _deck_entries() -> Array:
 		var id := str(deck.get("id", ""))
 		var item := LibraryCatalog.find_deck(id)
 		var cover := services.community_decks.cover_image(id) if CommunityDecksService.is_ref(id) else str(deck.get("cover",""))
-		result.append({"id": id, "name": str(deck.get("name", id)), "size": int(deck.get("size", 0)),
+		result.append({"id": id, "name": LibraryCatalog.display_name(id, str(deck.get("name", id))), "size": int(deck.get("size", 0)),
 			"cover": DeckCover.resolve_item(item) if not item.is_empty() else cover, "favorite": store.is_favorite(id),
 			"ref": ("creator:"+services.community_decks.source_deck_id(id)) if CommunityDecksService.is_ref(id) else "official:"+id, "community":CommunityDecksService.is_ref(id)})
 	return result
@@ -1334,7 +1334,7 @@ func _render_room() -> void:
 		grid.add_child(_member_card(member, admin, str(data.status)))
 	var summary := str(TranslationServer.translate("%d cartas por jogador  ·  %ds por turno  ·  %ds de seleção  ·  Bots %s  ·  Decks: %s")) % [int(settings.cards_per_player),
 		int(settings.turn_seconds), int(settings.selection_seconds), "permitidos" if settings.bots_allowed else "desativados",
-		", ".join((data.get("decks", []) as Array).map(func(d: Dictionary) -> String: return str(d.get("name", ""))))]
+		", ".join((data.get("decks", []) as Array).map(func(d: Dictionary) -> String: return LibraryCatalog.display_name(str(d.get("id", "")), str(d.get("name", "")))))]
 	body.add_child(PlayerUI.label(summary, 17, Color("#c9d6e6")))
 	var actions := PlayerUI.flow(body)
 	if UIScale.is_iphone():

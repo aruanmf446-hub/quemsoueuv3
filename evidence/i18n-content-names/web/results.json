@@ -1,0 +1,38 @@
+[
+  {
+    "lang": "en",
+    "width": 1672,
+    "height": 941,
+    "errors": [],
+    "screens": [
+      "library",
+      "official_cards",
+      "duel",
+      "skins"
+    ]
+  },
+  {
+    "lang": "fr",
+    "width": 844,
+    "height": 390,
+    "errors": [],
+    "screens": [
+      "library",
+      "official_cards",
+      "duel",
+      "skins"
+    ]
+  },
+  {
+    "lang": "ja",
+    "width": 640,
+    "height": 360,
+    "errors": [],
+    "screens": [
+      "library",
+      "official_cards",
+      "duel",
+      "skins"
+    ]
+  }
+]

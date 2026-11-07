@@ -6,7 +6,7 @@ https://github.com/notofonts/noto-cjk/blob/main/Sans/OTF/SimplifiedChinese/NotoS
 
 Mantém os caracteres dos catálogos `data/ui/*.json`, os nomes nativos dos
 idiomas, ASCII e o bloco cirílico U+0400–04FF. Gerado com fontTools subset
-4.61.1, preservando a tabela de nomes e licença. O arquivo tem cerca de 525 KB,
+4.61.1, preservando a tabela de nomes e licença. O arquivo tem cerca de 595 KiB,
 em vez dos 16 MB da fonte completa. Ao adicionar traduções asiáticas, regenere
 o subconjunto para incluir os novos caracteres. Não é uma fonte CJK completa
 para todo texto arbitrário enviado por usuários.

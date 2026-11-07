@@ -1,0 +1,14 @@
+[
+  {
+    "lang": "fr",
+    "width": 844,
+    "height": 390,
+    "errors": [],
+    "screens": [
+      "library",
+      "official_cards",
+      "duel",
+      "skins"
+    ]
+  }
+]

@@ -21,3 +21,11 @@
    apontam para `https://quemsoueu.cards` e `https://quemsoueu.cards/jogar/`.
    Publicar novamente a Edge Function `qse-coin-checkout` no projeto Supabase GAME.
 5. Google Search Console: verificar o domínio e enviar `https://quemsoueu.cards/sitemap.xml`.
+
+## Ajuste mobile retrato (07/11/2026)
+
+Após avaliação da captura do site em iPhone, a dobra inicial mobile foi compactada:
+a arte oficial ocupa uma faixa própria acima do texto, o título fica em uma linha,
+e **Jogar agora** é o único botão sólido. **Baixar e instalar** vira link secundário.
+A alteração está restrita ao CSS de celular em retrato; não muda o lobby, PWA, rotas,
+instalação ou desktop/paisagem. A direção ainda requer conferência visual no iPhone real.

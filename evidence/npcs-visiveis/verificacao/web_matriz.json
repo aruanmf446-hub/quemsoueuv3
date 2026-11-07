@@ -1,0 +1,111 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "order": 1,
+      "checkpoint": -1,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "dpr": 3,
+      "visible": 2,
+      "species": [
+        "human",
+        "cactus"
+      ],
+      "normal_physics": true,
+      "forced_queue": false,
+      "teleport": false
+    },
+    {
+      "order": 2,
+      "checkpoint": -1,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "dpr": 3,
+      "visible": 2,
+      "species": [
+        "human",
+        "cactus"
+      ],
+      "normal_physics": true,
+      "forced_queue": false,
+      "teleport": false
+    },
+    {
+      "order": 10,
+      "checkpoint": -1,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "dpr": 3,
+      "visible": 2,
+      "species": [
+        "human",
+        "cactus"
+      ],
+      "normal_physics": true,
+      "forced_queue": false,
+      "teleport": false
+    },
+    {
+      "order": 1,
+      "checkpoint": -1,
+      "viewport": {
+        "width": 640,
+        "height": 360
+      },
+      "dpr": 3,
+      "visible": 2,
+      "species": [
+        "human",
+        "cactus"
+      ],
+      "normal_physics": true,
+      "forced_queue": false,
+      "teleport": false
+    },
+    {
+      "order": 1,
+      "checkpoint": -1,
+      "viewport": {
+        "width": 1672,
+        "height": 941
+      },
+      "dpr": 1,
+      "visible": 2,
+      "species": [
+        "human",
+        "cactus"
+      ],
+      "normal_physics": true,
+      "forced_queue": false,
+      "teleport": false
+    },
+    {
+      "order": 1,
+      "checkpoint": -1,
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "dpr": 1,
+      "visible": 2,
+      "species": [
+        "human",
+        "cactus"
+      ],
+      "normal_physics": true,
+      "forced_queue": false,
+      "teleport": false
+    }
+  ],
+  "errors": [],
+  "blocked": [],
+  "gpu": "SwiftShader",
+  "physical_device": false
+}

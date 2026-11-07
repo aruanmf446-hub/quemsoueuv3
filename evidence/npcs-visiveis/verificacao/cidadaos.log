@@ -1,0 +1,11 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS atlas de pessoas e cactos não têm caixas de fundo visíveis
+PASS nenhum figurante usa imagem de personagem jogável ou soldado de combate
+PASS cidade inclui pessoas e cidadãos-cacto originais
+PASS composição alterna comércio, família em jardim e cidadãos sozinhos
+PASS alguns cidadãos se assustam; outros mantêm a rotina
+PASS reações não fazem cidadãos correr, girar ou mudar de lugar
+PASS troca de pose conserva os pés na superfície
+PASS figurantes descarregam com a fase
+ORIGINAL_CITIZENS checks=8 failures=0 contexts=["conversation", "alone", "family", "market", "workers", "watch"] species=["human", "cactus"]

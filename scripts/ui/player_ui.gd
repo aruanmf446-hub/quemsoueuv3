@@ -362,7 +362,7 @@ static func shop_package(parent: Node, pack: Dictionary, price: String, unavaila
 	var amount := label(str(pack.coins),44,TEXT)
 	amount.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(amount)
-	var unit_label := label("CRÉDITO DE DECK" if credit else "MOEDAS",20,GOLD)
+	var unit_label := label("CARTA DE CRIAÇÃO" if credit else "MOEDAS",20,GOLD)
 	unit_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(unit_label)
 	var cost := label(price,26,TEXT)

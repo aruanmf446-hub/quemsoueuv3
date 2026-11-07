@@ -37,7 +37,7 @@ func _ready() -> void:
 		target.focus_mode = Control.FOCUS_ALL
 	_hotspot($ProfileCard, "profile")
 	_hotspot($TopBar/CoinPill, "wallet")
-	_hotspot($TopBar/GemPill, "wallet")
+	_hotspot($TopBar/GemPill, "wallet", {"tab":"coins","category":"deck_credits"})
 	_mode_label = PlayerUI.label("", 18, PlayerUI.GOLD)
 	_mode_label.position = Vector2(42, 198)
 	_mode_label.size = Vector2(620, 44)
@@ -49,6 +49,7 @@ func _ready() -> void:
 	_services.session.changed.connect(_nickname_profile_changed)
 	_services.inventory.changed.connect(_refresh_profile)
 	_services.wallet.changed.connect(_refresh_wallet)
+	_services.cosmetic_shop.changed.connect(_refresh_wallet)
 	_services.friends.changed.connect(_refresh_friends)
 	_services.session.changed.connect(_refresh_profile)
 	_services.session.changed.connect(_auth_redirect_ready)
@@ -313,13 +314,13 @@ func _on_menu_button_activated(button_id: StringName) -> void:
 	_navigation.open(String(button_id))
 
 
-func _hotspot(target: Control, route: String) -> void:
+func _hotspot(target: Control, route: String, params: Dictionary={}) -> void:
 	var button := Button.new()
 	button.tooltip_text = {"profile": "Meu perfil", "wallet": "Minha carteira"}.get(route, route)
 	button.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for state: String in ["normal", "hover", "pressed"]:
 		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
-	button.pressed.connect(_navigation.open.bind(route, {}))
+	button.pressed.connect(_navigation.open.bind(route, params))
 	target.add_child(button)
 
 
@@ -344,7 +345,7 @@ func _refresh_profile() -> void:
 func _refresh_wallet() -> void:
 	var locale: String = _services.preferences.values.locale
 	$TopBar/CoinPill/Content/Value.text = DevicePreferences.number(_services.wallet.balance("coins"), locale)
-	$TopBar/GemPill/Content/Value.text = DevicePreferences.number(_services.wallet.balance("gems"), locale)
+	$TopBar/GemPill/Content/Value.text = DevicePreferences.number(_services.cosmetic_shop.deck_credits(), locale)
 
 
 func _refresh_friends() -> void:

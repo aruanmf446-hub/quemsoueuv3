@@ -1747,8 +1747,8 @@ func _render_editor() -> void:
 	_review_feedback(body,_draft)
 	var credit_info := PlayerUI.row(body)
 	var commerce := services.cosmetic_shop
-	credit_info.add_child(_text("Créditos de deck: "+str(commerce.data.get("deck_credits","—"))+ (" · 1 por novo deck na conta" if commerce.data.get("deck_credits_required",false) else " · criação gratuita"),20,PlayerUI.MUTED))
-	credit_info.add_child(PlayerUI.button("Créditos",func()->void:navigate_requested.emit("wallet",{"tab":"coins"})))
+	credit_info.add_child(_text("Cartas de criação: "+str(commerce.data.get("deck_credits","—"))+ (" · 1 carta = 1 deck" if commerce.data.get("deck_credits_required",false) else " · criação gratuita"),20,PlayerUI.MUTED))
+	credit_info.add_child(PlayerUI.button("Cartas",func()->void:navigate_requested.emit("wallet",{"tab":"coins","category":"deck_credits"})))
 	var metadata := PlayerUI.creator_panel(body)
 	var form := PlayerUI.row(metadata)
 	form.name="DeckForm"

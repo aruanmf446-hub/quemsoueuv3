@@ -4,6 +4,14 @@ Não existe loja simulada na produção. A carteira, o preço, o débito, a poss
 o equipamento e os créditos vêm do Supabase GAME. As fixtures em tests/commerce
 são somente testes de transporte/UI e não entram na exportação de produção.
 
+## Nome exibido da segunda unidade
+
+O dono definiu **Carta de criação** no lugar do diamante/gema da interface.
+**1 carta = 1 deck.** O contador lê o saldo real de `deck_credits`, separado
+das moedas. O identificador técnico `deck_credits` permanece no contrato.
+Saldos antigos de gems não são convertidos, apagados ou usados como cartas.
+A exigência de consumo continua desligada até a ativação autorizada.
+
 ## Estado entregue
 
 - GAME: pagamentos `enabled=false`, `live_mode=false`.

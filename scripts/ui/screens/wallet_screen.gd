@@ -12,14 +12,17 @@ func _ready() -> void:
 		if is_visible_in_tree(): render())
 	services.coin_store.changed.connect(func()->void:
 		if is_visible_in_tree() and _coin_store: render())
+	services.cosmetic_shop.changed.connect(func()->void:
+		if is_visible_in_tree(): render())
 	services.session.changed.connect(_close_checkout)
 	visibility_changed.connect(func()->void:
 		if not is_visible_in_tree(): _close_checkout())
 
 
 func show_screen(params: Dictionary={}) -> void:
+	_store_category=str(params.get("category","coins"))
 	super.show_screen(params)
-	if _coin_store: _refresh_store.call_deferred()
+	_refresh_store.call_deferred()
 
 
 func render() -> void:
@@ -31,11 +34,19 @@ func render() -> void:
 		_render_coin_store()
 		return
 	var row := PlayerUI.split(body)
-	for currency: String in ["coins", "gems"]:
+	for currency: String in ["coins", "deck_credits"]:
 		var card := PlayerUI.card(row)
-		card.add_child(PlayerUI.label("Moedas" if currency == "coins" else "Gemas", 14, PlayerUI.MUTED))
-		card.add_child(PlayerUI.label(DevicePreferences.number(services.wallet.balance(currency), services.preferences.values.locale), 42))
-	body.add_child(PlayerUI.button("Atualizar saldo", func() -> void: services.wallet.refresh()))
+		var caption := PlayerUI.row(card)
+		var icon := TextureRect.new()
+		icon.texture=load("res://assets/icons/vector/icon_coin.svg" if currency=="coins" else "res://assets/icons/vector/icon_deck_credit.svg") as Texture2D
+		icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.custom_minimum_size=Vector2(40,40)
+		caption.add_child(icon)
+		caption.add_child(PlayerUI.label("Moedas" if currency == "coins" else "Cartas de criação",20,PlayerUI.MUTED))
+		card.add_child(PlayerUI.label(DevicePreferences.number(services.wallet.balance(currency) if currency=="coins" else services.cosmetic_shop.deck_credits(), services.preferences.values.locale), 42))
+	body.add_child(PlayerUI.label("Cada carta de criação permite criar um deck.",20,PlayerUI.MUTED))
+	body.add_child(PlayerUI.button("Atualizar saldo", func() -> void: _refresh_store()))
 	var buy := PlayerUI.button("COMPRAR MOEDAS",func()->void:
 		_coin_store=true
 		render()
@@ -63,16 +74,23 @@ func render() -> void:
 
 
 func _render_coin_store() -> void:
-	heading.text=tr("Moedas e créditos")
+	heading.text=tr("Moedas e cartas")
 	body.add_theme_constant_override("separation",6)
 	var top := PlayerUI.row(body)
 	var balances := PlayerUI.row(top)
 	var balance := PlayerUI.label("%s moedas" % DevicePreferences.number(services.wallet.balance("coins"),services.preferences.values.locale),28,PlayerUI.GOLD)
 	balance.name="CoinStoreBalance"
 	balances.add_child(balance)
-	var credits := PlayerUI.label("Créditos de deck: "+str(services.cosmetic_shop.data.get("deck_credits","—")),20,PlayerUI.MUTED)
+	var credits := PlayerUI.label("Cartas: "+DevicePreferences.number(services.cosmetic_shop.deck_credits(),services.preferences.values.locale),20,PlayerUI.MUTED)
 	credits.name="DeckCreditBalance"
-	balances.add_child(credits)
+	var cards := PlayerUI.row(balances)
+	var card_symbol := TextureRect.new()
+	card_symbol.texture=load("res://assets/icons/vector/icon_deck_credit.svg") as Texture2D
+	card_symbol.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+	card_symbol.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	card_symbol.custom_minimum_size=Vector2(36,36)
+	cards.add_child(card_symbol)
+	cards.add_child(credits)
 	var refresh := PlayerUI.button("Atualizar",_refresh_store)
 	refresh.name="RefreshCoinPayments"
 	refresh.disabled=_refreshing
@@ -83,7 +101,7 @@ func _render_coin_store() -> void:
 	var store := services.coin_store
 	var categories := PlayerUI.row(body)
 	for id: String in ["coins","deck_credits"]:
-		var tab := PlayerUI.button("MOEDAS" if id=="coins" else "CRÉDITOS DE DECK",func()->void:
+		var tab := PlayerUI.button("MOEDAS" if id=="coins" else "CARTAS DE CRIAÇÃO",func()->void:
 			_store_category=id
 			render())
 		tab.name="StoreCategory_"+id
@@ -110,8 +128,8 @@ func _render_coin_store() -> void:
 		var details := PlayerUI.column(row)
 		details.size_flags_stretch_ratio=2.0
 		details.add_child(PlayerUI.label("Dê vida ao seu deck",30,PlayerUI.TEXT))
-		details.add_child(PlayerUI.label("Um crédito para criar um novo deck na sua conta.",22,PlayerUI.MUTED))
-		details.add_child(PlayerUI.label("Editar e reenviar o mesmo deck não gasta outro crédito.",20,PlayerUI.MUTED))
+		details.add_child(PlayerUI.label("Cada carta permite criar um deck na sua conta.",22,PlayerUI.MUTED))
+		details.add_child(PlayerUI.label("Editar e reenviar o mesmo deck não gasta outra carta.",20,PlayerUI.MUTED))
 		if not services.cosmetic_shop.data.get("deck_credits_required",false):
 			details.add_child(PlayerUI.label("A criação de decks continua gratuita.",22,PlayerUI.GOLD))
 	if store.state in ["error","offline"]:
@@ -121,7 +139,7 @@ func _render_coin_store() -> void:
 		body.add_child(PlayerUI.label("Seus pagamentos",26))
 		for order: Dictionary in orders:
 			var item := PlayerUI.card(body)
-			item.add_child(PlayerUI.label("%s %s · %s" % [order.coins,"crédito(s) de deck" if order.get("reward_kind")=="deck_credits" else "moedas",CoinStoreService.order_message(order.status)],22))
+			item.add_child(PlayerUI.label("%s %s · %s" % [order.coins,"carta(s) de criação" if order.get("reward_kind")=="deck_credits" else "moedas",CoinStoreService.order_message(order.status)],22))
 			item.add_child(PlayerUI.label("Pedido %s · %s" % [str(order.id).left(8),str(order.created_at).left(16).replace("T"," ")],20,PlayerUI.MUTED))
 
 
@@ -148,8 +166,8 @@ func _prepare_checkout(pack: Dictionary) -> void:
 	var panel := PlayerUI.deck_modal(self,_checkout_dialog)
 	var credit: bool=pack.get("reward_kind")=="deck_credits"
 	var art := load("res://assets/ui/store/deck_credit.png" if credit else "res://assets/ui/store/coin_treasure.png") as Texture2D
-	PlayerUI.shop_confirmation(panel,"Comprar créditos" if credit else "Comprar moedas",
-		"%s %s · %s" % [pack.coins,"crédito(s) de deck" if credit else "moedas",_brl(int(pack.price_brl_cents))],art)
+	PlayerUI.shop_confirmation(panel,"Comprar carta de criação" if credit else "Comprar moedas",
+		"%s %s · %s" % [pack.coins,"carta(s) de criação" if credit else "moedas",_brl(int(pack.price_brl_cents))],art)
 	var feedback := PlayerUI.label("Preparando pagamento seguro…",22,PlayerUI.MUTED)
 	feedback.name="CoinCheckoutFeedback"
 	panel.add_child(feedback)

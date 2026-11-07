@@ -94,13 +94,14 @@ func _ready() -> void:
 		var icon: Panel = menu.get_node("TopBar/" + currency + "/Content/Icon")
 		icon.add_theme_stylebox_override("panel", _box(Color.TRANSPARENT, 10))
 		var symbol := TextureRect.new()
-		symbol.texture = load("res://assets/icons/vector/icon_coin.svg" if currency == "CoinPill" else "res://assets/icons/vector/icon_gem.svg")
+		symbol.texture = load("res://assets/icons/vector/icon_coin.svg" if currency == "CoinPill" else "res://assets/icons/vector/icon_deck_credit.svg")
+		symbol.name = "CurrencySymbol"
 		symbol.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		symbol.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		symbol.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		icon.add_child(symbol)
 		symbol.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		menu.get_node("TopBar/" + currency).tooltip_text = "Moedas" if currency == "CoinPill" else "Gemas"
+		menu.get_node("TopBar/" + currency).tooltip_text = "Moedas" if currency == "CoinPill" else "Cartas de criação · 1 carta = 1 deck"
 	menu.get_node("FriendsPanel/Frame").hide()
 	social_bg = Panel.new()
 	social_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -219,7 +220,7 @@ func _layout() -> void:
 	var pad := 24.0 if compact else 40.0
 	_rect(brand_logo, Vector2(pad, 12) * unit, Vector2(150, 58) * unit)
 	_rect(menu.get_node("TopBar"), Vector2(w - pad - 200, 20) * unit, Vector2(200, 52) * unit)
-	# Decisão do dono: moedas e gemas ocultas por enquanto (todas as plataformas).
+	# Visibilidade original do contador preservada; o antigo slot de gema agora representa cartas.
 	menu.get_node("TopBar").visible = false
 	for currency: String in ["CoinPill", "GemPill"]:
 		menu.get_node("TopBar/" + currency).custom_minimum_size = Vector2(94, 52) * unit

@@ -16,7 +16,7 @@ try{const results=[];
    let s=await report();
    if(mode==='commerce'){
     for(const id of ['coins_100','coins_250','coins_400']){const b=s.controls.find(b=>b.name==='CoinPack_'+id);assert.equal(b?.disabled,true);assert.ok(b.rect[1]+b.rect[3]<=s.size[1]+1,'package action clipped '+id);}
-    assert.ok(s.labels.some(l=>l.includes('preços provisórios')));assert.ok(s.labels.includes('Créditos de deck: 0'));assert.equal(s.checkout_calls,0);
+    assert.ok(s.labels.some(l=>l.includes('preços provisórios')));assert.ok(s.labels.includes('Cartas: 0'));assert.equal(s.checkout_calls,0);
    }else{
     const end=Date.now()+30000;do{s=await report();if(s.emote_thumbnails.some(t=>t.name==='EmoteThumbnail_samba'&&t.ready))break;await page.waitForTimeout(100);}while(Date.now()<end);
     assert.ok(s.labels.includes('50 moedas'));assert.equal(s.controls.find(b=>b.name==='BuyEmotePreview').disabled,true);

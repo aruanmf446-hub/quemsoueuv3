@@ -56,3 +56,10 @@ identidade da conta e fluxos existentes permanecem os mesmos.
 A arte de referência não vira fundo/hotspots; não há tema paralelo nem
 alteração global nas demais telas. Capturas e validação em
 [evidence/deck-creator-polish](../../evidence/deck-creator-polish/README.md).
+
+## Unidades da loja — decisão do dono
+
+Moeda mantém o símbolo de moeda. A segunda unidade é **Carta de criação**,
+com ícone de carta em lugar do diamante: **cada carta libera um deck**.
+Exibir o saldo de créditos de criação da conta; não renomear um saldo de gemas
+como se fosse carta. A loja e os fluxos de criação devem usar esses termos.

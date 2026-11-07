@@ -21,6 +21,10 @@ func refresh() -> Dictionary:
 		changed.emit()
 	return result
 
+func deck_credits() -> Variant:
+	if not session.authenticated() or state!="success" or _owner!=str(session.user.get("id","")): return null
+	return str(data.get("deck_credits","0")).to_int()
+
 func product(character: String,style: String) -> Dictionary:
 	for item: Dictionary in data.get("items",[]):
 		if item.character_id==character and str(item.get("style_id",""))==style: return item

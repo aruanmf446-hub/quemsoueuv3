@@ -20,7 +20,8 @@ func _run() -> void:
 	await get_tree().process_frame
 	var mode := str(JavaScriptBridge.eval("new URLSearchParams(location.search).get('fixture')||'nickname'")) if OS.has_feature("web") else fixture_mode
 	var fake: SupabaseClient
-	if mode in ["ability_refills","refill_store"]: fake=preload("res://tests/ability_refills/fake_game.gd").new()
+	if mode in ["languages","public_profile","friends_search","duel_admin"]: fake=preload("res://tests/profile_languages/fake_game.gd").new()
+	elif mode in ["ability_refills","refill_store"]: fake=preload("res://tests/ability_refills/fake_game.gd").new()
 	elif mode.begins_with("commerce"): fake=preload("res://tests/commerce/fake_game.gd").new()
 	elif mode=="community": fake=preload("res://tests/community_attribution/fake_game.gd").new()
 	elif mode=="universal": fake=preload("res://tests/skin_emotes/universal_game.gd").new()
@@ -56,7 +57,34 @@ func _run() -> void:
 	services.cosmetic_shop.client=fake
 	services.ability_refills.client=fake
 	if mode.begins_with("commerce"): await services.cosmetic_shop.refresh()
-	if mode=="ability_refills":
+	if mode in ["languages","public_profile","friends_search","duel_admin"]:
+		profile.nickname="VisitanteTeste"
+		services.profile.data=profile.profile()
+		if mode=="languages":
+			ui=load("res://scenes/player/settings.tscn").instantiate()
+			add_child(ui)
+			ui._category=4
+			ui.show_screen()
+		elif mode=="public_profile":
+			services.profile.client=fake
+			ui=load("res://scenes/player/public_profile.tscn").instantiate()
+			add_child(ui)
+			ui.show_screen({"public_id":fake.target.public_id})
+		elif mode=="friends_search":
+			services.friends.state="success"
+			services.friends.data={"friends":[],"incoming":[],"outgoing":[]}
+			ui=load("res://scenes/player/friends.tscn").instantiate()
+			add_child(ui)
+			ui.show_screen({"tab":"search"})
+			await ui._search("aruan")
+		else:
+			await services.duel.use_local()
+			await services.duel.create("Sala de teste", false, {"deck_ids":["lendas_urbanas"]})
+			ui=load("res://scenes/player/duel.tscn").instantiate()
+			add_child(ui)
+			ui.show_screen()
+			await ui._open_form()
+	elif mode=="ability_refills":
 		ui=preload("res://tests/ability_refills/visual.gd").new()
 		add_child(ui)
 	elif mode in ["coins","stripe","commerce","refill_store"]:
@@ -169,7 +197,9 @@ func _probe(args: Array) -> void:
 		var scroll: ScrollContainer=ui.get_node("Margin/Column/Scroll")
 		scroll.scroll_vertical=int(scroll.get_v_scroll_bar().max_value)
 	report_sequence+=1
-	var result := {"sequence":report_sequence,"size":[ui.size.x,ui.size.y],"controls":[],"fields":{},"cards":0,"labels":[],"emote_thumbnails":[]}
+	var result := {"locale":services.preferences.values.locale,"language_choice":ui.get("_language_choice"),"sequence":report_sequence,"size":[ui.size.x,ui.size.y],"controls":[],"fields":{},"cards":0,"labels":[],"emote_thumbnails":[]}
+	var margin := ui.get_node_or_null("Margin") as Control
+	if margin!=null: result.layout_width=margin.size.x * margin.scale.x
 	if ui.get("_selected_styles") is Dictionary:
 		result.variations={"character":ui._selected,"style":ui._selected_styles.get(ui._selected,"original"),"thumbnails":[]}
 	if ui.has_method("_sync_resources") and ui.get("_player")!=null:

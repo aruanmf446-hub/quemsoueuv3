@@ -1,0 +1,179 @@
+{
+  "cards": 0,
+  "controls": [
+    {
+      "disabled": false,
+      "name": "Back",
+      "rect": [
+        48,
+        26,
+        152,
+        68
+      ],
+      "text": "Voltar"
+    },
+    {
+      "disabled": false,
+      "name": "Tab_0",
+      "rect": [
+        48,
+        116,
+        244,
+        76
+      ],
+      "text": "Meu Perfil"
+    },
+    {
+      "disabled": false,
+      "name": "Tab_1",
+      "rect": [
+        306,
+        116,
+        245,
+        76
+      ],
+      "text": "Áudio"
+    },
+    {
+      "disabled": false,
+      "name": "Tab_2",
+      "rect": [
+        565,
+        116,
+        245,
+        76
+      ],
+      "text": "Gráficos"
+    },
+    {
+      "disabled": false,
+      "name": "Tab_3",
+      "rect": [
+        824,
+        116,
+        245,
+        76
+      ],
+      "text": "Controles"
+    },
+    {
+      "disabled": false,
+      "name": "Tab_4",
+      "rect": [
+        1083,
+        116,
+        245,
+        76
+      ],
+      "text": "Idioma"
+    },
+    {
+      "disabled": false,
+      "name": "Locale_pt_BR",
+      "rect": [
+        68,
+        314,
+        281,
+        64
+      ],
+      "text": "Português (Brasil)"
+    },
+    {
+      "disabled": false,
+      "name": "Locale_en",
+      "rect": [
+        361,
+        314,
+        281,
+        64
+      ],
+      "text": "English"
+    },
+    {
+      "disabled": false,
+      "name": "Locale_es",
+      "rect": [
+        654,
+        314,
+        281,
+        64
+      ],
+      "text": "Español"
+    },
+    {
+      "disabled": false,
+      "name": "Locale_fr",
+      "rect": [
+        68,
+        388,
+        281,
+        64
+      ],
+      "text": "Français"
+    },
+    {
+      "disabled": false,
+      "name": "Locale_ja",
+      "rect": [
+        361,
+        388,
+        281,
+        64
+      ],
+      "text": "日本語"
+    },
+    {
+      "disabled": false,
+      "name": "Locale_zh_CN",
+      "rect": [
+        654,
+        388,
+        281,
+        64
+      ],
+      "text": "简体中文"
+    },
+    {
+      "disabled": false,
+      "name": "Locale_ru",
+      "rect": [
+        68,
+        462,
+        281,
+        64
+      ],
+      "text": "Русский"
+    },
+    {
+      "disabled": false,
+      "name": "ConfirmLanguage",
+      "rect": [
+        336,
+        551,
+        330,
+        72
+      ],
+      "text": "Confirmar"
+    }
+  ],
+  "emote_thumbnails": [],
+  "fields": {},
+  "labels": [
+    "Configurações",
+    "Quem Sou Eu",
+    "V3",
+    "Idioma",
+    "Prévia",
+    "Veja como o jogo será exibido no idioma selecionado.",
+    "Jogar · Voltar\nConfigurações",
+    "Tradução em expansão. Alguns textos ainda aparecem em português."
+  ],
+  "language_choice": "pt_BR",
+  "layout_width": 1376,
+  "locale": "pt_BR",
+  "sequence": 2,
+  "size": [
+    1376,
+    675
+  ]
+}

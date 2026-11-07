@@ -1,0 +1,68 @@
+{
+  "cards": 0,
+  "controls": [
+    {
+      "disabled": false,
+      "name": "Back",
+      "rect": [
+        40,
+        28,
+        154,
+        68
+      ],
+      "text": "Назад"
+    },
+    {
+      "disabled": false,
+      "name": "CopyPublicId",
+      "rect": [
+        1272,
+        289,
+        64,
+        64
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "AddPublicFriend",
+      "rect": [
+        744,
+        466,
+        592,
+        64
+      ],
+      "text": "Добавить в друзья"
+    },
+    {
+      "disabled": false,
+      "name": "ReportPlayer",
+      "rect": [
+        744,
+        544,
+        592,
+        64
+      ],
+      "text": "Пожаловаться на игрока"
+    }
+  ],
+  "emote_thumbnails": [],
+  "fields": {},
+  "labels": [
+    "Публичный профиль",
+    "aruan",
+    "Уровень —",
+    "Presença indisponível",
+    "QSE-00000000000000000000000000000022",
+    "Выбранный персонаж",
+    "Cowboy"
+  ],
+  "language_choice": null,
+  "layout_width": 1376,
+  "locale": "ru",
+  "sequence": 2,
+  "size": [
+    1376,
+    675
+  ]
+}

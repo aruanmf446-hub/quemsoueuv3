@@ -7,18 +7,21 @@ const DEFAULTS := {"muted": false, "master": 1.0, "music": 1.0, "sfx": 1.0, "qua
 	"menu_music": true, "shadows": true, "window": ""}
 ## Tamanhos de janela oferecidos no desktop ("" = o do sistema; "fullscreen" = tela cheia).
 const WINDOW_SIZES := ["", "1280x720", "1600x900", "1920x1080", "fullscreen"]
+const LANGUAGES := [["Português (Brasil)", "pt_BR"], ["English", "en"], ["Español", "es"], ["Français", "fr"], ["日本語", "ja"], ["简体中文", "zh_CN"], ["Русский", "ru"]]
 var values: Dictionary = DEFAULTS.duplicate()
 var last_error := OK
 
 
 func _ready() -> void:
 	values.quality = GraphicsProfile.default_for_platform()
-	var translations := PlayerContracts.read_json("res://data/ui/en.json")
-	var english := Translation.new()
-	english.locale = "en"
-	for message: String in translations:
-		english.add_message(message, translations[message])
-	TranslationServer.add_translation(english)
+	for language: Array in LANGUAGES:
+		if language[1] == "pt_BR": continue
+		var translations := PlayerContracts.read_json("res://data/ui/" + language[1] + ".json")
+		var translation := Translation.new()
+		translation.locale = language[1]
+		for message: String in translations:
+			translation.add_message(message, translations[message])
+		TranslationServer.add_translation(translation)
 	var config := ConfigFile.new()
 	if config.load(SAVE_PATH) == OK:
 		for key: String in DEFAULTS:
@@ -96,7 +99,7 @@ static func _valid(key: String, value: Variant) -> bool:
 		"master", "music", "sfx": return (value is float or value is int) and is_finite(value) and value >= 0 and value <= 1
 		"accept_key", "back_key": return value is int and value > 0 and value <= 0x7fffffff
 		"quality": return value in ["baixo", "medio", "alto"]
-		"locale": return value in ["pt_BR", "en"]
+		"locale": return LANGUAGES.any(func(item: Array) -> bool: return value == item[1])
 		"menu_music", "shadows": return value is bool
 		"window": return value in WINDOW_SIZES
 	return false

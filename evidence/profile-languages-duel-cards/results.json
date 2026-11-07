@@ -1,0 +1,26 @@
+[
+  {
+    "device": "desktop",
+    "width": 1672,
+    "height": 941,
+    "errors": []
+  },
+  {
+    "device": "iphone",
+    "width": 844,
+    "height": 390,
+    "errors": []
+  },
+  {
+    "device": "iphone",
+    "width": 640,
+    "height": 360,
+    "errors": []
+  },
+  {
+    "device": "android",
+    "width": 844,
+    "height": 390,
+    "errors": []
+  }
+]

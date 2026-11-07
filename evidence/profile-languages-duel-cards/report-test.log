@@ -1,0 +1,19 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS sem sessão não envia denúncia
+PASS motivo curto não chama o servidor
+PASS perfil público oferece Denunciar jogador
+PASS modal usa o viewport e teclado Web existentes
+PASS formulário vazio permanece aberto
+PASS erro already_reported preserva motivo e permite continuar
+PASS erro cannot_report_self preserva motivo e permite continuar
+PASS erro network preserva motivo e permite continuar
+PASS erro PGRST202 preserva motivo e permite continuar
+PASS resposta sem confirmação não mostra sucesso
+PASS envio duplo bloqueado enquanto aguarda
+PASS sucesso confirmado fecha formulário e mostra retorno
+PASS voltar consome o modal
+PASS voltar remove o formulário
+PASS troca de conta descarta resposta antiga e motivo
+PASS perfil próprio não oferece denúncia
+PLAYER_REPORTS checks=16 failures=0

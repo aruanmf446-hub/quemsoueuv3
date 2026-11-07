@@ -1,0 +1,297 @@
+{
+  "cards": 0,
+  "controls": [
+    {
+      "disabled": false,
+      "name": "Back",
+      "rect": [
+        40,
+        29,
+        152,
+        60
+      ],
+      "text": "Voltar"
+    },
+    {
+      "disabled": false,
+      "name": "Pick_max_players",
+      "rect": [
+        397,
+        268,
+        112,
+        48
+      ],
+      "text": "10"
+    },
+    {
+      "disabled": false,
+      "name": "Pick_cards_per_player",
+      "rect": [
+        397,
+        331,
+        112,
+        48
+      ],
+      "text": "3"
+    },
+    {
+      "disabled": false,
+      "name": "Pick_turn_seconds",
+      "rect": [
+        397,
+        394,
+        112,
+        48
+      ],
+      "text": "60"
+    },
+    {
+      "disabled": false,
+      "name": "Pick_selection_seconds",
+      "rect": [
+        397,
+        457,
+        112,
+        48
+      ],
+      "text": "30"
+    },
+    {
+      "disabled": false,
+      "name": "Pick_tiebreak_base",
+      "rect": [
+        397,
+        520,
+        112,
+        48
+      ],
+      "text": "7"
+    },
+    {
+      "disabled": false,
+      "name": "Pick_tiebreak_per_player",
+      "rect": [
+        397,
+        583,
+        112,
+        48
+      ],
+      "text": "2"
+    },
+    {
+      "disabled": false,
+      "name": "BotsToggle",
+      "rect": [
+        465,
+        653,
+        44,
+        24
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "DeckSearch",
+      "rect": [
+        600,
+        302,
+        552,
+        38
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "DeckTab_Todos",
+      "rect": [
+        546,
+        364,
+        72,
+        37.5
+      ],
+      "text": "Todos"
+    },
+    {
+      "disabled": false,
+      "name": "DeckTab_Favoritos",
+      "rect": [
+        626,
+        364,
+        93,
+        37.5
+      ],
+      "text": "Favoritos"
+    },
+    {
+      "disabled": false,
+      "name": "DeckTab_Bombando",
+      "rect": [
+        727,
+        364,
+        103,
+        37.5
+      ],
+      "text": "Bombando"
+    },
+    {
+      "disabled": false,
+      "name": "DeckTab_Meus_decks",
+      "rect": [
+        838,
+        364,
+        109,
+        37.5
+      ],
+      "text": "Meus decks"
+    },
+    {
+      "disabled": false,
+      "name": "DeckTab_Comprados",
+      "rect": [
+        955,
+        364,
+        107,
+        37.5
+      ],
+      "text": "Comprados"
+    },
+    {
+      "disabled": false,
+      "name": "DeckChoice_lendas_urbanas",
+      "rect": [
+        546,
+        415,
+        301,
+        280
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "Favorite",
+      "rect": [
+        769,
+        419,
+        40,
+        40
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "DeckChoice_nostalgia_web",
+      "rect": [
+        861,
+        415,
+        301,
+        280
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "Favorite",
+      "rect": [
+        1084,
+        419,
+        40,
+        40
+      ],
+      "text": ""
+    },
+    {
+      "disabled": true,
+      "name": "@Button@178",
+      "rect": [
+        546,
+        709,
+        64,
+        50
+      ],
+      "text": "‹"
+    },
+    {
+      "disabled": false,
+      "name": "@Button@179",
+      "rect": [
+        1098,
+        709,
+        64,
+        50
+      ],
+      "text": "›"
+    },
+    {
+      "disabled": false,
+      "name": "SubmitRoom",
+      "rect": [
+        40,
+        785,
+        240,
+        50
+      ],
+      "text": "Salvar"
+    },
+    {
+      "disabled": false,
+      "name": "CancelForm",
+      "rect": [
+        298,
+        785,
+        170,
+        50
+      ],
+      "text": "Cancelar"
+    }
+  ],
+  "emote_thumbnails": [],
+  "fields": {
+    "DeckSearch": ""
+  },
+  "labels": [
+    "Mata-Mata · Partida local",
+    "C O N F I G U R A Ç Õ E S   D A   S A L A",
+    "Configurações da partida local",
+    "Só neste aparelho, contra bots. Não aparece na lista online.",
+    "Configuração da partida",
+    "Jogadores máximos",
+    "Cartas por jogador",
+    "Tempo por turno (s)",
+    "Tempo de seleção (s)",
+    "Desempate: cartas com 2 jogadores",
+    "Desempate: cartas a mais por jogador",
+    "Bots permitidos",
+    "Permite o preenchimento da sala com bots.",
+    "Decks de personagens",
+    "Escolha o conjunto de personagens da sala (até 5).",
+    "Lendas Urbanas (9)",
+    "Nostalgia Web (10)",
+    "1 / 3",
+    "Resumo da sala",
+    "Confira as configurações antes de criar.",
+    "★  Lendas Urbanas (9)",
+    "Deck selecionado",
+    "Jogadores máximos",
+    "10",
+    "Cartas por jogador",
+    "3",
+    "Tempo por turno",
+    "60 s",
+    "Tempo de seleção",
+    "30 s",
+    "Desempate (2 jogadores)",
+    "7 cartas",
+    "Desempate (a mais por jogador)",
+    "2 cartas",
+    "Bots permitidos",
+    "Sim"
+  ],
+  "language_choice": null,
+  "layout_width": 1672,
+  "locale": "pt_BR",
+  "sequence": 2,
+  "size": [
+    1672,
+    941
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "cards": 0,
+  "controls": [
+    {
+      "disabled": false,
+      "name": "Back",
+      "rect": [
+        40,
+        28,
+        152,
+        60
+      ],
+      "text": "Voltar"
+    },
+    {
+      "disabled": false,
+      "name": "CopyPublicId",
+      "rect": [
+        1932,
+        418,
+        64,
+        64
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "AddPublicFriend",
+      "rect": [
+        1097,
+        595,
+        899,
+        64
+      ],
+      "text": "Adicionar amigo"
+    },
+    {
+      "disabled": false,
+      "name": "ReportPlayer",
+      "rect": [
+        1097,
+        673,
+        899,
+        64
+      ],
+      "text": "Denunciar jogador"
+    }
+  ],
+  "emote_thumbnails": [],
+  "fields": {},
+  "labels": [
+    "Perfil público",
+    "aruan",
+    "Nível —",
+    "Presença indisponível",
+    "QSE-00000000000000000000000000000022",
+    "Personagem equipado",
+    "Cowboy"
+  ],
+  "language_choice": null,
+  "layout_width": 2036,
+  "locale": "pt_BR",
+  "sequence": 2,
+  "size": [
+    2036,
+    941
+  ]
+}

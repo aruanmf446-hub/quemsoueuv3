@@ -138,6 +138,7 @@ func _nickname_profile_changed() -> void:
 func _nickname_offer() -> void:
 	if not is_inside_tree() or _initial_login_pending:
 		return
+	if not is_instance_valid(_nickname_modal): _nickname_modal = null
 	var logged := _services.session.authenticated()
 	var has_nickname := _services.profile.has_nickname()
 	if not logged or has_nickname:
@@ -148,6 +149,10 @@ func _nickname_offer() -> void:
 		_resume_coin_checkout.call_deferred()
 		return
 	if _services.session.needs_password_reset or is_instance_valid(_nickname_modal):
+		return
+	# Sessão autenticada não significa perfil carregado. Não apresentar cadastro
+	# enquanto a conta existente ainda está sendo consultada, nem após erro de rede.
+	if _services.profile.state != "success":
 		return
 	var prompt = preload("res://scripts/ui/nickname_onboarding.gd").new()
 	prompt.setup(_services)

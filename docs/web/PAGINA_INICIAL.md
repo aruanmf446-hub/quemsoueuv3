@@ -18,5 +18,6 @@
 3. Supabase GAME → Auth → URL Configuration: adicionar `https://quemsoueu.cards/**` às Redirect URLs
    e, se quiser, trocar o Site URL para `https://quemsoueu.cards/jogar/`.
 4. Pagamentos: `GAME_ORIGIN`/`GAME_RETURN` em `supabase/game/functions/_shared/stripe.js`
-   apontam para o github.io; atualizar para `https://quemsoueu.cards/jogar/` (sessão de pagamentos).
+   apontam para `https://quemsoueu.cards` e `https://quemsoueu.cards/jogar/`.
+   Publicar novamente a Edge Function `qse-coin-checkout` no projeto Supabase GAME.
 5. Google Search Console: verificar o domínio e enviar `https://quemsoueu.cards/sitemap.xml`.

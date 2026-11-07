@@ -97,6 +97,16 @@ func probe(args: Array) -> void:
  if command=="view" and is_instance_valid(phase):
   for i in 3:phase._follow_camera(1.0)
   phase._scenery.follow(phase._camera,phase._player.position.x)
+ if command=="ground" and is_instance_valid(phase):
+  phase.set_physics_process(false)
+  phase._player.set_physics_process(false)
+  for i in 2400:
+   if phase._build_queue.is_empty():break
+   phase._process(0)
+  for enemy in phase._troops.get_children():phase._retire_enemy(enemy)
+  phase._player._model.show()
+  for i in 3:phase._follow_camera(1.0)
+  phase._scenery.follow(phase._camera,phase._player.position.x)
  var state:={"highest":Local.highest_unlocked(),"completed":Local._highest_completed(),"notice":services.story_progress.notice,"sync":services.story_progress.state,"cloud_mock":true,"stage":"menu"}
  if is_instance_valid(phase):
   state.stage="play"

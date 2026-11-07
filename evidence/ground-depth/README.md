@@ -1,7 +1,7 @@
-# Prévia: sustentação do terreno até fora da tela
+# Sustentação do terreno até fora da tela
 
-Interpretação do pedido: a base abaixo do caminho é curta, deixa sua borda inferior
-aparecer e revela o cenário atrás dela. Esta prévia trata dessa base em primeiro
+Pedido aprovado para publicação: a base abaixo do caminho é curta, deixa sua borda inferior
+aparecer e revela o cenário atrás dela. O ajuste trata dessa base em primeiro
 plano; não reposiciona o cenário distante.
 
 Na capital a base tinha 1,50 m de altura. No oásis e nas partes de pedra da mineração

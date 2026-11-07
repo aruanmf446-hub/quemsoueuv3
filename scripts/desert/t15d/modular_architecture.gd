@@ -149,7 +149,7 @@ func _underground(at: Vector3,index: int) -> void:
 		_arch_frame(at+Vector3(0,0,-1.9),2.3,3.0,0.3)
 
 func _water_strip(at: Vector3,dimensions: Vector2,vertical: bool) -> void:
-	if _water == null:
+	if _water == null and _order!=5:
 		_water = ShaderMaterial.new()
 		var shader := Shader.new()
 		shader.code = "shader_type spatial; render_mode blend_mix, cull_disabled, depth_draw_opaque; void fragment(){float flow=sin(UV.y*65.0-TIME*5.0+sin(UV.x*25.0)*1.2); ALBEDO=mix(vec3(0.025,0.16,0.27),vec3(0.18,0.65,0.8),flow*0.5+0.5); ROUGHNESS=0.24; METALLIC=0.15; ALPHA=0.75; EMISSION=ALBEDO*0.12;}"
@@ -158,7 +158,7 @@ func _water_strip(at: Vector3,dimensions: Vector2,vertical: bool) -> void:
 	var plane := PlaneMesh.new()
 	plane.size = dimensions
 	water.mesh = plane
-	water.material_override = _water
+	water.material_override = Context.material("context_water_oasis") if _order==5 else _water
 	water.position = at
 	if vertical:water.rotation.x = PI*0.5
 	water.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF

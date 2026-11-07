@@ -35,5 +35,14 @@ continuam preservados. Arte, modelos, controles e força do salto não mudaram.
   [Resultados](regression-results.json).
 - `check_design.py`, `scope_test.py --base 192fa68`, importação do Godot e análise
   de sintaxe do teste Web aprovados. Não foram alterados serviços ou backend.
+- **WebAssembly real no Chromium, 844×390, DPR 3 e iPhone emulado:** salto duplo
+  com eventos nativos de toque do navegador, pouso na primeira lona da loja,
+  novo salto, caminhada no tecido e queda ao sair pela borda aprovados.
+  [Relatório](web/report.json) e [captura](web/01_pisando_na_lona.jpg).
+  Aproximação por fixture; saltos por CDP touchStart/touchEnd, confirmados pela
+  física, e caminhada por teclado. Sem erros de navegador/motor ou acesso externo
+  ao backend. GPU SwiftShader em software. O driver guarda a amostra do instante
+  validado; leituras posteriores podem perder o pico transitório do salto nessa
+  emulação lenta. Os comandos e a força do salto no jogo não foram alterados.
 
 Não se trata de validação em aparelho físico nem medição de desempenho.

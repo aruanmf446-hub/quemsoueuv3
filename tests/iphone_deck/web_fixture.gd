@@ -12,6 +12,9 @@ func _ready() -> void:
 		return
 	_run.call_deferred()
 func _run() -> void:
+	if OS.has_feature("web") and str(JavaScriptBridge.eval("new URLSearchParams(location.search).get('fixture')"))=="fbx_dance":
+		add_child(preload("res://tests/fbx_dance/preview.gd").new())
+		return
 	services=PlayerServices.new()
 	add_child(services)
 	await get_tree().process_frame

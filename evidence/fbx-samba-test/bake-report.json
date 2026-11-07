@@ -1,0 +1,152 @@
+{
+	"avatars": [
+		{
+			"bones": 41,
+			"bones_matched": 41,
+			"bounds_max": [
+				0.7791508436203,
+				1.70000004768372,
+				0.860796511173248
+			],
+			"bounds_min": [
+				-0.794033706188202,
+				-0.0393715798854828,
+				-0.704582929611206
+			],
+			"ground_error_local": 0.000000000640284270048141,
+			"id": "cowboy",
+			"path": "res://tests/fbx_dance/generated/cowboy.res",
+			"tracks": 123
+		},
+		{
+			"bones": 41,
+			"bones_matched": 41,
+			"bounds_max": [
+				0.734973192214966,
+				1.80732870101929,
+				0.806032478809357
+			],
+			"bounds_min": [
+				-0.663719713687897,
+				-0.0293689947575331,
+				-0.564625978469849
+			],
+			"ground_error_local": 0.000000000698491930961609,
+			"id": "michelly",
+			"path": "res://tests/fbx_dance/generated/michelly.res",
+			"tracks": 123
+		},
+		{
+			"bones": 33,
+			"bones_matched": 33,
+			"bounds_max": [
+				0.690054774284363,
+				1.74890470504761,
+				0.743721425533295
+			],
+			"bounds_min": [
+				-0.713777244091034,
+				-0.0112774008885026,
+				-0.646529495716095
+			],
+			"ground_error_local": 0.000000000640284270048141,
+			"id": "rodrigo",
+			"path": "res://tests/fbx_dance/generated/rodrigo.res",
+			"tracks": 99
+		},
+		{
+			"bones": 65,
+			"bones_matched": 65,
+			"bounds_max": [
+				0.736283719539642,
+				1.88442242145538,
+				0.808878421783447
+			],
+			"bounds_min": [
+				-0.754100143909454,
+				-0.0147833488881588,
+				-0.687643766403198
+			],
+			"ground_error_local": 0.000000000698491930961609,
+			"id": "lorena",
+			"path": "res://tests/fbx_dance/generated/lorena.res",
+			"tracks": 195
+		},
+		{
+			"bones": 65,
+			"bones_matched": 65,
+			"bounds_max": [
+				0.864774167537689,
+				1.83214116096497,
+				0.893359363079071
+			],
+			"bounds_min": [
+				-0.833469808101654,
+				-0.00535277230665088,
+				-0.795271158218384
+			],
+			"ground_error_local": 0.000000000698491930961609,
+			"id": "gus",
+			"path": "res://tests/fbx_dance/generated/gus.res",
+			"tracks": 195
+		},
+		{
+			"bones": 65,
+			"bones_matched": 65,
+			"bounds_max": [
+				0.718437492847443,
+				1.81762278079987,
+				0.796824872493744
+			],
+			"bounds_min": [
+				-0.703913748264313,
+				-0.00785228703171015,
+				-0.613434553146362
+			],
+			"ground_error_local": 0.000000000582076609134674,
+			"id": "lana",
+			"path": "res://tests/fbx_dance/generated/lana.res",
+			"tracks": 195
+		},
+		{
+			"bones": 65,
+			"bones_matched": 65,
+			"bounds_max": [
+				0.721345245838165,
+				1.85000002384186,
+				0.842301964759827
+			],
+			"bounds_min": [
+				-0.73322194814682,
+				-0.0208731237798929,
+				-0.614760100841522
+			],
+			"ground_error_local": 0.00000000128056854009628,
+			"id": "halloween",
+			"path": "res://tests/fbx_dance/generated/halloween.res",
+			"tracks": 195
+		},
+		{
+			"bones": 41,
+			"bones_matched": 41,
+			"bounds_max": [
+				0.570655345916748,
+				1.46002244949341,
+				0.589535593986511
+			],
+			"bounds_min": [
+				-0.584384918212891,
+				-0.00576872518286109,
+				-0.554502964019775
+			],
+			"ground_error_local": 0.000000000582076609134674,
+			"id": "el_fuego",
+			"path": "res://tests/fbx_dance/generated/el_fuego.res",
+			"tracks": 123
+		}
+	],
+	"clip": "mixamo_com",
+	"source": "res://tests/fbx_dance/source.fbx",
+	"source_duration": 18.2,
+	"test_duration": 12.0
+}

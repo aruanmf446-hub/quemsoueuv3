@@ -1,0 +1,26 @@
+[
+  {
+    "group": 1,
+    "frames": 60,
+    "fps": 10,
+    "characters": [
+      "Cowboy",
+      "El Fuego",
+      "Halloween",
+      "Lana"
+    ],
+    "errors": []
+  },
+  {
+    "group": 2,
+    "frames": 60,
+    "fps": 10,
+    "characters": [
+      "Michelly",
+      "Rodrigo",
+      "Lorena",
+      "Gus"
+    ],
+    "errors": []
+  }
+]

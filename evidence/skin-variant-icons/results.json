@@ -1,0 +1,83 @@
+[
+  {
+    "width": 1672,
+    "height": 941,
+    "iphone": false,
+    "character": "cowboy",
+    "styles": 3,
+    "realThumbnails": true,
+    "errors": []
+  },
+  {
+    "width": 1672,
+    "height": 941,
+    "iphone": false,
+    "character": "el_fuego",
+    "styles": 3,
+    "realThumbnails": true,
+    "errors": []
+  },
+  {
+    "width": 1672,
+    "height": 941,
+    "iphone": false,
+    "character": "halloween",
+    "styles": 3,
+    "realThumbnails": true,
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "iphone": true,
+    "character": "cowboy",
+    "styles": 3,
+    "realThumbnails": true,
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "iphone": true,
+    "character": "el_fuego",
+    "styles": 3,
+    "realThumbnails": true,
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "iphone": true,
+    "character": "halloween",
+    "styles": 3,
+    "realThumbnails": true,
+    "errors": []
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "iphone": true,
+    "character": "cowboy",
+    "styles": 3,
+    "realThumbnails": true,
+    "errors": []
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "iphone": true,
+    "character": "el_fuego",
+    "styles": 3,
+    "realThumbnails": true,
+    "errors": []
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "iphone": true,
+    "character": "halloween",
+    "styles": 3,
+    "realThumbnails": true,
+    "errors": []
+  }
+]

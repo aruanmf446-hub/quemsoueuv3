@@ -58,8 +58,10 @@ func _run() -> void:
 		add_child(ui)
 		# Os retratos distribuídos já cobrem a galeria. Testar só as novas prévias.
 		ui._generating=true
+		if mode=="variations":
+			for entry: Dictionary in CharacterCatalog.load_entries():
+				ui._paths[str(entry.id)]="res://assets/portraits/"+str(entry.id)+".png"
 		ui.open("cowboy")
-		if mode=="variations": ui._choose_cosmetic_mode("variations")
 	elif mode=="player_report":
 		services.profile.client=fake
 		ui=load("res://scenes/player/public_profile.tscn").instantiate()

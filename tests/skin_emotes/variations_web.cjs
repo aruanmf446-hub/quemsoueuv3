@@ -24,13 +24,13 @@ try{
    do{state=await report();if(state.variations?.character===id&&state.variations.thumbnails.length===3&&state.variations.thumbnails.every(t=>t.ready))break;await page.waitForTimeout(100);}while(Date.now()<deadline);
    if(!state.variations.thumbnails.every(t=>t.ready)){await page.screenshot({path:out+'/failed-'+id+'.png',scale:'css'});fs.writeFileSync(out+'/failed-'+id+'.json',JSON.stringify(state,null,2));}assert.equal(state.variations.character,id);assert.equal(state.variations.thumbnails.length,3);assert.ok(state.variations.thumbnails.every(t=>t.ready));
    for(const style of ['original','style_1','style_2']){
-    await tap('SkinVariation_'+style);await page.waitForTimeout(120);state=await report();assert.equal(state.variations.style,style);assert.equal(state.preview_render.static,true);assert.notEqual(state.preview_render.update,4);
+    await tap('SkinVariation_'+style);await page.waitForTimeout(120);state=await report();assert.equal(state.variations.style,style);assert.ok(!state.controls.some(c=>c.name==='CosmeticTab_variations'));const icon=state.controls.find(c=>c.name==='SkinVariation_'+style);assert.ok(Math.abs(icon.rect[2]-icon.rect[3])<2&&icon.rect[2]<=90,'compact square selector');assert.equal(state.preview_render.static,true);assert.notEqual(state.preview_render.update,4);
     if(!process.env.QSE_FAST_CAPTURE||style==='style_2')await page.screenshot({path:out+'/'+width+'x'+height+'_'+id+'_'+style+'.png',scale:'css'});
    }
    results.push({width,height,iphone,character:id,styles:3,realThumbnails:true,errors:[...errors]});
    console.log('VARIATIONS_WEB_PASS '+width+'x'+height+' '+id);
   }
-  const before=(await report()).variations.character;await tap('NextSkinCharacter');assert.notEqual((await report()).variations.character,before);await tap('PreviousSkinCharacter');assert.equal((await report()).variations.character,before);
+  await page.evaluate(()=>qseDeckInputProbe('variation_character:cowboy'));const before=(await report()).variations.character;await tap('NextSkinCharacter');assert.notEqual((await report()).variations.character,before);await tap('PreviousSkinCharacter');assert.equal((await report()).variations.character,before);
   if(!process.env.QSE_ONLY_VARIATIONS){await tap('CosmeticTab_shop');await page.waitForTimeout(150);let state=await report();
   assert.ok(state.controls.some(c=>c.name==='PreviewDanceMovement'));assert.ok(!state.controls.some(c=>c.name.startsWith('SkinVariation_')));
   await tap('CosmeticTab_skins');await page.waitForTimeout(150);state=await report();

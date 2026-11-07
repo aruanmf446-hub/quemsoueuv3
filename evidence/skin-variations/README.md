@@ -1,3 +1,6 @@
+> Histórico do commit `26da4af`: a aba desta captura foi substituída pelos
+> quadradinhos junto ao personagem. Ver `../skin-variant-icons/README.md`.
+
 # Variações — capturas reais do Godot
 
 Original e duas paletas para os oito avatares, em aba própria. São 16 variações

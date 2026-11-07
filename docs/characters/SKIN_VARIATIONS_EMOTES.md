@@ -2,22 +2,26 @@
 
 Branch `work/skin-variations-emotes`.
 
-As abas separam Skins, Variações, Reações e Emotes. Os exemplos gratuitos de reação são
+As abas separam Skins, Reações e Emotes. As variações ficam em pequenos
+seletores quadrados junto à prévia do personagem selecionado, sem aba própria.
+Os exemplos gratuitos de reação são
 Lobby (`anim_2`), Vitória (`anim_4`) e Derrota (`anim_3`). Os cartões reproduzem
 cada contexto no personagem maior, sem alterar partidas ou resultados reais.
 
 ## Variações visuais — implementação
 
-A aba própria **Variações** oferece Original e duas paletas editáveis para cada
-um dos oito personagens: Cowboy, Michelly, Rodrigo, Lorena, Gus, Lana, Halloween
+Selecionar um personagem mostra três quadradinhos com miniaturas: Original e
+duas paletas editáveis para cada um dos oito personagens: Cowboy, Michelly, Rodrigo, Lorena, Gus, Lana, Halloween
 e El Fuego. São 16 variações de cores, além dos oito originais. Não são novos
 modelos ou novas roupas: preservam geometria, rig, animações, texturas e detalhes
 dos personagens existentes. O shader remapeia uma faixa de cor definida por
 personagem, em vez de tingir o corpo inteiro.
 
-Os cartões têm miniaturas capturadas dos modelos reais; tocar mostra a variação
-no personagem maior. As setas percorrem todos os personagens, incluindo os
-bloqueados apenas para prévia. O desbloqueio de El Fuego continua dependendo do
+Os quadradinhos têm miniaturas capturadas dos modelos reais; tocar mostra a
+variação no personagem maior, mantendo a galeria de personagens visível.
+Selecionar outro personagem atualiza os ícones; as setas preservam a navegação
+da galeria filtrada/paginada existente. Personagens bloqueados permitem prévia.
+O desbloqueio de El Fuego continua dependendo do
 Modo História. A escolha de prévia é lembrada por personagem durante o painel.
 
 Esta entrega segue a etapa de **prévia** solicitada: não inventa posse, preço ou

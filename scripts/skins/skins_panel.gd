@@ -112,7 +112,7 @@ func _split_layout() -> void:
 	filter_row.add_theme_constant_override("separation", 6)
 	_toolbar.add_child(filter_row)
 	_search_field = LineEdit.new()
-	_search_field.placeholder_text = "Pesquisar personagem..."
+	_search_field.placeholder_text = tr("Pesquisar personagem...")
 	_search_field.custom_minimum_size.y = 52
 	PlayerUI.style_field(_search_field)
 	_search_field.add_theme_font_size_override("font_size", 22)
@@ -220,7 +220,7 @@ func _responsive_layout() -> void:
 	_fav_button.text = "♡"
 	_fav_button.add_theme_color_override("font_color", ACCENT if _favorite_only else PlayerUI.TEXT)
 	_fav_button.custom_minimum_size.x = 56
-	_search_field.placeholder_text = "Pesquisar..." if compact else "Pesquisar personagem..."
+	_search_field.placeholder_text = tr("Pesquisar..." if compact else "Pesquisar personagem...")
 	_search_field.custom_minimum_size.x = 116 if compact else 0
 	_search_field.custom_minimum_size.y = 44 if compact else PlayerUI.CONTROL_HEIGHT
 	_filter_button.custom_minimum_size=Vector2(140,PlayerUI.CONTROL_HEIGHT)
@@ -293,7 +293,7 @@ func _rebuild_gallery() -> void:
 		var id: String = str(entry.id)
 		if not in_collection.has(id): continue
 		var unlocked: bool = services.inventory.is_unlocked(id)
-		if not _search.is_empty() and not str(entry.name).to_lower().contains(_search.to_lower()):
+		if not _search.is_empty() and not (str(entry.name)+" "+tr(str(entry.name))).to_lower().contains(_search.to_lower()):
 			continue
 		if _favorite_only and not _favorites.has(id):
 			continue
@@ -332,7 +332,7 @@ func _rebuild_gallery() -> void:
 		_fav_button.add_theme_color_override("font_color", ACCENT if _favorite_only else PlayerUI.TEXT)
 	if _collection_count != null:
 		var obtained := in_collection.filter(func(item: String) -> bool: return services.inventory.is_unlocked(item)).size()
-		_collection_count.text = "%s  ·  %d/%d" % [_collection_title.to_upper(), obtained, in_collection.size()]
+		_collection_count.text = "%s  ·  %d/%d" % [tr(_collection_title).to_upper(), obtained, in_collection.size()]
 
 
 func _gallery_card(entry: Dictionary) -> PanelContainer:
@@ -525,7 +525,7 @@ func _select(character_id: String) -> void:
 	right_arrow.name="NextSkinCharacter"
 	right_arrow.custom_minimum_size = Vector2(56, 56)
 	arrows.add_child(right_arrow)
-	var details := PlayerUI.label(_collection_title + "  •  " + ("Equipado" if equipped else ("Disponível" if unlocked else "Bloqueado")), 15, ACCENT)
+	var details := PlayerUI.label(tr(_collection_title) + "  •  " + tr("Equipado" if equipped else ("Disponível" if unlocked else "Bloqueado")), 15, ACCENT)
 	details.hide()
 	_preview.add_child(details)
 	if kept != null:
@@ -652,11 +652,11 @@ func _build_variant_picker(entry: Dictionary,actions: Control) -> void:
 			_selected_styles[_selected]=style.id
 			VARIATIONS.apply(_stage.character,str(style.id))
 			_stage.get_node("Viewport").render_target_update_mode=SubViewport.UPDATE_ONCE
-			selected_name.text=tr("Prévia · ")+str(style.name)
+			selected_name.text=tr("Prévia")+" · "+tr(str(style.name))
 			_update_variation_action()
 		var button := _button("",select)
 		button.name="SkinVariation_"+str(style.id)
-		button.tooltip_text=str(style.name)
+		button.tooltip_text=tr(str(style.name))
 		button.toggle_mode=true
 		button.button_group=group
 		button.button_pressed=str(_selected_styles.get(_selected,"original"))==str(style.id)
@@ -673,7 +673,7 @@ func _build_variant_picker(entry: Dictionary,actions: Control) -> void:
 		image.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		image.offset_left=4;image.offset_top=4;image.offset_right=-4;image.offset_bottom=-4
 		images[style.id]=image
-		if button.button_pressed: selected_name.text=tr("Prévia · ")+str(style.name)
+		if button.button_pressed: selected_name.text=tr("Prévia")+" · "+tr(str(style.name))
 	row.add_child(selected_name)
 	var action := _button("",_variation_action)
 	action.name="VariationPurchase"
@@ -741,7 +741,7 @@ func _purchase_cosmetic(item: Dictionary) -> void:
 	_buy_dialog=Control.new()
 	_buy_dialog.name="CosmeticPurchase"
 	var panel := PlayerUI.deck_modal(self,_buy_dialog)
-	PlayerUI.shop_confirmation(panel,tr("Confirmar compra"),str(item.name)+" · "+str(item.price_coins)+tr(" moedas"),_cosmetic_purchase_image())
+	PlayerUI.shop_confirmation(panel,tr("Confirmar compra"),tr(str(item.name))+" · "+str(item.price_coins)+tr(" moedas"),_cosmetic_purchase_image())
 	var feedback := PlayerUI.label("",20)
 	panel.add_child(feedback)
 	var dialog := _buy_dialog

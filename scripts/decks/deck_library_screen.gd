@@ -118,6 +118,7 @@ func _editor_content_changed() -> void:
 
 
 func render() -> void:
+	_catalog = Catalog.decks()
 	if services != null and services.editor_content != null:
 		services.editor_content.refresh.call_deferred()
 	var requested := str(parameters.get("deck_id", ""))

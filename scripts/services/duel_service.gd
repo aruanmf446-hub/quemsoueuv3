@@ -203,9 +203,9 @@ static func card_name(card_id: String) -> String:
 		# Converter o Dictionary inteiro em String mostrava JSON sobre as cartas.
 		if entry is Dictionary:
 			var display_name := str(entry.get("name", "")).strip_edges()
-			if not display_name.is_empty(): return display_name
+			if not display_name.is_empty(): return preload("res://scripts/decks/deck_library_catalog.gd").display_name(deck, display_name)
 		elif entry is String and not entry.strip_edges().is_empty():
-			return entry
+			return preload("res://scripts/decks/deck_library_catalog.gd").display_name(deck, entry)
 	return file.replace("_", " ").capitalize()
 
 

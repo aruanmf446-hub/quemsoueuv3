@@ -191,6 +191,18 @@ func _i18n_screen(screen: String) -> void:
 		"lobby":
 			ui=preload("res://tests/i18n_expanded/hero_host.gd").new()
 			add_child(ui)
+		"library", "official_cards":
+			ui=load("res://scenes/player/deck_library.tscn").instantiate()
+			add_child(ui)
+			ui.show_screen()
+			if screen=="official_cards": ui._render_deck(preload("res://scripts/decks/deck_library_catalog.gd").find_deck("lendas_urbanas"))
+		"skins":
+			ui=load("res://scenes/skins/skins_panel.tscn").instantiate()
+			add_child(ui)
+			ui._generating=true
+			for entry: Dictionary in CharacterCatalog.load_entries():
+				ui._paths[str(entry.id)]="res://assets/portraits/"+str(entry.id)+".png"
+			ui.open("cowboy")
 		"editor", "review":
 			ui=load("res://scenes/player/deck_library.tscn").instantiate()
 			add_child(ui)

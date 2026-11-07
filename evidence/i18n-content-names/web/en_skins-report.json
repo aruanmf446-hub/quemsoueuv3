@@ -1,0 +1,338 @@
+{
+  "cards": 0,
+  "controls": [
+    {
+      "disabled": false,
+      "name": "Back",
+      "rect": [
+        26,
+        26,
+        152,
+        60
+      ],
+      "text": "Back"
+    },
+    {
+      "disabled": false,
+      "name": "Collection_comeco",
+      "rect": [
+        40,
+        164,
+        192,
+        52
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "CosmeticTab_skins",
+      "rect": [
+        264,
+        98,
+        223,
+        64
+      ],
+      "text": "SKINS"
+    },
+    {
+      "disabled": false,
+      "name": "CosmeticTab_emotes",
+      "rect": [
+        501,
+        98,
+        223,
+        64
+      ],
+      "text": "REACTIONS"
+    },
+    {
+      "disabled": false,
+      "name": "CosmeticTab_shop",
+      "rect": [
+        738,
+        98,
+        223,
+        64
+      ],
+      "text": "EMOTES"
+    },
+    {
+      "disabled": false,
+      "name": "@LineEdit@744",
+      "rect": [
+        264,
+        174,
+        334,
+        64
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "@Button@745",
+      "rect": [
+        602,
+        174,
+        64,
+        64
+      ],
+      "text": "♡"
+    },
+    {
+      "disabled": false,
+      "name": "@OptionButton@756",
+      "rect": [
+        670,
+        174,
+        193,
+        64
+      ],
+      "text": "All"
+    },
+    {
+      "disabled": false,
+      "name": "@OptionButton@767",
+      "rect": [
+        867,
+        174,
+        94,
+        64
+      ],
+      "text": "A-Z"
+    },
+    {
+      "disabled": false,
+      "name": "@Button@935",
+      "rect": [
+        447,
+        260,
+        30,
+        28
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "@Button@942",
+      "rect": [
+        680,
+        260,
+        30,
+        28
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "@Button@949",
+      "rect": [
+        913,
+        260,
+        30,
+        28
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "@Button@956",
+      "rect": [
+        447,
+        632,
+        30,
+        28
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "@Button@963",
+      "rect": [
+        680,
+        632,
+        30,
+        28
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "@Button@970",
+      "rect": [
+        913,
+        632,
+        30,
+        28
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "@Button@977",
+      "rect": [
+        447,
+        1004,
+        30,
+        28
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "@Button@984",
+      "rect": [
+        680,
+        1004,
+        30,
+        28
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "@Button@993",
+      "rect": [
+        1478,
+        98,
+        36,
+        56
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "PreviousSkinCharacter",
+      "rect": [
+        1526,
+        98,
+        56,
+        56
+      ],
+      "text": "‹"
+    },
+    {
+      "disabled": false,
+      "name": "NextSkinCharacter",
+      "rect": [
+        1590,
+        98,
+        56,
+        56
+      ],
+      "text": "›"
+    },
+    {
+      "disabled": false,
+      "name": "SkinVariation_original",
+      "rect": [
+        979,
+        769,
+        76,
+        76
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "SkinVariation_style_1",
+      "rect": [
+        1067.47998046875,
+        767.47998046875,
+        79.0399932861328,
+        79.0399932861328
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "SkinVariation_style_2",
+      "rect": [
+        1159,
+        769,
+        76,
+        76
+      ],
+      "text": ""
+    },
+    {
+      "disabled": true,
+      "name": "VariationPurchase",
+      "rect": [
+        979,
+        851,
+        667,
+        64
+      ],
+      "text": "COMING SOON"
+    }
+  ],
+  "emote": {
+    "animation": "base",
+    "playing": false,
+    "static": true
+  },
+  "emote_thumbnails": [],
+  "fields": {
+    "@LineEdit@744": ""
+  },
+  "labels": [
+    "Characters",
+    "COMEÇO  ·  0/8",
+    "Collections",
+    "Start",
+    "0/8",
+    "Cowboy",
+    "LOCKED",
+    "El Fuego",
+    "LOCKED",
+    "Gus",
+    "LOCKED",
+    "Halloween",
+    "LOCKED",
+    "Lana",
+    "LOCKED",
+    "Lorena",
+    "LOCKED",
+    "Michelly",
+    "LOCKED",
+    "Rodrigo",
+    "LOCKED",
+    "Cowboy",
+    "LOCKED",
+    "",
+    "Prévia · Blue Ranger"
+  ],
+  "language_choice": null,
+  "layout_width": 1672,
+  "locale": "en",
+  "preview_render": {
+    "static": true,
+    "update": 1
+  },
+  "sequence": 10,
+  "size": [
+    1672,
+    941
+  ],
+  "variations": {
+    "character": "cowboy",
+    "style": "style_1",
+    "thumbnails": [
+      {
+        "height": 68,
+        "name": "VariationThumbnail_original",
+        "ready": true
+      },
+      {
+        "height": 68,
+        "name": "VariationThumbnail_style_1",
+        "ready": true
+      },
+      {
+        "height": 68,
+        "name": "VariationThumbnail_style_2",
+        "ready": true
+      }
+    ]
+  }
+}

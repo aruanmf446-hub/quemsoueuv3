@@ -21,7 +21,7 @@ func _run() -> void:
 	elif mode=="claim": fake=preload("res://tests/community_claims/visual_game.gd").new()
 	elif mode=="report": fake=preload("res://tests/deck_runtime_corrections/fake_game.gd").new()
 	elif mode=="stripe": fake=preload("res://tests/coin_store/fake_game.gd").new()
-	elif mode in ["emotes","coins"]: fake=preload("res://tests/skin_emotes/fake_game.gd").new()
+	elif mode in ["emotes","coins","variations"]: fake=preload("res://tests/skin_emotes/fake_game.gd").new()
 	elif mode=="player_report": fake=preload("res://tests/player_reports/fake_game.gd").new()
 	else: fake=preload("res://tests/community_t27/fake_game.gd").new()
 	add_child(fake)
@@ -51,7 +51,7 @@ func _run() -> void:
 		ui=load("res://scenes/player/wallet.tscn").instantiate()
 		add_child(ui)
 		ui.show_screen({"tab":"coins"})
-	elif mode=="emotes":
+	elif mode in ["emotes","variations"]:
 		services.progression.state="success"
 		services.progression.data={"unlocked_character_ids":PlayerContracts.initial_ids(),"equipped_character_id":"cowboy"}
 		ui=load("res://scenes/skins/skins_panel.tscn").instantiate()
@@ -59,6 +59,7 @@ func _run() -> void:
 		# Os retratos distribuídos já cobrem a galeria. Testar só as novas prévias.
 		ui._generating=true
 		ui.open("cowboy")
+		if mode=="variations": ui._choose_cosmetic_mode("variations")
 	elif mode=="player_report":
 		services.profile.client=fake
 		ui=load("res://scenes/player/public_profile.tscn").instantiate()
@@ -124,6 +125,8 @@ func _seed_submission() -> void:
 	ui._open_submissions()
 
 func _probe(args: Array) -> void:
+	if args.size() and str(args[0]).begins_with("variation_character:"):
+		ui._select(str(args[0]).trim_prefix("variation_character:"))
 	if args.size() and str(args[0])=="owned_collection": ui._select_tab("Meus Decks")
 	if args.size() and str(args[0])=="report_success" and is_instance_valid(fixture_game):
 		fixture_game.report_code=""
@@ -139,11 +142,14 @@ func _probe(args: Array) -> void:
 		scroll.scroll_vertical=int(scroll.get_v_scroll_bar().max_value)
 	report_sequence+=1
 	var result := {"sequence":report_sequence,"size":[ui.size.x,ui.size.y],"controls":[],"fields":{},"cards":0,"labels":[],"emote_thumbnails":[]}
+	if ui.get("_selected_styles") is Dictionary:
+		result.variations={"character":ui._selected,"style":ui._selected_styles.get(ui._selected,"original"),"thumbnails":[]}
 	if services.emote_shop!=null and services.emote_shop.state=="success":
 		result.shop={"coins":services.emote_shop.data.get("coins",""),"owned":services.emote_shop.product("dance_01").get("owned",false)}
 	if services.wallet.state=="success": result.wallet_coins=services.wallet.data.get("coins","")
 	if ui.get("_stage") is LobbyStage and is_instance_valid(ui.get("_stage")):
 		var stage: LobbyStage=ui.get("_stage")
+		result.preview_render={"static":stage.static_preview,"update":stage.get_node("Viewport").render_target_update_mode}
 		var player: AnimationPlayer=stage.character.get("_anim_player")
 		if player!=null: result.emote={"animation":player.assigned_animation,"playing":player.is_playing(),"static":stage.character.is_static_pose}
 	for node: Control in ui.find_children("*","Control",true,false):
@@ -151,6 +157,8 @@ func _probe(args: Array) -> void:
 		if node is Label: result.labels.append(node.text)
 		if node is TextureRect and str(node.name).begins_with("EmoteThumbnail_"):
 			result.emote_thumbnails.append({"name":str(node.name),"ready":node.texture!=null,"height":node.size.y})
+		if node is TextureRect and str(node.name).begins_with("VariationThumbnail_"):
+			result.variations.thumbnails.append({"name":str(node.name),"ready":node.texture!=null,"height":node.size.y})
 		if node is LineEdit or node is TextEdit: result.fields[str(node.name)]=str(node.text)
 		if node is BaseButton or node is LineEdit or node is TextEdit:
 			var r := node.get_global_rect()

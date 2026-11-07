@@ -1,0 +1,58 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS original e duas variações: cowboy
+PASS prévia sem recriar modelo: cowboy/original
+PASS prévia sem recriar modelo: cowboy/style_1
+PASS prévia sem recriar modelo: cowboy/style_2
+PASS estilo inexistente recusado: cowboy
+PASS materiais originais restaurados: cowboy
+PASS original e duas variações: michelly
+PASS prévia sem recriar modelo: michelly/original
+PASS prévia sem recriar modelo: michelly/style_1
+PASS prévia sem recriar modelo: michelly/style_2
+PASS estilo inexistente recusado: michelly
+PASS materiais originais restaurados: michelly
+PASS original e duas variações: rodrigo
+PASS prévia sem recriar modelo: rodrigo/original
+PASS prévia sem recriar modelo: rodrigo/style_1
+PASS prévia sem recriar modelo: rodrigo/style_2
+PASS estilo inexistente recusado: rodrigo
+PASS materiais originais restaurados: rodrigo
+PASS original e duas variações: lorena
+PASS prévia sem recriar modelo: lorena/original
+PASS prévia sem recriar modelo: lorena/style_1
+PASS prévia sem recriar modelo: lorena/style_2
+PASS estilo inexistente recusado: lorena
+PASS materiais originais restaurados: lorena
+PASS original e duas variações: gus
+PASS prévia sem recriar modelo: gus/original
+PASS prévia sem recriar modelo: gus/style_1
+PASS prévia sem recriar modelo: gus/style_2
+PASS estilo inexistente recusado: gus
+PASS materiais originais restaurados: gus
+PASS original e duas variações: lana
+PASS prévia sem recriar modelo: lana/original
+PASS prévia sem recriar modelo: lana/style_1
+PASS prévia sem recriar modelo: lana/style_2
+PASS estilo inexistente recusado: lana
+PASS materiais originais restaurados: lana
+PASS original e duas variações: halloween
+PASS prévia sem recriar modelo: halloween/original
+PASS prévia sem recriar modelo: halloween/style_1
+PASS prévia sem recriar modelo: halloween/style_2
+PASS estilo inexistente recusado: halloween
+PASS materiais originais restaurados: halloween
+PASS original e duas variações: el_fuego
+PASS prévia sem recriar modelo: el_fuego/original
+PASS prévia sem recriar modelo: el_fuego/style_1
+PASS prévia sem recriar modelo: el_fuego/style_2
+PASS estilo inexistente recusado: el_fuego
+PASS materiais originais restaurados: el_fuego
+PASS variações usam renderização sob demanda
+PASS cartão seleciona a paleta do personagem
+PASS seta troca o personagem dentro de Variações
+PASS voltar preserva a escolha de prévia por personagem
+PASS reações retomam renderização animada
+PASS reação de vitória continua tocando
+PASS prévia de variação fica separada da loja e não cobra moedas
+VARIATIONS checks=55 failures=0

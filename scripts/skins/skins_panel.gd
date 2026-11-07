@@ -54,6 +54,8 @@ var _context_title: Label
 var _context_hint: Label
 var _buy_dialog: Control
 const DANCE_PREVIEW = preload("res://scripts/skins/dance_preview.gd")
+const VARIATIONS = preload("res://scripts/skins/skin_variations.gd")
+var _selected_styles: Dictionary={}
 
 
 func _ready() -> void:
@@ -267,6 +269,9 @@ func _rebuild_gallery() -> void:
 	if _cosmetic_mode in ["emotes","shop"]:
 		_build_emote_gallery(services.inventory.entry(_selected))
 		return
+	if _cosmetic_mode=="variations":
+		_build_variation_gallery(services.inventory.entry(_selected))
+		return
 	var entries: Array = services.inventory.entries.duplicate()
 	entries.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return str(a.get("name", "")).nocasecmp_to(str(b.get("name", ""))) > 0 if _reverse_sort else str(a.get("name", "")).nocasecmp_to(str(b.get("name", ""))) < 0)
@@ -443,10 +448,13 @@ func _save_favorites() -> void:
 
 func _select_neighbor(direction: int) -> void:
 	var ids: Array[String] = []
-	for child in _grid.get_children():
-		for id: String in _cards:
-			if _cards[id] == child:
-				ids.append(id)
+	if _cosmetic_mode=="variations":
+		for entry: Dictionary in services.inventory.entries: ids.append(str(entry.id))
+	else:
+		for child in _grid.get_children():
+			for id: String in _cards:
+				if _cards[id] == child:
+					ids.append(id)
 	if ids.is_empty():
 		return
 	var index := ids.find(_selected)
@@ -492,15 +500,17 @@ func _select(character_id: String) -> void:
 	_context_hint.visible=_cosmetic_mode!="skins"
 	var arrows := HBoxContainer.new()
 	arrows.name="CharacterArrows"
-	arrows.visible=_cosmetic_mode=="skins"
+	arrows.visible=_cosmetic_mode in ["skins","variations"]
 	_preview.add_child(arrows)
 	var left_arrow := _button("‹", _select_neighbor.bind(-1))
+	left_arrow.name="PreviousSkinCharacter"
 	left_arrow.custom_minimum_size = Vector2(56, 56)
 	arrows.add_child(left_arrow)
 	var hint := Control.new()
 	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	arrows.add_child(hint)
 	var right_arrow := _button("›", _select_neighbor.bind(1))
+	right_arrow.name="NextSkinCharacter"
 	right_arrow.custom_minimum_size = Vector2(56, 56)
 	arrows.add_child(right_arrow)
 	var details := PlayerUI.label(_collection_title + "  •  " + ("Equipado" if equipped else ("Disponível" if unlocked else "Bloqueado")), 15, ACCENT)
@@ -528,7 +538,7 @@ func _select(character_id: String) -> void:
 		_preview.add_child(lock_label)
 	var actions := HBoxContainer.new()
 	actions.name="SkinEquipActions"
-	actions.visible=_cosmetic_mode!="shop"
+	actions.visible=_cosmetic_mode in ["skins","emotes"]
 	actions.add_theme_constant_override("separation", 10)
 	_preview.add_child(actions)
 	var equip := _button("EQUIPADO" if equipped else ("EQUIPAR" if unlocked else "BLOQUEADO"), _equip.bind(character_id), true)
@@ -554,13 +564,20 @@ func _select(character_id: String) -> void:
 	buy.clip_text=true
 	shop_actions.add_child(buy)
 	if _cosmetic_mode in ["emotes","shop"]: _rebuild_gallery()
+	if _cosmetic_mode=="variations":
+		_rebuild_gallery()
+		_stage.static_preview=true
+		VARIATIONS.apply(_stage.character,str(_selected_styles.get(_selected,"original")))
+		_stage.get_node("Viewport").render_target_update_mode=SubViewport.UPDATE_ONCE
+		_context_title.text=str(entry.name)+" · Variações"
+		_context_hint.text=tr("Prévia visual")
 
 
 func _build_cosmetic_tabs() -> void:
 	var tabs := PlayerUI.row(_gallery_section)
 	_gallery_section.move_child(tabs,0)
-	for mode: String in ["skins","emotes","shop"]:
-		var button := _button({"skins":"SKINS","emotes":"REAÇÕES","shop":"EMOTES"}[mode],_choose_cosmetic_mode.bind(mode),mode==_cosmetic_mode)
+	for mode: String in ["skins","variations","emotes","shop"]:
+		var button := _button({"skins":"SKINS","variations":"VARIAÇÕES","emotes":"REAÇÕES","shop":"EMOTES"}[mode],_choose_cosmetic_mode.bind(mode),mode==_cosmetic_mode)
 		button.name="CosmeticTab_"+mode
 		button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 		tabs.add_child(button)
@@ -569,20 +586,77 @@ func _build_cosmetic_tabs() -> void:
 
 func _choose_cosmetic_mode(mode: String) -> void:
 	_cosmetic_mode=mode
+	_stage.static_preview=mode=="variations"
+	_stage.get_node("Viewport").render_target_update_mode=SubViewport.UPDATE_ONCE if mode=="variations" else SubViewport.UPDATE_ALWAYS
 	_toolbar.visible=mode=="skins"
 	_context_title.visible=mode!="skins"
 	_context_hint.visible=mode!="skins"
-	_preview.get_node("SkinEquipActions").visible=mode!="shop"
+	_preview.get_node("SkinEquipActions").visible=mode in ["skins","emotes"]
 	_preview.get_node("EmoteShopActions").visible=mode=="shop"
 	_context_title.text=tr("Exemplos de reações") if mode=="emotes" else tr("Loja de emotes · prévia")
 	_context_hint.text=tr("Lobby, vitória e derrota") if mode=="emotes" else tr("Dancinha demonstrativa · compra separada")
+	VARIATIONS.apply(_stage.character,str(_selected_styles.get(_selected,"original")) if mode=="variations" else "original")
+	if mode=="variations": _stage.get_node("Viewport").render_target_update_mode=SubViewport.UPDATE_ONCE
+	if mode=="variations":
+		_context_title.text=tr("Variações de ")+str(services.inventory.entry(_selected).name)
+		_context_hint.text=tr("Prévia visual")
 	if _stage.character.has_animation(&"base"): _stage.character.set_pose(&"base",0.0)
 	var arrows := _preview.get_node_or_null("CharacterArrows") as Control
-	if arrows!=null: arrows.visible=mode=="skins"
+	if arrows!=null: arrows.visible=mode in ["skins","variations"]
 	for key: String in _cosmetic_tabs: PlayerUI.style_button(_cosmetic_tabs[key],key==mode)
 	_rebuild_gallery()
 	_responsive_layout()
 	if mode=="shop": _refresh_emote_shop()
+
+
+func _build_variation_gallery(entry: Dictionary) -> void:
+	if entry.is_empty(): return
+	_collection_count.text="VARIAÇÕES · PRÉVIA"
+	_grid.columns=3
+	var images := {}
+	var group := ButtonGroup.new()
+	for style: Dictionary in VARIATIONS.entries(str(entry.id)):
+		var select := func()->void:
+			if _selected!=str(entry.id) or not is_instance_valid(_stage): return
+			_selected_styles[_selected]=style.id
+			VARIATIONS.apply(_stage.character,str(style.id))
+			_stage.get_node("Viewport").render_target_update_mode=SubViewport.UPDATE_ONCE
+			_context_title.text=str(entry.name)+" · "+str(style.name)
+			_context_hint.text=tr("Prévia visual")
+		var button := _button("",select)
+		button.name="SkinVariation_"+str(style.id)
+		button.toggle_mode=true
+		button.button_group=group
+		button.button_pressed=str(_selected_styles.get(_selected,"original"))==str(style.id)
+		button.custom_minimum_size=Vector2(0,260)
+		button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		_grid.add_child(button)
+		var content := VBoxContainer.new()
+		button.add_child(content)
+		content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		content.offset_left=8;content.offset_right=-8;content.offset_top=8;content.offset_bottom=-8
+		content.mouse_filter=Control.MOUSE_FILTER_IGNORE
+		var image := TextureRect.new()
+		image.name="VariationThumbnail_"+str(style.id)
+		image.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+		image.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		image.size_flags_vertical=Control.SIZE_EXPAND_FILL
+		image.mouse_filter=Control.MOUSE_FILTER_IGNORE
+		content.add_child(image)
+		images[style.id]=image
+		var label := PlayerUI.label(str(style.name),20)
+		label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+		label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+		label.mouse_filter=Control.MOUSE_FILTER_IGNORE
+		content.add_child(label)
+	_load_variation_previews(entry,_grid,images)
+
+
+func _load_variation_previews(entry: Dictionary,watch: Control,images: Dictionary) -> void:
+	var textures: Dictionary=await _emote_previews.capture(self,entry,watch,false,true)
+	if not is_instance_valid(watch) or watch.is_queued_for_deletion(): return
+	for id: String in images:
+		if is_instance_valid(images[id]) and textures.has(id): images[id].texture=textures[id]
 
 
 func _build_emote_gallery(entry: Dictionary) -> void:

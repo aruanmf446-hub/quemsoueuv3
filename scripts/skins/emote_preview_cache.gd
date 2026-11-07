@@ -3,9 +3,9 @@ extends RefCounted
 ## os cartões reutilizam texturas estáticas, sem três avatares animados extras.
 var _cache: Dictionary = {}
 
-func capture(host: Control,entry: Dictionary,watch: Control,dance := false) -> Dictionary:
-	var id := str(entry.id)+("_dance" if dance else "")
-	var emotes: Array=[{"id":"dance","animation":"dance_preview"}] if dance else CharacterCatalog.emotes_for(entry)
+func capture(host: Control,entry: Dictionary,watch: Control,dance := false,variations := false) -> Dictionary:
+	var id := str(entry.id)+("_styles" if variations else ("_dance" if dance else ""))
+	var emotes: Array=preload("res://scripts/skins/skin_variations.gd").entries(str(entry.id)) if variations else ([{"id":"dance","animation":"dance_preview"}] if dance else CharacterCatalog.emotes_for(entry))
 	if _cache.get(id,{}).size()==emotes.size(): return _cache[id]
 	if DisplayServer.get_name()=="headless": return {}
 	var stage: LobbyStage=preload("res://scenes/lobby/lobby_stage.tscn").instantiate()
@@ -24,9 +24,14 @@ func capture(host: Control,entry: Dictionary,watch: Control,dance := false) -> D
 	for emote: Dictionary in emotes:
 		if not is_instance_valid(watch) or watch.is_queued_for_deletion() or not watch.is_visible_in_tree(): break
 		if textures.has(emote.id): continue
-		var clip := StringName(emote.animation)
-		stage.character.set_pose(clip,minf(1.2,stage.character.animation_length(clip)*0.45))
-		_fit_pose(stage)
+		if variations: preload("res://scripts/skins/skin_variations.gd").apply(stage.character,str(emote.id))
+		var clip := StringName(emote.get("animation","base"))
+		stage.character.set_pose(clip,0.0 if variations else minf(1.2,stage.character.animation_length(clip)*0.45))
+		if variations:
+			stage.frame_character()
+			stage.set_zoom(0.9)
+		else:
+			_fit_pose(stage)
 		await RenderingServer.frame_post_draw
 		await RenderingServer.frame_post_draw
 		if not is_instance_valid(stage): return textures

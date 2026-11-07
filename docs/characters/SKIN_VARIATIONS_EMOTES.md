@@ -2,9 +2,40 @@
 
 Branch `work/skin-variations-emotes`.
 
-As abas separam Skins, Reações e Emotes. Os exemplos gratuitos de reação são
+As abas separam Skins, Variações, Reações e Emotes. Os exemplos gratuitos de reação são
 Lobby (`anim_2`), Vitória (`anim_4`) e Derrota (`anim_3`). Os cartões reproduzem
 cada contexto no personagem maior, sem alterar partidas ou resultados reais.
+
+## Variações visuais — implementação
+
+A aba própria **Variações** oferece Original e duas paletas editáveis para cada
+um dos oito personagens: Cowboy, Michelly, Rodrigo, Lorena, Gus, Lana, Halloween
+e El Fuego. São 16 variações de cores, além dos oito originais. Não são novos
+modelos ou novas roupas: preservam geometria, rig, animações, texturas e detalhes
+dos personagens existentes. O shader remapeia uma faixa de cor definida por
+personagem, em vez de tingir o corpo inteiro.
+
+Os cartões têm miniaturas capturadas dos modelos reais; tocar mostra a variação
+no personagem maior. As setas percorrem todos os personagens, incluindo os
+bloqueados apenas para prévia. O desbloqueio de El Fuego continua dependendo do
+Modo História. A escolha de prévia é lembrada por personagem durante o painel.
+
+Esta entrega segue a etapa de **prévia** solicitada: não inventa posse, preço ou
+compra de variações, nem aplica uma escolha local a partidas online. Emotes e
+reações continuam em abas separadas. O produto de dança continua indisponível
+até chegar o movimento real aprovado. Equipar o personagem original permanece
+no fluxo existente de Skins.
+
+Recursos: `scripts/skins/skin_variations.gd` e `variation_palette.gdshader`.
+Os materiais são exclusivos da instância de prévia e reutilizados ao alternar
+paletas. Original restaura os materiais anteriores; nenhum FBX, OBJ ou textura
+original foi alterado. As miniaturas usam um único palco temporário e cache de
+imagens estáticas. Nenhuma imagem foi gerada por IA nesta entrega.
+
+A prévia estática renderiza sob demanda ao selecionar paleta, girar ou aproximar
+a câmera. Ao abrir Reações/Emotes, o palco volta a renderizar continuamente para
+reproduzir o movimento. O flag é exclusivo do palco de prévia; não reativa
+viewports intencionalmente pausados de outros lugares do jogo.
 
 A loja é separada. Tem prévia do movimento, preço de **100 moedas** e confirmação
 de compra. O saldo, o débito e a posse vêm do GAME; o cliente não escreve saldos.

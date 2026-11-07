@@ -39,6 +39,7 @@ var _target_y: float = 0.9
 var _yaw: float = 0.0
 var _pitch: float = 0.0
 var _zoom: float = 1.0
+var static_preview := false
 
 
 func _ready() -> void:
@@ -144,6 +145,8 @@ func _zoom_by(factor: float) -> void:
 
 
 func _update_camera() -> void:
+	if is_instance_valid(_viewport) and static_preview:
+		_viewport.render_target_update_mode=SubViewport.UPDATE_ONCE
 	var distance := _base_distance * _zoom
 	var target := Vector3(0.0, _target_y, 0.0)
 	var offset := Vector3(
@@ -157,6 +160,8 @@ func _update_camera() -> void:
 
 func _resize_render() -> void:
 	if not is_instance_valid(_viewport): return
+	if static_preview:
+		_viewport.render_target_update_mode=SubViewport.UPDATE_ONCE
 	if is_instance_valid(_surface):
 		_surface.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	# Render above the physical output resolution, then resolve down to the UI.

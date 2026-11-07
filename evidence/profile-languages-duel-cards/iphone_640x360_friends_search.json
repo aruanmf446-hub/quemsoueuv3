@@ -1,0 +1,195 @@
+{
+  "cards": 0,
+  "controls": [
+    {
+      "disabled": false,
+      "name": "Back",
+      "rect": [
+        28,
+        16,
+        152,
+        68
+      ],
+      "text": "Voltar"
+    },
+    {
+      "disabled": false,
+      "name": "Tab_friends",
+      "rect": [
+        44,
+        118,
+        324,
+        56
+      ],
+      "text": "Amigos"
+    },
+    {
+      "disabled": false,
+      "name": "Tab_incoming",
+      "rect": [
+        44,
+        184,
+        324,
+        56
+      ],
+      "text": "Recebidas"
+    },
+    {
+      "disabled": false,
+      "name": "Tab_outgoing",
+      "rect": [
+        44,
+        250,
+        324,
+        56
+      ],
+      "text": "Enviadas"
+    },
+    {
+      "disabled": false,
+      "name": "Tab_search",
+      "rect": [
+        44,
+        316,
+        324,
+        56
+      ],
+      "text": "Buscar"
+    },
+    {
+      "disabled": false,
+      "name": "Refresh",
+      "rect": [
+        328,
+        382,
+        40,
+        40
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "SearchField",
+      "rect": [
+        432,
+        237,
+        569,
+        64
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "SearchButton",
+      "rect": [
+        1013,
+        237,
+        180,
+        64
+      ],
+      "text": "Buscar"
+    },
+    {
+      "disabled": false,
+      "name": "Player_QSE-00000000000000000000000000000022",
+      "rect": [
+        450,
+        384,
+        213,
+        78
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "CopyPublicId",
+      "rect": [
+        1133,
+        417,
+        40,
+        40
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "RequestMessage",
+      "rect": [
+        721,
+        716,
+        452,
+        48
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "AddFriend",
+      "rect": [
+        721,
+        774,
+        452,
+        64
+      ],
+      "text": "Adicionar amigo"
+    },
+    {
+      "disabled": false,
+      "name": "ViewProfile",
+      "rect": [
+        721,
+        848,
+        452,
+        64
+      ],
+      "text": "Ver perfil"
+    },
+    {
+      "disabled": true,
+      "name": "Talk",
+      "rect": [
+        721,
+        922,
+        452,
+        64
+      ],
+      "text": "Enviar mensagem"
+    }
+  ],
+  "emote_thumbnails": [],
+  "fields": {
+    "RequestMessage": "",
+    "SearchField": ""
+  },
+  "labels": [
+    "Quem Sou Eu V3",
+    "Amizades",
+    "0",
+    "0",
+    "0",
+    "Seus amigos (0)",
+    "Nenhum amigo ainda.",
+    "Buscar jogadores",
+    "Encontre amigos por nickname ou ID público.",
+    "Resultados (1)",
+    "aruan",
+    "Presença indisponível",
+    "aruan",
+    "QSE-00000000000000000000000000000022",
+    "Presença indisponível",
+    "Personagem equipado",
+    "Cowboy",
+    "Jogaram recentemente",
+    "Vocês ainda não jogaram juntos.",
+    "Jogadores parecidos",
+    "Sem sugestões por enquanto."
+  ],
+  "language_choice": null,
+  "layout_width": 1255,
+  "locale": "pt_BR",
+  "sequence": 2,
+  "size": [
+    1255,
+    675
+  ]
+}

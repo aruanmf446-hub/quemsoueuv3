@@ -1,0 +1,291 @@
+{
+  "cards": 0,
+  "controls": [
+    {
+      "disabled": false,
+      "name": "Back",
+      "rect": [
+        40,
+        28,
+        154,
+        68
+      ],
+      "text": "Назад"
+    },
+    {
+      "disabled": false,
+      "name": "Pick_max_players",
+      "rect": [
+        304,
+        168,
+        112,
+        36
+      ],
+      "text": "10"
+    },
+    {
+      "disabled": false,
+      "name": "Pick_cards_per_player",
+      "rect": [
+        304,
+        211,
+        112,
+        36
+      ],
+      "text": "3"
+    },
+    {
+      "disabled": false,
+      "name": "Pick_turn_seconds",
+      "rect": [
+        304,
+        254,
+        112,
+        36
+      ],
+      "text": "60"
+    },
+    {
+      "disabled": false,
+      "name": "Pick_selection_seconds",
+      "rect": [
+        304,
+        297,
+        112,
+        36
+      ],
+      "text": "30"
+    },
+    {
+      "disabled": false,
+      "name": "Pick_tiebreak_base",
+      "rect": [
+        304,
+        340,
+        112,
+        36
+      ],
+      "text": "7"
+    },
+    {
+      "disabled": false,
+      "name": "Pick_tiebreak_per_player",
+      "rect": [
+        304,
+        383,
+        112,
+        36
+      ],
+      "text": "2"
+    },
+    {
+      "disabled": false,
+      "name": "BotsToggle",
+      "rect": [
+        352,
+        426,
+        64,
+        36
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "DeckSearch",
+      "rect": [
+        507,
+        144,
+        426,
+        38
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "DeckTab_Todos",
+      "rect": [
+        453,
+        198,
+        76,
+        49.1666641235352
+      ],
+      "text": "Все"
+    },
+    {
+      "disabled": false,
+      "name": "DeckTab_Favoritos",
+      "rect": [
+        537,
+        198,
+        152,
+        49.1666641235352
+      ],
+      "text": "Избранное"
+    },
+    {
+      "disabled": false,
+      "name": "DeckTab_Bombando",
+      "rect": [
+        697,
+        198,
+        166,
+        49.1666641235352
+      ],
+      "text": "Популярное"
+    },
+    {
+      "disabled": false,
+      "name": "DeckTab_Meus_decks",
+      "rect": [
+        453,
+        255,
+        166,
+        49.1666641235352
+      ],
+      "text": "Мои колоды"
+    },
+    {
+      "disabled": false,
+      "name": "DeckTab_Comprados",
+      "rect": [
+        627,
+        255,
+        157,
+        49.1666641235352
+      ],
+      "text": "Купленные"
+    },
+    {
+      "disabled": false,
+      "name": "DeckChoice_lendas_urbanas",
+      "rect": [
+        453,
+        310,
+        241,
+        216
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "Favorite",
+      "rect": [
+        616,
+        314,
+        40,
+        40
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "DeckChoice_nostalgia_web",
+      "rect": [
+        702,
+        310,
+        241,
+        216
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "Favorite",
+      "rect": [
+        865,
+        314,
+        40,
+        40
+      ],
+      "text": ""
+    },
+    {
+      "disabled": true,
+      "name": "@Button@176",
+      "rect": [
+        453,
+        532,
+        64,
+        50
+      ],
+      "text": "‹"
+    },
+    {
+      "disabled": false,
+      "name": "@Button@177",
+      "rect": [
+        879,
+        532,
+        64,
+        50
+      ],
+      "text": "›"
+    },
+    {
+      "disabled": false,
+      "name": "SubmitRoom",
+      "rect": [
+        40,
+        606,
+        240,
+        50
+      ],
+      "text": "Сохранить"
+    },
+    {
+      "disabled": false,
+      "name": "CancelForm",
+      "rect": [
+        298,
+        606,
+        170,
+        50
+      ],
+      "text": "Отмена"
+    }
+  ],
+  "emote_thumbnails": [],
+  "fields": {
+    "DeckSearch": ""
+  },
+  "labels": [
+    "На выбывание · Локальная игра",
+    "C O N F I G U R A Ç Õ E S   D A   S A L A",
+    "Regras",
+    "Jogadores",
+    "Cartas/jogador",
+    "Turno (s)",
+    "Escolha (s)",
+    "Desempate",
+    "Extra/jogador",
+    "Bots",
+    "Lendas Urbanas (9)",
+    "Nostalgia Web (10)",
+    "1 / 3",
+    "Resumo",
+    "★  Lendas Urbanas (9)",
+    "Deck selecionado",
+    "Jogadores",
+    "10",
+    "Cartas/jogador",
+    "3",
+    "Turno",
+    "60 s",
+    "Escolha",
+    "30 s",
+    "Desempate",
+    "7 cartas",
+    "Extra/jogador",
+    "2 cartas",
+    "Bots",
+    "Sim"
+  ],
+  "language_choice": null,
+  "layout_width": 1376,
+  "locale": "ru",
+  "sequence": 2,
+  "size": [
+    1376,
+    675
+  ]
+}

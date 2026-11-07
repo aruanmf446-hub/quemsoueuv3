@@ -1,0 +1,20 @@
+LOAD desktop languages
+LOAD desktop public_profile
+LOAD desktop friends_search
+LOAD desktop duel_admin
+PROFILE_WEB_PASS desktop 1672 941
+LOAD iphone languages
+LOAD iphone public_profile
+LOAD iphone friends_search
+LOAD iphone duel_admin
+PROFILE_WEB_PASS iphone 844 390
+LOAD iphone languages
+LOAD iphone public_profile
+LOAD iphone friends_search
+LOAD iphone duel_admin
+PROFILE_WEB_PASS iphone 640 360
+LOAD android languages
+LOAD android public_profile
+LOAD android friends_search
+LOAD android duel_admin
+PROFILE_WEB_PASS android 844 390

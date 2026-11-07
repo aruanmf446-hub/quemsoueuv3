@@ -1,0 +1,195 @@
+{
+  "cards": 0,
+  "controls": [
+    {
+      "disabled": false,
+      "name": "Back",
+      "rect": [
+        28,
+        16,
+        154,
+        68
+      ],
+      "text": "Назад"
+    },
+    {
+      "disabled": false,
+      "name": "Tab_friends",
+      "rect": [
+        44,
+        118,
+        361,
+        56
+      ],
+      "text": "Друзья"
+    },
+    {
+      "disabled": false,
+      "name": "Tab_incoming",
+      "rect": [
+        44,
+        184,
+        361,
+        56
+      ],
+      "text": "Входящие"
+    },
+    {
+      "disabled": false,
+      "name": "Tab_outgoing",
+      "rect": [
+        44,
+        250,
+        361,
+        56
+      ],
+      "text": "Отправленные"
+    },
+    {
+      "disabled": false,
+      "name": "Tab_search",
+      "rect": [
+        44,
+        316,
+        361,
+        56
+      ],
+      "text": "Поиск"
+    },
+    {
+      "disabled": false,
+      "name": "Refresh",
+      "rect": [
+        365,
+        382,
+        40,
+        40
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "SearchField",
+      "rect": [
+        469,
+        237,
+        653,
+        64
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "SearchButton",
+      "rect": [
+        1134,
+        237,
+        180,
+        64
+      ],
+      "text": "Поиск"
+    },
+    {
+      "disabled": false,
+      "name": "Player_QSE-00000000000000000000000000000022",
+      "rect": [
+        487,
+        384,
+        213,
+        78
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "CopyPublicId",
+      "rect": [
+        1254,
+        417,
+        40,
+        40
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "RequestMessage",
+      "rect": [
+        758,
+        650,
+        536,
+        48
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "AddFriend",
+      "rect": [
+        758,
+        708,
+        536,
+        64
+      ],
+      "text": "Добавить в друзья"
+    },
+    {
+      "disabled": false,
+      "name": "ViewProfile",
+      "rect": [
+        758,
+        782,
+        536,
+        64
+      ],
+      "text": "Просмотр профиля"
+    },
+    {
+      "disabled": true,
+      "name": "Talk",
+      "rect": [
+        758,
+        856,
+        536,
+        64
+      ],
+      "text": "Enviar mensagem"
+    }
+  ],
+  "emote_thumbnails": [],
+  "fields": {
+    "RequestMessage": "",
+    "SearchField": ""
+  },
+  "labels": [
+    "Quem Sou Eu V3",
+    "Друзья",
+    "0",
+    "0",
+    "0",
+    "Seus amigos (0)",
+    "Друзей пока нет.",
+    "Поиск игроков",
+    "Encontre amigos por nickname ou ID público.",
+    "Resultados (1)",
+    "aruan",
+    "Presença indisponível",
+    "aruan",
+    "QSE-00000000000000000000000000000022",
+    "Presença indisponível",
+    "Выбранный персонаж",
+    "Cowboy",
+    "Jogaram recentemente",
+    "Vocês ainda não jogaram juntos.",
+    "Jogadores parecidos",
+    "Sem sugestões por enquanto."
+  ],
+  "language_choice": null,
+  "layout_width": 1376,
+  "locale": "ru",
+  "sequence": 2,
+  "size": [
+    1376,
+    675
+  ]
+}

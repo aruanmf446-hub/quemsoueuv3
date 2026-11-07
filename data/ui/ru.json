@@ -1248,5 +1248,12 @@
   "SKIN": "ОБЛИК",
   "deck": "колода",
   "deck:": "колода:",
-  "skin": "облик"
+  "skin": "облик",
+  "CONTINUAR PARTIDA": "ПРОДОЛЖИТЬ ИГРУ",
+  "Carregando fase…": "Загрузка уровня…",
+  "Checkpoint %d/%d salvo": "Точка %d/%d сохранена",
+  "Falta concluir: %s": "Осталось выполнить: %s",
+  "%s • siga para o ponto iluminado": "%s · идите к освещённой точке",
+  "Não foi possível salvar a partida neste aparelho": "Не удалось сохранить игру на устройстве",
+  "O soldado à frente vai arremessar uma lança. Toque no escudo quando ela vier para bloquear (K ou Shift). Cada defesa usa uma carga.\nVocê também pode pular ou agachar para desviar. Ele só persegue depois de acertar você ou o escudo.": "Солдат впереди бросит копьё. Нажмите щит для блока (K / Shift). Блок тратит один заряд.\nМожно прыгнуть или присесть. Он начинает погоню только после попадания в вас или щит."
 }

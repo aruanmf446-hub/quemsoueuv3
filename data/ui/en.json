@@ -1248,5 +1248,12 @@
   "SKIN": "SKIN",
   "deck": "deck",
   "deck:": "deck:",
-  "skin": "skin"
+  "skin": "skin",
+  "CONTINUAR PARTIDA": "RESUME GAME",
+  "Carregando fase…": "Loading stage…",
+  "Checkpoint %d/%d salvo": "Checkpoint %d/%d saved",
+  "Falta concluir: %s": "Still to complete: %s",
+  "%s • siga para o ponto iluminado": "%s • head to the lit point",
+  "Não foi possível salvar a partida neste aparelho": "Could not save the game on this device",
+  "O soldado à frente vai arremessar uma lança. Toque no escudo quando ela vier para bloquear (K ou Shift). Cada defesa usa uma carga.\nVocê também pode pular ou agachar para desviar. Ele só persegue depois de acertar você ou o escudo.": "The soldier ahead will throw a spear. Tap the shield to block it (K / Shift). Each block uses a charge.\nYou can also jump or crouch to dodge. He only chases after hitting you or your shield."
 }

@@ -2,8 +2,9 @@ const {chromium}=require('playwright'),{spawn}=require('child_process'),fs=requi
 const site=process.argv[2],out=process.argv[3];fs.mkdirSync(out,{recursive:true});const root=process.cwd();
 const server=spawn('python3',['-m','http.server','8168','--bind','127.0.0.1'],{cwd:site,stdio:'ignore'});
 (async()=>{let browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox','--use-angle=swiftshader','--disable-vulkan']});try{let results=[];
-const codes=process.argv[4]==='preview'?['fr']:['en','es','fr','ja','zh_CN','ru'];
-for(const code of codes){const width=code==='en'?1672:844,height=code==='en'?941:390,iphone=code!=='en';const catalog=JSON.parse(fs.readFileSync(root+'/data/ui/'+code+'.json'));
+const small=process.argv[4]==='small';
+const codes=small?['ja']:process.argv[4]==='preview'?['fr']:['en','es','fr','ja','zh_CN','ru'];
+for(const code of codes){const width=small?640:code==='en'?1672:844,height=small?360:code==='en'?941:390,iphone=code!=='en';const catalog=JSON.parse(fs.readFileSync(root+'/data/ui/'+code+'.json'));
 const ctx=await browser.newContext({viewport:{width,height},deviceScaleFactor:iphone?3:1,hasTouch:iphone,isMobile:iphone,...(iphone?{userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1'}:{})});await ctx.route('**/*',r=>new URL(r.request().url()).hostname==='127.0.0.1'?r.continue():r.abort());const page=await ctx.newPage(),errors=[];page.on('console',m=>{fs.appendFileSync(out+'/console.log',m.text()+'\n');if(/SCRIPT ERROR|Parse Error|^ERROR:/.test(m.text()))errors.push(m.text());});page.on('pageerror',e=>errors.push(e.message));
 await page.goto('http://127.0.0.1:8168/quemsoueuv3/?fixture=i18n&lang='+code);await page.waitForFunction(()=>window.qseDeckInputReady,null,{timeout:120000});
 const report=async(action)=>{let n=await page.evaluate(()=>qseDeckInputReport.sequence);await page.evaluate(a=>a?qseDeckInputProbe('i18n_screen:'+a):qseDeckInputProbe(),action);await page.waitForFunction(n=>qseDeckInputReport.sequence>n,n);return page.evaluate(()=>qseDeckInputReport);};

@@ -1,0 +1,69 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+HERO_PASS startup authentication preserved
+HERO_PASS return reveals hero
+HERO_PASS story initial slide with all three artworks
+HERO_PASS real music player above hero
+HERO_PASS music toggle receives input above hero
+HERO_PASS music transport keyboard accessible
+HERO_PASS 3D render paused
+HERO_PASS indicator selects 0
+HERO_PASS one visible layer 0/0
+HERO_PASS one visible layer 0/1
+HERO_PASS one visible layer 0/2
+HERO_PASS in bounds 0 Title
+HERO_PASS in bounds 0 Description
+HERO_PASS in bounds 0 Reward
+HERO_PASS in bounds 0 Play
+HERO_PASS CTA opens route 0
+HERO_PASS hero hidden on internal screen
+HERO_PASS autoplay paused on internal screen
+HERO_PASS return reveals hero
+HERO_PASS indicator selects 1
+HERO_PASS one visible layer 1/0
+HERO_PASS one visible layer 1/1
+HERO_PASS one visible layer 1/2
+HERO_PASS in bounds 1 Title
+HERO_PASS in bounds 1 Description
+HERO_PASS in bounds 1 Reward
+HERO_PASS in bounds 1 Play
+HERO_PASS CTA opens route 1
+HERO_PASS hero hidden on internal screen
+HERO_PASS autoplay paused on internal screen
+HERO_PASS return reveals hero
+HERO_PASS indicator selects 2
+HERO_PASS one visible layer 2/0
+HERO_PASS one visible layer 2/1
+HERO_PASS one visible layer 2/2
+HERO_PASS in bounds 2 Title
+HERO_PASS in bounds 2 Description
+HERO_PASS in bounds 2 Reward
+HERO_PASS in bounds 2 Play
+HERO_PASS CTA opens route 2
+HERO_PASS hero hidden on internal screen
+HERO_PASS autoplay paused on internal screen
+HERO_PASS return reveals hero
+HERO_PASS header selects slide 0
+HERO_PASS header selects slide 1
+HERO_PASS header selects slide 3
+HERO_PASS header opens route 2
+HERO_PASS return reveals hero
+HERO_PASS header opens route 4
+HERO_PASS return reveals hero
+HERO_PASS header opens route 5
+HERO_PASS return reveals hero
+HERO_PASS right arrow wraps to story
+HERO_PASS left arrow wraps to library
+HERO_PASS keyboard right selects next
+HERO_PASS keyboard left selects previous
+HERO_PASS swipe starting on CTA changes slide without routing
+HERO_PASS right swipe selects previous
+HERO_PASS keyboard focused CTA activates after swipe
+HERO_PASS return reveals hero
+HERO_PASS footer friends route
+HERO_PASS return reveals hero
+HERO_PASS native news action opens existing overlay
+HERO_PASS autoplay paused for news overlay
+HERO_PASS real 10-second autoplay advances horizontally
+HERO_PASS manual interaction resets autoplay
+HERO_RESULT checks=66 failures=0 resolution=(1672, 941) logical=(1672.0, 941.0)

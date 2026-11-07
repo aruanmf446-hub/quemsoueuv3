@@ -14,6 +14,8 @@ if (root/'assets/emotes').exists():
 if (root/'assets/ui/store').exists():
     shutil.copytree(root/'assets/ui/store',stage/'assets/ui/store',dirs_exist_ok=True)
 shutil.copytree(root/'assets/fonts',stage/'assets/fonts',dirs_exist_ok=True)
+for extra in ['assets/audio/desert_sfx','assets/desert/city_people']:
+    if (root/extra).exists(): shutil.copytree(root/extra,stage/extra,dirs_exist_ok=True)
 shutil.copytree(root/'assets/icons/vector',stage/'assets/icons/vector',dirs_exist_ok=True)
 (stage/'assets/desert/tutorial').mkdir(parents=True,exist_ok=True)
 for art in (root/'assets/desert/tutorial').glob('*.res'):

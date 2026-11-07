@@ -1,0 +1,98 @@
+[
+  {
+    "code": "en",
+    "width": 1672,
+    "height": 941,
+    "errors": [],
+    "domPlaceholder": false,
+    "nicknamePreserved": true,
+    "screens": [
+      "editor",
+      "review",
+      "friends",
+      "duel",
+      "lobby",
+      "tutorial"
+    ]
+  },
+  {
+    "code": "es",
+    "width": 844,
+    "height": 390,
+    "errors": [],
+    "domPlaceholder": true,
+    "nicknamePreserved": true,
+    "screens": [
+      "editor",
+      "review",
+      "friends",
+      "duel",
+      "lobby",
+      "tutorial"
+    ]
+  },
+  {
+    "code": "fr",
+    "width": 844,
+    "height": 390,
+    "errors": [],
+    "domPlaceholder": true,
+    "nicknamePreserved": true,
+    "screens": [
+      "editor",
+      "review",
+      "friends",
+      "duel",
+      "lobby",
+      "tutorial"
+    ]
+  },
+  {
+    "code": "ja",
+    "width": 844,
+    "height": 390,
+    "errors": [],
+    "domPlaceholder": true,
+    "nicknamePreserved": true,
+    "screens": [
+      "editor",
+      "review",
+      "friends",
+      "duel",
+      "lobby",
+      "tutorial"
+    ]
+  },
+  {
+    "code": "zh_CN",
+    "width": 844,
+    "height": 390,
+    "errors": [],
+    "domPlaceholder": true,
+    "nicknamePreserved": true,
+    "screens": [
+      "editor",
+      "review",
+      "friends",
+      "duel",
+      "lobby",
+      "tutorial"
+    ]
+  },
+  {
+    "code": "ru",
+    "width": 844,
+    "height": 390,
+    "errors": [],
+    "domPlaceholder": true,
+    "nicknamePreserved": true,
+    "screens": [
+      "editor",
+      "review",
+      "friends",
+      "duel",
+      "lobby",
+      "tutorial"
+    ]
+  }
+]

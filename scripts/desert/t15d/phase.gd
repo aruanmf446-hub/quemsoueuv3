@@ -551,7 +551,7 @@ func _update_bridge_hint() -> void:
 			task_available=true
 			var actions: Array=device.hole.get("actions",[device.hole.get("task_text","Montar ponte")])
 			var step:=mini(int(_task_steps.get(str(device.hole.id),0)),actions.size()-1)
-			caption=str(actions[step])+(" (%d/%d)" % [step+1,actions.size()] if actions.size()>1 else "")+" · F"
+			caption=tr(str(actions[step]))+(" (%d/%d)" % [step+1,actions.size()] if actions.size()>1 else "")+" · F"
 			break
 	_hud.set_bridge_task(task_available and not _player.is_dead and not completed,caption)
 	if task_available and _order==1 and is_instance_valid(_first_use) and not _first_use.seen("task"):
@@ -567,7 +567,7 @@ func _raise_earth_bridge() -> void:
 			_task_steps[id]=step+1
 			bridge.set_progress(step+1)
 			_hud.set_bridge_task(false)
-			_hud.notify(str(actions[step])+" • siga para o ponto iluminado")
+			_hud.notify(tr("%s • siga para o ponto iluminado") % tr(str(actions[step])))
 			_save_active_run()
 			return
 		# Montagem dura 0,8s: impede correr no vazio antes de a peça virar piso.
@@ -867,7 +867,7 @@ func _on_goal_entered(body: Node3D) -> void:
 	if body != _player or completed or _player.is_dead or _respawning: return
 	for task: Dictionary in _phase.get("tasks",[]):
 		if not _raised_bridges.has(str(task.id)):
-			_hud.notify("Falta concluir: "+str(task.task_text),true)
+			_hud.notify(tr("Falta concluir: %s") % tr(str(task.task_text)),true)
 			return
 	if _order == 10 and not _boss_defeated:
 		_hud.notify("Derrote Malagueta para concluir a travessia",true)

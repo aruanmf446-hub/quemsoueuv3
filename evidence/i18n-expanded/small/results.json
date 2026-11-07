@@ -1,0 +1,18 @@
+[
+  {
+    "code": "ja",
+    "width": 640,
+    "height": 360,
+    "errors": [],
+    "domPlaceholder": true,
+    "nicknamePreserved": true,
+    "screens": [
+      "editor",
+      "review",
+      "friends",
+      "duel",
+      "lobby",
+      "tutorial"
+    ]
+  }
+]

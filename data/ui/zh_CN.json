@@ -1248,5 +1248,12 @@
   "SKIN": "皮肤",
   "deck": "牌组",
   "deck:": "牌组:",
-  "skin": "皮肤"
+  "skin": "皮肤",
+  "CONTINUAR PARTIDA": "继续游戏",
+  "Carregando fase…": "正在加载关卡…",
+  "Checkpoint %d/%d salvo": "检查点%d/%d已保存",
+  "Falta concluir: %s": "尚需完成：%s",
+  "%s • siga para o ponto iluminado": "%s · 前往亮点",
+  "Não foi possível salvar a partida neste aparelho": "无法在此设备保存游戏",
+  "O soldado à frente vai arremessar uma lança. Toque no escudo quando ela vier para bloquear (K ou Shift). Cada defesa usa uma carga.\nVocê também pode pular ou agachar para desviar. Ele só persegue depois de acertar você ou o escudo.": "前方士兵会投掷长矛，点击盾牌格挡（K / Shift）。每次防御消耗1次充能。\n也可跳跃或蹲下躲避。命中你或盾牌后，他才会追击。"
 }

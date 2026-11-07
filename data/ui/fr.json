@@ -1248,5 +1248,12 @@
   "SKIN": "APPARENCE",
   "deck": "deck",
   "deck:": "deck:",
-  "skin": "apparence"
+  "skin": "apparence",
+  "CONTINUAR PARTIDA": "REPRENDRE LA PARTIE",
+  "Carregando fase…": "Chargement du niveau…",
+  "Checkpoint %d/%d salvo": "Point de contrôle %d/%d enregistré",
+  "Falta concluir: %s": "À terminer : %s",
+  "%s • siga para o ponto iluminado": "%s • allez au point éclairé",
+  "Não foi possível salvar a partida neste aparelho": "Impossible d'enregistrer la partie sur cet appareil",
+  "O soldado à frente vai arremessar uma lança. Toque no escudo quando ela vier para bloquear (K ou Shift). Cada defesa usa uma carga.\nVocê também pode pular ou agachar para desviar. Ele só persegue depois de acertar você ou o escudo.": "Le soldat lancera une lance. Touchez le bouclier pour bloquer (K / Maj). Chaque blocage utilise une charge.\nVous pouvez aussi sauter ou vous accroupir. Il poursuit après avoir touché vous ou le bouclier."
 }

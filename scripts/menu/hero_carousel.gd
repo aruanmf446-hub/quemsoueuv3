@@ -193,6 +193,9 @@ func _relayout() -> void:
 			longest = maxf(longest, _font.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, base_font).x)
 		title.add_theme_font_size_override("font_size", mini(base_font, maxi(24, floori(base_font * (content_w + 65) / longest))))
 		_rect(title, left, h * 0.225, content_w + 65, h * 0.19)
+		# CJK fallback glyphs can have taller lines than the Latin font.
+		while title.get_minimum_size().y > h * 0.19 and title.get_theme_font_size("font_size") > 24:
+			title.add_theme_font_size_override("font_size", title.get_theme_font_size("font_size") - 1)
 		var description: Label = layer.get_node("Description")
 		description.add_theme_font_size_override("font_size", body_font)
 		_rect(description, left, h * 0.43, content_w, h * 0.16)

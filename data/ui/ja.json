@@ -1248,5 +1248,12 @@
   "SKIN": "スキン",
   "deck": "デッキ",
   "deck:": "デッキ:",
-  "skin": "スキン"
+  "skin": "スキン",
+  "CONTINUAR PARTIDA": "対戦を再開",
+  "Carregando fase…": "ステージを読み込み中…",
+  "Checkpoint %d/%d salvo": "チェックポイント%d/%dを保存",
+  "Falta concluir: %s": "未完了：%s",
+  "%s • siga para o ponto iluminado": "%s · 光っている地点へ",
+  "Não foi possível salvar a partida neste aparelho": "この端末にゲームを保存できませんでした",
+  "O soldado à frente vai arremessar uma lança. Toque no escudo quando ela vier para bloquear (K ou Shift). Cada defesa usa uma carga.\nVocê também pode pular ou agachar para desviar. Ele só persegue depois de acertar você ou o escudo.": "前の兵士が槍を投げます。盾ボタンで防御（K / Shift）。1回に1チャージ消費。\nジャンプやしゃがみでも回避できます。敵はあなたか盾に命中してから追跡を始めます。"
 }

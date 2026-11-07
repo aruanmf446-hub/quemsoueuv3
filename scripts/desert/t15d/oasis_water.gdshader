@@ -3,6 +3,7 @@ render_mode unshaded, cull_disabled, shadows_disabled;
 uniform sampler2D water_detail : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
 
 varying vec3 world_position;
+varying float river_bend;
 
 float hash_water(vec2 p) {
 	vec3 q = fract(vec3(p.xyx) * 0.1031);
@@ -20,6 +21,7 @@ float water_noise(vec2 p) {
 
 void vertex() {
 	world_position = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	river_bend = sin(world_position.x * 0.17) * 0.50 + sin(world_position.x * 0.41 + 1.3) * 0.18;
 }
 
 void fragment() {
@@ -28,7 +30,7 @@ void fragment() {
 	float broad = water_noise(p * vec2(0.48, 0.72) + drift);
 	float detail = water_noise(p * 1.75 - drift * 1.3);
 	float undulation = sin(p.x * 1.5 + p.y * 1.8 + broad * 3.5 - TIME * 0.45);
-	float shore_distance = min(abs(p.y + 6.7), abs(p.y + 18.6));
+	float shore_distance = min(abs(p.y + 6.7 - river_bend), abs(p.y + 18.6 - river_bend));
 	float shallow = 1.0 - smoothstep(0.15, 2.8, shore_distance + (broad - 0.5) * 0.55);
 	vec3 deep_color = vec3(0.055, 0.180, 0.230);
 	vec3 clear_color = vec3(0.105, 0.340, 0.370);

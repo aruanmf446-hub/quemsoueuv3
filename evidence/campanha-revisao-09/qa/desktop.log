@@ -1,0 +1,33 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_01_x0035.jpg world_x=35.0 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_01_x0740.jpg world_x=726.0 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_01_x1390.jpg world_x=1372.625 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_02_x0035.jpg world_x=35.0 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_02_x0740.jpg world_x=734.150024414062 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_02_x1390.jpg world_x=1390.25 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_03_x0035.jpg world_x=39.7857131958008 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_03_x0740.jpg world_x=726.0 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_03_x1390.jpg world_x=1385.82141113281 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_04_x0035.jpg world_x=35.0 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_04_x0740.jpg world_x=726.0 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_04_x1390.jpg world_x=1372.625 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_05_x0035.jpg world_x=35.0 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_05_x0740.jpg world_x=726.0 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_05_x1390.jpg world_x=1372.625 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_06_x0035.jpg world_x=39.7857131958008 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_06_x0740.jpg world_x=726.0 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_06_x1390.jpg world_x=1385.82141113281 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_07_x0035.jpg world_x=35.0 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_07_x0740.jpg world_x=726.0 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_07_x1390.jpg world_x=1372.625 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_08_x0035.jpg world_x=39.7857131958008 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_08_x0740.jpg world_x=726.0 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_08_x1390.jpg world_x=1385.82141113281 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_09_x0035.jpg world_x=35.0 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_09_x0740.jpg world_x=726.0 grounded=true result=0
+REVISION_CAPTURE /tmp/qse-revision-desktop/fase_09_x1390.jpg world_x=1372.625 grounded=true result=0
+REVISION_CAPTURE failures=0

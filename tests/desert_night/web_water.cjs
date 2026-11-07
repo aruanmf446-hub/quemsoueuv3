@@ -1,6 +1,8 @@
-// Render real WebGL da fase 5. Fixture congela o ator e retira encontros para a captura.
+// Render real WebGL da água (fase 5 por padrão; QSE_WATER_PHASE=4 para o canal).
+// Fixture congela o ator e retira encontros para a captura.
 const {chromium}=require('playwright'),fs=require('fs'),assert=require('assert');
 const out=process.env.QSE_WATER_WEB_OUT||'/tmp/qse-water-web';fs.mkdirSync(out,{recursive:true});
+const phase=Number(process.env.QSE_WATER_PHASE||5);assert([4,5].includes(phase),'water phase must be 4 or 5');
 (async()=>{
  const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  try{
@@ -11,12 +13,12 @@ const out=process.env.QSE_WATER_WEB_OUT||'/tmp/qse-water-web';fs.mkdirSync(out,{
   page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{const s=m.text();fs.appendFileSync(out+'/console.log',s+'\n');if(/SCRIPT ERROR:|SHADER ERROR:|Parse Error:|^ERROR:/.test(s))errors.push(s);});
   await page.goto('http://127.0.0.1:8135/quemsoueuv3/',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>typeof window.qseContinuityProbe==='function');
-  await page.evaluate(()=>window.qseContinuityProbe('phase:5'));
-  await page.waitForFunction(()=>{window.qseContinuityProbe('state');return window.qseContinuityState.stage==='play'&&window.qseContinuityState.order===5;});
+  await page.evaluate(order=>window.qseContinuityProbe('phase:'+order),phase);
+  await page.waitForFunction(order=>{window.qseContinuityProbe('state');return window.qseContinuityState.stage==='play'&&window.qseContinuityState.order===order;},phase);
   await page.evaluate(()=>window.qseContinuityProbe('ground'));await page.waitForTimeout(1500);
-  await page.screenshot({path:out+'/fase_05_agua.jpg',type:'jpeg',quality:94,scale:'css'});
+  await page.screenshot({path:out+'/fase_'+String(phase).padStart(2,'0')+'_agua.jpg',type:'jpeg',quality:94,scale:'css'});
   assert(!errors.length&&!blocked.length,'browser/shader/backend error');
-  fs.writeFileSync(out+'/report.json',JSON.stringify({passed:true,viewport:'844x390',dpr:3,physical_device:false,gpu:'SwiftShader software',fixture_scenery_only:true,errors,blocked},null,2));
+  fs.writeFileSync(out+'/report.json',JSON.stringify({passed:true,phase,viewport:'844x390',dpr:3,physical_device:false,gpu:'SwiftShader software',fixture_scenery_only:true,errors,blocked},null,2));
   console.log('WEB_WATER PASS');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

@@ -82,14 +82,17 @@ static func _railway(props: Node3D,left: float,right: float,floor_y: float) -> v
 	for i in ties:
 		_box(props,Vector3(lerpf(left,right,(float(i)+0.5)/ties),floor_y+0.025,-5.6),Vector3(0.15,0.05,1.65),"context_wood",Color("#9d8c79"))
 
+static func _river_bend(x: float) -> float:
+	# Coordenada mundial: a curva não reinicia ao trocar de laje ou de chunk.
+	return sin(x*0.17)*0.50+sin(x*0.41+1.3)*0.18
+
 static func _waterway(props: Node3D,left: float,right: float,top: float,natural: bool,slot: int) -> void:
 	var segments:=8 if natural else 1
-	var color:=Color("#9d8a68") if natural else Color("#aaa4a3")
 	for i in segments:
 		var a:=lerpf(left,right,float(i)/segments)
 		var b:=lerpf(left,right,float(i+1)/segments)
-		var bend_a:=sin(float(i)/segments*PI*2.0+slot)*0.42 if natural else 0.0
-		var bend_b:=sin(float(i+1)/segments*PI*2.0+slot)*0.42 if natural else 0.0
+		var bend_a:=_river_bend(a) if natural else 0.0
+		var bend_b:=_river_bend(b) if natural else 0.0
 		var near_a:=-6.7+bend_a
 		var near_b:=-6.7+bend_b
 		var far_a:=(-18.6 if natural else -16.0)+bend_a
@@ -101,14 +104,22 @@ static func _waterway(props: Node3D,left: float,right: float,top: float,natural:
 			var z_b: float=near_b if edge==0 else far_b
 			var outward:=1.0 if edge==0 else -1.0
 			if natural:
-				_quad(props,"context_earth",Vector3(a,top-0.30,z_a),Vector3(a,top-0.10,z_a+outward*0.60),Vector3(b,top-0.10,z_b+outward*0.60),Vector3(b,top-0.30,z_b),Color("#b3aea0"))
-				_quad(props,"context_earth",Vector3(a,top-0.10,z_a+outward*0.60),Vector3(a,top,z_a+outward*2.0),Vector3(b,top,z_b+outward*2.0),Vector3(b,top-0.10,z_b+outward*0.60),Color("#ded2b4"))
+				var width_a: float=(2.0 if edge==0 else 3.2)+sin(a*0.25+edge)*0.22
+				var width_b: float=(2.0 if edge==0 else 3.2)+sin(b*0.25+edge)*0.22
+				# Lábio molhado, pequena rampa e terraço seco: tudo no lote de terra existente.
+				_quad(props,"context_earth",Vector3(a,top-0.29,z_a),Vector3(a,top-0.21,z_a+outward*0.15),Vector3(b,top-0.21,z_b+outward*0.15),Vector3(b,top-0.29,z_b),Color("#7d8c85"))
+				_quad(props,"context_earth",Vector3(a,top-0.21,z_a+outward*0.15),Vector3(a,top-0.015,z_a+outward*0.50),Vector3(b,top-0.015,z_b+outward*0.50),Vector3(b,top-0.21,z_b+outward*0.15),Color("#a09c8b"))
+				_quad(props,"context_earth",Vector3(a,top-0.015,z_a+outward*0.50),Vector3(a,top,z_a+outward*width_a),Vector3(b,top,z_b+outward*width_b),Vector3(b,top-0.015,z_b+outward*0.50),Color("#b7ab94"))
 			else:
-				_quad(props,"context_masonry",Vector3(a,top-0.34,z_a),Vector3(a,top,z_a),Vector3(b,top,z_b),Vector3(b,top-0.34,z_b),color)
-				_quad(props,"context_masonry",Vector3(a,top,z_a),Vector3(a,top,z_a+outward*1.4),Vector3(b,top,z_b+outward*1.4),Vector3(b,top,z_b),color)
+				# Pedra escurecida junto à água e remate chanfrado no mesmo lote.
+				_quad(props,"context_masonry",Vector3(a,top-0.34,z_a),Vector3(a,top-0.04,z_a),Vector3(b,top-0.04,z_b),Vector3(b,top-0.34,z_b),Color("#747d7d"))
+				_quad(props,"context_masonry",Vector3(a,top-0.04,z_a),Vector3(a,top+0.045,z_a+outward*0.14),Vector3(b,top+0.045,z_b+outward*0.14),Vector3(b,top-0.04,z_b),Color("#b6b0a5"))
+				_quad(props,"context_masonry",Vector3(a,top+0.045,z_a+outward*0.14),Vector3(a,top,z_a+outward*1.4),Vector3(b,top,z_b+outward*1.4),Vector3(b,top+0.045,z_b+outward*0.14),Color("#a39c92"))
 	if natural:
-		_decoration(props,"riverbank_context",Vector3(lerpf(left,right,0.38 if slot%2==0 else 0.56),top-0.04,-5.8),4.7,slot%2==1,Vector2(left,right))
-		_decoration(props,"riverbank_context",Vector3(lerpf(left,right,0.68 if slot%2==0 else 0.30),top-0.03,-19.5),5.8,true,Vector2(left,right))
+		var near_x:=lerpf(left,right,0.38 if slot%2==0 else 0.56)
+		var far_x:=lerpf(left,right,0.68 if slot%2==0 else 0.30)
+		_decoration(props,"riverbank_context",Vector3(near_x,top-0.025,-6.7+_river_bend(near_x)+0.75),4.7,slot%2==1,Vector2(left,right))
+		_decoration(props,"riverbank_context",Vector3(far_x,top-0.025,-18.6+_river_bend(far_x)-1.10),5.8,true,Vector2(left,right))
 	else:
 		for fraction: float in [0.18,0.78]:
 			var x:=lerpf(left,right,fraction)
@@ -153,7 +164,7 @@ static func material(key: String) -> Material:
 		if key in ["context_water","context_water_oasis"]:
 			var water:=ShaderMaterial.new()
 			water.shader=OASIS_WATER if key=="context_water_oasis" else WATER
-			if key=="context_water_oasis":water.set_shader_parameter("water_detail",load(ROOT+"oasis_water_surface.png"))
+			water.set_shader_parameter("water_detail",load(ROOT+"oasis_water_surface.png"))
 			_materials[key]=water
 		else:
 			var surface:=StandardMaterial3D.new()

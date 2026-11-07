@@ -1,0 +1,68 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS vitória real registra a fase 1
+PASS passagem tem tela de carregamento real
+PASS capa aparece antes da leitura terminar
+PASS fase 2 mantém exatamente as cargas guardadas na fase 1
+PASS cargas sobrevivem ao fechamento da cena
+PASS abrir a fase pelo menu também recupera as cargas
+PASS vitória real registra a fase 3
+PASS passagem tem tela de carregamento real
+PASS capa aparece antes da leitura terminar
+PASS fase 4 preserva inclusive zero ataque e três cargas de âmbar
+PASS poder guardado continua visível
+PASS poder novo continua sem carga inventada
+PASS vitória real registra a fase 5
+PASS passagem tem tela de carregamento real
+PASS capa aparece antes da leitura terminar
+PASS fase 6 conserva os cinco tipos de recarga, incluindo relâmpago e ruptura
+PASS não aplica cargas de uma fase em outra
+PASS vitória real registra a fase 1
+PASS passagem tem tela de carregamento real
+PASS capa aparece antes da leitura terminar
+PASS fase 1 → 2: preserva exatamente todos os recursos sem usar
+PASS fase 2: inventário da vitória salvo para reentrada
+PASS fase 2: sair e reabrir não zera nem duplica cargas
+PASS vitória real registra a fase 2
+PASS passagem tem tela de carregamento real
+PASS capa aparece antes da leitura terminar
+PASS fase 2 → 3: preserva exatamente todos os recursos sem usar
+PASS fase 3: inventário da vitória salvo para reentrada
+PASS fase 3: sair e reabrir não zera nem duplica cargas
+PASS vitória real registra a fase 3
+PASS passagem tem tela de carregamento real
+PASS capa aparece antes da leitura terminar
+PASS fase 3 → 4: preserva exatamente todos os recursos sem usar
+PASS fase 4: inventário da vitória salvo para reentrada
+PASS fase 4: sair e reabrir não zera nem duplica cargas
+PASS vitória real registra a fase 4
+PASS passagem tem tela de carregamento real
+PASS capa aparece antes da leitura terminar
+PASS fase 4 → 5: preserva exatamente todos os recursos sem usar
+PASS fase 5: inventário da vitória salvo para reentrada
+PASS fase 5: sair e reabrir não zera nem duplica cargas
+PASS vitória real registra a fase 5
+PASS passagem tem tela de carregamento real
+PASS capa aparece antes da leitura terminar
+PASS fase 5 → 6: preserva exatamente todos os recursos sem usar
+PASS fase 6: inventário da vitória salvo para reentrada
+PASS fase 6: sair e reabrir não zera nem duplica cargas
+PASS vitória real registra a fase 6
+PASS passagem tem tela de carregamento real
+PASS capa aparece antes da leitura terminar
+PASS fase 6 → 7: preserva exatamente todos os recursos sem usar
+PASS fase 7: inventário da vitória salvo para reentrada
+PASS fase 7: sair e reabrir não zera nem duplica cargas
+PASS vitória real registra a fase 7
+PASS passagem tem tela de carregamento real
+PASS capa aparece antes da leitura terminar
+PASS fase 7 → 8: preserva exatamente todos os recursos sem usar
+PASS fase 8: inventário da vitória salvo para reentrada
+PASS fase 8: sair e reabrir não zera nem duplica cargas
+PASS vitória real registra a fase 8
+PASS passagem tem tela de carregamento real
+PASS capa aparece antes da leitura terminar
+PASS fase 8 → 9: preserva exatamente todos os recursos sem usar
+PASS fase 9: inventário da vitória salvo para reentrada
+PASS fase 9: sair e reabrir não zera nem duplica cargas
+STORY_TRANSITIONS checks=65 failures=0

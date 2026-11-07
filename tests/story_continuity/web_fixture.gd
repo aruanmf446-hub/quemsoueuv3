@@ -10,6 +10,7 @@ var screen: PlayerScreen
 var phase: Node3D
 var loading: CampaignLoading
 var callback: JavaScriptObject
+var obstacle: Dictionary={}
 func _ready() -> void:
  if not OS.has_feature("story_continuity_fixture"):return
  preload("res://tests/desert_night/tutorial_fixture.gd").experienced()
@@ -72,12 +73,33 @@ func probe(args: Array) -> void:
  if command=="next" and is_instance_valid(phase):
   PhaseStory.mark_read(phase._order+1)
   phase._session.next_requested.emit()
+ if command=="obstacle" and is_instance_valid(phase):
+  var spec: Dictionary=phase._phase.platforms.filter(func(p: Dictionary) -> bool:return p.get("parkour_route",false))[0]
+  obstacle={"left":spec.span_start,"right":spec.span_end,"base":spec.surface_top,"top":spec.pos[1]+spec.size[1]*0.5}
+  phase.set_physics_process(false)
+  phase._player.position=Vector3(obstacle.left-1.4,obstacle.base+0.04,0)
+  phase._player.velocity=Vector3.ZERO
+  phase._player._invulnerable=0
+  phase._stream_world((obstacle.left+obstacle.right)*0.5,true)
+  for i in 2400:
+   if phase._build_queue.is_empty():break
+   phase._process(0)
+  for enemy in phase._troops.get_children():phase._retire_enemy(enemy)
+  for i in 3:phase._follow_camera(1.0)
+  phase._scenery.follow(phase._camera,phase._player.position.x)
  var state:={"highest":Local.highest_unlocked(),"completed":Local._highest_completed(),"notice":services.story_progress.notice,"sync":services.story_progress.state,"cloud_mock":true,"stage":"menu"}
  if is_instance_valid(phase):
   state.stage="play"
   state.order=phase._order
   state.attack=phase._player.attack_charges
   state.defense=phase._player.defense_charges
+  if not obstacle.is_empty():
+   var actor: CharacterBody3D=phase._player
+   state.obstacle=obstacle
+   state.actor={"x":actor.position.x,"y":actor.position.y,"floor":actor.is_on_floor(),"vx":actor.velocity.x}
+   var jump: Vector2=phase._touch_pad._buttons["jump"][0]
+   var size:=get_viewport().get_visible_rect().size
+   state.jump=[jump.x/size.x,jump.y/size.y]
  elif is_instance_valid(loading):
   state.stage="loading"
   state.reads=loading._completed_reads

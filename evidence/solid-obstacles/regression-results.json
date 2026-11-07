@@ -1,0 +1,50 @@
+[
+  {
+    "test": "spears",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 9.98,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "story-transitions",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 10.21,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "story-platforms",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 11.72,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "prop-landings",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 14.45,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "solid-obstacles",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 12.74,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "parkour",
+    "passed": false,
+    "exit_code": -15,
+    "wall_seconds": 55.19,
+    "graphical": false,
+    "fixed_physics_step": false
+  }
+]

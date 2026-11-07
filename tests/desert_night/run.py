@@ -35,6 +35,8 @@ targets=[
  ('account-merge',engine+headless+['--script','res://tests/story_continuity/account_merge.gd']),
  ('story-transitions',engine+headless+['--script','res://tests/story_continuity/transitions.gd']),
  ('story-platforms',engine+headless+['--script','res://tests/story_continuity/platforms.gd']),
+ ('prop-landings',engine+headless+['--script','res://tests/desert_night/prop_landings_test.gd']),
+ ('solid-obstacles',engine+headless+['--script','res://tests/desert_night/solid_obstacles_test.gd']),
  ('actions',engine+window+['--script','res://tests/desert_night/action_controls.gd']),
  ('layout',engine+headless+['--script','res://tests/desert_night/layout_test.gd']),
  ('legacy10',engine+headless+['--script','res://tests/desert_night/legacy10_test.gd']),

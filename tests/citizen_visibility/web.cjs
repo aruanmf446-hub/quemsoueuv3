@@ -5,7 +5,7 @@ const out=process.env.QSE_CITIZEN_OUT||'/tmp/qse-citizen-web';fs.mkdirSync(out,{
  const errors=[],blocked=[],checks=[];
  const resume=process.env.QSE_CITIZEN_RESUME==='1';
  try{
-  for(const spec of (resume?[{width:844,height:390,mobile:true,orders:[1,2,5,10]}]:[{width:844,height:390,mobile:true,orders:[1,2,5,10]},{width:640,height:360,mobile:true,orders:[1]},{width:1672,height:941,mobile:false,orders:[1]},{width:1920,height:1080,mobile:false,orders:[1]}])){
+  for(const spec of (resume?[{width:844,height:390,mobile:true,orders:[5,1,2,10]}]:[{width:844,height:390,mobile:true,orders:[5,1,2,10]},{width:640,height:360,mobile:true,orders:[1]},{width:1672,height:941,mobile:false,orders:[1]},{width:1920,height:1080,mobile:false,orders:[1]}])){
    const options={viewport:{width:spec.width,height:spec.height},deviceScaleFactor:spec.mobile?3:1,serviceWorkers:'block'};
    if(spec.mobile)Object.assign(options,{isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1'});
    const context=await browser.newContext(options);

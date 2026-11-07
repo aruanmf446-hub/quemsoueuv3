@@ -21,6 +21,7 @@ func open_phase(order: int,checkpoint:=-1) -> void:
  start_x=float(saved.position[0])
  run.save("",saved,"start")
  phase=load("res://scenes/desert/phase_%02d.tscn" % order).instantiate()
+ phase.process_mode=Node.PROCESS_MODE_PAUSABLE
  add_child(phase)
 func state() -> Dictionary:
  var result:={"tick":Engine.get_physics_frames(),"order":phase._order,"start_x":start_x,"checkpoint":phase._checkpoint_index,"x":phase._player.position.x,"queue":phase._build_queue.size(),"active":phase.is_physics_processing(),"paused":get_tree().paused,"citizens":[]}

@@ -1,111 +1,97 @@
-/* Página inicial do Quem Sou Eu. Tokens = scripts/ui/player_ui.gd (ver qse-web-design). */
-@font-face{font-family:"QSE Interface";src:url("img/interface.woff2") format("woff2");font-display:swap}
+/* Site do Quem Sou Eu: limpo, direto, para crianças, jovens e gamers. */
+@font-face{font-family:"Baloo 2";src:url("img/baloo-800.woff2") format("woff2");font-weight:800;font-display:swap}
+@font-face{font-family:"Baloo 2";src:url("img/baloo-600.woff2") format("woff2");font-weight:600;font-display:swap}
 :root{
-  --bg:#111820; --gold:#e9b975; --gold-bright:#f2cd94; --text:#f6f3e9; --muted:#a9b1bb; --ink:#151e25;
-  --panel:rgba(9,13,17,.82); --border:#28323c; --surface:rgba(23,29,36,.78); --surface-hover:rgba(36,42,48,.9);
-  --field-border:#3a444d; --radius:6px; --gutter:clamp(16px,3.4vw,56px);
+  --bg:#111820; --card:#18222c; --line:#263340; --text:#f6f3e9; --muted:#a9b1bb; --ink:#151e25;
+  --gold:#e9b975; --gold-bright:#f2cd94;
+  --win:#3b8cff; --android:#3ddc84; --ios:#e8ecf2; --web:#e9b975;
+  --r:20px; --gutter:clamp(16px,4vw,48px);
   color-scheme:dark;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.5 "QSE Interface",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:hidden}
+body{margin:0;background:var(--bg);color:var(--text);font:600 17px/1.5 "Baloo 2",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:hidden}
 img{max-width:100%;height:auto;display:block}
 a{color:inherit}
-:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px}
-.muted{color:var(--muted)}
-.eyebrow{margin:0 0 .4em;color:var(--gold);font-size:14px;letter-spacing:.04em;text-transform:uppercase}
+b{font-weight:800}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:8px}
+.wrap{max-width:1180px;margin:0 auto;padding-left:var(--gutter);padding-right:var(--gutter)}
+h1,h2,h3{font-weight:800;line-height:1.05;margin:0}
+h2{font-size:clamp(30px,3.6vw,44px);margin-bottom:24px}
+h3{font-size:24px}
+section.wrap{padding-top:clamp(40px,6vw,72px)}
 
-/* Topo: logo à esquerda, poucos links em caixa alta (igual ao lobby). */
-.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:clamp(16px,3vw,44px);
-  padding:max(10px,env(safe-area-inset-top)) max(var(--gutter),calc((100% - 1440px)/2 + var(--gutter))) 10px}
-.brand img{width:clamp(104px,9vw,140px)}
-.nav{display:flex;gap:clamp(14px,2.4vw,40px);flex:1}
-.nav a{text-decoration:none;text-transform:uppercase;font-size:15px;color:var(--text);opacity:.92;padding:10px 0}
-.nav a:hover{color:var(--gold-bright)}
+.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:24px;background:rgba(17,24,32,.92);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  padding:max(10px,env(safe-area-inset-top)) max(var(--gutter),calc((100% - 1180px)/2 + var(--gutter))) 10px}
+.brand img{width:clamp(110px,10vw,140px)}
+.nav{display:flex;gap:24px;flex:1}
+.nav a{text-decoration:none;color:var(--muted);font-size:17px}
+.nav a:hover{color:var(--text)}
 
-/* Botões: style_button do jogo. Uma ação principal dourada. */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:48px;padding:0 22px;border-radius:var(--radius);
-  text-decoration:none;text-transform:uppercase;font-size:18px;letter-spacing:.02em;border:1px solid transparent;cursor:pointer;white-space:nowrap}
-.btn svg{width:22px;height:22px;flex:none}
-.btn-primary{background:var(--gold);color:var(--ink)}
-.btn-primary:hover{background:var(--gold-bright)}
-.btn-ghost{background:var(--surface);border-color:var(--border);color:var(--text)}
-.btn-ghost:hover{background:var(--surface-hover)}
-.btn-sm{min-height:44px;font-size:15px;padding:0 18px}
-.is-off{color:var(--muted);cursor:default;pointer-events:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:14px;text-decoration:none;
+  font:800 18px/1 "Baloo 2",system-ui,sans-serif;cursor:pointer;white-space:nowrap;transition:transform .08s,box-shadow .08s}
+.btn-sm{min-height:44px;padding:0 20px}
+.btn-gold{background:var(--gold);color:var(--ink);box-shadow:0 4px 0 #b68646}
+.btn-gold:active{transform:translateY(3px);box-shadow:0 1px 0 #b68646}
 
-/* Apresentação: texto direto, fundo sólido, sem arte de capa (site institucional). */
-.intro{padding-top:clamp(40px,6vw,72px);padding-bottom:0}
-h1{margin:0;font-weight:400;text-transform:uppercase;font-size:clamp(34px,4vw,52px);line-height:1.1}
-.lede{margin:14px 0 24px;font-size:17px;color:var(--muted);max-width:44em}
-.intro-actions{display:flex;flex-wrap:wrap;gap:12px}
+.intro{display:grid;grid-template-columns:1.05fr 1fr;gap:clamp(24px,4vw,56px);align-items:center;padding-top:clamp(32px,5vw,64px)}
+h1{font-size:clamp(46px,6vw,76px);color:var(--gold)}
+.lede{margin:14px 0 20px;font-size:clamp(18px,1.6vw,21px);color:var(--text);max-width:32em}
+.lede b{color:var(--gold-bright)}
+.tags{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:0;padding:0}
+.tags li{padding:6px 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-size:15px}
+.crew{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;list-style:none;margin:0;padding:0}
+.crew li{border-radius:var(--r);overflow:hidden;background:var(--card);border:2px solid var(--line)}
+.crew li:nth-child(odd){transform:rotate(-2deg)}
+.crew li:nth-child(even){transform:rotate(2deg) translateY(10px)}
+.crew img{width:100%;aspect-ratio:1;object-fit:cover}
 
-/* Seções internas: fundo sólido, como as telas internas do jogo. */
-.band{padding:clamp(40px,5vw,72px) var(--gutter);max-width:1440px;margin:0 auto}
-h2{margin:0 0 28px;font-weight:400;text-transform:uppercase;font-size:clamp(28px,3vw,44px);line-height:1.1}
-h3{margin:0;font-weight:400;font-size:22px}
+.get{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.tile{--c:var(--gold);display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:28px 20px 22px;
+  border-radius:var(--r);background:var(--card);border:2px solid var(--line);border-top:6px solid var(--c)}
+.t-win{--c:var(--win)} .t-android{--c:var(--android)} .t-ios{--c:var(--ios)} .t-web{--c:var(--web)}
+.tile-icon{width:64px;height:64px;color:var(--c)}
+.btn-big{width:100%;min-height:60px;font-size:21px;background:var(--c);color:var(--ink);box-shadow:0 5px 0 rgba(0,0,0,.35)}
+.btn-big:hover{filter:brightness(1.07)}
+.btn-big:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.35)}
+.btn-big.is-off{background:transparent;color:var(--muted);border:2px dashed var(--line);box-shadow:none;cursor:default;pointer-events:none}
+.soon{margin:0;color:var(--muted);font-size:15px}
+.how{margin:0;color:var(--muted);font-size:15px;line-height:1.4}
+.how b{color:var(--text)}
+.inline{width:16px;height:16px;vertical-align:-2px;color:var(--text)}
+.browsers{display:flex;align-items:center;justify-content:center;gap:8px}
+.browsers svg{width:22px;height:22px;color:var(--text)}
+.note{margin:0;font-size:15px;color:var(--gold-bright)}
+.tile.is-you{box-shadow:0 0 0 3px var(--c)}
+.tile.is-you::before{content:"Para o seu aparelho";order:-1;font-size:14px;color:var(--c)}
 
-.platforms{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
-.plat{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:24px;border-radius:8px;background:var(--panel);border:1px solid var(--border)}
-.plat-icon{width:44px;height:44px;color:var(--text);margin-bottom:6px}
-.plat-format{margin:0 0 8px;color:var(--muted);text-transform:uppercase;font-size:14px}
-.plat .btn{width:100%;margin-top:auto}
-.plat.is-you{border-color:var(--gold)}
-.plat.is-you::before{content:"Recomendado para você";order:-1;color:var(--gold);font-size:13px;text-transform:uppercase}
-.steps{margin:6px 0 0;padding-left:20px;color:var(--muted);font-size:14px}
-.steps li{margin:4px 0}
-.steps b{color:var(--text);font-weight:400}
-.inline{width:16px;height:16px;vertical-align:-3px;color:var(--text)}
-.note{margin:0;font-size:14px;color:var(--gold-bright)}
-.browsers{display:flex;flex-wrap:wrap;gap:8px 16px;list-style:none;margin:6px 0 0;padding:0;color:var(--muted);font-size:14px}
-.browsers li{display:flex;align-items:center;gap:6px}
-.browsers svg{width:18px;height:18px;color:var(--text)}
-.plat .btn + .steps, .plat .btn + .browsers{margin-top:8px}
-.plat-main .btn{order:9}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;list-style:none;margin:0;padding:0}
+.steps li{padding:24px;border-radius:var(--r);background:var(--card);border:2px solid var(--line)}
+.n{display:inline-grid;place-items:center;width:48px;height:48px;border-radius:50%;background:var(--gold);color:var(--ink);font-weight:800;font-size:26px;margin-bottom:12px}
+.steps p,.modes p{margin:6px 0 0;color:var(--muted)}
+.modes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:16px}
+.modes div{padding:18px 24px;border-radius:var(--r);border:2px dashed var(--line)}
+.modes h3{font-size:20px;color:var(--gold-bright)}
 
-.modes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.modes article{padding:24px;border-radius:8px;background:var(--surface);border:1px solid var(--border)}
-.modes h3{margin-bottom:8px}
-.modes p:last-child{margin:0}
+.maker{margin:0;font-size:20px;max-width:40em;color:var(--muted)}
+.maker b{color:var(--text)}
 
-.cast{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;list-style:none;margin:0;padding:0}
-.cast li{border-radius:8px;background:var(--surface);border:1px solid var(--border);overflow:hidden}
-.cast img{width:100%;aspect-ratio:300/286;object-fit:cover}
-.cast span{display:block;padding:10px 14px;text-transform:uppercase;font-size:15px}
+.foot{display:flex;align-items:center;gap:16px;margin-top:clamp(48px,7vw,88px);padding-top:28px;padding-bottom:max(28px,env(safe-area-inset-bottom));border-top:1px solid var(--line);color:var(--muted);font-size:15px}
+.foot img{width:110px}
+.foot p{margin:0}
 
-.faq{max-width:860px}
-.faq details{border-bottom:1px solid var(--border)}
-.faq summary{cursor:pointer;padding:18px 0;font-size:18px;list-style:none;display:flex;justify-content:space-between;gap:16px}
-.faq summary::-webkit-details-marker{display:none}
-.faq summary::after{content:"+";color:var(--gold)}
-.faq details[open] summary::after{content:"–"}
-.faq p{margin:0 0 18px;color:var(--muted)}
-.faq b{color:var(--text);font-weight:400}
-
-.foot{display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding:32px var(--gutter) max(32px,env(safe-area-inset-bottom));border-top:1px solid var(--border)}
-.foot img{width:120px}
-.foot p{flex:1;margin:0;font-size:14px}
-
-@media (max-width:1100px){
-  .platforms{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .cast{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:980px){
+  .get{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .intro{grid-template-columns:1fr}
+  .crew{grid-template-columns:repeat(6,1fr);gap:8px}
+  .crew li{border-radius:14px}
 }
-@media (max-width:760px){
+@media (max-width:640px){
   .nav{display:none}
   .top{justify-content:space-between}
-  .modes{grid-template-columns:1fr}
+  .steps,.modes{grid-template-columns:1fr}
+  .crew{grid-template-columns:repeat(3,1fr)}
 }
-@media (max-width:520px){
-  .intro-actions .btn{width:100%}
-  .platforms{grid-template-columns:1fr}
-  .cast{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-/* Celular em retrato: seções mais compactas. */
-@media (max-width:760px) and (orientation:portrait){
-  .top{gap:12px}
-  .band{padding-top:36px;padding-bottom:40px}
-  .band h2{font-size:clamp(27px,7vw,34px);margin-bottom:22px}
-  .plat{padding:20px}
-  .plat .btn{font-size:16px}
-}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media (max-width:460px){.get{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn{transition:none}}

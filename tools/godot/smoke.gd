@@ -104,4 +104,5 @@ func _run() -> void:
 				return
 	print("SMOKE_OPEN_OK " + path)
 	# SceneTree encerra e libera a cena atual na ordem normal do motor.
+	await preload("res://tests/common/audio_cleanup.gd").finish(self,scene)
 	quit(0)

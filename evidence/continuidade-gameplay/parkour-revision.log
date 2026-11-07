@@ -1,0 +1,75 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS fase1: desníveis por terreno ou sequências de parkour
+PASS fase1: retorno por salto continua alcançável
+PASS fase1: telhados reais ou ao menos seis conjuntos de parkour, sem invadir Tasks
+PASS fase1: pontos das Tasks ficam apoiados nas duas margens
+PASS fase1: etapas de mecanismo próprias da região
+PASS fase1: duas pontes frágeis
+PASS fase2: desníveis por terreno ou sequências de parkour
+PASS fase2: retorno por salto continua alcançável
+PASS fase2: telhados reais ou ao menos seis conjuntos de parkour, sem invadir Tasks
+PASS fase2: pontos das Tasks ficam apoiados nas duas margens
+PASS fase2: etapas de mecanismo próprias da região
+PASS fase2: duas pontes frágeis
+PASS fase3: desníveis por terreno ou sequências de parkour
+PASS fase3: retorno por salto continua alcançável
+PASS fase3: telhados reais ou ao menos seis conjuntos de parkour, sem invadir Tasks
+PASS fase3: pontos das Tasks ficam apoiados nas duas margens
+PASS fase3: etapas de mecanismo próprias da região
+PASS fase3: duas pontes frágeis
+PASS fase4: desníveis por terreno ou sequências de parkour
+PASS fase4: retorno por salto continua alcançável
+PASS fase4: telhados reais ou ao menos seis conjuntos de parkour, sem invadir Tasks
+PASS fase4: pontos das Tasks ficam apoiados nas duas margens
+PASS fase4: etapas de mecanismo próprias da região
+PASS fase4: duas pontes frágeis
+PASS fase5: desníveis por terreno ou sequências de parkour
+PASS fase5: retorno por salto continua alcançável
+PASS fase5: telhados reais ou ao menos seis conjuntos de parkour, sem invadir Tasks
+PASS fase5: pontos das Tasks ficam apoiados nas duas margens
+PASS fase5: etapas de mecanismo próprias da região
+PASS fase5: duas pontes frágeis
+PASS fase6: desníveis por terreno ou sequências de parkour
+PASS fase6: retorno por salto continua alcançável
+PASS fase6: telhados reais ou ao menos seis conjuntos de parkour, sem invadir Tasks
+PASS fase6: pontos das Tasks ficam apoiados nas duas margens
+PASS fase6: etapas de mecanismo próprias da região
+PASS fase6: duas pontes frágeis
+PASS fase7: desníveis por terreno ou sequências de parkour
+PASS fase7: retorno por salto continua alcançável
+PASS fase7: telhados reais ou ao menos seis conjuntos de parkour, sem invadir Tasks
+PASS fase7: pontos das Tasks ficam apoiados nas duas margens
+PASS fase7: etapas de mecanismo próprias da região
+PASS fase7: duas pontes frágeis
+PASS fase8: desníveis por terreno ou sequências de parkour
+PASS fase8: retorno por salto continua alcançável
+PASS fase8: telhados reais ou ao menos seis conjuntos de parkour, sem invadir Tasks
+PASS fase8: pontos das Tasks ficam apoiados nas duas margens
+PASS fase8: etapas de mecanismo próprias da região
+PASS fase8: duas pontes frágeis
+PASS fase9: desníveis por terreno ou sequências de parkour
+PASS fase9: retorno por salto continua alcançável
+PASS fase9: telhados reais ou ao menos seis conjuntos de parkour, sem invadir Tasks
+PASS fase9: pontos das Tasks ficam apoiados nas duas margens
+PASS fase9: etapas de mecanismo próprias da região
+PASS fase9: duas pontes frágeis
+PASS dezenove tarefas de cenário, sem habilidades permanentes
+PASS nove perfis diferentes de subida/descida, sem repetir o mesmo percurso
+PASS tarefa aparece apenas perto da passagem
+PASS vão realmente aberto antes da montagem
+PASS primeiro mecanismo libera a segunda etapa, sem montar a ponte
+PASS montagem começa girando a peça, sem colisão antecipada
+PASS segurar avanço durante a montagem não derruba no vazio
+PASS ponte montada tem piso real
+PASS tarefa não usa poderes nem altera recursos
+PASS botão contextual some após concluir
+PASS ponte atravessável andando para a direita
+PASS ponte atravessável andando para a esquerda
+PASS descarregar e voltar preserva ponte sem duplicar
+PASS ponte frágil usa a peça física de desmoronamento
+PASS pisar inicia aviso antes da queda
+PASS ponte perde colisão e deixa cair de verdade
+PASS ponte se recompõe para retorno ou nova tentativa
+PASS saída limpa pontes e tarefas
+PARKOUR_REVISION checks=72 failures=0

@@ -62,6 +62,8 @@ func snap(label: String) -> void:
 	await RenderingServer.frame_post_draw
 	check(root.get_texture().get_image().save_png(output+"_"+label+".png") == OK,"captura real "+label)
 func run() -> void:
+	# Navegação de jogador experiente; apresentação inicial tem roteiro próprio.
+	preload("res://tests/desert_night/tutorial_fixture.gd").experienced()
 	var args := OS.get_cmdline_user_args()
 	if args.size() > 0: output = args[0]
 	var size := (args[1] if args.size() > 1 else "1920x1080").split("x")
@@ -105,6 +107,7 @@ func run() -> void:
 	check(not paused,"Continuar volta à partida")
 	# Isola o callback de vitória para avaliar o fluxo, sem alegar percurso ou duração.
 	print("NAVIGATION_FIXTURE calling goal callback; NOT a traversal test")
+	for task: Dictionary in phase._phase.tasks:phase._raised_bridges[str(task.id)]=true
 	phase._on_goal_entered(phase._player)
 	await frames(5)
 	check(Progress.is_completed(1) and Progress.is_unlocked(2),"vitória salva desbloqueio local da próxima fase")

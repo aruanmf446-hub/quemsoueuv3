@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "phases": [
+    1
+  ],
+  "viewport": "1672x941",
+  "dpr": 1,
+  "physical_device": false,
+  "gpu": "SwiftShader software",
+  "fixture_scenery_only": true,
+  "errors": [],
+  "blocked": []
+}

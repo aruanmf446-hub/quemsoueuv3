@@ -1,0 +1,29 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS K defende sem consumir ataque hp=3 atk=2 def=1 floor=true key=true
+PASS J ataca sem acionar defesa
+PASS Shift continua sendo alternativa real de defesa
+PASS pulo duplo por teclado solta areia dos pés
+PASS areia termina e não deixa emissores no cenário
+PASS voltar não desliza panorama nem palácios distantes
+PASS aproximar do marco ainda não ativa o checkpoint
+PASS marco grande identifica o checkpoint antes de salvar
+PASS passar pelo marco salva e muda identificação para SALVO
+PASS trechos possuem figurantes fora do combate
+PASS descarregar a fase remove os figurantes
+PASS fase1 distribui 3 lanceiros pelo percurso
+PASS fase2 distribui 0 lanceiros pelo percurso
+PASS fase3 distribui 0 lanceiros pelo percurso
+PASS fase4 distribui 2 lanceiros pelo percurso
+PASS fase5 distribui 2 lanceiros pelo percurso
+PASS fase6 distribui 3 lanceiros pelo percurso
+PASS fase7 distribui 2 lanceiros pelo percurso
+PASS fase8 distribui 4 lanceiros pelo percurso
+PASS fase9 distribui 3 lanceiros pelo percurso
+PASS lona real disponível para a patrulha
+PASS jogador apoiado na lona real
+PASS sob lona o guarda patrulha nos dois sentidos, sem pular nem girar para o fundo
+GAMEPLAY_FEEDBACK checks=23 failures=0

@@ -19,6 +19,8 @@ func advance(order: int,charges: Dictionary) -> Node3D:
  phase._player.attack_charges=charges.attack
  phase._player.defense_charges=charges.defense
  for kind in phase._player.abilities:phase._player.abilities[kind]=charges.get(kind,0)
+ # Pré-condição de vitória desta fixture de transição; Tasks são exercitadas separadamente.
+ for task: Dictionary in phase._phase.tasks:phase._raised_bridges[str(task.id)]=true
  phase._on_goal_entered(phase._player)
  check(phase.completed,"vitória real registra a fase %d" % order)
  phase._session.next_requested.emit()

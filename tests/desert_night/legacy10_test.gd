@@ -23,6 +23,8 @@ func run() -> void:
 	await frames(2)
 	check(is_instance_valid(phase._boss) and phase._boss.health==20,"Malagueta original aparece na arena final com vida20")
 	phase._boss.set_physics_process(false)
+	# Isola a exigência do chefe: a Task já foi cumprida nesta fixture de arena.
+	for task: Dictionary in phase._phase.tasks:phase._raised_bridges[str(task.id)]=true
 	phase._on_goal_entered(phase._player)
 	check(not phase.completed,"saída não ignora o chefe vivo")
 	phase._player.position=phase._boss.position+Vector3(-1.4,0,0)

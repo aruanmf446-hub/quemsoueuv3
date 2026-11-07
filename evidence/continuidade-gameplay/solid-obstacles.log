@@ -1,0 +1,105 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS fase1 tem obstáculo de parkour
+PASS fase1 cada degrau tem volume sólido até o chão
+PASS fase1 cada degrau tem volume sólido até o chão
+PASS fase1 tem colisão inteira do chão ao topo
+PASS fase1 bloqueia caminhada pela esquerda sem atravessar a arte
+PASS fase1 agachar não atravessa o volume sólido
+PASS fase1 salto real pousa no topo pela esquerda
+PASS fase1 corre sobre o obstáculo apoiado
+PASS fase1 bloqueia caminhada pela direita
+PASS fase1 salto real pousa no topo pela direita
+PASS fase1 desce pela borda sem grudar ou cair através do piso
+PASS soldado não permanece dentro do volume do obstáculo
+PASS descarregar trecho remove a colisão do obstáculo
+PASS retornar ao trecho recria o corpo inteiro sem duplicar
+PASS fase2 conserva a rota pelos tetos sem obstáculo sobreposto
+PASS fase3 tem obstáculo de parkour
+PASS fase3 cada degrau tem volume sólido até o chão
+PASS fase3 tem colisão inteira do chão ao topo
+PASS fase3 bloqueia caminhada pela esquerda sem atravessar a arte
+PASS fase3 agachar não atravessa o volume sólido
+PASS fase3 salto real pousa no topo pela esquerda
+PASS fase3 corre sobre o obstáculo apoiado
+PASS fase3 bloqueia caminhada pela direita
+PASS fase3 salto real pousa no topo pela direita
+PASS fase3 desce pela borda sem grudar ou cair através do piso
+PASS fase4 tem obstáculo de parkour
+PASS fase4 cada degrau tem volume sólido até o chão
+PASS fase4 tem colisão inteira do chão ao topo
+PASS fase4 bloqueia caminhada pela esquerda sem atravessar a arte
+PASS fase4 agachar não atravessa o volume sólido
+PASS fase4 salto real pousa no topo pela esquerda
+PASS fase4 corre sobre o obstáculo apoiado
+PASS fase4 bloqueia caminhada pela direita
+PASS fase4 salto real pousa no topo pela direita
+PASS fase4 desce pela borda sem grudar ou cair através do piso
+PASS fase5 tem obstáculo de parkour
+PASS fase5 cada degrau tem volume sólido até o chão
+PASS fase5 cada degrau tem volume sólido até o chão
+PASS fase5 cada degrau tem volume sólido até o chão
+PASS fase5 tem colisão inteira do chão ao topo
+PASS fase5 bloqueia caminhada pela esquerda sem atravessar a arte
+PASS fase5 agachar não atravessa o volume sólido
+PASS fase5 salto real pousa no topo pela esquerda
+PASS fase5 corre sobre o obstáculo apoiado
+PASS fase5 bloqueia caminhada pela direita
+PASS fase5 salto real pousa no topo pela direita
+PASS fase5 desce pela borda sem grudar ou cair através do piso
+PASS fase6 tem obstáculo de parkour
+PASS fase6 cada degrau tem volume sólido até o chão
+PASS fase6 cada degrau tem volume sólido até o chão
+PASS fase6 cada degrau tem volume sólido até o chão
+PASS fase6 tem colisão inteira do chão ao topo
+PASS fase6 bloqueia caminhada pela esquerda sem atravessar a arte
+PASS fase6 agachar não atravessa o volume sólido
+PASS fase6 salto real pousa no topo pela esquerda
+PASS fase6 corre sobre o obstáculo apoiado
+PASS fase6 bloqueia caminhada pela direita
+PASS fase6 salto real pousa no topo pela direita
+PASS fase6 desce pela borda sem grudar ou cair através do piso
+PASS fase7 tem obstáculo de parkour
+PASS fase7 cada degrau tem volume sólido até o chão
+PASS fase7 cada degrau tem volume sólido até o chão
+PASS fase7 tem colisão inteira do chão ao topo
+PASS fase7 bloqueia caminhada pela esquerda sem atravessar a arte
+PASS fase7 agachar não atravessa o volume sólido
+PASS fase7 salto real pousa no topo pela esquerda
+PASS fase7 corre sobre o obstáculo apoiado
+PASS fase7 bloqueia caminhada pela direita
+PASS fase7 salto real pousa no topo pela direita
+PASS fase7 desce pela borda sem grudar ou cair através do piso
+PASS fase8 tem obstáculo de parkour
+PASS fase8 cada degrau tem volume sólido até o chão
+PASS fase8 tem colisão inteira do chão ao topo
+PASS fase8 bloqueia caminhada pela esquerda sem atravessar a arte
+PASS fase8 agachar não atravessa o volume sólido
+PASS fase8 salto real pousa no topo pela esquerda
+PASS fase8 corre sobre o obstáculo apoiado
+PASS fase8 bloqueia caminhada pela direita
+PASS fase8 salto real pousa no topo pela direita
+PASS fase8 desce pela borda sem grudar ou cair através do piso
+PASS fase9 tem obstáculo de parkour
+PASS fase9 cada degrau tem volume sólido até o chão
+PASS fase9 cada degrau tem volume sólido até o chão
+PASS fase9 tem colisão inteira do chão ao topo
+PASS fase9 bloqueia caminhada pela esquerda sem atravessar a arte
+PASS fase9 agachar não atravessa o volume sólido
+PASS fase9 salto real pousa no topo pela esquerda
+PASS fase9 corre sobre o obstáculo apoiado
+PASS fase9 bloqueia caminhada pela direita
+PASS fase9 salto real pousa no topo pela direita
+PASS fase9 desce pela borda sem grudar ou cair através do piso
+PASS fase10 tem obstáculo de parkour
+PASS fase10 cada degrau tem volume sólido até o chão
+PASS fase10 tem colisão inteira do chão ao topo
+PASS fase10 bloqueia caminhada pela esquerda sem atravessar a arte
+PASS fase10 agachar não atravessa o volume sólido
+PASS fase10 salto real pousa no topo pela esquerda
+PASS fase10 corre sobre o obstáculo apoiado
+PASS fase10 bloqueia caminhada pela direita
+PASS fase10 salto real pousa no topo pela direita
+PASS fase10 desce pela borda sem grudar ou cair através do piso
+PASS descarregamento remove todos os corpos sólidos
+SOLID_OBSTACLES checks=102 failures=0

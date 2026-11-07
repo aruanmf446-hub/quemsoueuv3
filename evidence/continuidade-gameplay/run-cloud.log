@@ -1,0 +1,10 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS conta envia todos os recursos e checkpoint 7
+PASS outro aparelho recupera inventário e checkpoint completos
+PASS resposta de aparelho antigo não recria cargas gastas
+PASS autossalvamento durante conflito não recua o avanço do outro aparelho
+PASS autossalvamento simultâneo não recria carga rejeitada pela nuvem
+PASS resposta atrasada da fase anterior não apaga o inventário da próxima
+PASS trocar de conta não mistura a partida anterior
+RUN_CLOUD checks=7 failures=0

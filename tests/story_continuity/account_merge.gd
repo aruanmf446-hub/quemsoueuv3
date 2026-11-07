@@ -4,6 +4,7 @@ const A="11111111-1111-4111-8111-111111111111"
 const B="22222222-2222-4222-8222-222222222222"
 class FakeClient extends SupabaseClient:
  var cloud:={}
+ var runs:={}
  var account:=""
  var fail_next:=false
  var delay:=1
@@ -14,6 +15,15 @@ class FakeClient extends SupabaseClient:
   var sent:=int(params.p_completed)
   for i in delay:await get_tree().process_frame
   if fail:return ServiceResult.failure("network","offline")
+  if _name=="qse_story_run_sync":
+   var run: Dictionary=runs.get(captured,{"state":null,"revision":0})
+   var incoming: Variant=params.get("p_state")
+   if incoming is Dictionary:
+    var same: bool=run.state is Dictionary and run.state.run_id==incoming.run_id
+    if run.state==null or (int(params.p_revision)==int(run.revision) and (same or params.p_intent=="start")) or preload("res://scripts/desert/t15d/campaign_run.gd").farther(incoming,run.state if run.state is Dictionary else {}):
+     run={"state":incoming.duplicate(true),"revision":int(run.revision)+1}
+     runs[captured]=run
+   return ServiceResult.success({"schema_version":1,"state":run.state,"revision":run.revision,"highest_completed":cloud.get(captured,0)})
   var previous:=int(cloud.get(captured,0))
   var merged:=maxi(previous,sent)
   cloud[captured]=merged
@@ -91,7 +101,10 @@ func run() -> void:
  login(A)
  await frames(2)
  login(B)
- await frames(26)
+ # Duas chamadas por conta: avanço e partida. Espera limitada, sem depender de 26 frames.
+ for i in 60:
+  await process_frame
+  if not services.story_progress._busy and not services.story_progress._pending:break
  check(Local.highest_for(B)==7 and Local.highest_for(A)==8,"resposta atrasada não mistura contas")
  check(not services.story_progress._busy,"sincronização sempre libera estado ocupado")
  services.story_progress.dismiss_toast()

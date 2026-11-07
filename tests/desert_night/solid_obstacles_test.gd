@@ -6,6 +6,12 @@ var failures:=0
 var output:=""
 var phase: Node3D
 var player: CharacterBody3D
+var cluster: Array=[]
+func route_top(x: float,base: float) -> float:
+ var height:=base
+ for spec: Dictionary in cluster:
+  if x>=float(spec.span_start)-0.05 and x<=float(spec.span_end)+0.05:height=maxf(height,float(spec.pos[1])+float(spec.size[1])*0.5)
+ return height
 func _initialize() -> void:call_deferred("run")
 func check(ok: bool,label: String) -> void:
  checks+=1
@@ -40,11 +46,11 @@ func leap(direction: String,left: float,right: float,top: float) -> bool:
  var landed:=false
  for i in 110:
   await physics_frame
-  if player.is_on_floor() and absf(player.position.y-top)<0.04 and player.position.x>left and player.position.x<right:
+  if player.is_on_floor() and absf(player.position.y-route_top(player.position.x,top))<0.04 and player.position.x>left and player.position.x<right:
    landed=true
    break
  Input.action_release(direction)
- await ticks(18)
+ await ticks(1)
  return landed
 func run() -> void:
  preload("res://tests/desert_night/tutorial_fixture.gd").experienced()
@@ -70,8 +76,10 @@ func run() -> void:
    continue
   check(not routes.is_empty(),"fase%d tem obstáculo de parkour" % order)
   var spec: Dictionary=routes[0]
-  var left: float=spec.span_start
-  var right: float=spec.span_end
+  cluster=routes.filter(func(p: Dictionary) -> bool:return p.module==spec.module)
+  cluster.sort_custom(func(a: Dictionary,b: Dictionary) -> bool:return float(a.span_start)<float(b.span_start))
+  var left: float=cluster[0].span_start
+  var right: float=cluster[-1].span_end
   var base: float=spec.surface_top
   var top: float=spec.pos[1]+spec.size[1]*0.5
   player.position=Vector3(left-1.4,base+0.04,0)
@@ -81,6 +89,10 @@ func run() -> void:
    phase._process(0)
   for enemy in phase._troops.get_children():phase._retire_enemy(enemy)
   var bodies: Array=get_nodes_in_group("campaign_solid_obstacles").filter(func(n: Node) -> bool:return n.get_meta("obstacle_id","")==str(spec.id))
+  for step: Dictionary in cluster:
+   var step_top: float=step.pos[1]+step.size[1]*0.5
+   var step_bodies:=get_nodes_in_group("campaign_solid_obstacles").filter(func(n: Node) -> bool:return n.get_meta("obstacle_id","")==str(step.id))
+   check(not step_bodies.is_empty() and step_bodies.all(func(n: Node) -> bool:return not n.is_in_group("campaign_one_way") and absf(n.get_child(0).shape.size.y-(step_top-base))<0.001),"fase%d cada degrau tem volume sólido até o chão" % order)
   check(not bodies.is_empty() and bodies.all(func(n: Node) -> bool:return not n.is_in_group("campaign_one_way") and absf(n.get_child(0).shape.size.y-(top-base))<0.001),"fase%d tem colisão inteira do chão ao topo" % order)
   await approach(left-1.4,base)
   Input.action_press("move_right")
@@ -92,19 +104,21 @@ func run() -> void:
   check(player.position.x<=left-0.25,"fase%d agachar não atravessa o volume sólido" % order)
   release()
   await ticks(5)
-  check(await leap("move_right",left,right,top),"fase%d salto real pousa no topo pela esquerda" % order)
+  check(await leap("move_right",left,right,base),"fase%d salto real pousa no topo pela esquerda" % order)
   await snap("02_em_cima_do_obstaculo")
+  # Ponto com espaço para correr: o salto pode pousar encostado no próximo degrau.
+  await approach(left+0.6,route_top(left+0.6,base))
   var start: float=player.position.x
   Input.action_press("move_right")
   await ticks(8)
   Input.action_release("move_right")
-  check(player.position.x>start+0.2 and player.is_on_floor() and absf(player.position.y-top)<0.04,"fase%d corre sobre o obstáculo apoiado" % order)
+  check(player.position.x>start+0.2 and player.is_on_floor() and absf(player.position.y-route_top(player.position.x,base))<0.04,"fase%d corre sobre o obstáculo apoiado" % order)
   await approach(right+1.4,base)
   Input.action_press("move_left")
   await ticks(65)
   check(player.position.x>=right+0.25,"fase%d bloqueia caminhada pela direita" % order)
   Input.action_release("move_left")
-  check(await leap("move_left",left,right,top),"fase%d salto real pousa no topo pela direita" % order)
+  check(await leap("move_left",left,right,base),"fase%d salto real pousa no topo pela direita" % order)
   await snap("03_salto_vindo_da_direita")
   Input.action_press("move_left")
   for i in 150:
@@ -117,7 +131,7 @@ func run() -> void:
    phase._spawn_enemy(phase._world,{"id":"qa.solid.npc","pos":[(left+right)*0.5,base+0.02,0],"patrol":[left-2.0,right+2.0],"troop":true})
    var enemy: CharacterBody3D=phase._enemy_live.get("qa.solid.npc")
    await ticks(20)
-   check(is_instance_valid(enemy) and (enemy.position.y>=top-0.04 or enemy.position.x<left-0.3 or enemy.position.x>right+0.3),"soldado não permanece dentro do volume do obstáculo")
+   check(is_instance_valid(enemy) and (enemy.position.y>=route_top(enemy.position.x,base)-0.04 or enemy.position.x<left-0.3 or enemy.position.x>right+0.3),"soldado não permanece dentro do volume do obstáculo")
    phase._stream_world(right+512,true)
    await ticks(3)
    check(get_nodes_in_group("campaign_solid_obstacles").all(func(n: Node) -> bool:return n.get_meta("obstacle_id","")!=str(spec.id)),"descarregar trecho remove a colisão do obstáculo")
@@ -131,4 +145,5 @@ func run() -> void:
  check(get_nodes_in_group("campaign_solid_obstacles").is_empty(),"descarregamento remove todos os corpos sólidos")
  print("SOLID_OBSTACLES checks=%d failures=%d" % [checks,failures])
  if not output.is_empty():FileAccess.open(output+"/report.json",FileAccess.WRITE).store_string(JSON.stringify({"checks":checks,"failures":failures,"fixture_teleport":true,"physics_jump":true,"physical_device":false},"\t"))
+ await preload("res://tests/common/audio_cleanup.gd").finish(self)
  quit(1 if failures else 0)

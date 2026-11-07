@@ -125,8 +125,20 @@ func run() -> void:
 			for threat: Node3D in get_nodes_in_group("enemies"):
 				if threat.has_method("can_jump_gap") and threat._windup>0 and absf(threat.position.x-player.position.x)<2.2:
 					Input.action_press("defend")
+					steer(signf(threat.position.x-player.position.x))
 					_defense_release_at=step+2
+					await physics_frame
 					break
+		if player.is_defending:
+			var held:=false
+			for threat: Node3D in get_nodes_in_group("enemies"):
+				if threat._windup>0 and absf(threat.position.x-player.position.x)<2.2:
+					steer(signf(threat.position.x-player.position.x))
+					held=true
+					break
+			if held:
+				await physics_frame
+				continue
 		if order >= 5 and player.is_on_floor() and player.charges("rupture")>0 and step%60==0:
 			for pursuer: Node3D in get_nodes_in_group("enemies"):
 				var behind := player.position.x-pursuer.position.x
@@ -171,12 +183,18 @@ func run() -> void:
 		if fight_malagueta(step):
 			await physics_frame
 			continue
-		var enemy := enemy_ahead(2.5)
+		var travel:=1.0
+		for device in get_nodes_in_group("earth_bridges"):
+			if not phase.is_ancestor_of(device) or device.raised:continue
+			if player.position.x>=float(device.hole.start)-8.0 and player.position.x<float(device.hole.start)+3.0:
+				var point: Vector3=device.action_point(int(phase._task_steps.get(str(device.hole.id),0)))
+				if player.position.x>point.x+0.2:travel=-1.0
+		var enemy := enemy_ahead(2.5,travel)
 		if await ride_ferry(step):
 			_stalled = 0
 			continue
 		if player._attack_timer > 0.0:
-			if player.is_on_floor() or order!=2: Input.action_release("move_right")
+			if player.is_on_floor() or order!=2: steer(0)
 			else:
 				Input.action_press("move_right")
 				auto_jump(step)
@@ -184,19 +202,21 @@ func run() -> void:
 			var gap := enemy.global_position.x-player.global_position.x
 			var ray := PhysicsRayQueryParameters3D.create(player.global_position+Vector3.UP*0.7,enemy.global_position+Vector3.UP*0.7,1)
 			var clear := player.get_world_3d().direct_space_state.intersect_ray(ray).is_empty()
-			if gap <= 1.65 and clear:
-				Input.action_release("move_right")
+			if absf(gap) <= 1.65 and clear:
+				steer(signf(gap))
 				if not Input.is_action_pressed("attack"):
 					Input.action_press("attack")
 					_attack_release_at = step+2
 					swings += 1
 			else:
-				Input.action_press("move_right")
-				auto_jump(step)
+				steer(travel)
+				if travel>0:auto_jump(step)
+				else:auto_jump_left(step)
 		else:
-			Input.action_press("move_right")
+			steer(travel)
 			if enemy != null and player.attack_charges <= 0 and player.is_on_floor(): jump(step)
-			else: auto_jump(step)
+			elif travel>0:auto_jump(step)
+			else:auto_jump_left(step)
 		await physics_frame
 	for action in ["move_right","move_left","jump","attack","defend","crouch"]: Input.action_release(action)
 	var physics_seconds := float(Engine.get_physics_frames()-start_tick)/60.0
@@ -217,6 +237,7 @@ func run() -> void:
 	var result := {"cpu_step":cost,"render_frame_wall":render_cost,"measurement":"wall-clock; physics intervals include intentional 0.05x hit-stop; all maxima retained","order":order,"completed":phase.completed,"deaths":deaths,"checks":checks,"failures":failures,"physics_seconds":physics_seconds,"phase_seconds":phase._elapsed,"health":player.health,"swings":swings,"defeated":phase._defeated_ids.size(),"collected":phase._collected_ids.size(),"captured":capture_frames,"position":[player.position.x,player.position.y,player.position.z]}
 	FileAccess.open(output+".json",FileAccess.WRITE).store_string(JSON.stringify(result,"  "))
 	print("NIGHT_ROUTE_RESULT ",JSON.stringify(result))
+	await preload("res://tests/common/audio_cleanup.gd").finish(self,phase)
 	quit(1 if failures else 0)
 ## Balsa: espera na borda até ela encostar, sobe, fica parado e salta na outra borda.
 ## Retorna true quando controlou este quadro.
@@ -272,12 +293,16 @@ func surface_at(x: float) -> float:
 		if x >= float(platform.pos[0])-half and x <= float(platform.pos[0])+half:
 			top = maxf(top,float(platform.pos[1])+float(platform.size[1])*0.5)
 	return top
-func enemy_ahead(distance: float) -> Node3D:
+func steer(direction: float) -> void:
+	Input.action_release("move_left")
+	Input.action_release("move_right")
+	if direction!=0:Input.action_press("move_right" if direction>0 else "move_left")
+func enemy_ahead(distance: float,direction:=1.0) -> Node3D:
 	var nearest: Node3D
 	for actor: Node3D in get_nodes_in_group("enemies"):
 		var gap := actor.global_position.x-player.global_position.x
-		if gap > 0 and gap < distance and absf(actor.global_position.y-player.global_position.y) < 1.1:
-			if nearest == null or gap < nearest.global_position.x-player.global_position.x: nearest = actor
+		if gap*direction > 0 and absf(gap) < distance and absf(actor.global_position.y-player.global_position.y) < 1.1:
+			if nearest == null or absf(gap) < absf(nearest.global_position.x-player.global_position.x): nearest = actor
 	return nearest
 
 ## A arena usa as mesmas entradas e itens do jogador, inclusive Âmbar para recarregar.

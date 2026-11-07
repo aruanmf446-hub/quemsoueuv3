@@ -19,8 +19,12 @@ func _run() -> void:
 	add_child(services)
 	await get_tree().process_frame
 	var mode := str(JavaScriptBridge.eval("new URLSearchParams(location.search).get('fixture')||'nickname'")) if OS.has_feature("web") else fixture_mode
+	if OS.has_feature("web"):
+		var locale := str(JavaScriptBridge.eval("new URLSearchParams(location.search).get('lang')||'pt_BR'"))
+		if DevicePreferences._valid("locale",locale): services.preferences.set_preference("locale",locale)
 	var fake: SupabaseClient
-	if mode in ["languages","public_profile","friends_search","duel_admin"]: fake=preload("res://tests/profile_languages/fake_game.gd").new()
+	if mode=="i18n": fake=preload("res://tests/i18n_expanded/fake_game.gd").new()
+	elif mode in ["languages","public_profile","friends_search","duel_admin"]: fake=preload("res://tests/profile_languages/fake_game.gd").new()
 	elif mode in ["ability_refills","refill_store"]: fake=preload("res://tests/ability_refills/fake_game.gd").new()
 	elif mode.begins_with("commerce"): fake=preload("res://tests/commerce/fake_game.gd").new()
 	elif mode=="community": fake=preload("res://tests/community_attribution/fake_game.gd").new()
@@ -57,7 +61,11 @@ func _run() -> void:
 	services.cosmetic_shop.client=fake
 	services.ability_refills.client=fake
 	if mode.begins_with("commerce"): await services.cosmetic_shop.refresh()
-	if mode in ["languages","public_profile","friends_search","duel_admin"]:
+	if mode=="i18n":
+		profile.nickname="NicknameOriginal"
+		services.profile.data=profile.profile()
+		await _i18n_screen("editor")
+	elif mode in ["languages","public_profile","friends_search","duel_admin"]:
 		profile.nickname="VisitanteTeste"
 		services.profile.data=profile.profile()
 		if mode=="languages":
@@ -173,7 +181,47 @@ func _seed_submission() -> void:
 	ui._draft=draft
 	ui._open_submissions()
 
+func _i18n_screen(screen: String) -> void:
+	if get_tree().paused: get_tree().paused=false
+	if is_instance_valid(ui):
+		ui.hide()
+		ui.queue_free()
+		await get_tree().process_frame
+	match screen:
+		"lobby":
+			ui=preload("res://tests/i18n_expanded/hero_host.gd").new()
+			add_child(ui)
+		"editor", "review":
+			ui=load("res://scenes/player/deck_library.tscn").instantiate()
+			add_child(ui)
+			ui._create_deck()
+			if screen=="review": ui._render_review()
+		"friends":
+			services.friends.state="success"
+			services.friends.data={"friends":[],"incoming":[],"outgoing":[]}
+			ui=load("res://scenes/player/friends.tscn").instantiate()
+			add_child(ui)
+			ui.show_screen({"tab":"search"})
+			await ui._search("Configurações")
+		"duel":
+			await services.duel.use_local()
+			if not services.duel.in_room(): await services.duel.create("Custom Room",false,{"deck_ids":["lendas_urbanas"]})
+			ui=load("res://scenes/player/duel.tscn").instantiate()
+			add_child(ui)
+			ui.show_screen()
+			await ui._open_form()
+		"tutorial":
+			ui=Control.new()
+			ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			add_child(ui)
+			var lesson: Node=load("res://scripts/desert/t15d/first_use_tutorial.gd").new()
+			ui.add_child(lesson)
+			lesson.call("present","amber")
+	await get_tree().process_frame
+
 func _probe(args: Array) -> void:
+	if args.size() and str(args[0]).begins_with("i18n_screen:"):
+		await _i18n_screen(str(args[0]).trim_prefix("i18n_screen:"))
 	if args.size() and str(args[0])=="start_refill_phase":
 		ui.hide();ui.queue_free()
 		ui=preload("res://tests/ability_refills/visual.gd").new()
@@ -216,7 +264,7 @@ func _probe(args: Array) -> void:
 		if player!=null: result.emote={"animation":player.assigned_animation,"playing":player.is_playing(),"static":stage.character.is_static_pose}
 	for node: Control in ui.find_children("*","Control",true,false):
 		if not node.is_visible_in_tree(): continue
-		if node is Label: result.labels.append(node.text)
+		if node is Label: result.labels.append(node.text if node.auto_translate_mode==Node.AUTO_TRANSLATE_MODE_DISABLED else str(node.tr(node.text)))
 		if node is TextureRect and str(node.name).begins_with("EmoteThumbnail_"):
 			result.emote_thumbnails.append({"name":str(node.name),"ready":node.texture!=null,"height":node.size.y})
 		if node is TextureRect and str(node.name).begins_with("VariationThumbnail_"):
@@ -224,7 +272,7 @@ func _probe(args: Array) -> void:
 		if node is LineEdit or node is TextEdit: result.fields[str(node.name)]=str(node.text)
 		if node is BaseButton or node is LineEdit or node is TextEdit:
 			var r := node.get_global_rect()
-			result.controls.append({"name":str(node.name),"rect":[r.position.x,r.position.y,r.size.x,r.size.y],"text":node.text if node is Button else "","disabled":node.disabled if node is BaseButton else false})
+			result.controls.append({"name":str(node.name),"rect":[r.position.x,r.position.y,r.size.x,r.size.y],"text":(node.text if node.auto_translate_mode==Node.AUTO_TRANSLATE_MODE_DISABLED else str(node.tr(node.text))) if node is Button else "","disabled":node.disabled if node is BaseButton else false})
 	if ui.get("_draft") is Dictionary:
 		result.cards=ui._draft.get("cards",[]).size()
 		result.card_names=ui._draft.get("cards",[]).map(func(c:Dictionary)->String:return str(c.get("name","")))

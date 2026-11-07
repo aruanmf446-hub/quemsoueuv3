@@ -57,7 +57,7 @@ static func is_uuid(value: String) -> bool:
 ## O servidor só aceita decks com nome e categoria válidos; antes disso o rascunho fica só aqui.
 static func deck_ready(draft: Dictionary) -> String:
 	var name := str(draft.get("name", "")).strip_edges()
-	if name.length() < DeckDrafts.NAME_MIN or name.length() > DeckDrafts.NAME_MAX: return "Dê um nome de %d a %d caracteres para salvar na conta." % [DeckDrafts.NAME_MIN, DeckDrafts.NAME_MAX]
+	if name.length() < DeckDrafts.NAME_MIN or name.length() > DeckDrafts.NAME_MAX: return str(TranslationServer.translate("Dê um nome de %d a %d caracteres para salvar na conta.")) % [DeckDrafts.NAME_MIN, DeckDrafts.NAME_MAX]
 	if not str(draft.get("category", "")) in DeckDrafts.CATEGORIES: return "Escolha a categoria para salvar na conta."
 	if (draft.get("cards", []) as Array).size() > 30: return "Máximo de 30 cartas."
 	return ""

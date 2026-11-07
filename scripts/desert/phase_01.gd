@@ -225,7 +225,7 @@ func _build_hud() -> void:
 
 func _on_player_health_changed(current: int, maximum: int) -> void:
 	if _health_label:
-		_health_label.text = "Vida %d / %d" % [current, maximum]
+		_health_label.text = str(TranslationServer.translate("Vida %d / %d")) % [current, maximum]
 
 
 func _on_player_died() -> void:

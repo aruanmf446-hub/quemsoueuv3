@@ -100,7 +100,7 @@ static func flow(parent: Control) -> HFlowContainer:
 static func standard_back(button: Button, label := "") -> void:
 	if button == null: return
 	var text := label if not label.is_empty() else button.text.replace("‹", "").replace("←", "").strip_edges()
-	button.text = TranslationServer.translate(text if not text.is_empty() else "Voltar")
+	button.text = text if not text.is_empty() else "Voltar"
 	button.icon = PremiumUI.icon("back", TEXT, 48)
 	button.add_theme_constant_override("icon_max_width", 22)
 	button.add_theme_constant_override("h_separation", 8)
@@ -122,7 +122,8 @@ static func style_backdrop(tint: ColorRect) -> void:
 
 static func label(text: String, size: int = 22, color: Color = TEXT) -> Label:
 	var node := Label.new()
-	node.text = TranslationServer.translate(text)
+	# Keep the source so Godot can retranslate existing controls after locale changes.
+	node.text = text
 	node.add_theme_font_size_override("font_size", size)
 	node.add_theme_color_override("font_color", color)
 	node.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -132,7 +133,7 @@ static func label(text: String, size: int = 22, color: Color = TEXT) -> Label:
 
 static func button(text: String, action: Callable) -> Button:
 	var node := Button.new()
-	node.text = TranslationServer.translate(text)
+	node.text = text
 	node.custom_minimum_size = Vector2(144, CONTROL_HEIGHT)
 	node.focus_mode = Control.FOCUS_ALL
 	node.add_theme_font_size_override("font_size", CONTROL_FONT)

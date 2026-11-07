@@ -193,7 +193,7 @@ static func spaced(text: String) -> String:
 	return "   ".join(Array(text.split(" ", false)).map(func(word: String) -> String: return " ".join(Array(word.split("")))))
 
 
-func _header_extras(show: bool, tag_text := "S E R V I D O R E S   O N L I N E") -> void:
+func _header_extras(show: bool, tag_text := "Servidores online") -> void:
 	var header: HBoxContainer = $Margin/Column/Header
 	var icon := header.get_node_or_null("ModeIcon") as TextureRect
 	if icon == null:
@@ -224,7 +224,7 @@ func _header_extras(show: bool, tag_text := "S E R V I D O R E S   O N L I N E")
 	icon.visible = show
 	header.get_node("ModeDivider").visible = show and not compact
 	header.get_node("ModeTag").visible = show and not compact
-	(header.get_node("ModeTag") as Label).text = tag_text if tag_text.contains("  ") else spaced(tag_text)
+	(header.get_node("ModeTag") as Label).text = spaced(tr(tag_text)) if TranslationServer.get_locale().begins_with("pt") else tr(tag_text)
 	heading.add_theme_font_size_override("font_size", 26 if compact else 40)
 	# Sublinhado só sob o título (como na referência); fora da lista o título volta a ocupar a linha.
 	heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -887,7 +887,7 @@ func _render_form() -> void:
 	decks.add_theme_constant_override("separation", 14)
 	if UIScale.is_iphone(): decks.add_theme_constant_override("separation", 6)
 	split.add_child(decks)
-	var deck_heading := _section_head("cards", "Decks de personagens", "Escolha o conjunto de personagens da sala (até %d)." % MAX_DECKS)
+	var deck_heading := _section_head("cards", "Decks de personagens", str(TranslationServer.translate("Escolha o conjunto de personagens da sala (até %d).")) % MAX_DECKS)
 	decks.add_child(deck_heading)
 	if UIScale.is_iphone(): deck_heading.hide() # Busca e filtros já identificam a galeria.
 	var search_box := PanelContainer.new()
@@ -1296,7 +1296,7 @@ func _render_room() -> void:
 		header.add_child(tag)
 	else:
 		titles.add_child(PlayerUI.label(state + ("  ·  Sala pública" if data.is_public else "  ·  Só por convite"), 17, Color("#c9d6e6")))
-		var code := PlayerUI.button("Código  %s" % str(data.code), func() -> void:
+		var code := PlayerUI.button(str(TranslationServer.translate("Código  %s")) % str(data.code), func() -> void:
 			DisplayServer.clipboard_set(str(data.code))
 			banner.show_state("success", tr("Código copiado: %s") % str(data.code)))
 		code.tooltip_text = tr("Copiar código de convite")
@@ -1332,7 +1332,7 @@ func _render_room() -> void:
 	body.add_child(grid)
 	for member: Dictionary in duel.room.members:
 		grid.add_child(_member_card(member, admin, str(data.status)))
-	var summary := "%d cartas por jogador  ·  %ds por turno  ·  %ds de seleção  ·  Bots %s  ·  Decks: %s" % [int(settings.cards_per_player),
+	var summary := str(TranslationServer.translate("%d cartas por jogador  ·  %ds por turno  ·  %ds de seleção  ·  Bots %s  ·  Decks: %s")) % [int(settings.cards_per_player),
 		int(settings.turn_seconds), int(settings.selection_seconds), "permitidos" if settings.bots_allowed else "desativados",
 		", ".join((data.get("decks", []) as Array).map(func(d: Dictionary) -> String: return str(d.get("name", ""))))]
 	body.add_child(PlayerUI.label(summary, 17, Color("#c9d6e6")))

@@ -91,7 +91,7 @@ func render() -> void:
 	var info := PlayerUI.column(summary)
 	info.add_theme_constant_override("separation",0)
 	info.add_child(_label("REINO DO DESERTO  ·  CIDADE NOTURNA",_px(15,11)/_unit_or_one(),GOLD))
-	info.add_child(_label("El Fuego  —  %d de 10 fases concluídas" % local_completed.size(),_px(22,14)/_unit_or_one()))
+	info.add_child(_label(str(TranslationServer.translate("El Fuego  —  %d de 10 fases concluídas")) % local_completed.size(),_px(22,14)/_unit_or_one()))
 	var pips := Control.new()
 	pips.custom_minimum_size = Vector2(_px(300,150),_px(14,10))
 	pips.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -248,7 +248,7 @@ func _phase_card(parent: Control, order: int, title: String, description: String
 	pad.add_child(content)
 	var name_label := _plain(title,_px(26,16),GOLD if available else Color("#9aa6b3"))
 	content.add_child(name_label)
-	var text := _plain(description if available else "Conclua a fase %02d para liberar." % (order-1),_px(17,12),Color("#c3cfdc") if available else Color("#7f8b98"))
+	var text := _plain(description if available else str(TranslationServer.translate("Conclua a fase %02d para liberar.")) % (order-1),_px(17,12),Color("#c3cfdc") if available else Color("#7f8b98"))
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text.max_lines_visible = 4 if not _compact else 2
 	text.clip_text = true

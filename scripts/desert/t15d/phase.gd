@@ -221,7 +221,7 @@ func _build_player() -> void:
 	_player.blocked.connect(func() -> void: _sfx.play("block"))
 	_player.action_empty.connect(func(_kind: String) -> void: _sfx.play("empty",1.0,-5.0))
 	_player.action_empty.connect(func(kind: String) -> void:
-		if is_instance_valid(_hud): _hud.notify("Sem carga de %s • procure uma recarga" % {"attack":"fogo","defense":"defesa","rupture":"ruptura","amber":"âmbar","dash":"relâmpago"}.get(kind,kind),true))
+		if is_instance_valid(_hud): _hud.notify(str(TranslationServer.translate("Sem carga de %s • procure uma recarga")) % {"attack":"fogo","defense":"defesa","rupture":"ruptura","amber":"âmbar","dash":"relâmpago"}.get(kind,kind),true))
 	_player.blocked.connect(func() -> void: _impact(_player.position+Vector3(_player.facing*0.45,0.9,0),Color("#9cdeff")))
 	_player.ability_used.connect(_on_ability_used)
 	_player.setup(_find_protagonist())
@@ -857,7 +857,7 @@ func _check_checkpoints() -> void:
 	_checkpoint = _vec3(points[next].pos)
 	_snapshot = {"defeated":_defeated_ids.duplicate(),"collected":_collected_ids.duplicate(),"attack":_player.attack_charges,"defense":_player.defense_charges}
 	_sfx.play("checkpoint")
-	_hud.notify("Checkpoint %d de %d salvo neste dispositivo" % [next+1,points.size()])
+	_hud.notify(str(TranslationServer.translate("Checkpoint %d de %d salvo neste dispositivo")) % [next+1,points.size()])
 	get_tree().call_group("campaign_checkpoints","refresh_lit",_checkpoint_index)
 	if PlayerServices.current != null and PlayerServices.current.session.authenticated():
 		_sync_game_checkpoint(_checkpoint_index)

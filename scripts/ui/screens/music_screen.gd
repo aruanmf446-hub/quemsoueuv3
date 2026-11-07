@@ -48,7 +48,7 @@ func render() -> void:
 	for track: Dictionary in music.tracks:
 		if not music.is_excluded(str(track.id)): on += 1
 	var top := PlayerUI.split(body)
-	var count := PlayerUI.label("%d de %d músicas tocando no menu" % [on, music.tracks.size()], int(19 * k), Color("#c9d6e6"))
+	var count := PlayerUI.label(str(TranslationServer.translate("%d de %d músicas tocando no menu")) % [on, music.tracks.size()], int(19 * k), Color("#c9d6e6"))
 	count.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	top.add_child(count)
 	for spec: Array in [["Marcar todas", true], ["Desmarcar todas", false]]:
@@ -89,7 +89,7 @@ func _genre_header(music: Node, key: String, tracks: Array, k: float) -> HBoxCon
 	name_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	name_label.size_flags_vertical = Control.SIZE_SHRINK_END
 	header.add_child(name_label)
-	var count := PlayerUI.label("%d de %d" % [on, tracks.size()], int(20 * k), Color("#c9d6e6"))
+	var count := PlayerUI.label(str(TranslationServer.translate("%d de %d")) % [on, tracks.size()], int(20 * k), Color("#c9d6e6"))
 	count.autowrap_mode = TextServer.AUTOWRAP_OFF
 	count.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	count.size_flags_vertical = Control.SIZE_SHRINK_END

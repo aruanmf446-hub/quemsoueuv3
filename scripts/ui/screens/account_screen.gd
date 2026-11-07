@@ -159,7 +159,7 @@ func _build_social(column: VBoxContainer) -> void:
 	for entry: Dictionary in PROVIDERS:
 		var provider := str(entry.id)
 		var available := services.session.social_available(provider)
-		var button := _add_button(column, "Continuar com " + str(entry.name), _social.bind(provider), entry.bg, entry.ink)
+		var button := _add_button(column, tr("Continuar com %s") % str(entry.name), _social.bind(provider), entry.bg, entry.ink)
 		button.name = "Provider_" + provider
 		button.disabled = not available
 		button.tooltip_text = "" if available else "Em breve: precisa de configuração oficial no Supabase GAME"

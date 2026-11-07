@@ -145,7 +145,7 @@ func valid_data(value: Variant) -> bool:
  return true
 
 static func message(code: String,kind := "") -> String:
- if code=="ability_full": return "Sua habilidade %s está cheia (3/3). Nenhuma recarga foi gasta." % KINDS.get(kind,kind)
+ if code=="ability_full": return str(TranslationServer.translate("Sua habilidade %s está cheia (3/3). Nenhuma recarga foi gasta.")) % str(TranslationServer.translate(KINDS.get(kind,kind)))
  if code=="ability_locked": return "Esta habilidade ainda não foi liberada nesta fase."
  if code=="no_refills": return "Você não tem recargas guardadas para usar."
  if code=="refill_already_used": return "Esta recarga já foi aplicada. Atualize o inventário."

@@ -26,6 +26,7 @@ extends HBoxContainer
 
 
 func _ready() -> void:
+	_name_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	_refresh()
 
 

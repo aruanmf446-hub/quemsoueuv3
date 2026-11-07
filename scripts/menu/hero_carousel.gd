@@ -187,6 +187,11 @@ func _relayout() -> void:
 		title.add_theme_font_size_override("font_size", title_font)
 		if index == 2: title.add_theme_font_size_override("font_size", 46 if iphone else 62)
 		if index == 1: title.add_theme_font_size_override("font_size", 49 if iphone else 66)
+		var base_font := title.get_theme_font_size("font_size")
+		var longest := 1.0
+		for line: String in tr(str(SLIDES[index].title)).split("\n"):
+			longest = maxf(longest, _font.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, base_font).x)
+		title.add_theme_font_size_override("font_size", mini(base_font, maxi(24, floori(base_font * (content_w + 65) / longest))))
 		_rect(title, left, h * 0.225, content_w + 65, h * 0.19)
 		var description: Label = layer.get_node("Description")
 		description.add_theme_font_size_override("font_size", body_font)
@@ -203,7 +208,7 @@ func _relayout() -> void:
 	var widths: Array[float] = []
 	var total := 0.0
 	for text: String in TABS:
-		var width := _font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x + 28.0
+		var width := _font.get_string_size(tr(text), HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x + 28.0
 		widths.append(width)
 		total += width
 	for index in range(_tabs.size()):
@@ -276,7 +281,9 @@ func _process(delta: float) -> void:
 	if _elapsed >= SLIDE_SECONDS: _switch_slide(1)
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and using_art:
+		_relayout.call_deferred()
+	elif what == NOTIFICATION_APPLICATION_FOCUS_OUT:
 		_focused = false
 		_cancel_pointer()
 	elif what == NOTIFICATION_APPLICATION_FOCUS_IN:

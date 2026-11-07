@@ -90,7 +90,7 @@ func show_death(fell: bool, checkpoint_label: String) -> void:
 	_title(phase_name.to_upper(),12,Color("#d9b778"))
 	_title("Você caiu" if fell else "Você foi derrotado",28,Color("#f3b4a2"))
 	var has_checkpoint := not checkpoint_label.is_empty()
-	_title("Continue do %s com 1 vida e sem cargas." % checkpoint_label if has_checkpoint else "Recomece a fase com a vida cheia.",14,Color("#dccdb3"))
+	_title(str(TranslationServer.translate("Continue do %s com 1 vida e sem cargas.")) % checkpoint_label if has_checkpoint else "Recomece a fase com a vida cheia.",14,Color("#dccdb3"))
 	_button("Voltar ao checkpoint" if has_checkpoint else "Recomeçar do início",checkpoint_requested.emit,true)
 	if has_checkpoint: _button("Recomeçar fase",restart_requested.emit)
 	_button("Voltar ao menu",return_requested.emit)
@@ -99,7 +99,7 @@ func show_completion(defeated: int, seconds: float, saved := true) -> void:
 	_completion = true
 	_death = false
 	_clear()
-	_title("FASE %02d  /  CONCLUÍDA" % order,12,Color("#d9b778"))
+	_title(str(TranslationServer.translate("FASE %02d  /  CONCLUÍDA")) % order,12,Color("#d9b778"))
 	_title("Travessia concluída",27,Color.WHITE)
 	_title("Cactus  %d / %d    •    %02d:%02d" % [defeated,total_enemies,int(seconds)/60,int(seconds)%60],14,Color("#dccdb3"))
 	_title(("Reino do Deserto concluído neste aparelho" if order == 10 else "Próxima fase liberada neste aparelho") if saved else "Não foi possível salvar o progresso",14,Color("#9dc9dc"))

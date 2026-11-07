@@ -381,7 +381,7 @@ func _process(_delta: float) -> void:
 	_timer.text = "FIM" if _closed() else "%d s" % seconds
 	_timer.add_theme_color_override("font_color",Color("#ff8f86") if seconds <= 10 else PlayerUI.TEXT)
 	if _data.get("phase","") == "countdown":
-		_instruction.text = "Começa em %d" % maxi(seconds,1)
+		_instruction.text = str(TranslationServer.translate("Começa em %d")) % maxi(seconds,1)
 	CharacterSlot.collect_prepared()
 	_poll_reveal(_delta)
 var _reveal_wait := 0.0
@@ -456,7 +456,7 @@ func _render_instruction(me: Dictionary) -> void:
 		"selection":
 			var needed := int(_data.get("cards_per_player",1))
 			_instruction.text = "Escolha suas cartas"
-			_detail.text = "%d de %d selecionadas · escolha em segredo" % [_chosen.size(),needed]
+			_detail.text = str(TranslationServer.translate("%d de %d selecionadas · escolha em segredo")) % [_chosen.size(),needed]
 			_confirm.text = "Confirmar cartas"
 			_confirm.visible = not me.is_empty() and not me.confirmed and not me.eliminated
 			_confirm.disabled = _chosen.size() != needed
@@ -465,7 +465,7 @@ func _render_instruction(me: Dictionary) -> void:
 			_instruction.text = "A partida vai começar!"
 			_detail.text = "Suas cartas permanecem privadas."
 		"turns":
-			_instruction.text = "É a sua vez!" if _is_my_turn() else "Vez de %s" % str(turn.get("nickname","…"))
+			_instruction.text = "É a sua vez!" if _is_my_turn() else str(TranslationServer.translate("Vez de %s")) % str(turn.get("nickname","…"))
 			_detail.text = "Escolha uma carta para eliminar." if _is_my_turn() else "Aguarde a escolha do jogador."
 			if not _pending_pick.is_empty():
 				_detail.text = "Eliminar %s?" % _name(_pending_pick)
@@ -483,7 +483,7 @@ func _render_instruction(me: Dictionary) -> void:
 				_instruction.text="Revelando resultado…"
 				return
 			var winners: Array = (_data.result if _data.get("result") is Dictionary else {}).get("winners",[])
-			_instruction.text = "Vitória de %s!" % str(_player(_data,str(winners[0])).get("nickname","")) if winners.size() == 1 else "Empate!"
+			_instruction.text = str(TranslationServer.translate("Vitória de %s!")) % str(_player(_data,str(winners[0])).get("nickname","")) if winners.size() == 1 else "Empate!"
 			_detail.text = "Voltando ao lobby da sala…"
 		_:
 			_instruction.text = "Batalha"

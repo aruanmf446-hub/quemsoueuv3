@@ -560,13 +560,14 @@ func _draft_summary(parent: Node, draft: Dictionary) -> void:
 	var title := _submission_text(words,str(draft.get("name","")) if not str(draft.get("name", "")).is_empty() else tr("Sem nome"),"DeckSummaryName",PlayerUI.TEXT,26)
 	title.tooltip_text=title.text
 	words.add_theme_constant_override("separation",8)
-	if not str(draft.get("category", "")).is_empty(): _submission_text(words,str(draft.category),"DeckSummaryCategory",PlayerUI.MUTED,20)
+	if not str(draft.get("category", "")).is_empty(): _submission_text(words,tr(str(draft.category)),"DeckSummaryCategory",PlayerUI.MUTED,20)
 	var facts := HFlowContainer.new()
 	facts.add_theme_constant_override("h_separation",8)
 	facts.add_theme_constant_override("v_separation",8)
 	words.add_child(facts)
 	PlayerUI.creator_badge(facts,tr({"private":"Privado","unlisted":"Não listado","public":"Público"}.get(str(draft.get("visibility","private")),"Privado")))
-	PlayerUI.creator_badge(facts,tr("%d carta%s") % [draft.get("cards",[]).size(),"" if draft.get("cards",[]).size()==1 else "s"])
+	var count := (draft.get("cards",[]) as Array).size()
+	PlayerUI.creator_badge(facts,tr("%d carta" if count==1 else "%d cartas") % count)
 
 func _review_feedback(parent: Node, draft: Dictionary) -> void:
 	if not _is_revision(draft): return
@@ -580,7 +581,7 @@ func _review_feedback(parent: Node, draft: Dictionary) -> void:
 	_submission_text(text,reason if not reason.is_empty() else tr("A revisão não informou um motivo. Atualize o status para consultar novamente."),"RejectionReason")
 
 func _render_submissions() -> void:
-	_page("Status dos decks","submissions")
+	_page(tr("Status dos decks"),"submissions")
 	PlayerUI.standard_back($Margin/Column/Header/Back,"Meus Decks")
 	var intro := PlayerUI.row(body)
 	var caption := PlayerUI.column(intro)
@@ -1246,7 +1247,7 @@ func _retry_draft(draft: Dictionary) -> void:
 	elif str(result.get("code", "")) == "deck_incomplete":
 		banner.show_state("error", CreatorSync.deck_ready(draft))
 	else:
-		banner.show_state("error", "Sincronização não concluída (%s). Seus dados permanecem neste aparelho." % str(result.get("code", "erro")))
+		banner.show_state("error", str(TranslationServer.translate("Sincronização não concluída (%s). Seus dados permanecem neste aparelho.")) % str(result.get("code", "erro")))
 	if _view == "library": _update_results()
 
 
@@ -1424,7 +1425,7 @@ func _render_deck(item: Dictionary) -> void:
 	metadata.add_child(_text("%d cartas  ·  A–Z" % item.count, 16, PlayerUI.MUTED))
 	if not str(item.category).is_empty(): metadata.add_child(_data_text(item.category, 16))
 	for tag: String in item.tags: metadata.add_child(PlayerUI.pill(tag, "available"))
-	if not str(item.age_rating).is_empty(): metadata.add_child(_text("Classificação: " + str(item.age_rating), 16))
+	if not str(item.age_rating).is_empty(): metadata.add_child(_text(str(TranslationServer.translate("Classificação: ")) + str(item.age_rating), 16))
 	if not str(item.description).is_empty(): body.add_child(_data_text(item.description, 18, PlayerUI.MUTED))
 	for warning: String in item.content_warnings: body.add_child(_data_text(warning, 16, PlayerUI.GOLD))
 	_grid = GridContainer.new()
@@ -1676,7 +1677,7 @@ func _remote_section(kind: String) -> void:
 		_results.add_child(loading)
 		return
 	if _remote_error.has(kind):
-		_results.add_child(_text("Não foi possível falar com o servidor (%s). Seus dados continuam salvos neste aparelho." % str(_remote_error[kind]), 14, Color("#ff9797")))
+		_results.add_child(_text(str(TranslationServer.translate("Não foi possível falar com o servidor (%s). Seus dados continuam salvos neste aparelho.")) % str(_remote_error[kind]), 14, Color("#ff9797")))
 		var retry := _action("Tentar novamente", func() -> void:
 			_remote_error.erase(kind)
 			if kind == "decks": _pulled_decks = false
@@ -1732,7 +1733,7 @@ func _render_editor() -> void:
 	if _moderation(_draft) in ["pending_review", "published"]:
 		_page(str(_draft.name), "editor")
 		PlayerUI.standard_back($Margin/Column/Header/Back,"Meus Decks")
-		var locked := _text("Este deck está %s. Para editar, retire-o da Comunidade primeiro." % (tr("em revisão") if _moderation(_draft) == "pending_review" else tr("publicado")), 18)
+		var locked := _text(str(TranslationServer.translate("Este deck está %s. Para editar, retire-o da Comunidade primeiro.")) % (tr("em revisão") if _moderation(_draft) == "pending_review" else tr("publicado")), 18)
 		locked.name = "EditorLocked"
 		body.add_child(locked)
 		var withdraw := _action("Retirar da Comunidade para editar", _unpublish_draft.bind(_draft))
@@ -1741,13 +1742,13 @@ func _render_editor() -> void:
 		body.add_child(withdraw)
 		_reveal()
 		return
-	_page("Criar deck" if str(_draft.name).is_empty() else str(_draft.name), "editor")
+	_page(tr("Criar deck") if str(_draft.name).is_empty() else str(_draft.name), "editor")
 	PlayerUI.standard_back($Margin/Column/Header/Back,"Meus Decks")
 	body.add_theme_constant_override("separation",12)
 	_review_feedback(body,_draft)
 	var credit_info := PlayerUI.row(body)
 	var commerce := services.cosmetic_shop
-	credit_info.add_child(_text("Cartas de criação: "+str(commerce.data.get("deck_credits","—"))+ (" · 1 carta = 1 deck" if commerce.data.get("deck_credits_required",false) else " · criação gratuita"),20,PlayerUI.MUTED))
+	credit_info.add_child(_text(str(TranslationServer.translate("Cartas de criação: "))+str(commerce.data.get("deck_credits","—"))+ (tr(" · 1 carta = 1 deck") if commerce.data.get("deck_credits_required",false) else tr(" · criação gratuita")),20,PlayerUI.MUTED))
 	credit_info.add_child(PlayerUI.button("Cartas",func()->void:navigate_requested.emit("wallet",{"tab":"coins","category":"deck_credits"})))
 	var metadata := PlayerUI.creator_panel(body)
 	var form := PlayerUI.row(metadata)
@@ -1787,7 +1788,7 @@ func _render_editor() -> void:
 		description_count.text="%d/%d" % [str(_draft.description).length(),DeckDrafts.DESCRIPTION_MAX])
 	metadata.add_child(description)
 	WebTextBridge.attach(description)
-	var details := _action(("▾" if _editor_details_open else "▸")+" Capa e referência visual · opcional",func()->void:
+	var details := _action(("▾" if _editor_details_open else "▸")+tr(" Capa e referência visual · opcional"),func()->void:
 		_editor_details_open=not _editor_details_open
 		_render_editor())
 	details.name="DeckDetails"
@@ -1806,7 +1807,7 @@ func _render_editor() -> void:
 	for node: Control in extra.find_children("*","Control",true,false):
 		if node is BaseButton or node is LineEdit: PlayerUI.editor_control(node)
 	var card_intro := PlayerUI.creator_panel(body)
-	PlayerUI.creator_heading(card_intro,"CARTAS · %d de %d" % [_draft.cards.size(),Catalog.MAX_CARDS],"Adicione suas imagens e dê um nome a cada carta. Mínimo de 5 para revisão.","cards")
+	PlayerUI.creator_heading(card_intro,str(TranslationServer.translate("CARTAS · %d de %d")) % [_draft.cards.size(),Catalog.MAX_CARDS],"Adicione suas imagens e dê um nome a cada carta. Mínimo de 5 para revisão.","cards")
 	PlayerUI.creator_progress(card_intro,_draft.cards.size(),Catalog.MAX_CARDS)
 	_add_prompt_action()
 	var list := PlayerUI.column(body)
@@ -2083,7 +2084,7 @@ func _report(result: Dictionary) -> void:
 
 
 func _render_review() -> void:
-	_page("Revisar deck", "review")
+	_page(tr("Revisar deck"), "review")
 	$Margin/Column/Scroll.scroll_vertical=0
 	PlayerUI.standard_back($Margin/Column/Header/Back,"Editar")
 	var problems := DeckDrafts.problems(_draft)

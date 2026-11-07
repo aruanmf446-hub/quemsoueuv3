@@ -139,21 +139,21 @@ func delete(id: String) -> bool:
 static func problems(draft: Dictionary) -> Array[String]:
 	var result: Array[String] = []
 	var name := str(draft.get("name", "")).strip_edges()
-	if name.length() < NAME_MIN or name.length() > NAME_MAX: result.append("Nome do deck: de %d a %d caracteres." % [NAME_MIN, NAME_MAX])
-	if str(draft.get("description", "")).length() > DESCRIPTION_MAX: result.append("Descrição: até %d caracteres." % DESCRIPTION_MAX)
+	if name.length() < NAME_MIN or name.length() > NAME_MAX: result.append(str(TranslationServer.translate("Nome do deck: de %d a %d caracteres.")) % [NAME_MIN, NAME_MAX])
+	if str(draft.get("description", "")).length() > DESCRIPTION_MAX: result.append(str(TranslationServer.translate("Descrição: até %d caracteres.")) % DESCRIPTION_MAX)
 	if not str(draft.get("category", "")) in CATEGORIES: result.append("Escolha uma categoria.")
 	if not str(draft.get("visibility", "")) in VISIBILITY: result.append("Escolha a visibilidade.")
 	var cards: Array = draft.get("cards", [])
 	if cards.size() < Catalog.MIN_CARDS or cards.size() > Catalog.MAX_CARDS:
-		result.append("O deck precisa de %d a %d cartas (agora: %d)." % [Catalog.MIN_CARDS, Catalog.MAX_CARDS, cards.size()])
+		result.append(str(TranslationServer.translate("O deck precisa de %d a %d cartas (agora: %d).")) % [Catalog.MIN_CARDS, Catalog.MAX_CARDS, cards.size()])
 	var names := {}
 	for card: Dictionary in cards:
 		var card_name := str(card.get("name", "")).strip_edges()
-		if card_name.is_empty() or card_name.length() > CARD_NAME_MAX: result.append("Toda carta precisa de nome (até %d caracteres)." % CARD_NAME_MAX)
+		if card_name.is_empty() or card_name.length() > CARD_NAME_MAX: result.append(str(TranslationServer.translate("Toda carta precisa de nome (até %d caracteres).")) % CARD_NAME_MAX)
 		elif names.has(Catalog.search_key(card_name)): result.append("Nome de carta repetido: " + card_name)
 		names[Catalog.search_key(card_name)] = true
-		if str(card.get("description", "")).length() > CARD_DESCRIPTION_MAX: result.append("Descrição de \"%s\": até %d caracteres." % [card_name, CARD_DESCRIPTION_MAX])
-		if str(card.get("image_file", "")).is_empty(): result.append("A carta \"%s\" ainda não tem imagem." % card_name)
+		if str(card.get("description", "")).length() > CARD_DESCRIPTION_MAX: result.append(str(TranslationServer.translate("Descrição de \"%s\": até %d caracteres.")) % [card_name, CARD_DESCRIPTION_MAX])
+		if str(card.get("image_file", "")).is_empty(): result.append(str(TranslationServer.translate("A carta \"%s\" ainda não tem imagem.")) % card_name)
 	var unique: Array[String] = []
 	for item in result: if not unique.has(item): unique.append(item)
 	return unique

@@ -205,7 +205,7 @@ func _send_local() -> void:
 	var column := PlayerUI.column(bubble)
 	column.add_theme_constant_override("separation",2)
 	var now := Time.get_datetime_dict_from_system()
-	column.add_child(Style.label("Você · %02d:%02d" % [now.hour,now.minute],10,PlayerUI.GOLD))
+	column.add_child(Style.label(str(TranslationServer.translate("Você · %02d:%02d")) % [now.hour,now.minute],10,PlayerUI.GOLD))
 	var text := Style.label(message,12)
 	text.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	column.add_child(text)

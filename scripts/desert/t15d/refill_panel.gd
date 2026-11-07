@@ -36,7 +36,7 @@ func _load() -> void:
  _refresh_buttons()
 func _refresh_buttons() -> void:
  var n: Variant=_service.count() if _service!=null else null
- _stock.text="Recargas guardadas: "+("—" if n==null else str(n))
+ _stock.text=tr("Recargas guardadas: %s") % ("—" if n==null else str(n))
  for kind: String in _buttons:
   var reason := str(phase._player.refill_status(kind,phase._order))
   var count := int(phase._player.charges(kind))
@@ -59,7 +59,7 @@ func _use(kind: String) -> void:
  phase._session.operation_busy=false
  if result.ok:
   phase._sync_resources()
-  _status.text="%s recarregada: 3/3." % AbilityRefillService.KINDS[kind]
+  _status.text=str(TranslationServer.translate("%s recarregada: 3/3.")) % tr(AbilityRefillService.KINDS[kind])
   PlayerUI.refill_feedback(_status,true)
  else:
   _status.text=AbilityRefillService.message(result.code,kind)

@@ -109,15 +109,16 @@ func _process(_delta: float) -> void:
 		bottom_right.x = minf(bottom_right.x, (to_window * eye.get_global_rect().position).x)
 	var kind := kind_of(field)
 	var value := str(field.get("text"))
+	var placeholder := str(TranslationServer.translate(str(field.get("placeholder_text"))))
 	var secret: bool=field.secret if field is LineEdit else false
 	var maximum: int=field.max_length if field is LineEdit else int(field.get_meta("qse_max_length",10000))
-	var key := "%d,%d,%d,%d,%s,%s,%s" % [top_left.x, top_left.y, bottom_right.x, bottom_right.y, value, kind, secret]
+	var key := "%d,%d,%d,%d,%s,%s,%s,%s" % [top_left.x, top_left.y, bottom_right.x, bottom_right.y, value, kind, secret, placeholder]
 	if key == _last: return
 	_last = key
 	# clearRegion remove também os callbacks. Perfil carregando, rolagem ou um
 	# modal podem ocultar o campo temporariamente: religar antes de republicá-lo.
 	_bridge.bind(_id,_callbacks[0],_callbacks[1],_callbacks[2])
-	_bridge.setRegion(_id, top_left.x, top_left.y, bottom_right.x - top_left.x, bottom_right.y - top_left.y, value, str(field.get("placeholder_text")), maximum,
+	_bridge.setRegion(_id, top_left.x, top_left.y, bottom_right.x - top_left.x, bottom_right.y - top_left.y, value, placeholder, maximum,
 		kind, str(field.get_meta("qse_autocomplete", "")), secret)
 
 static func visible_control_rect(control: Control) -> Rect2:

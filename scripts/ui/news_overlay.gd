@@ -424,7 +424,7 @@ func _add_offer(grid: GridContainer, offer: Dictionary, rewards: OfficialRewards
 		var found: Dictionary = DeckCatalog.find_deck(id)
 		var count := int(found.get("count", 0))
 		if count > 0:
-			var count_label := _label("%d cartas" % count, 10 if _compact else (20 if _iphone else 13), MUTED)
+			var count_label := _label(str(TranslationServer.translate("%d cartas")) % count, 10 if _compact else (20 if _iphone else 13), MUTED)
 			count_label.name = "CardCount"
 			count_label.size_flags_horizontal = Control.SIZE_SHRINK_END
 			name_row.add_child(count_label)

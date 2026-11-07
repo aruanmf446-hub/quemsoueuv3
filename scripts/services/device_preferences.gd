@@ -67,6 +67,8 @@ func apply() -> void:
 		AudioServer.set_bus_mute(index, gain <= 0.001 or (bus_name == "Master" and bool(values.muted)))
 		AudioServer.set_bus_volume_db(index, linear_to_db(maxf(gain, 0.0001)))
 	TranslationServer.set_locale(values.locale)
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("window.qseSetLocale && window.qseSetLocale(" + JSON.stringify(str(values.locale)) + ")")
 	for binding: Array in [["ui_accept", "accept_key"], ["ui_cancel", "back_key"]]:
 		for event: InputEvent in InputMap.action_get_events(binding[0]):
 			if event is InputEventKey:

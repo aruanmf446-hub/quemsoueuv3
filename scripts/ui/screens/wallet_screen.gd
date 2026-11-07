@@ -83,7 +83,7 @@ func _render_coin_store() -> void:
 	var balance := PlayerUI.label("%s moedas" % DevicePreferences.number(services.wallet.balance("coins"),services.preferences.values.locale),28,PlayerUI.GOLD)
 	balance.name="CoinStoreBalance"
 	balances.add_child(balance)
-	var credits := PlayerUI.label("Cartas: "+DevicePreferences.number(services.cosmetic_shop.deck_credits(),services.preferences.values.locale),20,PlayerUI.MUTED)
+	var credits := PlayerUI.label(str(TranslationServer.translate("Cartas: "))+DevicePreferences.number(services.cosmetic_shop.deck_credits(),services.preferences.values.locale),20,PlayerUI.MUTED)
 	credits.name="DeckCreditBalance"
 	var cards := PlayerUI.row(balances)
 	var card_symbol := TextureRect.new()
@@ -178,7 +178,7 @@ func _prepare_refill_purchase() -> void:
 	var price := str(service.data.price_coins).to_int()
 	_checkout_dialog=Control.new();_checkout_dialog.name="AbilityRefillPurchase"
 	var panel := PlayerUI.deck_modal(self,_checkout_dialog)
-	PlayerUI.shop_confirmation(panel,"Comprar recarga","1 recarga completa · %d moedas" % price,load("res://assets/icons/vector/icon_refill.svg") as Texture2D)
+	PlayerUI.shop_confirmation(panel,"Comprar recarga",str(TranslationServer.translate("1 recarga completa · %d moedas")) % price,load("res://assets/icons/vector/icon_refill.svg") as Texture2D)
 	var feedback := PlayerUI.label("A recarga fica guardada até você escolher uma habilidade no menu de pausa.",20,PlayerUI.MUTED)
 	panel.add_child(feedback)
 	var actions := PlayerUI.row(panel)

@@ -190,7 +190,8 @@ static func iso_seconds(text: String) -> float:
 static func ago(seconds: float) -> String:
 	if seconds <= 0.0: return ""
 	var delta := maxf(Time.get_unix_time_from_system() - seconds, 0.0)
-	if delta < 60.0: return "agora"
-	if delta < 3600.0: return "há %d min" % int(delta / 60.0)
-	if delta < 86400.0: return "há %d h" % int(delta / 3600.0)
-	return "há %d dia%s" % [int(delta / 86400.0), "s" if int(delta / 86400.0) > 1 else ""]
+	if delta < 60.0: return str(TranslationServer.translate("agora"))
+	if delta < 3600.0: return str(TranslationServer.translate("há %d min")) % int(delta / 60.0)
+	if delta < 86400.0: return str(TranslationServer.translate("há %d h")) % int(delta / 3600.0)
+	var days := int(delta / 86400.0)
+	return str(TranslationServer.translate("há %d dia" if days==1 else "há %d dias")) % days

@@ -331,8 +331,9 @@ func _hotspot(target: Control, route: String, params: Dictionary={}) -> void:
 
 func _refresh_profile() -> void:
 	var profile := _services.profile.data
-	$ProfileCard/Content/Info/Name.text = str(profile.get("nickname", "Minha conta") if profile.get("nickname") != null else "Minha conta")
-	$ProfileCard/Content/Info/Level.text = "Nível " + DevicePreferences.number(profile.get("level")) if profile.get("level") != null else "Perfil · sem nível registrado"
+	$ProfileCard/Content/Info/Name.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	$ProfileCard/Content/Info/Name.text = str(profile.get("nickname")) if profile.get("nickname") != null else tr("Minha conta")
+	$ProfileCard/Content/Info/Level.text = str(TranslationServer.translate("Nível ")) + DevicePreferences.number(profile.get("level")) if profile.get("level") != null else "Perfil · sem nível registrado"
 	$ProfileCard/Content/Info/Xp.hide()
 	_mode_label.text = "Conta conectada" if _services.session.authenticated() else "Demonstração local • entre para sincronizar"
 	var avatar: Panel = $ProfileCard/Content/Avatar
@@ -421,5 +422,7 @@ func _publish_update_safety(route: String) -> void:
 
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_refresh_profile()
+	elif what == NOTIFICATION_WM_CLOSE_REQUEST:
 		get_tree().quit()

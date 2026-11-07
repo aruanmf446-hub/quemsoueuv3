@@ -21,11 +21,7 @@ func _ready() -> void:
 	# The project default is Nearest Mipmap: it also reaches the glyph atlas.
 	# Use interpolation for the UI while keeping mipmaps for downscaled artwork.
 	menu.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	var font := preload("res://assets/desert/phase01/interface.ttf").duplicate() as FontFile
-	font.multichannel_signed_distance_field = true
-	var theme := Theme.new()
-	theme.default_font = font
-	menu.theme = theme
+	PlayerUI.apply_theme(menu)
 	# Reuse the existing buttons and their signals in a freely composed navigation layer.
 	var old_menu := menu.get_node("MenuButtons")
 	var navigation := Control.new()
@@ -238,7 +234,7 @@ func _layout() -> void:
 	for id: String in tabs:
 		var title: Label = buttons.get_node(nodes[id]).get_node("ActionBody/Text/Title")
 		var font := title.get_theme_font("font")
-		widths[id] = font.get_string_size(title.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 24).x + 16.0
+		widths[id] = font.get_string_size(tr(title.text), HORIZONTAL_ALIGNMENT_LEFT, -1, 24).x + 16.0
 		total += float(widths[id])
 	# Ajusta o texto na base de design, nunca pela largura física do aparelho.
 	# Telas mais largas acrescentam espaço, sem aumentar as abas ou sua fonte.
@@ -296,10 +292,11 @@ func _social_size() -> void:
 	pass # The lobby shows a compact social shortcut; the full list remains in Friends.
 
 func _language() -> void:
-	# Source strings are Portuguese; avoid English fallback on untranslated pt_BR keys.
-	var mode := Node.AUTO_TRANSLATE_MODE_INHERIT if TranslationServer.get_locale().begins_with("en") else Node.AUTO_TRANSLATE_MODE_DISABLED
+	# Native translation applies to every supported language, not only English.
+	var mode := Node.AUTO_TRANSLATE_MODE_INHERIT
 	for path: String in ["MenuButtons", "ProfileCard", "FriendsPanel", "TopBar", "LobbyArea"]:
 		menu.get_node(path).auto_translate_mode = mode
+	_layout.call_deferred()
 
 
 ## Hover/foco: o conteúdo do botão avança alguns pixels; ao sair, volta suave.

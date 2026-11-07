@@ -286,6 +286,7 @@ func _adapt() -> void:
 	_brand.visible = logical.x >= 760.0
 	_nav.add_theme_constant_override("separation", 6 if compact else 14)
 	for tab in _tabs:
+		tab.text = tr(CATEGORIES[_tabs.find(tab)][0])
 		tab.custom_minimum_size = Vector2(0, 40 if compact else 76)
 		tab.add_theme_font_size_override("font_size", 14 if compact else (20 if narrow else 28))
 		tab.expand_icon = false

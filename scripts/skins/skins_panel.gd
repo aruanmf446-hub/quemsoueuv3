@@ -707,7 +707,7 @@ func _update_variation_action() -> void:
 	elif not item.is_empty():
 		button.text=tr("USAR") if item.owned else str(item.price_coins)+tr(" moedas")
 		button.disabled=not services.inventory.is_unlocked(_selected) or (not item.owned and not item.available)
-		if button.disabled: button.text+=tr(" · EM BREVE")
+		if button.disabled: button.text=tr(button.text)+tr(" · EM BREVE")
 	else:
 		button.text=tr("EM BREVE")
 
@@ -787,7 +787,7 @@ func _build_emote_gallery(entry: Dictionary) -> void:
 		if not pending and buy.disabled: buy.text=tr("EM BREVE")
 		var preview := _preview.find_child("PreviewDanceMovement",true,false) as Button
 		if preview!=null: PlayerUI.style_button(preview,pending)
-	_collection_count.text="LOJA · PRÉVIA" if shop else "REAÇÕES · %d" % emotes.size()
+	_collection_count.text="LOJA · PRÉVIA" if shop else str(TranslationServer.translate("REAÇÕES · %d")) % emotes.size()
 	var hint := PlayerUI.label("Emotes da conta · todas as skins compatíveis" if shop else "Exemplos de lobby, vitória e derrota",20,PlayerUI.MUTED)
 	body.add_child(hint)
 	body.move_child(hint,0)
@@ -805,7 +805,7 @@ func _build_emote_gallery(entry: Dictionary) -> void:
 				_preview_dance()
 			elif is_instance_valid(_stage):
 				_context_title.text={"Lobby":"No lobby","Vitória":"Você venceu!","Derrota":"Fim de partida"}.get(str(emote.context),str(emote.context))
-				_context_hint.text=tr("Exemplo da reação de ")+str(emote.context).to_lower()
+				_context_hint.text=tr("Exemplo da reação de %s") % tr(str(emote.context).to_lower())
 				_stage.character.play_emote(StringName(emote.animation)))
 		button.name="EmotePreview_"+str(emote.id)
 		button.tooltip_text=tr(str(emote.name))+" · "+tr("Toque para visualizar")

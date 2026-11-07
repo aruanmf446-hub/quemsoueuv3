@@ -88,7 +88,7 @@ func present(lesson: String,context := "") -> void:
 	active=true
 	_was_paused=get_tree().paused
 	_title.text=LESSONS[lesson][0]
-	_body.text=LESSONS[lesson][1]
+	_body.text=tr(LESSONS[lesson][1])
 	var art_path:="res://assets/desert/tutorial/"+lesson+".res"
 	_illustration.texture=load(art_path) if lesson in ["defense","amber","dash","rupture"] and ResourceLoader.exists(art_path) else null
 	_illustration.visible=_illustration.texture!=null

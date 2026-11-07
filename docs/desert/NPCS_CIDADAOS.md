@@ -24,3 +24,13 @@ de corrida dos soldados. Sem colisão, dano, recarga ou grupo de inimigos.
 Os sprites e suas reações pertencem ao trecho carregado e desaparecem ao
 sair dele. Os pés permanecem alinhados ao trocar de pose. Não alterar a pista,
 a aparência dos heróis ou a lógica de combate para acomodar figurantes.
+
+## Visibilidade corrigida após relato do dono
+
+Contar nós na árvore ou no frustum não comprova visibilidade. Fachadas, paredes de
+telhados e jardins são planos pintados opacos; os cidadãos precisam ficar à frente
+desses planos, ainda atrás do jogador. Evitar retornar às profundidades -2/-5 usadas
+antes, que escondiam corpos inteiros. Conferir pixels e pés nas capturas reais.
+Entradas de fases e distritos/checkpoints têm pequenos grupos visíveis imediatamente;
+os encontros anteriores continuam distribuídos pelo percurso. A arena final fica livre.
+Evidências: `evidence/npcs-visiveis/`.

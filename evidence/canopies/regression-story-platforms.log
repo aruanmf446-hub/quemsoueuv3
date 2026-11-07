@@ -1,0 +1,33 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS fase 1 tem objetos próximos alcançáveis por cima
+PASS fase 1 não prende a cabeça ao subir pelo objeto
+PASS fase 1 permite pousar por cima com salto real
+PASS fase 2 conserva seus telhados físicos
+PASS fase 2 salta e pousa no teto
+PASS fase 3 tem objetos próximos alcançáveis por cima
+PASS fase 3 não prende a cabeça ao subir pelo objeto
+PASS fase 3 permite pousar por cima com salto real
+PASS fase 4 tem objetos próximos alcançáveis por cima
+PASS fase 4 não prende a cabeça ao subir pelo objeto
+PASS fase 4 permite pousar por cima com salto real
+PASS fase 5 tem objetos próximos alcançáveis por cima
+PASS fase 5 não prende a cabeça ao subir pelo objeto
+PASS fase 5 permite pousar por cima com salto real
+PASS fase 6 tem objetos próximos alcançáveis por cima
+PASS fase 6 não prende a cabeça ao subir pelo objeto
+PASS fase 6 permite pousar por cima com salto real
+PASS fase 7 tem objetos próximos alcançáveis por cima
+PASS fase 7 não prende a cabeça ao subir pelo objeto
+PASS fase 7 permite pousar por cima com salto real
+PASS fase 8 tem objetos próximos alcançáveis por cima
+PASS fase 8 não prende a cabeça ao subir pelo objeto
+PASS fase 8 permite pousar por cima com salto real
+PASS fase 9 tem objetos próximos alcançáveis por cima
+PASS fase 9 não prende a cabeça ao subir pelo objeto
+PASS fase 9 permite pousar por cima com salto real
+PASS fase 10 tem objetos próximos alcançáveis por cima
+PASS fase 10 não prende a cabeça ao subir pelo objeto
+PASS fase 10 permite pousar por cima com salto real
+PASS sair remove os apoios sem referências antigas
+STORY_PLATFORMS checks=30 failures=0

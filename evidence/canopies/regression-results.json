@@ -1,0 +1,58 @@
+[
+  {
+    "test": "story-platforms",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 9.23,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "prop-landings",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 10.99,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "facade-canopies",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 5.75,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "solid-obstacles",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 6.89,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "route-01",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 15.95,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-03",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 14.64,
+    "graphical": false,
+    "fixed_physics_step": true
+  },
+  {
+    "test": "route-08",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 18.17,
+    "graphical": false,
+    "fixed_physics_step": true
+  }
+]

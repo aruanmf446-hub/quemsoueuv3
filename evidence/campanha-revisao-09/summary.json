@@ -1,0 +1,61 @@
+{
+  "base": "876e7c9",
+  "phases": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "full_routes_passed": 9,
+  "route_deaths": 0,
+  "surface_checks": 71,
+  "surface_failures": 0,
+  "canopies": 427,
+  "street_below_phase_2": 310,
+  "carry_transition_checks": 65,
+  "roof_contact_checks": 30,
+  "pedestal_checks": 79,
+  "current_parkour_checks": 52,
+  "native_mobile_captures": 27,
+  "native_desktop_captures": 27,
+  "small_captures": 9,
+  "physical_device": false,
+  "legacy_tests": [
+    "layout_test.gd: 12 baseline failures",
+    "parkour_test.gd: removed geyser fixture, now fails fast"
+  ],
+  "notes": [
+    "Three initial native capture fixtures landed inside a real gap; target corrected without changing the game, original and corrected logs retained.",
+    "Full route suite retained unedited result with legacy parkour failure; not claimed all green."
+  ],
+  "web_review": {
+    "passed": true,
+    "phases": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "viewport": "844x390",
+    "dpr": 3,
+    "physical_device": false,
+    "gpu": "SwiftShader software",
+    "fixture_scenery_only": true,
+    "errors": [],
+    "blocked": []
+  },
+  "web_canopies_passed": [
+    "near-canopy phase 1",
+    "task-canopy phase 3"
+  ]
+}

@@ -1,5 +1,6 @@
 extends PlayerScreen
 var _coin_store := false
+var _store_category := "coins"
 var _checkout_dialog: Control
 var _refreshing := false
 
@@ -62,52 +63,58 @@ func render() -> void:
 
 
 func _render_coin_store() -> void:
-	var summary := PlayerUI.card(body)
-	summary.add_child(PlayerUI.label("Moedas para a sua conta",28,PlayerUI.TEXT))
-	summary.add_child(PlayerUI.label("Compre pacotes de moedas e use o saldo em skins, emotes, mochilas e outros itens.",22,PlayerUI.MUTED))
-	summary.add_child(PlayerUI.label("Os itens da loja têm preço em moedas.",20,PlayerUI.GOLD))
-	var balance := PlayerUI.label("Saldo: %s moedas" % DevicePreferences.number(services.wallet.balance("coins"),services.preferences.values.locale),30,PlayerUI.TEXT)
+	heading.text=tr("Moedas e créditos")
+	var top := PlayerUI.row(body)
+	var balances := PlayerUI.row(top)
+	var balance := PlayerUI.label("%s moedas" % DevicePreferences.number(services.wallet.balance("coins"),services.preferences.values.locale),28,PlayerUI.GOLD)
 	balance.name="CoinStoreBalance"
-	body.add_child(balance)
+	balances.add_child(balance)
+	var credits := PlayerUI.label("Créditos de deck: "+str(services.cosmetic_shop.data.get("deck_credits","—")),20,PlayerUI.MUTED)
+	credits.name="DeckCreditBalance"
+	balances.add_child(credits)
+	var refresh := PlayerUI.button("Atualizar",_refresh_store)
+	refresh.name="RefreshCoinPayments"
+	refresh.disabled=_refreshing
+	top.add_child(refresh)
 	if not services.session.authenticated():
 		account_button(body)
 		return
 	var store := services.coin_store
-	var packages: Array=store.data.get("packages",[])
+	var categories := PlayerUI.row(body)
+	for id: String in ["coins","deck_credits"]:
+		var tab := PlayerUI.button("MOEDAS" if id=="coins" else "CRÉDITOS DE DECK",func()->void:
+			_store_category=id
+			render())
+		tab.name="StoreCategory_"+id
+		PlayerUI.style_button(tab,_store_category==id)
+		tab.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		categories.add_child(tab)
+	var packages: Array=store.data.get("packages",[]).filter(func(p: Dictionary)->bool:return p.get("reward_kind","coins")==_store_category)
 	if not store.data.get("enabled",false):
-		body.add_child(PlayerUI.label("Vendas desabilitadas · valores provisórios. Nenhuma cobrança disponível.",22,PlayerUI.GOLD))
+		var notice := PlayerUI.label("Em breve · preços provisórios",20,PlayerUI.MUTED)
+		notice.name="CoinSalesNotice"
+		body.add_child(notice)
+	elif not store.data.get("live_mode",false):
+		body.add_child(PlayerUI.label("Modo de teste · sem cobrança ou crédito de moedas reais.",20,PlayerUI.GOLD))
+	var row := PlayerUI.row(body)
+	for pack: Dictionary in packages:
+		var unavailable: bool=not store.data.get("enabled",false) or not pack.get("available",true)
+		var buy := PlayerUI.shop_package(row,pack,_brl(int(pack.price_brl_cents)),unavailable,_prepare_checkout.bind(pack))
+		buy.name="CoinPack_"+str(pack.id)
 	if packages.is_empty():
-		var empty := PlayerUI.card(body)
-		empty.add_child(PlayerUI.label("Pacotes de moedas",26,PlayerUI.TEXT))
-		var notice := PlayerUI.label("Os pacotes de moedas estarão disponíveis em breve.",22,PlayerUI.MUTED)
-		notice.name="CoinPackagesPending"
-		empty.add_child(notice)
-	else:
-		if store.data.get("enabled",false) and not store.data.live_mode:
-			body.add_child(PlayerUI.label("Modo de teste · sem cobrança ou crédito de moedas reais.",22,PlayerUI.GOLD))
-		var row := PlayerUI.flow(body)
-		for pack: Dictionary in packages:
-			var card := PlayerUI.card(row)
-			card.custom_minimum_size.x=300
-			card.add_child(PlayerUI.label(pack.name,24))
-			card.add_child(PlayerUI.label("%s %s" % [pack.coins,"crédito(s) de deck" if pack.get("reward_kind")=="deck_credits" else "moedas"],32,PlayerUI.GOLD))
-			var buy := PlayerUI.button("%s · COMPRAR" % _brl(int(pack.price_brl_cents)),_prepare_checkout.bind(pack))
-			buy.name="CoinPack_"+str(pack.id)
-			buy.disabled=not store.data.get("enabled",false) or not pack.get("available",true)
-			if buy.disabled: buy.text="%s · EM BREVE" % _brl(int(pack.price_brl_cents))
-			PlayerUI.editor_control(buy,true)
-			card.add_child(buy)
-	if store.state=="error" or store.state=="offline":
-		body.add_child(PlayerUI.label("Não foi possível atualizar os pacotes. Tente novamente.",22,PlayerUI.MUTED))
-	var credits := PlayerUI.label("Créditos de deck: "+str(services.cosmetic_shop.data.get("deck_credits","—")),26)
-	credits.name="DeckCreditBalance"
-	body.add_child(credits)
-	body.add_child(PlayerUI.label("Um crédito libera um novo deck. Editar, corrigir e reenviar o mesmo deck não usa outro crédito.",20,PlayerUI.MUTED))
-	body.add_child(PlayerUI.label("Criação gratuita enquanto o uso de créditos estiver desabilitado.",20,PlayerUI.MUTED))
-	var refresh := PlayerUI.button("Atualizar pagamentos e saldo",_refresh_store)
-	refresh.name="RefreshCoinPayments"
-	refresh.disabled=_refreshing
-	body.add_child(refresh)
+		var pending := PlayerUI.label("Os pacotes de moedas estarão disponíveis em breve.",24,PlayerUI.MUTED)
+		pending.name="CoinPackagesPending"
+		body.add_child(pending)
+	if _store_category=="deck_credits" and not packages.is_empty():
+		var details := PlayerUI.column(row)
+		details.size_flags_stretch_ratio=2.0
+		details.add_child(PlayerUI.label("Dê vida ao seu deck",30,PlayerUI.TEXT))
+		details.add_child(PlayerUI.label("Um crédito para criar um novo deck na sua conta.",22,PlayerUI.MUTED))
+		details.add_child(PlayerUI.label("Editar e reenviar o mesmo deck não gasta outro crédito.",20,PlayerUI.MUTED))
+		if not services.cosmetic_shop.data.get("deck_credits_required",false):
+			details.add_child(PlayerUI.label("A criação de decks continua gratuita.",22,PlayerUI.GOLD))
+	if store.state in ["error","offline"]:
+		body.add_child(PlayerUI.label("Não foi possível atualizar. Tente novamente.",20,PlayerUI.MUTED))
 	var orders: Array=store.data.get("orders",[])
 	if not orders.is_empty():
 		body.add_child(PlayerUI.label("Seus pagamentos",26))

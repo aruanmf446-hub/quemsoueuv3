@@ -4,7 +4,7 @@ extends PlayerScreen
 ## Layout: galeria rolável à esquerda (duas colunas) e prévia 3D fixa à direita, fora da rolagem.
 signal character_selected(character_id: StringName)
 signal progress_changed
-const PREVIEW_FILL_RATIO := 0.80
+const PREVIEW_FILL_RATIO := 0.86
 ## Cada arquivo .json desta pasta vira uma categoria (coleção) na barra lateral.
 const COLLECTIONS_DIR := "res://data/collections/"
 var _collection_title := "Começo"
@@ -176,7 +176,7 @@ func _split_layout() -> void:
 	_side = PanelContainer.new()
 	_side.name = "HeroPreview"
 	_side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_side.size_flags_stretch_ratio = 1.0
+	_side.size_flags_stretch_ratio = 1.1
 	_side.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	# Como na referência, o palco do personagem fica direto sobre o cenário, sem caixa.
 	_side.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
@@ -207,11 +207,11 @@ func _responsive_layout() -> void:
 	$Margin/Column.add_theme_constant_override("separation", 6 if compact else 12)
 	_split.add_theme_constant_override("separation", 8 if compact else 18)
 	_scroll.size_flags_stretch_ratio = 1.0
-	_gallery_section.size_flags_stretch_ratio = 1.25 if compact else 1.4
-	_side.size_flags_stretch_ratio = 1.0
+	_gallery_section.size_flags_stretch_ratio = 1.15
+	_side.size_flags_stretch_ratio = 1.1
 	# Barra de coleções só quando sobra largura; em telas estreitas a coleção atual
 	# continua no topo ("COMEÇO · 7/8") e a prévia não é empurrada para fora.
-	_collection_sidebar.visible = _cosmetic_mode=="skins" and not compact and get_viewport().get_visible_rect().size.x >= 1200.0
+	_collection_sidebar.visible = _cosmetic_mode=="skins" and not UIScale.is_iphone() and not compact and get_viewport().get_visible_rect().size.x >= 1500.0
 	_toolbar.add_theme_constant_override("separation", 4 if compact else 8)
 	_fav_button.text = "Favoritos" if not compact else "FAV"
 	_fav_button.add_theme_color_override("font_color", ACCENT if _favorite_only else PlayerUI.TEXT)
@@ -509,7 +509,7 @@ func _select(character_id: String) -> void:
 	var arrows := HBoxContainer.new()
 	arrows.name="CharacterArrows"
 	arrows.visible=_cosmetic_mode=="skins"
-	_preview.add_child(arrows)
+	heading_row.add_child(arrows)
 	var left_arrow := _button("‹", _select_neighbor.bind(-1))
 	left_arrow.name="PreviousSkinCharacter"
 	left_arrow.custom_minimum_size = Vector2(56, 56)
@@ -535,7 +535,7 @@ func _select(character_id: String) -> void:
 		_stage.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		_stage.fill_ratio = PREVIEW_FILL_RATIO
 		_stage.frame_character()
-		_stage.set_zoom(ThumbnailCache.framing_zoom(character_id))
+		_stage.set_zoom(0.88*ThumbnailCache.framing_zoom(character_id))
 		_stage.frame_character.call_deferred()
 	_description = PlayerUI.label(str(entry.get("description", "")), 16)
 	_description.custom_minimum_size.y = 0
@@ -550,7 +550,8 @@ func _select(character_id: String) -> void:
 	actions.add_theme_constant_override("separation", 10)
 	_preview.add_child(actions)
 	var equip := _button("EQUIPADO" if equipped else ("EQUIPAR" if unlocked else "BLOQUEADO"), _equip.bind(character_id), true)
-	equip.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	equip.name="SkinEquipButton"
+	equip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	equip.custom_minimum_size.x = 300
 	equip.custom_minimum_size.y = 36 if compact else PlayerUI.CONTROL_HEIGHT
 	equip.disabled = not unlocked or equipped
@@ -564,6 +565,7 @@ func _select(character_id: String) -> void:
 			actions.add_child(buy_skin)
 	var back := _button("VOLTAR", close)
 	back.custom_minimum_size.y = 36 if compact else PlayerUI.CONTROL_HEIGHT
+	back.hide()
 	actions.add_child(back)
 	var shop_actions := PlayerUI.row(_preview)
 	shop_actions.name="EmoteShopActions"
@@ -619,8 +621,8 @@ func _choose_cosmetic_mode(mode: String) -> void:
 	if _stage.character.has_animation(&"base"): _stage.character.set_pose(&"base",0.0)
 	if mode!="shop":
 		_stage.frame_character()
-		_stage.set_zoom(ThumbnailCache.framing_zoom(_selected))
-	var arrows := _preview.get_node_or_null("CharacterArrows") as Control
+		_stage.set_zoom(0.88*ThumbnailCache.framing_zoom(_selected))
+	var arrows := _preview.find_child("CharacterArrows",true,false) as Control
 	if arrows!=null: arrows.visible=mode=="skins"
 	for key: String in _cosmetic_tabs: PlayerUI.style_button(_cosmetic_tabs[key],key==mode)
 	_rebuild_gallery()
@@ -673,8 +675,7 @@ func _build_variant_picker(entry: Dictionary,actions: Control) -> void:
 	action.name="VariationPurchase"
 	action.clip_text=true
 	action.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-	_preview.add_child(action)
-	_preview.move_child(action,row.get_index()+1)
+	actions.add_child(action)
 	_update_variation_action()
 	if row.visible: _load_variation_previews(entry,row,images)
 
@@ -692,6 +693,8 @@ func _update_variation_action() -> void:
 	var style := str(_selected_styles.get(_selected,"original"))
 	var item := services.cosmetic_shop.product(_selected,style)
 	button.visible=_cosmetic_mode=="skins" and (style!="original" or services.cosmetic_shop.equipped(_selected)!="original")
+	var equip := _preview.find_child("SkinEquipButton",true,false) as Button
+	if equip!=null: equip.visible=not button.visible
 	button.disabled=true
 	button.text=tr("ORIGINAL")
 	if style=="original":
@@ -788,8 +791,8 @@ func _build_emote_gallery(entry: Dictionary) -> void:
 		button.toggle_mode=true
 		button.button_group=group
 		if shop: button.button_pressed=_shop_item==str(emote.product_id)
-		button.custom_minimum_size=Vector2(0,260)
-		button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		button.custom_minimum_size=Vector2(280,350) if shop else Vector2(0,260)
+		button.size_flags_horizontal=Control.SIZE_SHRINK_BEGIN if shop else Control.SIZE_EXPAND_FILL
 		_grid.add_child(button)
 		var content := VBoxContainer.new()
 		button.add_child(content)

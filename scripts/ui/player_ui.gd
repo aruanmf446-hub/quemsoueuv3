@@ -336,6 +336,60 @@ static func card(parent: Node) -> VBoxContainer:
 	return column(panel)
 
 
+## Store merchandise uses the same theme; no text baked into artwork.
+static func shop_package(parent: Node, pack: Dictionary, price: String, unavailable: bool, action: Callable) -> Button:
+	var shell := PanelContainer.new()
+	shell.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	var surface := frame_panel(16)
+	surface.bg_color=Color("18232e")
+	surface.border_color=Color("344452")
+	shell.add_theme_stylebox_override("panel",surface)
+	parent.add_child(shell)
+	var content := column(shell)
+	content.add_theme_constant_override("separation",6)
+	var credit: bool=pack.get("reward_kind")=="deck_credits"
+	var art := Control.new()
+	art.custom_minimum_size.y=80
+	art.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	content.add_child(art)
+	var count := 1 if credit else (2 if int(pack.coins)<=100 else (4 if int(pack.coins)<=250 else 6))
+	for i in count:
+		var icon := TextureRect.new()
+		icon.texture=preload("res://assets/icons/vector/icon_coin.svg")
+		icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.mouse_filter=Control.MOUSE_FILTER_IGNORE
+		art.add_child(icon)
+		icon.set_anchors_preset(Control.PRESET_CENTER)
+		var offset := Vector2((i%3-1)*36,-(i/3)*22)
+		icon.position=Vector2(-42,0)+offset
+		icon.size=Vector2(84,84)
+	if credit:
+		for child in art.get_children(): child.queue_free()
+		var symbol := TextureRect.new()
+		symbol.texture=preload("res://assets/icons/vector/icon_reward_deck.svg")
+		symbol.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+		symbol.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		art.add_child(symbol)
+		symbol.set_anchors_preset(Control.PRESET_CENTER)
+		symbol.position=Vector2(-40,-8)
+		symbol.size=Vector2(80,80)
+	var amount := label(str(pack.coins),44,TEXT)
+	amount.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	content.add_child(amount)
+	var unit_label := label("CRÉDITO DE DECK" if credit else "MOEDAS",20,GOLD)
+	unit_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	content.add_child(unit_label)
+	var cost := label(price,26,TEXT)
+	cost.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	content.add_child(cost)
+	var buy := button("EM BREVE" if unavailable else "COMPRAR",action)
+	style_button(buy,not unavailable)
+	buy.disabled=unavailable
+	content.add_child(buy)
+	return buy
+
+
 ## Painel grande (superfície escura com filete fino).
 static func panel(parent: Node, padding := 34) -> VBoxContainer:
 	var node := PanelContainer.new()

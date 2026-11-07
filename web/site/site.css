@@ -16,11 +16,11 @@ a{color:inherit}
 .eyebrow{margin:0 0 .4em;color:var(--gold);font-size:14px;letter-spacing:.04em;text-transform:uppercase}
 
 /* Topo: logo à esquerda, poucos links em caixa alta (igual ao lobby). */
-.top{position:absolute;inset:0 0 auto;z-index:5;display:flex;align-items:center;gap:clamp(16px,3vw,44px);
-  padding:max(14px,env(safe-area-inset-top)) var(--gutter) 14px}
-.brand img{width:clamp(110px,11vw,170px)}
+.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:clamp(16px,3vw,44px);
+  padding:max(10px,env(safe-area-inset-top)) max(var(--gutter),calc((100% - 1440px)/2 + var(--gutter))) 10px}
+.brand img{width:clamp(104px,9vw,140px)}
 .nav{display:flex;gap:clamp(14px,2.4vw,40px);flex:1}
-.nav a{text-decoration:none;text-transform:uppercase;font-size:clamp(14px,1.25vw,19px);color:var(--text);opacity:.92;padding:10px 0}
+.nav a{text-decoration:none;text-transform:uppercase;font-size:15px;color:var(--text);opacity:.92;padding:10px 0}
 .nav a:hover{color:var(--gold-bright)}
 
 /* Botões: style_button do jogo. Uma ação principal dourada. */
@@ -34,16 +34,11 @@ a{color:inherit}
 .btn-sm{min-height:44px;font-size:15px;padding:0 18px}
 .is-off{color:var(--muted);cursor:default;pointer-events:none}
 
-/* Herói: a arte do lobby é exclusiva desta primeira dobra. */
-.hero{position:relative;min-height:min(100svh,941px);display:flex;align-items:flex-end;overflow:hidden}
-.hero-art{position:absolute;inset:0}
-.hero-art img{width:100%;height:100%;object-fit:cover;object-position:62% 50%}
-.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,14,18,.86) 0%,rgba(10,14,18,.55) 34%,rgba(10,14,18,0) 62%)}
-.hero-copy{position:relative;z-index:1;width:min(560px,100%);padding:120px var(--gutter) clamp(36px,8vh,88px)}
-h1{margin:0;font-weight:400;text-transform:uppercase;font-size:clamp(48px,6.4vw,96px);line-height:1.02}
-.lede{margin:18px 0 28px;font-size:clamp(16px,1.35vw,20px);color:var(--text);max-width:30em}
-.hero-actions{display:flex;flex-wrap:wrap;gap:14px}
-.hero-actions .btn-primary{min-width:min(100%,300px);justify-content:flex-start;min-height:60px;font-size:22px}
+/* Apresentação: texto direto, fundo sólido, sem arte de capa (site institucional). */
+.intro{padding-top:clamp(40px,6vw,72px);padding-bottom:0}
+h1{margin:0;font-weight:400;text-transform:uppercase;font-size:clamp(34px,4vw,52px);line-height:1.1}
+.lede{margin:14px 0 24px;font-size:17px;color:var(--muted);max-width:44em}
+.intro-actions{display:flex;flex-wrap:wrap;gap:12px}
 
 /* Seções internas: fundo sólido, como as telas internas do jogo. */
 .band{padding:clamp(40px,5vw,72px) var(--gutter);max-width:1440px;margin:0 auto}
@@ -99,55 +94,18 @@ h3{margin:0;font-weight:400;font-size:22px}
   .nav{display:none}
   .top{justify-content:space-between}
   .modes{grid-template-columns:1fr}
-  .hero::after{background:linear-gradient(0deg,rgba(10,14,18,.92) 0%,rgba(10,14,18,.6) 45%,rgba(10,14,18,.1) 100%)}
 }
 @media (max-width:520px){
+  .intro-actions .btn{width:100%}
   .platforms{grid-template-columns:1fr}
   .cast{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .hero-actions .btn{width:100%}
 }
-/* Mobile retrato: arte em destaque, texto e CTA fora da ilustração. 
-   Mantém o layout horizontal do lobby/jogo completamente separado. */
+/* Celular em retrato: seções mais compactas. */
 @media (max-width:760px) and (orientation:portrait){
-  .top{padding:max(14px,env(safe-area-inset-top)) 20px 12px;gap:12px}
-  .brand img{width:clamp(118px,33vw,142px)}
-  .top-play{min-height:44px;padding:0 16px;font-size:14px}
-  .hero{display:block;min-height:0;overflow:visible}
-  .hero-art{position:relative;inset:auto;display:block;height:clamp(240px,39svh,340px);overflow:hidden}
-  .hero-art img{width:100%;height:100%;object-fit:cover;object-position:48% 43%}
-  .hero-art::after{content:"";position:absolute;inset:0;pointer-events:none;
-    background:linear-gradient(180deg,rgba(10,14,18,.3),transparent 35%,rgba(10,14,18,.07))}
-  .hero::after{display:none}
-  .hero-copy{width:100%;padding:24px 20px 30px;background:var(--bg)}
-  .hero-copy .eyebrow{margin:0 0 8px;font-size:11px;letter-spacing:.11em}
-  .hero-copy h1{font-size:clamp(32px,9.3vw,42px);line-height:1.1;letter-spacing:.015em}
-  .hero-copy h1 br{display:none}
-  .hero-copy .lede{margin:12px 0 20px;font-size:15px;line-height:1.5;color:var(--muted);max-width:40ch}
-  .hero-actions{display:flex;flex-direction:column;gap:6px}
-  .hero-actions .btn-primary{width:100%;min-width:0;min-height:52px;font-size:17px;
-    justify-content:center;letter-spacing:.03em}
-  .hero-actions .btn-primary svg{width:20px;height:20px}
-  .hero-actions .btn-ghost{width:100%;min-height:44px;padding:0 12px;border-color:transparent;
-    background:transparent;color:var(--muted);font-size:13px;letter-spacing:.025em;
-    text-decoration:underline;text-underline-offset:4px}
-  .hero-actions .btn-ghost:hover{color:var(--text);background:transparent}
+  .top{gap:12px}
   .band{padding-top:36px;padding-bottom:40px}
   .band h2{font-size:clamp(27px,7vw,34px);margin-bottom:22px}
   .plat{padding:20px}
   .plat .btn{font-size:16px}
-}
-
-/* Celular deitado (844×390, 640×360): herói compacto, sem cortar o título. */
-@media (max-height:480px) and (orientation:landscape){
-  .hero{min-height:100svh}
-  .hero-copy{width:min(720px,100%);padding-top:64px;padding-bottom:18px}
-  .hero-actions{flex-wrap:nowrap}
-  .hero-actions .btn-primary{min-width:0}
-  h1{font-size:clamp(36px,9vh,56px)}
-  .lede{margin:8px 0 14px;font-size:15px}
-  .hero-actions .btn{min-height:44px;font-size:16px}
-  .hero-actions{gap:10px}
-  .top{padding-top:max(8px,env(safe-area-inset-top));padding-bottom:8px}
-  .brand img{width:100px}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}

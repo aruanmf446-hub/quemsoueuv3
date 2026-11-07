@@ -83,41 +83,48 @@ jobs:
         run: |
           set -euo pipefail
           engine="$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64"
-          mkdir -p "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" build/web
+          mkdir -p "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" build/web/jogar
           cp "$RUNNER_TEMP/tpl-names/web_nothreads_release.zip" "$XDG_DATA_HOME/godot/export_templates/4.7.2.stable/web_nothreads_release.zip"
           "$engine" --headless --editor --import --quit > "$RUNNER_TEMP/import.log" 2>&1
-          "$engine" --headless --export-release Web build/web/index.html > "$RUNNER_TEMP/export.log" 2>&1
+          "$engine" --headless --export-release Web build/web/jogar/index.html > "$RUNNER_TEMP/export.log" 2>&1
           # Ignore apenas avisos conhecidos de limpeza do Godot ao encerrar a exportação.
           # Erros de script, importação e exportação continuam bloqueando o deploy.
           if grep -E 'SCRIPT ERROR:|ERROR:|Parse Error:' "$RUNNER_TEMP/import.log" "$RUNNER_TEMP/export.log" \
             | grep -Ev 'ERROR: ([0-9]+ resources still in use at exit|Pages in use exist at exit in PagedAllocator:|[0-9]+ RID allocations of type .* were leaked at exit)'; then
             exit 1
           fi
-          test -s build/web/index.html
-          test -s build/web/index.pck
-          test -s build/web/index.wasm
-          python3 tools/web/wasm_has_names.py build/web/index.wasm
+          test -s build/web/jogar/index.html
+          test -s build/web/jogar/index.pck
+          test -s build/web/jogar/index.wasm
+          python3 tools/web/wasm_has_names.py build/web/jogar/index.wasm
           # Músicas do menu fora do pacote: o jogo baixa cada faixa sob demanda (menu_music.gd).
           # Imagens da tela de carregamento: tudo que estiver em web/loading/ (jpg, png, webp).
-          mkdir -p build/web/loading
-          find web/loading -maxdepth 1 -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) -exec cp {} build/web/loading/ \;
-          python3 -c "import json,os; d='build/web/loading'; json.dump(sorted(f for f in os.listdir(d) if f.lower().endswith(('.jpg','.jpeg','.png','.webp'))), open(d+'/list.json','w'))"
-          cat build/web/loading/list.json
-          mkdir -p build/web/music
-          (cd assets/music && find . -name '*.mp3' -exec cp --parents {} ../../build/web/music/ \;)
+          mkdir -p build/web/jogar/loading
+          find web/loading -maxdepth 1 -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) -exec cp {} build/web/jogar/loading/ \;
+          python3 -c "import json,os; d='build/web/jogar/loading'; json.dump(sorted(f for f in os.listdir(d) if f.lower().endswith(('.jpg','.jpeg','.png','.webp'))), open(d+'/list.json','w'))"
+          cat build/web/jogar/loading/list.json
+          mkdir -p build/web/jogar/music
+          (cd assets/music && find . -name '*.mp3' -exec cp --parents {} ../../build/web/jogar/music/ \;)
           # PWA (T24 iOS): manifest, ícones e um único service worker versionado por build.
-          mkdir -p build/web/pwa
-          cp web/pwa/icon-*.png build/web/pwa/
-          cp web/pwa/manifest.webmanifest build/web/manifest.webmanifest
+          mkdir -p build/web/jogar/pwa
+          cp web/pwa/icon-*.png build/web/jogar/pwa/
+          cp web/pwa/manifest.webmanifest build/web/jogar/manifest.webmanifest
           # T32: ship browser bridge inside the same versioned PWA build.
           node --check web/voice/bridge.js
-          mkdir -p build/web/voice
-          cp web/voice/bridge.js build/web/voice/bridge.js
-          python3 -c 'from pathlib import Path; p=Path("build/web/index.html"); s=p.read_text(); assert "</head>" in s; p.write_text(s.replace("</head>", "<script src=\"voice/bridge.js\" defer></script></head>", 1))'
-          python3 tools/web/stamp_sw.py build/web "${GITHUB_SHA::12}"
-          python3 tools/web/check_pwa.py build/web
-          ls -la build/web/index.pck
-          du -sh build/web build/web/music
+          mkdir -p build/web/jogar/voice
+          cp web/voice/bridge.js build/web/jogar/voice/bridge.js
+          python3 -c 'from pathlib import Path; p=Path("build/web/jogar/index.html"); s=p.read_text(); assert "</head>" in s; p.write_text(s.replace("</head>", "<script src=\"voice/bridge.js\" defer></script></head>", 1))'
+          python3 tools/web/stamp_sw.py build/web/jogar "${GITHUB_SHA::12}"
+          python3 tools/web/check_pwa.py build/web/jogar
+          ls -la build/web/jogar/index.pck
+          du -sh build/web/jogar build/web/jogar/music
+      # Página inicial (quemsoueu.cards/): SEO e downloads, sem o motor. O jogo fica em /jogar/.
+      - name: Montar página inicial
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp -r web/site/. build/web/
+          python3 tools/web/check_site.py build/web
       # Painel separado da exportação Godot. Nunca grava USER/PASSWORD no artefato.
       - name: Build QSE Command Center from repository secrets
         if: github.ref == 'refs/heads/main'

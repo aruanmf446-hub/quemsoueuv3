@@ -808,6 +808,7 @@ func _pause() -> void:
 	_session.show_pause()
 	get_tree().paused = true
 func _resume() -> void:
+	if is_instance_valid(_session) and _session.operation_busy: return
 	get_tree().paused = false
 	_paused = false
 	_release_input()

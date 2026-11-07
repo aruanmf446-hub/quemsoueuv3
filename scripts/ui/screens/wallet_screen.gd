@@ -14,6 +14,8 @@ func _ready() -> void:
 		if is_visible_in_tree() and _coin_store: render())
 	services.cosmetic_shop.changed.connect(func()->void:
 		if is_visible_in_tree(): render())
+	services.ability_refills.changed.connect(func()->void:
+		if is_visible_in_tree() and _coin_store: render())
 	services.session.changed.connect(_close_checkout)
 	visibility_changed.connect(func()->void:
 		if not is_visible_in_tree(): _close_checkout())
@@ -100,14 +102,17 @@ func _render_coin_store() -> void:
 		return
 	var store := services.coin_store
 	var categories := PlayerUI.row(body)
-	for id: String in ["coins","deck_credits"]:
-		var tab := PlayerUI.button("MOEDAS" if id=="coins" else "CARTAS DE CRIAÇÃO",func()->void:
+	for id: String in ["coins","deck_credits","refills"]:
+		var tab := PlayerUI.button({"coins":"MOEDAS","deck_credits":"CARTAS DE CRIAÇÃO","refills":"RECARGAS"}[id],func()->void:
 			_store_category=id
 			render())
 		tab.name="StoreCategory_"+id
 		PlayerUI.style_button(tab,_store_category==id)
 		tab.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 		categories.add_child(tab)
+	if _store_category=="refills":
+		_render_refills()
+		return
 	var packages: Array=store.data.get("packages",[]).filter(func(p: Dictionary)->bool:return p.get("reward_kind","coins")==_store_category)
 	if not store.data.get("enabled",false):
 		var notice := PlayerUI.label("Em breve · preços provisórios",20,PlayerUI.MUTED)
@@ -143,11 +148,63 @@ func _render_coin_store() -> void:
 			item.add_child(PlayerUI.label("Pedido %s · %s" % [str(order.id).left(8),str(order.created_at).left(16).replace("T"," ")],20,PlayerUI.MUTED))
 
 
+func _render_refills() -> void:
+	var service := services.ability_refills
+	var row := PlayerUI.row(body)
+	var art := TextureRect.new()
+	art.texture=load("res://assets/icons/vector/icon_refill.svg") as Texture2D
+	art.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+	art.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	art.custom_minimum_size=Vector2(144,144)
+	row.add_child(art)
+	var info := PlayerUI.column(row)
+	info.add_child(PlayerUI.label("Recarga completa",30,PlayerUI.TEXT))
+	info.add_child(PlayerUI.label("Completa uma habilidade escolhida até 3/3.",22,PlayerUI.GOLD))
+	info.add_child(PlayerUI.label("Use durante a fase: Pausa → Configurações → Recargas compradas.",20,PlayerUI.MUTED))
+	info.add_child(PlayerUI.label("Se a habilidade estiver cheia, nenhuma recarga é gasta.",20,PlayerUI.MUTED))
+	var n: Variant=service.count()
+	body.add_child(PlayerUI.label("Recargas guardadas: "+("—" if n==null else str(n)),24,PlayerUI.TEXT))
+	var price := str(service.data.get("price_coins",""))
+	var buy := PlayerUI.button((price+" moedas · COMPRAR") if service.data.get("available",false) else (price+" moedas · EM BREVE" if not price.is_empty() else "INDISPONÍVEL"),_prepare_refill_purchase)
+	buy.name="BuyAbilityRefill"
+	buy.disabled=not service.data.get("available",false) or service.busy
+	PlayerUI.style_button(buy,true)
+	body.add_child(buy)
+
+
+func _prepare_refill_purchase() -> void:
+	var service := services.ability_refills
+	if not service.data.get("available",false) or is_instance_valid(_checkout_dialog): return
+	var price := str(service.data.price_coins).to_int()
+	_checkout_dialog=Control.new();_checkout_dialog.name="AbilityRefillPurchase"
+	var panel := PlayerUI.deck_modal(self,_checkout_dialog)
+	PlayerUI.shop_confirmation(panel,"Comprar recarga","1 recarga completa · %d moedas" % price,load("res://assets/icons/vector/icon_refill.svg") as Texture2D)
+	var feedback := PlayerUI.label("A recarga fica guardada até você escolher uma habilidade no menu de pausa.",20,PlayerUI.MUTED)
+	panel.add_child(feedback)
+	var actions := PlayerUI.row(panel)
+	var confirm := PlayerUI.button("CONFIRMAR COMPRA",func()->void:pass)
+	confirm.name="ConfirmAbilityRefillPurchase"
+	PlayerUI.style_button(confirm,true)
+	confirm.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	var dialog := _checkout_dialog
+	confirm.pressed.connect(func()->void:
+		confirm.disabled=true
+		var result := await service.buy(price)
+		if not is_instance_valid(dialog) or dialog!=_checkout_dialog: return
+		feedback.text="Recarga guardada na sua conta." if result.ok else AbilityRefillService.message(result.code)
+		if result.ok: await services.wallet.refresh()
+		else: confirm.disabled=false)
+	actions.add_child(confirm)
+	var cancel := PlayerUI.button("Voltar",_close_checkout);cancel.name="CloseAbilityRefillPurchase"
+	actions.add_child(cancel);cancel.grab_focus.call_deferred()
+
+
 func _refresh_store() -> void:
 	if _refreshing or not services.session.authenticated(): return
 	_refreshing=true
 	await services.coin_store.refresh()
 	await services.cosmetic_shop.refresh()
+	await services.ability_refills.refresh()
 	await services.wallet.refresh()
 	_refreshing=false
 	if is_visible_in_tree(): render()

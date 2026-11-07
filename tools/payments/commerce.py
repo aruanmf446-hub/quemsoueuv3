@@ -10,7 +10,8 @@ STATUS="""select jsonb_build_object('payments',(select to_jsonb(s) from qse_v3.c
 'commerce',(select to_jsonb(s) from qse_v3.commerce_settings s),
 'packages',(select jsonb_agg(to_jsonb(p) order by p.price_brl_cents,p.id) from qse_v3.coin_packages p),
 'active_cosmetics',(select count(*) from qse_v3.cosmetic_products where active),
-'active_emotes',(select count(*) from qse_v3.emote_products where active));"""
+'active_emotes',(select count(*) from qse_v3.emote_products where active),
+'ability_refills',(select to_jsonb(s) from qse_v3.ability_refill_settings s));"""
 
 def main():
  p=argparse.ArgumentParser(description=__doc__)
@@ -24,6 +25,7 @@ update qse_v3.commerce_settings set cosmetics_enabled=false,deck_credits_require
 update qse_v3.coin_packages set active=false;
 update qse_v3.cosmetic_products set active=false;
 update qse_v3.emote_products set active=false;
+update qse_v3.ability_refill_settings set active=false;
 commit;"""
   call('/database/query','POST',json.dumps({'query':sql,'read_only':False}).encode())
  result=call('/database/query','POST',json.dumps({'query':STATUS,'read_only':True}).encode())

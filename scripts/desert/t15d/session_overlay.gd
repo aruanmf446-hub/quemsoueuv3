@@ -9,6 +9,8 @@ var _veil: ColorRect
 var _panel: PanelContainer
 var _column: VBoxContainer
 var opened := false
+var operation_busy := false
+var _page := "pause"
 var _completion := false
 var _death := false
 var order := 1
@@ -51,14 +53,34 @@ func _clear() -> void:
 		_column.remove_child(child)
 		child.queue_free()
 func show_pause() -> void:
+	_page="pause"
 	_completion = false
 	_death = false
 	_clear()
 	_title(phase_name.to_upper(),12,Color("#d9b778"))
 	_title("Pausa",28,Color.WHITE)
 	_button("Continuar",resume_requested.emit,true)
+	_button("Configurações",show_settings)
 	_button("Recomeçar fase",restart_requested.emit)
 	_button("Voltar aos reinos",return_requested.emit)
+	_open()
+func show_settings() -> void:
+	if operation_busy: return
+	_page="settings"
+	_clear()
+	_title("Configurações",28,Color.WHITE)
+	_button("Recargas compradas",show_refills,true)
+	_button("Voltar à pausa",show_pause)
+	_open()
+func show_refills() -> void:
+	if operation_busy: return
+	_page="refills"
+	_clear()
+	_panel.add_theme_stylebox_override("panel",PlayerUI.frame_panel(20))
+	var panel := preload("res://scripts/desert/t15d/refill_panel.gd").new()
+	panel.name="AbilityRefillPanel"
+	panel.phase=get_parent()
+	_column.add_child(panel)
 	_open()
 ## Tela de derrota: a fase fica pausada até o jogador escolher para onde voltar.
 func show_death(fell: bool, checkpoint_label: String) -> void:
@@ -110,6 +132,14 @@ func close() -> void:
 	hide()
 func _unhandled_input(event: InputEvent) -> void:
 	if opened and event.is_action_pressed("ui_cancel"):
+		if operation_busy:
+			get_viewport().set_input_as_handled()
+			return
+		if _page in ["refills","settings"] and not _completion and not _death:
+			if _page=="refills": show_settings()
+			else: show_pause()
+			get_viewport().set_input_as_handled()
+			return
 		if _completion: return_requested.emit()
 		elif _death: checkpoint_requested.emit()
 		else: resume_requested.emit()

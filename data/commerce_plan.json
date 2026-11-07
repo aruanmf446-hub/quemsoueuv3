@@ -8,5 +8,9 @@
   "authority": "Supabase GAME catalogue and feature switches; this file does not enable sales",
   "activation_guide": "docs/backend/COMMERCE_ACTIVATION.md",
   "deck_credit_display_name": "Carta de criação",
-  "decks_per_creation_card": 1
+  "decks_per_creation_card": 1,
+  "ability_full_recharge_coins": 10,
+  "ability_full_recharge_capacity": 3,
+  "ability_refill_target": "one_chosen_unlocked_ability",
+  "ability_refill_location": "pause_settings_only"
 }

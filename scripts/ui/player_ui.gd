@@ -393,6 +393,78 @@ static func shop_confirmation(parent: Node, title: String, detail: String, image
 	return value
 
 
+## Illustrated inventory card, shared with the game's original power artwork.
+static func ability_refill_card(parent: Node, kind: String, title: String, art: Texture2D, emblem: Texture2D, action: Callable) -> Dictionary:
+	var shell := PanelContainer.new()
+	shell.custom_minimum_size.x=244
+	shell.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	var style := frame_panel(10)
+	style.bg_color=Color("#1b2532")
+	style.border_color=FIELD_BORDER
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(8)
+	shell.add_theme_stylebox_override("panel",style)
+	parent.add_child(shell)
+	var content := column(shell)
+	content.add_theme_constant_override("separation",6)
+	var illustration := Control.new()
+	illustration.custom_minimum_size.y=88
+	illustration.clip_contents=true
+	content.add_child(illustration)
+	var image := TextureRect.new()
+	image.texture=art
+	image.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+	image.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED if kind=="attack" else TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	image.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	illustration.add_child(image)
+	image.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var icon := TextureRect.new()
+	icon.texture=emblem
+	icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	illustration.add_child(icon)
+	icon.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	icon.offset_left=-56 if kind=="attack" else -38
+	icon.offset_top=-56 if kind=="attack" else -38
+	var labels := row(content)
+	var name_label := label(title,20,TEXT)
+	name_label.autowrap_mode=TextServer.AUTOWRAP_OFF
+	name_label.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	labels.add_child(name_label)
+	var amount := label("0/3",20,GOLD)
+	labels.add_child(amount)
+	var meter := row(content)
+	var segments: Array=[]
+	for i in 3:
+		var segment := ColorRect.new()
+		segment.custom_minimum_size.y=5
+		segment.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		segment.mouse_filter=Control.MOUSE_FILTER_IGNORE
+		meter.add_child(segment)
+		segments.append(segment)
+	var use := button("USAR RECARGA",action)
+	use.add_theme_font_size_override("font_size",20)
+	content.add_child(use)
+	return {"panel":shell,"style":style,"button":use,"amount":amount,"segments":segments}
+
+
+static func update_refill_card(card: Dictionary, charges: int, reason: String, usable: bool) -> void:
+	var full := reason=="ability_full"
+	var accent := Color("#93d6b2") if full else GOLD
+	card.amount.text="%d/3" % charges
+	card.amount.add_theme_color_override("font_color",accent)
+	card.style.border_color=Color(accent,0.55) if full else FIELD_BORDER
+	for i in 3: card.segments[i].color=accent if i<charges else Color("#35404d")
+	card.button.text="ESTÁ CHEIA" if full else ("BLOQUEADA" if reason=="ability_locked" else "USAR RECARGA")
+	card.button.disabled=not usable
+	style_button(card.button,usable)
+
+
+static func refill_feedback(node: Label, success: bool) -> void:
+	node.add_theme_color_override("font_color",Color("#93d6b2") if success else MUTED)
+
+
 ## Painel grande (superfície escura com filete fino).
 static func panel(parent: Node, padding := 34) -> VBoxContainer:
 	var node := PanelContainer.new()

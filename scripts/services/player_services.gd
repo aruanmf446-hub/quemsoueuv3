@@ -20,6 +20,7 @@ var wallet: WalletService
 var emote_shop: EmoteShopService
 var coin_store: CoinStoreService
 var cosmetic_shop: CosmeticShopService
+var ability_refills: AbilityRefillService
 var friends: FriendsService
 var presence: FriendPresence
 var duel: DuelService
@@ -99,6 +100,10 @@ func _ready() -> void:
 	emote_shop.client=client
 	emote_shop.session=session
 	add_child(emote_shop)
+	ability_refills=AbilityRefillService.new()
+	ability_refills.client=client
+	ability_refills.session=session
+	add_child(ability_refills)
 	cosmetic_shop=CosmeticShopService.new()
 	cosmetic_shop.client=client
 	cosmetic_shop.session=session
@@ -181,6 +186,7 @@ func _session_changed() -> void:
 	emote_shop.clear()
 	coin_store.clear()
 	cosmetic_shop.clear()
+	ability_refills.clear()
 	friends.clear()
 	chat.clear()
 	chat.me_id = str(session.user.get("id", "")) if session.authenticated() else ""

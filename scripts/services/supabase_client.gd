@@ -92,6 +92,7 @@ func request(path: String, method: HTTPClient.Method, body: Dictionary = {}, aut
 		return ServiceResult.failure("not_authenticated", "unauthorized")
 	var epoch := generation
 	var http := HTTPRequest.new()
+	http.process_mode=Node.PROCESS_MODE_ALWAYS
 	# Na Web o navegador já descompacta a resposta; o Godot não deve descompactar de novo.
 	http.accept_gzip = not OS.has_feature("web")
 	http.timeout = 15.0
@@ -144,6 +145,7 @@ func send(path: String, method: HTTPClient.Method, body: Variant = null, headers
 		return ServiceResult.failure("not_authenticated", "unauthorized")
 	var epoch := generation
 	var http := HTTPRequest.new()
+	http.process_mode=Node.PROCESS_MODE_ALWAYS
 	http.accept_gzip = not OS.has_feature("web")
 	http.timeout = timeout
 	http.body_size_limit = 16 * 1024 * 1024

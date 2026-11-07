@@ -1,0 +1,22 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS recargas guardadas vêm da conta
+PASS poka-yoke em 3/3: nem RPC nem consumo
+PASS aviso identifica a habilidade cheia
+PASS defesa 0/3 vira 3/3 usando uma recarga
+PASS defesa 1/3 vira 3/3, não 2/3
+PASS outras habilidades não recebem cargas
+PASS não desbloqueia poderes antes da fase
+PASS sem estoque não fabrica recarga
+PASS 2/3 também completa até o limite 3/3
+PASS resposta perdida deixa uma entrega pendente
+PASS retentativa recupera a mesma recarga sem novo consumo
+PASS falha de confirmação não desfaz a habilidade aplicada
+PASS recibo aplicado não recarrega outra vez
+PASS confirmação pendente é reconciliada sem reaplicar
+PASS troca de conta impede entrega ao jogador errado
+PASS a conta original recupera a entrega
+PASS compra sem resposta não inventa sucesso
+PASS retentativa de compra não duplica débito nem estoque
+PASS uso funciona com o jogo pausado
+ABILITY_REFILLS_CLIENT checks=19 failures=0

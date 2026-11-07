@@ -51,6 +51,7 @@ Migrações registradas no GAME:
 - `20261107220000_commerce_catalog_credits`
 - `20261107221500_commerce_availability`
 - `20261107223000_commerce_package_identity`
+- `20261107230000_ability_refills`
 
 RPCs de conta: `qse_cosmetic_shop()`,
 `qse_cosmetic_purchase(p_product,p_request,p_expected_price)` e
@@ -118,3 +119,11 @@ Limite externo atual: `STRIPE_SECRET_KEY` ausente. Checkout/assinatura com
 sessão Stripe real, cartão, concorrência simultânea de clientes e pagamento
 real ainda precisam ser testados após configurar a chave correta.
 Evidências: `evidence/commerce-live/`.
+
+## Recargas de habilidades
+
+[ABILITY_REFILLS.md](ABILITY_REFILLS.md) descreve o consumível real de **10 moedas**
+por recarga completa de uma habilidade até 3/3, guardado na conta e usado apenas
+em Pausa → Configurações. A venda continua inativa. Sua configuração específica
+é `ability_refill_settings.active`; a compra também respeita o bloqueio global
+da loja. Não confundir uma recarga guardada com três itens/recargas parciais.

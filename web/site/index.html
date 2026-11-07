@@ -33,7 +33,7 @@ if(app||/[?&](invite|coin_order)=/.test(s)||/access_token=/.test(h))location.rep
 <link rel="stylesheet" href="site.css">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
-{"@type":"VideoGame","@id":"https://quemsoueu.cards/#game","name":"Quem Sou Eu","url":"https://quemsoueu.cards/","publisher":{"@type":"Organization","name":"CRM Plus .store"},"image":"https://quemsoueu.cards/img/og.jpg","description":"Jogo de cartas de adivinhação com modo história no Reino do Deserto, duelos com amigos e personagens colecionáveis.","inLanguage":"pt-BR","genre":["Jogo de cartas","Aventura","Adivinhação"],"gamePlatform":["Navegador","iPhone (PWA)","Android","Windows"],"applicationCategory":"Game","operatingSystem":"Web, iOS, Android, Windows","playMode":["SinglePlayer","MultiPlayer"],"offers":{"@type":"Offer","price":"0","priceCurrency":"BRL"}},
+{"@type":"VideoGame","@id":"https://quemsoueu.cards/#game","name":"Quem Sou Eu","url":"https://quemsoueu.cards/","publisher":{"@type":"Organization","name":"CRM Plus Store"},"image":"https://quemsoueu.cards/img/og.jpg","description":"Jogo de cartas de adivinhação com modo história no Reino do Deserto, duelos com amigos e personagens colecionáveis.","inLanguage":"pt-BR","genre":["Jogo de cartas","Aventura","Adivinhação"],"gamePlatform":["Navegador","iPhone (PWA)","Android","Windows"],"applicationCategory":"Game","operatingSystem":"Web, iOS, Android, Windows","playMode":["SinglePlayer","MultiPlayer"],"offers":{"@type":"Offer","price":"0","priceCurrency":"BRL"}},
 {"@type":"WebSite","@id":"https://quemsoueu.cards/#site","name":"Quem Sou Eu","url":"https://quemsoueu.cards/","inLanguage":"pt-BR"},
 {"@type":"FAQPage","mainEntity":[
 {"@type":"Question","name":"Quem Sou Eu é grátis?","acceptedAnswer":{"@type":"Answer","text":"Sim. Você joga grátis no navegador, sem instalar nada."}},
@@ -78,6 +78,9 @@ if(app||/[?&](invite|coin_order)=/.test(s)||/access_token=/.test(h))location.rep
   <p class="hint">iPhone: abra no Safari, toque em Compartilhar e em <b>Adicionar à Tela de Início</b>.</p>
   <p class="hint" id="ios-note" hidden>Você está fora do Safari. Abra este site no Safari para instalar.</p>
 
+<div class="scene-wrap">
+  <img class="scene" src="img/deserto.webp" width="1400" height="588" alt="" >
+</div>
 </section>
 
 <div class="sections">
@@ -138,19 +141,6 @@ if(app||/[?&](invite|coin_order)=/.test(s)||/access_token=/.test(h))location.rep
     </div>
   </section>
 
-  <section class="band" id="personagens" aria-labelledby="t-pers">
-    <p class="eyebrow">Personagens</p>
-    <h2 id="t-pers">Escolha quem entra em campo</h2>
-    <ul class="cast">
-      <li><img src="img/p-cowboy.webp" width="300" height="286" alt="Cowboy" loading="lazy"><span>Cowboy</span></li>
-      <li><img src="img/p-michelly.webp" width="300" height="286" alt="Michelly" loading="lazy"><span>Michelly</span></li>
-      <li><img src="img/p-el_fuego.webp" width="300" height="286" alt="El Fuego" loading="lazy"><span>El Fuego</span></li>
-      <li><img src="img/p-lana.webp" width="300" height="286" alt="Lana" loading="lazy"><span>Lana</span></li>
-      <li><img src="img/p-lorena.webp" width="300" height="286" alt="Lorena" loading="lazy"><span>Lorena</span></li>
-      <li><img src="img/p-gus.webp" width="300" height="286" alt="Gus" loading="lazy"><span>Gus</span></li>
-    </ul>
-  </section>
-
   <section class="band" id="perguntas" aria-labelledby="t-faq">
     <p class="eyebrow">Perguntas</p>
     <h2 id="t-faq">Perguntas frequentes</h2>
@@ -164,9 +154,6 @@ if(app||/[?&](invite|coin_order)=/.test(s)||/access_token=/.test(h))location.rep
 </div>
 </main>
 
-<div class="scene-wrap">
-  <img class="scene" src="img/deserto.webp" width="1400" height="588" alt="" loading="lazy">
-</div>
 
 <footer class="foot">
   <span class="crm-mark"><i aria-hidden="true">+</i><b>CRM Plus</b> Store</span>

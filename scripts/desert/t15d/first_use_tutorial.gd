@@ -99,6 +99,16 @@ func present(lesson: String,context := "") -> void:
 	opened.emit(lesson)
 	get_tree().paused=true
 	_continue.grab_focus()
+func import_seen(kinds: Array) -> void:
+	var config:=ConfigFile.new()
+	config.load(SAVE_PATH)
+	for value: Variant in kinds:
+		var lesson:=str(value)
+		if not LESSONS.has(lesson):continue
+		_seen[lesson]=true
+		config.set_value(_section,_save_key(lesson),true)
+		if OS.has_feature("web"):JavaScriptBridge.eval("try{localStorage.setItem("+_web_key(lesson)+",'1');}catch(e){}")
+	config.save(SAVE_PATH)
 func dismiss() -> void:
 	if not active:return
 	var config:=ConfigFile.new()

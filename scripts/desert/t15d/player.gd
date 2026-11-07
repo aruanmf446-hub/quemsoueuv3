@@ -214,9 +214,11 @@ func restore_charge(kind: String) -> bool:
 func _can_hit(enemy: Node3D) -> bool:
 	var offset := enemy.global_position-global_position
 	return (offset.x*facing > 0.0 or absf(offset.x)<0.3) and absf(offset.x)<=1.7 and absf(offset.y)<1.35
+func can_block(from_x: float) -> bool:
+	return is_defending and (from_x-global_position.x)*facing>=-0.05
 func take_damage(amount: int, from_x: float) -> void:
 	if is_dead or _invulnerable > 0.0: return
-	if is_defending:
+	if can_block(from_x):
 		_shield_timer = 0.0
 		is_defending = false
 		_invulnerable = 0.35
@@ -224,6 +226,8 @@ func take_damage(amount: int, from_x: float) -> void:
 		_model.flash(Color("#8ccfff"))
 		return
 	_dash_left = 0.0
+	_shield_timer = 0.0
+	is_defending = false
 	health = maxi(health-amount,0)
 	_invulnerable = HIT_INVULNERABLE
 	_knockback_timer = 0.18

@@ -6,6 +6,7 @@ const Cactus = preload("res://scripts/desert/t15d/cactus.gd")
 const Terrain = preload("res://scripts/desert/t15d/terrain.gd")
 const Layout = preload("res://scripts/desert/t15d/campaign_layout.gd")
 const Progress = preload("res://scripts/desert/t15d/campaign_progress.gd")
+const Run=preload("res://scripts/desert/t15d/campaign_run.gd")
 const Pickup = preload("res://scripts/desert/t15d/charge_pickup.gd")
 const CHUNK_SIZE := 64.0
 const AHEAD := 2
@@ -24,6 +25,7 @@ var _last_wave := -99.0
 var _ruptured := {}
 var _floor_parts := {}
 var _raised_bridges := {}
+var _task_steps: Dictionary={}
 var _bridge_hints := {}
 var _world: Node3D
 var _loaded_chunks := {}
@@ -54,7 +56,18 @@ var _hit_stopping := false
 var _environment: Environment
 var _announced_place := false
 var _key_light: OmniLight3D
+var _save_owner:=""
+var _run_id:=""
+var _loaded_run: Dictionary={}
+var _run_template: Dictionary={}
+var _save_error:=false
+var _safe_position:=Vector3.ZERO
+var _run_ready:=false
+var _save_clock:=0.0
+var _cloud_clock:=0.0
 func _ready() -> void:
+	_save_owner=OwnerStorage.owner_id()
+	_loaded_run=Run.read(_save_owner).state
 	_set_web_story_playing(true)
 	_previous_go_back = bool(get_meta("previous_go_back",get_tree().quit_on_go_back))
 	get_tree().quit_on_go_back = false
@@ -103,12 +116,19 @@ func _ready() -> void:
 	_build_hud()
 	_first_use=preload("res://scripts/desert/t15d/first_use_tutorial.gd").new()
 	add_child(_first_use)
+	if not _loaded_run.is_empty():_first_use.import_seen(_loaded_run.get("lessons",[]))
 	_restore_ability_buttons()
 	_sync_resources()
 	_first_use.opened.connect(func(_kind: String) -> void:
 		_release_input()
 		_player._model.visible=true)
-	_first_use.closed.connect(func(_kind: String) -> void: _release_input())
+	_first_use.closed.connect(func(_kind: String) -> void:
+		_release_input()
+		_save_active_run())
+	_safe_position=_player.position
+	_run_ready=true
+	_save_active_run(false,"start" if _loaded_run.is_empty() else "save")
+	_sync_run_cloud()
 	if _order==1:_first_use.present.call_deferred("attack")
 func _physics_process(delta: float) -> void:
 	if not is_instance_valid(_player): return
@@ -121,6 +141,20 @@ func _physics_process(delta: float) -> void:
 		_check_checkpoints()
 		_update_storm()
 		_update_bridge_hint()
+		if _player.is_on_floor():
+			var floor:=Layout.floor_at(_phase,_player.position.x)
+			var stable: bool=not floor.is_empty()
+			for task: Dictionary in _phase.tasks:
+				if _raised_bridges.has(str(task.id)) and _player.position.x>=float(task.start) and _player.position.x<=float(task.end):stable=true
+			if stable:_safe_position=_player.position
+		_save_clock+=delta
+		_cloud_clock+=delta
+		if _save_clock>=2.0:
+			_save_clock=0.0
+			_save_active_run()
+		if _cloud_clock>=15.0:
+			_cloud_clock=0.0
+			_sync_run_cloud()
 		if not _tutorial_pit and _player.position.x > float(_phase.holes[0].start)-12.0:
 			_tutorial_pit = true
 			_hud.notify("Buraco à frente • pule para atravessar")
@@ -441,6 +475,7 @@ func _build_chunk_details(chunk: Node3D, index: int) -> void:
 			var device := preload("res://scripts/desert/t15d/earth_bridge.gd").new()
 			device.configure(task)
 			chunk.add_child(device)
+			device.set_progress(int(_task_steps.get(str(task.id),0)))
 			if _raised_bridges.has(str(task.id)): device.raise_bridge(false)
 	for geyser: Dictionary in _phase.get("geysers",[]):
 		if _in_chunk(float(geyser.pos[0]),index):
@@ -466,6 +501,13 @@ func _in_chunk(x: float, index: int) -> bool:
 func _near_bridge(hole: Dictionary, distance := 4.0) -> bool:
 	var x := _player.position.x
 	return (absf(x-float(hole.start))<distance and absf(_player.position.y-float(hole.from_y))<0.7) or (absf(x-float(hole.end))<distance and absf(_player.position.y-float(hole.to_y))<0.7)
+func _near_task_action(device: Node3D) -> bool:
+	var step:=int(_task_steps.get(str(device.hole.id),0))
+	for right in [false,true]:
+		var point: Vector3=device.action_point(step,right)
+		var reach:=0.45 if right and str(device.hole.get("task_kind",""))=="gate" else 1.25
+		if absf(_player.position.x-point.x)<reach and absf(_player.position.y-point.y)<0.7:return true
+	return false
 func _update_bridge_hint() -> void:
 	var task_available := false
 	var caption := ""
@@ -474,9 +516,11 @@ func _update_bridge_hint() -> void:
 			_bridge_hints[str(hole.id)] = true
 			_hud.notify("Ponte frágil • atravesse antes que desabe; ela se recompõe")
 	for device in get_tree().get_nodes_in_group("earth_bridges"):
-		if is_ancestor_of(device) and not device.raised and _near_bridge(device.hole) and _player.is_on_floor():
+		if is_ancestor_of(device) and not device.raised and _near_task_action(device) and _player.is_on_floor():
 			task_available=true
-			caption=str(device.hole.get("task_text","Montar ponte"))+" · F"
+			var actions: Array=device.hole.get("actions",[device.hole.get("task_text","Montar ponte")])
+			var step:=mini(int(_task_steps.get(str(device.hole.id),0)),actions.size()-1)
+			caption=str(actions[step])+(" (%d/%d)" % [step+1,actions.size()] if actions.size()>1 else "")+" · F"
 			break
 	_hud.set_bridge_task(task_available and not _player.is_dead and not completed,caption)
 	if task_available and _order==1 and is_instance_valid(_first_use) and not _first_use.seen("task"):
@@ -484,7 +528,17 @@ func _update_bridge_hint() -> void:
 func _raise_earth_bridge() -> void:
 	if _player.is_dead or not _player.is_on_floor() or completed or _paused: return
 	for bridge in get_tree().get_nodes_in_group("earth_bridges"):
-		if not is_ancestor_of(bridge) or bridge.raised or not _near_bridge(bridge.hole): continue
+		if not is_ancestor_of(bridge) or bridge.raised or not _near_task_action(bridge): continue
+		var id:=str(bridge.hole.id)
+		var actions: Array=bridge.hole.get("actions",[bridge.hole.get("task_text","Montar ponte")])
+		var step:=int(_task_steps.get(id,0))
+		if step<actions.size()-1:
+			_task_steps[id]=step+1
+			bridge.set_progress(step+1)
+			_hud.set_bridge_task(false)
+			_hud.notify(str(actions[step])+" • siga para o ponto iluminado")
+			_save_active_run()
+			return
 		# Montagem dura 0,8s: impede correr no vazio antes de a peça virar piso.
 		var life := _life_token
 		_player.velocity = Vector3.ZERO
@@ -492,7 +546,9 @@ func _raise_earth_bridge() -> void:
 		bridge.assembled.connect(func() -> void:
 			if life == _life_token and not _player.is_dead: _player.set_physics_process(true),CONNECT_ONE_SHOT)
 		bridge.raise_bridge()
+		_task_steps[id]=actions.size()
 		_raised_bridges[str(bridge.hole.id)] = true
+		_save_active_run()
 		_hud.set_bridge_task(false)
 		_hud.notify("Tarefa concluída • passagem liberada")
 		return
@@ -734,6 +790,7 @@ func _build_hud() -> void:
 	_sync_resources()
 func _sync_resources() -> void:
 	if is_instance_valid(_hud): _hud.update_resources(_player)
+	if _run_ready:_save_active_run.call_deferred()
 func _on_player_health_changed(_current: int, _maximum: int) -> void:
 	_sync_resources()
 func _update_progress() -> void:
@@ -777,12 +834,21 @@ func _impact(point: Vector3, color := Color("#ffd58a")) -> void:
 	get_tree().create_timer(0.8,false).timeout.connect(particles.queue_free)
 func _on_goal_entered(body: Node3D) -> void:
 	if body != _player or completed or _player.is_dead or _respawning: return
+	for task: Dictionary in _phase.get("tasks",[]):
+		if not _raised_bridges.has(str(task.id)):
+			_hud.notify("Falta concluir: "+str(task.task_text),true)
+			return
 	if _order == 10 and not _boss_defeated:
 		_hud.notify("Derrote Malagueta para concluir a travessia",true)
 		return
 	completed = true
 	_saved = Progress.complete(_order) == OK
 	if _order<10:Progress.store_carry(_order+1,_charge_snapshot(),OwnerStorage.owner_id())
+	if _order<10:
+		var next_run:=Run.fresh(_order+1,_charge_snapshot())
+		next_run.lessons=_learned_lessons()
+		Run.save(_save_owner,next_run,"start")
+	_sync_run_cloud()
 	_player.velocity = Vector3.ZERO
 	_player.set_physics_process(false)
 	_player._model.play_animation("pronto",true)
@@ -801,6 +867,8 @@ func _release_input() -> void:
 func _pause() -> void:
 	if is_instance_valid(_first_use) and _first_use.active:return
 	if completed or _paused or _respawning: return
+	_save_active_run()
+	_sync_run_cloud()
 	_release_input()
 	_player.cancel_dash()
 	_touch_pad.hide()
@@ -832,6 +900,8 @@ func _notification(what: int) -> void:
 func _on_player_died() -> void:
 	if _respawning or completed: return
 	_respawning = true
+	_save_active_run(true)
+	_sync_run_cloud()
 	_release_input()
 	_life_token += 1
 	var token := _life_token
@@ -854,7 +924,8 @@ func _check_checkpoints() -> void:
 	if _player.position.x < float(points[next].pos[0]) or not _player.is_on_floor(): return
 	_checkpoint_index = next
 	_checkpoint = _vec3(points[next].pos)
-	_snapshot = {"defeated":_defeated_ids.duplicate(),"collected":_collected_ids.duplicate(),"attack":_player.attack_charges,"defense":_player.defense_charges}
+	_snapshot = {"defeated":_defeated_ids.duplicate(),"collected":_collected_ids.duplicate(),"attack":_player.attack_charges,"defense":_player.defense_charges,"tasks":_raised_bridges.duplicate(),"task_steps":_task_steps.duplicate()}
+	_save_active_run()
 	_sfx.play("checkpoint")
 	_hud.notify("Checkpoint %d de %d salvo neste dispositivo" % [next+1,points.size()])
 	get_tree().call_group("campaign_checkpoints","refresh_lit",_checkpoint_index)
@@ -872,6 +943,8 @@ func _respawn_at_checkpoint() -> void:
 	_collected_ids = (_snapshot.collected as Dictionary).duplicate()
 	_defeated = _defeated_ids.size()
 	_reset_remaster_state()
+	_raised_bridges=(_snapshot.get("tasks",{}) as Dictionary).duplicate()
+	_task_steps=(_snapshot.get("task_steps",{}) as Dictionary).duplicate()
 	for chunk: Node in _loaded_chunks.values():
 		_world.remove_child(chunk)
 		chunk.queue_free()
@@ -898,6 +971,8 @@ func _respawn_at_checkpoint() -> void:
 	_follow_camera(1.0)
 	_sync_resources()
 	_hud.notify("De volta ao checkpoint %d" % (_checkpoint_index+1))
+	_safe_position=_player.position
+	_save_active_run()
 func _respawn_player() -> void:
 	_restart_level()
 func _restart_level() -> void:
@@ -913,6 +988,8 @@ func _restart_level() -> void:
 	_tutorial_pit = false
 	_checkpoint_index = -1
 	_snapshot = {}
+	_run_id=PlayerContracts.uuid()
+	_loaded_run={}
 	_in_storm = false
 	_player.wind = 0.0
 	_hud.set_storm(false)
@@ -939,8 +1016,55 @@ func _restart_level() -> void:
 	_follow_camera(1.0)
 	_hud.set_completed(false)
 	_sync_resources()
+	_safe_position=_player.position
+	_save_active_run(false,"start")
 func _charge_snapshot() -> Dictionary:
 	return {"attack":_player.attack_charges,"defense":_player.defense_charges,"amber":_player.charges("amber"),"dash":_player.charges("dash"),"rupture":_player.charges("rupture")}
+static func _id_set(ids: Array) -> Dictionary:
+	var result: Dictionary={}
+	for id: Variant in ids:result[str(id)]=true
+	return result
+func _learned_lessons() -> Array:
+	var result: Array=[]
+	if is_instance_valid(_first_use):
+		for kind: String in ["attack","defense","task","amber","dash","rupture"]:
+			if _first_use.seen(kind):result.append(kind)
+	return result
+func _save_active_run(death:=false,intent:="save") -> void:
+	if not _run_ready or completed or not is_instance_valid(_player) or (_player.is_dead and not death):return
+	var state:=_run_template.duplicate(true)
+	state.run_id=_run_id
+	state.checkpoint=_checkpoint_index
+	state.position=[_safe_position.x,_safe_position.y]
+	state.health=_player.health
+	state.charges=_charge_snapshot()
+	state.defeated=_defeated_ids.keys()
+	state.collected=_collected_ids.keys()
+	state.tasks=_raised_bridges.keys()
+	state.task_steps=_task_steps.duplicate()
+	state.elapsed=_elapsed
+	state.lessons=_learned_lessons()
+	state.checkpoint_state={"defeated":(_snapshot.get("defeated",{}) as Dictionary).keys(),"collected":(_snapshot.get("collected",{}) as Dictionary).keys(),"tasks":(_snapshot.get("tasks",{}) as Dictionary).keys(),"task_steps":(_snapshot.get("task_steps",{}) as Dictionary).duplicate()}
+	state.boss_defeated=_boss_defeated
+	state.boss_health=0 if _boss_defeated else (_boss.health if is_instance_valid(_boss) else int(_loaded_run.get("boss_health",20)))
+	if death:
+		var at: Vector3=_checkpoint if _checkpoint_index>=0 else _vec3(_phase.player_spawn)
+		state.position=[at.x,at.y]
+		state.health=1 if _checkpoint_index>=0 else 3
+		state.charges={"attack":0,"defense":0,"amber":0,"dash":0,"rupture":0} if _checkpoint_index>=0 else Run.fresh(_order).charges
+		state.defeated=state.checkpoint_state.defeated
+		state.collected=state.checkpoint_state.collected
+		state.tasks=state.checkpoint_state.tasks
+		state.task_steps=state.checkpoint_state.task_steps
+		state.boss_defeated=false
+		state.boss_health=20
+	var error:=Run.save(_save_owner,state,intent)
+	if error!=OK and not _save_error and is_instance_valid(_hud):_hud.notify("Não foi possível salvar a partida neste aparelho",true)
+	_save_error=error!=OK
+func _sync_run_cloud() -> void:
+	if _save_owner!=OwnerStorage.owner_id() or PlayerServices.current==null:return
+	var service:=PlayerServices.current.story_progress
+	if service!=null:service.sync.call_deferred()
 func _advance(path: String) -> void:
 	if _advancing:return
 	_advancing=true
@@ -977,10 +1101,13 @@ func _hide_legacy_wrapper() -> void:
 			sibling.hide()
 			sibling.process_mode = Node.PROCESS_MODE_DISABLED
 func _return_to_story() -> void:
+	_save_active_run()
+	_sync_run_cloud()
 	_resume()
 	if return_requested.get_connections().is_empty(): get_tree().change_scene_to_file("res://scenes/menu/main_menu.tscn")
 	else: return_requested.emit()
 func _exit_tree() -> void:
+	_save_active_run()
 	# Cancela tarefas ligadas aos nós antes de liberar o cenário em streaming.
 	_build_queue.clear()
 	_actor_resources.clear()
@@ -998,33 +1125,42 @@ func _exit_tree() -> void:
 				sibling.process_mode = Node.PROCESS_MODE_INHERIT
 
 
-## Apenas sincroniza checkpoints. A API não aceita a conclusão sem prova assinada.
-func _sync_game_checkpoint(index: int) -> void:
-	if PlayerServices.current == null:
-		return
-	var owner := PlayerServices.current
-	if not owner.session.authenticated():
-		return
-	var ids: Array = PlayerContracts.read_json(PlayerContracts.RULES_PATH).get("phases", []) 
-	if _order < 1 or _order > ids.size():
-		return
-	var checkpoints: Array = ids[_order - 1].get("checkpoint_ids", [])
-	if index < 0 or index >= checkpoints.size():
-		return
-	var phase_id := str(ids[_order - 1].get("id", ""))
-	var result: Dictionary = await owner.progression.campaign_command({
-		"type": "record_checkpoint",
-		"phase_id": phase_id,
-		"checkpoint_id": str(checkpoints[index])
-	})
-	if is_inside_tree() and is_instance_valid(_hud):
-		if result.ok:
-			_hud.notify("Checkpoint sincronizado com sua conta")
-		else:
-			_hud.notify("Checkpoint local • sincronização indisponível", true)
-
+## Partida jogável é separada dos contratos assinados de economia e recompensas.
+func _sync_game_checkpoint(_index: int) -> void:
+	_save_active_run()
+	_sync_run_cloud()
 
 func _restore_game_checkpoint() -> void:
+	_run_template=Run.fresh(_order,_charge_snapshot())
+	_run_id=_run_template.run_id
+	if _loaded_run.is_empty() or int(_loaded_run.phase)!=_order:
+		_loaded_run={}
+		_restore_legacy_checkpoint()
+		return
+	_run_id=str(_loaded_run.run_id)
+	_checkpoint_index=int(_loaded_run.checkpoint)
+	if _checkpoint_index>=0:_checkpoint=_vec3(_phase.checkpoints[_checkpoint_index].pos)
+	_elapsed=float(_loaded_run.elapsed)
+	_defeated_ids=_id_set(_loaded_run.defeated)
+	_collected_ids=_id_set(_loaded_run.collected)
+	_raised_bridges=_id_set(_loaded_run.tasks)
+	_task_steps=(_loaded_run.task_steps as Dictionary).duplicate()
+	_defeated=_defeated_ids.size()
+	var snap: Dictionary=_loaded_run.checkpoint_state
+	_snapshot={"defeated":_id_set(snap.defeated),"collected":_id_set(snap.collected),"tasks":_id_set(snap.tasks),"task_steps":(snap.task_steps as Dictionary).duplicate(),"attack":0,"defense":0}
+	_player.health=int(_loaded_run.health)
+	_player.attack_charges=int(_loaded_run.charges.attack)
+	_player.defense_charges=int(_loaded_run.charges.defense)
+	for kind: String in Layout.ABILITY_PHASE:
+		_player.abilities[kind]=int(_loaded_run.charges[kind]) if _order>=int(Layout.ABILITY_PHASE[kind]) else 0
+	var at:=Vector3(float(_loaded_run.position[0]),float(_loaded_run.position[1]),0)
+	var stable: bool=not Layout.floor_at(_phase,at.x).is_empty()
+	for task: Dictionary in _phase.tasks:
+		if _raised_bridges.has(str(task.id)) and at.x>=float(task.start) and at.x<=float(task.end):stable=true
+	_player.position=(at if stable else _checkpoint)+Vector3.UP*0.05
+	_boss_defeated=bool(_loaded_run.boss_defeated)
+
+func _restore_legacy_checkpoint() -> void:
 	if bool(get_meta("from_previous_phase",false)):return
 	if PlayerServices.current == null or not PlayerServices.current.session.authenticated():
 		return
@@ -1062,6 +1198,7 @@ func _reset_remaster_state() -> void:
 	_last_wave=-99.0
 	_ruptured.clear()
 	_raised_bridges.clear()
+	_task_steps.clear()
 	_bridge_hints.clear()
 	_floor_parts.clear()
 
@@ -1175,6 +1312,7 @@ func _build_malagueta() -> void:
 	_boss.add_child(model)
 	add_child(_boss)
 	_boss.setup(_enemy_catalog.malagueta,_phase.boss)
+	if not _loaded_run.is_empty():_boss.health=clampi(int(_loaded_run.get("boss_health",20)),1,20)
 	_boss.persistent_follow = false
 	_boss.defeated.connect(func() -> void:
 		_boss_defeated = true

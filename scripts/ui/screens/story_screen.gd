@@ -1,6 +1,7 @@
 extends PlayerScreen
 
 const LocalCampaign = preload("res://scripts/desert/t15d/campaign_progress.gd")
+const SavedRun = preload("res://scripts/desert/t15d/campaign_run.gd")
 const CampaignLayout = preload("res://scripts/desert/t15d/campaign_layout.gd")
 var _realm := "desert"
 var _launching := false
@@ -84,6 +85,8 @@ func render() -> void:
 		if not LocalCampaign.is_completed(order): LocalCampaign.complete(order)
 	var local_completed := LocalCampaign.completed_orders()
 	var unlocked := maxi(LocalCampaign.highest_unlocked(),online_unlocked)
+	var saved: Dictionary = SavedRun.read(OwnerStorage.owner_id()).state
+	var resume_order := int(saved.get("phase",0))
 	_next_card = null
 	# Resumo: reino, protagonista e progresso em dez segmentos.
 	var summary := PlayerUI.row(body)
@@ -133,11 +136,12 @@ func render() -> void:
 		var exists := ResourceLoader.exists(path,"PackedScene")
 		var available := order <= unlocked
 		var done := order in local_completed or str(phase.id) in confirmed
-		var current := available and not done and order == unlocked
+		var current := available and (order == resume_order if resume_order > 0 else not done and order == unlocked)
 		var card := _phase_card(cards,order,str(metadata.get("name",phase.name)),str(metadata.get("description","")),available,done,current)
 		card.name = "PhaseCard%02d" % order
 		if current: _next_card = card
 		var action := "JOGAR NOVAMENTE" if done else ("CONTINUAR" if available and order > 1 else "JOGAR")
+		if available and order == resume_order: action = "CONTINUAR PARTIDA"
 		if not available: action = "BLOQUEADA"
 		if not exists: action = "INDISPONÍVEL"
 		var start := Button.new()
@@ -306,12 +310,15 @@ func _launch(phase_id: String, path: String) -> void:
 	if order < 1: return
 	if _launching: return
 	_launching = true
-	# Sincroniza o inicio da fase no GAME (conta autenticada). A conclusao
-	# local não substitui a prova antifraude exigida pelo backend.
-	if services.session.authenticated():
-		var started: Dictionary = await services.progression.campaign_command({"type": "start_phase", "phase_id": phase_id})
-		if not started.ok:
-			push_warning("Fase iniciada localmente; checkpoint GAME indisponível: " + str(started.code))
+	# A partida jogável tem salvamento próprio; não usa o contrato de recompensas.
+	if services.session.authenticated() and services.story_progress!=null:
+		var owner:=OwnerStorage.owner_id()
+		var veil:=await LoadingVeil.begin(get_tree(),"Carregando fase…",self)
+		await services.story_progress.prepare_run()
+		veil.finish()
+		if owner!=OwnerStorage.owner_id() or not is_visible_in_tree():
+			_launching=false
+			return
 	var confirmed: Array = services.progression.data.get("completed_phase_ids",[]) if services.progression.state == "success" else []
 	if not LocalCampaign.is_unlocked(order) and order > _confirmed_unlocked(confirmed):
 		_launching = false

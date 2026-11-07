@@ -1,8 +1,9 @@
 class_name StoryProgressService
 extends Node
-## Sincroniza somente o avanço da campanha. Nunca substitui inventário/recompensas.
+## Sincroniza avanço e partida da campanha, separados de economia e recompensas.
 signal changed
 const Local=preload("res://scripts/desert/t15d/campaign_progress.gd")
+const Run=preload("res://scripts/desert/t15d/campaign_run.gd")
 var client: SupabaseClient
 var session: SessionService
 var state:="empty"
@@ -12,6 +13,7 @@ var _epoch:=0
 var _busy:=false
 var _pending:=false
 var _toast: CanvasLayer
+var run_state:="local"
 func set_scope() -> void:
 	_epoch+=1
 	_owner=OwnerStorage.owner_id()
@@ -20,6 +22,7 @@ func set_scope() -> void:
 	if is_instance_valid(_toast):_toast.queue_free()
 	if not _owner.is_empty():
 		Local.adopt_guest(_owner)
+		Run.adopt_guest(_owner)
 		sync.call_deferred()
 	changed.emit()
 func sync() -> void:
@@ -49,10 +52,36 @@ func sync() -> void:
 				# Uma vitória pode acontecer enquanto a requisição estava em voo.
 				if Local.highest_for(owner)>merged:_pending=true
 			else:state="offline"
+			await _sync_run(owner,epoch)
 			changed.emit()
 		if not _pending:break
 	_busy=false
 	if _pending:sync.call_deferred()
+func _sync_run(owner: String,epoch: int) -> void:
+	if epoch!=_epoch or owner!=OwnerStorage.owner_id():return
+	var record:=Run.read(owner)
+	var sent: Dictionary=record.state.duplicate(true)
+	run_state="loading"
+	var result:=await client.call_rpc("qse_story_run_sync",{"p_state":sent if record.pending else null,"p_revision":int(record.revision),"p_completed":Local.highest_for(owner),"p_intent":str(record.intent)})
+	if epoch!=_epoch or owner!=OwnerStorage.owner_id():return
+	var value: Variant=result.get("data")
+	if result.ok and value is Dictionary and value.get("schema_version")==1 and (value.get("revision") is float or value.get("revision") is int):
+		if (value.get("highest_completed") is float or value.get("highest_completed") is int) and int(value.highest_completed)>=Local.highest_for(owner) and int(value.highest_completed)<=10:Local.merge_highest(owner,int(value.highest_completed))
+		if value.get("state")==null:
+			run_state="success"
+		elif Run.valid(value.get("state")):
+			Run.accept(owner,value,sent)
+			var pending:=Run.read(owner)
+			if pending.pending and pending.state.get("run_id")!=sent.get("run_id"):_pending=true
+			run_state="success"
+		else:run_state="offline"
+	else:run_state="offline"
+func prepare_run() -> void:
+	if _owner.is_empty() or not session.authenticated():return
+	var deadline:=Time.get_ticks_msec()+4500
+	if not _busy:sync.call_deferred()
+	await get_tree().process_frame
+	while _busy and Time.get_ticks_msec()<deadline:await get_tree().process_frame
 func _valid(value: Variant,sent: int) -> bool:
 	if not value is Dictionary or value.get("schema_version")!=1:return false
 	for key in ["highest_completed","previous_completed","revision"]:

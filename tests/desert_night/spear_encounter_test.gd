@@ -50,6 +50,9 @@ func ticks(n: int) -> void:
 func make_phase(collect:=true) -> void:
 	for action in ["move_left","move_right","jump","crouch","defend"]:
 		if InputMap.has_action(action):Input.action_release(action)
+	# Cenários independentes: cada arremesso começa numa partida nova, sem retomar o anterior.
+	var run_save=preload("res://scripts/desert/t15d/campaign_run.gd")
+	run_save.save("",run_save.fresh(1),"start")
 	phase=load("res://scenes/desert/phase_01.tscn").instantiate()
 	root.add_child(phase)
 	current_scene=phase
@@ -90,7 +93,7 @@ func run() -> void:
 	for order in range(1,11):
 		var data:=Layout.build(order)
 		var spears: Array=data.enemies.filter(func(e: Dictionary) -> bool:return e.get("spear",false))
-		check(not spears.is_empty() if order in [1,6,8] else spears.is_empty(),"fase%02d: distribuição pontual dos lanceiros" % order)
+		check(not spears.is_empty() if order in [1,4,5,6,7,8,9] else spears.is_empty(),"fase%02d: distribuição pontual dos lanceiros" % order)
 	await make_phase(false)
 	var start: Vector3=guard.position
 	await ticks(150)

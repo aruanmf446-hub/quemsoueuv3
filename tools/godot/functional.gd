@@ -102,4 +102,7 @@ func _run() -> void:
 		phase.call("_on_goal_entered", player)
 		check(phase.get("completed"), "boss_exit_after_defeat")
 	await create_timer(1.8).timeout
+	for node in root.get_children():
+		if node is Node3D and node.has_node("CombatSfx"):node.free()
+	await preload("res://tests/common/audio_cleanup.gd").finish(self)
 	quit(1 if failures else 0)

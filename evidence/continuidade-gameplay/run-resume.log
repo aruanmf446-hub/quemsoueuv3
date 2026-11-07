@@ -1,0 +1,13 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS partida guarda checkpoint 6 e estado válido
+PASS reabrir retoma o último ponto seguro
+PASS reabrir mantém vida e cinco recursos exatos
+PASS reabrir conserva itens, inimigos e Task concluída
+PASS reabrir conserva a primeira etapa de uma Task ainda não terminada
+PASS saída não libera capítulo com Task obrigatória faltando
+PASS vitória prepara a próxima fase no salvamento completo
+PASS vitória leva recursos exatos para a próxima fase
+PASS escudo bloqueia golpe que vem pela frente
+PASS escudo frontal não bloqueia golpe pelas costas
+RUN_RESUME checks=10 failures=0

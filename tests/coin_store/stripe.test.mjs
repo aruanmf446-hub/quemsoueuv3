@@ -56,7 +56,8 @@ test('server quote, authenticated identity, stable Stripe idempotency, fixed ret
  const prepare=JSON.parse(rpcCalls(f,'qse_coin_order_prepare')[0].init.body);assert.equal(prepare.p_user,USER);
  const call=f.calls.find(c=>c.url==='https://api.stripe.com/v1/checkout/sessions'),form=new URLSearchParams(call.init.body);
  assert.equal(call.init.headers['Idempotency-Key'],'qse-coins-'+ORDER);assert.equal(form.get('line_items[0][price_data][unit_amount]'),'990');
- assert.equal(form.get('success_url'),'https://aruanmf446-hub.github.io/quemsoueuv3/?coin_order='+ORDER);
+ assert.equal(form.get('success_url'),'https://quemsoueu.cards/jogar/?coin_order='+ORDER);
+ assert.equal(form.get('cancel_url'),'https://quemsoueu.cards/jogar/?coin_order='+ORDER);
  assert.equal(form.get('payment_intent_data[metadata][qse_order]'),ORDER);assert.equal(rpcCalls(f,'qse_coin_order_bind').length,1);
  assert.equal(rpcCalls(f,'qse_coin_order_complete').length,0,'checkout never credits coins');
 });

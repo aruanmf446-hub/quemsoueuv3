@@ -1,0 +1,11 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS save antigo não repete ataque
+PASS recarga real apresenta a explicação nova mesmo com defesa antiga ensinada
+PASS ilustração real e texto explicam a lança
+PASS explicação e botão cabem na janela
+PASS durante explicação, movimento, arremesso e carga ficam pausados
+PASS continuar libera jogo sem comando preso
+PASS nova lição salva sem apagar o registro antigo
+PASS lição nova não se repete depois de confirmada
+SPEAR_INTRO checks=8 failures=0

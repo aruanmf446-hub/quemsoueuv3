@@ -15,16 +15,37 @@ func ray(phase: Node3D,x: float,y: float) -> Dictionary:
 func run() -> void:
 	preload("res://tests/desert_night/tutorial_fixture.gd").experienced()
 	var tasks := 0
+	var profiles: Dictionary={}
 	for order in range(1,11):
 		var stage := Layout.build(order)
 		tasks += stage.tasks.size()
 		if order == 10: continue
 		var heights: Array = stage.surfaces.map(func(s: Dictionary) -> float:return float(s.height))
-		check(heights.max()-heights.min()>2.5,"fase%d: diferenças de nível visíveis" % order)
+		var relief: float=heights.max()-heights.min()
+		var clusters: Dictionary={}
+		for platform: Dictionary in stage.platforms:
+			if platform.get("parkour_route",false):clusters[platform.module]=true
+		check(relief>=1.7 or (relief>=0.6 and clusters.size()>=6),"fase%d: desníveis por terreno ou sequências de parkour" % order)
+		var signature: Array=[]
+		for i in 12:signature.append(snappedf(float(heights[i])-float(heights[0]),0.01))
+		profiles[str(signature)]=true
 		check(stage.holes.all(func(g: Dictionary) -> bool:return g.get("requires_task",false) or (absf(float(g.from_y)-float(g.to_y))<0.56 and float(g.width)<=3.2)),"fase%d: retorno por salto continua alcançável" % order)
-		check(stage.platforms.filter(func(p: Dictionary) -> bool:return p.get("parkour_route",false)).size()==(0 if order==2 else 8),"fase%d: rota de teto real ou obstáculo conforme a fase" % order)
+		check(clusters.size()==0 if order==2 else clusters.size()>=6,"fase%d: telhados reais ou ao menos seis conjuntos de parkour, sem invadir Tasks" % order)
+		var controls_on_floor:=true
+		for task: Dictionary in stage.tasks:
+			var device:=preload("res://scripts/desert/t15d/earth_bridge.gd").new()
+			device.configure(task)
+			for step in task.actions.size():
+				for right in [false,true]:
+					var point: Vector3=device.action_point(step,right)
+					var floor:=Layout.floor_at(stage,point.x)
+					controls_on_floor=controls_on_floor and not floor.is_empty() and not floor.get("task_void",false) and absf(float(floor.get("height",-999))-point.y)<0.01
+			device.free()
+		check(controls_on_floor,"fase%d: pontos das Tasks ficam apoiados nas duas margens" % order)
+		check(stage.tasks.all(func(t: Dictionary) -> bool:return t.actions.size()==(1 if order==1 and t.task_kind=="gate" else 2)),"fase%d: etapas de mecanismo próprias da região" % order)
 		check(stage.holes.filter(func(g: Dictionary) -> bool:return g.get("crumble_bridge",false)).size()==2,"fase%d: duas pontes frágeis" % order)
 	check(tasks==19,"dezenove tarefas de cenário, sem habilidades permanentes")
+	check(profiles.size()==9,"nove perfis diferentes de subida/descida, sem repetir o mesmo percurso")
 	var phase: Node3D = load("res://scenes/desert/phase_04.tscn").instantiate()
 	root.add_child(phase)
 	current_scene = phase
@@ -32,7 +53,7 @@ func run() -> void:
 	phase.set_physics_process(false)
 	var hole: Dictionary = phase._phase.tasks.filter(func(g: Dictionary) -> bool:return g.task_kind=="bridge")[0]
 	var player: Node3D = phase._player
-	player.position = Vector3(float(hole.start)-1.6,float(hole.from_y)+0.1,0)
+	player.position = Vector3(float(hole.start)-4.8,float(hole.from_y)+0.1,0)
 	player.velocity = Vector3.ZERO
 	phase._stream_world(player.position.x,true)
 	for enemy in phase._troops.get_children(): phase._retire_enemy(enemy)
@@ -45,6 +66,12 @@ func run() -> void:
 	player.defense_charges=0
 	var powers: Dictionary=player.abilities.duplicate()
 	var bridge: Node3D=get_nodes_in_group("earth_bridges")[0]
+	phase._hud._bridge_task.pressed.emit()
+	check(not bridge.raised and int(phase._task_steps.get(str(hole.id),0))==1,"primeiro mecanismo libera a segunda etapa, sem montar a ponte")
+	player.position.x=float(hole.start)-1.6
+	player.velocity=Vector3.ZERO
+	await frames(3)
+	phase._update_bridge_hint()
 	phase._hud._bridge_task.pressed.emit()
 	check(bridge.raised and bridge._shape.disabled,"montagem começa girando a peça, sem colisão antecipada")
 	var assembly_x: float=player.position.x
@@ -95,4 +122,5 @@ func run() -> void:
 	await frames(3)
 	check(get_nodes_in_group("earth_bridges").is_empty() and get_nodes_in_group("crumble_stones").is_empty(),"saída limpa pontes e tarefas")
 	print("PARKOUR_REVISION checks=%d failures=%d" % [checks,failures])
+	await preload("res://tests/common/audio_cleanup.gd").finish(self)
 	quit(1 if failures else 0)

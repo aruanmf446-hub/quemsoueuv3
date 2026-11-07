@@ -13,6 +13,30 @@ var _art: Node3D
 var _cables: Array[MeshInstance3D] = []
 var _cable_anchors: Array[Vector3] = []
 var _cable_ends: Array[Vector3] = []
+var action_index:=0
+var _action_markers: Array[MeshInstance3D]=[]
+static var _marker_active: StandardMaterial3D
+static var _marker_waiting: StandardMaterial3D
+static var _marker_done: StandardMaterial3D
+func action_point(step: int,from_right:=false) -> Vector3:
+	var distance:=4.8 if hole.get("actions",[]).size()>1 and step==0 else 1.6
+	if from_right and _kind=="gate" and hole.get("actions",[]).size()>1:
+		var span: Array=hole.get("operation_span",[hole.start-8.0,hole.end+3.0])
+		distance=minf(2.0,float(span[1])-float(hole.end)-0.45) if step==0 else 0.35
+	return Vector3(float(hole.end)+distance if from_right else float(hole.start)-distance,float(hole.to_y if from_right else hole.from_y),0)
+func set_progress(step: int) -> void:
+	action_index=step
+	if _marker_active==null:
+		_marker_active=StandardMaterial3D.new()
+		_marker_active.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED
+		_marker_active.albedo_color=Color("#eec27f")
+		_marker_waiting=_marker_active.duplicate() as StandardMaterial3D
+		_marker_waiting.albedo_color=Color("#746b59")
+		_marker_done=_marker_active.duplicate() as StandardMaterial3D
+		_marker_done.albedo_color=Color("#71988a")
+	for marker in _action_markers:
+		var index:=int(marker.get_meta("action_index"))
+		marker.material_override=_marker_done if raised or index<step else (_marker_active if index==step else _marker_waiting)
 func configure(data: Dictionary) -> void:
 	hole = data
 	_kind = str(data.get("task_kind","bridge"))
@@ -83,7 +107,9 @@ func _ready() -> void:
 		for point in [start-Vector3(0.75,0,0),finish+Vector3(0.75,0,0)]:props.winch(point+Vector3(0,0,-1.2),theme)
 		props._flush()
 	# Marcas sobre o piso das duas margens. Nunca ficam flutuando sobre o vão.
-	for point in [start-Vector3(0.65,0,0),finish+Vector3(0.65,0,0)]:
+	for marker_index in maxi(1,hole.get("actions",[]).size())*2:
+		var step:=marker_index/2
+		var point:=action_point(step,marker_index%2==1)
 		var mark := MeshInstance3D.new()
 		var ring := TorusMesh.new()
 		ring.inner_radius = 0.24
@@ -93,14 +119,14 @@ func _ready() -> void:
 		mark.mesh = ring
 		mark.scale.y = 0.13
 		mark.position = point+Vector3(0,0.035,-0.85)
-		var material := StandardMaterial3D.new()
-		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		material.albedo_color = Color("#eec27f")
-		mark.material_override = material
+		mark.set_meta("action_index",step)
 		add_child(mark)
+		_action_markers.append(mark)
+	set_progress(0)
 func raise_bridge(animated := true) -> void:
 	if raised: return
 	raised = true
+	set_progress(hole.get("actions",[]).size())
 	_deck.show()
 	if not animated:
 		if _kind=="gate": _hinge.position.y+=5.5

@@ -5,6 +5,8 @@ signal inventory_changed
 signal action_empty(kind: String)
 signal swung
 signal jumped_up
+signal stepped
+var _step_clock:=0.0
 signal landed
 signal strike_window
 signal hurt
@@ -136,6 +138,12 @@ func _physics_process(delta: float) -> void:
 	_separate_actors()
 	global_position.z = 0.0
 	_update_floor_state(jumped)
+	if is_on_floor() and absf(velocity.x)>1.0 and _attack_timer<=0.0:
+		_step_clock+=delta*absf(velocity.x)/SPEED
+		if _step_clock>=0.31:
+			_step_clock=0.0
+			stepped.emit()
+	else:_step_clock=0.18
 	_update_model_facing()
 	if _attack_timer > 0.0:
 		# A investida termina antes da janela do golpe; volta à guarda suavemente.
@@ -228,9 +236,11 @@ func restore_charge(kind: String) -> bool:
 func _can_hit(enemy: Node3D) -> bool:
 	var offset := enemy.global_position-global_position
 	return (offset.x*facing > 0.0 or absf(offset.x)<0.3) and absf(offset.x)<=1.7 and absf(offset.y)<1.35
+func can_block(from_x: float) -> bool:
+	return is_defending and (from_x-global_position.x)*facing>=-0.05
 func take_damage(amount: int, from_x: float) -> void:
 	if is_dead or _invulnerable > 0.0: return
-	if is_defending:
+	if can_block(from_x):
 		_shield_timer = 0.0
 		is_defending = false
 		_invulnerable = 0.35
@@ -238,6 +248,8 @@ func take_damage(amount: int, from_x: float) -> void:
 		_model.flash(Color("#8ccfff"))
 		return
 	_dash_left = 0.0
+	_shield_timer = 0.0
+	is_defending = false
 	health = maxi(health-amount,0)
 	_invulnerable = HIT_INVULNERABLE
 	_knockback_timer = 0.18

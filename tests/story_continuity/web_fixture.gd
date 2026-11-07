@@ -79,10 +79,46 @@ func probe(args: Array) -> void:
  if not is_instance_valid(phase):
   for node in get_tree().root.get_children():
    if node.get_script()==load("res://scripts/desert/t15d/phase.gd"):phase=node
+ if command=="feedback-controls" and is_instance_valid(phase):
+  phase.set_physics_process(false)
+  phase._player.set_physics_process(true)
+  phase._player._invulnerable=999
+  phase._player.attack_charges=2
+  phase._player.defense_charges=2
+  for enemy in phase._troops.get_children():phase._retire_enemy(enemy)
  if command=="charges" and is_instance_valid(phase):
   phase._player.attack_charges=2
   phase._player.defense_charges=3
   phase._sync_resources()
+ if command=="complete-tasks" and is_instance_valid(phase):
+  for task: Dictionary in phase._phase.tasks:phase._raised_bridges[str(task.id)]=true
+ if command=="save-run" and is_instance_valid(phase):
+  phase.set_physics_process(false)
+  phase._player.set_physics_process(false)
+  phase._checkpoint_index=4
+  phase._checkpoint=phase._vec3(phase._phase.checkpoints[4].pos)
+  var at: float=phase._checkpoint.x+2.0
+  var floor:=preload("res://scripts/desert/t15d/campaign_layout.gd").floor_at(phase._phase,at)
+  phase._player.position=Vector3(at,float(floor.height)+0.04,0)
+  phase._safe_position=phase._player.position
+  phase._player.health=2
+  phase._player.attack_charges=2
+  phase._player.defense_charges=0
+  phase._player.abilities={"amber":1,"dash":0,"rupture":2}
+  phase._raised_bridges[str(phase._phase.tasks[0].id)]=true
+  phase._task_steps[str(phase._phase.tasks[1].id)]=1
+  phase._collected_ids[str(phase._phase.pickups[0].id)]=true
+  phase._defeated_ids[str(phase._phase.enemies[0].id)]=true
+  phase._elapsed=123.0
+  phase._save_active_run()
+  phase._sync_resources()
+  phase._stream_world(at,true)
+  for i in 2400:
+   if phase._build_queue.is_empty():break
+   phase._process(0)
+  for enemy in phase._troops.get_children():phase._retire_enemy(enemy)
+  for i in 3:phase._follow_camera(1.0)
+  phase._scenery.follow(phase._camera,phase._player.position.x)
  if command=="goal" and is_instance_valid(phase):phase._on_goal_entered(phase._player)
  if command=="next" and is_instance_valid(phase):
   PhaseStory.mark_read(phase._order+1)
@@ -143,6 +179,8 @@ func probe(args: Array) -> void:
   state.order=phase._order
   state.attack=phase._player.attack_charges
   state.defense=phase._player.defense_charges
+  state.actor_feedback={"floor":phase._player.is_on_floor(),"defending":phase._player.is_defending,"jumps":phase._player.jumps_used,"dust":get_tree().get_nodes_in_group("campaign_double_jump_dust").size()}
+  state.run={"checkpoint":phase._checkpoint_index,"health":phase._player.health,"x":phase._player.position.x,"charges":phase._charge_snapshot(),"tasks":phase._raised_bridges.size(),"steps":phase._task_steps.duplicate(),"collected":phase._collected_ids.size(),"defeated":phase._defeated_ids.size()}
   if not obstacle.is_empty():
    state.motion=motion_samples
    var actor: CharacterBody3D=phase._player

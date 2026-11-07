@@ -1,11 +1,11 @@
 ---
 name: qse-design
-description: Criar e revisar interfaces do Quem Sou Eu V3 com a direção visual aprovada, controles Godot reais e validação visual no desktop e iPhone. Aplicar ao alterar layout, loja, personagens, menus ou apresentação de fluxos.
+description: Criar e revisar o visual do Quem Sou Eu V3 com referências aprovadas e validação real. Aplicar a interfaces, UI/UX, cenários, assets, materiais, efeitos, enquadramento e responsividade; revisar também o impacto visual de mudanças funcionais.
 ---
 
 # Design do Quem Sou Eu V3
 
-Use esta habilidade nas mudanças de interface deste repositório. O pedido atual
+Use esta habilidade nas mudanças com impacto visual deste repositório. O pedido atual
 do dono tem prioridade. Não prometa qualidade apenas porque os testes passaram.
 
 ## Antes de desenhar
@@ -54,6 +54,25 @@ do dono tem prioridade. Não prometa qualidade apenas porque os testes passaram.
 - Agrupe leituras e verificações independentes. Evite exportar repetidamente
   sem uma mudança relevante ou repetir testes que já passaram sem motivo.
 
+## Cenários, materiais e efeitos
+
+- Preserve o deserto noturno e o contexto de cada fase. Assente os elementos em
+  superfícies coerentes; evite bases flutuando, bordas cortadas, repetições
+  evidentes e fundos aparecendo por baixo de uma sustentação rasa.
+- Preserve buracos reais, telhados jogáveis e aberturas intencionais das pontes.
+  Em polimento visual, mantenha movimentação, saltos, combate, cargas e progressão.
+- Localize o elemento e a camada apontados: interface, sprite, material, chão,
+  fundo, câmera ou colisão. Testar apenas um objeto parecido que já funciona
+  não reproduz a reclamação. Confira outros usos de componentes compartilhados.
+- Preserve proporção, enquadramento e nitidez dos assets; use mipmaps e filtragem
+  adequados. Não invente personagens/cartas nem use conteúdo sem licença.
+- Efeitos devem ser legíveis sem cobrir personagem, inimigos, obstáculos ou
+  controles. Shaders precisam funcionar em Compatibility e no export Web.
+- Prefira materiais compartilhados, lotes e carregamento por trechos. Evite
+  reconstrução por quadro, decodificação pesada em cliques e carregamento antecipado
+  de assets grandes sem necessidade. Não reduza resolução, modelos, texturas ou
+  antisserrilhado indiscriminadamente para esconder gargalos: meça a causa.
+
 ## Conferência obrigatória
 
 Exporte e execute o Godot Web 4.7.2; use o roteiro existente em
@@ -72,6 +91,13 @@ Antes de considerar a tela pronta, abra as capturas e corrija:
 - galeria desproporcional ou controles consumindo a área principal;
 - diferença material em relação à direção aprovada ou ao pedido atual.
 
+Compare antes/depois com câmera, posição e tamanho equivalentes. Para cenários,
+confira também 1920×1080 e use testes de streaming quando pertinente. Reaproveite
+motor, navegador e workflows disponíveis. Se uma ferramenta faltar, tente a CLI
+ou outro meio existente e registre a limitação sem inventar capturas ou aprovações.
+Não alegue FPS de aparelho real usando GPU emulada. Não remova ou enfraqueça
+verificações para aprovar a entrega; documente falhas preexistentes com evidência.
+
 Execute `python3 tools/player_ui/check_design.py` e os testes de interação
 afetados. Teste clique/toque, navegação por teclado, voltar, seleção e estados
 disponível/bloqueado/erro conforme o fluxo. Não escreva testes que só espelham CSS.
@@ -88,3 +114,10 @@ esta habilidade não cria uma nova exigência de permissão nem autoriza deploy.
 Guarde evidências e uma nota curta da decisão visual na documentação do projeto.
 Novas aprovações explícitas do dono devem atualizar a referência vigente para
 que a próxima IA não restaure um desenho reprovado.
+
+Ao publicar dentro da autorização existente, acompanhe o deploy e confira
+`qseBuild` no HTML e o identificador no `sw.js`. Commit na main ou CI verde,
+isoladamente, não provam que o Pages atualizou. Se falhar, informe o erro e a
+versão ainda servida; não apague dados/cache de progresso do jogador. Preserve
+alterações de outros agentes, não use force push nem bypass de proteção.
+Esta habilidade não autoriza acesso ao backend, compras ou publicação.

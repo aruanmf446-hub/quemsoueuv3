@@ -31,6 +31,7 @@ static func attach(art: Sprite3D,id: String,order: int,left: float,right: float,
 	var width:=art.texture.get_width()*art.pixel_size
 	var height:=art.texture.get_height()*art.pixel_size
 	var lower:=art.position.y-height*0.5
+	# Leva a borda pintada ao plano do jogador, compensando a inclinação da câmera.
 	var projection:=-art.position.z*((2.2 if order==2 else 1.0)/14.0)
 	var index:=0
 	for ledge: Array in ledges:

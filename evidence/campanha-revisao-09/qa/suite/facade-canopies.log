@@ -1,0 +1,72 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS fase1 capital_balcony_house: lona visível da fachada tem exatamente um apoio
+PASS fase1 capital_balcony_house_fachada: uma única altura física para o tecido
+CANOPY 1 capital_balcony_house rise=2.75491781472062 x=-3.26408338546753
+PASS fase1 capital_balcony_house: salto de baixo não bate a cabeça
+PASS fase1 capital_balcony_house: pousa na lona sem atravessar (pico 3.45, lona 2.75)
+PASS fase1 capital_balcony_house: anda apoiado no tecido (dx=0.693, y=2.756, topo=2.755, apoio=true)
+PASS fase1 capital_balcony_house: salta novamente da lona
+PASS fase1 capital_merchant: lona visível da fachada tem exatamente um apoio
+PASS fase1 capital_merchant_fachada: uma única altura física para o tecido
+CANOPY 1 capital_merchant rise=1.87907625598434 x=5.80733299255371
+PASS fase1 capital_merchant: salto de baixo não bate a cabeça
+PASS fase1 capital_merchant: pousa na lona sem atravessar (pico 3.45, lona 1.88)
+PASS fase1 capital_merchant: anda apoiado no tecido (dx=0.693, y=1.880, topo=1.879, apoio=true)
+PASS fase1 capital_merchant: salta novamente da lona
+PASS fase1 capital_house: lona visível da fachada tem exatamente um apoio
+PASS fase1 capital_house_fachada: uma única altura física para o tecido
+CANOPY 1 capital_house rise=2.70481358748994 x=35.4047660827637
+PASS fase1 capital_house: salto de baixo não bate a cabeça
+PASS fase1 capital_house: pousa na lona sem atravessar (pico 3.45, lona 2.70)
+PASS fase1 capital_house: anda apoiado no tecido (dx=0.693, y=3.256, topo=3.255, apoio=true)
+PASS fase1 capital_house: salta novamente da lona
+PASS fase1: fachadas presentes na rota examinadas pela arte
+PASS fase2: lonas da rua inferior permanecem abaixo da rota dos tetos
+PASS fase2: tetos reais continuam sendo o caminho
+PASS fase2: fachadas presentes na rota examinadas pela arte
+PASS fase3 capital_house: lona visível da fachada tem exatamente um apoio
+PASS fase3 capital_house_fachada: uma única altura física para o tecido
+CANOPY 3 capital_house rise=2.65467587283946 x=-5.37750005722046
+PASS fase3 capital_house: salto de baixo não bate a cabeça
+PASS fase3 capital_house: pousa na lona sem atravessar (pico 3.45, lona 2.65)
+PASS fase3 capital_house: anda apoiado no tecido (dx=0.693, y=2.656, topo=2.655, apoio=true)
+PASS fase3 capital_house: salta novamente da lona
+PASS fase3 capital_market_stall: lona visível da fachada tem exatamente um apoio
+PASS fase3 capital_market_stall_proxima: uma única altura física para o tecido
+CANOPY 3 capital_market_stall rise=2.38888499380222 x=0.72314286231995
+PASS fase3 capital_market_stall: salto de baixo não bate a cabeça
+PASS fase3 capital_market_stall: pousa na lona sem atravessar (pico 3.45, lona 2.39)
+PASS fase3 capital_market_stall: anda apoiado no tecido (dx=0.693, y=2.390, topo=2.389, apoio=true)
+PASS fase3 capital_market_stall: salta novamente da lona
+PASS fase3 capital_merchant: lona visível da fachada tem exatamente um apoio
+PASS fase3 capital_merchant_fachada: uma única altura física para o tecido
+CANOPY 3 capital_merchant rise=1.82419871128098 x=2.55521416664124
+PASS fase3 capital_merchant: salto de baixo não bate a cabeça
+PASS fase3 capital_merchant: pousa na lona sem atravessar (pico 3.45, lona 1.82)
+PASS fase3 capital_merchant: anda apoiado no tecido (dx=0.693, y=1.825, topo=1.824, apoio=true)
+PASS fase3 capital_merchant: salta novamente da lona
+PASS fase3: fachadas presentes na rota examinadas pela arte
+PASS fase4: fachadas presentes na rota examinadas pela arte
+PASS fase5: fachadas presentes na rota examinadas pela arte
+PASS fase6: fachadas presentes na rota examinadas pela arte
+PASS fase7: fachadas presentes na rota examinadas pela arte
+PASS fase8 capital_house: lona visível da fachada tem exatamente um apoio
+PASS fase8 capital_house_fachada: uma única altura física para o tecido
+CANOPY 8 capital_house rise=2.4041258418906 x=0.93871426582336
+PASS fase8 capital_house: salto de baixo não bate a cabeça
+PASS fase8 capital_house: pousa na lona sem atravessar (pico 3.45, lona 2.40)
+PASS fase8 capital_house: anda apoiado no tecido (dx=0.693, y=2.405, topo=2.404, apoio=true)
+PASS fase8 capital_house: salta novamente da lona
+PASS fase8 capital_merchant: lona visível da fachada tem exatamente um apoio
+PASS fase8 capital_merchant_fachada: uma única altura física para o tecido
+CANOPY 8 capital_merchant rise=1.89562735423512 x=15.0060710906982
+PASS fase8 capital_merchant: salto de baixo não bate a cabeça
+PASS fase8 capital_merchant: pousa na lona sem atravessar (pico 3.45, lona 1.90)
+PASS fase8 capital_merchant: anda apoiado no tecido (dx=0.693, y=2.447, topo=2.446, apoio=true)
+PASS fase8 capital_merchant: salta novamente da lona
+PASS fase8: fachadas presentes na rota examinadas pela arte
+PASS fase9: fachadas presentes na rota examinadas pela arte
+PASS fase10: fachadas presentes na rota examinadas pela arte
+PASS sair remove os apoios das lonas
+FACADE_CANOPIES checks=61 failures=0

@@ -1,0 +1,149 @@
+{
+  "passed": true,
+  "order": 3,
+  "target": "task-canopy",
+  "viewport": "844x390",
+  "dpr": 3,
+  "physical_device": false,
+  "gpu": "SwiftShader software",
+  "fixture_approach": true,
+  "jumps": "native browser touchStart/touchEnd via CDP, held until physics acknowledges each jump",
+  "walking": {
+    "floor": true,
+    "vx": 0.800000011920929,
+    "x": 832.9072265625,
+    "y": 3.88981199264526
+  },
+  "before": {
+    "actor": {
+      "floor": true,
+      "jumps": 0,
+      "vx": 0,
+      "vy": 0,
+      "x": 832.893920898438,
+      "y": 1.65098965167999
+    },
+    "attack": 1,
+    "cloud_mock": true,
+    "completed": 0,
+    "defense": 1,
+    "highest": 1,
+    "jump": [
+      0.940406976744186,
+      0.881481481481482
+    ],
+    "motion": {},
+    "notice": "",
+    "obstacle": {
+      "asset": "capital_market_stall",
+      "base": 1.65,
+      "left": 831.869934082031,
+      "right": 833.917907714844,
+      "top": 3.88888485756304
+    },
+    "order": 3,
+    "stage": "play",
+    "sync": "empty"
+  },
+  "air": {
+    "actor": {
+      "floor": false,
+      "jumps": 2,
+      "vx": 0,
+      "vy": 5.80000019073486,
+      "x": 832.893920898438,
+      "y": 4.21099996566772
+    },
+    "attack": 1,
+    "cloud_mock": true,
+    "completed": 0,
+    "defense": 1,
+    "highest": 1,
+    "jump": [
+      0.940406976744186,
+      0.881481481481482
+    ],
+    "motion": {},
+    "notice": "",
+    "obstacle": {
+      "asset": "capital_market_stall",
+      "base": 1.65,
+      "left": 831.869934082031,
+      "right": 833.917907714844,
+      "top": 3.88888485756304
+    },
+    "order": 3,
+    "stage": "play",
+    "sync": "empty"
+  },
+  "landed": {
+    "actor": {
+      "floor": true,
+      "jumps": 0,
+      "vx": 0,
+      "vy": 0,
+      "x": 832.893920898438,
+      "y": 3.8888897895813
+    },
+    "attack": 1,
+    "cloud_mock": true,
+    "completed": 0,
+    "defense": 1,
+    "highest": 1,
+    "jump": [
+      0.940406976744186,
+      0.881481481481482
+    ],
+    "motion": {},
+    "notice": "",
+    "obstacle": {
+      "asset": "capital_market_stall",
+      "base": 1.65,
+      "left": 831.869934082031,
+      "right": 833.917907714844,
+      "top": 3.88888485756304
+    },
+    "order": 3,
+    "stage": "play",
+    "sync": "empty"
+  },
+  "again": {
+    "actor": {
+      "floor": false,
+      "jumps": 1,
+      "vx": 0,
+      "vy": 6.40000057220459,
+      "x": 832.893920898438,
+      "y": 4.92888879776001
+    },
+    "attack": 1,
+    "cloud_mock": true,
+    "completed": 0,
+    "defense": 1,
+    "highest": 1,
+    "jump": [
+      0.940406976744186,
+      0.881481481481482
+    ],
+    "motion": {},
+    "notice": "",
+    "obstacle": {
+      "asset": "capital_market_stall",
+      "base": 1.65,
+      "left": 831.869934082031,
+      "right": 833.917907714844,
+      "top": 3.88888485756304
+    },
+    "order": 3,
+    "stage": "play",
+    "sync": "empty"
+  },
+  "edge": {
+    "floor": false,
+    "vx": 6,
+    "x": 834.766906738281,
+    "y": 3.66830992698669
+  },
+  "errors": [],
+  "blocked": []
+}

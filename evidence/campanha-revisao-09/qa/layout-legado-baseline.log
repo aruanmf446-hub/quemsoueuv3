@@ -1,0 +1,133 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS fase01: identidade única e estável
+PASS fase01: distância e duração mínima
+PASS fase01: entrada e saída apoiadas no percurso
+PASS fase01: módulos extensos em oito setores
+FAIL fase01: vãos e desníveis alcançáveis
+PASS fase01: IDs únicos para streaming e persistência
+PASS fase01: recargas sustentadas, separadas e fora dos abismos
+PASS fase01: suprimento suficiente para combate
+PASS fase01: soldados na mesma altitude da rota
+PASS fase01: sete checkpoints apoiados no piso real
+PASS fase01: ruptura limitada a3m e sem destruir apoios de itens
+PASS fase01: continuidade e conclusão do reino
+PASS fase01: nenhuma moeda decorativa ou item econômico
+PASS fase02: identidade única e estável
+PASS fase02: distância e duração mínima
+PASS fase02: entrada e saída apoiadas no percurso
+PASS fase02: módulos extensos em oito setores
+FAIL fase02: vãos e desníveis alcançáveis
+PASS fase02: IDs únicos para streaming e persistência
+PASS fase02: recargas sustentadas, separadas e fora dos abismos
+PASS fase02: suprimento suficiente para combate
+PASS fase02: soldados na mesma altitude da rota
+PASS fase02: sete checkpoints apoiados no piso real
+PASS fase02: ruptura limitada a3m e sem destruir apoios de itens
+PASS fase02: continuidade e conclusão do reino
+PASS fase02: nenhuma moeda decorativa ou item econômico
+PASS fase03: identidade única e estável
+PASS fase03: distância e duração mínima
+PASS fase03: entrada e saída apoiadas no percurso
+PASS fase03: módulos extensos em oito setores
+FAIL fase03: vãos e desníveis alcançáveis
+PASS fase03: IDs únicos para streaming e persistência
+PASS fase03: recargas sustentadas, separadas e fora dos abismos
+PASS fase03: suprimento suficiente para combate
+PASS fase03: soldados na mesma altitude da rota
+PASS fase03: sete checkpoints apoiados no piso real
+PASS fase03: ruptura limitada a3m e sem destruir apoios de itens
+PASS fase03: continuidade e conclusão do reino
+PASS fase03: nenhuma moeda decorativa ou item econômico
+PASS fase04: identidade única e estável
+PASS fase04: distância e duração mínima
+PASS fase04: entrada e saída apoiadas no percurso
+PASS fase04: módulos extensos em oito setores
+FAIL fase04: vãos e desníveis alcançáveis
+PASS fase04: IDs únicos para streaming e persistência
+PASS fase04: recargas sustentadas, separadas e fora dos abismos
+PASS fase04: suprimento suficiente para combate
+PASS fase04: soldados na mesma altitude da rota
+PASS fase04: sete checkpoints apoiados no piso real
+PASS fase04: ruptura limitada a3m e sem destruir apoios de itens
+PASS fase04: continuidade e conclusão do reino
+PASS fase04: nenhuma moeda decorativa ou item econômico
+PASS fase05: identidade única e estável
+PASS fase05: distância e duração mínima
+PASS fase05: entrada e saída apoiadas no percurso
+PASS fase05: módulos extensos em oito setores
+FAIL fase05: vãos e desníveis alcançáveis
+PASS fase05: IDs únicos para streaming e persistência
+PASS fase05: recargas sustentadas, separadas e fora dos abismos
+PASS fase05: suprimento suficiente para combate
+PASS fase05: soldados na mesma altitude da rota
+PASS fase05: sete checkpoints apoiados no piso real
+PASS fase05: ruptura limitada a3m e sem destruir apoios de itens
+PASS fase05: continuidade e conclusão do reino
+PASS fase05: nenhuma moeda decorativa ou item econômico
+PASS fase06: identidade única e estável
+PASS fase06: distância e duração mínima
+PASS fase06: entrada e saída apoiadas no percurso
+PASS fase06: módulos extensos em oito setores
+FAIL fase06: vãos e desníveis alcançáveis
+PASS fase06: IDs únicos para streaming e persistência
+PASS fase06: recargas sustentadas, separadas e fora dos abismos
+FAIL fase06: suprimento suficiente para combate
+PASS fase06: soldados na mesma altitude da rota
+PASS fase06: sete checkpoints apoiados no piso real
+PASS fase06: ruptura limitada a3m e sem destruir apoios de itens
+PASS fase06: continuidade e conclusão do reino
+PASS fase06: nenhuma moeda decorativa ou item econômico
+PASS fase07: identidade única e estável
+PASS fase07: distância e duração mínima
+PASS fase07: entrada e saída apoiadas no percurso
+PASS fase07: módulos extensos em oito setores
+FAIL fase07: vãos e desníveis alcançáveis
+PASS fase07: IDs únicos para streaming e persistência
+PASS fase07: recargas sustentadas, separadas e fora dos abismos
+PASS fase07: suprimento suficiente para combate
+PASS fase07: soldados na mesma altitude da rota
+PASS fase07: sete checkpoints apoiados no piso real
+PASS fase07: ruptura limitada a3m e sem destruir apoios de itens
+PASS fase07: continuidade e conclusão do reino
+PASS fase07: nenhuma moeda decorativa ou item econômico
+PASS fase08: identidade única e estável
+PASS fase08: distância e duração mínima
+PASS fase08: entrada e saída apoiadas no percurso
+PASS fase08: módulos extensos em oito setores
+FAIL fase08: vãos e desníveis alcançáveis
+PASS fase08: IDs únicos para streaming e persistência
+PASS fase08: recargas sustentadas, separadas e fora dos abismos
+FAIL fase08: suprimento suficiente para combate
+PASS fase08: soldados na mesma altitude da rota
+PASS fase08: sete checkpoints apoiados no piso real
+PASS fase08: ruptura limitada a3m e sem destruir apoios de itens
+PASS fase08: continuidade e conclusão do reino
+PASS fase08: nenhuma moeda decorativa ou item econômico
+PASS fase09: identidade única e estável
+PASS fase09: distância e duração mínima
+PASS fase09: entrada e saída apoiadas no percurso
+PASS fase09: módulos extensos em oito setores
+FAIL fase09: vãos e desníveis alcançáveis
+PASS fase09: IDs únicos para streaming e persistência
+PASS fase09: recargas sustentadas, separadas e fora dos abismos
+PASS fase09: suprimento suficiente para combate
+PASS fase09: soldados na mesma altitude da rota
+PASS fase09: sete checkpoints apoiados no piso real
+PASS fase09: ruptura limitada a3m e sem destruir apoios de itens
+PASS fase09: continuidade e conclusão do reino
+PASS fase09: nenhuma moeda decorativa ou item econômico
+PASS fase10: identidade única e estável
+PASS fase10: distância e duração mínima
+PASS fase10: entrada e saída apoiadas no percurso
+PASS fase10: módulos extensos em oito setores
+FAIL fase10: vãos e desníveis alcançáveis
+PASS fase10: IDs únicos para streaming e persistência
+PASS fase10: recargas sustentadas, separadas e fora dos abismos
+PASS fase10: suprimento suficiente para combate
+PASS fase10: soldados na mesma altitude da rota
+PASS fase10: sete checkpoints apoiados no piso real
+PASS fase10: ruptura limitada a3m e sem destruir apoios de itens
+PASS fase10: continuidade e conclusão do reino
+PASS fase10: nenhuma moeda decorativa ou item econômico
+NIGHT_LAYOUT_RESULT checks=130 failures=12

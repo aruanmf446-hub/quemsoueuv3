@@ -1,0 +1,74 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS fase1: topo plano sem iluminação inclinada nas emendas
+PASS fase1: catálogo sem atlas aninhado, texturas limitadas e com mipmaps
+PASS fase1: todas as recargas apoiadas e poderes na fase correta
+PASS fase1 capital_house_fachada: salta de baixo e pousa na lona real
+PASS fase1 capital_house_fachada: caminha apoiado, sem flutuar/atravessar
+PASS fase1 capital_balcony_house_fachada: salta de baixo e pousa na lona real
+PASS fase1 capital_balcony_house_fachada: caminha apoiado, sem flutuar/atravessar
+PASS fase1 capital_merchant_fachada: salta de baixo e pousa na lona real
+PASS fase1 capital_merchant_fachada: caminha apoiado, sem flutuar/atravessar
+PASS fase1 capital_house_proxima: salta de baixo e pousa na lona real
+PASS fase1 capital_house_proxima: caminha apoiado, sem flutuar/atravessar
+PASS fase1 capital_merchant_proxima: salta de baixo e pousa na lona real
+PASS fase1 capital_merchant_proxima: caminha apoiado, sem flutuar/atravessar
+PASS fase1 capital_balcony_house_proxima: salta de baixo e pousa na lona real
+PASS fase1 capital_balcony_house_proxima: caminha apoiado, sem flutuar/atravessar
+PASS fase1: 113 lonas inspecionadas em todo o percurso, 0 fachadas abaixo da rota
+PASS fase1: apoios descarregados sem resíduos
+PASS fase2: catálogo sem atlas aninhado, texturas limitadas e com mipmaps
+PASS fase2: todas as recargas apoiadas e poderes na fase correta
+PASS fase2: 0 lonas inspecionadas em todo o percurso, 310 fachadas abaixo da rota
+PASS fase2: apoios descarregados sem resíduos
+PASS fase3: topo plano sem iluminação inclinada nas emendas
+PASS fase3: catálogo sem atlas aninhado, texturas limitadas e com mipmaps
+PASS fase3: todas as recargas apoiadas e poderes na fase correta
+PASS fase3 capital_merchant_fachada: salta de baixo e pousa na lona real
+PASS fase3 capital_merchant_fachada: caminha apoiado, sem flutuar/atravessar
+PASS fase3 capital_house_fachada: salta de baixo e pousa na lona real
+PASS fase3 capital_house_fachada: caminha apoiado, sem flutuar/atravessar
+PASS fase3 capital_market_stall_proxima: salta de baixo e pousa na lona real
+PASS fase3 capital_market_stall_proxima: caminha apoiado, sem flutuar/atravessar
+PASS fase3 capital_merchant_proxima: salta de baixo e pousa na lona real
+PASS fase3 capital_merchant_proxima: caminha apoiado, sem flutuar/atravessar
+PASS fase3 capital_market_stall_proxima_mecanismo: salta de baixo e pousa na lona real
+PASS fase3 capital_market_stall_proxima_mecanismo: caminha apoiado, sem flutuar/atravessar
+PASS fase3: saltar da nova lona não dispensa acionar o portão
+PASS fase3: 222 lonas inspecionadas em todo o percurso, 0 fachadas abaixo da rota
+PASS fase3: apoios descarregados sem resíduos
+PASS fase4: topo plano sem iluminação inclinada nas emendas
+PASS fase4: catálogo sem atlas aninhado, texturas limitadas e com mipmaps
+PASS fase4: todas as recargas apoiadas e poderes na fase correta
+PASS fase4: 0 lonas inspecionadas em todo o percurso, 0 fachadas abaixo da rota
+PASS fase4: apoios descarregados sem resíduos
+PASS fase5: topo plano sem iluminação inclinada nas emendas
+PASS fase5: catálogo sem atlas aninhado, texturas limitadas e com mipmaps
+PASS fase5: todas as recargas apoiadas e poderes na fase correta
+PASS fase5: 0 lonas inspecionadas em todo o percurso, 0 fachadas abaixo da rota
+PASS fase5: apoios descarregados sem resíduos
+PASS fase6: topo plano sem iluminação inclinada nas emendas
+PASS fase6: catálogo sem atlas aninhado, texturas limitadas e com mipmaps
+PASS fase6: todas as recargas apoiadas e poderes na fase correta
+PASS fase6: 0 lonas inspecionadas em todo o percurso, 0 fachadas abaixo da rota
+PASS fase6: apoios descarregados sem resíduos
+PASS fase7: topo plano sem iluminação inclinada nas emendas
+PASS fase7: catálogo sem atlas aninhado, texturas limitadas e com mipmaps
+PASS fase7: todas as recargas apoiadas e poderes na fase correta
+PASS fase7: 0 lonas inspecionadas em todo o percurso, 0 fachadas abaixo da rota
+PASS fase7: apoios descarregados sem resíduos
+PASS fase8: topo plano sem iluminação inclinada nas emendas
+PASS fase8: catálogo sem atlas aninhado, texturas limitadas e com mipmaps
+PASS fase8: todas as recargas apoiadas e poderes na fase correta
+PASS fase8 capital_house_fachada: salta de baixo e pousa na lona real
+PASS fase8 capital_house_fachada: caminha apoiado, sem flutuar/atravessar
+PASS fase8 capital_merchant_fachada: salta de baixo e pousa na lona real
+PASS fase8 capital_merchant_fachada: caminha apoiado, sem flutuar/atravessar
+PASS fase8: 92 lonas inspecionadas em todo o percurso, 0 fachadas abaixo da rota
+PASS fase8: apoios descarregados sem resíduos
+PASS fase9: topo plano sem iluminação inclinada nas emendas
+PASS fase9: catálogo sem atlas aninhado, texturas limitadas e com mipmaps
+PASS fase9: todas as recargas apoiadas e poderes na fase correta
+PASS fase9: 0 lonas inspecionadas em todo o percurso, 0 fachadas abaixo da rota
+PASS fase9: apoios descarregados sem resíduos
+CAMPAIGN_SURFACE_AUDIT checks=71 failures=0

@@ -12,9 +12,9 @@ const CANOPIES:={
 # Frações do recorte visível: esquerda, direita, altura desde o topo da imagem.
 const LEDGES:={
  "capital_market_stall":[[0.18,0.82,0.23],[0.12,0.88,0.705]],
- "capital_merchant":[[0.07,0.93,0.135],[0.105,0.475,0.575],[0.145,0.445,0.815]],
+ "capital_merchant":[[0.07,0.93,0.135],[0.145,0.445,0.815]],
  "capital_house":[[0.07,0.93,0.105]],
- "capital_balcony_house":[[0.06,0.94,0.145],[0.645,0.915,0.405],[0.12,0.46,0.525]],
+ "capital_balcony_house":[[0.06,0.94,0.145],[0.645,0.915,0.405]],
  "desert_oasis_fountain":[[0.095,0.905,0.65],[0.34,0.67,0.305]],
  "desert_ancient_ruins":[[0.13,0.79,0.185],[0.79,0.93,0.67]],
  "desert_mining_gantry":[[0.12,0.89,0.115],[0.375,0.645,0.72],[0.43,0.62,0.52]],

@@ -9,6 +9,7 @@ const Landings=preload("res://scripts/desert/t15d/prop_landings.gd")
 const BUILDING_SPACING := 19.0
 static var _house_texture: Texture2D
 var _builders := {}
+var _flat_faces := false
 static var _shared_materials := {}
 var _materials := {}
 var _order := 1
@@ -310,6 +311,7 @@ func _dome(origin: Vector3, radius: float, height: float, key: String) -> void:
 			_quad(key,origin+a,origin+b,origin+c,origin+d)
 
 func _box(center: Vector3, size: Vector3, key: String) -> void:
+	_flat_faces = true
 	var r := size*0.5
 	var a := center+Vector3(-r.x,-r.y,r.z)
 	var b := center+Vector3(-r.x,r.y,r.z)
@@ -325,6 +327,7 @@ func _box(center: Vector3, size: Vector3, key: String) -> void:
 	_quad(key,d,c,g,h)
 	_quad(key,b,f,g,c)
 	_quad(key,e,a,d,h)
+	_flat_faces = false
 
 func _quad(key: String, a: Vector3, b: Vector3, c: Vector3, d: Vector3) -> void:
 	_triangle(key,a,c,b)
@@ -336,6 +339,9 @@ func _triangle(key: String, a: Vector3, b: Vector3, c: Vector3) -> void:
 		builder.begin(Mesh.PRIMITIVE_TRIANGLES)
 		_builders[key] = builder
 	var st: SurfaceTool = _builders[key]
+	# Topos e laterais das caixas têm arestas duras. Suavizá-los juntos criava
+	# rampas de luz diferentes em cada peça de piso, apesar da colisão plana.
+	st.set_smooth_group(-1 if _flat_faces else 0)
 	var normal := (b-a).cross(c-a).normalized()
 	for point in [a,b,c]:
 		var uv := Vector2(point.x,point.y)

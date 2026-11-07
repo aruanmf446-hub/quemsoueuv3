@@ -1,0 +1,87 @@
+{
+	"checks": 71,
+	"failures": 0,
+	"fixture_teleport": true,
+	"physical_device": false,
+	"records": [
+		{
+			"canopies": 113,
+			"issues": [],
+			"order": 1,
+			"street_below": 0,
+			"variants_exercised": [
+				"capital_house_fachada",
+				"capital_balcony_house_fachada",
+				"capital_merchant_fachada",
+				"capital_house_proxima",
+				"capital_merchant_proxima",
+				"capital_balcony_house_proxima"
+			]
+		},
+		{
+			"canopies": 0,
+			"issues": [],
+			"order": 2,
+			"street_below": 310,
+			"variants_exercised": []
+		},
+		{
+			"canopies": 222,
+			"issues": [],
+			"order": 3,
+			"street_below": 0,
+			"variants_exercised": [
+				"capital_merchant_fachada",
+				"capital_house_fachada",
+				"capital_market_stall_proxima",
+				"capital_merchant_proxima",
+				"capital_market_stall_proxima_mecanismo"
+			]
+		},
+		{
+			"canopies": 0,
+			"issues": [],
+			"order": 4,
+			"street_below": 0,
+			"variants_exercised": []
+		},
+		{
+			"canopies": 0,
+			"issues": [],
+			"order": 5,
+			"street_below": 0,
+			"variants_exercised": []
+		},
+		{
+			"canopies": 0,
+			"issues": [],
+			"order": 6,
+			"street_below": 0,
+			"variants_exercised": []
+		},
+		{
+			"canopies": 0,
+			"issues": [],
+			"order": 7,
+			"street_below": 0,
+			"variants_exercised": []
+		},
+		{
+			"canopies": 92,
+			"issues": [],
+			"order": 8,
+			"street_below": 0,
+			"variants_exercised": [
+				"capital_house_fachada",
+				"capital_merchant_fachada"
+			]
+		},
+		{
+			"canopies": 0,
+			"issues": [],
+			"order": 9,
+			"street_below": 0,
+			"variants_exercised": []
+		}
+	]
+}

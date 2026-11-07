@@ -36,21 +36,78 @@ func render() -> void:
 		return
 	var data: Dictionary = result.data
 	var row := PlayerUI.split(body)
+	row.name = "PublicProfileLayout"
 	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var visual := PlayerUI.column(row)
-	preview(visual, str(data.get("equipped_character_id", "")))
+	visual.size_flags_stretch_ratio = 1.15
+	var character_id := str(data.get("equipped_character_id", ""))
+	var stage := preview(visual, character_id)
+	if stage != null:
+		stage.name = "PublicProfileCharacter"
+		stage.custom_minimum_size = Vector2(320, 360)
 	var info := PlayerUI.column(row)
-	info.add_child(PlayerUI.label(str(data.get("nickname", "Sem nickname")), 32, PlayerUI.TEXT))
-	info.add_child(PlayerUI.label("ID público: " + str(data.get("public_id", "—"))))
-	info.add_child(PlayerUI.label("Nível: " + DevicePreferences.number(data.get("level"), services.preferences.values.locale)))
-	info.add_child(PlayerUI.label(services.friends.presence_label(str(data.get("user_id", "")))))
-	info.add_child(PlayerUI.label("Somente informações públicas do jogador são exibidas."))
+	info.size_flags_stretch_ratio = 1.0
+	info.alignment = BoxContainer.ALIGNMENT_CENTER
+	var nickname := PlayerUI.label(str(data.get("nickname", "Sem nickname")), 44, PlayerUI.TEXT)
+	nickname.name = "PublicNickname"
+	nickname.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	info.add_child(nickname)
+	var facts := PlayerUI.flow(info)
+	facts.add_child(PlayerUI.label(tr("Nível") + " " + DevicePreferences.number(data.get("level"), services.preferences.values.locale), 26, PlayerUI.GOLD))
+	facts.add_child(PlayerUI.label(services.friends.presence_label(str(data.get("user_id", ""))), 22, PlayerUI.MUTED))
+	var id_row := PlayerUI.row(info)
+	var public_id := str(data.get("public_id", ""))
+	var identifier := PlayerUI.label(public_id, 20, PlayerUI.MUTED)
+	identifier.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	identifier.autowrap_mode = TextServer.AUTOWRAP_OFF
+	identifier.clip_text = true
+	identifier.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	id_row.add_child(identifier)
+	var copy := PlayerUI.button("", func() -> void:
+		DisplayServer.clipboard_set(public_id)
+		banner.show_state("success", tr("ID público copiado.")))
+	copy.name = "CopyPublicId"
+	copy.tooltip_text = tr("Copiar ID público")
+	copy.icon = PremiumUI.icon("copy", PlayerUI.TEXT, 24)
+	copy.custom_minimum_size.x = 64
+	id_row.add_child(copy)
+	info.add_child(PlayerUI.label("Personagem equipado", 20, PlayerUI.MUTED))
+	var character := PlayerUI.label(str(services.inventory.entry(character_id).get("name", "—")), 28, PlayerUI.TEXT)
+	character.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	info.add_child(character)
 	if str(data.get("user_id",""))!=str(services.session.user.get("id","")):
+		var relation := "none"
+		for key: String in ["friends", "incoming", "outgoing"]:
+			for player: Dictionary in services.friends.data.get(key, []):
+				if player.get("user_id") == data.get("user_id"): relation = key
+		if relation == "none":
+			var add := PlayerUI.button("Adicionar amigo", func() -> void:
+				await _add_friend(str(data.user_id)))
+			add.name = "AddPublicFriend"
+			PlayerUI.style_button(add, true)
+			info.add_child(add)
+		elif relation == "friends":
+			info.add_child(PlayerUI.label("Vocês são amigos", 22, PlayerUI.GOLD))
+		else:
+			info.add_child(PlayerUI.label("Solicitação pendente", 22, PlayerUI.MUTED))
 		var report := PlayerUI.button("Denunciar jogador",func()->void:
-			_open_report(str(data.get("public_id",""))))
+			_open_report(public_id))
 		report.name="ReportPlayer"
 		info.add_child(report)
+
+
+func _add_friend(user_id: String) -> void:
+	var epoch := _epoch
+	var button := body.find_child("AddPublicFriend", true, false) as Button
+	if button == null or button.disabled: return
+	button.disabled = true
+	var result := await services.friends.act("send", user_id)
+	if epoch != _epoch or not is_visible_in_tree(): return
+	status(result)
+	if is_instance_valid(button):
+		button.disabled = result.ok
+		if result.ok: button.text = tr("Solicitação enviada")
 
 
 func handle_back() -> bool:

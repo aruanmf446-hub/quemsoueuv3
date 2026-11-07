@@ -184,6 +184,7 @@ func _sidebar() -> Control:
 		tab.custom_minimum_size.y = 36 if compact else 56
 		tab.add_theme_font_size_override("font_size", 15 if compact else 22)
 		PremiumUI.style_tab(tab)
+		PlayerUI.reserve_trailing(tab, 64 if count >= 0 else 14)
 		tab.pressed.connect(_change_tab.bind(item[1]))
 		if count >= 0:
 			var badge := PremiumUI.plain(str(count), 13 if compact else 18, Color.WHITE, false)
@@ -334,7 +335,7 @@ func _status_line(player: Dictionary, font: int) -> Control:
 			var ago := PlayerContracts.ago(services.friends.last_seen(id))
 			return PremiumUI.presence(tr("Offline") + (" (%s)" % ago if not ago.is_empty() else ""), false, font)
 	var level: Variant = player.get("level")
-	return PremiumUI.plain(tr("Nível ") + str(level) if level != null else tr("Presença indisponível"), font, PremiumUI.MUTED, false)
+	return PlayerUI.label(tr("Nível ") + str(level) if level != null else tr("Presença indisponível"), font, PremiumUI.MUTED)
 
 
 ## Consulta com cache por chave; re-renderiza ao chegar se a tela ainda estiver aberta.
@@ -387,19 +388,25 @@ func _detail(parent: Control, player: Dictionary, kind: String) -> void:
 	top.add_theme_constant_override("separation", 16 if compact else 34)
 	parent.add_child(top)
 	var character_id := str(player.get("equipped_character_id", ""))
-	top.add_child(PremiumUI.avatar(PlayerUI.portrait_texture(character_id), (72 if kind == "search" else 100) if compact else (170 if kind == "search" else 220), 4))
+	top.add_child(PremiumUI.avatar(PlayerUI.portrait_texture(character_id), 100 if compact else 220, 4))
 	var info := VBoxContainer.new()
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	info.alignment = BoxContainer.ALIGNMENT_CENTER
 	info.add_theme_constant_override("separation", 4 if compact else 8)
 	top.add_child(info)
-	var name := PremiumUI.plain(_nickname(player), 22 if compact else 46, Color.WHITE, false)
+	var name := PlayerUI.label(_nickname(player), 22 if compact else 46, Color.WHITE)
+	name.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	name.name = "PlayerName"
 	info.add_child(name)
 	var id_line := HBoxContainer.new()
 	id_line.add_theme_constant_override("separation", 10)
 	var public_id := str(player.get("public_id", ""))
-	id_line.add_child(PremiumUI.plain(tr("ID Público: ") + public_id, 13 if compact else 22, PremiumUI.MUTED, false))
+	var identifier := PremiumUI.plain(public_id, 20, PremiumUI.MUTED, false)
+	identifier.clip_text = true
+	identifier.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	identifier.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	id_line.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	id_line.add_child(identifier)
 	var copy := Button.new()
 	copy.name = "CopyPublicId"
 	copy.tooltip_text = tr("Copiar ID público")
@@ -416,8 +423,7 @@ func _detail(parent: Control, player: Dictionary, kind: String) -> void:
 	equipped.name = "EquippedCharacter"
 	var box := PremiumUI.flat(Color(0.07, 0.09, 0.13), Color(1, 1, 1, 0.14), 12, 1, 12 if compact else 16)
 	equipped.add_theme_stylebox_override("panel", box)
-	equipped.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	equipped.custom_minimum_size.x = 220 if compact else 460
+	equipped.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	info.add_child(equipped)
 	var line := HBoxContainer.new()
 	line.add_theme_constant_override("separation", 14)
@@ -426,7 +432,8 @@ func _detail(parent: Control, player: Dictionary, kind: String) -> void:
 	var labels := VBoxContainer.new()
 	labels.add_theme_constant_override("separation", 0)
 	line.add_child(labels)
-	labels.add_child(PremiumUI.plain("Personagem equipado", 11 if compact else 16, PremiumUI.MUTED))
+	labels.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	labels.add_child(PlayerUI.label("Personagem equipado", 11 if compact else 16, PremiumUI.MUTED))
 	labels.add_child(PremiumUI.plain(str(services.inventory.entry(character_id).get("name", "—")), 16 if compact else 28, Color.WHITE, false))
 	if kind == "search" and _relation(str(player.user_id)) == "none":
 		var message := LineEdit.new()
@@ -451,9 +458,10 @@ func _detail(parent: Control, player: Dictionary, kind: String) -> void:
 
 func _actions(parent: Control, player: Dictionary, kind: String) -> void:
 	var compact := _compact()
-	var row := HBoxContainer.new()
+	var row := HFlowContainer.new()
 	row.name = "PlayerActions"
-	row.add_theme_constant_override("separation", 10 if compact else 22)
+	row.add_theme_constant_override("h_separation", 10 if compact else 22)
+	row.add_theme_constant_override("v_separation", 10)
 	parent.add_child(row)
 	var id := str(player.user_id)
 	var relation := _relation(id)
@@ -749,7 +757,7 @@ func _render_search(parent: Control) -> void:
 	split.add_theme_constant_override("separation", 12 if compact else 20)
 	parent.add_child(split)
 	var results := _sub_panel(split, "friends", tr("Resultados (%d)") % _results.size(), "")
-	results.get_parent().size_flags_stretch_ratio = 0.8
+	results.get_parent().size_flags_stretch_ratio = 0.65
 	var current := _current(_results)
 	for player: Dictionary in _results:
 		results.add_child(_list_row(player, str(player.user_id) == str(current.get("user_id", ""))))
@@ -758,8 +766,8 @@ func _render_search(parent: Control) -> void:
 	var detail := PanelContainer.new()
 	detail.name = "SearchDetail"
 	detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	detail.size_flags_stretch_ratio = 1.4
-	detail.add_theme_stylebox_override("panel", PremiumUI.flat(Color(0.05, 0.07, 0.11), PremiumUI.EDGE, 14, 1, 12 if compact else 20))
+	detail.size_flags_stretch_ratio = 1.6
+	detail.add_theme_stylebox_override("panel", PlayerUI.frame_panel(20))
 	split.add_child(detail)
 	var detail_column := VBoxContainer.new()
 	detail_column.add_theme_constant_override("separation", 10)

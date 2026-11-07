@@ -48,6 +48,9 @@ static func apply_theme(root: Control) -> void:
 		_menu_theme = Theme.new()
 		var font := preload("res://assets/desert/phase01/interface.ttf").duplicate() as FontFile
 		font.multichannel_signed_distance_field = true
+		var fallback := preload("res://assets/fonts/qse-interface-fallback.otf").duplicate() as FontFile
+		fallback.multichannel_signed_distance_field = true
+		font.fallbacks = [fallback]
 		_menu_theme.default_font = font
 		_menu_theme.default_font_size = 24
 		var popup_surface := _flat(Color(0.035, 0.05, 0.065, 0.98), FIELD_BORDER, 4, Color.WHITE)
@@ -167,8 +170,17 @@ static func style_button(node: Button, primary: bool) -> void:
 	fluid(node)
 
 
-## Linha de lista selecionável (coleções, categorias): transparente até passar o mouse;
-## selecionada fica âmbar escuro com filete dourado, como na referência.
+## Reserva espaço para um contador sem sobrepor textos traduzidos maiores.
+static func reserve_trailing(node: Button, width: float) -> void:
+	node.clip_text = true
+	node.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	for state: String in ["normal", "hover", "pressed", "hover_pressed", "focus", "disabled"]:
+		var style := node.get_theme_stylebox(state).duplicate() as StyleBox
+		style.content_margin_right = width
+		node.add_theme_stylebox_override(state, style)
+
+
+## Linha de lista selecionável: transparente, com seleção âmbar discreta.
 static func style_row(node: Button) -> void:
 	style_button(node, false)
 	var normal := _flat(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 8, Color.WHITE)

@@ -28,6 +28,10 @@ var _battle_layout := false
 func _ready() -> void:
 	super._ready()
 	heading.text = tr("Mata-Mata")
+	heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	heading.autowrap_mode = TextServer.AUTOWRAP_OFF
+	heading.clip_text = true
+	heading.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	duel = services.duel
 	duel.changed.connect(func() -> void:
 		if is_visible_in_tree() and not _busy: render())
@@ -223,8 +227,8 @@ func _header_extras(show: bool, tag_text := "S E R V I D O R E S   O N L I N E")
 	(header.get_node("ModeTag") as Label).text = tag_text if tag_text.contains("  ") else spaced(tag_text)
 	heading.add_theme_font_size_override("font_size", 26 if compact else 40)
 	# Sublinhado só sob o título (como na referência); fora da lista o título volta a ocupar a linha.
-	heading.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if show else Control.SIZE_EXPAND_FILL
-	heading.autowrap_mode = TextServer.AUTOWRAP_OFF if show else TextServer.AUTOWRAP_WORD_SMART
+	heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	heading.autowrap_mode = TextServer.AUTOWRAP_OFF
 	if show:
 		heading.add_theme_stylebox_override("normal", heading.get_meta("underline"))
 	else:
@@ -883,7 +887,9 @@ func _render_form() -> void:
 	decks.add_theme_constant_override("separation", 14)
 	if UIScale.is_iphone(): decks.add_theme_constant_override("separation", 6)
 	split.add_child(decks)
-	decks.add_child(_section_head("cards", "Decks de personagens", "Escolha o conjunto de personagens da sala (até %d)." % MAX_DECKS))
+	var deck_heading := _section_head("cards", "Decks de personagens", "Escolha o conjunto de personagens da sala (até %d)." % MAX_DECKS)
+	decks.add_child(deck_heading)
+	if UIScale.is_iphone(): deck_heading.hide() # Busca e filtros já identificam a galeria.
 	var search_box := PanelContainer.new()
 	var field_box := PremiumUI.flat(Color("#0a1626"), LINE, 12, 1)
 	field_box.content_margin_left = 18
@@ -940,10 +946,7 @@ func _render_form() -> void:
 		tabs.add_child(chip)
 	var grid := GridContainer.new()
 	grid.name = "DeckChoices"
-	grid.columns = 2 if UIScale.is_iphone() else 3
-	grid.resized.connect(func() -> void:
-		# Colunas pela largura disponível (cards de ~132 + espaço), sem esmagar as capas.
-		grid.columns = clampi(floori((grid.size.x + 14.0) / 146.0), 2, 5))
+	grid.columns = 2
 	grid.add_theme_constant_override("h_separation", 14)
 	grid.add_theme_constant_override("v_separation", 14)
 	if UIScale.is_iphone():
@@ -1042,10 +1045,10 @@ func _refresh_deck_grid() -> void:
 		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		holder.add_child(empty)
 		return
-	if UIScale.is_iphone():
-		var pages := maxi(1, ceili(shown.size() / 4.0))
+	if not shown.is_empty():
+		var pages := maxi(1, ceili(shown.size() / 2.0))
 		_iphone_deck_page = clampi(_iphone_deck_page, 0, pages - 1)
-		shown = shown.slice(_iphone_deck_page * 4, (_iphone_deck_page + 1) * 4)
+		shown = shown.slice(_iphone_deck_page * 2, (_iphone_deck_page + 1) * 2)
 		if pages > 1:
 			var navigation := HBoxContainer.new()
 			navigation.name = "DeckPager"
@@ -1074,8 +1077,8 @@ func _deck_choice(entry: Dictionary) -> Control:
 	card.toggle_mode = true
 	card.button_pressed = selected
 	# T24 iOS: capa mais alta e arte inteira (antes, uma faixa panorâmica cortava os personagens).
-	card.custom_minimum_size = Vector2(132, 176)
-	if UIScale.is_iphone(): card.custom_minimum_size = Vector2(110, 88)
+	card.custom_minimum_size = Vector2(190, 280)
+	if UIScale.is_iphone(): card.custom_minimum_size = Vector2(160, 216)
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	card.clip_contents = true
 	card.tooltip_text = "%s (%d)" % [entry.name, entry.size]

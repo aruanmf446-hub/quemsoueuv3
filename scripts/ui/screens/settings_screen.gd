@@ -298,7 +298,7 @@ func _adapt() -> void:
 	if UIScale.is_iphone(): _main_panel.size_flags_stretch_ratio = 2.6
 	_panel_title.add_theme_font_size_override("font_size", 20 if compact else 34)
 	_panel_subtitle.add_theme_font_size_override("font_size", 12 if compact else 17)
-	_panel_subtitle.visible = not (compact and narrow)
+	_panel_subtitle.visible = _category != 4 and not (compact and narrow)
 	WebPerf.measure("_adapt", perf_started)
 
 
@@ -326,6 +326,7 @@ func _show_category() -> void:
 	_perf_timer.stop()
 	_panel_title.text = tr(CATEGORIES[_category][0])
 	_panel_subtitle.text = tr(SUBTITLES[_category])
+	_panel_subtitle.visible = _category != 4 and not (_compact() and size.x < 1100)
 	match _category:
 		0: _my_profile()
 		1: _audio()
@@ -859,54 +860,22 @@ var _language_choice := ""
 func _language() -> void:
 	var compact := _compact()
 	if _language_choice.is_empty(): _language_choice = str(services.preferences.values.locale)
-	_content.add_child(_section_title("translate", "Idioma do texto"))
-	var options := HBoxContainer.new()
+	var options := GridContainer.new()
 	options.name = "LanguageOptions"
-	options.add_theme_constant_override("separation", 16)
+	options.columns = 3
+	options.add_theme_constant_override("h_separation", 12)
+	options.add_theme_constant_override("v_separation", 10)
 	_content.add_child(options)
-	for item: Array in [["Português (Brasil)", "pt_BR", "br"], ["English", "en", "gb"]]:
-		var selected: bool = _language_choice == item[1]
-		var option := Button.new()
-		option.name = "Locale_" + item[1]
-		option.text = item[0]
-		option.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
-		option.toggle_mode = true
-		option.button_pressed = selected
-		option.icon = _flag(item[2])
-		option.expand_icon = false
-		option.add_theme_constant_override("icon_max_width", 40 if compact else 70)
-		option.add_theme_constant_override("h_separation", 14)
-		option.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		option.custom_minimum_size.y = 56 if compact else 110
-		option.add_theme_font_size_override("font_size", 16 if compact else 26)
-		_style_tab(option)
-		# Marca de seleção (✓ dourado) ou círculo vazio, como na referência.
-		var mark := TextureRect.new()
-		mark.name = "SelectionMark"
-		var mark_svg := '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">' + ('<circle cx="12" cy="12" r="10" fill="#f4cf7a"/><path d="M7 12.5l3.5 3.5L17 9" fill="none" stroke="#141006" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>' if selected else '<circle cx="12" cy="12" r="9.5" fill="none" stroke="#a8bad3" stroke-width="1.8"/>') + '</svg>'
-		var mark_image := Image.new()
-		mark_image.load_svg_from_string(mark_svg)
-		mark.texture = ImageTexture.create_from_image(mark_image)
-		mark.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		option.add_child(mark)
-		var mark_side := 24.0 if compact else 38.0
-		mark.anchor_left = 1.0
-		mark.anchor_right = 1.0
-		mark.anchor_top = 0.5
-		mark.anchor_bottom = 0.5
-		mark.offset_left = -mark_side - 20
-		mark.offset_right = -20
-		mark.offset_top = -mark_side / 2
-		mark.offset_bottom = mark_side / 2
-		for state in ["normal", "hover", "pressed", "hover_pressed", "focus", "disabled"]:
-			var style := option.get_theme_stylebox(state).duplicate() as StyleBox
-			style.content_margin_right = mark_side + 34
-			option.add_theme_stylebox_override(state, style)
-		option.pressed.connect(func() -> void:
+	for item: Array in DevicePreferences.LANGUAGES:
+		var option := PlayerUI.button(item[0], func() -> void:
 			_language_choice = item[1]
 			_show_category())
+		option.name = "Locale_" + item[1]
+		option.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		option.toggle_mode = true
+		option.button_pressed = _language_choice == item[1]
+		PlayerUI.style_button(option, option.button_pressed)
+		option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		options.add_child(option)
 	var rule := ColorRect.new()
 	rule.color = Color(1, 1, 1, 0.1)
@@ -920,7 +889,7 @@ func _language() -> void:
 	confirm.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	confirm.custom_minimum_size.x = 200 if compact else 330
 	_content.add_child(confirm)
-	_side_head("book", "Pré-visualização", "Veja como o jogo será exibido no idioma selecionado.")
+	_side_head("book", "Prévia", "Veja como o jogo será exibido no idioma selecionado.")
 	var bubble := PanelContainer.new()
 	bubble.name = "LanguageBubble"
 	var bubble_box := _flat(Color(0.1, 0.07, 0.03), GOLD_LIGHT, 24, 3)
@@ -929,7 +898,8 @@ func _language() -> void:
 	bubble_box.set_content_margin_all(14 if compact else 22)
 	bubble.add_theme_stylebox_override("panel", bubble_box)
 	bubble.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	var sample := _plain("Jogar · Voltar\nConfigurações" if _language_choice == "pt_BR" else "Play · Back\nSettings", 15 if compact else 26, GOLD_LIGHT)
+	var samples := {"pt_BR":"Jogar · Voltar\nConfigurações", "en":"Play · Back\nSettings", "es":"Jugar · Volver\nConfiguración", "fr":"Jouer · Retour\nParamètres", "ja":"プレイ · 戻る\n設定", "zh_CN":"开始 · 返回\n设置", "ru":"Играть · Назад\nНастройки"}
+	var sample := _plain(samples.get(_language_choice, samples.pt_BR), 26, GOLD_LIGHT)
 	sample.name = "LanguageSample"
 	sample.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	sample.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -939,18 +909,8 @@ func _language() -> void:
 	rule2.color = Color(1, 1, 1, 0.1)
 	rule2.custom_minimum_size.y = 1
 	_side.add_child(rule2)
-	_tip("Sobre o idioma: altera os textos do jogo, incluindo menus, mensagens e instruções. Nomes de cartas e decks continuam no idioma original.")
+	_tip("Tradução em expansão. Alguns textos ainda aparecem em português.")
 
-
-func _flag(code: String) -> Texture2D:
-	var svg := ""
-	if code == "br":
-		svg = '<svg xmlns="http://www.w3.org/2000/svg" width="70" height="48" viewBox="0 0 70 48"><rect width="70" height="48" rx="6" fill="#1f9d48"/><path d="M35 6 63 24 35 42 7 24z" fill="#f6d33c"/><circle cx="35" cy="24" r="10" fill="#203a8f"/><path d="M25.5 22c6-2 13-1.5 19 2" stroke="#fff" stroke-width="1.6" fill="none"/></svg>'
-	else:
-		svg = '<svg xmlns="http://www.w3.org/2000/svg" width="70" height="48" viewBox="0 0 70 48"><rect width="70" height="48" rx="6" fill="#1f3a8a"/><path d="M0 0 70 48M70 0 0 48" stroke="#fff" stroke-width="9"/><path d="M0 0 70 48M70 0 0 48" stroke="#c8263a" stroke-width="3.5"/><path d="M35 0v48M0 24h70" stroke="#fff" stroke-width="13"/><path d="M35 0v48M0 24h70" stroke="#c8263a" stroke-width="7"/></svg>'
-	var image := Image.new()
-	image.load_svg_from_string(svg)
-	return ImageTexture.create_from_image(image)
 
 
 # --- Persistência e remapeamento ------------------------------------------------------

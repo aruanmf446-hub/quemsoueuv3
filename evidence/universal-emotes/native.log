@@ -1,0 +1,48 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS conta sem compra não tem emote
+PASS uma compra concede posse à conta
+PASS único débito de 100 moedas
+PASS movimento real ausente não é declarado universal pronto
+PASS produção sem asset não entrega demonstração: cowboy
+PASS adaptador liga movimento ao rig: cowboy
+PASS mesmo item usado em cowboy
+PASS trocar skin não cobra nem espera nova consulta: cowboy
+PASS produção sem asset não entrega demonstração: michelly
+PASS adaptador liga movimento ao rig: michelly
+PASS mesmo item usado em michelly
+PASS trocar skin não cobra nem espera nova consulta: michelly
+PASS produção sem asset não entrega demonstração: rodrigo
+PASS adaptador liga movimento ao rig: rodrigo
+PASS mesmo item usado em rodrigo
+PASS trocar skin não cobra nem espera nova consulta: rodrigo
+PASS produção sem asset não entrega demonstração: lorena
+PASS adaptador liga movimento ao rig: lorena
+PASS mesmo item usado em lorena
+PASS trocar skin não cobra nem espera nova consulta: lorena
+PASS produção sem asset não entrega demonstração: gus
+PASS adaptador liga movimento ao rig: gus
+PASS mesmo item usado em gus
+PASS trocar skin não cobra nem espera nova consulta: gus
+PASS produção sem asset não entrega demonstração: lana
+PASS adaptador liga movimento ao rig: lana
+PASS mesmo item usado em lana
+PASS trocar skin não cobra nem espera nova consulta: lana
+PASS produção sem asset não entrega demonstração: halloween
+PASS adaptador liga movimento ao rig: halloween
+PASS mesmo item usado em halloween
+PASS trocar skin não cobra nem espera nova consulta: halloween
+PASS produção sem asset não entrega demonstração: el_fuego
+PASS adaptador liga movimento ao rig: el_fuego
+PASS mesmo item usado em el_fuego
+PASS trocar skin não cobra nem espera nova consulta: el_fuego
+PASS rig incompatível recusado sem deformar o personagem
+PASS eventos de método não são executados pelo emote importado
+PASS caminho do rig é ligado ao avatar atual
+PASS nova instância recupera a posse do servidor
+PASS cache anterior não concede posse à outra conta
+PASS outra conta não usa o item
+PASS navegação cancelada impede reprodução atrasada
+PASS produto não adquirido recusado
+PASS convidado não herda emotes de conta
+UNIVERSAL_EMOTES checks=45 failures=0

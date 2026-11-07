@@ -18,6 +18,7 @@ func _run() -> void:
 	var mode := str(JavaScriptBridge.eval("new URLSearchParams(location.search).get('fixture')||'nickname'")) if OS.has_feature("web") else fixture_mode
 	var fake: SupabaseClient
 	if mode=="community": fake=preload("res://tests/community_attribution/fake_game.gd").new()
+	elif mode=="universal": fake=preload("res://tests/skin_emotes/universal_game.gd").new()
 	elif mode=="claim": fake=preload("res://tests/community_claims/visual_game.gd").new()
 	elif mode=="report": fake=preload("res://tests/deck_runtime_corrections/fake_game.gd").new()
 	elif mode=="stripe": fake=preload("res://tests/coin_store/fake_game.gd").new()
@@ -37,6 +38,7 @@ func _run() -> void:
 	services.client=fake
 	services.session.client=fake
 	services.session.user={"id":profile.user_id,"user_metadata":{"name":"Nome do Gmail"}}
+	if mode=="universal": fake.account=profile.user_id
 	services.session._expires_at=Time.get_unix_time_from_system()+86400.0
 	services.session.set_process(false)
 	services.profile.client=profile
@@ -51,7 +53,7 @@ func _run() -> void:
 		ui=load("res://scenes/player/wallet.tscn").instantiate()
 		add_child(ui)
 		ui.show_screen({"tab":"coins"})
-	elif mode in ["emotes","variations"]:
+	elif mode in ["emotes","variations","universal"]:
 		services.progression.state="success"
 		services.progression.data={"unlocked_character_ids":PlayerContracts.initial_ids(),"equipped_character_id":"cowboy"}
 		ui=load("res://scenes/skins/skins_panel.tscn").instantiate()
@@ -62,6 +64,10 @@ func _run() -> void:
 			for entry: Dictionary in CharacterCatalog.load_entries():
 				ui._paths[str(entry.id)]="res://assets/portraits/"+str(entry.id)+".png"
 		ui.open("cowboy")
+		if mode=="universal":
+			_fixture_universal_motion()
+			ui._choose_cosmetic_mode("shop")
+			ui.heading.text="Emotes universais · teste"
 	elif mode=="player_report":
 		services.profile.client=fake
 		ui=load("res://scenes/player/public_profile.tscn").instantiate()
@@ -127,6 +133,9 @@ func _seed_submission() -> void:
 	ui._open_submissions()
 
 func _probe(args: Array) -> void:
+	if args.size() and str(args[0]).begins_with("universal_character:"):
+		ui._select(str(args[0]).trim_prefix("universal_character:"))
+		_fixture_universal_motion()
 	if args.size() and str(args[0]).begins_with("variation_character:"):
 		ui._select(str(args[0]).trim_prefix("variation_character:"))
 	if args.size() and str(args[0])=="owned_collection": ui._select_tab("Meus Decks")
@@ -149,6 +158,7 @@ func _probe(args: Array) -> void:
 	if services.emote_shop!=null and services.emote_shop.state=="success":
 		result.shop={"coins":services.emote_shop.data.get("coins",""),"owned":services.emote_shop.product("dance_01").get("owned",false)}
 	if services.wallet.state=="success": result.wallet_coins=services.wallet.data.get("coins","")
+	if fixture_game.get("purchase_calls") is Array: result.emote_purchases=fixture_game.purchase_calls.size()
 	if ui.get("_stage") is LobbyStage and is_instance_valid(ui.get("_stage")):
 		var stage: LobbyStage=ui.get("_stage")
 		result.preview_render={"static":stage.static_preview,"update":stage.get_node("Viewport").render_target_update_mode}
@@ -164,7 +174,7 @@ func _probe(args: Array) -> void:
 		if node is LineEdit or node is TextEdit: result.fields[str(node.name)]=str(node.text)
 		if node is BaseButton or node is LineEdit or node is TextEdit:
 			var r := node.get_global_rect()
-			result.controls.append({"name":str(node.name),"rect":[r.position.x,r.position.y,r.size.x,r.size.y]})
+			result.controls.append({"name":str(node.name),"rect":[r.position.x,r.position.y,r.size.x,r.size.y],"text":node.text if node is Button else ""})
 	if ui.get("_draft") is Dictionary:
 		result.cards=ui._draft.get("cards",[]).size()
 		result.card_names=ui._draft.get("cards",[]).map(func(c:Dictionary)->String:return str(c.get("name","")))
@@ -173,3 +183,10 @@ func _probe(args: Array) -> void:
 		result.category=str(ui._draft.get("category",""))
 		result.cover=ui._draft.get("cover",{})
 	JavaScriptBridge.eval("window.qseDeckInputReport="+JSON.stringify(result))
+
+
+func _fixture_universal_motion() -> void:
+	# Existing base clip tests binding/entitlement ONLY. Not an approved dance asset.
+	var entry := services.inventory.entry(ui._selected)
+	preload("res://scripts/skins/universal_emotes.gd").install_from_catalog(ui._stage.character,"emote_dance_01",{
+		"items":[{"scope":"account","animation_key":"emote_dance_01","clips":{str(entry.id):str(entry.animations.base)}}]})

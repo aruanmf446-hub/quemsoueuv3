@@ -55,7 +55,7 @@ func run() -> void:
 	fake.hold_purchase=false;await settle()
 	check(services.wallet.data.coins=="150" and shop.product("dance_01").owned,"sucesso atualiza carteira e posse com leituras do servidor")
 	check(confirm.disabled and confirm.text=="ADQUIRIDO","sucesso não permite repetir a cobrança")
-	check(screen.find_child("BuyEmotePreview",true,false).disabled,"loja identifica o item adquirido")
+	check(not screen.find_child("BuyEmotePreview",true,false).disabled and screen.find_child("BuyEmotePreview",true,false).text=="USAR EMOTE","item adquirido oferece usar, sem nova compra")
 	screen._close_purchase();await settle()
 	fake.owned=false;fake.available=false;shop.clear()
 	screen._rebuild_gallery()

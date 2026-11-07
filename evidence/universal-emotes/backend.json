@@ -1,0 +1,17 @@
+[
+  {
+    "result": {
+      "areas": [
+        "account_ownership",
+        "one_debit",
+        "no_character_binding",
+        "another_account_denied",
+        "reopened_account_read",
+        "retired_item_keeps_ownership",
+        "no_direct_grants"
+      ],
+      "passed": true,
+      "transaction": "rollback"
+    }
+  }
+]

@@ -3,19 +3,50 @@ extends RemoteDataService
 var session: SessionService
 var _pending: Dictionary = {}
 var _buying := false
+var _owner := ""
+const MOTIONS=preload("res://scripts/skins/universal_emotes.gd")
 
 func clear() -> void:
 	_pending={}
+	_owner=""
 	super.clear()
 
 func refresh() -> Dictionary:
 	if not session.authenticated(): return ServiceResult.failure("not_authenticated")
-	return await load_rpc("qse_emote_shop")
+	var owner := str(session.user.get("id",""))
+	var epoch := client.generation
+	var result := await load_rpc("qse_emote_shop")
+	if epoch!=client.generation or owner!=str(session.user.get("id","")): return ServiceResult.failure("session_changed")
+	if result.ok and state=="success": _owner=owner
+	return result
 
 func product(id: String) -> Dictionary:
 	for item: Dictionary in data.get("items",[]):
 		if item.id==id: return item
 	return {}
+
+func owned(id: String) -> bool:
+	return session.authenticated() and _owner==str(session.user.get("id","")) and product(id).get("owned",false)==true
+
+## Use entitlement confirmed for this session; changing avatar neither buys nor waits on HTTP.
+func play_owned(slot: CharacterSlot,id: String,still_current: Callable=Callable()) -> Dictionary:
+	if not session.authenticated(): return ServiceResult.failure("not_authenticated")
+	if not is_instance_valid(slot): return ServiceResult.failure("emote_target_changed")
+	var owner := str(session.user.get("id",""))
+	var epoch := client.generation
+	var character := str(slot.character_id)
+	var guarded := not still_current.is_null()
+	if not owned(id):
+		var result := await refresh()
+		if not result.ok: return result
+	if owner!=str(session.user.get("id","")) or epoch!=client.generation: return ServiceResult.failure("session_changed")
+	if not owned(id): return ServiceResult.failure("emote_not_owned")
+	if not is_instance_valid(slot) or slot.is_queued_for_deletion(): return ServiceResult.failure("emote_target_changed")
+	if str(slot.character_id)!=character or (guarded and (not still_current.is_valid() or not still_current.call())): return ServiceResult.failure("emote_target_changed")
+	var key := str(product(id).get("animation_key",""))
+	if not MOTIONS.install(slot,key): return ServiceResult.failure("emote_motion_unavailable")
+	if not slot.play_emote(StringName(key)): return ServiceResult.failure("emote_motion_unavailable")
+	return ServiceResult.success({"emote_id":id,"scope":"account","character_id":character})
 
 func buy(id: String,expected_price: int) -> Dictionary:
 	if not session.authenticated(): return ServiceResult.failure("not_authenticated")
@@ -36,6 +67,7 @@ func buy(id: String,expected_price: int) -> Dictionary:
 			return ServiceResult.failure("invalid_contract")
 		var item := product(id)
 		if not item.is_empty(): item.owned=true
+		_owner=owner
 		data.coins=result.data.coins_after
 		changed.emit()
 		await refresh()
@@ -54,6 +86,9 @@ func valid_data(value: Variant) -> bool:
 
 static func message(code: String) -> String:
 	match code:
+		"emote_not_owned": return "Este emote ainda não está na sua conta."
+		"emote_target_changed": return "O personagem mudou. Toque em usar novamente."
+		"emote_motion_unavailable": return "O movimento deste emote ainda não está disponível para este personagem nesta versão."
 		"insufficient_funds": return "Você não tem moedas suficientes."
 		"emote_unavailable": return "Este emote ainda não está à venda. A prévia continua disponível."
 		"price_changed": return "O preço mudou. Abra a confirmação novamente."

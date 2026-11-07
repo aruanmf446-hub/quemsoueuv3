@@ -185,6 +185,7 @@ func _session_changed() -> void:
 		refresh_all()
 		_heartbeat()
 		rewards.refresh.call_deferred()
+		emote_shop.refresh.call_deferred()
 
 
 func refresh_all() -> void:

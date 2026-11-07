@@ -1,0 +1,21 @@
+[
+  {
+    "result": {
+      "columns": [
+        "user_id",
+        "emote_id",
+        "transaction_id",
+        "purchased_at"
+      ],
+      "product": {
+        "id": "dance_01",
+        "active": false,
+        "asset_ready": false,
+        "price_coins": 100
+      },
+      "direct_write": false,
+      "ownership_key": "PRIMARY KEY (user_id, emote_id)",
+      "purchase_authenticated": true
+    }
+  }
+]

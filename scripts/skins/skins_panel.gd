@@ -490,6 +490,7 @@ func _select(character_id: String) -> void:
 	_context_title=PlayerUI.label("",24,PlayerUI.GOLD)
 	_context_title.name="ReactionPreviewTitle"
 	_context_hint=PlayerUI.label("",20,PlayerUI.MUTED)
+	_context_hint.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	_preview.add_child(_context_title)
 	_preview.add_child(_context_hint)
 	_context_title.visible=_cosmetic_mode!="skins"
@@ -554,7 +555,7 @@ func _select(character_id: String) -> void:
 	preview.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	preview.clip_text=true
 	shop_actions.add_child(preview)
-	var buy := _button("COMPRAR",_preview_purchase,true)
+	var buy := _button("COMPRAR",_emote_primary_action,true)
 	buy.name="BuyEmotePreview"
 	buy.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	buy.clip_text=true
@@ -657,14 +658,14 @@ func _load_variation_previews(entry: Dictionary,watch: Control,images: Dictionar
 
 func _build_emote_gallery(entry: Dictionary) -> void:
 	var shop := _cosmetic_mode=="shop"
-	var owned: bool=services.emote_shop.product("dance_01").get("owned",false)
+	var owned: bool=services.emote_shop.owned("dance_01")
 	var emotes: Array=[{"id":"dance","name":"Dancinha","context":"ADQUIRIDO" if owned else "100 moedas","animation":"dance_preview"}] if shop else CharacterCatalog.emotes_for(entry)
 	var buy := _preview.find_child("BuyEmotePreview",true,false) as Button
 	if shop and buy!=null:
-		buy.text=tr("ADQUIRIDO" if owned else "COMPRAR")
-		buy.disabled=owned
+		buy.text=tr("USAR EMOTE" if owned else "COMPRAR")
+		buy.disabled=false
 	_collection_count.text="LOJA · PRÉVIA" if shop else "REAÇÕES · %d" % emotes.size()
-	var hint := PlayerUI.label("Emotes de dança · prévia da loja" if shop else "Exemplos de lobby, vitória e derrota",20,PlayerUI.MUTED)
+	var hint := PlayerUI.label("Emotes da conta · todas as skins compatíveis" if shop else "Exemplos de lobby, vitória e derrota",20,PlayerUI.MUTED)
 	body.add_child(hint)
 	body.move_child(hint,0)
 	if emotes.is_empty():
@@ -721,7 +722,7 @@ func _load_emote_previews(entry: Dictionary,watch: Control,images: Dictionary,da
 
 func _preview_dance() -> void:
 	if not is_instance_valid(_stage): return
-	if _stage.character.has_animation(&"emote_dance_01"):
+	if preload("res://scripts/skins/universal_emotes.gd").install(_stage.character,"emote_dance_01"):
 		_context_title.text=tr("Dancinha · prévia do movimento")
 		_context_hint.text=tr("Emote da loja")
 		_stage.character.play_emote(&"emote_dance_01")
@@ -730,6 +731,23 @@ func _preview_dance() -> void:
 	_context_title.text=tr("Dancinha · prévia do movimento")
 	_context_hint.text=tr("Movimento demonstrativo original")
 	_stage.character.play_emote(DANCE_PREVIEW.ALIAS)
+
+
+func _emote_primary_action() -> void:
+	if not services.emote_shop.owned("dance_01"):
+		_preview_purchase()
+		return
+	if not is_instance_valid(_stage): return
+	var target := _stage.character
+	var selected := _selected
+	var current := func()->bool:return is_inside_tree() and is_visible_in_tree() and is_instance_valid(_stage) and _stage.character==target and _selected==selected and _cosmetic_mode=="shop"
+	var result := await services.emote_shop.play_owned(target,"dance_01",current)
+	if not is_instance_valid(_stage) or _stage.character!=target or _selected!=selected or _cosmetic_mode!="shop": return
+	if result.ok:
+		_context_title.text=tr("Dancinha")
+		_context_hint.text=tr("Emote da sua conta")
+	else:
+		_context_hint.text=EmoteShopService.message(str(result.code))
 
 
 func _preview_purchase() -> void:
@@ -784,7 +802,7 @@ func _preview_purchase() -> void:
 		confirm.text=tr("ADQUIRIDO")
 	elif not item.available:
 		feedback.text=tr("100 moedas. Venda aguardando o movimento real; a prévia continua disponível.")
-	elif not _stage.character.has_animation(StringName(item.animation_key)):
+	elif not preload("res://scripts/skins/universal_emotes.gd").install(_stage.character,str(item.animation_key)):
 		feedback.text=tr("O movimento real ainda não está disponível nesta versão.")
 	elif balance_coins<str(item.price_coins).to_int():
 		feedback.text=tr("Saldo: %s moedas. Você não tem moedas suficientes.") % str(balance_coins)

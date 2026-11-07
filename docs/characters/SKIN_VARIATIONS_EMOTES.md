@@ -47,6 +47,12 @@ Uma resposta perdida reutiliza o identificador da compra. Posse já confirmada
 impede uma segunda cobrança, inclusive com outro identificador de requisição.
 O histórico da carteira identifica o lançamento como compra de emote.
 
+O item é universal da conta GAME. Comprar uma vez libera o mesmo emote para
+todos os personagens compatíveis e suas paletas. A loja passa a mostrar
+**Usar emote**; trocar de skin não compra novamente nem espera outra consulta
+de posse já confirmada. A coleção é recuperada no login e isolada entre contas.
+O movimento real continua pendente; os clipes de QA não são produtos vendidos.
+
 A dancinha atual é uma animação original demonstrativa feita em GDScript sobre
 os ossos dos modelos existentes. Não foi extraída do YouTube. As imagens e o
 vídeo foram capturados no Godot, sem geração de imagens por IA. As miniaturas

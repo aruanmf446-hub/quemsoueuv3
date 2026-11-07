@@ -1,0 +1,101 @@
+[
+  {
+    "width": 1672,
+    "height": 941,
+    "iphone": false,
+    "character": "cowboy",
+    "owned": true,
+    "purchases": 1,
+    "coins": 150,
+    "useWithoutRepurchase": true,
+    "errors": []
+  },
+  {
+    "width": 1672,
+    "height": 941,
+    "iphone": false,
+    "character": "el_fuego",
+    "owned": true,
+    "purchases": 1,
+    "coins": 150,
+    "useWithoutRepurchase": true,
+    "errors": []
+  },
+  {
+    "width": 1672,
+    "height": 941,
+    "iphone": false,
+    "character": "halloween",
+    "owned": true,
+    "purchases": 1,
+    "coins": 150,
+    "useWithoutRepurchase": true,
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "iphone": true,
+    "character": "cowboy",
+    "owned": true,
+    "purchases": 1,
+    "coins": 150,
+    "useWithoutRepurchase": true,
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "iphone": true,
+    "character": "el_fuego",
+    "owned": true,
+    "purchases": 1,
+    "coins": 150,
+    "useWithoutRepurchase": true,
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "iphone": true,
+    "character": "halloween",
+    "owned": true,
+    "purchases": 1,
+    "coins": 150,
+    "useWithoutRepurchase": true,
+    "errors": []
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "iphone": true,
+    "character": "cowboy",
+    "owned": true,
+    "purchases": 1,
+    "coins": 150,
+    "useWithoutRepurchase": true,
+    "errors": []
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "iphone": true,
+    "character": "el_fuego",
+    "owned": true,
+    "purchases": 1,
+    "coins": 150,
+    "useWithoutRepurchase": true,
+    "errors": []
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "iphone": true,
+    "character": "halloween",
+    "owned": true,
+    "purchases": 1,
+    "coins": 150,
+    "useWithoutRepurchase": true,
+    "errors": []
+  }
+]

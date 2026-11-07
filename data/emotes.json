@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "items": [
+    {
+      "id": "dance_01",
+      "animation_key": "emote_dance_01",
+      "scope": "account",
+      "clips": {}
+    }
+  ]
+}

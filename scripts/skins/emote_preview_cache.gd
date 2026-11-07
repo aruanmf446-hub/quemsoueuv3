@@ -14,7 +14,11 @@ func capture(host: Control,entry: Dictionary,watch: Control,dance := false,varia
 	host.add_child(stage)
 	stage.apply_profile("medio")
 	stage.show_character(entry)
-	if dance: preload("res://scripts/skins/dance_preview.gd").install(stage.character)
+	if dance:
+		if preload("res://scripts/skins/universal_emotes.gd").install(stage.character,"emote_dance_01"):
+			emotes=[{"id":"dance","animation":"emote_dance_01"}]
+		else:
+			preload("res://scripts/skins/dance_preview.gd").install(stage.character)
 	stage.set_zoom(1.08)
 	var viewport: SubViewport=stage.get_node("Viewport")
 	viewport.size=Vector2i(384,480)

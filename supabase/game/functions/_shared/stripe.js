@@ -1,6 +1,6 @@
 // No SDK/client secrets. Dependency injection keeps payment tests offline.
-export const GAME_ORIGIN = 'https://aruanmf446-hub.github.io';
-export const GAME_RETURN = GAME_ORIGIN + '/quemsoueuv3/';
+export const GAME_ORIGIN = 'https://quemsoueu.cards';
+export const GAME_RETURN = GAME_ORIGIN + '/jogar/';
 export const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export const checkoutUrl = value => {
  try { const u = new URL(value); return u.origin === 'https://checkout.stripe.com' && !u.username && !u.password && u.pathname.startsWith('/c/'); }

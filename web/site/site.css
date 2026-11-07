@@ -1,0 +1,153 @@
+/* Página inicial do Quem Sou Eu. Tokens = scripts/ui/player_ui.gd (ver qse-web-design). */
+@font-face{font-family:"QSE Interface";src:url("img/interface.woff2") format("woff2");font-display:swap}
+:root{
+  --bg:#111820; --gold:#e9b975; --gold-bright:#f2cd94; --text:#f6f3e9; --muted:#a9b1bb; --ink:#151e25;
+  --panel:rgba(9,13,17,.82); --border:#28323c; --surface:rgba(23,29,36,.78); --surface-hover:rgba(36,42,48,.9);
+  --field-border:#3a444d; --radius:6px; --gutter:clamp(16px,3.4vw,56px);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.5 "QSE Interface",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:hidden}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px}
+.muted{color:var(--muted)}
+.eyebrow{margin:0 0 .4em;color:var(--gold);font-size:14px;letter-spacing:.04em;text-transform:uppercase}
+
+/* Topo: logo à esquerda, poucos links em caixa alta (igual ao lobby). */
+.top{position:absolute;inset:0 0 auto;z-index:5;display:flex;align-items:center;gap:clamp(16px,3vw,44px);
+  padding:max(14px,env(safe-area-inset-top)) var(--gutter) 14px}
+.brand img{width:clamp(110px,11vw,170px)}
+.nav{display:flex;gap:clamp(14px,2.4vw,40px);flex:1}
+.nav a{text-decoration:none;text-transform:uppercase;font-size:clamp(14px,1.25vw,19px);color:var(--text);opacity:.92;padding:10px 0}
+.nav a:hover{color:var(--gold-bright)}
+
+/* Botões: style_button do jogo. Uma ação principal dourada. */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:48px;padding:0 22px;border-radius:var(--radius);
+  text-decoration:none;text-transform:uppercase;font-size:18px;letter-spacing:.02em;border:1px solid transparent;cursor:pointer;white-space:nowrap}
+.btn svg{width:22px;height:22px;flex:none}
+.btn-primary{background:var(--gold);color:var(--ink)}
+.btn-primary:hover{background:var(--gold-bright)}
+.btn-ghost{background:var(--surface);border-color:var(--border);color:var(--text)}
+.btn-ghost:hover{background:var(--surface-hover)}
+.btn-sm{min-height:44px;font-size:15px;padding:0 18px}
+.is-off{color:var(--muted);cursor:default;pointer-events:none}
+
+/* Herói: a arte do lobby é exclusiva desta primeira dobra. */
+.hero{position:relative;min-height:min(100svh,941px);display:flex;align-items:flex-end;overflow:hidden}
+.hero-art{position:absolute;inset:0}
+.hero-art img{width:100%;height:100%;object-fit:cover;object-position:62% 50%}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,14,18,.86) 0%,rgba(10,14,18,.55) 34%,rgba(10,14,18,0) 62%)}
+.hero-copy{position:relative;z-index:1;width:min(560px,100%);padding:120px var(--gutter) clamp(36px,8vh,88px)}
+h1{margin:0;font-weight:400;text-transform:uppercase;font-size:clamp(48px,6.4vw,96px);line-height:1.02}
+.lede{margin:18px 0 28px;font-size:clamp(16px,1.35vw,20px);color:var(--text);max-width:30em}
+.hero-actions{display:flex;flex-wrap:wrap;gap:14px}
+.hero-actions .btn-primary{min-width:min(100%,300px);justify-content:flex-start;min-height:60px;font-size:22px}
+
+/* Seções internas: fundo sólido, como as telas internas do jogo. */
+.band{padding:clamp(40px,5vw,72px) var(--gutter);max-width:1440px;margin:0 auto}
+h2{margin:0 0 28px;font-weight:400;text-transform:uppercase;font-size:clamp(28px,3vw,44px);line-height:1.1}
+h3{margin:0;font-weight:400;font-size:22px}
+
+.platforms{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.plat{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:24px;border-radius:8px;background:var(--panel);border:1px solid var(--border)}
+.plat-icon{width:44px;height:44px;color:var(--text);margin-bottom:6px}
+.plat-format{margin:0 0 8px;color:var(--muted);text-transform:uppercase;font-size:14px}
+.plat .btn{width:100%;margin-top:auto}
+.plat.is-you{border-color:var(--gold)}
+.plat.is-you::before{content:"Recomendado para você";order:-1;color:var(--gold);font-size:13px;text-transform:uppercase}
+.steps{margin:6px 0 0;padding-left:20px;color:var(--muted);font-size:14px}
+.steps li{margin:4px 0}
+.steps b{color:var(--text);font-weight:400}
+.inline{width:16px;height:16px;vertical-align:-3px;color:var(--text)}
+.note{margin:0;font-size:14px;color:var(--gold-bright)}
+.browsers{display:flex;flex-wrap:wrap;gap:8px 16px;list-style:none;margin:6px 0 0;padding:0;color:var(--muted);font-size:14px}
+.browsers li{display:flex;align-items:center;gap:6px}
+.browsers svg{width:18px;height:18px;color:var(--text)}
+.plat .btn + .steps, .plat .btn + .browsers{margin-top:8px}
+.plat-main .btn{order:9}
+
+.modes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.modes article{padding:24px;border-radius:8px;background:var(--surface);border:1px solid var(--border)}
+.modes h3{margin-bottom:8px}
+.modes p:last-child{margin:0}
+
+.cast{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;list-style:none;margin:0;padding:0}
+.cast li{border-radius:8px;background:var(--surface);border:1px solid var(--border);overflow:hidden}
+.cast img{width:100%;aspect-ratio:300/286;object-fit:cover}
+.cast span{display:block;padding:10px 14px;text-transform:uppercase;font-size:15px}
+
+.faq{max-width:860px}
+.faq details{border-bottom:1px solid var(--border)}
+.faq summary{cursor:pointer;padding:18px 0;font-size:18px;list-style:none;display:flex;justify-content:space-between;gap:16px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";color:var(--gold)}
+.faq details[open] summary::after{content:"–"}
+.faq p{margin:0 0 18px;color:var(--muted)}
+.faq b{color:var(--text);font-weight:400}
+
+.foot{display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding:32px var(--gutter) max(32px,env(safe-area-inset-bottom));border-top:1px solid var(--border)}
+.foot img{width:120px}
+.foot p{flex:1;margin:0;font-size:14px}
+
+@media (max-width:1100px){
+  .platforms{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cast{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:760px){
+  .nav{display:none}
+  .top{justify-content:space-between}
+  .modes{grid-template-columns:1fr}
+  .hero::after{background:linear-gradient(0deg,rgba(10,14,18,.92) 0%,rgba(10,14,18,.6) 45%,rgba(10,14,18,.1) 100%)}
+}
+@media (max-width:520px){
+  .platforms{grid-template-columns:1fr}
+  .cast{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hero-actions .btn{width:100%}
+}
+/* Mobile retrato: arte em destaque, texto e CTA fora da ilustração. 
+   Mantém o layout horizontal do lobby/jogo completamente separado. */
+@media (max-width:760px) and (orientation:portrait){
+  .top{padding:max(14px,env(safe-area-inset-top)) 20px 12px;gap:12px}
+  .brand img{width:clamp(118px,33vw,142px)}
+  .top-play{min-height:44px;padding:0 16px;font-size:14px}
+  .hero{display:block;min-height:0;overflow:visible}
+  .hero-art{position:relative;inset:auto;display:block;height:clamp(240px,39svh,340px);overflow:hidden}
+  .hero-art img{width:100%;height:100%;object-fit:cover;object-position:48% 43%}
+  .hero-art::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(180deg,rgba(10,14,18,.3),transparent 35%,rgba(10,14,18,.07))}
+  .hero::after{display:none}
+  .hero-copy{width:100%;padding:24px 20px 30px;background:var(--bg)}
+  .hero-copy .eyebrow{margin:0 0 8px;font-size:11px;letter-spacing:.11em}
+  .hero-copy h1{font-size:clamp(32px,9.3vw,42px);line-height:1.1;letter-spacing:.015em}
+  .hero-copy h1 br{display:none}
+  .hero-copy .lede{margin:12px 0 20px;font-size:15px;line-height:1.5;color:var(--muted);max-width:40ch}
+  .hero-actions{display:flex;flex-direction:column;gap:6px}
+  .hero-actions .btn-primary{width:100%;min-width:0;min-height:52px;font-size:17px;
+    justify-content:center;letter-spacing:.03em}
+  .hero-actions .btn-primary svg{width:20px;height:20px}
+  .hero-actions .btn-ghost{width:100%;min-height:44px;padding:0 12px;border-color:transparent;
+    background:transparent;color:var(--muted);font-size:13px;letter-spacing:.025em;
+    text-decoration:underline;text-underline-offset:4px}
+  .hero-actions .btn-ghost:hover{color:var(--text);background:transparent}
+  .band{padding-top:36px;padding-bottom:40px}
+  .band h2{font-size:clamp(27px,7vw,34px);margin-bottom:22px}
+  .plat{padding:20px}
+  .plat .btn{font-size:16px}
+}
+
+/* Celular deitado (844×390, 640×360): herói compacto, sem cortar o título. */
+@media (max-height:480px) and (orientation:landscape){
+  .hero{min-height:100svh}
+  .hero-copy{width:min(720px,100%);padding-top:64px;padding-bottom:18px}
+  .hero-actions{flex-wrap:nowrap}
+  .hero-actions .btn-primary{min-width:0}
+  h1{font-size:clamp(36px,9vh,56px)}
+  .lede{margin:8px 0 14px;font-size:15px}
+  .hero-actions .btn{min-height:44px;font-size:16px}
+  .hero-actions{gap:10px}
+  .top{padding-top:max(8px,env(safe-area-inset-top));padding-bottom:8px}
+  .brand img{width:100px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}

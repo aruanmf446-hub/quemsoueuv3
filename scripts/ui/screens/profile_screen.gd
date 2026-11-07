@@ -1,4 +1,5 @@
 extends PlayerScreen
+const Campaign=preload("res://scripts/desert/t15d/campaign_progress.gd")
 
 
 func _ready() -> void:
@@ -7,6 +8,7 @@ func _ready() -> void:
 	services.profile.changed.connect(_refresh_visible)
 	services.inventory.changed.connect(_refresh_visible)
 	services.session.changed.connect(_refresh_visible)
+	if services.story_progress!=null:services.story_progress.changed.connect(_refresh_visible)
 
 
 func _refresh_visible() -> void:
@@ -50,11 +52,12 @@ func render() -> void:
 		info.add_child(PlayerUI.label("%s: %s" % [key, DevicePreferences.number(stats[key], services.preferences.values.locale)]))
 	var progress := PlayerUI.card(body)
 	progress.add_child(PlayerUI.label("Conquistas e reinos", 25, PlayerUI.GOLD))
+	var confirmed: Array=services.progression.data.get("completed_phase_ids",[]) if services.progression.state=="success" else []
+	progress.add_child(PlayerUI.label("Deserto · %d de 10 fases concluídas" % maxi(Campaign.completed_orders().size(),confirmed.size())))
 	if services.progression.state != "success":
-		progress.add_child(PlayerUI.label("Progresso confirmado indisponível."))
+		progress.add_child(PlayerUI.label("Conquistas confirmadas indisponíveis."))
 	else:
 		var snapshot := services.progression.data
-		progress.add_child(PlayerUI.label("Deserto · %d de 10 fases concluídas" % snapshot.completed_phase_ids.size()))
 		progress.add_child(PlayerUI.label("Reino do Deserto concluído" if PlayerContracts.ACHIEVEMENT in snapshot.achievement_ids else "Nenhuma conquista registrada."))
 	progress.add_child(PlayerUI.label("Floresta · Mar · Lunar: campanhas futuras"))
 

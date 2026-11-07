@@ -1,0 +1,28 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS fase1 capital_balcony_house: lona visível da fachada tem exatamente um apoio
+CANOPY 1 capital_balcony_house rise=2.75491781472062 x=-3.26408338546753
+PASS fase1 capital_balcony_house: salto de baixo não bate a cabeça
+PASS fase1 capital_balcony_house: pousa na lona sem atravessar (pico 3.45, lona 2.75)
+PASS fase1 capital_balcony_house: anda apoiado no tecido (dx=0.573, y=2.756, topo=2.755, apoio=true)
+PASS fase1 capital_balcony_house: salta novamente da lona
+PASS fase1 capital_merchant: lona visível da fachada tem exatamente um apoio
+CANOPY 1 capital_merchant rise=1.87907625598434 x=5.80733299255371
+PASS fase1 capital_merchant: salto de baixo não bate a cabeça
+PASS fase1 capital_merchant: pousa na lona sem atravessar (pico 3.45, lona 1.88)
+PASS fase1 capital_merchant: anda apoiado no tecido (dx=0.573, y=1.880, topo=1.879, apoio=true)
+PASS fase1 capital_merchant: salta novamente da lona
+PASS fase1 capital_house: lona visível da fachada tem exatamente um apoio
+CANOPY 1 capital_house rise=2.70481358748994 x=35.4047660827637
+PASS fase1 capital_house: salto de baixo não bate a cabeça
+PASS fase1 capital_house: pousa na lona sem atravessar (pico 3.45, lona 2.70)
+PASS fase1 capital_house: anda apoiado no tecido (dx=0.573, y=3.256, topo=3.255, apoio=true)
+PASS fase1 capital_house: salta novamente da lona
+PASS fase1: fachadas presentes na rota examinadas pela arte
+PASS sair remove os apoios das lonas
+FACADE_CANOPIES checks=17 failures=0
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)

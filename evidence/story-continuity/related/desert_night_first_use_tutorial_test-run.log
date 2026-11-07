@@ -1,0 +1,24 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS fase1 começa sem ataque e defesa
+PASS primeira lição de ataque pausa o jogo
+PASS pausa realmente congela movimento e relógio
+PASS continuar funciona e salva a primeira lição
+PASS continuar não conserva comando pressionado
+PASS recarga real libera ataque sem repetir a lição
+PASS primeira recarga de defesa pausa e explica o escudo
+PASS defesa fica marcada como ensinada
+PASS primeira Task pausa e explica o botão contextual
+PASS botão contextual está disponível durante a explicação
+PASS Task fica acima do ataque no toque
+PASS botão some depois de executar a Task
+PASS Task preserva a carga de defesa recebida
+PASS controles voltam após a montagem
+PASS lição não reaparece ao reabrir a fase 1
+PASS reabrir fase1 mantém inventário inicial zerado
+PASS defesa não repete explicação já lida
+PASS Task seguinte funciona sem repetir a lição
+PASS fase2 não apresenta as lições da fase1
+PASS inventário inicial das outras fases preservado
+PASS sair das cenas não deixa o jogo pausado
+FIRST_USE_TUTORIAL checks=21 failures=0

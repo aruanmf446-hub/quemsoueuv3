@@ -1,0 +1,23 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+FAIL fase1 capital_balcony_house: lona visível da fachada tem exatamente um apoio
+FAIL fase1 capital_merchant: lona visível da fachada tem exatamente um apoio
+FAIL fase1 capital_house: lona visível da fachada tem exatamente um apoio
+PASS fase1: fachadas presentes na rota examinadas pela arte
+PASS fase2: lonas da rua inferior permanecem abaixo da rota dos tetos
+PASS fase2: tetos reais continuam sendo o caminho
+PASS fase2: fachadas presentes na rota examinadas pela arte
+FAIL fase3 capital_house: lona visível da fachada tem exatamente um apoio
+FAIL fase3 capital_merchant: lona visível da fachada tem exatamente um apoio
+PASS fase3: fachadas presentes na rota examinadas pela arte
+PASS fase4: fachadas presentes na rota examinadas pela arte
+PASS fase5: fachadas presentes na rota examinadas pela arte
+PASS fase6: fachadas presentes na rota examinadas pela arte
+PASS fase7: fachadas presentes na rota examinadas pela arte
+FAIL fase8 capital_house: lona visível da fachada tem exatamente um apoio
+FAIL fase8 capital_merchant: lona visível da fachada tem exatamente um apoio
+PASS fase8: fachadas presentes na rota examinadas pela arte
+PASS fase9: fachadas presentes na rota examinadas pela arte
+PASS fase10: fachadas presentes na rota examinadas pela arte
+PASS sair remove os apoios das lonas
+FACADE_CANOPIES checks=20 failures=7

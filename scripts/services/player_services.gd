@@ -14,6 +14,7 @@ var rewards: OfficialRewardsService
 var preferences: DevicePreferences
 var profile: ProfileService
 var progression: ProgressionService
+var story_progress: StoryProgressService
 var inventory: InventoryService
 var wallet: WalletService
 var emote_shop: EmoteShopService
@@ -86,6 +87,10 @@ func _ready() -> void:
 	progression.client = client
 	progression.session = session
 	add_child(progression)
+	story_progress = StoryProgressService.new()
+	story_progress.client = client
+	story_progress.session = session
+	add_child(story_progress)
 	wallet = WalletService.new()
 	wallet.client = client
 	add_child(wallet)
@@ -165,6 +170,7 @@ func _session_changed() -> void:
 	presence.stop()
 	profile.clear()
 	progression.clear()
+	story_progress.set_scope()
 	wallet.clear()
 	emote_shop.clear()
 	coin_store.clear()
@@ -224,6 +230,7 @@ func _poll_connected() -> void:
 	_heartbeat()
 	wallet.refresh_if_stale(MAX_AGE.wallet)
 	progression.refresh_if_stale(MAX_AGE.progression)
+	story_progress.sync()
 
 
 ## Presença T22 (qse_presence_heartbeat): no máximo 1 chamada por minuto, só com o jogo

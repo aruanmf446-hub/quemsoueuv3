@@ -25,6 +25,9 @@ func _ready() -> void:
 	super._ready()
 	_font = preload("res://assets/desert/phase01/interface.ttf").duplicate() as FontFile
 	_font.multichannel_signed_distance_field = true
+	if services.story_progress!=null:
+		services.story_progress.changed.connect(func() -> void:
+			if is_visible_in_tree():render())
 	services.progression.changed.connect(func() -> void:
 		if is_visible_in_tree(): render())
 
@@ -52,6 +55,9 @@ func render() -> void:
 	var back: Button = $Margin/Column/Header/Back
 	PlayerUI.standard_back(back)
 	banner.hide()
+	if services.story_progress!=null and not services.story_progress.notice.is_empty():
+		banner.show_state("success",services.story_progress.notice)
+		services.story_progress.dismiss_toast()
 	var tabs := PlayerUI.row(body)
 	tabs.add_theme_constant_override("separation",roundi(_px(2,1)))
 	for realm: Array in [["Deserto","desert"],["Floresta","forest"],["Mar","sea"],["Lunar","lunar"]]:

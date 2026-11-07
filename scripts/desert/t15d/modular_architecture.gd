@@ -3,6 +3,7 @@ extends "res://scripts/desert/t15d/city_props.gd"
 ## Apenas decoração; os corpos de colisão usam os mesmos limites do CampaignLayout.
 var _theme := 1
 static var _water: ShaderMaterial
+const GROUND_BASE_DEPTH := 8.0
 
 func build_surface(platform: Dictionary, order: int) -> void:
 	_theme = order
@@ -49,20 +50,29 @@ func build_surface(platform: Dictionary, order: int) -> void:
 				for tie in range(ceili(left/1.3),floori(right/1.3)):
 					_box(Vector3(tie*1.3,top+0.015,0),Vector3(0.17,0.03,1.95),"wood")
 		5:
+			_ground_base(x,width,top)
 			_water_strip(Vector3(x,top-0.18,-3.1),Vector2(width,1.9),false)
 		7,9:
 			if material == "wood":
 				_painted_facade(left,right,top-0.18,2.12,"desert_timber_bridge",7.0)
 				for column in range(ceili(left/3.2),floori(right/3.2)):
 					_box(Vector3(column*3.2,top-2.8,-0.7),Vector3(0.24,5.2,2.8),"wood")
+			else:
+				_ground_base(x,width,top)
 		_:
-			_box(Vector3(x,top-1.0,0),Vector3(width,1.5,3.8),"stone")
+			_ground_base(x,width,top)
 	# Variantes sémanticas aux limites des modules; aucun escalier.
 	for marker in range(ceili((left+1)/7.0),floori((right-1)/7.0)+1):
 		var at := Vector3(marker*7.0,top,-2.1)
 		if order == 4 and marker%3 == 1: _water_strip(at+Vector3(0,-1.5,-0.7),Vector2(1.6,3.0),true)
 		if order in [6,10] and marker%3==0: _underground(at,marker)
 	_flush()
+
+func _ground_base(x: float,width: float,top: float) -> void:
+	# A borda inferior fica fora do enquadramento, sem empilhar pisos ou esticar tijolos.
+	# Somente malha visual: colisões, vãos e altura de caminhada continuam no layout.
+	var ceiling:=top-0.25
+	_box(Vector3(x,ceiling-GROUND_BASE_DEPTH*0.5,0),Vector3(width,GROUND_BASE_DEPTH,3.8),"stone")
 
 func _house_roof_slice(platform: Dictionary) -> void:
 	var house := Assets.surface(2,int(platform.module))
@@ -139,7 +149,7 @@ func _underground(at: Vector3,index: int) -> void:
 		_arch_frame(at+Vector3(0,0,-1.9),2.3,3.0,0.3)
 
 func _water_strip(at: Vector3,dimensions: Vector2,vertical: bool) -> void:
-	if _water == null:
+	if _water == null and _order!=5:
 		_water = ShaderMaterial.new()
 		var shader := Shader.new()
 		shader.code = "shader_type spatial; render_mode blend_mix, cull_disabled, depth_draw_opaque; void fragment(){float flow=sin(UV.y*65.0-TIME*5.0+sin(UV.x*25.0)*1.2); ALBEDO=mix(vec3(0.025,0.16,0.27),vec3(0.18,0.65,0.8),flow*0.5+0.5); ROUGHNESS=0.24; METALLIC=0.15; ALPHA=0.75; EMISSION=ALBEDO*0.12;}"
@@ -148,7 +158,7 @@ func _water_strip(at: Vector3,dimensions: Vector2,vertical: bool) -> void:
 	var plane := PlaneMesh.new()
 	plane.size = dimensions
 	water.mesh = plane
-	water.material_override = _water
+	water.material_override = Context.material("context_water_oasis") if _order==5 else _water
 	water.position = at
 	if vertical:water.rotation.x = PI*0.5
 	water.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF

@@ -5,7 +5,7 @@ signal closed(kind: String)
 const SAVE_PATH := "user://desert_first_use_v1.cfg"
 const LESSONS := {
  "attack":["Seu primeiro ataque","Você começa sem cargas de ataque ou defesa. Pegue uma recarga de fogo e toque no botão de chama para dar um soco nos cactos. Cada golpe usa uma carga. No teclado: J."],
- "defense":["Sua primeira defesa","O soldado à frente vai arremessar uma lança. Toque no escudo quando ela vier para bloquear (Shift). Cada defesa usa uma carga.\nVocê também pode pular ou agachar para desviar. Ele só persegue depois de acertar você ou o escudo."],
+ "defense":["Sua primeira defesa","O soldado à frente vai arremessar uma lança. Toque no escudo quando ela vier para bloquear (K ou Shift). Cada defesa usa uma carga.\nVocê também pode pular ou agachar para desviar. Ele só persegue depois de acertar você ou o escudo."],
  "task":["Sua primeira Task","Este caminho depende de uma tarefa do cenário. Toque em TASK, acima do ataque, para executar a ação indicada. O botão só aparece perto das tarefas e some depois. Não usa cargas de ataque ou defesa. No teclado: F."],
  "amber":["Âmbar · congele quem vem atrás","Imobilize os cactos atrás de você por alguns segundos. Toque no botão de Âmbar ou use E.\nCada uso gasta 1 carga. Pegue outra recarga para usar de novo."],
  "dash":["Relâmpago · avance com choque","Corra mais rápido e dê choque nos cactos que tocar. Toque no botão de Relâmpago ou use R.\nCada uso gasta 1 carga. Pegue outra recarga para usar de novo."],

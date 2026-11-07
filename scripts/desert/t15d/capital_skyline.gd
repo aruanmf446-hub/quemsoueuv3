@@ -56,7 +56,7 @@ func _tint(part: Node3D) -> void:
 			if _order in [7,9]: material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 			node.material_override = material
 			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-func follow(camera: Camera3D, x: float, travel: float) -> void:
+func follow(camera: Camera3D, _x: float, travel: float) -> void:
 	var scale_factor := camera.size/7.0
 	global_transform = Transform3D(camera.global_basis,camera.global_position-camera.global_basis.z*36.0)
 	if _order==2:
@@ -64,8 +64,8 @@ func follow(camera: Camera3D, x: float, travel: float) -> void:
 		# Seguir a câmera em Y na proporção 1:1 fazia o muro parecer suspenso no salto.
 		var city_camera_y:=8.0+(0.20 if UIScale.is_iphone() else 0.50)+2.2
 		global_position.y-=(camera.global_position.y-city_camera_y)*0.80
-	var wall_offset := fposmod(x*0.18,WALL_SPAN*scale_factor)
-	var palace_offset := fposmod(x*0.08+_order*2.0,PALACE_SPAN*scale_factor)
+	var wall_offset := 0.0
+	var palace_offset := fposmod(_order*2.0,PALACE_SPAN*scale_factor)
 	for i in 3:
 		_walls[i].scale = Vector3.ONE*scale_factor
 		_walls[i].position = Vector3((i-1)*WALL_SPAN*scale_factor-wall_offset,-2.8*scale_factor,1.0)

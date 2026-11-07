@@ -333,6 +333,33 @@ class SandShield extends Node3D:
 		dust.emitting = true
 		get_tree().create_timer(0.8, false).timeout.connect(dust.queue_free)
 
+## Impulso do segundo salto: areia sai dos pés e fica no lugar, sem seguir o corpo.
+class DoubleJumpDust extends Node3D:
+	func _ready() -> void:
+		add_to_group("campaign_double_jump_dust")
+		var sand:=CPUParticles3D.new()
+		sand.amount=40
+		sand.lifetime=0.46
+		sand.one_shot=true
+		sand.explosiveness=1.0
+		sand.local_coords=false
+		sand.direction=Vector3.DOWN
+		sand.spread=65.0
+		sand.gravity=Vector3(0,-3.2,0)
+		sand.initial_velocity_min=0.9
+		sand.initial_velocity_max=2.3
+		sand.emission_shape=CPUParticles3D.EMISSION_SHAPE_SPHERE
+		sand.emission_sphere_radius=0.15
+		sand.scale_amount_min=0.45
+		sand.scale_amount_max=1.0
+		sand.mesh=Res.sprite(0.28)
+		var ramp:=Gradient.new()
+		ramp.colors=PackedColorArray([Color("#f2d3a1"),Color("#c48e4d"),Color(0.63,0.43,0.22,0)])
+		ramp.offsets=PackedFloat32Array([0,0.35,1])
+		sand.color_ramp=ramp
+		add_child(sand)
+		get_tree().create_timer(0.8,false).timeout.connect(queue_free)
+
 # --- recursos compartilhados ------------------------------------------------
 
 class Res:

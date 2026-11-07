@@ -5,6 +5,8 @@ signal inventory_changed
 signal action_empty(kind: String)
 signal swung
 signal jumped_up
+signal stepped
+var _step_clock:=0.0
 signal landed
 signal strike_window
 signal hurt
@@ -136,6 +138,12 @@ func _physics_process(delta: float) -> void:
 	_separate_actors()
 	global_position.z = 0.0
 	_update_floor_state(jumped)
+	if is_on_floor() and absf(velocity.x)>1.0 and _attack_timer<=0.0:
+		_step_clock+=delta*absf(velocity.x)/SPEED
+		if _step_clock>=0.31:
+			_step_clock=0.0
+			stepped.emit()
+	else:_step_clock=0.18
 	_update_model_facing()
 	if _attack_timer > 0.0:
 		# A investida termina antes da janela do golpe; volta à guarda suavemente.

@@ -97,8 +97,12 @@ func _physics_process(delta: float) -> void:
 	velocity.y = maxf(velocity.y - GRAVITY * delta, -26.0)
 	var offset := _player.global_position - global_position if is_instance_valid(_player) and not _player.is_dead else Vector3(INF, INF, 0)
 	if is_instance_valid(_spear_guard) and _spear_guard.handle(delta,offset):return
-	_watch_pass(offset)
-	if is_finite(offset.x) and offset.x > 1.5 and offset.x < 16.0 and absf(offset.y) < 2.5:
+	var overhead:=_player_on_canopy(offset)
+	if overhead:
+		_windup=0.0
+		_side=0.0
+	else:_watch_pass(offset)
+	if not overhead and is_finite(offset.x) and offset.x > 1.5 and offset.x < 16.0 and absf(offset.y) < 2.5:
 		persistent_follow = true
 	_model.set_rate(1.0)
 	if _stagger > 0.0:
@@ -129,9 +133,9 @@ func _physics_process(delta: float) -> void:
 		else:
 			_model.play_animation("pronto",true)
 	else:
-		var pursuing := persistent_follow or (_pursue > 0.0 and absf(offset.x) < PURSUE_RANGE and absf(offset.y) < 3.0)
+		var pursuing := not overhead and (persistent_follow or (_pursue > 0.0 and absf(offset.x) < PURSUE_RANGE and absf(offset.y) < 3.0))
 		if _pursue > 0.0 and not pursuing: _pursue = 0.0
-		var chasing := pursuing or (absf(offset.x) < detect_range and absf(offset.y) < 1.6)
+		var chasing := not overhead and (pursuing or (absf(offset.x) < detect_range and absf(offset.y) < 1.6))
 		_state = State.CHASE if chasing else State.PATROL
 		if not chasing:
 			if position.x <= _patrol_min: _direction = 1
@@ -166,7 +170,15 @@ func _physics_process(delta: float) -> void:
 	_keep_formation()
 	move_and_slide()
 	global_position.z = 0.0
-	_model.rotation.y = lerp_angle(_model.rotation.y,_yaw_target,1.0-exp(-16.0*delta))
+	_model.rotation.y = _yaw_target # Patrulha lateral: nunca gira o corpo para o fundo.
+func _player_on_canopy(offset: Vector3) -> bool:
+	if not is_instance_valid(_player) or offset.y<0.9 or not _player.is_on_floor():return false
+	for i in _player.get_slide_collision_count():
+		var contact:=_player.get_slide_collision(i)
+		var body:=contact.get_collider()
+		if contact.get_normal().y>0.7 and body is Node and body.get_meta("canopy",false):return true
+	return false
+
 ## O jogador cruzou o Cacto (estava de um lado, agora está do outro, perto dele): começa
 ## a perseguição. Cruzar de novo enquanto ele persegue só renova o tempo.
 func _watch_pass(offset: Vector3) -> void:

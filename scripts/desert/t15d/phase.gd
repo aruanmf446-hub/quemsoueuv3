@@ -173,6 +173,15 @@ func _physics_process(delta: float) -> void:
 	_shield.active = _player.is_defending and not _player.is_dead
 	_shield.facing = _player.facing
 	_shield.position = _player.position
+func _ensure_input_actions() -> void:
+	super._ensure_input_actions()
+	# O protótipo legado mapeava J e K para ataque. Na campanha K é defesa.
+	for event in InputMap.action_get_events("attack"):
+		if event is InputEventKey and (event.physical_keycode==KEY_K or event.keycode==KEY_K):InputMap.action_erase_event("attack",event)
+	var defense:=InputEventKey.new()
+	defense.physical_keycode=KEY_K
+	if not InputMap.action_has_event("defend",defense):InputMap.action_add_event("defend",defense)
+
 func _build_environment() -> void:
 	var world_environment := WorldEnvironment.new()
 	world_environment.environment = Environment.new()
@@ -244,7 +253,29 @@ func _build_player() -> void:
 	_player.strike_landed.connect(_impact)
 	_player.inventory_changed.connect(_sync_resources)
 	_player.swung.connect(func() -> void: _sfx.play("swing"))
-	_player.jumped_up.connect(func() -> void: _sfx.play("jump",1.0 if _player.jumps_used < 2 else 1.25,-9.0))
+	_player.jumped_up.connect(func() -> void:
+		var double_jump:=_player.jumps_used>=2
+		_sfx.play("double_jump" if double_jump else "jump",1.0,-6.0)
+		if double_jump:
+			var dust:=preload("res://scripts/desert/t15d/sand_fx.gd").DoubleJumpDust.new()
+			var feet:=_player.global_position+Vector3.UP*0.12
+			var skeleton: Skeleton3D=_player._model._skeleton
+			if is_instance_valid(skeleton):
+				var points: Array[Vector3]=[]
+				for name in ["mixamorig_LeftFoot","mixamorig_RightFoot"]:
+					var bone:=skeleton.find_bone(name)
+					if bone>=0:points.append(skeleton.global_transform*skeleton.get_bone_global_pose(bone).origin)
+				if points.size()==2:feet=(points[0]+points[1])*0.5
+			dust.position=to_local(feet)
+			add_child(dust))
+	_player.stepped.connect(func() -> void:
+		var cue:="step"
+		for i in _player.get_slide_collision_count():
+			var body:=_player.get_slide_collision(i).get_collider()
+			if not body is Node:continue
+			if body.get_meta("canopy",false):cue="step_soft"
+			elif (body.get_meta("parkour_route",false) and _order in [5,7,9]) or (body.name=="EarthDeck" and _order not in [4,6]) or (body.is_in_group("crumble_stones") and body.timber):cue="step_wood"
+		_sfx.play(cue,1.0,-9.0))
 	_player.landed.connect(func() -> void: _sfx.play("land",1.0,-8.0))
 	_player.hurt.connect(func() -> void: _sfx.play("hurt"))
 	_player.strike_landed.connect(func(_point: Vector3) -> void:
@@ -927,7 +958,7 @@ func _check_checkpoints() -> void:
 	_snapshot = {"defeated":_defeated_ids.duplicate(),"collected":_collected_ids.duplicate(),"attack":_player.attack_charges,"defense":_player.defense_charges,"tasks":_raised_bridges.duplicate(),"task_steps":_task_steps.duplicate()}
 	_save_active_run()
 	_sfx.play("checkpoint")
-	_hud.notify("Checkpoint %d de %d salvo neste dispositivo" % [next+1,points.size()])
+	if not _save_error:_hud.notify("Checkpoint %d/%d salvo" % [next+1,points.size()])
 	get_tree().call_group("campaign_checkpoints","refresh_lit",_checkpoint_index)
 	if PlayerServices.current != null and PlayerServices.current.session.authenticated():
 		_sync_game_checkpoint(_checkpoint_index)

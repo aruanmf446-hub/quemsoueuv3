@@ -1,0 +1,146 @@
+{
+  "author": "Kenney",
+  "collection": "Impact Sounds",
+  "license": "CC0 1.0",
+  "original": "https://kenney.nl/assets/impact-sounds",
+  "mirror_commit": "999dd1684873f8b020a3aa5b26e713da21688924",
+  "conversion": "Mono PCM 44.1kHz; high-pass55Hz, low-pass8.5kHz, 3ms fade-in, limiter-2.2dBFS",
+  "files": [
+    {
+      "file": "impact_punch_heavy_000.wav",
+      "source": "https://raw.githubusercontent.com/Boyquotes/kenney-impact-sounds-for-godot/999dd1684873f8b020a3aa5b26e713da21688924/addons/kenney%20impact%20sounds/impact_punch_heavy_000.ogg",
+      "source_sha256": "b33a8f14068aec24ec69ba85e5e87fdc41228975f6a1a3e44a6e7d6fc3d9f8d8",
+      "sha256": "5dd7b7424d339ae23eb7096a18277e54aee0d97701d3b9502443ec974e60aaa9"
+    },
+    {
+      "file": "impact_punch_heavy_001.wav",
+      "source": "https://raw.githubusercontent.com/Boyquotes/kenney-impact-sounds-for-godot/999dd1684873f8b020a3aa5b26e713da21688924/addons/kenney%20impact%20sounds/impact_punch_heavy_001.ogg",
+      "source_sha256": "f92f5cb6ba4ff2766497292ffd90865654317eeca976f5652e0708dbdcdc0dd9",
+      "sha256": "64e8cc06e05aa82c567a76ae27781e7c844a1960019ba39ad64c426319644731"
+    },
+    {
+      "file": "impact_punch_heavy_002.wav",
+      "source": "https://raw.githubusercontent.com/Boyquotes/kenney-impact-sounds-for-godot/999dd1684873f8b020a3aa5b26e713da21688924/addons/kenney%20impact%20sounds/impact_punch_heavy_002.ogg",
+      "source_sha256": "7993dd4c156b9979ad69f17be5ebe31850b16039a3857f8477141be54dfee1b3",
+      "sha256": "d9d1e0f2a430b45554ca673e0091378574df70fa407540d53af577965d531442"
+    },
+    {
+      "file": "impact_soft_heavy_000.wav",
+      "source": "https://raw.githubusercontent.com/Boyquotes/kenney-impact-sounds-for-godot/999dd1684873f8b020a3aa5b26e713da21688924/addons/kenney%20impact%20sounds/impact_soft_heavy_000.ogg",
+      "source_sha256": "49e7ca88743fca974bb8676ea138b751cfd8f9033b5e7af8736c2a215d6edbc1",
+      "sha256": "957de6855d7170e51dd1b289b3dda865750476dccc6024191a597f07f15ade47"
+    },
+    {
+      "file": "impact_mining_000.wav",
+      "source": "https://raw.githubusercontent.com/Boyquotes/kenney-impact-sounds-for-godot/999dd1684873f8b020a3aa5b26e713da21688924/addons/kenney%20impact%20sounds/impact_mining_000.ogg",
+      "source_sha256": "36b4ea107222d073c67ca64dde26944975609202d5090b2f2021213c1a7e35cd",
+      "sha256": "ef6be3fb20d2d2d19d24e53c20e9e821d62fdf29dc73c32ec392e117133b4082"
+    },
+    {
+      "file": "impact_mining_001.wav",
+      "source": "https://raw.githubusercontent.com/Boyquotes/kenney-impact-sounds-for-godot/999dd1684873f8b020a3aa5b26e713da21688924/addons/kenney%20impact%20sounds/impact_mining_001.ogg",
+      "source_sha256": "61235a18de3f3d92118235398222dbf51d448f1be70b1c8bc962b10b86f2d9c6",
+      "sha256": "aeb04a7108b7cee93159746267cec1c1d7549848b2e7fc02f973683b0b84838b"
+    },
+    {
+      "file": "impact_mining_002.wav",
+      "source": "https://raw.githubusercontent.com/Boyquotes/kenney-impact-sounds-for-godot/999dd1684873f8b020a3aa5b26e713da21688924/addons/kenney%20impact%20sounds/impact_mining_002.ogg",
+      "source_sha256": "059558ec751115ca6b1441e00f0adc837c1a3eeb0a066b109e0fd879fc5d0b0c",
+      "sha256": "f4dddb9552aadd4dcb69fe616ccc73108bdde5ab2e9b273001d25a78ad83e74c"
+    },
+    {
+      "file": "footstep_carpet_000.wav",
+      "source": "https://raw.githubusercontent.com/Boyquotes/kenney-impact-sounds-for-godot/999dd1684873f8b020a3aa5b26e713da21688924/addons/kenney%20impact%20sounds/footstep_carpet_000.ogg",
+      "source_sha256": "b9524658b52a99a20590f8feefc103088637fd13ea8ec35811aee785e1f2f330",
+      "sha256": "85123afb12ae2ef7f27a8f34120626ff6284f1fe2ca265611dd6849ffe72458c"
+    },
+    {
+      "file": "footstep_carpet_001.wav",
+      "source": "https://raw.githubusercontent.com/Boyquotes/kenney-impact-sounds-for-godot/999dd1684873f8b020a3aa5b26e713da21688924/addons/kenney%20impact%20sounds/footstep_carpet_001.ogg",
+      "source_sha256": "9af3c3f76705107339e72036e4053bdca3eaa50ad31c8c929f42ce8d40e5d781",
+      "sha256": "d6b1e648dda3f150c9640363a1adf755f795448636cfe75ba27dbf2d65da1db7"
+    },
+    {
+      "file": "footstep_snow_000.wav",
+      "source": "https://raw.githubusercontent.com/Boyquotes/kenney-impact-sounds-for-godot/999dd1684873f8b020a3aa5b26e713da21688924/addons/kenney%20impact%20sounds/footstep_snow_000.ogg",
+      "source_sha256": "c05fa4a9dc9a7aabc04996466fb589537e49af76de9998d8f9e6270ec92dcef7",
+      "sha256": "d6cd2bfad7a18dd9b8bfdcc6641f8046791e3f275a520159f61ae509ebb3b12e"
+    },
+    {
+      "file": "footstep_snow_001.wav",
+      "source": "https://raw.githubusercontent.com/Boyquotes/kenney-impact-sounds-for-godot/999dd1684873f8b020a3aa5b26e713da21688924/addons/kenney%20impact%20sounds/footstep_snow_001.ogg",
+      "source_sha256": "980fb9a1c9227aed7995067b0357f373053337f2416316db8ea0438418542fb4",
+      "sha256": "405f022cbda0ed7cc64d3836406cfe262a8d8d8c93948994aaf4fabe1c27ed1b"
+    },
+    {
+      "file": "impact_wood_light_000.wav",
+      "source": "https://raw.githubusercontent.com/Boyquotes/kenney-impact-sounds-for-godot/999dd1684873f8b020a3aa5b26e713da21688924/addons/kenney%20impact%20sounds/impact_wood_light_000.ogg",
+      "source_sha256": "eb45e35b4bed784d3f120de4afec4b0d6ac09d9e143cce8cfcb7d739e1b1f3c3",
+      "sha256": "1b964c1e00d6d91a6280481443f97ae91db223b18bb35f59d120320de3f8b256"
+    },
+    {
+      "file": "impact_bell_heavy_000.wav",
+      "source": "https://raw.githubusercontent.com/Boyquotes/kenney-impact-sounds-for-godot/999dd1684873f8b020a3aa5b26e713da21688924/addons/kenney%20impact%20sounds/impact_bell_heavy_000.ogg",
+      "source_sha256": "94b8bb5f2d43ab65e4bcc32b28562416e9bc2c51d9fd4be1e333660ee52f977f",
+      "sha256": "390989f9f27c961cedd957bf080c82e6c35df3701a1e5d97826e3f369f10cd36"
+    },
+    {
+      "file": "footstep_concrete_000.wav",
+      "source": "Kenney Impact Sounds / Audio/footstep_concrete_000.ogg",
+      "source_sha256": "d7267e183067757c92c169de2a379abea592cfca6b39bb2e8feea15221ad79fe",
+      "sha256": "110dcc8bfd32f9fe02b952a5bc257980ca8af44cbbabd061ff254128e5dd6ab8"
+    },
+    {
+      "file": "footstep_concrete_001.wav",
+      "source": "Kenney Impact Sounds / Audio/footstep_concrete_001.ogg",
+      "source_sha256": "507a75eb19b897087855a3be3cf11a12d7fa37d143ad535eeebe0b8031c7325d",
+      "sha256": "09cd51ac9181ca124f2606893497ffcf1423c0e8114c3459d03672a53262a4a9"
+    },
+    {
+      "file": "footstep_wood_000.wav",
+      "source": "Kenney Impact Sounds / Audio/footstep_wood_000.ogg",
+      "source_sha256": "5f1c252942a220d658121bd9417448cd19649ded9fff2ff15f6e50899373ce8e",
+      "sha256": "1a787d9dd6e7fe6d40b0d8776028ef72f699abdd11b640cb513280abfcd18aa9"
+    },
+    {
+      "file": "footstep_wood_001.wav",
+      "source": "Kenney Impact Sounds / Audio/footstep_wood_001.ogg",
+      "source_sha256": "e4f68e1c9fd55b4dc8ca89ed2bbab6f200171bc54bdc18aa96b80d8e7336f462",
+      "sha256": "775cffd6af49def9c4c55b28243e2db0c39f73b0ea9961b71452855941de5bad"
+    }
+  ],
+  "official_pack_sha256": "029d734af1582474edf3a694d1b0cebc97c1c152f2f39fa34d4c2bafc5de77f8",
+  "verified_against_official_archive": true,
+  "derived": [
+    {
+      "file": "sand_swing.wav",
+      "source": "Original filtered noise + Kenney footstep_carpet_000 reversed",
+      "sha256": "b11a24ed7f486142010f7d5169cd44aed16174f94e6333351808cd7dd6df1b3c"
+    },
+    {
+      "file": "sand_jump.wav",
+      "source": "Kenney footstep_snow_000 + original air",
+      "sha256": "7d39c9a93cf1735e22c8423b85a1f766861d76773fa7dbcfe41e03ecf582270e"
+    },
+    {
+      "file": "sand_double_jump.wav",
+      "source": "Kenney footstep_snow_000 reversed + original air",
+      "sha256": "bea67caff6e8fbb2ea7fd6ecfc11351fef44f1b09f05f131de15f24f5170388e"
+    },
+    {
+      "file": "sand_fall.wav",
+      "source": "Original filtered air, no synthetic whistle",
+      "sha256": "ae796a4c79036c085b631b2638704b5f76d6e3f771e4fbc484b7a2a2751e6f28"
+    },
+    {
+      "file": "collect.wav",
+      "source": "Kenney impact_bell_heavy_000, filtered and shortened",
+      "sha256": "e3625258be65b6d7e9429a2a886f8d62438e510a3c267c2f4284c080393012f4"
+    },
+    {
+      "file": "save.wav",
+      "source": "Kenney impact_bell_heavy_000, two quiet resonances",
+      "sha256": "96dd2e64ef10558e0e592227d7a818bcb49de725ecc350ac91f4d3bd6a4cc82a"
+    }
+  ]
+}

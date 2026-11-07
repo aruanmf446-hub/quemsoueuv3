@@ -88,7 +88,6 @@ static func _river_bend(x: float) -> float:
 
 static func _waterway(props: Node3D,left: float,right: float,top: float,natural: bool,slot: int) -> void:
 	var segments:=8 if natural else 1
-	var color:=Color("#9d8a68") if natural else Color("#aaa4a3")
 	for i in segments:
 		var a:=lerpf(left,right,float(i)/segments)
 		var b:=lerpf(left,right,float(i+1)/segments)
@@ -112,8 +111,10 @@ static func _waterway(props: Node3D,left: float,right: float,top: float,natural:
 				_quad(props,"context_earth",Vector3(a,top-0.21,z_a+outward*0.15),Vector3(a,top-0.015,z_a+outward*0.50),Vector3(b,top-0.015,z_b+outward*0.50),Vector3(b,top-0.21,z_b+outward*0.15),Color("#a09c8b"))
 				_quad(props,"context_earth",Vector3(a,top-0.015,z_a+outward*0.50),Vector3(a,top,z_a+outward*width_a),Vector3(b,top,z_b+outward*width_b),Vector3(b,top-0.015,z_b+outward*0.50),Color("#b7ab94"))
 			else:
-				_quad(props,"context_masonry",Vector3(a,top-0.34,z_a),Vector3(a,top,z_a),Vector3(b,top,z_b),Vector3(b,top-0.34,z_b),color)
-				_quad(props,"context_masonry",Vector3(a,top,z_a),Vector3(a,top,z_a+outward*1.4),Vector3(b,top,z_b+outward*1.4),Vector3(b,top,z_b),color)
+				# Pedra escurecida junto à água e remate chanfrado no mesmo lote.
+				_quad(props,"context_masonry",Vector3(a,top-0.34,z_a),Vector3(a,top-0.04,z_a),Vector3(b,top-0.04,z_b),Vector3(b,top-0.34,z_b),Color("#747d7d"))
+				_quad(props,"context_masonry",Vector3(a,top-0.04,z_a),Vector3(a,top+0.045,z_a+outward*0.14),Vector3(b,top+0.045,z_b+outward*0.14),Vector3(b,top-0.04,z_b),Color("#b6b0a5"))
+				_quad(props,"context_masonry",Vector3(a,top+0.045,z_a+outward*0.14),Vector3(a,top,z_a+outward*1.4),Vector3(b,top,z_b+outward*1.4),Vector3(b,top+0.045,z_b+outward*0.14),Color("#a39c92"))
 	if natural:
 		var near_x:=lerpf(left,right,0.38 if slot%2==0 else 0.56)
 		var far_x:=lerpf(left,right,0.68 if slot%2==0 else 0.30)
@@ -163,7 +164,7 @@ static func material(key: String) -> Material:
 		if key in ["context_water","context_water_oasis"]:
 			var water:=ShaderMaterial.new()
 			water.shader=OASIS_WATER if key=="context_water_oasis" else WATER
-			if key=="context_water_oasis":water.set_shader_parameter("water_detail",load(ROOT+"oasis_water_surface.png"))
+			water.set_shader_parameter("water_detail",load(ROOT+"oasis_water_surface.png"))
 			_materials[key]=water
 		else:
 			var surface:=StandardMaterial3D.new()

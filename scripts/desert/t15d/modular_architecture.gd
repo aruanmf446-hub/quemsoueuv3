@@ -2,7 +2,7 @@ extends "res://scripts/desert/t15d/city_props.gd"
 ## Biblioteca de módulos 3D editáveis: materiais e malhas agrupadas por trecho.
 ## Apenas decoração; os corpos de colisão usam os mesmos limites do CampaignLayout.
 var _theme := 1
-static var _water: ShaderMaterial
+static var _waterfall: ShaderMaterial
 const GROUND_BASE_DEPTH := 8.0
 
 func build_surface(platform: Dictionary, order: int) -> void:
@@ -149,16 +149,14 @@ func _underground(at: Vector3,index: int) -> void:
 		_arch_frame(at+Vector3(0,0,-1.9),2.3,3.0,0.3)
 
 func _water_strip(at: Vector3,dimensions: Vector2,vertical: bool) -> void:
-	if _water == null and _order!=5:
-		_water = ShaderMaterial.new()
-		var shader := Shader.new()
-		shader.code = "shader_type spatial; render_mode blend_mix, cull_disabled, depth_draw_opaque; void fragment(){float flow=sin(UV.y*65.0-TIME*5.0+sin(UV.x*25.0)*1.2); ALBEDO=mix(vec3(0.025,0.16,0.27),vec3(0.18,0.65,0.8),flow*0.5+0.5); ROUGHNESS=0.24; METALLIC=0.15; ALPHA=0.75; EMISSION=ALBEDO*0.12;}"
-		_water.shader = shader
+	if vertical and _waterfall == null:
+		_waterfall = Context.material("context_water").duplicate() as ShaderMaterial
+		_waterfall.set_shader_parameter("falling",true)
 	var water := MeshInstance3D.new()
 	var plane := PlaneMesh.new()
 	plane.size = dimensions
 	water.mesh = plane
-	water.material_override = Context.material("context_water_oasis") if _order==5 else _water
+	water.material_override = Context.material("context_water_oasis") if _order==5 else (_waterfall if vertical else Context.material("context_water"))
 	water.position = at
 	if vertical:water.rotation.x = PI*0.5
 	water.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF

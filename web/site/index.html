@@ -8,10 +8,12 @@
 (function(){var s=location.search,h=location.hash,app=navigator.standalone||(window.matchMedia&&matchMedia("(display-mode: standalone)").matches);
 if(app||/[?&](invite|coin_order)=/.test(s)||/access_token=/.test(h))location.replace("jogar/"+s+h);})();
 </script>
-<title>Quem Sou Eu — jogo de cartas e aventura grátis no navegador, Android e PC</title>
-<meta name="description" content="Quem Sou Eu é um jogo de cartas de adivinhação com modo história no Reino do Deserto, duelos com amigos e personagens colecionáveis. Jogue grátis no navegador ou instale no iPhone.">
+<title>Quem Sou Eu — jogo de cartas e adivinhação grátis | CRM Plus Store</title>
+<meta name="description" content="Quem Sou Eu é um jogo de cartas e adivinhação para jogar com os amigos: modo história, duelos e baralhos temáticos. Jogue grátis no navegador ou instale no iPhone como app (PWA).">
 <link rel="canonical" href="https://quemsoueu.cards/">
+<link rel="alternate" hreflang="pt-BR" href="https://quemsoueu.cards/">
 <meta name="theme-color" content="#fbeee6">
+<meta name="author" content="CRM Plus Store">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="google-site-verification" content="nyKbTp6uoIm-YZRUkd7mWdu4qZW0w02Bg0aBfvLdCAw">
 <link rel="icon" type="image/png" href="img/favicon.png">
@@ -19,28 +21,21 @@ if(app||/[?&](invite|coin_order)=/.test(s)||/access_token=/.test(h))location.rep
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Quem Sou Eu">
 <meta property="og:locale" content="pt_BR">
-<meta property="og:title" content="Quem Sou Eu — jogo de cartas e aventura">
-<meta property="og:description" content="Adivinhe quem é, enfrente o Reino do Deserto e desafie amigos. Grátis no navegador.">
+<meta property="og:title" content="Quem Sou Eu — descubra, adivinhe e se divirta com os amigos">
+<meta property="og:description" content="O jogo de cartas e adivinhação para turbinar a diversão em grupo. Grátis no navegador e no iPhone.">
 <meta property="og:url" content="https://quemsoueu.cards/">
 <meta property="og:image" content="https://quemsoueu.cards/img/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Logo do Quem Sou Eu">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Quem Sou Eu — jogo de cartas e aventura">
-<meta name="twitter:description" content="Adivinhe quem é, enfrente o Reino do Deserto e desafie amigos. Grátis no navegador.">
+<meta name="twitter:title" content="Quem Sou Eu — descubra, adivinhe e se divirta com os amigos">
+<meta name="twitter:description" content="O jogo de cartas e adivinhação para turbinar a diversão em grupo. Grátis no navegador e no iPhone.">
 <meta name="twitter:image" content="https://quemsoueu.cards/img/og.jpg">
 <link rel="preload" href="img/nunito-800.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="site.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[
-{"@type":"VideoGame","@id":"https://quemsoueu.cards/#game","name":"Quem Sou Eu","url":"https://quemsoueu.cards/","publisher":{"@type":"Organization","name":"CRM Plus Store"},"image":"https://quemsoueu.cards/img/og.jpg","description":"Jogo de cartas de adivinhação com modo história no Reino do Deserto, duelos com amigos e personagens colecionáveis.","inLanguage":"pt-BR","genre":["Jogo de cartas","Aventura","Adivinhação"],"gamePlatform":["Navegador","iPhone (PWA)","Android","Windows"],"applicationCategory":"Game","operatingSystem":"Web, iOS, Android, Windows","playMode":["SinglePlayer","MultiPlayer"],"offers":{"@type":"Offer","price":"0","priceCurrency":"BRL"}},
-{"@type":"WebSite","@id":"https://quemsoueu.cards/#site","name":"Quem Sou Eu","url":"https://quemsoueu.cards/","inLanguage":"pt-BR"},
-{"@type":"FAQPage","mainEntity":[
-{"@type":"Question","name":"Quem Sou Eu é grátis?","acceptedAnswer":{"@type":"Answer","text":"Sim. Você joga grátis no navegador, sem instalar nada."}},
-{"@type":"Question","name":"Como instalar Quem Sou Eu no iPhone?","acceptedAnswer":{"@type":"Answer","text":"Abra quemsoueu.cards/jogar no Safari, toque em Compartilhar e escolha Adicionar à Tela de Início. O jogo abre em tela cheia como um app."}},
-{"@type":"Question","name":"Em quais navegadores funciona?","acceptedAnswer":{"@type":"Answer","text":"Nas versões atuais do Chrome, Safari, Firefox, Edge e Opera, no computador e no celular."}},
-{"@type":"Question","name":"Tem versão para Android e Windows?","acceptedAnswer":{"@type":"Answer","text":"O APK para Android e o programa para Windows estão a caminho. Enquanto isso, jogue pelo navegador."}}
-]}]}
+{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://quemsoueu.cards/#org","name":"CRM Plus Store","logo":"https://quemsoueu.cards/img/crm-plus.webp"},{"@type":"VideoGame","@id":"https://quemsoueu.cards/#game","name":"Quem Sou Eu","url":"https://quemsoueu.cards/","publisher":{"@id":"https://quemsoueu.cards/#org"},"image":"https://quemsoueu.cards/img/og.jpg","description":"Quem Sou Eu é um jogo de cartas e adivinhação para jogar com os amigos: modo história, duelos e baralhos temáticos. Jogue grátis no navegador ou instale no iPhone como app (PWA).","inLanguage":"pt-BR","genre":["Jogo de cartas","Adivinhação","Aventura"],"gamePlatform":["Navegador","iPhone (PWA)"],"applicationCategory":"Game","operatingSystem":"Web, iOS","playMode":["SinglePlayer","MultiPlayer"],"offers":{"@type":"Offer","price":"0","priceCurrency":"BRL"},"author":{"@id":"https://quemsoueu.cards/#org"},"potentialAction":{"@type":"PlayAction","target":"https://quemsoueu.cards/jogar/"}},{"@type":"WebSite","@id":"https://quemsoueu.cards/#site","name":"Quem Sou Eu","url":"https://quemsoueu.cards/","inLanguage":"pt-BR","publisher":{"@id":"https://quemsoueu.cards/#org"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Quem Sou Eu é grátis?","acceptedAnswer":{"@type":"Answer","text":"Sim. Você joga grátis no navegador, sem instalar nada."}},{"@type":"Question","name":"Como instalar Quem Sou Eu no iPhone?","acceptedAnswer":{"@type":"Answer","text":"Abra quemsoueu.cards/jogar no Safari, toque em Compartilhar e escolha Adicionar à Tela de Início. O jogo abre em tela cheia como um app."}},{"@type":"Question","name":"Em quais navegadores funciona?","acceptedAnswer":{"@type":"Answer","text":"Nas versões atuais do Chrome, Safari, Firefox, Edge e Opera, no computador e no celular."}},{"@type":"Question","name":"Tem versão para Android e Windows?","acceptedAnswer":{"@type":"Answer","text":"O APK para Android e o programa para Windows estão a caminho. Enquanto isso, jogue pelo navegador."}}]}]}
 </script>
 </head>
 <body>

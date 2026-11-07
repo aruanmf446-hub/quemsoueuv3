@@ -1,0 +1,36 @@
+{
+  "id": "samba",
+  "name": "Samba",
+  "animation_key": "emote_samba",
+  "scope": "account",
+  "motion_approved": true,
+  "purchase_enabled": false,
+  "price_coins": null,
+  "commerce_status": "awaiting_price_or_free_claim_decision",
+  "duration_seconds": 12.0,
+  "clips": {
+    "cowboy": "res://assets/emotes/samba/cowboy.res",
+    "michelly": "res://assets/emotes/samba/michelly.res",
+    "rodrigo": "res://assets/emotes/samba/rodrigo.res",
+    "lorena": "res://assets/emotes/samba/lorena.res",
+    "gus": "res://assets/emotes/samba/gus.res",
+    "lana": "res://assets/emotes/samba/lana.res",
+    "halloween": "res://assets/emotes/samba/halloween.res",
+    "el_fuego": "res://assets/emotes/samba/el_fuego.res"
+  },
+  "sha256": {
+    "cowboy.res": "cec167ef29f07d5976abb0bc8a543931edb286fa7d08803669fd3f5ea2a52b02",
+    "michelly.res": "9cf0de65051c80dade61a8b8fb9b70d329080e8c3784dd6bf1b436c1b1d37867",
+    "rodrigo.res": "493d2b6c641fd8615ddb7559d673eca0fb5c04ea59ee5ffab4394528cc067c65",
+    "lorena.res": "c1b3cb57dd337434b2e55b4c6e937285b3cbd3b8b053b55c5adad0ab9aac9d05",
+    "gus.res": "1ee00a61efbc4e33001219b3781f9b69af9f7f44477224ffdd164dc772f530a7",
+    "lana.res": "e41c847192ce76eb6e30b550843498cabd1d8e0161bda2e365e4b20ea5e057b8",
+    "halloween.res": "0bcdfe8e488f975f0cc595391c6d45f47701f5eef964d8d2be8025893380572f",
+    "el_fuego.res": "14de47b59af96b9f744774a2e56e7e5b324f8067046776d8ff29664eb3701713"
+  },
+  "source": {
+    "url": "https://github.com/mrdoob/three.js/blob/dev/examples/models/fbx/Samba%20Dancing.fbx",
+    "clip": "mixamo_com",
+    "sha256": "b9003ee562c87bf03051c3a502411b0808d3513f1d74a2011f7530d9f067069f"
+  }
+}

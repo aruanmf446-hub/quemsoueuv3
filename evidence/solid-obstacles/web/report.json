@@ -1,0 +1,175 @@
+{
+  "passed": true,
+  "fixture_approach": true,
+  "physics_real": true,
+  "movement": "held arrow keys",
+  "jump": "actual touchscreen.tap, coordinates inside canvas safe area",
+  "viewport": "844x390",
+  "dpr": 3,
+  "physical_device": false,
+  "gpu": "SwiftShader software",
+  "wall": {
+    "actor": {
+      "floor": true,
+      "vx": 0,
+      "x": 88.6206893920898,
+      "y": 1.65088379383087
+    },
+    "attack": 0,
+    "cloud_mock": true,
+    "completed": 0,
+    "defense": 0,
+    "highest": 1,
+    "jump": [
+      0.940406976744186,
+      0.881481481481482
+    ],
+    "notice": "",
+    "obstacle": {
+      "base": 1.65,
+      "left": 88.9708333333333,
+      "right": 94.5708333333333,
+      "top": 2.75
+    },
+    "order": 1,
+    "stage": "play",
+    "sync": "empty"
+  },
+  "held": {
+    "actor": {
+      "floor": true,
+      "vx": 0,
+      "x": 88.6206893920898,
+      "y": 1.65088379383087
+    },
+    "attack": 0,
+    "cloud_mock": true,
+    "completed": 0,
+    "defense": 0,
+    "highest": 1,
+    "jump": [
+      0.940406976744186,
+      0.881481481481482
+    ],
+    "notice": "",
+    "obstacle": {
+      "base": 1.65,
+      "left": 88.9708333333333,
+      "right": 94.5708333333333,
+      "top": 2.75
+    },
+    "order": 1,
+    "stage": "play",
+    "sync": "empty"
+  },
+  "top": {
+    "actor": {
+      "floor": true,
+      "vx": 6,
+      "x": 92.1737899780273,
+      "y": 2.75088357925415
+    },
+    "attack": 0,
+    "cloud_mock": true,
+    "completed": 0,
+    "defense": 0,
+    "highest": 1,
+    "jump": [
+      0.940406976744186,
+      0.881481481481482
+    ],
+    "notice": "",
+    "obstacle": {
+      "base": 1.65,
+      "left": 88.9708333333333,
+      "right": 94.5708333333333,
+      "top": 2.75
+    },
+    "order": 1,
+    "stage": "play",
+    "sync": "empty"
+  },
+  "exit": {
+    "actor": {
+      "floor": true,
+      "vx": 6,
+      "x": 98.5741500854492,
+      "y": 1.65088379383087
+    },
+    "attack": 0,
+    "cloud_mock": true,
+    "completed": 0,
+    "defense": 0,
+    "highest": 1,
+    "jump": [
+      0.940406976744186,
+      0.881481481481482
+    ],
+    "notice": "",
+    "obstacle": {
+      "base": 1.65,
+      "left": 88.9708333333333,
+      "right": 94.5708333333333,
+      "top": 2.75
+    },
+    "order": 1,
+    "stage": "play",
+    "sync": "empty"
+  },
+  "returnWall": {
+    "actor": {
+      "floor": true,
+      "vx": 0,
+      "x": 94.9232177734375,
+      "y": 1.6509416103363
+    },
+    "attack": 0,
+    "cloud_mock": true,
+    "completed": 0,
+    "defense": 0,
+    "highest": 1,
+    "jump": [
+      0.940406976744186,
+      0.881481481481482
+    ],
+    "notice": "",
+    "obstacle": {
+      "base": 1.65,
+      "left": 88.9708333333333,
+      "right": 94.5708333333333,
+      "top": 2.75
+    },
+    "order": 1,
+    "stage": "play",
+    "sync": "empty"
+  },
+  "returnTop": {
+    "actor": {
+      "floor": true,
+      "vx": -6,
+      "x": 90.5675735473633,
+      "y": 2.75088357925415
+    },
+    "attack": 0,
+    "cloud_mock": true,
+    "completed": 0,
+    "defense": 0,
+    "highest": 1,
+    "jump": [
+      0.940406976744186,
+      0.881481481481482
+    ],
+    "notice": "",
+    "obstacle": {
+      "base": 1.65,
+      "left": 88.9708333333333,
+      "right": 94.5708333333333,
+      "top": 2.75
+    },
+    "order": 1,
+    "stage": "play",
+    "sync": "empty"
+  },
+  "errors": [],
+  "blocked": []
+}

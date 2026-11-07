@@ -109,25 +109,26 @@ func run() -> void:
 	Input.action_release("move_left")
 	await ticks(15)
 	check(player.position.x<span.x-0.5 and player.position.y<top-0.2 and not player.is_dead,"sai pela borda e cai sem travar")
-	# Uma passarela antiga também deve deixar subir por baixo.
-	var routes:=get_nodes_in_group(Landings.GROUP).filter(func(n: Node) -> bool:return n.get_meta("parkour_route",false))
-	check(not routes.is_empty(),"obstáculos de parkour existentes usam a mesma passagem por baixo")
+	# Os obstáculos de parkour são sólidos; as lonas acima continuam atravessáveis.
+	var routes:=get_nodes_in_group("campaign_solid_obstacles")
+	check(not routes.is_empty(),"obstáculos de parkour existentes têm corpo sólido")
 	var old: StaticBody3D=routes[0]
-	var old_top: float=old.get_meta("one_way_top")
-	await place(old.position.x,old_top-1.10)
-	Input.action_press("crouch")
-	await ticks(3)
-	Input.action_release("crouch")
-	await ticks(3)
-	check(not player.is_crouching,"levanta após agachar por baixo do balcão, sem ficar preso")
+	var old_top: float=old.get_meta("obstacle_top")
+	var old_floor: float=old.get_meta("obstacle_floor")
+	var old_span: Vector2=old.get_meta("obstacle_span")
+	await place(old_span.x-1.2,old_floor)
+	Input.action_press("move_right")
+	await ticks(35)
+	check(player.position.x<old_span.x-0.20,"não atravessa o corpo do balcão andando")
 	await jump()
-	var old_ceiling:=false
-	var old_crossed:=false
-	for i in 95:
+	var old_landed:=false
+	for i in 100:
 		await physics_frame
-		old_ceiling=old_ceiling or player.is_on_ceiling()
-		old_crossed=old_crossed or player.position.y>old_top+0.05
-	check(old_crossed and not old_ceiling,"balcão de parkour atravessável por baixo, mantendo apoio por cima")
+		if player.is_on_floor() and absf(player.position.y-old_top)<0.04:
+			old_landed=true
+			break
+	Input.action_release("move_right")
+	check(old_landed,"salta pela lateral e pousa em cima do balcão sólido")
 	var crates:=get_nodes_in_group(Landings.GROUP).filter(func(n: Node) -> bool:return n.get_meta("prop_asset","")=="city_supplies_context")
 	check(not crates.is_empty(),"caixas do cenário também oferecem apoio")
 	if not crates.is_empty():

@@ -21,7 +21,7 @@ func _ready() -> void:
   var use: Button=card.button;use.name="UseRefill_"+kind
   _buttons[kind]=use;_cards[kind]=card
  _status=PlayerUI.label("",20,PlayerUI.MUTED);_status.name="RefillFeedback";add_child(_status)
- _back=PlayerUI.button("Voltar às configurações",func()->void:phase._session.show_settings());add_child(_back)
+ _back=PlayerUI.button("Voltar à pausa",func()->void:phase._session.show_pause());add_child(_back)
  _back.grab_focus.call_deferred()
  if PlayerServices.current==null:
   _status.text="Entre na conta para acessar suas recargas."

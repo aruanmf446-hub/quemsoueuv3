@@ -32,3 +32,16 @@
 - Retratos dos personagens equipáveis são distribuídos em `assets/portraits`; Amizades e Duelo não podem depender de abrir Personagens antes ou de caches de `user://`. Refaça os retratos pelos modelos reais com `tools/godot/bake_portraits.gd` quando necessário.
 - **Exceção iPhone (PWA/Safari, decisão do dono):** só no iPhone o jogo fica dentro da área segura (faixas pretas no notch, topo e barrinha), usa a base 1200×675 (`UIScale.IPHONE_BASE`) e um piso de fonte. Ver [`docs/layout/README_IPHONE.md`](docs/layout/README_IPHONE.md). Demais aparelhos seguem a regra abaixo sem mudança.
 - **Layout padrão em todas as telas (decisão do dono):** o jogo é desenhado uma vez na base 1672×941 (stretch `canvas_items`/`expand`) e o Godot escala tudo por igual. Não criar layouts "compactos", escalas por densidade (`UIScale.unit_for`/`PlayerUI.unit` são sempre 1) nem fontes/botões diferentes por aparelho. Telas mais largas só mostram mais espaço. `UIScale.is_handheld()` serve apenas para desempenho e toque. Validar com `tests/responsive/capture_all.gd` (inclusive com `--ui-scale=3`).
+
+## Figurantes do cenário (decisão do dono)
+
+- Cidadãos do fundo usam assets inéditos de pessoas e cidadãos-cacto, com roupas civis.
+  Não reutilizar imagens, retratos ou renders dos personagens jogáveis nem do soldado
+  Cacto de combate como figurantes. As posições gerais foram aprovadas; esse reaproveitamento foi reprovado.
+- Usar grupos espaçados e contextualizados: comerciantes/clientes nas bancas, famílias
+  nos jardins, trabalhadores e vigias nas áreas correspondentes. Alguns ficam sozinhos.
+- Cidadãos ficam parados, mantendo a rotina ou reagindo discretamente à passagem do
+  jogador. Evitar corrida em loop, rotação para o fundo e multidões repetidas.
+- Fonte atual: `assets/desert/npc_citizens/` e `scripts/desert/t15d/background_people.gd`.
+  Ver `docs/desert/NPCS_CIDADAOS.md`. Capturas anteriores com heróis como cidadãos
+  são históricas e reprovadas para esse uso.

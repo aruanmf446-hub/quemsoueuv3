@@ -1,5 +1,9 @@
 # Continuidade e variedade da campanha
 
+**Atualização posterior:** o dono reprovou o uso de personagens jogáveis como cidadãos
+do fundo. Essa parte das capturas é histórica. Não regenerar esses figurantes pelos
+modelos dos heróis; seguir [a direção atual](../../docs/desert/NPCS_CIDADAOS.md).
+
 Base: `66b2ea4`. Motor: Godot 4.7.2, Compatibility. Fases 01–09.
 
 ## O que muda para jogar

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://4t5h36hxwpbr"
-path="res://.godot/imported/cactus.png-e32ca2ab12e2ff6af9d52ca3a78fafc5.ctex"
+uid="uid://d2hbpsik52174"
+path="res://.godot/imported/human_citizens.png-8ccec5088d7cfdc681a10cc5bc41d470.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/desert/city_people/cactus.png"
-dest_files=["res://.godot/imported/cactus.png-e32ca2ab12e2ff6af9d52ca3a78fafc5.ctex"]
+source_file="res://assets/desert/npc_citizens/human_citizens.png"
+dest_files=["res://.godot/imported/human_citizens.png-8ccec5088d7cfdc681a10cc5bc41d470.ctex"]
 
 [params]
 

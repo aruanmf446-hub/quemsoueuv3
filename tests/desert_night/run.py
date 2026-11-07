@@ -32,6 +32,7 @@ targets=[
  ('reino10',engine+headless+['--script','res://tests/desert_night/reino10_test.gd']),
  ('spears',engine+headless+['--script','res://tests/desert_night/spear_encounter_test.gd']),
  ('spear-intro',engine+headless+['--script','res://tests/desert_night/spear_intro_test.gd']),
+ ('control-modes',engine+headless+['--script','res://tests/control_modes/flow.gd']),
  ('feedback',engine+headless+['--script','res://tests/desert_night/feedback_test.gd']),
  ('run-resume',engine+headless+['--script','res://tests/story_continuity/run_resume.gd']),
  ('run-cloud',engine+headless+['--script','res://tests/story_continuity/run_cloud.gd']),

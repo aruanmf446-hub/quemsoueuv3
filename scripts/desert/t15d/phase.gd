@@ -66,6 +66,8 @@ var _run_ready:=false
 var _save_clock:=0.0
 var _cloud_clock:=0.0
 func _ready() -> void:
+	preload("res://scripts/desert/t15d/control_scheme.gd").load_saved(get_tree())
+	add_to_group("campaign_control_consumers")
 	_save_owner=OwnerStorage.owner_id()
 	_loaded_run=Run.read(_save_owner).state
 	_set_web_story_playing(true)
@@ -119,6 +121,7 @@ func _ready() -> void:
 	if not _loaded_run.is_empty():_first_use.import_seen(_loaded_run.get("lessons",[]))
 	_restore_ability_buttons()
 	_sync_resources()
+	_player.controls.reset()
 	_first_use.opened.connect(func(_kind: String) -> void:
 		_release_input()
 		_player._model.visible=true)
@@ -819,6 +822,16 @@ func _build_hud() -> void:
 		_advance(str(_phase.next_scene)))
 	_session.return_requested.connect(_return_to_story)
 	_sync_resources()
+func apply_control_scheme() -> void:
+	if not is_instance_valid(_player):return
+	_release_input()
+	_player._jump_buffer=0.0
+	_player._attack_buffer=0.0
+	_player._defend_buffer=0.0
+	if is_instance_valid(_touch_pad):
+		_touch_pad.visible=_touch_pad._wanted()
+		_touch_pad.queue_redraw()
+	if is_instance_valid(_hud):_hud.apply_control_scheme()
 func _sync_resources() -> void:
 	if is_instance_valid(_hud): _hud.update_resources(_player)
 	if _run_ready:_save_active_run.call_deferred()
@@ -895,6 +908,7 @@ func _on_goal_entered(body: Node3D) -> void:
 func _release_input() -> void:
 	if is_instance_valid(_touch_pad): _touch_pad.release_all()
 	for action in ["move_left","move_right","jump","attack","defend","crouch","rupture","amber","dash"]: Input.action_release(action)
+	if is_instance_valid(_player):_player.controls.reset()
 func _pause() -> void:
 	if is_instance_valid(_first_use) and _first_use.active:return
 	if completed or _paused or _respawning: return
@@ -915,7 +929,7 @@ func _resume() -> void:
 	_touch_pad._last_pixels = Vector2i.ZERO
 	get_viewport().gui_release_focus()
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_F:
+	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_F and preload("res://scripts/desert/t15d/control_scheme.gd").keyboard_enabled():
 		_raise_earth_bridge()
 	if event.is_action_pressed("ui_cancel") and not completed:
 		_pause()

@@ -1,0 +1,15 @@
+Keyboard mode selected by real UI and moves by key
+Opening pause
+Pause open {"Configurações":[0.5,0.521481481481481],"Continuar":[0.5,0.435555555555556],"Recomeçar fase":[0.5,0.607407407407407],"Voltar aos reinos":[0.5,0.693333333333333]}
+Pause controls open
+Mixed selected
+Resumed mixed
+Mixed source ownership: releasing touch preserves key; releasing key preserves joystick
+Opening pause
+Pause open {"Configurações":[0.5,0.521481391059028],"Continuar":[0.5,0.435555826822917],"Recomeçar fase":[0.5,0.607406910083912],"Voltar aos reinos":[0.5,0.693332429108796]}
+Pause controls open
+Resumed touch {"actor":{"attack":3,"defending":false,"defense":3,"floor":true,"jumps":0,"x":7.99897956848145},"defend_button":[0.940406976744186,0.703703703703704],"menu":{},"mode":"touch","paused":false,"play":true,"preference":"touch","stick":[0.100290697674419,0.804444444444444,0.0755813953488372],"tick":1432,"touch":true}
+Keyboard ignored {"actor":{"attack":3,"defending":false,"defense":3,"floor":true,"jumps":0,"x":7.99897956848145},"defend_button":[0.940406976744186,0.703703703703704],"menu":{},"mode":"touch","paused":false,"play":true,"preference":"touch","stick":[0.100290697674419,0.804444444444444,0.0755813953488372],"tick":1472,"touch":true}
+Defense tap {"actor":{"attack":3,"defending":true,"defense":2,"floor":true,"jumps":0,"x":7.99897956848145},"defend_button":[0.940406976744186,0.703703703703704],"menu":{},"mode":"touch","paused":false,"play":true,"preference":"touch","stick":[0.100290697674419,0.804444444444444,0.0755813953488372],"tick":1552,"touch":true}
+Touch-only ignores keys, executes button, and survives reload
+CONTROL_MODES_WEB PASS

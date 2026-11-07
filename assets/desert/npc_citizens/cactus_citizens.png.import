@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d6jl33fhudke"
-path="res://.godot/imported/lana.png-545ad7b4cacb017e0e4dce4a4a19fb6b.ctex"
+uid="uid://c06s1eikk3s8s"
+path="res://.godot/imported/cactus_citizens.png-ea4fbdab0d79efbc866d42adeb3ef456.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/desert/city_people/lana.png"
-dest_files=["res://.godot/imported/lana.png-545ad7b4cacb017e0e4dce4a4a19fb6b.ctex"]
+source_file="res://assets/desert/npc_citizens/cactus_citizens.png"
+dest_files=["res://.godot/imported/cactus_citizens.png-ea4fbdab0d79efbc866d42adeb3ef456.ctex"]
 
 [params]
 

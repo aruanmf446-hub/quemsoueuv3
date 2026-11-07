@@ -18,7 +18,7 @@ const SUBTITLES := [
 	"Suas informações de conta e personalização.",
 	"Ajuste os volumes, efeitos e preferências sonoras do jogo.",
 	"Ajuste a qualidade visual para equilibrar aparência e desempenho.",
-	"Veja como controlar o jogo no teclado e no toque.",
+	"Escolha como jogar e configure os controles.",
 	"Defina o idioma do jogo (textos, menus e mensagens).",
 ]
 const ICONS := {
@@ -713,6 +713,9 @@ static func _bytes(value: float) -> String:
 # --- 04 Controles ---------------------------------------------------------------------
 
 func _controls() -> void:
+	var picker:=preload("res://scripts/ui/control_mode_picker.gd").new()
+	picker.preferences=services.preferences
+	_content.add_child(picker)
 	var compact := _compact()
 	var top := HBoxContainer.new()
 	top.add_theme_constant_override("separation", 18)
@@ -766,7 +769,7 @@ func _controls() -> void:
 	var remap_rows := VBoxContainer.new()
 	remap_rows.add_theme_constant_override("separation", 8)
 	remap.add_child(remap_rows)
-	remap_rows.add_child(PlayerUI.label(tr("Remapear controles"), 16 if compact else 22, Color.WHITE))
+	remap_rows.add_child(PlayerUI.label(tr("Teclas dos menus"), 16 if compact else 22, Color.WHITE))
 	var remap_hint := PlayerUI.label(tr("Toque numa ação e pressione a nova tecla. Confirmar e Voltar precisam ser diferentes."), 12 if compact else 15, MUTED)
 	remap_rows.add_child(remap_hint)
 	var buttons := HBoxContainer.new()
@@ -788,7 +791,7 @@ func _controls() -> void:
 	_side.add_child(pad)
 	_hint_row("keyboard", "A, D / ← →", "Andar")
 	_hint_row("keyboard", "W / Espaço", "Pular · S agacha")
-	_hint_row("keyboard", "J, K · L, Shift", "Atacar · Defender")
+	_hint_row("keyboard", "J · K / Shift", "Atacar · Defender")
 	_hint_row("enter", OS.get_keycode_string(int(services.preferences.values.accept_key)), "Confirmar / Selecionar")
 	_hint_row("logout", OS.get_keycode_string(int(services.preferences.values.back_key)), "Voltar / Cancelar")
 	_hint_row("touch", "Toque", "Joystick à esquerda; pular, atacar e defender à direita.")

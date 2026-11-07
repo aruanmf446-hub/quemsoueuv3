@@ -1,0 +1,26 @@
+[
+  {
+    "test": "control-modes",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 6.38,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "actions",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 30.76,
+    "graphical": false,
+    "fixed_physics_step": false
+  },
+  {
+    "test": "feedback",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 5.91,
+    "graphical": false,
+    "fixed_physics_step": false
+  }
+]

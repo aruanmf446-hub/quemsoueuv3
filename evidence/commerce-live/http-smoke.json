@@ -1,0 +1,12 @@
+[
+  {
+    "path": "/functions/v1/qse-coin-checkout",
+    "status": 503,
+    "code": "payments_unavailable"
+  },
+  {
+    "path": "/rest/v1/rpc/qse_cosmetic_shop",
+    "status": 401,
+    "code": "42501"
+  }
+]

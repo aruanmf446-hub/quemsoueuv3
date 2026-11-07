@@ -20,7 +20,8 @@ func _run() -> void:
 	await get_tree().process_frame
 	var mode := str(JavaScriptBridge.eval("new URLSearchParams(location.search).get('fixture')||'nickname'")) if OS.has_feature("web") else fixture_mode
 	var fake: SupabaseClient
-	if mode=="community": fake=preload("res://tests/community_attribution/fake_game.gd").new()
+	if mode.begins_with("commerce"): fake=preload("res://tests/commerce/fake_game.gd").new()
+	elif mode=="community": fake=preload("res://tests/community_attribution/fake_game.gd").new()
 	elif mode=="universal": fake=preload("res://tests/skin_emotes/universal_game.gd").new()
 	elif mode=="claim": fake=preload("res://tests/community_claims/visual_game.gd").new()
 	elif mode=="report": fake=preload("res://tests/deck_runtime_corrections/fake_game.gd").new()
@@ -51,12 +52,14 @@ func _run() -> void:
 	services.emote_shop.client=fake
 	services.wallet.client=fake
 	services.coin_store.client=fake
-	if mode in ["coins","stripe"]:
+	services.cosmetic_shop.client=fake
+	if mode.begins_with("commerce"): await services.cosmetic_shop.refresh()
+	if mode in ["coins","stripe","commerce"]:
 		await services.wallet.refresh()
 		ui=load("res://scenes/player/wallet.tscn").instantiate()
 		add_child(ui)
 		ui.show_screen({"tab":"coins"})
-	elif mode in ["emotes","variations","universal","samba"]:
+	elif mode in ["emotes","variations","universal","samba","commerce_skins"]:
 		services.progression.state="success"
 		services.progression.data={"unlocked_character_ids":PlayerContracts.initial_ids(),"equipped_character_id":"cowboy"}
 		ui=load("res://scenes/skins/skins_panel.tscn").instantiate()
@@ -68,7 +71,7 @@ func _run() -> void:
 				ui._paths[str(entry.id)]="res://assets/portraits/"+str(entry.id)+".png"
 		if mode in ["emotes","universal"]: ui._shop_item="dance_01"
 		ui.open("cowboy")
-		if mode=="samba": ui._choose_cosmetic_mode("shop")
+		if mode=="samba" or mode=="commerce_skins": ui._choose_cosmetic_mode("shop")
 		if mode=="universal":
 			_fixture_universal_motion()
 			ui._choose_cosmetic_mode("shop")
@@ -164,6 +167,7 @@ func _probe(args: Array) -> void:
 		result.shop={"coins":services.emote_shop.data.get("coins",""),"owned":services.emote_shop.product("dance_01").get("owned",false)}
 	if services.wallet.state=="success": result.wallet_coins=services.wallet.data.get("coins","")
 	if fixture_game.get("purchase_calls") is Array: result.emote_purchases=fixture_game.purchase_calls.size()
+	if fixture_game.get("checkout_calls") is Array: result.checkout_calls=fixture_game.checkout_calls.size()
 	if ui.get("_stage") is LobbyStage and is_instance_valid(ui.get("_stage")):
 		var stage: LobbyStage=ui.get("_stage")
 		result.preview_render={"static":stage.static_preview,"update":stage.get_node("Viewport").render_target_update_mode}

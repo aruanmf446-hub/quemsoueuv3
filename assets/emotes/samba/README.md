@@ -19,3 +19,8 @@ Origem: FBX de exemplo Samba Dancing do Three.js; URL e SHA-256 no manifesto.
 O FBX bruto e o personagem doador não estão incluídos. Os recursos Animation
 foram adaptados aos modelos originais do projeto, conforme os testes e créditos
 em `tests/fbx_dance/README.md` e `evidence/fbx-samba-test/README.md`.
+
+Atualização: o GAME agora tem a cotação provisória de 50 moedas para Samba,
+INATIVA, conforme o exemplo posterior do dono. O manifesto preserva a aprovação
+do movimento e o preço não definitivo; a loja usa a cotação real do servidor.
+Vendas continuam bloqueadas. Ver docs/backend/COMMERCE_ACTIVATION.md.

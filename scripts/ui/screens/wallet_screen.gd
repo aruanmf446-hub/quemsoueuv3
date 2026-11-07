@@ -74,27 +74,36 @@ func _render_coin_store() -> void:
 		return
 	var store := services.coin_store
 	var packages: Array=store.data.get("packages",[])
-	if not store.data.get("enabled",false) or packages.is_empty():
+	if not store.data.get("enabled",false):
+		body.add_child(PlayerUI.label("Vendas desabilitadas · valores provisórios. Nenhuma cobrança disponível.",22,PlayerUI.GOLD))
+	if packages.is_empty():
 		var empty := PlayerUI.card(body)
 		empty.add_child(PlayerUI.label("Pacotes de moedas",26,PlayerUI.TEXT))
 		var notice := PlayerUI.label("Os pacotes de moedas estarão disponíveis em breve.",22,PlayerUI.MUTED)
 		notice.name="CoinPackagesPending"
 		empty.add_child(notice)
 	else:
-		if not store.data.live_mode:
+		if store.data.get("enabled",false) and not store.data.live_mode:
 			body.add_child(PlayerUI.label("Modo de teste · sem cobrança ou crédito de moedas reais.",22,PlayerUI.GOLD))
 		var row := PlayerUI.flow(body)
 		for pack: Dictionary in packages:
 			var card := PlayerUI.card(row)
 			card.custom_minimum_size.x=300
 			card.add_child(PlayerUI.label(pack.name,24))
-			card.add_child(PlayerUI.label("%s moedas" % pack.coins,32,PlayerUI.GOLD))
+			card.add_child(PlayerUI.label("%s %s" % [pack.coins,"crédito(s) de deck" if pack.get("reward_kind")=="deck_credits" else "moedas"],32,PlayerUI.GOLD))
 			var buy := PlayerUI.button("%s · COMPRAR" % _brl(int(pack.price_brl_cents)),_prepare_checkout.bind(pack))
 			buy.name="CoinPack_"+str(pack.id)
+			buy.disabled=not store.data.get("enabled",false) or not pack.get("available",true)
+			if buy.disabled: buy.text="%s · EM BREVE" % _brl(int(pack.price_brl_cents))
 			PlayerUI.editor_control(buy,true)
 			card.add_child(buy)
 	if store.state=="error" or store.state=="offline":
 		body.add_child(PlayerUI.label("Não foi possível atualizar os pacotes. Tente novamente.",22,PlayerUI.MUTED))
+	var credits := PlayerUI.label("Créditos de deck: "+str(services.cosmetic_shop.data.get("deck_credits","—")),26)
+	credits.name="DeckCreditBalance"
+	body.add_child(credits)
+	body.add_child(PlayerUI.label("Um crédito libera um novo deck. Editar, corrigir e reenviar o mesmo deck não usa outro crédito.",20,PlayerUI.MUTED))
+	body.add_child(PlayerUI.label("Criação gratuita enquanto o uso de créditos estiver desabilitado.",20,PlayerUI.MUTED))
 	var refresh := PlayerUI.button("Atualizar pagamentos e saldo",_refresh_store)
 	refresh.name="RefreshCoinPayments"
 	refresh.disabled=_refreshing
@@ -104,7 +113,7 @@ func _render_coin_store() -> void:
 		body.add_child(PlayerUI.label("Seus pagamentos",26))
 		for order: Dictionary in orders:
 			var item := PlayerUI.card(body)
-			item.add_child(PlayerUI.label("%s moedas · %s" % [order.coins,CoinStoreService.order_message(order.status)],22))
+			item.add_child(PlayerUI.label("%s %s · %s" % [order.coins,"crédito(s) de deck" if order.get("reward_kind")=="deck_credits" else "moedas",CoinStoreService.order_message(order.status)],22))
 			item.add_child(PlayerUI.label("Pedido %s · %s" % [str(order.id).left(8),str(order.created_at).left(16).replace("T"," ")],20,PlayerUI.MUTED))
 
 
@@ -112,6 +121,7 @@ func _refresh_store() -> void:
 	if _refreshing or not services.session.authenticated(): return
 	_refreshing=true
 	await services.coin_store.refresh()
+	await services.cosmetic_shop.refresh()
 	await services.wallet.refresh()
 	_refreshing=false
 	if is_visible_in_tree(): render()
@@ -123,12 +133,13 @@ func _notification(what: int) -> void:
 
 
 func _prepare_checkout(pack: Dictionary) -> void:
+	if not services.coin_store.data.get("enabled",false) or not pack.get("available",true): return
 	if is_instance_valid(_checkout_dialog): return
 	_checkout_dialog=Control.new()
 	_checkout_dialog.name="CoinCheckoutPanel"
 	var panel := PlayerUI.deck_modal(self,_checkout_dialog)
 	panel.add_child(PlayerUI.label("Comprar moedas",30))
-	panel.add_child(PlayerUI.label("%s moedas · %s" % [pack.coins,_brl(int(pack.price_brl_cents))],28,PlayerUI.GOLD))
+	panel.add_child(PlayerUI.label("%s %s · %s" % [pack.coins,"crédito(s) de deck" if pack.get("reward_kind")=="deck_credits" else "moedas",_brl(int(pack.price_brl_cents))],28,PlayerUI.GOLD))
 	var feedback := PlayerUI.label("Preparando pagamento seguro…",22,PlayerUI.MUTED)
 	feedback.name="CoinCheckoutFeedback"
 	panel.add_child(feedback)

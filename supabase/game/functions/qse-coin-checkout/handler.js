@@ -34,7 +34,7 @@ export function createCheckoutHandler(config, transport = fetch) {
     'payment_intent_data[metadata][qse_order]':order.id,
     'line_items[0][price_data][currency]':'brl',
     'line_items[0][price_data][unit_amount]':String(order.amount),
-    'line_items[0][price_data][product_data][name]':order.coins + ' moedas — Quem Sou Eu V3',
+    'line_items[0][price_data][product_data][name]':order.coins + (order.reward_kind === 'deck_credits' ? ' crédito(s) de deck' : ' moedas') + ' — Quem Sou Eu V3',
     'line_items[0][quantity]':'1',
    });
    const session = await t.stripe('checkout/sessions',form,'qse-coins-' + order.id);

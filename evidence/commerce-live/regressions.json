@@ -1,0 +1,22 @@
+[
+  {
+    "test": "gallery",
+    "exit": 0
+  },
+  {
+    "test": "purchase",
+    "exit": 0
+  },
+  {
+    "test": "universal",
+    "exit": 0
+  },
+  {
+    "test": "return",
+    "exit": 0
+  },
+  {
+    "test": "account",
+    "exit": 0
+  }
+]

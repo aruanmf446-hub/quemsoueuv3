@@ -1,0 +1,24 @@
+✔ no merchant secrets: checkout disabled without creating orders (27.092627ms)
+✔ foreign origin and missing/invalid sessions cannot create payments (3.172904ms)
+✔ malformed amount or nonce rejected before order (3.589813ms)
+✔ server quote, authenticated identity, stable Stripe idempotency, fixed return URL (7.976847ms)
+✔ bound retry reuses checkout; no second Stripe session (1.157204ms)
+✔ price mismatch and unsafe checkout URLs never returned (2.675724ms)
+✔ price changed by server surfaced, without Stripe calls (0.536349ms)
+✔ Stripe signatures use exact raw payload, rotation signatures and freshness (6.43984ms)
+✔ invalid signature has zero side effects (0.692394ms)
+✔ signed webhook retrieves canonical session, then completes server-side (4.321696ms)
+✔ unpaid, wrong live mode and unrelated Stripe sessions cannot credit (3.209405ms)
+✔ database failure requests webhook retry and leaks no error details (2.917689ms)
+✔ canonical refunds and disputes enter manual review (1.974347ms)
+✔ unrelated refunds, no actual refund and won disputes do not create holds (4.909363ms)
+✔ unrelated valid event acknowledged without any network mutation (0.942642ms)
+✔ deck credit checkout uses server reward kind, not coin product label (1.161912ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 79.416497

@@ -171,6 +171,7 @@ func push(draft: Dictionary) -> Dictionary:
 	draft.sync_state = "synced"
 	draft.synced_at = int(Time.get_unix_time_from_system())
 	store.save(draft)
+	if PlayerServices.current!=null: PlayerServices.current.cosmetic_shop.refresh()
 	return ServiceResult.success(draft)
 
 

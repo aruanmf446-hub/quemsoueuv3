@@ -170,6 +170,7 @@ func send(path: String, method: HTTPClient.Method, body: Variant = null, headers
 		return ServiceResult.failure("not_authenticated" if status == 401 else "forbidden", "unauthorized")
 	if status < 200 or status >= 300:
 		var code := str(data.get("code", data.get("error", "request_failed"))) if data is Dictionary else "request_failed"
+		if code=="P0001" and data.get("message") in ["insufficient_deck_credits","payment_review","deck_id_already_used"]: code=str(data.message)
 		return ServiceResult.failure(code, "error")
 	return ServiceResult.success({"status": status, "data": data, "bytes": bytes})
 

@@ -13,6 +13,10 @@ static func failure(code: String, state: String = "error") -> Dictionary:
 static func message(result: Dictionary) -> String:
 	match result.get("code", ""):
 		"not_configured": return "Conexão ainda não configurada. Você está na demonstração local."
+		"insufficient_deck_credits": return "Você precisa de um crédito para salvar um novo deck na conta. Seu rascunho continua neste aparelho."
+		"payment_review": return "Há um pagamento em análise. Entre em contato com o suporte."
+		"deck_id_already_used": return "Este deck foi excluído. Crie um novo rascunho."
+		"sales_disabled": return "As vendas estão desabilitadas."
 		"backend_pending": return "A publicação para a comunidade ainda não está habilitada. Seu rascunho continua salvo."
 		"deck_incomplete": return "Complete nome e categoria para salvar na conta."
 		"invalid_draft", "save_failed": return "Não foi possível salvar o rascunho neste aparelho."

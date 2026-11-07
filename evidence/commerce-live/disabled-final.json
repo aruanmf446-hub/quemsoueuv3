@@ -1,0 +1,56 @@
+{
+  "game": [
+    {
+      "jsonb_build_object": {
+        "commerce": {
+          "singleton": true,
+          "cosmetics_enabled": false,
+          "deck_credits_required": false
+        },
+        "packages": [
+          {
+            "id": "coins_100",
+            "name": "100 moedas",
+            "coins": 100,
+            "active": false,
+            "reward_kind": "coins",
+            "price_brl_cents": 1000
+          },
+          {
+            "id": "deck_credit",
+            "name": "1 cr\u00e9dito de deck",
+            "coins": 1,
+            "active": false,
+            "reward_kind": "deck_credits",
+            "price_brl_cents": 1000
+          },
+          {
+            "id": "coins_250",
+            "name": "250 moedas",
+            "coins": 250,
+            "active": false,
+            "reward_kind": "coins",
+            "price_brl_cents": 2000
+          },
+          {
+            "id": "coins_400",
+            "name": "400 moedas",
+            "coins": 400,
+            "active": false,
+            "reward_kind": "coins",
+            "price_brl_cents": 3000
+          }
+        ],
+        "payments": {
+          "enabled": false,
+          "live_mode": false,
+          "singleton": true
+        },
+        "active_emotes": 0,
+        "active_cosmetics": 0
+      }
+    }
+  ],
+  "stripe_secret_configured": false,
+  "webhook_secret_configured": true
+}

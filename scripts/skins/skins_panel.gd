@@ -236,6 +236,15 @@ func _responsive_layout() -> void:
 func open(equipped_id: String = "") -> void:
 	_selected = equipped_id
 	show_screen()
+	if services.session.authenticated(): _refresh_cosmetics()
+
+
+func _refresh_cosmetics() -> void:
+	var previous := _selected_styles.duplicate()
+	var result := await services.cosmetic_shop.refresh()
+	if result.ok and is_visible_in_tree() and _selected_styles==previous:
+		_selected_styles=services.cosmetic_shop.data.get("equipped",{}).duplicate()
+		render()
 
 
 func close() -> void:
@@ -463,6 +472,7 @@ func _select_neighbor(direction: int) -> void:
 
 func _select(character_id: String) -> void:
 	_selected = character_id
+	if not _selected_styles.has(character_id): _selected_styles[character_id]=services.cosmetic_shop.equipped(character_id)
 	for id: String in _cards:
 		(_cards[id] as PanelContainer).add_theme_stylebox_override("panel", _card_style(id == character_id))
 	var kept: LobbyStage = _stage if is_instance_valid(_stage) and _stage.get_parent() == _preview else null
@@ -545,6 +555,13 @@ func _select(character_id: String) -> void:
 	equip.custom_minimum_size.y = 36 if compact else PlayerUI.CONTROL_HEIGHT
 	equip.disabled = not unlocked or equipped
 	actions.add_child(equip)
+	if not unlocked:
+		var product := services.cosmetic_shop.product(character_id,"")
+		if product.get("kind")=="skin":
+			var buy_skin := _button(str(product.price_coins)+tr(" moedas"),_purchase_cosmetic.bind(product))
+			buy_skin.name="BuySkin"
+			buy_skin.disabled=not product.get("available",false)
+			actions.add_child(buy_skin)
 	var back := _button("VOLTAR", close)
 	back.custom_minimum_size.y = 36 if compact else PlayerUI.CONTROL_HEIGHT
 	actions.add_child(back)
@@ -608,6 +625,7 @@ func _choose_cosmetic_mode(mode: String) -> void:
 	for key: String in _cosmetic_tabs: PlayerUI.style_button(_cosmetic_tabs[key],key==mode)
 	_rebuild_gallery()
 	_responsive_layout()
+	_update_variation_action()
 	if mode=="shop": _refresh_emote_shop()
 
 
@@ -629,6 +647,7 @@ func _build_variant_picker(entry: Dictionary,actions: Control) -> void:
 			VARIATIONS.apply(_stage.character,str(style.id))
 			_stage.get_node("Viewport").render_target_update_mode=SubViewport.UPDATE_ONCE
 			selected_name.text=tr("Prévia · ")+str(style.name)
+			_update_variation_action()
 		var button := _button("",select)
 		button.name="SkinVariation_"+str(style.id)
 		button.tooltip_text=str(style.name)
@@ -650,6 +669,13 @@ func _build_variant_picker(entry: Dictionary,actions: Control) -> void:
 		images[style.id]=image
 		if button.button_pressed: selected_name.text=tr("Prévia · ")+str(style.name)
 	row.add_child(selected_name)
+	var action := _button("",_variation_action)
+	action.name="VariationPurchase"
+	action.clip_text=true
+	action.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	_preview.add_child(action)
+	_preview.move_child(action,row.get_index()+1)
+	_update_variation_action()
 	if row.visible: _load_variation_previews(entry,row,images)
 
 
@@ -658,6 +684,62 @@ func _load_variation_previews(entry: Dictionary,watch: Control,images: Dictionar
 	if not is_instance_valid(watch) or watch.is_queued_for_deletion(): return
 	for id: String in images:
 		if is_instance_valid(images[id]) and textures.has(id): images[id].texture=textures[id]
+
+
+func _update_variation_action() -> void:
+	var button := _preview.find_child("VariationPurchase",true,false) as Button
+	if button==null: return
+	var style := str(_selected_styles.get(_selected,"original"))
+	var item := services.cosmetic_shop.product(_selected,style)
+	button.visible=_cosmetic_mode=="skins" and (style!="original" or services.cosmetic_shop.equipped(_selected)!="original")
+	button.disabled=true
+	button.text=tr("ORIGINAL")
+	if style=="original":
+		button.text=tr("USAR ORIGINAL")
+		button.disabled=not services.session.authenticated()
+	elif not item.is_empty():
+		button.text=tr("USAR") if item.owned else str(item.price_coins)+tr(" moedas")
+		button.disabled=not services.inventory.is_unlocked(_selected) or (not item.owned and not item.available)
+		if button.disabled: button.text+=tr(" · EM BREVE")
+	else:
+		button.text=tr("EM BREVE")
+
+
+func _variation_action() -> void:
+	var style := str(_selected_styles.get(_selected,"original"))
+	var character := _selected
+	var item := services.cosmetic_shop.product(character,style)
+	if style=="original" or item.get("owned",false):
+		var result := await services.cosmetic_shop.equip(character,style)
+		if is_instance_valid(_stage) and _selected==character:
+			_context_hint.text=tr("Variação salva na conta") if result.ok else EmoteShopService.message(result.code)
+		return
+	_purchase_cosmetic(item)
+
+
+func _purchase_cosmetic(item: Dictionary) -> void:
+	if not item.get("available",false) or is_instance_valid(_buy_dialog): return
+	_buy_dialog=Control.new()
+	_buy_dialog.name="CosmeticPurchase"
+	var panel := PlayerUI.deck_modal(self,_buy_dialog)
+	panel.add_child(PlayerUI.label(str(item.name),28))
+	panel.add_child(PlayerUI.label(str(item.price_coins)+tr(" moedas"),24,PlayerUI.GOLD))
+	var feedback := PlayerUI.label("",20)
+	panel.add_child(feedback)
+	var dialog := _buy_dialog
+	var confirm := PlayerUI.button("CONFIRMAR COMPRA",func()->void:pass)
+	confirm.name="ConfirmCosmeticPurchase"
+	confirm.pressed.connect(func()->void:
+		confirm.disabled=true
+		var result := await services.cosmetic_shop.buy(item)
+		if not is_instance_valid(dialog) or dialog!=_buy_dialog: return
+		feedback.text=tr("Adquirido na sua conta") if result.ok else EmoteShopService.message(result.code)
+		if result.ok:
+			await services.wallet.refresh()
+			await services.progression.refresh()
+		else: confirm.disabled=false)
+	panel.add_child(confirm)
+	panel.add_child(PlayerUI.button("Voltar",_close_purchase))
 
 
 func _build_emote_gallery(entry: Dictionary) -> void:
@@ -669,15 +751,16 @@ func _build_emote_gallery(entry: Dictionary) -> void:
 		emotes=[]
 		for item: Dictionary in PlayerContracts.read_json(motions.PATH).get("items",[]):
 			if not item.get("preview_visible",false) and item.id!=_shop_item and not services.emote_shop.owned(str(item.id)): continue
-			var pending: bool=motions.price_pending(str(item.id))
+			var pending: bool=motions.price_pending(str(item.id)) and services.emote_shop.product(str(item.id)).is_empty()
 			var product: Dictionary=services.emote_shop.product(str(item.id))
 			var caption := "Preço a definir" if pending else ("ADQUIRIDO" if services.emote_shop.owned(str(item.id)) else (str(product.price_coins)+" moedas" if product.has("price_coins") else "Indisponível"))
 			emotes.append({"id":"dance" if item.id=="dance_01" else str(item.id),"product_id":item.id,"name":item.get("name","Emote"),"context":caption,"animation":item.animation_key})
 	var buy := _preview.find_child("BuyEmotePreview",true,false) as Button
 	if shop and buy!=null:
-		var pending: bool=motions.price_pending(_shop_item)
+		var pending: bool=motions.price_pending(_shop_item) and services.emote_shop.product(_shop_item).is_empty()
 		buy.text=tr("PREÇO A DEFINIR" if pending else ("USAR EMOTE" if owned else "COMPRAR"))
-		buy.disabled=pending
+		buy.disabled=pending or (not owned and not services.emote_shop.product(_shop_item).get("available",false))
+		if not pending and buy.disabled: buy.text=tr("EM BREVE")
 		var preview := _preview.find_child("PreviewDanceMovement",true,false) as Button
 		if preview!=null: PlayerUI.style_button(preview,pending)
 	_collection_count.text="LOJA · PRÉVIA" if shop else "REAÇÕES · %d" % emotes.size()
@@ -753,7 +836,7 @@ func _preview_dance() -> void:
 			_stage._base_distance=extent/(2.0*tan(deg_to_rad(LobbyStage.CAMERA_FOV*0.5)))
 			_stage.set_zoom(1.0)
 		_context_title.text=str(item.get("name","Emote"))+" · "+tr("prévia")
-		_context_hint.text=tr("Preço a definir") if motions.price_pending(_shop_item) else tr("Emote da loja")
+		_context_hint.text=tr("Preço a definir") if motions.price_pending(_shop_item) and services.emote_shop.product(_shop_item).is_empty() else tr("Emote da loja")
 		_stage.character.play_emote(StringName(key))
 		return
 	if _shop_item!="dance_01":
@@ -766,7 +849,7 @@ func _preview_dance() -> void:
 
 
 func _emote_primary_action() -> void:
-	if preload("res://scripts/skins/universal_emotes.gd").price_pending(_shop_item): return
+	if preload("res://scripts/skins/universal_emotes.gd").price_pending(_shop_item) and services.emote_shop.product(_shop_item).is_empty(): return
 	if not services.emote_shop.owned(_shop_item):
 		_preview_purchase()
 		return
@@ -784,7 +867,7 @@ func _emote_primary_action() -> void:
 
 
 func _preview_purchase() -> void:
-	if preload("res://scripts/skins/universal_emotes.gd").price_pending(_shop_item): return
+	if preload("res://scripts/skins/universal_emotes.gd").price_pending(_shop_item) and services.emote_shop.product(_shop_item).is_empty(): return
 	if is_instance_valid(_buy_dialog): return
 	_buy_dialog=Control.new()
 	_buy_dialog.name="EmotePurchasePreview"

@@ -1,0 +1,22 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS visitante guarda cinco conclusões
+PASS login mantém a descoberta do poder mesmo sem carga
+PASS login conserva imediatamente cinco fases do visitante
+PASS conta nova recebe automaticamente as cinco fases
+PASS cargas acompanham a migração do visitante
+PASS cópia visitante não é apagada
+PASS descobertas importadas não se espalham para outra conta
+PASS não importa novamente para outra conta o visitante já transferido
+PASS conta existente recupera avanço maior
+PASS troca de conta preserva a primeira conta
+PASS recuperação tem aviso informativo
+PASS diferença local/nuvem escolhe automaticamente o maior avanço
+PASS conflito avisa sem escolha de substituição
+PASS vitória salva localmente antes de consultar a nuvem
+PASS sem rede mantém avanço e sinaliza pendência
+PASS reconexão envia avanço pendente
+PASS resposta atrasada não mistura contas
+PASS sincronização sempre libera estado ocupado
+PASS aviso removido não deixa callback para um objeto liberado
+ACCOUNT_MERGE checks=19 failures=0

@@ -1,0 +1,10 @@
+{
+  "status":"disabled_pending_final_prices_and_stripe_validation",
+  "examples_only":true,
+  "new_skin_reference_coins":200,
+  "variation_reference_coins":100,
+  "dance_reference_coins":50,
+  "deck_credit_reference_brl_cents":1000,
+  "authority":"Supabase GAME catalogue and feature switches; this file does not enable sales",
+  "activation_guide":"docs/backend/COMMERCE_ACTIVATION.md"
+}

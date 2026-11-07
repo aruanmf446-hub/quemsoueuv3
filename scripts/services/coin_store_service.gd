@@ -15,7 +15,7 @@ func create_checkout(pack: Dictionary) -> Dictionary:
 	if not session.authenticated(): return ServiceResult.failure("not_authenticated")
 	if _creating: return ServiceResult.failure("request_in_progress")
 	if not data.get("enabled",false): return ServiceResult.failure("payments_unavailable")
-	if not data.get("packages",[]).has(pack): return ServiceResult.failure("package_unavailable")
+	if not pack.get("available",true) or not data.get("packages",[]).has(pack): return ServiceResult.failure("package_unavailable")
 	var owner := str(session.user.id)
 	var key := str(pack.id)+":"+str(pack.price_brl_cents)+":"+str(pack.coins)+":"+str(data.live_mode)
 	var saved := ConfigFile.new()
@@ -51,6 +51,8 @@ func valid_data(value: Variant) -> bool:
 		if not pack.get("coins") is String or not str(pack.coins).is_valid_int() or str(pack.coins).to_int()<1: return false
 		if not (pack.get("price_brl_cents") is int or pack.get("price_brl_cents") is float): return false
 		if not is_finite(float(pack.price_brl_cents)) or float(pack.price_brl_cents)!=floor(float(pack.price_brl_cents)) or pack.price_brl_cents<50 or pack.price_brl_cents>99999999: return false
+		if pack.get("reward_kind","coins") not in ["coins","deck_credits"]: return false
+		if pack.has("available") and not pack.available is bool: return false
 	for order: Variant in value.orders:
 		if not order is Dictionary or not uuid_valid(str(order.get("id",""))) or not uuid_valid(str(order.get("request_id",""))): return false
 		if not order.get("coins") is String or not str(order.coins).is_valid_int() or str(order.coins).to_int()<1: return false

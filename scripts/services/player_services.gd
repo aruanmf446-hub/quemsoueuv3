@@ -19,6 +19,7 @@ var inventory: InventoryService
 var wallet: WalletService
 var emote_shop: EmoteShopService
 var coin_store: CoinStoreService
+var cosmetic_shop: CosmeticShopService
 var friends: FriendsService
 var presence: FriendPresence
 var duel: DuelService
@@ -98,6 +99,10 @@ func _ready() -> void:
 	emote_shop.client=client
 	emote_shop.session=session
 	add_child(emote_shop)
+	cosmetic_shop=CosmeticShopService.new()
+	cosmetic_shop.client=client
+	cosmetic_shop.session=session
+	add_child(cosmetic_shop)
 	coin_store=CoinStoreService.new()
 	coin_store.client=client
 	coin_store.session=session
@@ -110,6 +115,7 @@ func _ready() -> void:
 	inventory.session = session
 	add_child(inventory)
 	inventory.initialize()
+	cosmetic_shop.changed.connect(func()->void: inventory.changed.emit())
 	inventory.changed.connect(_equipment_changed)
 	presence = FriendPresence.new()
 	presence.client = client
@@ -174,6 +180,7 @@ func _session_changed() -> void:
 	wallet.clear()
 	emote_shop.clear()
 	coin_store.clear()
+	cosmetic_shop.clear()
 	friends.clear()
 	chat.clear()
 	chat.me_id = str(session.user.get("id", "")) if session.authenticated() else ""
@@ -192,6 +199,7 @@ func _session_changed() -> void:
 		_heartbeat()
 		rewards.refresh.call_deferred()
 		emote_shop.refresh.call_deferred()
+		cosmetic_shop.refresh.call_deferred()
 
 
 func refresh_all() -> void:

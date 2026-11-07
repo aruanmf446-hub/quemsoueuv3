@@ -32,6 +32,7 @@ func revalidate() -> void:
 		_current_id = character_id
 		_stage.show_character(entry)
 		character_changed.emit(StringName(_current_id))
+	preload("res://scripts/skins/skin_variations.gd").apply(_stage.character,PlayerServices.current.cosmetic_shop.equipped(character_id))
 
 
 func step(delta: int) -> void:

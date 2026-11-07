@@ -118,3 +118,10 @@ test('unrelated refunds, no actual refund and won disputes do not create holds',
 test('unrelated valid event acknowledged without any network mutation',async()=>{
  const f=fixture();assert.equal((await f.webhook(await webhookRequest('customer.created',{id:'cus_fixture'}))).status,200);assert.equal(f.calls.length,0);
 });
+
+test('deck credit checkout uses server reward kind, not coin product label',async()=>{
+ const f=fixture({quote:{...quote,reward_kind:'deck_credits'}});
+ assert.equal((await f.checkout(request())).status,200);
+ const call=f.calls.find(c=>c.url==='https://api.stripe.com/v1/checkout/sessions');
+ assert.match(new URLSearchParams(call.init.body).get('line_items[0][price_data][product_data][name]'),/crédito/);
+});

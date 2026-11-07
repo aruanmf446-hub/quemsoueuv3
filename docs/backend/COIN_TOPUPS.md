@@ -1,5 +1,10 @@
 # Venda de moedas
 
+Atualização: o fluxo real, os créditos de deck e o estado desligado estão em
+[COMMERCE_ACTIVATION.md](COMMERCE_ACTIVATION.md). Esse documento substitui os
+estados históricos abaixo sobre catálogo vazio, preços e publicação.
+
+
 Modelo comercial: dinheiro compra pacotes de moedas; moedas compram skins,
 emotes, mochilas e outros itens. Os itens não recebem preço em reais. A compra
 de emote já usa `price_coins`, com o preço confirmado de 100 moedas.

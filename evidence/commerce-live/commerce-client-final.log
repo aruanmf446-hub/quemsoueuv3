@@ -1,0 +1,15 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS catálogo real de cosméticos validado pelo contrato
+PASS créditos separados, criação gratuita enquanto bloqueada
+PASS vendas desligadas bloqueiam compra antes da RPC
+PASS sem posse fabricada
+PASS créditos negativos recusados
+PASS pacotes reais aceitam tipos moedas e créditos
+PASS três pacotes e um crédito de deck
+PASS desabilitado não cria checkout de créditos
+PASS variação confirmada por conta
+PASS trocar conta não herda equipamento
+PASS sair limpa catálogo e créditos da sessão
+PASS testes de bloqueio não debitam conta
+COMMERCE_CLIENT checks=12 failures=0

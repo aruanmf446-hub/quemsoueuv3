@@ -1745,6 +1745,10 @@ func _render_editor() -> void:
 	PlayerUI.standard_back($Margin/Column/Header/Back,"Meus Decks")
 	body.add_theme_constant_override("separation",12)
 	_review_feedback(body,_draft)
+	var credit_info := PlayerUI.row(body)
+	var commerce := services.cosmetic_shop
+	credit_info.add_child(_text("Créditos de deck: "+str(commerce.data.get("deck_credits","—"))+ (" · 1 por novo deck na conta" if commerce.data.get("deck_credits_required",false) else " · criação gratuita"),20,PlayerUI.MUTED))
+	credit_info.add_child(PlayerUI.button("Créditos",func()->void:navigate_requested.emit("wallet",{"tab":"coins"})))
 	var metadata := PlayerUI.creator_panel(body)
 	var form := PlayerUI.row(metadata)
 	form.name="DeckForm"

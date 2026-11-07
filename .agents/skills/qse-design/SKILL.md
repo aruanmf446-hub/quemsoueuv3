@@ -1,95 +1,123 @@
 ---
 name: qse-design
-description: >-
-  Padrão de qualidade visual do Quem Sou Eu V3 em Godot. Use ao criar, corrigir ou
-  refinar menus, UI/UX, cenários, materiais, assets, efeitos, enquadramento ou
-  responsividade; use também para revisar o impacto visual de mudanças funcionais.
-  Preserva referências aprovadas e exige evidência real do resultado.
+description: Criar e revisar o visual do Quem Sou Eu V3 com referências aprovadas e validação real. Aplicar a interfaces, UI/UX, cenários, assets, materiais, efeitos, enquadramento e responsividade; revisar também o impacto visual de mudanças funcionais.
 ---
 
-# QSE Design
+# Design do Quem Sou Eu V3
 
-Transforme o pedido em uma melhoria visível, coerente com o jogo e verificável.
-As instruções específicas do dono e da tarefa prevalecem sobre este roteiro.
-Esta habilidade não concede autorização para backend, compras ou publicação.
+Use esta habilidade nas mudanças com impacto visual deste repositório. O pedido atual
+do dono tem prioridade. Não prometa qualidade apenas porque os testes passaram.
 
-## Começar pelo problema real
+## Antes de desenhar
 
-1. Leia o [AGENTS.md](../../../AGENTS.md), a
-   [direção visual atual](../../../docs/referencias/README.md) e, quando relevante,
-   o [layout do iPhone](../../../docs/layout/README_IPHONE.md).
-2. Trabalhe a partir da versão atual do repositório, preservando alterações de
-   outros agentes. Identifique a versão servida no site quando investigar produção.
-3. Observe a tela/trecho apontado antes de editar. Localize o elemento e a camada:
-   interface, sprite, material, chão, fundo, câmera ou colisão. Testar apenas um
-   objeto parecido que já funciona não reproduz a reclamação.
-4. Defina um alvo concreto e pequeno para a rodada. Se a ambiguidade muda a
-   implementação, faça uma pergunta curta e continue a investigação independente.
+1. Leia `AGENTS.md`, `docs/referencias/README.md` e
+   `docs/layout/README_IPHONE.md`. Abra a referência atualmente aprovada.
+2. Abra uma captura real da tela existente. Identifique a ação principal, o
+   conteúdo protagonista e o problema concreto; não redesenhe sistemas fora do pedido.
+3. Se a referência ou a crítica for ambígua, faça uma pergunta curta. Continue
+   a inspeção independente. Não infira aprovação de uma resposta vaga.
 
-## Preservar o que foi aprovado
+## Composição
 
-- Mantenha identidade, referências atuais, organização aprovada e proporções.
-  Uma captura produzida pelo agente não se torna referência aprovada por si só.
-- Em correções funcionais, preserve o visual; em polimento visual, preserve
-  movimentação, saltos, combate, cargas, progressão, autenticação e economia.
-  Amplie o escopo somente quando a tarefa realmente pedir isso.
-- Não restaurar molduras ornamentais históricas ou criar um tema paralelo.
-  Menus usam `PlayerUI`; consulte as referências específicas das telas.
-- Não reduzir resolução, modelos, texturas ou antisserrilhado indiscriminadamente
-  para esconder um gargalo. Investigue e registre o que foi medido.
+- Estilo e componentes vêm de `scripts/ui/player_ui.gd`. Evolua esse sistema
+  quando faltar um componente; não crie um tema paralelo.
+- Preserve os personagens, modelos e artes oficiais. Fundo sólido nas telas
+  internas; não use arte do lobby como fundo de todas as telas.
+- Defina uma ação principal visível e uma hierarquia clara entre título,
+  conteúdo, preço/estado e ação. Dourado indica prioridade ou seleção.
+- Personagens são protagonistas: reserve espaço real ao corpo, cabeça e
+  movimento. Não diminua o avatar para acomodar linhas redundantes de botões.
+- Variações ficam junto ao personagem selecionado. Prévia, reação e posse
+  precisam ser distinguíveis sem multiplicar abas e legendas.
+- Pacotes e produtos precisam ser reconhecíveis visualmente. Use arte ou ícones
+  adequados e quantidade/preço legíveis, sem repetir a mesma informação em
+  título, descrição e botão. Não substitua apresentação de produto por um formulário.
+- Evite barras enormes com uma miniatura pequena, espaços vazios sem função,
+  cartões idênticos para conteúdos diferentes e controles com texto cortado.
+- Prefira poucos grupos bem organizados a uma sucessão de caixas e avisos.
+  Não tente corrigir composição ruim adicionando brilhos, bordas ou decoração.
+- Use controles nativos para textos, preços, botões, seletores e navegação.
+  Arte ilustrativa não contém botões falsos nem texto duplicado.
+- Mostre somente informações úteis ao jogador. Mantenha bloqueios e estados
+  reais claros, sem expor detalhes de backend no fluxo normal.
 
-## Critérios visuais
+## Implementação e custo
 
-- **Hierarquia:** ação principal clara, textos legíveis, botões confortáveis e
-  proporções equilibradas. Evite faixas muito largas e baixas ou elementos minúsculos.
-- **Responsividade:** base padrão 1672×941, escala uniforme; exceção iPhone
-  1200×675 por `UIScale.is_iphone()`, respeitando área segura e regras existentes.
-  Não criar ajustes de zoom ou temas por dispositivo.
-- **Cenário:** preserve o deserto noturno e o contexto de cada fase. Assente os
-  elementos em superfícies coerentes; evite bases flutuando, bordas cortadas,
-  repetições evidentes e fundos aparecendo por baixo de uma sustentação rasa.
-  Preserve buracos reais, telhados jogáveis e aberturas intencionais das pontes.
-- **Assets:** avalie o catálogo existente antes de gerar algo. Preserve proporção,
-  enquadramento e nitidez; use mipmaps e filtragem adequados. Declare procedência
-  de assets novos. Não invente personagens/cartas ou use conteúdo sem licença.
-- **Materiais e efeitos:** detalhe legível, contraste controlado e animação suave.
-  Efeitos não devem cobrir personagem, inimigos, obstáculos ou controles. Shaders
-  devem funcionar no renderizador Compatibility e no export Web.
-- **Desempenho:** prefira materiais compartilhados, lotes e carregamento por
-  trechos. Evite reconstrução por quadro, decodificação pesada em cliques e assets
-  grandes carregados antes de serem necessários. Não alegue FPS real usando GPU emulada.
+- Preserve sinais, rotas, autenticação, música e regras de compra. Refatoração
+  visual não pode ativar pagamentos ou alterar dados/posse para parecer funcional.
+- Reutilize assets e componentes existentes. Gere arte nova quando ela resolver
+  uma necessidade concreta; registre sua origem e não chame um mockup de captura.
+- Mantenha a base 1672×941. Só `UIScale.is_iphone()` usa a exceção 1200×675 e a
+  área segura. Não introduza escala por densidade nem modo compacto geral.
+- Faça primeiro a composição representativa da tela afetada. Não propague uma
+  nova direção para várias telas sem conferir uma captura dela.
+- Agrupe leituras e verificações independentes. Evite exportar repetidamente
+  sem uma mudança relevante ou repetir testes que já passaram sem motivo.
 
-## Verificar o acabamento
+## Cenários, materiais e efeitos
 
-1. Valide primeiro um caso representativo. Compare antes/depois com câmera,
-   posição e tamanho equivalentes; confira outros usos quando o componente for comum.
-2. Inspecione capturas reais em 1920×1080, 844×390 e 640×360. Para Web, tente
-   Chromium/WebGL e registre erros de shader, script e navegador quando pertinente.
-3. Use verificações proporcionais: importação/compilação para scripts e shaders,
-   testes de interação/streaming se afetados e `tools/player_ui/check_design.py`
-   para a integridade do design. Só repita a suíte ampla quando houver motivo.
-4. Não remova ou enfraqueça testes para aprovar a entrega. Falhas anteriores
-   precisam de evidência na base; registre limitações sem chamá-las de aprovação.
-5. Uma imagem gerada não substitui captura do jogo. Identifique fixtures e
-   emulação; nunca apresente isso como teste em aparelho físico.
+- Preserve o deserto noturno e o contexto de cada fase. Assente os elementos em
+  superfícies coerentes; evite bases flutuando, bordas cortadas, repetições
+  evidentes e fundos aparecendo por baixo de uma sustentação rasa.
+- Preserve buracos reais, telhados jogáveis e aberturas intencionais das pontes.
+  Em polimento visual, mantenha movimentação, saltos, combate, cargas e progressão.
+- Localize o elemento e a camada apontados: interface, sprite, material, chão,
+  fundo, câmera ou colisão. Testar apenas um objeto parecido que já funciona
+  não reproduz a reclamação. Confira outros usos de componentes compartilhados.
+- Preserve proporção, enquadramento e nitidez dos assets; use mipmaps e filtragem
+  adequados. Não invente personagens/cartas nem use conteúdo sem licença.
+- Efeitos devem ser legíveis sem cobrir personagem, inimigos, obstáculos ou
+  controles. Shaders precisam funcionar em Compatibility e no export Web.
+- Prefira materiais compartilhados, lotes e carregamento por trechos. Evite
+  reconstrução por quadro, decodificação pesada em cliques e carregamento antecipado
+  de assets grandes sem necessidade. Não reduza resolução, modelos, texturas ou
+  antisserrilhado indiscriminadamente para esconder gargalos: meça a causa.
 
-Reaproveite o motor, navegador e workflows autorizados já disponíveis. Se uma
-ferramenta estiver ausente, tente o motor real pela CLI ou outro meio disponível.
-Registre checagens impossíveis e entregue o restante verificável; não invente
-capturas nem transforme a ausência de uma ferramenta em pedido automático de aprovação.
+## Conferência obrigatória
 
-## Entregar e publicar
+Exporte e execute o Godot Web 4.7.2; use o roteiro existente em
+`tests/iphone_deck/export_fixture.py` quando uma fixture for necessária.
+Fixtures ficam em testes e fora do build de produção.
 
-- Entregue o código e uma comparação visual acessível, com links para capturas.
-  Explique brevemente o que mudou para o jogador, como verificou e o que ficou pendente.
-- Siga o fluxo autorizado na conversa/repositório. Não peça autorização novamente
-  quando já foi dada; não invente uma aprovação adicional por causa desta habilidade.
-  Não misture arquivos de outros trabalhos nem use force push ou bypass de proteção.
-- Quando a publicação estiver autorizada, acompanhe o deploy e confirme a versão
-  em produção. Neste projeto, confira `qseBuild` no HTML e o identificador no `sw.js`.
-  Commit na main e CI verde, isoladamente, não provam que o Pages atualizou.
-- Se a publicação falhar, informe o erro observado e a versão ainda servida.
-  Não declare o site atualizado nem apague dados/cache de progresso do jogador.
+Confira desktop 1672×941, iPhone UA 844×390/DPR 3 e 640×360/DPR 3. Capturas
+de Chromium não provam funcionamento em Safari ou iPhone físico.
 
-Pronto significa: o problema apontado melhorou de forma visível, o desenho
-aprovado permanece coerente, o escopo protegido foi respeitado e há evidência real.
+Antes de considerar a tela pronta, abra as capturas e corrija:
+
+- título, preço ou ação cortados, sobrepostos ou fora da área segura;
+- personagem pequeno demais, cabeça/pés cortados ou movimento saindo do quadro;
+- informação repetida, texto desnecessário ou aviso dominando o produto;
+- botão sem hierarquia, ícone sem significado ou estado de bloqueio confuso;
+- galeria desproporcional ou controles consumindo a área principal;
+- diferença material em relação à direção aprovada ou ao pedido atual.
+
+Compare antes/depois com câmera, posição e tamanho equivalentes. Para cenários,
+confira também 1920×1080 e use testes de streaming quando pertinente. Reaproveite
+motor, navegador e workflows disponíveis. Se uma ferramenta faltar, tente a CLI
+ou outro meio existente e registre a limitação sem inventar capturas ou aprovações.
+Não alegue FPS de aparelho real usando GPU emulada. Não remova ou enfraqueça
+verificações para aprovar a entrega; documente falhas preexistentes com evidência.
+
+Execute `python3 tools/player_ui/check_design.py` e os testes de interação
+afetados. Teste clique/toque, navegação por teclado, voltar, seleção e estados
+disponível/bloqueado/erro conforme o fluxo. Não escreva testes que só espelham CSS.
+
+## Entrega e continuidade
+
+Mostre as capturas reais no chat, sobretudo quando o dono estiver no celular.
+Informe exatamente o que foi implementado, testado e publicado. Não declare
+aprovação visual pelo dono nem qualidade garantida a partir de testes automáticos.
+Se a direção foi reprovada, apresente a correção concreta antes de propagar o
+mesmo desenho para outras telas. Respeite a autorização de publicação atual;
+esta habilidade não cria uma nova exigência de permissão nem autoriza deploy.
+
+Guarde evidências e uma nota curta da decisão visual na documentação do projeto.
+Novas aprovações explícitas do dono devem atualizar a referência vigente para
+que a próxima IA não restaure um desenho reprovado.
+
+Ao publicar dentro da autorização existente, acompanhe o deploy e confira
+`qseBuild` no HTML e o identificador no `sw.js`. Commit na main ou CI verde,
+isoladamente, não provam que o Pages atualizou. Se falhar, informe o erro e a
+versão ainda servida; não apague dados/cache de progresso do jogador. Preserve
+alterações de outros agentes, não use force push nem bypass de proteção.
+Esta habilidade não autoriza acesso ao backend, compras ou publicação.

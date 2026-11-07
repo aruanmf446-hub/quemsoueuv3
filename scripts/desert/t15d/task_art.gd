@@ -61,7 +61,16 @@ func gate_frame(theme: int,at: Vector3) -> void:
 		frame_width=10.8
 	elif theme==9:frame_id="desert_mining_gantry"
 	place_asset(frame_id,at+Vector3(0,0,-3.5),frame_width)
-	if theme==3:place_asset("capital_market_stall",at+Vector3(-3.55,0,-4.0),3.2)
+	if theme==3:
+		# Esta tenda é criada pelo mecanismo, fora do construtor de composição.
+		# Ela precisa do mesmo apoio atravessável das outras tendas do mercado.
+		# Recuada na aproximação: a lona jogável não vira trampolim sobre o portão.
+		var stall:=place_asset("capital_market_stall",at+Vector3(-16.0,0,-4.0),3.2)
+		stall.set_meta("task_canopy",true)
+		var layout:=preload("res://scripts/desert/t15d/campaign_layout.gd")
+		var floor: Dictionary=layout.floor_at(layout.build(theme),stall.position.x)
+		if not floor.is_empty() and not floor.get("task_void",false):
+			Landings.attach(stall,"capital_market_stall",theme,float(floor.left),float(floor.right),float(floor.height))
 	if theme==5:place_asset("capital_palm_garden",at+Vector3(3.0,0,-4.0),3.0)
 	for side in [-1.0,1.0]:
 		var x: float = side*1.46
@@ -228,6 +237,7 @@ func _quad(key: String,a: Vector3,b: Vector3,c: Vector3,d: Vector3) -> void:
 		builder.begin(Mesh.PRIMITIVE_TRIANGLES)
 		_builders[key]=builder
 	var st: SurfaceTool = _builders[key]
+	st.set_smooth_group(-1 if _flat_faces else 0)
 	# Recorte UV da travessa do asset aprovado. Não cria nem decodifica novas texturas.
 	var uv := [Vector2(0.105,0.848),Vector2(0.105,0.888),Vector2(0.280,0.888),Vector2(0.280,0.848)]
 	if key.begins_with("cloth"):uv=[Vector2(0.35,0.16),Vector2(0.35,0.25),Vector2(0.65,0.25),Vector2(0.65,0.16)]
@@ -246,6 +256,7 @@ func _triangle(key: String,a: Vector3,b: Vector3,c: Vector3) -> void:
 		builder.begin(Mesh.PRIMITIVE_TRIANGLES)
 		_builders[key]=builder
 	var st: SurfaceTool = _builders[key]
+	st.set_smooth_group(-1 if _flat_faces else 0)
 	var uv := [Vector2(0.14,0.853),Vector2(0.21,0.883),Vector2(0.27,0.853)]
 	if key.begins_with("cloth"):uv=[Vector2(0.35,0.16),Vector2(0.5,0.25),Vector2(0.65,0.16)]
 	var corners := [a,b,c]

@@ -6,6 +6,7 @@ const ACTIONS:=["move_left","move_right","crouch","jump","attack","defend","rupt
 static var mode:="auto"
 var _virtual: Dictionary={}
 var _previous: Dictionary={}
+var _pending: Dictionary={}
 var _down: Dictionary={}
 var _edges: Dictionary={}
 var _blocked: Dictionary={}
@@ -44,10 +45,13 @@ static func key_held(action: String) -> bool:
  return false
 func set_virtual(action: String,strength: float) -> void:
  if action not in ACTIONS:return
- if strength>0.0 and touch_enabled():_virtual[action]=clampf(strength,0,1)
+ if strength>0.0 and touch_enabled():
+  if float(_virtual.get(action,0.0))<=0.0 and not (keyboard_enabled() and key_held(action)):_pending[action]=true
+  _virtual[action]=clampf(strength,0,1)
  else:_virtual.erase(action)
 func reset() -> void:
  _virtual.clear()
+ _pending.clear()
  _previous.clear()
  _edges.clear()
  _down.clear()
@@ -71,7 +75,10 @@ func _sample() -> void:
   if keyboard_enabled() and not _blocked.has(action) and InputMap.has_action(action):injected=Input.get_action_strength(action)
   var strength:=maxf(virtual,maxf(1.0 if physical else 0.0,injected))
   _down[action]=strength
-  _edges[action]=strength>0.0 and not bool(_previous.get(action,false))
+  # Um toque pode começar e terminar entre dois quadros, sobretudo na Web.
+  var pending: bool=(keyboard_enabled() and not _blocked.has(action) and InputMap.has_action(action) and Input.is_action_just_pressed(action))
+  _edges[action]=_pending.has(action) or ((strength>0.0 or pending) and not bool(_previous.get(action,false)))
+  _pending.erase(action)
   _previous[action]=strength>0.0
 func pressed(action: String) -> bool:
  _sample()

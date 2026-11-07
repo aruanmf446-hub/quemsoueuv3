@@ -16,4 +16,7 @@ if args.story_continuity:
 if args.control_modes:
  changed=[path for path in changed if path!="scripts/services/device_preferences.gd"]
 assert not changed,'Arquivos fora do escopo alterados: '+str(changed)
-print('PASS modelos oficiais, lobby, Personagens, música do menu e demais sistemas protegidos preservados; continuidade da campanha autorizada' if args.story_continuity else 'PASS modelos oficiais, sistemas compartilhados, lobby, Personagens, áudio, serviços e Supabase preservados')
+if args.control_modes:
+ print('PASS somente preferências de controle autorizadas; modelos, lobby, música, backend e demais serviços preservados')
+else:
+ print('PASS modelos oficiais, lobby, Personagens, música do menu e demais sistemas protegidos preservados; continuidade da campanha autorizada' if args.story_continuity else 'PASS modelos oficiais, sistemas compartilhados, lobby, Personagens, áudio, serviços e Supabase preservados')

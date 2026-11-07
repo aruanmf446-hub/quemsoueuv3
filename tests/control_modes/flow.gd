@@ -66,6 +66,12 @@ func run() -> void:
  await ticks(3)
  pad._release(7)
  check(player.is_defending and player.defense_charges==1,"modo só-toque defende pelo botão")
+ player._shield_timer=0
+ player.is_defending=false
+ pad._press(8,pad._buttons.defend[0])
+ pad._release(8)
+ await ticks(3)
+ check(player.is_defending and player.defense_charges==0,"toque curto entre quadros também ativa defesa uma única vez")
  await snap("03_toque")
  player._shield_timer=0
  player.is_defending=false

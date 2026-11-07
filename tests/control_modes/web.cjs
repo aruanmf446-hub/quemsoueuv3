@@ -33,9 +33,9 @@ const out=process.env.QSE_CONTROL_OUT||'/tmp/qse-control-web';fs.mkdirSync(out,{
   await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[start]});await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[right]});await page.keyboard.down('d');await page.keyboard.up('d');
   s=await probe('state');at=s.actor.x;await wait(s=>s.actor.x>at+0.2);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
   console.log('Mixed source ownership: releasing touch preserves key; releasing key preserves joystick');
-  await settings();await choose(1,'touch');await page.screenshot({path:out+'/03_controles_na_pausa.jpg',type:'jpeg',quality:94,scale:'css'});await resume();
+  await settings();await choose(1,'touch');await page.screenshot({path:out+'/03_controles_na_pausa.jpg',type:'jpeg',quality:94,scale:'css'});await resume();console.log('Resumed touch',JSON.stringify(await probe('state')));
   s=await probe('state');const shots=s.actor.attack,tick=s.tick;await page.keyboard.down('j');await wait(s=>s.tick>tick+4);await page.keyboard.up('j');s=await probe('state');assert(s.actor.attack===shots,'Touch-only responds to keyboard attack');
-  await tap(s.defend_button);s=await wait(s=>s.actor.defending);assert(s.actor.defense===2,'Touch defense failed');
+  console.log('Keyboard ignored',JSON.stringify(s));await tap(s.defend_button);console.log('Defense tap',JSON.stringify(await probe('state')));s=await wait(s=>s.actor.defending);assert(s.actor.defense===2,'Touch defense failed');
   await page.screenshot({path:out+'/04_somente_toque.jpg',type:'jpeg',quality:94,scale:'css'});
   await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>typeof window.qseControlProbe==='function');const restored=await probe('state');assert(restored.mode==='touch'&&restored.preference==='touch','Mode lost after browser reload');
   await probe('play');await wait(s=>s.play&&s.touch);console.log('Touch-only ignores keys, executes button, and survives reload');

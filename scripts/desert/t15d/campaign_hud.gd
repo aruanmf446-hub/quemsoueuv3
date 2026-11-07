@@ -201,7 +201,7 @@ func update_resources(player: Node) -> void:
 				var button := Button.new()
 				button.custom_minimum_size = Vector2(88,88)
 				PlayerUI.style_story_action(button)
-				button.tooltip_text = {"attack":"Fogo (J)","defense":"Defesa (Shift)","jump":"Pulo (Espaço)","rupture":"Ruptura (Q)","amber":"Âmbar (E)","dash":"Relâmpago (R)"}[kind]
+				button.tooltip_text = {"attack":"Fogo (J)","defense":"Defesa (K / Shift)","jump":"Pulo (Espaço)","rupture":"Ruptura (Q)","amber":"Âmbar (E)","dash":"Relâmpago (R)"}[kind]
 				button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 				for spec: Array in [["Count",Vector2(60,7),18],["Key",Vector2(0,64),16]]:
 					var caption := Label.new()
@@ -225,7 +225,7 @@ func update_resources(player: Node) -> void:
 			action_index += 1
 			node.text = "↑" if kind == "jump" else ""
 			(node.get_node("Count") as Label).text = "" if kind == "jump" else str(player.charges(kind))
-			(node.get_node("Key") as Label).text = {"attack":"J","defense":"Shift","rupture":"Q","amber":"E","dash":"R","jump":"Espaço"}[kind]
+			(node.get_node("Key") as Label).text = {"attack":"J","defense":"K","rupture":"Q","amber":"E","dash":"R","jump":"Espaço"}[kind]
 			if kind != "jump": node.icon = Icons.medallion(kind,36,player.charges(kind)>0)
 		_layout()
 	for index in range(3):

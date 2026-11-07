@@ -1,0 +1,239 @@
+{
+  "base": "66b2ea4",
+  "engine": "4.7.2",
+  "all_passed": true,
+  "checks": [
+    {
+      "test": "import",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 8.06,
+      "graphical": false,
+      "fixed_physics_step": false
+    },
+    {
+      "test": "reino10",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 9.03,
+      "graphical": false,
+      "fixed_physics_step": false
+    },
+    {
+      "test": "account-merge",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 3.73,
+      "graphical": false,
+      "fixed_physics_step": false
+    },
+    {
+      "test": "story-transitions",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 17.51,
+      "graphical": false,
+      "fixed_physics_step": false
+    },
+    {
+      "test": "story-platforms",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 8.66,
+      "graphical": false,
+      "fixed_physics_step": false
+    },
+    {
+      "test": "prop-landings",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 10.81,
+      "graphical": false,
+      "fixed_physics_step": false
+    },
+    {
+      "test": "facade-canopies",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 8.66,
+      "graphical": false,
+      "fixed_physics_step": false
+    },
+    {
+      "test": "surface-audit",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 10.44,
+      "graphical": false,
+      "fixed_physics_step": false
+    },
+    {
+      "test": "parkour-revision",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 5.14,
+      "graphical": false,
+      "fixed_physics_step": false
+    },
+    {
+      "test": "solid-obstacles",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 7.18,
+      "graphical": false,
+      "fixed_physics_step": false
+    },
+    {
+      "test": "legacy10",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 4.65,
+      "graphical": false,
+      "fixed_physics_step": false
+    },
+    {
+      "test": "progress",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 3.63,
+      "graphical": false,
+      "fixed_physics_step": false
+    },
+    {
+      "test": "checkpoints",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 4.94,
+      "graphical": false,
+      "fixed_physics_step": false
+    },
+    {
+      "test": "route-01",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 18.02,
+      "graphical": false,
+      "fixed_physics_step": true
+    },
+    {
+      "test": "route-02",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 16.32,
+      "graphical": false,
+      "fixed_physics_step": true
+    },
+    {
+      "test": "route-03",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 26.45,
+      "graphical": false,
+      "fixed_physics_step": true
+    },
+    {
+      "test": "route-04",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 22.85,
+      "graphical": false,
+      "fixed_physics_step": true
+    },
+    {
+      "test": "route-05",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 25.15,
+      "graphical": false,
+      "fixed_physics_step": true
+    },
+    {
+      "test": "route-06",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 28.61,
+      "graphical": false,
+      "fixed_physics_step": true
+    },
+    {
+      "test": "route-07",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 22.68,
+      "graphical": false,
+      "fixed_physics_step": true
+    },
+    {
+      "test": "route-08",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 26.38,
+      "graphical": false,
+      "fixed_physics_step": true
+    },
+    {
+      "test": "route-09",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 30.83,
+      "graphical": false,
+      "fixed_physics_step": true
+    },
+    {
+      "test": "run-resume",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 4.76,
+      "graphical": false,
+      "fixed_physics_step": false
+    },
+    {
+      "test": "run-cloud",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 3.64,
+      "graphical": false,
+      "fixed_physics_step": false
+    },
+    {
+      "test": "navigation-desktop",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 81.96,
+      "graphical": true,
+      "fixed_physics_step": false
+    },
+    {
+      "test": "navigation-mobile",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 43.57,
+      "graphical": true,
+      "fixed_physics_step": false
+    },
+    {
+      "test": "spears",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 8.73,
+      "graphical": false,
+      "fixed_physics_step": false
+    },
+    {
+      "test": "spear-intro",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 4.56,
+      "graphical": false,
+      "fixed_physics_step": false
+    },
+    {
+      "test": "feedback",
+      "passed": true,
+      "exit_code": 0,
+      "wall_seconds": 4.95,
+      "graphical": false,
+      "fixed_physics_step": false
+    }
+  ]
+}

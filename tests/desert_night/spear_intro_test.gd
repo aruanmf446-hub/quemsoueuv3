@@ -64,6 +64,8 @@ func run() -> void:
 	await frames(4)
 	check(not paused and not phase._first_use.active,"lição nova não se repete depois de confirmada")
 	phase.free()
+	await frames(6)
 	print("SPEAR_INTRO checks=%d failures=%d" % [checks,failures])
 	if not output.is_empty():FileAccess.open(output+"/report.json",FileAccess.WRITE).store_string(JSON.stringify({"checks":checks,"failures":failures,"physical_device":false,"fixture_teleport":true},"\t"))
+	await preload("res://tests/common/audio_cleanup.gd").finish(self)
 	quit(1 if failures else 0)

@@ -80,6 +80,11 @@ func _build_slot(slot: int, left: float, right: float, top: float,_at_x := INF) 
 			Landings.attach(art,part.asset,_order,left,right,top)
 		piece += 1
 	Context.build(self,_order,slot,left,right,top)
+	# Poucos figurantes por região, sempre fora da pista e das colisões.
+	if _order<10 and slot%(12 if _order==2 else 4)==1 and right-left>4.0:
+		var people:=preload("res://scripts/desert/t15d/background_people.gd").new()
+		add_child(people)
+		people.configure(_order,slot,left,right,top)
 
 func _building(origin: Vector3, width: float, rng: RandomNumberGenerator) -> void:
 	if _order in [1,2] and _painted_house(origin,width): return

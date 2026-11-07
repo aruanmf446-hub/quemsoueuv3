@@ -56,6 +56,7 @@ func _physics_process(delta: float) -> void:
 		missed.emit()
 func _hit_player(point: Vector3,blocked: bool) -> void:
 	_set_impact(point)
+	blocked=blocked and actor.has_method("can_block") and actor.can_block(source_x)
 	actor.take_damage(1,source_x)
 	player_struck.emit(blocked,point)
 func _set_impact(point: Vector3) -> void:

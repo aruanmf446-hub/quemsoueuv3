@@ -1,0 +1,38 @@
+[
+  {
+    "case": "functional",
+    "base": "66b2ea4",
+    "baseline_failures": [
+      "FAIL actual_malagueta_model"
+    ],
+    "current_failures": [
+      "FAIL actual_malagueta_model"
+    ],
+    "same_failures": true
+  },
+  {
+    "case": "battle_presentation",
+    "base": "66b2ea4",
+    "baseline_failures": [
+      "FAIL real_selection_committed",
+      "FAIL private_hand_from_real_data",
+      "FAIL cancel_available",
+      "FAIL cancel_keeps_state",
+      "FAIL revealed_damage_updates_top_panel",
+      "FAIL eliminated_avatar_desaturated",
+      "FAIL elimination_removes_active_highlight",
+      "FAIL room_chat_local_only_device"
+    ],
+    "current_failures": [
+      "FAIL real_selection_committed",
+      "FAIL private_hand_from_real_data",
+      "FAIL cancel_available",
+      "FAIL cancel_keeps_state",
+      "FAIL revealed_damage_updates_top_panel",
+      "FAIL eliminated_avatar_desaturated",
+      "FAIL elimination_removes_active_highlight",
+      "FAIL room_chat_local_only_device"
+    ],
+    "same_failures": true
+  }
+]

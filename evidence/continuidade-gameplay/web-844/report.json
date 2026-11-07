@@ -1,0 +1,262 @@
+{
+  "fixture_rpc_mock": true,
+  "real_backend_test": "tests/story_continuity/backend.sql + run_backend.sql, transaction rollback",
+  "viewport": "844x390",
+  "dpr": 3,
+  "physical_device": false,
+  "gpu": "SwiftShader software",
+  "guestHigher": {
+    "cloud_mock": true,
+    "completed": 5,
+    "highest": 6,
+    "notice": "Avanços diferentes encontrados. Mantida automaticamente a fase 6.",
+    "stage": "menu",
+    "sync": "success"
+  },
+  "cloudHigher": {
+    "cloud_mock": true,
+    "completed": 7,
+    "highest": 8,
+    "notice": "Progresso da conta recuperado: fase 8.",
+    "stage": "menu",
+    "sync": "success"
+  },
+  "shield": {
+    "actor_feedback": {
+      "defending": true,
+      "dust": 0,
+      "floor": true,
+      "jumps": 0
+    },
+    "attack": 2,
+    "cloud_mock": true,
+    "completed": 5,
+    "defense": 1,
+    "highest": 6,
+    "notice": "",
+    "order": 1,
+    "run": {
+      "charges": {
+        "amber": 0,
+        "attack": 2,
+        "dash": 0,
+        "defense": 1,
+        "rupture": 0
+      },
+      "checkpoint": -1,
+      "collected": 0,
+      "defeated": 0,
+      "health": 3,
+      "steps": {},
+      "tasks": 0,
+      "x": -8
+    },
+    "stage": "play",
+    "sync": "success"
+  },
+  "punch": {
+    "actor_feedback": {
+      "defending": false,
+      "dust": 0,
+      "floor": true,
+      "jumps": 0
+    },
+    "attack": 1,
+    "cloud_mock": true,
+    "completed": 5,
+    "defense": 1,
+    "highest": 6,
+    "notice": "",
+    "order": 1,
+    "run": {
+      "charges": {
+        "amber": 0,
+        "attack": 1,
+        "dash": 0,
+        "defense": 1,
+        "rupture": 0
+      },
+      "checkpoint": -1,
+      "collected": 0,
+      "defeated": 0,
+      "health": 3,
+      "steps": {},
+      "tasks": 0,
+      "x": -8
+    },
+    "stage": "play",
+    "sync": "success"
+  },
+  "doubleJump": {
+    "actor_feedback": {
+      "defending": false,
+      "dust": 1,
+      "floor": false,
+      "jumps": 2
+    },
+    "attack": 1,
+    "cloud_mock": true,
+    "completed": 5,
+    "defense": 1,
+    "highest": 6,
+    "notice": "",
+    "order": 1,
+    "run": {
+      "charges": {
+        "amber": 0,
+        "attack": 1,
+        "dash": 0,
+        "defense": 1,
+        "rupture": 0
+      },
+      "checkpoint": -1,
+      "collected": 0,
+      "defeated": 0,
+      "health": 3,
+      "steps": {},
+      "tasks": 0,
+      "x": -8
+    },
+    "stage": "play",
+    "sync": "success"
+  },
+  "arrival": {
+    "actor_feedback": {
+      "defending": false,
+      "dust": 0,
+      "floor": true,
+      "jumps": 0
+    },
+    "attack": 2,
+    "cloud_mock": true,
+    "completed": 5,
+    "defense": 3,
+    "highest": 6,
+    "notice": "",
+    "order": 2,
+    "run": {
+      "charges": {
+        "amber": 0,
+        "attack": 2,
+        "dash": 0,
+        "defense": 3,
+        "rupture": 0
+      },
+      "checkpoint": -1,
+      "collected": 0,
+      "defeated": 0,
+      "health": 3,
+      "steps": {},
+      "tasks": 0,
+      "x": -8
+    },
+    "stage": "play",
+    "sync": "success"
+  },
+  "restored": {
+    "actor_feedback": {
+      "defending": false,
+      "dust": 0,
+      "floor": true,
+      "jumps": 0
+    },
+    "attack": 2,
+    "cloud_mock": true,
+    "completed": 5,
+    "defense": 3,
+    "highest": 6,
+    "notice": "",
+    "order": 2,
+    "run": {
+      "charges": {
+        "amber": 0,
+        "attack": 2,
+        "dash": 0,
+        "defense": 3,
+        "rupture": 0
+      },
+      "checkpoint": -1,
+      "collected": 0,
+      "defeated": 0,
+      "health": 3,
+      "steps": {},
+      "tasks": 0,
+      "x": -8
+    },
+    "stage": "play",
+    "sync": "success"
+  },
+  "saved": {
+    "actor_feedback": {
+      "defending": false,
+      "dust": 0,
+      "floor": true,
+      "jumps": 0
+    },
+    "attack": 2,
+    "cloud_mock": true,
+    "completed": 5,
+    "defense": 0,
+    "highest": 6,
+    "notice": "",
+    "order": 6,
+    "run": {
+      "charges": {
+        "amber": 1,
+        "attack": 2,
+        "dash": 0,
+        "defense": 0,
+        "rupture": 2
+      },
+      "checkpoint": 4,
+      "collected": 1,
+      "defeated": 1,
+      "health": 2,
+      "steps": {
+        "p06.task.1": 1
+      },
+      "tasks": 1,
+      "x": 911.049987792969
+    },
+    "stage": "play",
+    "sync": "success"
+  },
+  "resumed": {
+    "actor_feedback": {
+      "defending": false,
+      "dust": 0,
+      "floor": true,
+      "jumps": 0
+    },
+    "attack": 2,
+    "cloud_mock": true,
+    "completed": 5,
+    "defense": 0,
+    "highest": 6,
+    "notice": "",
+    "order": 6,
+    "run": {
+      "charges": {
+        "amber": 1,
+        "attack": 2,
+        "dash": 0,
+        "defense": 0,
+        "rupture": 2
+      },
+      "checkpoint": 4,
+      "collected": 1,
+      "defeated": 1,
+      "health": 2,
+      "steps": {
+        "p06.task.1": 1
+      },
+      "tasks": 1,
+      "x": 911.049987792969
+    },
+    "stage": "play",
+    "sync": "success"
+  },
+  "errors": [],
+  "engineErrors": [],
+  "blocked": []
+}

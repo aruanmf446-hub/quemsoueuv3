@@ -41,7 +41,7 @@ func follow(camera: Camera3D,x: float) -> void:
 	if _order == 7: _panorama.modulate.a = lerpf(1.0,0.5,travel)
 	var aspect := camera.get_viewport().get_visible_rect().size.aspect()
 	var height := maxf(camera.size*1.65,camera.size*aspect/1.778*1.65)
-	parallax_offset = lerpf(-1.0,1.0,travel)*camera.size*0.22
+	parallax_offset = 0.0 # Horizonte distante estável inclusive ao andar para trás.
 	_panorama.basis = camera.basis
 	_panorama.position = camera.position-camera.basis.z*48-camera.basis.x*parallax_offset
 	_panorama.position += camera.basis.y*camera.size*0.22

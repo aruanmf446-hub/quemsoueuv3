@@ -123,7 +123,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cp -r web/site/. build/web/
+          cp -r web/site/. build/web/ && rm -f build/web/.gdignore
           python3 tools/web/check_site.py build/web
       # Painel separado da exportação Godot. Nunca grava USER/PASSWORD no artefato.
       - name: Build QSE Command Center from repository secrets

@@ -1,0 +1,13 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+FAIL NPC_ENTRY phase=01 visible=0 species=[] player_x=-8.00 queue=0
+FAIL NPC_ENTRY phase=02 visible=0 species=[] player_x=-8.00 queue=0
+FAIL NPC_ENTRY phase=03 visible=0 species=[] player_x=-8.00 queue=0
+FAIL NPC_ENTRY phase=04 visible=0 species=[] player_x=-8.00 queue=0
+FAIL NPC_ENTRY phase=05 visible=0 species=[] player_x=-8.00 queue=0
+FAIL NPC_ENTRY phase=06 visible=0 species=[] player_x=-8.00 queue=0
+FAIL NPC_ENTRY phase=07 visible=0 species=[] player_x=-8.00 queue=0
+FAIL NPC_ENTRY phase=08 visible=0 species=[] player_x=-8.00 queue=0
+FAIL NPC_ENTRY phase=09 visible=0 species=[] player_x=-8.00 queue=0
+FAIL NPC_ENTRY phase=10 visible=0 species=[] player_x=-8.00 queue=0
+NPC_ENTRY checks=10 failures=10

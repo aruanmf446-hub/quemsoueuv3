@@ -45,3 +45,8 @@
 - Fonte atual: `assets/desert/npc_citizens/` e `scripts/desert/t15d/background_people.gd`.
   Ver `docs/desert/NPCS_CIDADAOS.md`. Capturas anteriores com heróis como cidadãos
   são históricas e reprovadas para esse uso.
+
+- Verifique a imagem renderizada dos figurantes: frustum e presença na árvore não provam
+  que o NPC aparece. Fachadas, jardins e telhados pintados podem encobri-lo. A profundidade
+  deve ficar à frente da arte opaca e atrás do jogador; conferir corpo e pés no Web.
+  Entradas de fases e distritos/checkpoints têm cidadãos visíveis. Ver `evidence/npcs-visiveis/`.

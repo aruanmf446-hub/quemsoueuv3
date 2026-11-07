@@ -52,6 +52,14 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 		var next_top := _height(order,mini(index+1,modules-1))
 		var gap := 0.0 if index == modules-1 else (2.3+0.18*float(index%6))
 		if index%4 == 0 and order != 2: gap = 1.8
+		if order<10 and index<modules-1:
+			var patterns: Array=[
+				[1.8,2.2,2.6,2.0,2.8,2.2],[1.8,2.4,3.0,2.2,2.8,2.0],
+				[1.8,2.0,2.4,1.8,2.6,2.2],[2.2,2.8,3.1,2.4,2.9,2.0],
+				[1.8,2.2,2.8,2.0,2.6,1.8],[2.0,2.4,2.8,2.2,3.0,2.0],
+				[2.2,3.0,2.6,3.1,2.4,2.8],[1.8,2.6,2.2,2.8,2.0,2.4],
+				[2.0,2.8,3.0,2.2,2.6,3.1]]
+			gap=float(patterns[order-1][index%6])
 		var end := right-gap
 		var district := mini(7,index/sector_modules)
 		surfaces.append({"left":left,"right":end,"height":top,"index":index})
@@ -79,13 +87,22 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 			if index%(24 if order == 2 else 8) == ({"rupture":1,"amber":9,"dash":17}[ability] if order == 2 else {"rupture":1,"amber":3,"dash":5}[ability]):
 				pickups.append({"id":"%s.%s.%02d" % [prefix,ability,index],"kind":ability,"pos":[left+(3.6 if order == 2 else 12),top,0],"surface":index})
 		# Patamares e obstáculos apoiados na mesma superfície do módulo.
-		var stair_run := index%sector_modules == (4 if order==2 else 3)
+		var stair_run := index%sector_modules == (3 if order==10 else mini(sector_modules-2,[3,4,4,3,2,4,3,5,3][order-1]+int(index/sector_modules)%2))
 		if order==2: stair_run=false # O teto da própria casa é a rota, sem plataforma sobreposta.
 		if order==10 and index>=modules/2: stair_run=false # Arena final preservada.
 		if stair_run:
-			var route_width := 5.6
-			var route_x := left+module_length*0.5
-			platforms.append({"id":"%s.route.%02d" % [prefix,index],"kind":"route","pos":[route_x,top+1.0,0],"size":[route_width,0.20,3.8],"span_start":route_x-route_width*0.5,"span_end":route_x+route_width*0.5,"module":index,"architecture":THEMES[order-1],"surface_top":top,"parkour_route":true})
+			var shapes: Array=[[0.0,5.6,1.1]]
+			if order==1:shapes=[[-1.6,3.2,0.60],[1.6,3.2,1.1]]
+			if order in [5,6]:shapes=[[-2.3,2.4,0.55],[0.0,2.4,1.1],[2.3,2.4,0.55]]
+			if order in [7,9]:shapes=[[-1.4,2.8,0.55],[1.4,2.8,1.1]]
+			var center:=end-5.2 if order<10 else left+module_length*0.5
+			for step in shapes.size():
+				var spec: Array=shapes[step]
+				var route_x:=center+float(spec[0])
+				var route_width:=float(spec[1])
+				var route_top:=top+float(spec[2])
+				var route_id:="%s.route.%02d" % [prefix,index] if shapes.size()==1 else "%s.route.%02d.%d" % [prefix,index,step]
+				platforms.append({"id":route_id,"kind":"route","pos":[route_x,route_top-0.10,0],"size":[route_width,0.20,3.8],"span_start":route_x-route_width*0.5,"span_end":route_x+route_width*0.5,"module":index,"architecture":THEMES[order-1],"surface_top":top,"parkour_route":true})
 		if not stair_run and index > 0 and order != 2 and index%3 == 2:
 			var height := 0.5 if order == 2 else 0.6
 			platforms.append({"id":"%s.obstacle.%02d" % [prefix,index],"kind":"ledge","pos":[left+module_length*0.55,top+height*0.5,0],"size":[0.9,height,2.6],"span_start":left+module_length*0.55-0.45,"span_end":left+module_length*0.55+0.45,"chunk":floori(left/64),"architecture":THEMES[order-1],"surface_top":top})
@@ -128,6 +145,8 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 	for i in plans.size():
 		var module := 7 if i==0 else floori(modules*0.58)
 		var floor: Dictionary=surfaces[module]
+		# A área de operação da Task fica livre de balcões/caixas aleatórios.
+		platforms=platforms.filter(func(p: Dictionary) -> bool:return int(p.get("module",-1))!=module or p.kind=="ground")
 		var kind: String=plans[i][0]
 		var data: Dictionary
 		if kind=="gate":
@@ -148,6 +167,19 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 			holes[module].width=float(data.end)-float(data.start)
 			holes[module].requires_task=true
 		data.merge({"id":"%s.task.%d" % [prefix,i],"task_kind":kind,"task_text":plans[i][1],"theme":order,"width":float(data.end)-float(data.start)})
+		var actions: Array=[
+			[["Acionar portão"],["Destravar guincho","Baixar passarela"]],
+			[["Soltar passarela","Fixar ancoragem"],["Prender cabo","Içar plataforma"]],
+			[["Prender tecido","Esticar toldo"],["Liberar trinco","Abrir depósito"]],
+			[["Fechar alimentação","Abrir comporta"],["Fixar apoio","Montar passagem"]],
+			[["Soltar amarra","Reposicionar tronco"],["Soltar trava","Abrir passagem"]],
+			[["Liberar contrapeso","Alinhar laje"],["Destravar selo","Abrir portal"]],
+			[["Prender carga","Acionar elevador"],["Soltar viga","Baixar travessia"]],
+			[["Liberar ferrolho","Erguer portão"],["Prender cabo","Baixar passarela"]],
+			[["Engatar minério","Acionar guindaste"],["Destravar trilho","Abrir portão"]],
+			[["Içar passarela"]]][order-1][i]
+		data.actions=actions
+		data.operation_span=[floor.left,floor.right]
 		data.width=float(data.end)-float(data.start)
 		tasks.append(data)
 	# Retira de fato piso, atores e decoração dentro da passagem que depende da Task.
@@ -182,7 +214,17 @@ static func _height(order: int,index: int) -> float:
 	var pattern: float = [0.0,0.4,0.8,0.3,0.7,0.2][index%6]
 	# Sequências de subida, patamar e descida. Degraus entre prédios continuam <=0,55m.
 	if order < 10:
-		var climb: float = [0.0,0.55,1.1,1.65,2.2,2.75,2.75,2.2,1.65,1.1,0.55,0.0][index%12]
+		var profiles: Array=[
+			[0.0,0.0,0.35,0.7,0.7,0.35,0.0,0.0,0.35,0.35,0.0,0.0],
+			[0.0,0.45,0.9,0.9,1.35,1.8,1.8,1.35,0.9,0.9,0.45,0.0],
+			[0.0,0.35,0.35,0.0,0.0,0.45,0.9,0.9,0.45,0.0,0.0,0.0],
+			[0.0,0.5,1.0,1.5,2.0,2.5,2.5,2.0,1.5,1.0,0.5,0.0],
+			[0.0,0.3,0.6,0.9,0.6,0.3,0.0,0.0,0.35,0.7,0.35,0.0],
+			[0.0,-0.45,-0.9,-1.35,-1.8,-1.8,-1.35,-0.9,-0.45,0.0,0.45,0.0],
+			[0.0,0.5,1.0,1.5,1.5,1.0,0.5,0.0,-0.5,-1.0,-0.5,0.0],
+			[0.0,0.55,1.1,1.65,2.2,2.75,2.75,2.2,1.65,1.1,0.55,0.0],
+			[1.8,1.35,0.9,0.45,0.0,-0.45,-0.9,-0.9,-0.45,0.0,0.45,0.9,1.35,1.8]]
+		var climb: float=profiles[order-1][index%profiles[order-1].size()]
 		var base := 8.0 if order == 2 else (3.5 if order == 4 else (-1.8 if order == 6 else 0.0))
 		return base+climb
 	match order:

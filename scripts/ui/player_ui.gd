@@ -349,31 +349,16 @@ static func shop_package(parent: Node, pack: Dictionary, price: String, unavaila
 	content.add_theme_constant_override("separation",6)
 	var credit: bool=pack.get("reward_kind")=="deck_credits"
 	var art := Control.new()
-	art.custom_minimum_size.y=80
+	art.custom_minimum_size.y=128
 	art.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	content.add_child(art)
-	var count := 1 if credit else (2 if int(pack.coins)<=100 else (4 if int(pack.coins)<=250 else 6))
-	for i in count:
-		var icon := TextureRect.new()
-		icon.texture=preload("res://assets/icons/vector/icon_coin.svg")
-		icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
-		icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.mouse_filter=Control.MOUSE_FILTER_IGNORE
-		art.add_child(icon)
-		icon.set_anchors_preset(Control.PRESET_CENTER)
-		var offset := Vector2((i%3-1)*36,-(i/3)*22)
-		icon.position=Vector2(-42,0)+offset
-		icon.size=Vector2(84,84)
-	if credit:
-		for child in art.get_children(): child.queue_free()
-		var symbol := TextureRect.new()
-		symbol.texture=preload("res://assets/icons/vector/icon_reward_deck.svg")
-		symbol.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
-		symbol.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		art.add_child(symbol)
-		symbol.set_anchors_preset(Control.PRESET_CENTER)
-		symbol.position=Vector2(-40,-8)
-		symbol.size=Vector2(80,80)
+	var icon := TextureRect.new()
+	icon.texture=load("res://assets/ui/store/deck_credit.png" if credit else "res://assets/ui/store/coin_treasure.png") as Texture2D
+	icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	art.add_child(icon)
+	icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var amount := label(str(pack.coins),44,TEXT)
 	amount.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(amount)

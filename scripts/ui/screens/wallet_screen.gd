@@ -64,6 +64,7 @@ func render() -> void:
 
 func _render_coin_store() -> void:
 	heading.text=tr("Moedas e créditos")
+	body.add_theme_constant_override("separation",6)
 	var top := PlayerUI.row(body)
 	var balances := PlayerUI.row(top)
 	var balance := PlayerUI.label("%s moedas" % DevicePreferences.number(services.wallet.balance("coins"),services.preferences.values.locale),28,PlayerUI.GOLD)

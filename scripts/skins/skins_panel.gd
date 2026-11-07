@@ -141,6 +141,10 @@ func _split_layout() -> void:
 		_rebuild_gallery()
 		PlayerUI.cascade(_grid))
 	filter_row.add_child(_sort_button)
+	# Uma linha de ferramentas deixa a galeria e o personagem respirarem.
+	for item in filter_row.get_children(): item.reparent(search_row)
+	filter_row.queue_free()
+	_fav_button.tooltip_text=tr("Mostrar favoritos")
 	for option: OptionButton in [_filter_button, _sort_button]:
 		option.custom_minimum_size = Vector2(130, PlayerUI.CONTROL_HEIGHT)
 		option.add_theme_font_size_override("font_size", 22)
@@ -213,15 +217,15 @@ func _responsive_layout() -> void:
 	# continua no topo ("COMEÇO · 7/8") e a prévia não é empurrada para fora.
 	_collection_sidebar.visible = _cosmetic_mode=="skins" and not UIScale.is_iphone() and not compact and get_viewport().get_visible_rect().size.x >= 1500.0
 	_toolbar.add_theme_constant_override("separation", 4 if compact else 8)
-	_fav_button.text = "Favoritos" if not compact else "FAV"
+	_fav_button.text = "♡"
 	_fav_button.add_theme_color_override("font_color", ACCENT if _favorite_only else PlayerUI.TEXT)
-	_fav_button.custom_minimum_size.x = 34 if compact else 144
+	_fav_button.custom_minimum_size.x = 56
 	_search_field.placeholder_text = "Pesquisar..." if compact else "Pesquisar personagem..."
 	_search_field.custom_minimum_size.x = 116 if compact else 0
 	_search_field.custom_minimum_size.y = 44 if compact else PlayerUI.CONTROL_HEIGHT
-	_filter_button.custom_minimum_size.y = 44 if compact else PlayerUI.CONTROL_HEIGHT
+	_filter_button.custom_minimum_size=Vector2(140,PlayerUI.CONTROL_HEIGHT)
 	_sort_button.custom_minimum_size.y = 44 if compact else PlayerUI.CONTROL_HEIGHT
-	_sort_button.custom_minimum_size.x = 68 if compact else 130
+	_sort_button.custom_minimum_size.x = 90
 	if _grid != null:
 		_grid.columns = _columns() if _cosmetic_mode=="skins" else (1 if _cosmetic_mode=="shop" else 3)
 		if _cosmetic_mode=="skins":
@@ -324,7 +328,7 @@ func _rebuild_gallery() -> void:
 	if count == 0:
 		body.add_child(PlayerUI.label("Nenhum personagem encontrado.", 19))
 	if _fav_button != null:
-		_fav_button.text = "FAV" if UIScale.is_compact() else "Favoritos"
+		_fav_button.text = "♡"
 		_fav_button.add_theme_color_override("font_color", ACCENT if _favorite_only else PlayerUI.TEXT)
 	if _collection_count != null:
 		var obtained := in_collection.filter(func(item: String) -> bool: return services.inventory.is_unlocked(item)).size()
@@ -607,8 +611,8 @@ func _choose_cosmetic_mode(mode: String) -> void:
 	_context_hint.visible=mode!="skins"
 	_preview.get_node("SkinEquipActions").visible=mode in ["skins","emotes"]
 	_preview.get_node("EmoteShopActions").visible=mode=="shop"
-	_context_title.text=tr("Exemplos de reações") if mode=="emotes" else tr("Loja de emotes · prévia")
-	_context_hint.text=tr("Lobby, vitória e derrota") if mode=="emotes" else tr("Dancinha demonstrativa · compra separada")
+	_context_title.text=tr("Exemplos de reações") if mode=="emotes" else tr("Emotes")
+	_context_hint.text=tr("Lobby, vitória e derrota") if mode=="emotes" else tr("Escolha um movimento para ver no personagem")
 	VARIATIONS.apply(_stage.character,str(_selected_styles.get(_selected,"original")))
 	var picker := _preview.get_node_or_null("SkinVariantPicker") as Control
 	if picker!=null: picker.visible=mode=="skins"

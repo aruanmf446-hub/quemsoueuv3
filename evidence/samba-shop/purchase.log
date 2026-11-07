@@ -1,0 +1,17 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS preço vem do catálogo do servidor
+PASS saldo insuficiente não confirma posse
+PASS resposta perdida não exibe compra confirmada
+PASS repetir após perda da resposta não cobra novamente
+PASS nova tentativa reutiliza a chave de idempotência
+PASS catálogo confirma emote adquirido na conta
+PASS recibo confirmado preserva a posse se a releitura falhar
+PASS confirmação mostra preço de 100 moedas e saldo suficiente
+PASS dois cliques geram uma compra em andamento
+PASS sucesso atualiza carteira e posse com leituras do servidor
+PASS sucesso não permite repetir a cobrança
+PASS item adquirido oferece usar, sem nova compra
+PASS produto sem movimento real permanece fora de venda
+PASS troca de sessão fecha a confirmação e limpa a coleção
+EMOTE_PURCHASE checks=14 failures=0

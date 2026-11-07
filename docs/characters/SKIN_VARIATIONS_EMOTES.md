@@ -26,8 +26,9 @@ Modo História. A escolha de prévia é lembrada por personagem durante o painel
 
 Esta entrega segue a etapa de **prévia** solicitada: não inventa posse, preço ou
 compra de variações, nem aplica uma escolha local a partidas online. Emotes e
-reações continuam em abas separadas. O produto de dança continua indisponível
-até chegar o movimento real aprovado. Equipar o personagem original permanece
+reações continuam em abas separadas. A Samba aprovada já permite ver o movimento nos oito personagens; sua compra
+e resgate permanecem bloqueados como “Preço a definir”. O placeholder dance_01
+continua separado e indisponível. Equipar o personagem original permanece
 no fluxo existente de Skins.
 
 Recursos: `scripts/skins/skin_variations.gd` e `variation_palette.gdshader`.

@@ -1,6 +1,9 @@
 # Compra de emotes — GAME
 
-Preço confirmado pelo dono: **100 coins (moedas comuns)**. Não utiliza gemas,
+O placeholder `dance_01` tem preço histórico de **100 coins** e permanece inativo.
+A dança aprovada `samba` é outro item: **preço ainda não definido**, prévia
+visível no cliente e compra/resgate bloqueados. Nenhum produto Samba foi criado
+ou ativado no GAME; esta alteração não executa migrations nem concede emotes. Não utiliza gemas,
 R2, outro provedor, serviço de pagamento ou acesso ao projeto CHAT/CATALOG.
 
 ## Contrato

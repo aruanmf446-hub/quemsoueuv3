@@ -42,7 +42,7 @@ func run() -> void:
 	fake.shop_code=""
 	fake.owned=false;fake.coins=250;shop.clear()
 	var screen: Control=load("res://scenes/skins/skins_panel.tscn").instantiate()
-	root.add_child(screen);screen._generating=true;screen.open("cowboy")
+	root.add_child(screen);screen._shop_item="dance_01";screen._generating=true;screen.open("cowboy")
 	screen._choose_cosmetic_mode("shop");await settle()
 	screen.find_child("PreviewDanceMovement",true,false).pressed.emit()
 	screen.find_child("BuyEmotePreview",true,false).pressed.emit();await settle()

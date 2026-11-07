@@ -1,0 +1,92 @@
+[
+  {
+    "width": 1672,
+    "height": 941,
+    "iphone": false,
+    "character": "cowboy",
+    "realSambaPreview": true,
+    "pricePending": true,
+    "purchases": 0,
+    "errors": []
+  },
+  {
+    "width": 1672,
+    "height": 941,
+    "iphone": false,
+    "character": "el_fuego",
+    "realSambaPreview": true,
+    "pricePending": true,
+    "purchases": 0,
+    "errors": []
+  },
+  {
+    "width": 1672,
+    "height": 941,
+    "iphone": false,
+    "character": "halloween",
+    "realSambaPreview": true,
+    "pricePending": true,
+    "purchases": 0,
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "iphone": true,
+    "character": "cowboy",
+    "realSambaPreview": true,
+    "pricePending": true,
+    "purchases": 0,
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "iphone": true,
+    "character": "el_fuego",
+    "realSambaPreview": true,
+    "pricePending": true,
+    "purchases": 0,
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "iphone": true,
+    "character": "halloween",
+    "realSambaPreview": true,
+    "pricePending": true,
+    "purchases": 0,
+    "errors": []
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "iphone": true,
+    "character": "cowboy",
+    "realSambaPreview": true,
+    "pricePending": true,
+    "purchases": 0,
+    "errors": []
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "iphone": true,
+    "character": "el_fuego",
+    "realSambaPreview": true,
+    "pricePending": true,
+    "purchases": 0,
+    "errors": []
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "iphone": true,
+    "character": "halloween",
+    "realSambaPreview": true,
+    "pricePending": true,
+    "purchases": 0,
+    "errors": []
+  }
+]

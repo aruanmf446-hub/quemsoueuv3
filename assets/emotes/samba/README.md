@@ -10,11 +10,10 @@ Item universal da conta: `samba`, separado do placeholder `dance_01`.
 `price_coins=null`, `purchase_enabled=false`. Não foi inserido preço fictício,
 não houve criação/ativação de produto no Supabase nem concessão a usuários.
 
-Pendente esclarecer a frase “sem preço … resgatar com preço”: resgate gratuito
-ou resgate bloqueado até definir um preço. Não assumir 0 nem reutilizar as
-100 moedas do placeholder. O registro comercial só deve ser conectado depois
-dessa definição. O manifesto nesta pasta é um registro de conteúdo, não uma
-autorização de compra nem a fonte de preços do servidor.
+Decisão confirmada: mostrar no jogo e permitir ver o movimento agora, mantendo
+compra/resgate bloqueados até o dono definir o preço. A aba Emotes mostra Samba,
+“Preço a definir” e “Ver movimento”; nenhuma concessão gratuita é feita.
+O manifesto registra conteúdo; o preço comercial futuro deverá vir do servidor.
 
 Origem: FBX de exemplo Samba Dancing do Three.js; URL e SHA-256 no manifesto.
 O FBX bruto e o personagem doador não estão incluídos. Os recursos Animation

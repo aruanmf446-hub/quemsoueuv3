@@ -25,7 +25,7 @@ func _run() -> void:
 	elif mode=="claim": fake=preload("res://tests/community_claims/visual_game.gd").new()
 	elif mode=="report": fake=preload("res://tests/deck_runtime_corrections/fake_game.gd").new()
 	elif mode=="stripe": fake=preload("res://tests/coin_store/fake_game.gd").new()
-	elif mode in ["emotes","coins","variations"]: fake=preload("res://tests/skin_emotes/fake_game.gd").new()
+	elif mode in ["emotes","coins","variations","samba"]: fake=preload("res://tests/skin_emotes/fake_game.gd").new()
 	elif mode=="player_report": fake=preload("res://tests/player_reports/fake_game.gd").new()
 	else: fake=preload("res://tests/community_t27/fake_game.gd").new()
 	add_child(fake)
@@ -56,7 +56,7 @@ func _run() -> void:
 		ui=load("res://scenes/player/wallet.tscn").instantiate()
 		add_child(ui)
 		ui.show_screen({"tab":"coins"})
-	elif mode in ["emotes","variations","universal"]:
+	elif mode in ["emotes","variations","universal","samba"]:
 		services.progression.state="success"
 		services.progression.data={"unlocked_character_ids":PlayerContracts.initial_ids(),"equipped_character_id":"cowboy"}
 		ui=load("res://scenes/skins/skins_panel.tscn").instantiate()
@@ -66,7 +66,9 @@ func _run() -> void:
 		if mode=="variations":
 			for entry: Dictionary in CharacterCatalog.load_entries():
 				ui._paths[str(entry.id)]="res://assets/portraits/"+str(entry.id)+".png"
+		if mode in ["emotes","universal"]: ui._shop_item="dance_01"
 		ui.open("cowboy")
+		if mode=="samba": ui._choose_cosmetic_mode("shop")
 		if mode=="universal":
 			_fixture_universal_motion()
 			ui._choose_cosmetic_mode("shop")
@@ -177,7 +179,7 @@ func _probe(args: Array) -> void:
 		if node is LineEdit or node is TextEdit: result.fields[str(node.name)]=str(node.text)
 		if node is BaseButton or node is LineEdit or node is TextEdit:
 			var r := node.get_global_rect()
-			result.controls.append({"name":str(node.name),"rect":[r.position.x,r.position.y,r.size.x,r.size.y],"text":node.text if node is Button else ""})
+			result.controls.append({"name":str(node.name),"rect":[r.position.x,r.position.y,r.size.x,r.size.y],"text":node.text if node is Button else "","disabled":node.disabled if node is BaseButton else false})
 	if ui.get("_draft") is Dictionary:
 		result.cards=ui._draft.get("cards",[]).size()
 		result.card_names=ui._draft.get("cards",[]).map(func(c:Dictionary)->String:return str(c.get("name","")))

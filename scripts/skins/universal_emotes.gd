@@ -2,6 +2,15 @@ extends RefCounted
 ## One account product, with shared or per-rig motion assets. No prices/ownership here.
 const PATH := "res://data/emotes.json"
 
+
+static func definition(id: String) -> Dictionary:
+	for item: Dictionary in PlayerContracts.read_json(PATH).get("items",[]):
+		if item.get("id")==id: return item
+	return {}
+
+static func price_pending(id: String) -> bool:
+	return definition(id).get("commerce_status")=="price_pending"
+
 static func install(slot: CharacterSlot,key: String) -> bool:
 	return install_from_catalog(slot,key,PlayerContracts.read_json(PATH))
 
@@ -17,7 +26,8 @@ static func install_from_catalog(slot: CharacterSlot,key: String,catalog: Dictio
 	var player: AnimationPlayer=slot.get("_anim_player")
 	var skeleton: Skeleton3D=slot.get("_skeleton")
 	if player==null or skeleton==null: return false
-	var clip: Animation=slot.call("_extract_clip",source)
+	var resource := load(source)
+	var clip: Animation=resource.duplicate() as Animation if resource is Animation else slot.call("_extract_clip",source)
 	if clip==null: return false
 	var adapted := adapt(clip,player,skeleton)
 	if adapted==null: return false

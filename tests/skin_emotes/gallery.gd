@@ -15,6 +15,7 @@ func run() -> void:
 	services.session.set_process(false)
 	var screen: Control=load("res://scenes/skins/skins_panel.tscn").instantiate()
 	root.add_child(screen)
+	screen._shop_item="dance_01"
 	screen._generating=true
 	screen.open("cowboy")
 	await settle()

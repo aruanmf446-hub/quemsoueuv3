@@ -49,6 +49,7 @@ func play_owned(slot: CharacterSlot,id: String,still_current: Callable=Callable(
 	return ServiceResult.success({"emote_id":id,"scope":"account","character_id":character})
 
 func buy(id: String,expected_price: int) -> Dictionary:
+	if MOTIONS.price_pending(id): return ServiceResult.failure("price_pending")
 	if not session.authenticated(): return ServiceResult.failure("not_authenticated")
 	if _buying: return ServiceResult.failure("request_in_progress")
 	var owner := str(session.user.get("id",""))
@@ -86,6 +87,7 @@ func valid_data(value: Variant) -> bool:
 
 static func message(code: String) -> String:
 	match code:
+		"price_pending": return "O preço deste emote ainda não foi definido."
 		"emote_not_owned": return "Este emote ainda não está na sua conta."
 		"emote_target_changed": return "O personagem mudou. Toque em usar novamente."
 		"emote_motion_unavailable": return "O movimento deste emote ainda não está disponível para este personagem nesta versão."

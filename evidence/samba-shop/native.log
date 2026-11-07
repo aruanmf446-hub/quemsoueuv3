@@ -1,0 +1,26 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS Samba disponível nos oito rigs
+PASS preço pendente explícito
+PASS carrega o recurso aprovado: cowboy
+PASS movimento real e proporções preservadas: cowboy
+PASS carrega o recurso aprovado: michelly
+PASS movimento real e proporções preservadas: michelly
+PASS carrega o recurso aprovado: rodrigo
+PASS movimento real e proporções preservadas: rodrigo
+PASS carrega o recurso aprovado: lorena
+PASS movimento real e proporções preservadas: lorena
+PASS carrega o recurso aprovado: gus
+PASS movimento real e proporções preservadas: gus
+PASS carrega o recurso aprovado: lana
+PASS movimento real e proporções preservadas: lana
+PASS carrega o recurso aprovado: halloween
+PASS movimento real e proporções preservadas: halloween
+PASS carrega o recurso aprovado: el_fuego
+PASS movimento real e proporções preservadas: el_fuego
+PASS preço pendente bloqueia o serviço antes de qualquer débito
+PASS Samba aparece na loja
+PASS compra/resgate desabilitados sem preço
+PASS Ver movimento toca a Samba aprovada
+PASS modal de cobrança não abre para Samba
+SAMBA_PREVIEW checks=23 failures=0

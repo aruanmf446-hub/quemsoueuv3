@@ -6,7 +6,7 @@
   "motion_approved": true,
   "purchase_enabled": false,
   "price_coins": null,
-  "commerce_status": "awaiting_price_or_free_claim_decision",
+  "commerce_status": "price_pending",
   "duration_seconds": 12.0,
   "clips": {
     "cowboy": "res://assets/emotes/samba/cowboy.res",
@@ -19,18 +19,60 @@
     "el_fuego": "res://assets/emotes/samba/el_fuego.res"
   },
   "sha256": {
-    "cowboy.res": "cec167ef29f07d5976abb0bc8a543931edb286fa7d08803669fd3f5ea2a52b02",
-    "michelly.res": "9cf0de65051c80dade61a8b8fb9b70d329080e8c3784dd6bf1b436c1b1d37867",
-    "rodrigo.res": "493d2b6c641fd8615ddb7559d673eca0fb5c04ea59ee5ffab4394528cc067c65",
-    "lorena.res": "c1b3cb57dd337434b2e55b4c6e937285b3cbd3b8b053b55c5adad0ab9aac9d05",
-    "gus.res": "1ee00a61efbc4e33001219b3781f9b69af9f7f44477224ffdd164dc772f530a7",
-    "lana.res": "e41c847192ce76eb6e30b550843498cabd1d8e0161bda2e365e4b20ea5e057b8",
-    "halloween.res": "0bcdfe8e488f975f0cc595391c6d45f47701f5eef964d8d2be8025893380572f",
-    "el_fuego.res": "14de47b59af96b9f744774a2e56e7e5b324f8067046776d8ff29664eb3701713"
+    "cowboy.res": "c6e8481934e4b1992a332fbfe89ec7915a7e752084f7313cad429df81ab62e2c",
+    "michelly.res": "ad60e2bebe67af0c358edc51b534a1fc6b5ac6918afc4b3bce0c420dfeb18037",
+    "rodrigo.res": "660bae4b418e00767a1dc8010426bc1c5e6278130b18d36814df83c0ac68bd08",
+    "lorena.res": "8a8d3233feefb0a72126337facffee8b54c1b1605915037a81c43e4b3df00a68",
+    "gus.res": "857bff3410d9aa37b8d5d64dad3f285a572d52e75e38420c58dee9c4c6041059",
+    "lana.res": "ba1dcad68d95652bb6b02075f0eed655651f7c5536e46aebe18375d7f4c72afa",
+    "halloween.res": "9337f5bae07e8e02f91e3403df4306d540a44f74d5f4ea2e382d94d56ecc54d8",
+    "el_fuego.res": "b3439b8c2eac034ff240044af499987be33c84f5a961c40b8fa76fa7c423a999"
   },
   "source": {
     "url": "https://github.com/mrdoob/three.js/blob/dev/examples/models/fbx/Samba%20Dancing.fbx",
     "clip": "mixamo_com",
     "sha256": "b9003ee562c87bf03051c3a502411b0808d3513f1d74a2011f7530d9f067069f"
+  },
+  "preview_framing": {
+    "cowboy": {
+      "center_y": 0.8303142338991186,
+      "height": 2.017671087980275,
+      "width": 1.8248940777778622
+    },
+    "michelly": {
+      "center_y": 0.8889798531308785,
+      "height": 2.1305693271011146,
+      "width": 1.622483770847321
+    },
+    "rodrigo": {
+      "center_y": 0.8688136520795537,
+      "height": 2.0418112428858906,
+      "width": 1.6284451413154606
+    },
+    "lorena": {
+      "center_y": 0.9348195362836106,
+      "height": 2.203078693598505,
+      "width": 1.7359657382965081
+    },
+    "gus": {
+      "center_y": 0.9133941943291596,
+      "height": 2.1314929625950803,
+      "width": 1.9699630117416378
+    },
+    "lana": {
+      "center_y": 0.9048852468840799,
+      "height": 2.1175510786846328,
+      "width": 1.6499274396896366
+    },
+    "halloween": {
+      "center_y": 0.9145634500309835,
+      "height": 2.1702128512412333,
+      "width": 1.6901919960975647
+    },
+    "el_fuego": {
+      "center_y": 0.7271268621552744,
+      "height": 1.7003177626244743,
+      "width": 1.3398467063903814
+    }
   }
 }

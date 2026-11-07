@@ -3,9 +3,12 @@ extends RefCounted
 ## os cartões reutilizam texturas estáticas, sem três avatares animados extras.
 var _cache: Dictionary = {}
 
-func capture(host: Control,entry: Dictionary,watch: Control,dance := false,variations := false) -> Dictionary:
+func capture(host: Control,entry: Dictionary,watch: Control,dance := false,variations := false,items: Array=[]) -> Dictionary:
 	var id := str(entry.id)+("_styles" if variations else ("_dance" if dance else ""))
 	var emotes: Array=preload("res://scripts/skins/skin_variations.gd").entries(str(entry.id)) if variations else ([{"id":"dance","animation":"dance_preview"}] if dance else CharacterCatalog.emotes_for(entry))
+	if not items.is_empty():
+		emotes=items.duplicate(true)
+		id+="_"+str(items.map(func(item:Dictionary)->String:return str(item.id)))
 	if _cache.get(id,{}).size()==emotes.size(): return _cache[id]
 	if DisplayServer.get_name()=="headless": return {}
 	var stage: LobbyStage=preload("res://scenes/lobby/lobby_stage.tscn").instantiate()
@@ -15,7 +18,12 @@ func capture(host: Control,entry: Dictionary,watch: Control,dance := false,varia
 	stage.apply_profile("medio")
 	stage.show_character(entry)
 	if dance:
-		if preload("res://scripts/skins/universal_emotes.gd").install(stage.character,"emote_dance_01"):
+		if not items.is_empty():
+			for item: Dictionary in emotes:
+				if not preload("res://scripts/skins/universal_emotes.gd").install(stage.character,str(item.animation)) and item.id=="dance":
+					preload("res://scripts/skins/dance_preview.gd").install(stage.character)
+					item.animation="dance_preview"
+		elif preload("res://scripts/skins/universal_emotes.gd").install(stage.character,"emote_dance_01"):
 			emotes=[{"id":"dance","animation":"emote_dance_01"}]
 		else:
 			preload("res://scripts/skins/dance_preview.gd").install(stage.character)

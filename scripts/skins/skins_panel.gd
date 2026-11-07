@@ -56,6 +56,7 @@ var _buy_dialog: Control
 const DANCE_PREVIEW = preload("res://scripts/skins/dance_preview.gd")
 const VARIATIONS = preload("res://scripts/skins/skin_variations.gd")
 var _selected_styles: Dictionary={}
+var _shop_item := "samba"
 
 
 func _ready() -> void:
@@ -550,7 +551,7 @@ func _select(character_id: String) -> void:
 	var shop_actions := PlayerUI.row(_preview)
 	shop_actions.name="EmoteShopActions"
 	shop_actions.visible=_cosmetic_mode=="shop"
-	var preview := _button("VER DANÇA",_preview_dance)
+	var preview := _button("VER MOVIMENTO",_preview_dance)
 	preview.name="PreviewDanceMovement"
 	preview.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	preview.clip_text=true
@@ -599,6 +600,9 @@ func _choose_cosmetic_mode(mode: String) -> void:
 			if image!=null and image.texture==null: images[style.id]=image
 		if not images.is_empty(): _load_variation_previews(services.inventory.entry(_selected),picker,images)
 	if _stage.character.has_animation(&"base"): _stage.character.set_pose(&"base",0.0)
+	if mode!="shop":
+		_stage.frame_character()
+		_stage.set_zoom(ThumbnailCache.framing_zoom(_selected))
 	var arrows := _preview.get_node_or_null("CharacterArrows") as Control
 	if arrows!=null: arrows.visible=mode=="skins"
 	for key: String in _cosmetic_tabs: PlayerUI.style_button(_cosmetic_tabs[key],key==mode)
@@ -658,12 +662,24 @@ func _load_variation_previews(entry: Dictionary,watch: Control,images: Dictionar
 
 func _build_emote_gallery(entry: Dictionary) -> void:
 	var shop := _cosmetic_mode=="shop"
-	var owned: bool=services.emote_shop.owned("dance_01")
-	var emotes: Array=[{"id":"dance","name":"Dancinha","context":"ADQUIRIDO" if owned else "100 moedas","animation":"dance_preview"}] if shop else CharacterCatalog.emotes_for(entry)
+	var motions = preload("res://scripts/skins/universal_emotes.gd")
+	var owned: bool=services.emote_shop.owned(_shop_item)
+	var emotes: Array=CharacterCatalog.emotes_for(entry)
+	if shop:
+		emotes=[]
+		for item: Dictionary in PlayerContracts.read_json(motions.PATH).get("items",[]):
+			if not item.get("preview_visible",false) and item.id!=_shop_item and not services.emote_shop.owned(str(item.id)): continue
+			var pending: bool=motions.price_pending(str(item.id))
+			var product: Dictionary=services.emote_shop.product(str(item.id))
+			var caption := "Preço a definir" if pending else ("ADQUIRIDO" if services.emote_shop.owned(str(item.id)) else (str(product.price_coins)+" moedas" if product.has("price_coins") else "Indisponível"))
+			emotes.append({"id":"dance" if item.id=="dance_01" else str(item.id),"product_id":item.id,"name":item.get("name","Emote"),"context":caption,"animation":item.animation_key})
 	var buy := _preview.find_child("BuyEmotePreview",true,false) as Button
 	if shop and buy!=null:
-		buy.text=tr("USAR EMOTE" if owned else "COMPRAR")
-		buy.disabled=false
+		var pending: bool=motions.price_pending(_shop_item)
+		buy.text=tr("PREÇO A DEFINIR" if pending else ("USAR EMOTE" if owned else "COMPRAR"))
+		buy.disabled=pending
+		var preview := _preview.find_child("PreviewDanceMovement",true,false) as Button
+		if preview!=null: PlayerUI.style_button(preview,pending)
 	_collection_count.text="LOJA · PRÉVIA" if shop else "REAÇÕES · %d" % emotes.size()
 	var hint := PlayerUI.label("Emotes da conta · todas as skins compatíveis" if shop else "Exemplos de lobby, vitória e derrota",20,PlayerUI.MUTED)
 	body.add_child(hint)
@@ -676,7 +692,10 @@ func _build_emote_gallery(entry: Dictionary) -> void:
 	var group := ButtonGroup.new()
 	for emote: Dictionary in emotes:
 		var button := _button("",func()->void:
-			if shop: _preview_dance()
+			if shop:
+				_shop_item=str(emote.product_id)
+				_rebuild_gallery()
+				_preview_dance()
 			elif is_instance_valid(_stage):
 				_context_title.text={"Lobby":"No lobby","Vitória":"Você venceu!","Derrota":"Fim de partida"}.get(str(emote.context),str(emote.context))
 				_context_hint.text=tr("Exemplo da reação de ")+str(emote.context).to_lower()
@@ -685,6 +704,7 @@ func _build_emote_gallery(entry: Dictionary) -> void:
 		button.tooltip_text=tr(str(emote.name))+" · "+tr("Toque para visualizar")
 		button.toggle_mode=true
 		button.button_group=group
+		if shop: button.button_pressed=_shop_item==str(emote.product_id)
 		button.custom_minimum_size=Vector2(0,260)
 		button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 		_grid.add_child(button)
@@ -710,11 +730,11 @@ func _build_emote_gallery(entry: Dictionary) -> void:
 		context.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 		context.mouse_filter=Control.MOUSE_FILTER_IGNORE
 		content.add_child(context)
-	_load_emote_previews(entry,_grid,images,shop)
+	_load_emote_previews(entry,_grid,images,shop,emotes if shop else [])
 
 
-func _load_emote_previews(entry: Dictionary,watch: Control,images: Dictionary,dance := false) -> void:
-	var textures: Dictionary=await _emote_previews.capture(self,entry,watch,dance)
+func _load_emote_previews(entry: Dictionary,watch: Control,images: Dictionary,dance := false,items: Array=[]) -> void:
+	var textures: Dictionary=await _emote_previews.capture(self,entry,watch,dance,false,items)
 	if not is_instance_valid(watch) or watch.is_queued_for_deletion(): return
 	for id: String in images:
 		if is_instance_valid(images[id]) and textures.has(id): images[id].texture=textures[id]
@@ -722,10 +742,22 @@ func _load_emote_previews(entry: Dictionary,watch: Control,images: Dictionary,da
 
 func _preview_dance() -> void:
 	if not is_instance_valid(_stage): return
-	if preload("res://scripts/skins/universal_emotes.gd").install(_stage.character,"emote_dance_01"):
-		_context_title.text=tr("Dancinha · prévia do movimento")
-		_context_hint.text=tr("Emote da loja")
-		_stage.character.play_emote(&"emote_dance_01")
+	var motions = preload("res://scripts/skins/universal_emotes.gd")
+	var item: Dictionary=motions.definition(_shop_item)
+	var key := str(item.get("animation_key","emote_dance_01"))
+	if motions.install(_stage.character,key):
+		var frame: Dictionary=item.get("preview_framing",{}).get(_selected,{})
+		if not frame.is_empty():
+			_stage._target_y=float(frame.center_y)
+			var extent := maxf(float(frame.height),float(frame.width)/maxf(_stage.size.x/_stage.size.y,0.3))
+			_stage._base_distance=extent/(2.0*tan(deg_to_rad(LobbyStage.CAMERA_FOV*0.5)))
+			_stage.set_zoom(1.0)
+		_context_title.text=str(item.get("name","Emote"))+" · "+tr("prévia")
+		_context_hint.text=tr("Preço a definir") if motions.price_pending(_shop_item) else tr("Emote da loja")
+		_stage.character.play_emote(StringName(key))
+		return
+	if _shop_item!="dance_01":
+		_context_hint.text=tr("Movimento indisponível nesta versão.")
 		return
 	if not DANCE_PREVIEW.install(_stage.character): return
 	_context_title.text=tr("Dancinha · prévia do movimento")
@@ -734,35 +766,39 @@ func _preview_dance() -> void:
 
 
 func _emote_primary_action() -> void:
-	if not services.emote_shop.owned("dance_01"):
+	if preload("res://scripts/skins/universal_emotes.gd").price_pending(_shop_item): return
+	if not services.emote_shop.owned(_shop_item):
 		_preview_purchase()
 		return
 	if not is_instance_valid(_stage): return
 	var target := _stage.character
 	var selected := _selected
 	var current := func()->bool:return is_inside_tree() and is_visible_in_tree() and is_instance_valid(_stage) and _stage.character==target and _selected==selected and _cosmetic_mode=="shop"
-	var result := await services.emote_shop.play_owned(target,"dance_01",current)
+	var result := await services.emote_shop.play_owned(target,_shop_item,current)
 	if not is_instance_valid(_stage) or _stage.character!=target or _selected!=selected or _cosmetic_mode!="shop": return
 	if result.ok:
-		_context_title.text=tr("Dancinha")
+		_context_title.text=str(preload("res://scripts/skins/universal_emotes.gd").definition(_shop_item).get("name","Emote"))
 		_context_hint.text=tr("Emote da sua conta")
 	else:
 		_context_hint.text=EmoteShopService.message(str(result.code))
 
 
 func _preview_purchase() -> void:
+	if preload("res://scripts/skins/universal_emotes.gd").price_pending(_shop_item): return
 	if is_instance_valid(_buy_dialog): return
 	_buy_dialog=Control.new()
 	_buy_dialog.name="EmotePurchasePreview"
+	_buy_dialog.set_meta("product_id",_shop_item)
 	var panel := PlayerUI.deck_modal(self,_buy_dialog)
 	panel.add_child(PlayerUI.label("Comprar emote",30,PlayerUI.TEXT))
-	var details := PlayerUI.label("Dancinha · 100 moedas",22,PlayerUI.GOLD)
+	var item_name := str(preload("res://scripts/skins/universal_emotes.gd").definition(_shop_item).get("name","Emote"))
+	var details := PlayerUI.label(item_name+" · "+tr("Consultando preço…"),22,PlayerUI.GOLD)
 	details.name="EmotePurchasePrice"
 	panel.add_child(details)
 	var feedback := PlayerUI.label("Consultando saldo e disponibilidade…",20,PlayerUI.MUTED)
 	feedback.name="EmotePurchaseFeedback"
 	panel.add_child(feedback)
-	var confirm := PlayerUI.button("COMPRAR POR 100 MOEDAS",func()->void:
+	var confirm := PlayerUI.button("AGUARDE",func()->void:
 		if is_instance_valid(_buy_dialog):
 			await _buy_emote(_buy_dialog,_buy_dialog.find_child("ConfirmEmotePurchase",true,false) as Button,feedback))
 	confirm.name="ConfirmEmotePurchase"
@@ -789,19 +825,19 @@ func _preview_purchase() -> void:
 	if not result.ok:
 		feedback.text=EmoteShopService.message(str(result.code))
 		return
-	var item := services.emote_shop.product("dance_01")
+	var item := services.emote_shop.product(str(dialog.get_meta("product_id",_shop_item)))
 	if item.is_empty():
 		feedback.text=EmoteShopService.message("emote_not_found")
 		return
 	dialog.set_meta("price",str(item.price_coins).to_int())
-	details.text=tr("Dancinha · %s moedas") % str(item.price_coins)
+	details.text=item_name+" · "+tr("%s moedas") % str(item.price_coins)
 	confirm.text=tr("COMPRAR POR %s MOEDAS") % str(item.price_coins)
 	var balance_coins := str(services.emote_shop.data.coins).to_int()
 	if item.owned:
 		feedback.text=tr("Este emote já está na sua conta.")
 		confirm.text=tr("ADQUIRIDO")
 	elif not item.available:
-		feedback.text=tr("100 moedas. Venda aguardando o movimento real; a prévia continua disponível.")
+		feedback.text=tr("Venda indisponível; a prévia continua disponível.")
 	elif not preload("res://scripts/skins/universal_emotes.gd").install(_stage.character,str(item.animation_key)):
 		feedback.text=tr("O movimento real ainda não está disponível nesta versão.")
 	elif balance_coins<str(item.price_coins).to_int():
@@ -824,7 +860,7 @@ func _buy_emote(dialog: Control,confirm: Button,feedback: Label) -> void:
 	var close := dialog.find_child("CloseEmotePurchase",true,false) as Button
 	if close!=null: close.text=tr("Fechar")
 	var owner := str(services.session.user.get("id",""))
-	var result := await services.emote_shop.buy("dance_01",int(dialog.get_meta("price",100)))
+	var result := await services.emote_shop.buy(str(dialog.get_meta("product_id",_shop_item)),int(dialog.get_meta("price",100)))
 	if owner!=str(services.session.user.get("id","")): return
 	if result.ok: await services.wallet.refresh()
 	if not is_instance_valid(dialog) or dialog!=_buy_dialog or owner!=str(services.session.user.get("id","")): return

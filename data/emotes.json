@@ -5,7 +5,71 @@
       "id": "dance_01",
       "animation_key": "emote_dance_01",
       "scope": "account",
-      "clips": {}
+      "clips": {},
+      "name": "Dancinha",
+      "preview_visible": false
+    },
+    {
+      "id": "samba",
+      "name": "Samba",
+      "animation_key": "emote_samba",
+      "scope": "account",
+      "clips": {
+        "cowboy": "res://assets/emotes/samba/cowboy.res",
+        "michelly": "res://assets/emotes/samba/michelly.res",
+        "rodrigo": "res://assets/emotes/samba/rodrigo.res",
+        "lorena": "res://assets/emotes/samba/lorena.res",
+        "gus": "res://assets/emotes/samba/gus.res",
+        "lana": "res://assets/emotes/samba/lana.res",
+        "halloween": "res://assets/emotes/samba/halloween.res",
+        "el_fuego": "res://assets/emotes/samba/el_fuego.res"
+      },
+      "price_coins": null,
+      "purchase_enabled": false,
+      "commerce_status": "price_pending",
+      "preview_visible": true,
+      "preview_framing": {
+        "cowboy": {
+          "center_y": 0.8303142338991186,
+          "height": 2.017671087980275,
+          "width": 1.8248940777778622
+        },
+        "michelly": {
+          "center_y": 0.8889798531308785,
+          "height": 2.1305693271011146,
+          "width": 1.622483770847321
+        },
+        "rodrigo": {
+          "center_y": 0.8688136520795537,
+          "height": 2.0418112428858906,
+          "width": 1.6284451413154606
+        },
+        "lorena": {
+          "center_y": 0.9348195362836106,
+          "height": 2.203078693598505,
+          "width": 1.7359657382965081
+        },
+        "gus": {
+          "center_y": 0.9133941943291596,
+          "height": 2.1314929625950803,
+          "width": 1.9699630117416378
+        },
+        "lana": {
+          "center_y": 0.9048852468840799,
+          "height": 2.1175510786846328,
+          "width": 1.6499274396896366
+        },
+        "halloween": {
+          "center_y": 0.9145634500309835,
+          "height": 2.1702128512412333,
+          "width": 1.6901919960975647
+        },
+        "el_fuego": {
+          "center_y": 0.7271268621552744,
+          "height": 1.7003177626244743,
+          "width": 1.3398467063903814
+        }
+      }
     }
   ]
 }

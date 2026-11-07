@@ -33,7 +33,7 @@ func run() -> void:
 	check(not wallet.handle_back(),"entrada direta permite voltar à loja anterior")
 	wallet.queue_free();await settle()
 	var skins: Control=load("res://scenes/skins/skins_panel.tscn").instantiate()
-	root.add_child(skins);skins._generating=true;skins.open("cowboy")
+	root.add_child(skins);skins._shop_item="dance_01";skins._generating=true;skins.open("cowboy")
 	skins._choose_cosmetic_mode("shop");await settle()
 	skins.find_child("PreviewDanceMovement",true,false).pressed.emit()
 	skins.find_child("BuyEmotePreview",true,false).pressed.emit();await settle()

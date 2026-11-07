@@ -5,6 +5,7 @@ static var _materials: Dictionary={}
 static var _textures: Dictionary={}
 const ROOT="res://assets/desert/modular/"
 const WATER=preload("res://scripts/desert/t15d/regional_water.gdshader")
+const OASIS_WATER=preload("res://scripts/desert/t15d/oasis_water.gdshader")
 const Landings=preload("res://scripts/desert/t15d/prop_landings.gd")
 
 static func build(props: Node3D,order: int,slot: int,left: float,right: float,top: float) -> void:
@@ -93,7 +94,7 @@ static func _waterway(props: Node3D,left: float,right: float,top: float,natural:
 		var near_b:=-6.7+bend_b
 		var far_a:=(-18.6 if natural else -16.0)+bend_a
 		var far_b:=(-18.6 if natural else -16.0)+bend_b
-		_quad(props,"context_water",Vector3(a,top-0.28,near_a),Vector3(b,top-0.28,near_b),Vector3(b,top-0.28,far_b),Vector3(a,top-0.28,far_a),Color.WHITE)
+		_quad(props,"context_water_oasis" if natural else "context_water",Vector3(a,top-0.28,near_a),Vector3(b,top-0.28,near_b),Vector3(b,top-0.28,far_b),Vector3(a,top-0.28,far_a),Color.WHITE)
 		# Margens com espessura e terreno de apoio: a água fica no interior.
 		for edge in [0,1]:
 			var z_a: float=near_a if edge==0 else far_a
@@ -149,9 +150,10 @@ static func _quad(props: Node3D,key: String,a: Vector3,b: Vector3,c: Vector3,d: 
 
 static func material(key: String) -> Material:
 	if not _materials.has(key):
-		if key=="context_water":
+		if key in ["context_water","context_water_oasis"]:
 			var water:=ShaderMaterial.new()
-			water.shader=WATER
+			water.shader=OASIS_WATER if key=="context_water_oasis" else WATER
+			if key=="context_water_oasis":water.set_shader_parameter("water_detail",load(ROOT+"oasis_water_surface.png"))
 			_materials[key]=water
 		else:
 			var surface:=StandardMaterial3D.new()

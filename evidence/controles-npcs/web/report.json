@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "real_dropdown": true,
+  "real_keyboard": true,
+  "real_touch": true,
+  "paused_switch": true,
+  "mixed_both_release_orders": true,
+  "reload": true,
+  "sizes": [
+    "844x390",
+    "640x360",
+    "1672x941"
+  ],
+  "physical_device": false,
+  "gpu": "SwiftShader",
+  "errors": [],
+  "blocked": []
+}

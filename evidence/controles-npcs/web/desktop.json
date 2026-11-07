@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "ua": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+  "viewport": {
+    "width": 1672,
+    "height": 941
+  },
+  "dpr": 1,
+  "physical_device": false
+}

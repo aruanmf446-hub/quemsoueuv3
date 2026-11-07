@@ -1,0 +1,26 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+PASS Configurações tem seletor real de modos
+PASS escolha keyboard salva
+PASS somente teclado oculta o joystick e os botões de toque
+PASS somente teclado defende com K
+PASS escolha touch salva
+PASS modo toque mostra botões mesmo no computador
+PASS modo só-toque ignora movimento do teclado
+PASS modo só-toque não ataca pelo teclado
+PASS modo só-toque defende pelo botão
+PASS toque curto entre quadros também ativa defesa uma única vez
+PASS escolha mixed salva
+PASS modo misto mantém botões na tela
+PASS soltar o toque não cancela a tecla mantida no modo misto
+PASS soltar a tecla não cancela o joystick no modo misto
+PASS pausa permite alterar controles sem sair da fase
+PASS seletor da pausa aplica o modo imediatamente
+PASS opções e retorno da pausa cabem inteiros na tela
+PASS trocar o modo libera os comandos antigos
+PASS reabrir as preferências recupera a escolha salva
+PASS modo inválido não altera a escolha
+CONTROL_MODES checks=20 failures=0

@@ -8,7 +8,7 @@ const out=process.env.QSE_CONTROL_OUT||'/tmp/qse-control-web';fs.mkdirSync(out,{
   await context.route('**/*',r=>{if(['localhost','127.0.0.1'].includes(new URL(r.request().url()).hostname))return r.continue();blocked.push(r.request().url());return r.abort();});
   page=await context.newPage();page.setDefaultTimeout(180000);
   page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{const s=m.text();fs.appendFileSync(out+'/console.log',s+'\n');if(/SCRIPT ERROR:|Parse Error:|^ERROR:/.test(s))errors.push(s);});
-  const probe=cmd=>Promise.race([page.evaluate(c=>{window.qseControlProbe(c);return window.qseControlState;},cmd),new Promise((_,reject)=>setTimeout(()=>reject(Error('Probe blocked: '+cmd)),30000))]);
+  const probe=async cmd=>{let timer;try{return await Promise.race([page.evaluate(c=>{window.qseControlProbe(c);return window.qseControlState;},cmd),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Probe blocked: '+cmd)),30000);})]);}finally{clearTimeout(timer);}};
   const wait=async test=>{const end=Date.now()+180000;while(Date.now()<end){const s=await probe('state');if(test(s))return s;await page.waitForTimeout(60);}throw Error('State timeout: '+JSON.stringify(await probe('state')));};
   async function tap(point){const b=await page.locator('canvas').boundingBox();await page.touchscreen.tap(b.x+b.width*point[0],b.y+b.height*point[1]);}
   async function choose(index,mode){
@@ -40,7 +40,7 @@ const out=process.env.QSE_CONTROL_OUT||'/tmp/qse-control-web';fs.mkdirSync(out,{
   await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>typeof window.qseControlProbe==='function');const restored=await probe('state');assert(restored.mode==='touch'&&restored.preference==='touch','Mode lost after browser reload');
   await probe('play');await wait(s=>s.play&&s.touch);console.log('Touch-only ignores keys, executes button, and survives reload');
   for(const size of [{width:640,height:360},{width:1672,height:941}]){
-   await probe('settings');await page.setViewportSize(size);await wait(s=>Array.isArray(s.option));await page.screenshot({path:out+'/settings_'+size.width+'x'+size.height+'.jpg',type:'jpeg',quality:94,scale:'css'});
+   await probe('settings');await page.setViewportSize(size);await wait(s=>Array.isArray(s.option));const frame=(await probe('state')).tick;await wait(s=>s.tick>frame+12);await page.screenshot({path:out+'/settings_'+size.width+'x'+size.height+'.jpg',type:'jpeg',quality:94,scale:'css'});
   }
   assert(!errors.length&&!blocked.length,'Browser error or external request');
   fs.writeFileSync(out+'/report.json',JSON.stringify({passed:true,real_dropdown:true,real_keyboard:true,real_touch:true,paused_switch:true,mixed_both_release_orders:true,reload:true,sizes:['844x390','640x360','1672x941'],physical_device:false,gpu:'SwiftShader',errors,blocked},null,2));

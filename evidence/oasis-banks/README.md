@@ -27,6 +27,6 @@ zero acesso externo ao backend. GPU SwiftShader, fixture de cenário. Não há
 alegação de teste em aparelho físico, percurso completo ou medição de FPS.
 
 A habilidade reutilizável de qualidade visual fica em
-[qse-design](../../.agents/skills/qse-design/SKILL.md), com entrada correspondente
+[qse-visual-polish](../../.agents/skills/qse-visual-polish/SKILL.md), com entrada correspondente
 para Claude Code e acionamento nas instruções dos dois agentes. É uma habilidade
 do repositório; não foi instalada no catálogo global da conta.

@@ -12,7 +12,7 @@
 
 - Em tarefas com impacto visual (design, UI/UX, cenários, assets, materiais,
   efeitos, enquadramento ou responsividade), leia e aplique a habilidade
-  [`qse-design`](.agents/skills/qse-design/SKILL.md).
+  [`qse-visual-polish`](.agents/skills/qse-visual-polish/SKILL.md).
 - Em mudanças funcionais, preserve o desenho aprovado e confira o impacto visual
   quando existir; não transforme a correção em uma repaginação não solicitada.
 - Essa habilidade padroniza a qualidade e as evidências. O escopo e a autorização

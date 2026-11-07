@@ -1,9 +1,9 @@
 ---
-name: qse-design
+name: qse-visual-polish
 description: Criar e revisar o visual do Quem Sou Eu V3 com referências aprovadas e validação real. Aplicar a interfaces, UI/UX, cenários, assets, materiais, efeitos, enquadramento e responsividade; revisar também o impacto visual de mudanças funcionais.
 ---
 
-# Design do Quem Sou Eu V3
+# Acabamento visual do Quem Sou Eu V3
 
 Use esta habilidade nas mudanças com impacto visual deste repositório. O pedido atual
 do dono tem prioridade. Não prometa qualidade apenas porque os testes passaram.

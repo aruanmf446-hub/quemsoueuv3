@@ -23,6 +23,8 @@ var _previous: Button
 var _next: Button
 var _news: Button
 var _friends: Button
+var _coins: Button
+var _emotes: Button
 var _transition: Tween
 var _changing := false
 var _elapsed := 0.0
@@ -75,6 +77,13 @@ func _ready() -> void:
 	_news.pressed.connect(func() -> void: news_requested.emit())
 	_friends = _button("VER AMIGOS  ›", "HeroFriends")
 	_friends.pressed.connect(func() -> void: route_requested.emit("friends"))
+	_coins = _button("MOEDAS", "HeroCoins")
+	_coins.icon = preload("res://assets/icons/vector/icon_coin.svg")
+	_coins.expand_icon = true
+	_coins.add_theme_constant_override("icon_max_width", 26)
+	_coins.pressed.connect(func() -> void: route_requested.emit("wallet"))
+	_emotes = _button("EMOTES", "HeroEmotes")
+	_emotes.pressed.connect(func() -> void: route_requested.emit("emotes"))
 	resized.connect(_relayout)
 	get_parent().get_node("Navigation").route_changed.connect(_route_changed)
 	_hide_original_lobby()
@@ -230,6 +239,10 @@ func _relayout() -> void:
 	_friends.add_theme_font_size_override("font_size", 22 if iphone else 29)
 	_rect(_news, left, h * 0.91, w * 0.15, h * 0.07)
 	_rect(_friends, left + w * 0.17, h * 0.91, w * 0.19, h * 0.07)
+	for shortcut: Button in [_coins, _emotes]:
+		shortcut.add_theme_font_size_override("font_size", 22 if iphone else 27)
+	_rect(_coins, w * 0.65, h * 0.12, w * 0.15, maxf(96 if iphone else 64, h * 0.065))
+	_rect(_emotes, w * 0.82, h * 0.12, w * 0.15, maxf(96 if iphone else 64, h * 0.065))
 	_update_selection()
 
 func _tab_selected(index: int) -> void:

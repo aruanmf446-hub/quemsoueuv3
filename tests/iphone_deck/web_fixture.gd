@@ -61,7 +61,9 @@ func _run() -> void:
 	services.cosmetic_shop.client=fake
 	services.ability_refills.client=fake
 	if mode.begins_with("commerce"): await services.cosmetic_shop.refresh()
-	if mode=="i18n":
+	if mode=="commerce_entrypoints":
+		await _i18n_screen("lobby")
+	elif mode=="i18n":
 		profile.nickname="NicknameOriginal"
 		services.profile.data=profile.profile()
 		await _i18n_screen("editor")
@@ -191,6 +193,19 @@ func _i18n_screen(screen: String) -> void:
 		"lobby":
 			ui=preload("res://tests/i18n_expanded/hero_host.gd").new()
 			add_child(ui)
+			ui.hero.route_requested.connect(func(route: String)->void:
+				if route in ["wallet","emotes"]: _i18n_screen("commerce_wallet" if route=="wallet" else "commerce_emotes"))
+		"commerce_wallet":
+			ui=load("res://scenes/player/wallet.tscn").instantiate()
+			add_child(ui)
+			ui.show_screen({"tab":"coins"})
+		"commerce_emotes":
+			ui=load("res://scenes/skins/skins_panel.tscn").instantiate()
+			add_child(ui)
+			ui._generating=true
+			for entry: Dictionary in CharacterCatalog.load_entries():
+				ui._paths[str(entry.id)]="res://assets/portraits/"+str(entry.id)+".png"
+			ui.show_screen({"cosmetic_mode":"shop"})
 		"library", "official_cards":
 			ui=load("res://scenes/player/deck_library.tscn").instantiate()
 			add_child(ui)

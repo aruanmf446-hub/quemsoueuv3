@@ -124,6 +124,16 @@ func _run() -> void:
 		await settle(0.2)
 		check(is_equal_approx(elapsed, hero._elapsed), "autoplay paused on internal screen")
 		await back()
+	for shortcut: String in ["HeroCoins", "HeroEmotes"]:
+		var button: Button = hero.get_node(shortcut)
+		check(button.is_visible_in_tree(), "shortcut visible: " + shortcut)
+		check(Rect2(Vector2.ZERO,hero.size).encloses(button.get_rect()), "shortcut in viewport: " + shortcut)
+		await click(button)
+		await settle()
+		check(route() == ("wallet" if shortcut == "HeroCoins" else "skins"), "shortcut opens existing route: " + shortcut)
+		var params: Dictionary = nav._history.back().params
+		check(params.get("tab", "") == "coins" if shortcut == "HeroCoins" else params.get("cosmetic_mode", "") == "shop", "shortcut opens correct section: " + shortcut)
+		await back()
 	for index in [0, 1, 3]:
 		await click(hero.get_node("Tab%d" % index))
 		await settle()

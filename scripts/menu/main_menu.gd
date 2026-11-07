@@ -305,7 +305,12 @@ func _resume_coin_checkout() -> void:
 
 
 func _hero_route_selected(route: String) -> void:
-	_on_menu_button_activated(StringName(route))
+	if route == "wallet":
+		_navigation.open("wallet", {"tab":"coins"})
+	elif route == "emotes":
+		_navigation.open("skins", {"cosmetic_mode":"shop"})
+	else:
+		_on_menu_button_activated(StringName(route))
 
 func _open_news() -> void:
 	if get_node_or_null("NewsOverlay") != null: return

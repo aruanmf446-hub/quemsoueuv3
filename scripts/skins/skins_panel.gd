@@ -237,6 +237,13 @@ func _responsive_layout() -> void:
 		_description.hide()
 
 
+func show_screen(params: Dictionary = {}) -> void:
+	_cosmetic_mode = "shop" if params.get("cosmetic_mode", "") == "shop" else "skins"
+	super.show_screen(params)
+	_choose_cosmetic_mode(_cosmetic_mode)
+	if _cosmetic_mode == "shop": _preview_dance.call_deferred()
+
+
 func open(equipped_id: String = "") -> void:
 	_selected = equipped_id
 	show_screen()
@@ -258,6 +265,10 @@ func close() -> void:
 func render() -> void:
 	if _selected.is_empty():
 		_selected = services.inventory.equipped_id()
+	# A preview remains available while account equipment is still loading.
+	# Ownership and purchase checks continue to come from the services.
+	if services.inventory.entry(_selected).is_empty() and not services.inventory.entries.is_empty():
+		_selected = str(services.inventory.entries[0].id)
 	_build_collections()
 	_rebuild_gallery()
 	# Sem texto de demonstração: o banner só aparece para erros e estados de carregamento.

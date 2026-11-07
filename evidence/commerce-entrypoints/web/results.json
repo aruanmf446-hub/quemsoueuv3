@@ -1,0 +1,41 @@
+[
+  {
+    "width": 1672,
+    "height": 941,
+    "iphoneUA": false,
+    "animation": {
+      "animation": "emote_samba",
+      "playing": true,
+      "static": false
+    },
+    "salesDisabled": true,
+    "checkoutCalls": 0,
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "iphoneUA": true,
+    "animation": {
+      "animation": "emote_samba",
+      "playing": true,
+      "static": false
+    },
+    "salesDisabled": true,
+    "checkoutCalls": 0,
+    "errors": []
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "iphoneUA": true,
+    "animation": {
+      "animation": "emote_samba",
+      "playing": true,
+      "static": false
+    },
+    "salesDisabled": true,
+    "checkoutCalls": 0,
+    "errors": []
+  }
+]

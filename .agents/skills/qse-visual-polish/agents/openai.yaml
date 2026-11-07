@@ -1,0 +1,6 @@
+interface:
+  display_name: "QSE — Acabamento visual"
+  short_description: "Refina o visual do jogo preservando identidade e gameplay."
+  default_prompt: "Use $qse-visual-polish para melhorar o acabamento visual do Quem Sou Eu V3 com capturas reais e validação proporcional."
+policy:
+  allow_implicit_invocation: true

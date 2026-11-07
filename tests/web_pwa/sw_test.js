@@ -8,13 +8,13 @@ const root = path.resolve(__dirname, '../..');
 const site = '/tmp/claude-0/pwa_site';
 let failures = 0, checks = 0;
 function check(ok, msg) { checks++; console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!ok) failures++; }
-function assemble(build) { execSync(`python3 tests/web_pwa/assemble.py ${site}/quemsoueuv3 ${build}`, { cwd: root }); }
+function assemble(build) { execSync(`python3 tests/web_pwa/assemble.py ${site}/quemsoueuv3/jogar ${build}`, { cwd: root }); }
 (async () => {
-  execSync(`rm -rf ${site} && mkdir -p ${site}/quemsoueuv3`);
+  execSync(`rm -rf ${site} && mkdir -p ${site}/quemsoueuv3/jogar`);
   assemble('build-a');
   const server = spawn('python3', ['-m', 'http.server', '8765', '--bind', '127.0.0.1'], { cwd: site, stdio: 'ignore' });
   await new Promise(r => setTimeout(r, 800));
-  const url = 'http://localhost:8765/quemsoueuv3/';
+  const url = 'http://localhost:8765/quemsoueuv3/jogar/';
   const browser = await chromium.launch({ executablePath: process.env.QSE_CHROMIUM_EXECUTABLE || undefined });
   const context = await browser.newContext();
   const page = await context.newPage();
@@ -36,7 +36,7 @@ function assemble(build) { execSync(`python3 tests/web_pwa/assemble.py ${site}/q
   const thirdParty = await page.evaluate(async () => (await (await caches.open('qse-files')).keys()).filter(r => !r.url.startsWith(location.origin)).length);
   check(thirdParty === 0, 'nenhuma resposta de terceiros (Supabase/OAuth) no cache');
   const manifest = await page.evaluate(async () => (await fetch('manifest.webmanifest')).json());
-  check(manifest.display === 'standalone' && manifest.orientation === 'landscape' && manifest.scope === '/quemsoueuv3/', 'manifest standalone/landscape/escopo');
+  check(manifest.display === 'standalone' && manifest.orientation === 'landscape' && manifest.scope === './', 'manifest standalone/landscape/escopo');
   // Depois da janela de boot, a atualização aguarda o jogador. O shell permite
   // ativação automática só nos primeiros 15 s; não testar o fluxo manual nela.
   await page.waitForTimeout(16000);

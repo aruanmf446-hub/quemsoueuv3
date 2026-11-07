@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /bots/
+Sitemap: https://quemsoueu.cards/sitemap.xml

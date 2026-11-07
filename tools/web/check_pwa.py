@@ -6,7 +6,7 @@ import json, os, re, sys
 root = sys.argv[1] if len(sys.argv) > 1 else "build/web"
 errors = []
 manifest = json.load(open(os.path.join(root, "manifest.webmanifest"), encoding="utf-8"))
-for key, value in {"display": "standalone", "start_url": "/quemsoueuv3/", "scope": "/quemsoueuv3/", "orientation": "landscape"}.items():
+for key, value in {"display": "standalone", "start_url": "./", "scope": "./", "orientation": "landscape"}.items():
     if manifest.get(key) != value: errors.append(f"manifest.{key} != {value}")
 for icon in manifest.get("icons", []):
     if not os.path.exists(os.path.join(root, icon["src"])): errors.append("ícone ausente: " + icon["src"])

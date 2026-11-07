@@ -146,8 +146,10 @@ func _prepare_checkout(pack: Dictionary) -> void:
 	_checkout_dialog=Control.new()
 	_checkout_dialog.name="CoinCheckoutPanel"
 	var panel := PlayerUI.deck_modal(self,_checkout_dialog)
-	panel.add_child(PlayerUI.label("Comprar moedas",30))
-	panel.add_child(PlayerUI.label("%s %s · %s" % [pack.coins,"crédito(s) de deck" if pack.get("reward_kind")=="deck_credits" else "moedas",_brl(int(pack.price_brl_cents))],28,PlayerUI.GOLD))
+	var credit: bool=pack.get("reward_kind")=="deck_credits"
+	var art := load("res://assets/ui/store/deck_credit.png" if credit else "res://assets/ui/store/coin_treasure.png") as Texture2D
+	PlayerUI.shop_confirmation(panel,"Comprar créditos" if credit else "Comprar moedas",
+		"%s %s · %s" % [pack.coins,"crédito(s) de deck" if credit else "moedas",_brl(int(pack.price_brl_cents))],art)
 	var feedback := PlayerUI.label("Preparando pagamento seguro…",22,PlayerUI.MUTED)
 	feedback.name="CoinCheckoutFeedback"
 	panel.add_child(feedback)
@@ -155,11 +157,13 @@ func _prepare_checkout(pack: Dictionary) -> void:
 	open.name="OpenStripeCheckout"
 	open.disabled=true
 	PlayerUI.editor_control(open,true)
-	panel.add_child(open)
+	var actions := PlayerUI.row(panel)
+	open.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	actions.add_child(open)
 	var close := PlayerUI.button("Voltar",_close_checkout)
 	close.name="CloseCoinCheckout"
 	PlayerUI.editor_control(close)
-	panel.add_child(close)
+	actions.add_child(close)
 	close.grab_focus.call_deferred()
 	var dialog := _checkout_dialog
 	var result := await services.coin_store.create_checkout(pack)

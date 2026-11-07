@@ -375,6 +375,24 @@ static func shop_package(parent: Node, pack: Dictionary, price: String, unavaila
 	return buy
 
 
+static func shop_confirmation(parent: Node, title: String, detail: String, image: Texture2D) -> Label:
+	parent.add_child(label(title,30,TEXT))
+	var summary := row(parent)
+	summary.add_theme_constant_override("separation",24)
+	var art := TextureRect.new()
+	art.custom_minimum_size=Vector2(144,144)
+	art.texture=image
+	art.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+	art.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	art.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	summary.add_child(art)
+	var info := column(summary)
+	info.size_flags_vertical=Control.SIZE_SHRINK_CENTER
+	var value := label(detail,26,GOLD)
+	info.add_child(value)
+	return value
+
+
 ## Painel grande (superfície escura com filete fino).
 static func panel(parent: Node, padding := 34) -> VBoxContainer:
 	var node := PanelContainer.new()

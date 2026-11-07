@@ -724,13 +724,24 @@ func _variation_action() -> void:
 	_purchase_cosmetic(item)
 
 
+func _cosmetic_purchase_image() -> Texture2D:
+	if _cosmetic_mode=="shop":
+		var id := "dance" if _shop_item=="dance_01" else _shop_item
+		var thumb := _grid.find_child("EmoteThumbnail_"+id,true,false) as TextureRect
+		if thumb!=null and thumb.texture!=null: return thumb.texture
+	var style := str(_selected_styles.get(_selected,"original"))
+	var thumb := _preview.find_child("VariationThumbnail_"+style,true,false) as TextureRect
+	if thumb!=null and thumb.texture!=null: return thumb.texture
+	var path := "res://assets/portraits/"+_selected+".png"
+	return load(path) as Texture2D if ResourceLoader.exists(path) else null
+
+
 func _purchase_cosmetic(item: Dictionary) -> void:
 	if not item.get("available",false) or is_instance_valid(_buy_dialog): return
 	_buy_dialog=Control.new()
 	_buy_dialog.name="CosmeticPurchase"
 	var panel := PlayerUI.deck_modal(self,_buy_dialog)
-	panel.add_child(PlayerUI.label(str(item.name),28))
-	panel.add_child(PlayerUI.label(str(item.price_coins)+tr(" moedas"),24,PlayerUI.GOLD))
+	PlayerUI.shop_confirmation(panel,tr("Confirmar compra"),str(item.name)+" · "+str(item.price_coins)+tr(" moedas"),_cosmetic_purchase_image())
 	var feedback := PlayerUI.label("",20)
 	panel.add_child(feedback)
 	var dialog := _buy_dialog
@@ -745,8 +756,14 @@ func _purchase_cosmetic(item: Dictionary) -> void:
 			await services.wallet.refresh()
 			await services.progression.refresh()
 		else: confirm.disabled=false)
-	panel.add_child(confirm)
-	panel.add_child(PlayerUI.button("Voltar",_close_purchase))
+	var actions := PlayerUI.row(panel)
+	confirm.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	PlayerUI.style_button(confirm,true)
+	actions.add_child(confirm)
+	var cancel := PlayerUI.button("Cancelar",_close_purchase)
+	cancel.name="CloseCosmeticPurchase"
+	actions.add_child(cancel)
+	cancel.grab_focus.call_deferred()
 
 
 func _build_emote_gallery(entry: Dictionary) -> void:
@@ -880,11 +897,9 @@ func _preview_purchase() -> void:
 	_buy_dialog.name="EmotePurchasePreview"
 	_buy_dialog.set_meta("product_id",_shop_item)
 	var panel := PlayerUI.deck_modal(self,_buy_dialog)
-	panel.add_child(PlayerUI.label("Comprar emote",30,PlayerUI.TEXT))
 	var item_name := str(preload("res://scripts/skins/universal_emotes.gd").definition(_shop_item).get("name","Emote"))
-	var details := PlayerUI.label(item_name+" · "+tr("Consultando preço…"),22,PlayerUI.GOLD)
+	var details := PlayerUI.shop_confirmation(panel,tr("Comprar emote"),item_name+" · "+tr("Consultando preço…"),_cosmetic_purchase_image())
 	details.name="EmotePurchasePrice"
-	panel.add_child(details)
 	var feedback := PlayerUI.label("Consultando saldo e disponibilidade…",20,PlayerUI.MUTED)
 	feedback.name="EmotePurchaseFeedback"
 	panel.add_child(feedback)
@@ -894,7 +909,9 @@ func _preview_purchase() -> void:
 	confirm.name="ConfirmEmotePurchase"
 	confirm.disabled=true
 	PlayerUI.editor_control(confirm,true)
-	panel.add_child(confirm)
+	var actions := PlayerUI.row(panel)
+	confirm.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	actions.add_child(confirm)
 	var coins := PlayerUI.button("COMPRAR MOEDAS",func()->void:
 		_close_purchase()
 		navigate_requested.emit("wallet",{"tab":"coins"}))
@@ -904,7 +921,7 @@ func _preview_purchase() -> void:
 	var close := PlayerUI.button("Cancelar",_close_purchase)
 	close.name="CloseEmotePurchase"
 	PlayerUI.editor_control(close)
-	panel.add_child(close)
+	actions.add_child(close)
 	close.grab_focus.call_deferred()
 	var dialog := _buy_dialog
 	if not services.session.authenticated():

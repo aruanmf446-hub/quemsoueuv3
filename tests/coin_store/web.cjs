@@ -16,7 +16,7 @@ try{const results=[];
    const [x,y,w,h]=control.rect;assert.ok(x>=0&&y>=0&&x+w<=state.size[0]+1&&y+h<=state.size[1]+1,'outside '+name);
    const c=await page.locator('#canvas').boundingBox(),px=c.x+(x+w/2)*c.width/state.size[0],py=c.y+(y+h/2)*c.height/state.size[1];
    if(iphone)await page.touchscreen.tap(px,py);else await page.mouse.click(px,py);};
-  let state=await report();assert.ok(state.labels.includes('Pacote de teste'));assert.ok(state.labels.some(s=>s.includes('Modo de teste')));
+  let state=await report();assert.ok(state.labels.includes('500')&&state.labels.includes('MOEDAS'));assert.ok(state.labels.some(s=>s.includes('Modo de teste')));
   assert.equal(state.wallet_coins,'250');await page.screenshot({path:out+'/'+width+'x'+height+'_packages.png',scale:'css'});
   await tap('CoinPack_fixture_pack');await page.waitForTimeout(150);state=await report();
   assert.ok(state.labels.includes('500 moedas · R$ 9,90'));assert.equal(state.wallet_coins,'250');

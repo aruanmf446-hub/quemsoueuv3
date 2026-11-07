@@ -31,7 +31,7 @@ func _ready() -> void:
 	_layout()
 	_drawn_origin=_base
 func _wanted() -> bool:
-	return DisplayServer.is_touchscreen_available() or OS.has_feature("android") or OS.has_feature("web") or UIScale.is_handheld() or "--touch-controls" in OS.get_cmdline_user_args()
+	return preload("res://scripts/desert/t15d/control_scheme.gd").touch_enabled()
 func _layout() -> void:
 	var screen := get_viewport_rect().size
 	var unit := UIScale.unit_for(get_viewport())
@@ -123,6 +123,7 @@ func _press(index: int, point: Vector2) -> void:
 	if not action.is_empty():
 		_held[index] = action
 		Input.action_press(action)
+		_virtual(action,1.0)
 		get_viewport().set_input_as_handled()
 		return
 	if _stick_finger == null and _in_stick_zone(point):
@@ -148,22 +149,31 @@ func _drag(index: int, point: Vector2) -> void:
 	for action in _stick_actions.keys():
 		if not wanted.has(action):
 			_stick_actions.erase(action)
-			if not _held.values().has(action): Input.action_release(action)
+			if not _held.values().has(action):
+				Input.action_release(action)
+				_virtual(action,0.0)
 	for action in wanted:
 		_stick_actions[action] = wanted[action]
 		Input.action_press(action, wanted[action])
+		_virtual(action,float(wanted[action]))
 func _release(index: int) -> void:
 	if _stick_finger != null and _stick_finger == index:
 		_stick_finger = null
 		_stick = Vector2.ZERO
 		for action in _stick_actions.keys():
-			if not _held.values().has(action): Input.action_release(action)
+			if not _held.values().has(action):
+				Input.action_release(action)
+				_virtual(action,0.0)
 		_stick_actions.clear()
 		return
 	if not _held.has(index): return
 	var action: String = _held[index]
 	_held.erase(index)
-	if not _held.values().has(action) and not _stick_actions.has(action): Input.action_release(action)
+	if not _held.values().has(action) and not _stick_actions.has(action):
+		Input.action_release(action)
+		_virtual(action,0.0)
+func _virtual(action: String,strength: float) -> void:
+	if is_instance_valid(actor):actor.controls.set_virtual(action,strength)
 func _exit_tree() -> void:
 	release_all()
 func release_all() -> void:

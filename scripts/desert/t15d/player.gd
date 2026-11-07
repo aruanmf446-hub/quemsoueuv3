@@ -10,6 +10,7 @@ var _step_clock:=0.0
 signal landed
 signal strike_window
 signal hurt
+var controls=preload("res://scripts/desert/t15d/control_scheme.gd").new()
 const ActorSlot = preload("res://scripts/desert/t15d/actor_slot.gd")
 const SandFx = preload("res://scripts/desert/t15d/sand_fx.gd")
 const PropLandings=preload("res://scripts/desert/t15d/prop_landings.gd")
@@ -91,18 +92,18 @@ func _physics_process(delta: float) -> void:
 	_hurt_timer = maxf(_hurt_timer-delta,0.0)
 	_dash_left = maxf(0.0,_dash_left-delta)
 	for kind in abilities:
-		if Input.is_action_just_pressed(kind): use_ability(kind)
-	var direction := Input.get_axis("move_left", "move_right")
+		if controls.just_pressed(kind): use_ability(kind)
+	var direction := controls.axis()
 	if _dash_left > 0.0 and direction == 0.0: direction = facing
 	if direction != 0.0 and _attack_timer <= 0.0:
 		facing = signf(direction)
 	velocity.y = maxf(velocity.y - GRAVITY * delta, MAX_FALL_SPEED)
-	if Input.is_action_just_pressed("jump") and get_viewport().gui_get_focus_owner() == null: _jump_buffer = JUMP_BUFFER
-	if Input.is_action_just_pressed("attack"):
+	if controls.just_pressed("jump") and get_viewport().gui_get_focus_owner() == null: _jump_buffer = JUMP_BUFFER
+	if controls.just_pressed("attack"):
 		if attack_charges > 0: _attack_buffer = 0.15
 		else: action_empty.emit("attack")
 	# Defesa com buffer curto: apertar pouco antes de pousar ou no fim do golpe não se perde.
-	if Input.is_action_just_pressed("defend"):
+	if controls.just_pressed("defend"):
 		if defense_charges > 0: _defend_buffer = 0.2
 		else: action_empty.emit("defense")
 	if _defend_buffer > 0.0 and defense_charges > 0 and is_on_floor() and _attack_timer <= 0.0:
@@ -112,7 +113,7 @@ func _physics_process(delta: float) -> void:
 		_shield_timer = 1.2
 		inventory_changed.emit()
 	is_defending = _shield_timer > 0.0 and is_on_floor() and _knockback_timer <= 0.0 and _attack_timer <= 0.0
-	_set_crouched(not is_defending and Input.is_action_pressed("crouch") and is_on_floor() and _attack_timer <= 0.0)
+	_set_crouched(not is_defending and controls.pressed("crouch") and is_on_floor() and _attack_timer <= 0.0)
 	var jumped := false
 	if _jump_buffer > 0.0 and not is_defending and _attack_timer <= 0.15:
 		jumped = _try_jump()

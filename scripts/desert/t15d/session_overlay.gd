@@ -69,6 +69,10 @@ func show_settings() -> void:
 	_page="settings"
 	_clear()
 	_title("Configurações",28,Color.WHITE)
+	if PlayerServices.current!=null and PlayerServices.current.preferences!=null:
+		var picker:=preload("res://scripts/ui/control_mode_picker.gd").new()
+		picker.preferences=PlayerServices.current.preferences
+		_column.add_child(picker)
 	_button("Recargas compradas",show_refills,true)
 	_button("Voltar à pausa",show_pause)
 	_open()

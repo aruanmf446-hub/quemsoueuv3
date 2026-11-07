@@ -4,7 +4,7 @@ extends Node
 signal changed
 const SAVE_PATH := "user://device_preferences_v1.cfg"
 const DEFAULTS := {"muted": false, "master": 1.0, "music": 1.0, "sfx": 1.0, "quality": "medio", "locale": "pt_BR", "accept_key": KEY_ENTER, "back_key": KEY_ESCAPE,
-	"menu_music": true, "shadows": true, "window": ""}
+	"menu_music": true, "shadows": true, "window": "", "control_mode": "auto"}
 ## Tamanhos de janela oferecidos no desktop ("" = o do sistema; "fullscreen" = tela cheia).
 const WINDOW_SIZES := ["", "1280x720", "1600x900", "1920x1080", "fullscreen"]
 const LANGUAGES := [["Português (Brasil)", "pt_BR"], ["English", "en"], ["Español", "es"], ["Français", "fr"], ["日本語", "ja"], ["简体中文", "zh_CN"], ["Русский", "ru"]]
@@ -28,6 +28,7 @@ func _ready() -> void:
 			var value: Variant = config.get_value("device", key, DEFAULTS[key])
 			if _valid(key, value):
 				values[key] = value
+	values.control_mode=preload("res://scripts/desert/t15d/control_scheme.gd").saved_mode(values.control_mode)
 	if values.accept_key == values.back_key:
 		values.accept_key = KEY_ENTER
 		values.back_key = KEY_ESCAPE
@@ -47,6 +48,9 @@ func set_preference(key: String, value: Variant) -> bool:
 	for item: String in values:
 		config.set_value("device", item, values[item])
 	last_error = config.save(SAVE_PATH)
+	if key=="control_mode" and OS.has_feature("web"):
+		var stored: Variant=JavaScriptBridge.eval("(()=>{try{localStorage.setItem('qse-control-mode-v1',"+JSON.stringify(str(value))+");return true;}catch(e){return false;}})()")
+		if UIScale.js_true(stored):last_error=OK
 	if last_error != OK:
 		values[key] = previous
 		return false
@@ -75,6 +79,7 @@ func apply() -> void:
 		key_event.physical_keycode = int(values[binding[1]])
 		InputMap.action_add_event(binding[0], key_event)
 	get_tree().call_group("player_preview_stages", "apply_profile", values.quality)
+	preload("res://scripts/desert/t15d/control_scheme.gd").apply(str(values.control_mode),get_tree())
 	_apply_window()
 
 
@@ -95,6 +100,7 @@ func _apply_window() -> void:
 
 static func _valid(key: String, value: Variant) -> bool:
 	match key:
+		"control_mode": return value in ["auto","touch","keyboard","mixed"]
 		"muted": return value is bool
 		"master", "music", "sfx": return (value is float or value is int) and is_finite(value) and value >= 0 and value <= 1
 		"accept_key", "back_key": return value is int and value > 0 and value <= 0x7fffffff

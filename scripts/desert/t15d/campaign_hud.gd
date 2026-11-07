@@ -36,6 +36,7 @@ var _actions: HBoxContainer
 var _bridge_task: Button
 var _task_caption: Label
 var _action_buttons := {}
+const Scheme=preload("res://scripts/desert/t15d/control_scheme.gd")
 var _stage: Dictionary
 func configure(stage: Dictionary) -> void:
 	_stage = stage
@@ -123,9 +124,16 @@ func _ready() -> void:
 	_task_caption.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	_task_caption.hide()
 	_root.add_child(_task_caption)
-	_actions.visible = not (DisplayServer.is_touchscreen_available() or OS.has_feature("android") or OS.has_feature("web") or UIScale.is_handheld() or "--touch-controls" in OS.get_cmdline_user_args())
+	apply_control_scheme()
 	get_viewport().size_changed.connect(_layout)
 	_layout()
+func apply_control_scheme() -> void:
+	if not is_instance_valid(_actions):return
+	_actions.visible=not Scheme.touch_enabled()
+	for button: Button in _action_buttons.values():
+		button.mouse_filter=Control.MOUSE_FILTER_IGNORE if Scheme.mode=="keyboard" else Control.MOUSE_FILTER_STOP
+		button.focus_mode=Control.FOCUS_NONE if Scheme.mode=="keyboard" else Control.FOCUS_ALL
+	_bridge_task.mouse_filter=Control.MOUSE_FILTER_IGNORE if Scheme.mode=="keyboard" else Control.MOUSE_FILTER_STOP
 func label(text: String, size: int, color: Color) -> Label:
 	var node := Label.new()
 	node.text = text
@@ -227,6 +235,7 @@ func update_resources(player: Node) -> void:
 			(node.get_node("Count") as Label).text = "" if kind == "jump" else str(player.charges(kind))
 			(node.get_node("Key") as Label).text = {"attack":"J","defense":"K","rupture":"Q","amber":"E","dash":"R","jump":"Espaço"}[kind]
 			if kind != "jump": node.icon = Icons.medallion(kind,36,player.charges(kind)>0)
+		apply_control_scheme()
 		_layout()
 	for index in range(3):
 		if (index < player.health) != (index < _hp): _heart_pop[index] = 1.0

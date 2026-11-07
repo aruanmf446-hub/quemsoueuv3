@@ -1,0 +1,139 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS tendas existentes recebem apoio na lona
+PASS lona alcançável com os saltos aprovados: 2.54m
+PASS parte do piso real abaixo da tenda
+PASS salto insuficiente não bate a cabeça nem se prende à lona
+PASS desce normalmente para o balcão, sem subir por teleporte
+PASS salto duplo atravessa a lona de baixo para cima
+PASS aterrissa de verdade na lona e recupera os saltos
+PASS corre apoiado em cima da tenda
+PASS consegue saltar novamente de cima da lona
+PASS sai pela borda e cai sem travar
+PASS obstáculos de parkour existentes têm corpo sólido
+PASS não atravessa o corpo do balcão andando
+PASS salta pela lateral e pousa em cima do balcão sólido
+PASS caixas do cenário também oferecem apoio
+PASS pisa de verdade na caixa, sem flutuar
+PASS sair da fase remove todos os apoios
+PASS fase01 x12: streaming limpa referências físicas antigas
+PASS fase01 x12: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS capital_house: aterrissagem real por cima
+PASS capital_balcony_house: aterrissagem real por cima
+PASS capital_merchant: aterrissagem real por cima
+PASS city_supplies_context: aterrissagem real por cima
+PASS fase01 x350: streaming limpa referências físicas antigas
+PASS fase01 x350: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase01 x700: streaming limpa referências físicas antigas
+PASS fase01 x700: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase01 x1100: streaming limpa referências físicas antigas
+PASS fase01 x1100: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase01 x12: streaming limpa referências físicas antigas
+PASS fase01 x12: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase01 descarrega apoios sem resíduos
+PASS fase02 x12: streaming limpa referências físicas antigas
+PASS fase02 x12: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase02 x350: streaming limpa referências físicas antigas
+PASS fase02 x350: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase02 x700: streaming limpa referências físicas antigas
+PASS fase02 x700: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase02 x1100: streaming limpa referências físicas antigas
+PASS fase02 x1100: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase02 x12: streaming limpa referências físicas antigas
+PASS fase02 x12: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase02 descarrega apoios sem resíduos
+PASS fase03 x12: streaming limpa referências físicas antigas
+PASS fase03 x12: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS capital_market_stall: aterrissagem real por cima
+PASS fase03 x350: streaming limpa referências físicas antigas
+PASS fase03 x350: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase03 x700: streaming limpa referências físicas antigas
+PASS fase03 x700: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase03 x1100: streaming limpa referências físicas antigas
+PASS fase03 x1100: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase03 x12: streaming limpa referências físicas antigas
+PASS fase03 x12: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase03 descarrega apoios sem resíduos
+PASS fase04 x12: streaming limpa referências físicas antigas
+PASS fase04 x12: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS desert_oasis_fountain: aterrissagem real por cima
+PASS fase04 x350: streaming limpa referências físicas antigas
+PASS fase04 x350: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase04 x700: streaming limpa referências físicas antigas
+PASS fase04 x700: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase04 x1100: streaming limpa referências físicas antigas
+PASS fase04 x1100: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase04 x12: streaming limpa referências físicas antigas
+PASS fase04 x12: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase04 descarrega apoios sem resíduos
+PASS fase05 x12: streaming limpa referências físicas antigas
+PASS fase05 x12: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase05 x350: streaming limpa referências físicas antigas
+PASS fase05 x350: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase05 x700: streaming limpa referências físicas antigas
+PASS fase05 x700: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase05 x1100: streaming limpa referências físicas antigas
+PASS fase05 x1100: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase05 x12: streaming limpa referências físicas antigas
+PASS fase05 x12: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase05 descarrega apoios sem resíduos
+PASS fase06 x12: streaming limpa referências físicas antigas
+PASS fase06 x12: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS desert_mine_crystals: aterrissagem real por cima
+PASS desert_ancient_ruins: aterrissagem real por cima
+PASS fase06 x350: streaming limpa referências físicas antigas
+PASS fase06 x350: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase06 x700: streaming limpa referências físicas antigas
+PASS fase06 x700: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase06 x1100: streaming limpa referências físicas antigas
+PASS fase06 x1100: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase06 x12: streaming limpa referências físicas antigas
+PASS fase06 x12: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase06 descarrega apoios sem resíduos
+PASS fase07 x12: streaming limpa referências físicas antigas
+PASS fase07 x12: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS ore_cart_context: aterrissagem real por cima
+PASS fase07 x350: streaming limpa referências físicas antigas
+PASS fase07 x350: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase07 x700: streaming limpa referências físicas antigas
+PASS fase07 x700: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS desert_mining_gantry: aterrissagem real por cima
+PASS fase07 x1100: streaming limpa referências físicas antigas
+PASS fase07 x1100: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase07 x12: streaming limpa referências físicas antigas
+PASS fase07 x12: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase07 descarrega apoios sem resíduos
+PASS fase08 x12: streaming limpa referências físicas antigas
+PASS fase08 x12: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase08 x350: streaming limpa referências físicas antigas
+PASS fase08 x350: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase08 x700: streaming limpa referências físicas antigas
+PASS fase08 x700: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase08 x1100: streaming limpa referências físicas antigas
+PASS fase08 x1100: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase08 x12: streaming limpa referências físicas antigas
+PASS fase08 x12: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase08 descarrega apoios sem resíduos
+PASS fase09 x12: streaming limpa referências físicas antigas
+PASS fase09 x12: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase09 x350: streaming limpa referências físicas antigas
+PASS fase09 x350: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase09 x700: streaming limpa referências físicas antigas
+PASS fase09 x700: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase09 x1100: streaming limpa referências físicas antigas
+PASS fase09 x1100: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase09 x12: streaming limpa referências físicas antigas
+PASS fase09 x12: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase09 descarrega apoios sem resíduos
+PASS fase10 x12: streaming limpa referências físicas antigas
+PASS fase10 x12: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase10 x350: streaming limpa referências físicas antigas
+PASS fase10 x350: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase10 x700: streaming limpa referências físicas antigas
+PASS fase10 x700: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase10 x1100: streaming limpa referências físicas antigas
+PASS fase10 x1100: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase10 x12: streaming limpa referências físicas antigas
+PASS fase10 x12: apoios únicos, sobre piso existente, sem fechar lacunas
+PASS fase10 descarrega apoios sem resíduos
+PROP_LANDINGS checks=136 failures=0

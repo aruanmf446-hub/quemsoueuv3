@@ -1,0 +1,10 @@
+[
+  {
+    "test": "facade-canopies",
+    "passed": true,
+    "exit_code": 0,
+    "wall_seconds": 8.26,
+    "graphical": false,
+    "fixed_physics_step": false
+  }
+]

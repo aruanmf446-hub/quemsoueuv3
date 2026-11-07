@@ -3,6 +3,12 @@ extends RefCounted
 const LAYER:=64
 const GROUP:=&"campaign_one_way"
 const Support=preload("res://scripts/desert/t15d/one_way_support.gd")
+# Lonas das fachadas são plataformas mesmo na camada atrás da pista.
+# Coordenadas da borda frontal do tecido no recorte aprovado, não do telhado.
+const CANOPIES:={
+ "capital_house":[[0.14,0.44,0.565]],
+ "capital_merchant":[[0.09,0.49,0.605]],
+ "capital_balcony_house":[[0.14,0.44,0.565]]}
 # Frações do recorte visível: esquerda, direita, altura desde o topo da imagem.
 const LEDGES:={
  "capital_market_stall":[[0.18,0.82,0.23],[0.12,0.88,0.705]],
@@ -17,14 +23,17 @@ const LEDGES:={
  "ore_cart_context":[[0.10,0.90,0.25]]}
 static func attach(art: Sprite3D,id: String,order: int,left: float,right: float,base_y: float) -> void:
 	if art==null or not LEDGES.has(id):return
-	# A cidade distante é cenário. Só objetos próximos ao caminho oferecem apoio.
-	if art.position.z < -8.0 or art.position.y<base_y-0.1:return
+	# A fachada próxima fica em z=-10..-12; antes esse filtro excluía suas lonas.
+	# O skyline distante continua sem colisão. Só o tecido ganha apoio nessa camada.
+	if art.position.z < -12.5 or art.position.y<base_y-0.1:return
+	var ledges: Array=[] if art.position.z < -8.0 else LEDGES[id].duplicate()
+	ledges.append_array(CANOPIES.get(id,[]))
 	var width:=art.texture.get_width()*art.pixel_size
 	var height:=art.texture.get_height()*art.pixel_size
 	var lower:=art.position.y-height*0.5
-	var projection:=-art.position.z*(1.0/14.0)
+	var projection:=-art.position.z*((2.2 if order==2 else 1.0)/14.0)
 	var index:=0
-	for ledge: Array in LEDGES[id]:
+	for ledge: Array in ledges:
 		var u0:=1.0-float(ledge[1]) if art.flip_h else float(ledge[0])
 		var u1:=1.0-float(ledge[0]) if art.flip_h else float(ledge[1])
 		var a:=maxf(left+0.12,art.position.x+(u0-0.5)*width)
@@ -41,6 +50,7 @@ static func attach(art: Sprite3D,id: String,order: int,left: float,right: float,
 		body.set_meta("prop_asset",id)
 		body.set_meta("prop_art",art.get_path())
 		body.set_meta("prop_ledge",index)
+		body.set_meta("canopy",CANOPIES.has(id) and CANOPIES[id].has(ledge) or id=="capital_market_stall" and index==0)
 		body.set_meta("landing_span",Vector2(a,b))
 		body.set_meta("source_floor",base_y)
 		var collider:=CollisionShape3D.new()

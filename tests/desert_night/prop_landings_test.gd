@@ -165,7 +165,8 @@ func run() -> void:
 				if not body.has_meta("prop_asset"):continue
 				var art: Sprite3D=body.get_node(body.get_meta("prop_art"))
 				var key:=str(art.get_instance_id())+":"+str(body.get_meta("prop_ledge"))
-				if ids.has(key) or art.position.z < -8.0:valid=false
+				if ids.has(key) or art.position.z < -12.5:valid=false
+				if art.position.z < -8.0 and not body.get_meta("canopy",false):valid=false
 				ids[key]=true
 				var extent: Vector2=body.get_meta("landing_span")
 				var floor: Dictionary=preload("res://scripts/desert/t15d/campaign_layout.gd").floor_at(phase._phase,(extent.x+extent.y)*0.5)

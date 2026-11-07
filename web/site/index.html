@@ -11,7 +11,7 @@ if(app||/[?&](invite|coin_order)=/.test(s)||/access_token=/.test(h))location.rep
 <title>Quem Sou Eu — jogo de cartas e aventura grátis no navegador, Android e PC</title>
 <meta name="description" content="Quem Sou Eu é um jogo de cartas de adivinhação com modo história no Reino do Deserto, duelos com amigos e personagens colecionáveis. Jogue grátis no navegador ou instale no iPhone.">
 <link rel="canonical" href="https://quemsoueu.cards/">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#fbeee6">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="google-site-verification" content="nyKbTp6uoIm-YZRUkd7mWdu4qZW0w02Bg0aBfvLdCAw">
 <link rel="icon" type="image/png" href="img/favicon.png">
@@ -29,6 +29,7 @@ if(app||/[?&](invite|coin_order)=/.test(s)||/access_token=/.test(h))location.rep
 <meta name="twitter:title" content="Quem Sou Eu — jogo de cartas e aventura">
 <meta name="twitter:description" content="Adivinhe quem é, enfrente o Reino do Deserto e desafie amigos. Grátis no navegador.">
 <meta name="twitter:image" content="https://quemsoueu.cards/img/og.jpg">
+<link rel="preload" href="img/nunito-800.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="site.css">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
@@ -48,44 +49,34 @@ if(app||/[?&](invite|coin_order)=/.test(s)||/access_token=/.test(h))location.rep
   <symbol id="i-firefox" viewBox="0 0 24 24"><path d="M20.6 9.3c-.5-1.3-1.6-2.6-2.4-3 .7 1.3 1 2.6 1.2 3.4-1.1-2.8-3-3.9-4.5-6.4l-.2-.4-.1-.2v-.1h-.1c-2.2 1.3-3 3.6-3.1 4.8a4.5 4.5 0 0 0-2.4.9l-.2-.2c-.3-.8-.3-1.6 0-2.4A5.4 5.4 0 0 0 7 7.4c-.6-.8-.6-2-.5-2.3-.3.1-.6.3-.8.5a8.7 8.7 0 0 0-1.6 2.9l-.1.2-.2 1.4v.1a9.2 9.2 0 1 0 16.8-1Zm-8.6 10.9a6.6 6.6 0 0 1-6.2-4.6c.6 1 1.8 2.1 3.6 2.2 2.7.1 4.4-2.1 3.3-3.7.8.3 1.5 1.3 1.5 1.3s.2-2.4-2.1-3.2c-.2-.6-.8-1-1.8-1 .1-.5 1.5-1.1 1.6-1.2.2-.2.2-.6.1-.8-.4-.3-.8-.2-1.3-.2-.5 0-1-.4-1.3-.7.5-1.2 1.9-1.9 3-2.1 0 .1 1.7 2.6 4 3.9a6.6 6.6 0 0 1-4.4 10.1Z" fill="currentColor"/></symbol>
   <symbol id="i-opera" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9" ry="9.4" fill="none" stroke="currentColor" stroke-width="1.6"/><ellipse cx="12" cy="12" rx="3.8" ry="7" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
   <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3 8 7l1.4 1.4L11 6.8V15h2V6.8l1.6 1.6L16 7l-4-4ZM6 10v10h12V10h-3v2h1v6H8v-6h1v-2H6Z" fill="currentColor"/></symbol>
+  <symbol id="i-open" viewBox="0 0 24 24"><path d="M14 3h7v7h-2V6.4l-8.3 8.3-1.4-1.4L17.6 5H14V3ZM5 5h6v2H6v11h11v-5h2v7H4V5h1Z" fill="currentColor"/></symbol>
 </svg>
 <header class="top">
-  <a class="brand" href="./"><img src="img/logo.webp" width="720" height="234" alt="Quem Sou Eu"></a>
+  <a class="crm" href="./" aria-label="CRM Plus Store"><img src="img/crm-plus.webp" width="700" height="220" alt="CRM Plus Store"></a>
 </header>
 
-<main class="wrap">
-  <h1>Onde jogar</h1>
-  <div class="get">
-    <article class="tile" data-os="windows">
-      <svg class="icon" aria-hidden="true"><use href="#i-windows"/></svg>
-      <h2>Windows</h2>
-      <span class="btn is-off" aria-disabled="true">Baixar .EXE</span>
-      <p class="sub">Em breve</p>
-    </article>
-    <article class="tile" data-os="android">
-      <svg class="icon" aria-hidden="true"><use href="#i-android"/></svg>
-      <h2>Android</h2>
-      <span class="btn is-off" aria-disabled="true">Baixar APK</span>
-      <p class="sub">Em breve</p>
-    </article>
-    <article class="tile" data-os="ios">
-      <svg class="icon" aria-hidden="true"><use href="#i-apple"/></svg>
-      <h2>iPhone</h2>
-      <a class="btn" href="jogar/">Instalar PWA</a>
-      <p class="sub">No Safari: Compartilhar → Adicionar à Tela de Início</p>
-      <p class="sub" id="ios-note" hidden>Abra este site no Safari para instalar.</p>
-    </article>
-    <article class="tile" data-os="web">
-      <svg class="icon" aria-hidden="true"><use href="#i-globe"/></svg>
-      <h2>Navegador</h2>
-      <a class="btn" href="jogar/">Jogar online</a>
-      <p class="sub">Chrome, Safari, Firefox e Opera</p>
-    </article>
-  </div>
+<main class="hero">
+  <img class="logo" src="img/logo-qse.webp" width="900" height="602" alt="Quem Sou Eu" fetchpriority="high">
+  <h1>Descubra, adivinhe e se divirta com os amigos!</h1>
+  <p class="lede">O jogo de cartas e adivinhação para turbinar a diversão em grupo.</p>
+
+  <a class="cta" href="jogar/"><svg aria-hidden="true"><use href="#i-open"/></svg><span>Acessar o Jogo</span><b aria-hidden="true">›</b></a>
+
+  <ul class="plats" aria-label="Plataformas">
+    <li><a class="plat" data-os="web" href="jogar/"><svg aria-hidden="true"><use href="#i-globe"/></svg>Navegador</a></li>
+    <li><a class="plat" data-os="ios" href="jogar/"><svg aria-hidden="true"><use href="#i-apple"/></svg>iPhone</a></li>
+    <li><span class="plat is-off" data-os="android" aria-disabled="true"><svg aria-hidden="true"><use href="#i-android"/></svg>Android<small>Em breve</small></span></li>
+    <li><span class="plat is-off" data-os="windows" aria-disabled="true"><svg aria-hidden="true"><use href="#i-windows"/></svg>Windows<small>Em breve</small></span></li>
+  </ul>
+  <p class="hint">iPhone: abra no Safari, toque em Compartilhar e em <b>Adicionar à Tela de Início</b>.</p>
+  <p class="hint" id="ios-note" hidden>Você está fora do Safari. Abra este site no Safari para instalar.</p>
+
+  <img class="scene" src="img/deserto.webp" width="1400" height="588" alt="" loading="lazy">
 </main>
 
-<footer class="foot wrap">
-  <p>Quem Sou Eu é uma propriedade da CRM Plus .store · © 2026</p>
+<footer class="foot">
+  <span class="crm-mark"><i aria-hidden="true">+</i><b>CRM Plus</b> Store</span>
+  <p>Quem Sou Eu é propriedade da CRM Plus Store · © 2026</p>
 </footer>
 
 <script src="site.js" defer></script>

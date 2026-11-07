@@ -1,23 +1,50 @@
-/* Estrutura neutra do site institucional. O visual final será definido depois. */
-:root{--bg:#fff;--text:#1a1a1a;--muted:#666;--line:#e2e2e2;--accent:#1a1a1a;color-scheme:light}
+/* Site institucional do Quem Sou Eu (CRM Plus Store), conforme o esboço aprovado. */
+@font-face{font-family:Nunito;src:url("img/nunito-800.woff2") format("woff2");font-weight:800;font-display:swap}
+@font-face{font-family:Nunito;src:url("img/nunito-600.woff2") format("woff2");font-weight:600;font-display:swap}
+:root{--cream:#fbeee6;--navy:#141a3c;--text:#141a3c;--muted:#3b4266;--orange:#ff7a1a;--orange-dark:#e5560a;--gold:#f5b416;color-scheme:light}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;color:var(--text);font:600 17px/1.45 Nunito,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:hidden;
+  background:radial-gradient(60% 40% at 0% 8%,#f8c9ad 0,transparent 70%),radial-gradient(55% 35% at 100% 55%,#f9d6b8 0,transparent 70%),var(--cream)}
 img{max-width:100%;height:auto;display:block}
 a{color:inherit}
-:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
-.top{border-bottom:1px solid var(--line);padding:12px max(16px,calc((100% - 1080px)/2 + 16px))}
-.brand img{width:130px}
-h1{font-size:32px;margin:40px 0 24px}
-h2{font-size:20px;margin:0}
-.get{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
-.tile{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:24px 16px;border:1px solid var(--line);border-radius:12px}
-.tile.is-you{border-color:var(--accent)}
-.icon{width:48px;height:48px}
-.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;border-radius:8px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
-.btn.is-off{background:none;color:var(--muted);border:1px dashed var(--line)}
-.sub{margin:0;color:var(--muted);font-size:14px}
-.foot{margin-top:56px;padding-top:20px;padding-bottom:24px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}
-.foot p{margin:0}
-@media (max-width:860px){.get{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:480px){.get{grid-template-columns:1fr}}
+:focus-visible{outline:3px solid var(--orange);outline-offset:3px;border-radius:12px}
+
+.top{display:flex;align-items:center;justify-content:center;padding:max(12px,env(safe-area-inset-top)) 16px 12px;
+  background:rgba(255,255,255,.7);border-radius:0 0 28px 28px;box-shadow:0 6px 20px rgba(20,26,60,.06)}
+.crm img{width:clamp(180px,24vw,240px)}
+
+.hero{display:flex;flex-direction:column;align-items:center;text-align:center;max-width:760px;margin:0 auto;padding:clamp(20px,4vw,40px) 16px 0}
+.logo{width:min(78%,440px)}
+h1{margin:18px 0 0;font-weight:800;font-size:clamp(28px,4.6vw,44px);line-height:1.12;letter-spacing:-.01em}
+h1::after{content:"";display:block;width:120px;height:6px;margin:14px auto 0;border-radius:6px;background:var(--gold)}
+.lede{margin:16px 0 26px;font-size:clamp(18px,2.4vw,22px);color:var(--muted);max-width:26em}
+
+.cta{display:flex;align-items:center;justify-content:center;gap:18px;width:min(100%,560px);min-height:72px;border-radius:999px;
+  background:linear-gradient(#ff9a3c,var(--orange));color:#fff;text-decoration:none;font-weight:800;font-size:clamp(22px,3.4vw,30px);
+  box-shadow:0 6px 0 var(--orange-dark),0 14px 28px rgba(229,86,10,.28);transition:transform .08s,box-shadow .08s}
+.cta svg{width:32px;height:32px;padding-right:16px;box-sizing:content-box;border-right:2px solid rgba(255,255,255,.5)}
+.cta b{font-size:1.3em;line-height:1}
+.cta:active{transform:translateY(5px);box-shadow:0 1px 0 var(--orange-dark),0 6px 14px rgba(229,86,10,.25)}
+
+.plats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;width:min(100%,560px);list-style:none;margin:22px 0 0;padding:0}
+.plat{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 4px 12px;border-radius:18px;background:rgba(255,255,255,.75);
+  box-shadow:0 4px 14px rgba(20,26,60,.06);text-decoration:none;font-size:clamp(14px,2vw,17px);color:var(--text)}
+.plat svg{width:36px;height:36px;color:var(--navy)}
+a.plat:hover{background:#fff}
+.plat.is-you{box-shadow:0 0 0 2px var(--orange)}
+.plat small{font-size:12px;color:var(--muted);line-height:1}
+.is-off{opacity:.7}
+.hint{margin:14px 0 0;font-size:14px;color:var(--muted);max-width:30em}
+.hint b{color:var(--text)}
+
+.scene{width:min(100%,900px);margin-top:clamp(16px,4vw,32px);margin-bottom:-6px}
+
+.foot{display:flex;flex-direction:column;align-items:center;gap:6px;padding:28px 16px max(28px,env(safe-area-inset-bottom));
+  background:var(--navy);color:#fff;border-radius:28px 28px 0 0;text-align:center}
+.crm-mark{display:inline-flex;align-items:center;gap:12px;font-size:clamp(24px,4vw,32px);font-weight:600}
+.crm-mark b{font-weight:800}
+.crm-mark i{display:grid;place-items:center;width:1.5em;height:1.5em;border-radius:50%;background:var(--orange);color:var(--navy);font-style:normal;font-weight:800;line-height:1}
+.foot p{margin:0;font-size:14px;color:rgba(255,255,255,.75)}
+@media (max-width:420px){.plats{gap:8px}.plat svg{width:30px;height:30px}.cta{min-height:64px}}
+@media (prefers-reduced-motion:reduce){.cta{transition:none}}

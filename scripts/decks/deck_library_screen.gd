@@ -200,10 +200,6 @@ func _render_library() -> void:
 	# Ao (re)abrir a Biblioteca o header começa no destaque de maior prioridade.
 	_featured = 0
 	_page("BIBLIOTECA DE DECKS", "library")
-	if services.session.authenticated():
-		var review := _action("Revisão manual",_open_manual_review)
-		review.name="OpenManualReview"
-		body.add_child(review)
 	_search.text = _query
 	_search.editable = true
 	var compact := _compact()
@@ -235,7 +231,7 @@ func _render_library() -> void:
 	rule.color = Color(PremiumUI.GOLD, 0.25)
 	rule.custom_minimum_size.y = 1
 	body.add_child(rule)
-	var layout := HBoxContainer.new()
+	var layout := VBoxContainer.new()
 	layout.name = "LibraryLayout"
 	layout.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	layout.add_theme_constant_override("separation", 12 if compact else 24)
@@ -245,8 +241,6 @@ func _render_library() -> void:
 	_results.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_results.add_theme_constant_override("separation", 10 if compact else 18)
 	layout.add_child(_results)
-	_filter_panel = _filters()
-	layout.add_child(_filter_panel)
 	_update_results()
 
 
@@ -334,7 +328,7 @@ func _load_community() -> void:
 	if _community_busy or not _demo_entries.is_empty(): return
 	var service := CommunityService.for_current()
 	if not service.available() or CommunityService.state=="error": return
-	var complete := not _query.strip_edges().is_empty()
+	var complete := not _query.strip_edges().is_empty() or _tab == "Populares"
 	var needs_catalog := CommunityService.state!="ok" or Time.get_ticks_msec()/1000.0-CommunityService.loaded_at>=CommunityService.LIST_TTL or (complete and not CommunityService.next_cursor.is_empty())
 	var term := Catalog.search_key(_query)
 	var missing_cover := false
@@ -364,6 +358,7 @@ func _load_community() -> void:
 					covers+=1
 			if covers>=48: break
 	_community_busy=false
+	if result.ok and needs_catalog and _stats_state != "loading": _stats_state="idle"
 	if is_inside_tree() and _view=="library" and _tab!="Meus Decks": _update_results()
 
 func _retry_community() -> void:
@@ -654,7 +649,11 @@ func _sort_options() -> Array:
 	match _tab:
 		"Favoritos": return [["recent_favorite", "Adicionados recentemente"], ["name", "Nome A–Z"]]
 		"Meus Decks": return [["edited", "Última edição"], ["name", "Nome A–Z"]]
-	if _tab == "Populares" and _stats_state == "ok": return [["popular", "Mais populares"], ["name", "Nome A–Z"]]
+	if _tab == "Populares" and _stats_state == "ok":
+		var options := [["popular", "Bombando"], ["saved", "Mais salvos"]]
+		if _stats.values().any(func(stat: Dictionary) -> bool: return stat.has("downloads")): options.append(["downloads", "Mais baixados"])
+		options.append(["name", "Nome A–Z"])
+		return options
 	if _tab == "Recentes": return [["recent", "Publicados recentemente"], ["name", "Nome A–Z"]]
 	return [["name", "Nome A–Z"]]
 
@@ -667,6 +666,12 @@ func _sorted(list: Array[Dictionary]) -> Array[Dictionary]:
 	var mode := _sort if not _sort.is_empty() else str(_sort_options()[0][0])
 	if mode == "edited":
 		list.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a.get("edited", 0)) > float(b.get("edited", 0)))
+	elif mode in ["saved", "downloads"]:
+		var field := "favorites" if mode == "saved" else "downloads"
+		list.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+			var sa := int(_stats.get(str(a.get("ref", "")), {}).get(field, 0))
+			var sb := int(_stats.get(str(b.get("ref", "")), {}).get(field, 0))
+			return Catalog.search_key(a.name).naturalnocasecmp_to(Catalog.search_key(b.name)) < 0 if sa == sb else sa > sb)
 	elif mode == "popular":
 		# Sem engajamento medido (score 0) vai para o fim, em ordem alfabética.
 		list.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
@@ -698,6 +703,9 @@ func _update_results() -> void:
 		if _matches(entry): shown.append(entry)
 	shown = _sorted(shown)
 	if _tab == "Descobrir": _discover_top(all)
+	else:
+		_filter_panel = _filters()
+		_results.add_child(_filter_panel)
 	var titles := {"Descobrir": ["layers", "Resultados"], "Populares": ["bolt", "Decks populares"], "Recentes": ["clock", "Decks recentes"], "Favoritos": ["star", "Meus favoritos"], "Meus Decks": ["layers", "Meus decks"]}
 	_results_header(titles[_tab][0], "%s (%d)" % [tr(titles[_tab][1]), shown.size()])
 	if _tab == "Populares":
@@ -797,6 +805,10 @@ func _tile_facts(meta: HBoxContainer, entry: Dictionary, compact: bool) -> void:
 			players.tooltip_text = tr("Jogadores distintos nos últimos 30 dias")
 			players.name = "Players30d"
 			meta.add_child(players)
+		if int(stat.get("downloads", 0)) > 0:
+			var downloads := PremiumUI.plain("↓ %d" % int(stat.downloads), size, PremiumUI.MUTED, false)
+			downloads.tooltip_text = tr("Jogadores que adicionaram este deck à biblioteca")
+			meta.add_child(downloads)
 		if int(stat.get("favorites", 0)) > 0:
 			var hearts := PremiumUI.plain("♥ %d" % int(stat.favorites), size, Color("#e8817a"), false)
 			hearts.name = "FavoritesCount"
@@ -826,7 +838,13 @@ func _load_stats() -> void:
 		var ref := str(entry.get("ref", ""))
 		if not ref.is_empty() and not refs.has(ref): refs.append(ref)
 	_stats_state = "loading"
-	var result: Dictionary = await client.call_rpc("qse_deck_stats", {"p_refs": refs.slice(0, 100)})
+	var result: Dictionary = ServiceResult.success([])
+	var rows: Array = []
+	for offset in range(0, refs.size(), 100):
+		result = await client.call_rpc("qse_deck_stats", {"p_refs": refs.slice(offset, offset + 100)})
+		if not result.ok or not result.data is Array: break
+		rows.append_array(result.data)
+	if result.ok and result.data is Array: result = ServiceResult.success(rows)
 	_stats_at = Time.get_ticks_msec() / 1000.0
 	_stats.clear()
 	if result.ok and result.data is Array:
@@ -834,7 +852,13 @@ func _load_stats() -> void:
 			if row is Dictionary and row.get("deck_ref") is String:
 				_stats[row.deck_ref] = {"plays_30d": int(row.get("plays_30d", 0)), "players_30d": int(row.get("players_30d", 0)),
 					"favorites": int(row.get("favorites", 0)), "score": float(row.get("score", 0))}
+				if row.has("downloads"): _stats[row.deck_ref]["downloads"] = maxi(0, int(row.downloads))
 		_stats_state = "ok"
+		var current_refs: Array = []
+		for entry in _entries():
+			var ref := str(entry.get("ref", ""))
+			if not ref.is_empty() and not current_refs.has(ref): current_refs.append(ref)
+		if current_refs != refs: _stats_state = "idle"
 	else:
 		_stats_state = "error"
 	if is_inside_tree() and _view == "library" and _tab in ["Populares", "Descobrir"]: _update_results()
@@ -896,6 +920,8 @@ func _discover_top(all: Array[Dictionary]) -> void:
 		_results.add_child(_banner(_slides[_featured], _slides.size()))
 		_arm_rotation()
 	_load_stats.call_deferred()
+	_filter_panel = _filters()
+	_results.add_child(_filter_panel)
 	var counts := {"official": 0, "themed": 0, "community": 0, "mine": 0}
 	for entry in all:
 		counts[entry.origin] = int(counts.get(entry.origin, 0)) + 1
@@ -1010,7 +1036,7 @@ func _banner(slide: Dictionary, total: int) -> Control:
 	banner_panel.name = "FeaturedBanner"
 	banner_panel.set_meta("reason", slide.reason)
 	banner_panel.set_meta("deck", str(entry.get("ref", entry.id)))
-	banner_panel.custom_minimum_size.y = 440
+	banner_panel.custom_minimum_size.y = 500
 	var frame := PremiumUI.flat(Color(0.03, 0.04, 0.07), Color(PremiumUI.GOLD, 0.4), 16, 1, 0)
 	banner_panel.add_theme_stylebox_override("panel", frame)
 	banner_panel.clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
@@ -1326,10 +1352,9 @@ func _monogram(cover: TextureRect, title: String) -> void:
 func _fit_tiles() -> void:
 	if not is_instance_valid(_grid) or _grid.name != "DeckGrid": return
 	var compact := _compact()
-	var panel := _filter_panel.custom_minimum_size.x + 18.0 if is_instance_valid(_filter_panel) and _filter_panel.visible else 0.0
 	# iPhone: margens reais da página (laterais + espaçamento do painel) para a grade nunca
 	# alargar a tela e empurrar a busca para fora.
-	var width: float = _physical_size().x - panel - (170.0 if UIScale.is_iphone() else (60.0 if compact else 130.0))
+	var width: float = _physical_size().x - (170.0 if UIScale.is_iphone() else (60.0 if compact else 130.0))
 	var gap := 10.0 if compact else 18.0
 	var minimum := 200.0 if compact else 320.0
 	_grid.columns = clampi(floori((width + gap) / (minimum + gap)), 1, 5)
@@ -1345,11 +1370,10 @@ func _fit_tiles() -> void:
 func _filters() -> Control:
 	var compact := _compact()
 	var panel := PremiumUI.panel("FilterPanel", 10 if compact else 20)
-	panel.custom_minimum_size.x = 170 if compact else 300
-	if UIScale.is_iphone(): panel.custom_minimum_size.x = 220
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	panel.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 4 if compact else 8)
+	var column := HBoxContainer.new()
+	column.add_theme_constant_override("separation", 24)
 	panel.add_child(column)
 	var head := HBoxContainer.new()
 	head.add_theme_constant_override("separation", 10)
@@ -1364,9 +1388,11 @@ func _filters() -> Control:
 	themes.sort_custom(func(a: Array, b: Array) -> bool: return str(a[0]) < str(b[0]))
 	var theme_group := _filter_group("Temática", themes, _themes, "Theme_")
 	if themes.is_empty(): theme_group.add_child(PlayerUI.label("Os decks ainda não informam temática.", 11 if compact else 14, PremiumUI.MUTED))
+	theme_group.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	column.add_child(theme_group)
 	var clear := PremiumUI.action("Limpar filtros", "refresh", false, _clear_filters, compact)
 	clear.name = "ClearFilters"
+	clear.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	column.add_child(clear)
 	return panel
 
@@ -1381,6 +1407,9 @@ func _filter_group(title: String, options: Array, selected: Dictionary, prefix: 
 	rule.custom_minimum_size.y = 1
 	group.add_child(rule)
 	group.add_child(PremiumUI.plain(title, 13 if compact else 20, Color.WHITE))
+	var choices := HFlowContainer.new()
+	choices.add_theme_constant_override("h_separation", 12)
+	group.add_child(choices)
 	for option: Array in options:
 		var box := CheckBox.new()
 		box.name = prefix + str(option[1]).replace(" ", "_")
@@ -1395,7 +1424,7 @@ func _filter_group(title: String, options: Array, selected: Dictionary, prefix: 
 			if value: selected[str(option[1])] = true
 			else: selected.erase(str(option[1]))
 			_update_results())
-		group.add_child(box)
+		choices.add_child(box)
 	return group
 
 
@@ -1473,7 +1502,7 @@ func _render_deck(item: Dictionary) -> void:
 		var column := PlayerUI.column(margin)
 		column.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		column.add_theme_constant_override("separation", 4)
-		var image := _image(entry.image)
+		var image := _image(entry.image, true)
 		image.name = "CardImage"
 		image.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		column.add_child(image)
@@ -1497,7 +1526,7 @@ func _fit_grid() -> void:
 	var available := _physical_size().x - (56 if _compact() else 96)
 	_grid.columns = clampi(floori((available + 16) / (148 if _compact() else 236)), 1, 6)
 	var width := floorf((available - (_grid.columns - 1) * 16) / _grid.columns)
-	var image_height := clampf(_physical_size().y - 240, 120, 210) if _compact() else width * 1.35
+	var image_height := (width - 16.0) / CardFramer.LIBRARY_ASPECT
 	for button: Control in _grid.get_children():
 		button.custom_minimum_size = Vector2(width, image_height + 62)
 	_refit_margin.call_deferred()
@@ -1608,9 +1637,19 @@ func _data_text(value: String, font_size := 20, color := PlayerUI.TEXT) -> Label
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return label
 
-func _image(path: String) -> TextureRect:
+func _image(path: String, gallery := false) -> TextureRect:
 	var image := TextureRect.new()
-	image.texture = DeckCover.load_texture(path)
+	var source := DeckCover.load_texture(path)
+	image.texture = source
+	if gallery and source != null:
+		# Mesmo recorte 5:7 do editor. Prévias manuais já nesse formato permanecem intactas.
+		var key := "gallery:" + DeckCover.stamp(path)
+		if not _covers.has(key):
+			var framed := AtlasTexture.new()
+			framed.atlas = source
+			framed.region = CardFramer.region(source.get_size(), CardFramer.LIBRARY_ASPECT, {"x": DeckCover.PORTRAIT_FOCUS.x, "y": DeckCover.PORTRAIT_FOCUS.y})
+			_covers[key] = framed
+		image.texture = _covers[key]
 	image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	image.mouse_filter = Control.MOUSE_FILTER_IGNORE

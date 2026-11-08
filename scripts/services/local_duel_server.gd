@@ -12,6 +12,7 @@ extends Node
 
 const DECKS_ROOT := "res://assets/duel/decks/oficial"
 const VALID_ID := "^[a-z0-9_]{2,32}$"
+const VALID_CARD_ID := "^(?:[a-z0-9_]{2,32}|[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})$"
 const HUMAN := "local_player"
 const SETTING_KEYS := ["max_players", "deck_ids", "cards_per_player", "bots_allowed", "turn_seconds",
 	"selection_seconds", "tiebreak_base", "tiebreak_per_player"]
@@ -80,6 +81,7 @@ func now() -> float:
 func decks() -> Array:
 	if not _decks.is_empty(): return _decks+community_decks
 	var valid := RegEx.create_from_string(VALID_ID)
+	var valid_card := RegEx.create_from_string(VALID_CARD_ID)
 	var folders := Array(DirAccess.get_directories_at(DECKS_ROOT))
 	folders.sort()
 	for folder: String in folders:
@@ -96,7 +98,7 @@ func decks() -> Array:
 			if not stem.ends_with(".png"): continue
 			stem = stem.trim_suffix(".png")
 			var id := "%s/%s" % [folder, stem]
-			if valid.search(stem) != null and not cards.has(id): cards.append(id)
+			if valid_card.search(stem) != null and not cards.has(id): cards.append(id)
 		cards.sort()
 		if cards.size() < 2: continue
 		_decks.append({"id": folder, "name": str(info.get("name", folder.replace("_", " ").capitalize())).left(32),

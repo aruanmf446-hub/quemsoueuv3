@@ -263,6 +263,16 @@ func _select_tab(tab: String) -> void:
 	PlayerUI.cascade(_results)
 
 
+## Curated badge, never inferred from creator content or a deck title.
+func _official_badges(parent: Node, entry: Dictionary) -> void:
+	parent.add_child(PlayerUI.pill("OFICIAL", "equipped"))
+	if bool(entry.get("qse_original", false)):
+		var original := PlayerUI.pill("QSE Originals", "equipped")
+		original.name = "QSEOriginalsBadge"
+		original.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		parent.add_child(original)
+
+
 # --- Modelo único das abas: oficiais, comunidade e meus rascunhos ---------------------
 
 ## Entradas reais. Decks de demonstração só existem quando um TESTE preenche _demo_entries.
@@ -273,7 +283,7 @@ func _entries() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for item in _catalog:
 		var images: Array = (item.cards as Array).map(func(card: Dictionary) -> String: return str(card.image))
-		result.append({"id": str(item.id), "name": str(item.name), "origin": "official" if item.official else "community",
+		result.append({"id": str(item.id), "name": str(item.name), "origin": "official" if item.official else "community", "qse_original": bool(item.get("qse_original", false)),
 			"creator": str(item.creator), "category": str(item.category), "count": int(item.count), "tags": item.get("tags", []),
 			"cover": DeckCover.resolve_item(item), "live_cover_path": str(item.get("cover_path", "")),
 			"focus": DeckCover.PORTRAIT_FOCUS, "images": images, "item": item,
@@ -1032,7 +1042,7 @@ func _banner(slide: Dictionary, total: int) -> Control:
 	reason.name = "FeaturedReason"
 	badges.add_child(reason)
 	if entry.origin == "official":
-		badges.add_child(PlayerUI.pill("OFICIAL", "equipped"))
+		_official_badges(badges, entry)
 	text.add_child(badges)
 	var title := PremiumUI.plain(str(entry.name), 50, Color.WHITE, false)
 	title.name = "FeaturedTitle"
@@ -1116,11 +1126,19 @@ func _deck_tile(entry: Dictionary) -> Control:
 	if entry.origin == "official" and services.editor_content != null:
 		services.editor_content.attach_cover(cover, str(entry.get("live_cover_path", "")))
 	if entry.origin == "official":
-		var seal := PlayerUI.pill("OFICIAL", "equipped")
-		seal.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		cover.add_child(seal)
-		seal.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
-		seal.position += Vector2(10, -32)
+		var badges := HFlowContainer.new()
+		badges.name = "OfficialBadges"
+		badges.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		badges.add_theme_constant_override("h_separation", 6)
+		badges.add_theme_constant_override("v_separation", 4)
+		cover.add_child(badges)
+		_official_badges(badges, entry)
+		badges.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+		badges.grow_vertical = Control.GROW_DIRECTION_BEGIN
+		badges.offset_left = 10
+		badges.offset_right = -10
+		badges.offset_top = -32
+		badges.offset_bottom = -8
 	var info := MarginContainer.new()
 	info.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	info.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -1399,7 +1417,7 @@ func _render_deck(item: Dictionary) -> void:
 	var metadata := PlayerUI.flow(body)
 	metadata.name = "DeckMetadata"
 	if item.official:
-		metadata.add_child(PlayerUI.pill("OFICIAL", "equipped"))
+		_official_badges(metadata, item)
 		if services.rewards != null and services.rewards.is_deck_claimed(str(item.id)):
 			metadata.add_child(PlayerUI.pill("NA SUA CONTA", "equipped"))
 		elif services.session.authenticated():

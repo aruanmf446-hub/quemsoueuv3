@@ -206,6 +206,23 @@ func _i18n_screen(screen: String) -> void:
 			for entry: Dictionary in CharacterCatalog.load_entries():
 				ui._paths[str(entry.id)]="res://assets/portraits/"+str(entry.id)+".png"
 			ui.show_screen({"cosmetic_mode":"shop"})
+		"originals", "originals_gallery":
+			ui=load("res://scenes/player/deck_library.tscn").instantiate()
+			add_child(ui)
+			if screen=="originals": ui._render_deck(preload("res://scripts/decks/deck_library_catalog.gd").find_deck("lado_sombrio"))
+			else:
+				ui.show_screen()
+				ui._query="Lado Sombrio"
+				ui._update_results()
+		"skins_locked", "skins_unlocked":
+			services.progression.state="success"
+			services.progression.data={"unlocked_character_ids":PlayerContracts.initial_ids(),"equipped_character_id":"cowboy"}
+			if screen=="skins_unlocked": services.progression.data.unlocked_character_ids.append("el_fuego")
+			ui=load("res://scenes/skins/skins_panel.tscn").instantiate()
+			add_child(ui)
+			ui._generating=true
+			for entry: Dictionary in CharacterCatalog.load_entries(): ui._paths[str(entry.id)]="res://assets/portraits/"+str(entry.id)+".png"
+			ui.open("el_fuego")
 		"library", "official_cards":
 			ui=load("res://scenes/player/deck_library.tscn").instantiate()
 			add_child(ui)
@@ -247,6 +264,8 @@ func _i18n_screen(screen: String) -> void:
 	await get_tree().process_frame
 
 func _probe(args: Array) -> void:
+	if args.size() and str(args[0]).begins_with("original_card:"):
+		ui._render_card(str(args[0]).trim_prefix("original_card:").to_int())
 	if args.size() and str(args[0]).begins_with("i18n_screen:"):
 		await _i18n_screen(str(args[0]).trim_prefix("i18n_screen:"))
 	if args.size() and str(args[0])=="start_refill_phase":

@@ -1,0 +1,35 @@
+[
+  {
+    "width": 1672,
+    "height": 941,
+    "mobile": false,
+    "lockedHidden": true,
+    "unlockedSelectable": true,
+    "newBadge": true,
+    "legacyBadgeAbsent": true,
+    "cards": 10,
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "mobile": true,
+    "lockedHidden": true,
+    "unlockedSelectable": true,
+    "newBadge": true,
+    "legacyBadgeAbsent": true,
+    "cards": 10,
+    "errors": []
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "mobile": true,
+    "lockedHidden": true,
+    "unlockedSelectable": true,
+    "newBadge": true,
+    "legacyBadgeAbsent": true,
+    "cards": 10,
+    "errors": []
+  }
+]

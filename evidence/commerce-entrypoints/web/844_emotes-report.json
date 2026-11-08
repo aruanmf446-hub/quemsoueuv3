@@ -1,0 +1,142 @@
+{
+  "cards": 0,
+  "checkout_calls": 0,
+  "controls": [
+    {
+      "disabled": false,
+      "name": "Back",
+      "rect": [
+        26,
+        26,
+        152,
+        68
+      ],
+      "text": "Voltar"
+    },
+    {
+      "disabled": false,
+      "name": "CosmeticTab_skins",
+      "rect": [
+        26,
+        106,
+        213,
+        64
+      ],
+      "text": "SKINS"
+    },
+    {
+      "disabled": false,
+      "name": "CosmeticTab_emotes",
+      "rect": [
+        253,
+        106,
+        213,
+        64
+      ],
+      "text": "REAÇÕES"
+    },
+    {
+      "disabled": false,
+      "name": "CosmeticTab_shop",
+      "rect": [
+        480,
+        106,
+        213,
+        64
+      ],
+      "text": "EMOTES"
+    },
+    {
+      "disabled": false,
+      "name": "EmotePreview_samba",
+      "rect": [
+        26,
+        230,
+        280,
+        350
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "@Button@425",
+      "rect": [
+        1314,
+        106,
+        36,
+        50
+      ],
+      "text": ""
+    },
+    {
+      "disabled": false,
+      "name": "PreviewDanceMovement",
+      "rect": [
+        711,
+        585,
+        312,
+        64
+      ],
+      "text": "VER MOVIMENTO"
+    },
+    {
+      "disabled": true,
+      "name": "BuyEmotePreview",
+      "rect": [
+        1037,
+        585,
+        313,
+        64
+      ],
+      "text": "EM BREVE"
+    }
+  ],
+  "emote": {
+    "animation": "emote_samba",
+    "playing": true,
+    "static": false
+  },
+  "emote_purchases": 0,
+  "emote_thumbnails": [
+    {
+      "height": 262,
+      "name": "EmoteThumbnail_samba",
+      "ready": true
+    }
+  ],
+  "fields": {},
+  "labels": [
+    "Personagens",
+    "LOJA · PRÉVIA",
+    "Emotes da conta · todas as skins compatíveis",
+    "Samba",
+    "50 moedas",
+    "Cowboy",
+    "BLOQUEADO",
+    "Samba · prévia",
+    "Preço a definir",
+    ""
+  ],
+  "language_choice": null,
+  "layout_width": 1376,
+  "locale": "pt_BR",
+  "preview_render": {
+    "static": false,
+    "update": 4
+  },
+  "sequence": 6,
+  "shop": {
+    "coins": "250",
+    "owned": false
+  },
+  "size": [
+    1376,
+    675
+  ],
+  "variations": {
+    "character": "cowboy",
+    "style": "original",
+    "thumbnails": []
+  },
+  "wallet_coins": "250"
+}

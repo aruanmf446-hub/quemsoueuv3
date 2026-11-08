@@ -37,7 +37,10 @@ func run() -> void:
  var wallet: Control=load("res://scenes/player/wallet.tscn").instantiate();root.add_child(wallet)
  wallet.show_screen({"tab":"coins","category":"deck_credits"})
  for i in 10: await process_frame
- check(wallet.find_child("CoinPack_deck_credit",true,false)!=null and wallet.find_child("CoinPack_coins_100",true,false)==null,"atalho de cartas abre a categoria correta")
+ if ReleaseFeatures.COMMERCE_ENABLED:
+  check(wallet.find_child("CoinPack_deck_credit",true,false)!=null and wallet.find_child("CoinPack_coins_100",true,false)==null,"atalho de cartas abre a categoria correta")
+ else:
+  check(wallet.find_child("CoinPack_deck_credit",true,false)==null,"free release keeps purchase categories inactive")
  wallet.queue_free()
  for i in 3: await process_frame
  services.queue_free();fake.queue_free()

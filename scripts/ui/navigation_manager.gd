@@ -42,6 +42,7 @@ func register_screen(route: String, screen: PlayerScreen) -> void:
 ## Entrada instantanea: renderiza a autenticacao antes do primeiro frame do lobby.
 ## Evita o LoadingVeil e a animacao que mostrariam o lobby por tras do login.
 func open_initial(route: String, params: Dictionary = {}) -> void:
+	if route == "wallet" and not ReleaseFeatures.COMMERCE_ENABLED: return
 	if _busy or not _history.is_empty() or not _routes.has(route):
 		return
 	if not _screens.has(route):
@@ -63,6 +64,7 @@ func open_initial(route: String, params: Dictionary = {}) -> void:
 
 
 func open(route: String, params: Dictionary = {}) -> void:
+	if route == "wallet" and not ReleaseFeatures.COMMERCE_ENABLED: return
 	var perf_started := Time.get_ticks_usec()
 	if not _routes.has(route): return
 	if _busy:

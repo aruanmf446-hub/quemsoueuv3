@@ -81,8 +81,10 @@ func _ready() -> void:
 	_coins.icon = preload("res://assets/icons/vector/icon_coin.svg")
 	_coins.expand_icon = true
 	_coins.add_theme_constant_override("icon_max_width", 26)
+	_coins.visible = ReleaseFeatures.COMMERCE_ENABLED
 	_coins.pressed.connect(func() -> void: route_requested.emit("wallet"))
 	_emotes = _button("EMOTES", "HeroEmotes")
+	_emotes.visible = ReleaseFeatures.COSMETIC_EXTRAS_ENABLED
 	_emotes.pressed.connect(func() -> void: route_requested.emit("emotes"))
 	resized.connect(_relayout)
 	get_parent().get_node("Navigation").route_changed.connect(_route_changed)

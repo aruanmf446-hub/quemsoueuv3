@@ -29,6 +29,9 @@ func show_screen(params: Dictionary={}) -> void:
 
 func render() -> void:
 	PlayerUI.clear(body)
+	if not ReleaseFeatures.COMMERCE_ENABLED:
+		heading.text = tr("Minha carteira")
+		return
 	if str(parameters.get("tab",""))=="coins": _coin_store=true
 	heading.text=tr("Comprar moedas" if _coin_store else "Minha carteira")
 	banner.show_state(services.wallet.state)

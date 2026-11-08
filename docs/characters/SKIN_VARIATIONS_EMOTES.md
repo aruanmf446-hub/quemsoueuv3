@@ -67,3 +67,13 @@ derrota não são vendidos como dancinhas. A interface permanece apenas na branc
 
 [Contrato, implantação e testes da compra](../backend/EMOTE_SHOP.md).
 [Capturas e gravação atuais](../../evidence/skin-emotes/examples-shop/README.md).
+
+## Atualização — versão gratuita de 08/11/2026
+
+O dono validou e pediu que as prévias de Reações/Emotes, variações e ações de
+compra ficassem ocultas até a comercialização. Código e assets continuam na main.
+`ReleaseFeatures.COSMETIC_EXTRAS_ENABLED` controla essa apresentação e
+`ReleaseFeatures.COMMERCE_ENABLED` controla acesso/compras. Os dois estão false.
+As animações de lobby, vitória e derrota já integradas às partidas não foram
+retiradas. Equipar os personagens originais segue funcionando. Consulte a seção
+“Versão gratuita” de `docs/backend/COMMERCE_ACTIVATION.md` antes de reativar.

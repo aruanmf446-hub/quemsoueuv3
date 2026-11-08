@@ -35,6 +35,7 @@ func equipped(character: String) -> String:
 	return str(data.get("equipped",{}).get(character,"original"))
 
 func buy(item: Dictionary) -> Dictionary:
+	if not ReleaseFeatures.COMMERCE_ENABLED: return ServiceResult.failure("sales_disabled")
 	if not session.authenticated(): return ServiceResult.failure("not_authenticated")
 	if _owner!=str(session.user.get("id","")) or not data.get("enabled",false) or not item.get("available",false): return ServiceResult.failure("sales_disabled")
 	if _buying: return ServiceResult.failure("request_in_progress")

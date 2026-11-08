@@ -52,6 +52,7 @@ func has_for(kind: String) -> bool:
  return data.get("pending",[]).any(func(r:Dictionary)->bool:return r.ability==kind and not cfg.get_value(_owner,"applied_"+str(r.id),false))
 
 func buy(price: int) -> Dictionary:
+ if not ReleaseFeatures.COMMERCE_ENABLED: return ServiceResult.failure("sales_disabled")
  if not session.authenticated(): return ServiceResult.failure("not_authenticated")
  if busy: return ServiceResult.failure("request_in_progress")
  if not data.get("available",false) or _owner!=str(session.user.get("id","")): return ServiceResult.failure("sales_disabled")

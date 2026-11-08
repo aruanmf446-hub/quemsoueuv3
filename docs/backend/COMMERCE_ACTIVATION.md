@@ -127,3 +127,32 @@ por recarga completa de uma habilidade até 3/3, guardado na conta e usado apena
 em Pausa → Configurações. A venda continua inativa. Sua configuração específica
 é `ability_refill_settings.active`; a compra também respeita o bloqueio global
 da loja. Não confundir uma recarga guardada com três itens/recargas parciais.
+
+## Versão gratuita — decisão de 08/11/2026
+
+A implementação permanece na main, porém inativa no cliente. O ponto de controle
+é `scripts/ui/release_features.gd`:
+
+- `COMMERCE_ENABLED = false`: oculta Moedas/carteira e links para comprar cartas
+  de criação; bloqueia checkout e compras de cosméticos, emotes e recargas antes
+  de qualquer requisição de compra, mesmo se o catálogo remoto vier habilitado.
+- `COSMETIC_EXTRAS_ENABLED = false`: oculta o atalho Emotes, abas Reações/Emotes e
+  os seletores de variação. Uma abertura antiga de Emotes leva às Skins normais.
+
+Equipar skins originais, prévias dos personagens, favoritos e as reações reais
+já usadas no lobby/partidas continuam preservados. Não se apagam assets,
+animações, itens possuídos, saldos ou equipamento da conta. Não há concessão
+fictícia de itens pagos. O editor de decks permanece disponível sem link de
+compra de créditos; `deck_credits_required` no GAME deve continuar **false**.
+A política local não altera nem substitui essa regra autoritativa do servidor.
+
+Para ativação futura autorizada, revise os dois flags e siga os passos de backend
+acima, com preços e testes reais; não basta revelar botões ou somente ligar Stripe.
+Nenhuma migration ou Edge Function deve ser reaplicada para ocultar a interface.
+
+Validação da versão gratuita: `tests/free_release/client.gd`,
+`tests/free_release/web.cjs`, `tests/hero_carousel/flow_test.gd`,
+`tests/decks_t21/flow_test.gd` e `tests/commerce/client.gd`.
+Os roteiros históricos de prévia/compra habilitada em `tests/commerce_entrypoints`
+e `tests/skin_emotes` continuam preservados para o futuro build de ativação;
+suas expectativas visuais de loja aberta não representam esta versão gratuita.

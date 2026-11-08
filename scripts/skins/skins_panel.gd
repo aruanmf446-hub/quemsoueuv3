@@ -238,7 +238,7 @@ func _responsive_layout() -> void:
 
 
 func show_screen(params: Dictionary = {}) -> void:
-	_cosmetic_mode = "shop" if params.get("cosmetic_mode", "") == "shop" else "skins"
+	_cosmetic_mode = "shop" if ReleaseFeatures.COSMETIC_EXTRAS_ENABLED and params.get("cosmetic_mode", "") == "shop" else "skins"
 	super.show_screen(params)
 	_choose_cosmetic_mode(_cosmetic_mode)
 	if _cosmetic_mode == "shop": _preview_dance.call_deferred()
@@ -571,7 +571,7 @@ func _select(character_id: String) -> void:
 	equip.custom_minimum_size.y = 36 if compact else PlayerUI.CONTROL_HEIGHT
 	equip.disabled = not unlocked or equipped
 	actions.add_child(equip)
-	if not unlocked:
+	if not unlocked and ReleaseFeatures.COMMERCE_ENABLED:
 		var product := services.cosmetic_shop.product(character_id,"")
 		if product.get("kind")=="skin":
 			var buy_skin := _button(str(product.price_coins)+tr(" moedas"),_purchase_cosmetic.bind(product))
@@ -604,6 +604,7 @@ func _select(character_id: String) -> void:
 
 func _build_cosmetic_tabs() -> void:
 	var tabs := PlayerUI.row(_gallery_section)
+	tabs.visible = ReleaseFeatures.COSMETIC_EXTRAS_ENABLED
 	_gallery_section.move_child(tabs,0)
 	for mode: String in ["skins","emotes","shop"]:
 		var button := _button({"skins":"SKINS","emotes":"REAÇÕES","shop":"EMOTES"}[mode],_choose_cosmetic_mode.bind(mode),mode==_cosmetic_mode)
@@ -614,6 +615,7 @@ func _build_cosmetic_tabs() -> void:
 
 
 func _choose_cosmetic_mode(mode: String) -> void:
+	if not ReleaseFeatures.COSMETIC_EXTRAS_ENABLED: mode = "skins"
 	_cosmetic_mode=mode
 	_stage.static_preview=mode=="skins"
 	_stage.get_node("Viewport").render_target_update_mode=SubViewport.UPDATE_ONCE if mode=="skins" else SubViewport.UPDATE_ALWAYS
@@ -647,6 +649,7 @@ func _choose_cosmetic_mode(mode: String) -> void:
 
 
 func _build_variant_picker(entry: Dictionary,actions: Control) -> void:
+	if not ReleaseFeatures.COSMETIC_EXTRAS_ENABLED: return
 	var row := PlayerUI.row(_preview)
 	row.name="SkinVariantPicker"
 	row.visible=_cosmetic_mode=="skins"

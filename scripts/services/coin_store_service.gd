@@ -12,6 +12,7 @@ func refresh() -> Dictionary:
 	return await load_rpc("qse_coin_store")
 
 func create_checkout(pack: Dictionary) -> Dictionary:
+	if not ReleaseFeatures.COMMERCE_ENABLED: return ServiceResult.failure("payments_unavailable")
 	if not session.authenticated(): return ServiceResult.failure("not_authenticated")
 	if _creating: return ServiceResult.failure("request_in_progress")
 	if not data.get("enabled",false): return ServiceResult.failure("payments_unavailable")

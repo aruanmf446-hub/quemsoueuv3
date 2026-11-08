@@ -306,8 +306,10 @@ func _resume_coin_checkout() -> void:
 
 func _hero_route_selected(route: String) -> void:
 	if route == "wallet":
+		if not ReleaseFeatures.COMMERCE_ENABLED: return
 		_navigation.open("wallet", {"tab":"coins"})
 	elif route == "emotes":
+		if not ReleaseFeatures.COSMETIC_EXTRAS_ENABLED: return
 		_navigation.open("skins", {"cosmetic_mode":"shop"})
 	else:
 		_on_menu_button_activated(StringName(route))

@@ -1748,6 +1748,8 @@ func _render_editor() -> void:
 	body.add_theme_constant_override("separation",12)
 	_review_feedback(body,_draft)
 	var credit_info := PlayerUI.row(body)
+	credit_info.name = "DeckCreationCredits"
+	credit_info.visible = ReleaseFeatures.COMMERCE_ENABLED
 	var commerce := services.cosmetic_shop
 	credit_info.add_child(_text(str(TranslationServer.translate("Cartas de criação: "))+str(commerce.data.get("deck_credits","—"))+ (tr(" · 1 carta = 1 deck") if commerce.data.get("deck_credits_required",false) else tr(" · criação gratuita")),20,PlayerUI.MUTED))
 	credit_info.add_child(PlayerUI.button("Cartas",func()->void:navigate_requested.emit("wallet",{"tab":"coins","category":"deck_credits"})))

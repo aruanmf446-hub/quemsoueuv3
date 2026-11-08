@@ -49,6 +49,7 @@ func play_owned(slot: CharacterSlot,id: String,still_current: Callable=Callable(
 	return ServiceResult.success({"emote_id":id,"scope":"account","character_id":character})
 
 func buy(id: String,expected_price: int) -> Dictionary:
+	if not ReleaseFeatures.COMMERCE_ENABLED: return ServiceResult.failure("sales_disabled")
 	if MOTIONS.price_pending(id) and product(id).is_empty(): return ServiceResult.failure("price_pending")
 	if not session.authenticated(): return ServiceResult.failure("not_authenticated")
 	if _buying: return ServiceResult.failure("request_in_progress")

@@ -1,0 +1,35 @@
+[
+  {
+    "width": 1672,
+    "height": 941,
+    "mobile": false,
+    "hiddenCommerce": true,
+    "hiddenCosmeticExtras": true,
+    "characterNavigation": true,
+    "deckEditorAvailable": true,
+    "checkoutCalls": 0,
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "mobile": true,
+    "hiddenCommerce": true,
+    "hiddenCosmeticExtras": true,
+    "characterNavigation": true,
+    "deckEditorAvailable": true,
+    "checkoutCalls": 0,
+    "errors": []
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "mobile": true,
+    "hiddenCommerce": true,
+    "hiddenCosmeticExtras": true,
+    "characterNavigation": true,
+    "deckEditorAvailable": true,
+    "checkoutCalls": 0,
+    "errors": []
+  }
+]

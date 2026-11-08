@@ -22,6 +22,7 @@ var _modal: Panel
 var _margin: MarginContainer
 var _stack: VBoxContainer
 var _tab := "deck"
+var _history := false
 var _sort_mode := "recent"
 var _notice := ""
 var _working := false
@@ -135,23 +136,24 @@ func _render() -> void:
 		_stack.add_child(retry)
 		_footer()
 		return
-	if rewards.campaign.is_empty():
-		_message("Nenhuma campanha ativa no momento. Novidades da equipe aparecerão aqui.", false)
+	var shown := _visible_offers(rewards)
+	if shown.is_empty():
+		var message := "Você ainda não resgatou presentes." if _history else "Nenhuma novidade no momento. Seus presentes resgatados estão no histórico."
+		if _history and rewards.inventory_state == "error": message = "Não foi possível consultar seu histórico. Tente novamente."
+		_message(message, _history and rewards.inventory_state == "error")
+		if _history and rewards.inventory_state == "error":
+			var retry := _button("TENTAR NOVAMENTE", true)
+			retry.pressed.connect(func() -> void: rewards.refresh())
+			_stack.add_child(retry)
 		_footer()
 		return
-	if _campaign_waits_for_art():
+	if not _history and _campaign_waits_for_art():
 		_message("Diva Pop está em preparação. As cartas aparecerão quando as dez imagens estiverem publicadas.", false)
 		_footer()
 		return
-	# Decisão do dono: o que já foi resgatado some de Novidades; só fica o que ainda está
-	# para receber (ex.: a campanha de Natal enquanto não for resgatada).
-	if rewards.offers.filter(func(o: Dictionary) -> bool: return _pending(o, rewards)).is_empty():
-		_message("Nenhuma novidade no momento. Quando houver uma campanha (ex.: Natal), ela aparece aqui.", false)
-		_footer()
-		return
-	if rewards.offers.filter(func(o: Dictionary) -> bool: return str(o.get("kind", "")) == _tab and _pending(o, rewards)).is_empty():
+	if not shown.any(func(o: Dictionary) -> bool: return str(o.get("kind", "")) == _tab):
 		_tab = "skin" if _tab == "deck" else "deck"
-	_banner(rewards)
+	if not _history and not rewards.campaign.is_empty(): _banner(rewards)
 	_categories(rewards)
 	if rewards.inventory_state == "error":
 		var history_warning := _label("Presentes anteriores temporariamente indisponíveis. Tente reabrir Novidades.", 11 if _compact else 14, MUTED)
@@ -174,7 +176,7 @@ func _header() -> void:
 	_stack.add_child(header)
 	var gift := _icon(ICON_GIFT, 27 if _compact else 40)
 	header.add_child(gift)
-	var title := _label("Resgatar Presentes", 19 if _compact else (36 if _iphone else 32), WHITE)
+	var title := _label("Histórico de resgates" if _history else "Resgatar Presentes", 19 if _compact else (36 if _iphone else 32), WHITE)
 	title.name = "HeaderTitle"
 	title.custom_minimum_size.x = 190 if _compact else 310
 	title.autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -281,11 +283,11 @@ func _categories(rewards: OfficialRewardsService) -> void:
 	bar.custom_minimum_size.y = 36 if _compact else 50
 	bar.add_theme_constant_override("separation", 10)
 	_stack.add_child(bar)
-	for info in [["deck", "Decks Grátis", ICON_DECK], ["skin", "Skins", ICON_SKIN]]:
+	for info in [["deck", "Decks" if _history else "Decks Grátis", ICON_DECK], ["skin", "Skins", ICON_SKIN]]:
 		var kind := str(info[0])
 		var count := 0
-		for offer: Dictionary in rewards.offers:
-			if str(offer.get("kind", "")) == kind and _pending(offer, rewards): count += 1
+		for offer: Dictionary in _visible_offers(rewards):
+			if str(offer.get("kind", "")) == kind: count += 1
 		if count == 0: continue
 		var tab := _button("%s (%d)" % [str(info[1]), count], _tab == kind)
 		tab.name = "Tab" + kind.capitalize()
@@ -296,9 +298,9 @@ func _categories(rewards: OfficialRewardsService) -> void:
 		tab.pressed.connect(_switch.bind(kind))
 		bar.add_child(tab)
 	# A leitura histórica do GAME inclui a data real da oferta.
-	var can_sort := not rewards.offers.is_empty()
-	for offer: Dictionary in rewards.offers:
-		if str(offer.get("created_at", "")).is_empty(): can_sort = false
+	var can_sort := not _visible_offers(rewards).is_empty()
+	for offer: Dictionary in _visible_offers(rewards):
+		if _offer_date(offer).is_empty(): can_sort = false
 	if can_sort:
 		var gap := Control.new()
 		gap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -313,6 +315,7 @@ func _categories(rewards: OfficialRewardsService) -> void:
 		sort.add_theme_color_override("font_color", WHITE)
 		for mode in ["normal", "hover", "pressed"]:
 			sort.add_theme_stylebox_override(mode, _style(SURFACE, Color("#516070"), 9, 1))
+		PlayerUI.transparent_button_fill(sort)
 		sort.item_selected.connect(_set_sort)
 		bar.add_child(sort)
 
@@ -320,6 +323,20 @@ func _categories(rewards: OfficialRewardsService) -> void:
 ## Ainda para receber: não resgatado, ou incluso num pacote que ainda não foi aberto.
 func _pending(offer: Dictionary, rewards: OfficialRewardsService) -> bool:
 	return rewards.is_offer_pending(offer)
+
+
+## Somente recibos confirmados pela conta; campanhas antigas não precisam estar ativas.
+func _visible_offers(rewards: OfficialRewardsService) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for offer: Dictionary in rewards.offers:
+		var included := bool(offer.get("claimed", false)) and not _pending(offer, rewards) if _history else _pending(offer, rewards)
+		if included: result.append(offer)
+	return result
+
+
+func _offer_date(offer: Dictionary) -> String:
+	var value: Variant = offer.get("claimed_at") if _history else offer.get("created_at")
+	return str(value) if value is String else ""
 
 
 func _rewards_grid(rewards: OfficialRewardsService) -> void:
@@ -337,13 +354,13 @@ func _rewards_grid(rewards: OfficialRewardsService) -> void:
 	rows.add_theme_constant_override("separation", 8)
 	scroll.add_child(rows)
 	var list: Array[Dictionary] = []
-	for offer: Dictionary in rewards.offers:
-		if str(offer.get("kind", "")) == _tab and _pending(offer, rewards):
+	for offer: Dictionary in _visible_offers(rewards):
+		if str(offer.get("kind", "")) == _tab:
 			list.append(offer)
-	if list.size() > 1 and list.all(func(o: Dictionary) -> bool: return not str(o.get("created_at", "")).is_empty()):
+	if list.size() > 1 and list.all(func(o: Dictionary) -> bool: return not _offer_date(o).is_empty()):
 		list.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
-			var left := str(a.get("created_at", ""))
-			var right := str(b.get("created_at", ""))
+			var left := _offer_date(a)
+			var right := _offer_date(b)
 			return (left > right if _sort_mode == "recent" else left < right) if left != right else str(a.get("id", "")) < str(b.get("id", "")))
 	if list.is_empty():
 		var empty := _label("Nenhuma oferta de skins nesta campanha." if _tab == "skin" else "Nenhum deck disponível nesta campanha.", 16 if _compact else 20, MUTED)
@@ -442,6 +459,18 @@ func _add_offer(grid: GridContainer, offer: Dictionary, rewards: OfficialRewards
 	filler.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	filler.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	content.add_child(filler)
+	if _history:
+		var receipt := _label("✓  RESGATADO", 12 if _compact else 16, GOLD_SOFT)
+		receipt.name = "ClaimedReceipt"
+		content.add_child(receipt)
+		var when := str(offer.get("claimed_at", ""))
+		if when != "" and when != "<null>":
+			var timestamp := Time.get_datetime_dict_from_datetime_string(when.left(19), false)
+			if not timestamp.is_empty():
+				var date := _label("%02d/%02d/%04d" % [timestamp.day, timestamp.month, timestamp.year], 11 if _compact else 14, MUTED)
+				date.name = "ClaimedDate"
+				content.add_child(date)
+		return
 	var claim_allowed := bool(offer.get("claim_enabled", kind == "deck"))
 	var current_campaign := str(rewards.campaign.get("id", ""))
 	var historical := offer.has("campaign_id") and str(offer.get("campaign_id", "")) != current_campaign
@@ -466,16 +495,16 @@ func _footer(rewards: OfficialRewardsService = null) -> void:
 	footer.custom_minimum_size.y = 40 if _compact else 55
 	footer.add_theme_constant_override("separation", 8)
 	_stack.add_child(footer)
-	var news := _button("Outras notícias" if _compact else "Ver outras notícias do jogo", false)
+	var news := _button("Ver presentes disponíveis" if _history else "Histórico de resgates", false)
 	news.name = "MoreNews"
-	news.tooltip_text = "Ver outras notícias do jogo"
+	news.tooltip_text = news.text
 	news.custom_minimum_size = Vector2(142 if _compact else (300 if _iphone else 242), 38 if _compact else 49)
 	news.pressed.connect(_legacy_news)
 	footer.add_child(news)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	footer.add_child(spacer)
-	if rewards == null: return
+	if rewards == null or _history: return
 	if not rewards.revealed and rewards.offers.any(func(item: Dictionary)->bool: return bool(item.get("auto_grant", true)) and rewards.is_offer_pending(item)):
 		var redeem := _button("RESGATAR PRESENTES", true)
 		redeem.name = "RedeemGiftBundle"
@@ -547,26 +576,10 @@ func _switch(kind: String) -> void:
 
 
 func _legacy_news() -> void:
-	if _shade.get_node_or_null("OtherNews") != null: return
-	var carousel := PresentationCarousel.new()
-	carousel.name = "OtherNews"
-	# Novidades ativas vêm do editor. Off-line: manter apresentações locais.
-	if _services != null and _services.editor_content != null and _services.editor_content.state == "remote":
-		var entries := _services.editor_content.news_cards()
-		if entries.is_empty():
-			_notice = "Não há novidades ativas neste momento."
-			_render()
-			return
-		carousel.set_cards_data(entries)
-	else:
-		carousel.set_cards("news")
-	carousel.show_close = true
-	carousel.allow_skip = false
-	carousel.dwell_seconds = 5.0
-	carousel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	carousel.close_requested.connect(carousel.queue_free)
-	_shade.add_child(carousel)
-	carousel.focus_close()
+	_history = not _history
+	_notice = ""
+	_tab = "deck"
+	_render()
 
 
 func _feature_cover(rewards: OfficialRewardsService) -> Texture2D:
@@ -603,14 +616,15 @@ func _button(caption: String, primary: bool) -> Button:
 	button.add_theme_color_override("font_hover_color", NAVY if primary else WHITE)
 	button.add_theme_color_override("font_pressed_color", NAVY if primary else WHITE)
 	button.add_theme_color_override("font_disabled_color", MUTED)
-	var base := GOLD if primary else SURFACE
+	var base := GOLD if primary else Color.TRANSPARENT
 	button.add_theme_stylebox_override("normal", _style(base, GOLD_SOFT if primary else Color("#516070"), 10, 1))
-	button.add_theme_stylebox_override("hover", _style(base.lightened(0.10), GOLD_SOFT, 10, 1))
-	button.add_theme_stylebox_override("pressed", _style(base.darkened(0.12), GOLD_SOFT, 10, 1))
-	button.add_theme_stylebox_override("disabled", _style(Color("#2a3442"), Color("#485260"), 10, 1))
+	button.add_theme_stylebox_override("hover", _style(base.lightened(0.10) if primary else Color.TRANSPARENT, GOLD_SOFT, 10, 1))
+	button.add_theme_stylebox_override("pressed", _style(base.darkened(0.12) if primary else Color.TRANSPARENT, GOLD_SOFT, 10, 1))
+	button.add_theme_stylebox_override("disabled", _style(Color.TRANSPARENT, Color("#485260"), 10, 1))
 	var focused := _style(Color.TRANSPARENT, GOLD, 10, 2)
 	focused.draw_center = false
 	button.add_theme_stylebox_override("focus", focused)
+	if not primary: PlayerUI.transparent_button_fill(button)
 	return button
 
 

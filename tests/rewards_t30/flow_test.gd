@@ -116,11 +116,11 @@ func _run() -> void:
 	var more := overlay.find_child("MoreNews", true, false) as Button
 	more.pressed.emit()
 	await _frames()
-	check(overlay.find_child("OtherNews", true, false) != null, "carrossel legado abre sobre a janela")
-	overlay._close_top()
+	check(overlay._history and overlay.find_child("ClaimedReceipt", true, false) != null, "histórico mostra resgates confirmados")
+	(overlay.find_child("MoreNews", true, false) as Button).pressed.emit()
 	await _frames()
 	check(overlay.find_child("OtherNews", true, false) == null and overlay.find_child("RewardWindow", true, false) != null,
-		"ao fechar notícias, os presentes permanecem")
+		"ao voltar do histórico, os presentes permanecem")
 	# T30 leitura histórica: 4 decks + 7 skins da T29, somados ao Diva Pop atual.
 	services.rewards.offers.clear()
 	for item_id: String in ["lendas_urbanas", "nostalgia_web", "sol_nascente", "pinturas", "diva_pop"]:

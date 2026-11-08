@@ -7,11 +7,18 @@
   const text = value => window.qseWebText ? window.qseWebText(value) : value;
   const safe = () => external || (!!window.qseSafeToUpdate && !window.qseStoryPlaying);
   let registration, registering, checking, registeredBuild, reloadRequested = false, lastCheck = 0;
+  let stalledTimer, downloadFailed = false;
+  const DOWNLOAD_STALL_MS = 180000;
   const watched = new WeakSet(), watchedRegistrations = new WeakSet();
-  const state = { status: 'idle', current: external ? '' : window.qseBuild || '', latest: '', ready: false };
+  const state = { status: 'idle', current: external ? '' : window.qseBuild || '', latest: '', ready: false, progress: null };
   window.qsePwa = window.qsePwa || {};
   function emit(status) {
     if (status) state.status = status;
+    if (['error','offline'].includes(state.status)) downloadFailed = true;
+    if (state.status === 'downloading') {
+      clearTimeout(stalledTimer);
+      stalledTimer = setTimeout(() => emit('stalled'), DOWNLOAD_STALL_MS);
+    } else { clearTimeout(stalledTimer); }
     window.qsePwa.updateReady = state.ready;
     window.dispatchEvent(new CustomEvent('qse-update-state', {detail: {...state}}));
     render();
@@ -65,6 +72,7 @@
     if (checking) return checking;
     lastCheck = Date.now();
     checking = (async () => {
+      downloadFailed = false;
       emit('checking');
       const abort = new AbortController(), timer = setTimeout(() => abort.abort(), 15000);
       try {
@@ -74,6 +82,7 @@
         if (!response.ok) throw new Error('version');
         const version = await response.json();
         if (version.schema !== 1 || !/^[a-zA-Z0-9._-]{1,100}$/.test(version.build)) throw new Error('version');
+        if (state.latest !== version.build) state.progress = null;
         state.latest = version.build;
         const reg = await register();
         if (external) {
@@ -83,7 +92,8 @@
         // Version detection is independent of downloading the large game package.
         if (state.current !== state.latest || reg.waiting) {
           emit(reg.waiting ? 'ready' : 'downloading');
-          await reg.update();
+          // A transfer already in flight must not be queued behind another update() call.
+          if (!reg.installing && !reg.waiting) await reg.update();
           watch(reg.installing);
         }
         state.ready = !!reg.waiting;
@@ -129,7 +139,13 @@
       if (!external && reloadRequested && safe()) { reloadRequested = false; location.reload(); }
     });
     navigator.serviceWorker.addEventListener('message', event => {
-      if (event.data && event.data.type === 'qse-update-progress' && event.data.build !== state.current) emit('downloading');
+      const data = event.data;
+      if (!downloadFailed && data && data.type === 'qse-update-progress' && data.build === state.latest && data.build !== state.current && !state.ready && state.status !== 'applying') {
+        if (Number.isFinite(data.completed) && Number.isFinite(data.total) && data.total > 0) {
+          state.progress = {completed:Math.max(0, Math.min(data.completed, data.total)), total:data.total, loadedBytes:Math.max(0, Number(data.loadedBytes) || 0)};
+        }
+        emit('downloading');
+      }
     });
   }
   const messages = {
@@ -137,19 +153,37 @@
     ready:'Atualização pronta para instalar.', current:'Você está na versão mais recente.',
     offline:'Sem conexão. Tente novamente quando estiver online.', error:'Não foi possível verificar. Tente novamente.',
     unsafe:'Volte ao menu para reiniciar com segurança.', 'close-game':'Feche as outras abas e o app do jogo antes de atualizar.',
+    stalled:'O download parou de avançar. Verifique sua conexão e tente novamente.',
     applying:'Reiniciando para atualizar…'
   };
   function render() {
     const panel = document.getElementById('qse-update-panel');
+    const busy = ['checking','downloading','applying'].includes(state.status);
+    if (panel) {
+      panel.classList.toggle('qse-loading', busy);
+      panel.setAttribute('aria-busy', String(busy));
+    }
+    const loading = document.getElementById('qse-update-loading');
+    if (loading) loading.hidden = !busy;
+    const bar = document.getElementById('qse-update-progress');
+    if (bar) {
+      if (state.status === 'downloading' && state.progress) { bar.max = state.progress.total; bar.value = state.progress.completed; }
+      else bar.removeAttribute('value');
+    }
+    const detail = document.getElementById('qse-update-progress-detail');
+    if (detail) {
+      const p = state.status === 'downloading' ? state.progress : null;
+      detail.textContent = p ? `${p.completed} / ${p.total} ${text("arquivos")} · ${(p.loadedBytes / 1048576).toFixed(1)} MB` : '';
+    }
     const status = document.getElementById('qse-update-status');
     if (status) status.textContent = text(messages[state.status] || messages.idle);
     for (const [id,value] of [['qse-current-build',state.current],['qse-latest-build',state.latest]]) {
       const node = document.getElementById(id); if (node) node.textContent = value || '—';
     }
     const confirm = document.getElementById('qse-update-apply');
-    if (confirm) confirm.disabled = !safe() || !state.latest || ['checking','downloading','applying','offline','error'].includes(state.status) || !(state.ready || (external && state.current === state.latest));
+    if (confirm) confirm.disabled = !safe() || !state.latest || ['checking','downloading','applying','offline','error','stalled'].includes(state.status) || !(state.ready || (external && state.current === state.latest));
     const checkingButton = document.getElementById('qse-update-check');
-    if (checkingButton) checkingButton.disabled = state.status === 'checking' || state.status === 'applying';
+    if (checkingButton) checkingButton.disabled = busy;
     const chip = document.getElementById('qse-update');
     if (chip) {
       chip.style.display = safe() && ['downloading','ready'].includes(state.status) ? 'block' : 'none';
@@ -160,7 +194,7 @@
   function open() {
     const panel = document.getElementById('qse-update-panel');
     if (panel && panel.showModal && !panel.open) panel.showModal();
-    check();
+    if (state.status !== 'downloading') check();
   }
   window.qseUpdates = { check, apply, open, getState: () => ({...state}) };
   window.qseCheckForUpdate = open;

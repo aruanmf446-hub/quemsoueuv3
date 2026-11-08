@@ -5,7 +5,11 @@ const root=path.resolve(__dirname,'../..'),dir=process.argv[2]||'/tmp/qse-update
 fs.mkdirSync(dir,{recursive:true});fs.mkdirSync(out,{recursive:true});fs.cpSync(path.join(root,'web/site'),dir+'/quemsoueuv3',{recursive:true});
 const assemble=build=>execFileSync('python3',['tests/web_pwa/assemble.py',dir+game,build],{cwd:root});
 let hold=false,stale=null,held=[],requests=[];const send=(res,body,type='application/octet-stream')=>{res.writeHead(200,{'Content-Type':type,'Cache-Control':'public,max-age=86400'});res.end(body);};
-const server=http.createServer((req,res)=>{let url=new URL(req.url,'http://localhost');requests.push(url.pathname+url.search);let file=path.resolve(dir,'.'+url.pathname);if(!file.startsWith(path.resolve(dir)+path.sep)){res.writeHead(403);return res.end();}if(url.pathname.endsWith('/'))file+='/index.html';if(!fs.existsSync(file)){res.writeHead(404);return res.end();}const type=file.endsWith('.js')?'text/javascript':file.endsWith('.html')?'text/html':file.endsWith('.json')?'application/json':file.endsWith('.css')?'text/css':'application/octet-stream';const body=stale&&url.pathname===game+'index.html'?stale:fs.readFileSync(file);if(hold&&url.pathname===game+'index.pck'){held.push(()=>send(res,body,type));return;}send(res,body,type);});
+const server=http.createServer((req,res)=>{let url=new URL(req.url,'http://localhost');requests.push(url.pathname+url.search);let file=path.resolve(dir,'.'+url.pathname);if(!file.startsWith(path.resolve(dir)+path.sep)){res.writeHead(403);return res.end();}if(url.pathname.endsWith('/'))file+='/index.html';if(!fs.existsSync(file)){res.writeHead(404);return res.end();}const type=file.endsWith('.js')?'text/javascript':file.endsWith('.html')?'text/html':file.endsWith('.json')?'application/json':file.endsWith('.css')?'text/css':'application/octet-stream';const body=stale&&url.pathname===game+'index.html'?stale:fs.readFileSync(file);if(hold&&url.pathname===game+'index.pck'){held.push(()=>{
+ res.writeHead(200,{'Content-Type':type,'Content-Length':body.length});
+ let offset=0;const timer=setInterval(()=>{const end=Math.min(offset+256,body.length);res.write(body.subarray(offset,end));offset=end;if(offset===body.length){clearInterval(timer);res.end();}},40);
+ res.on('close',()=>clearInterval(timer));
+});return;}send(res,body,type);});
 let checks=0;function check(ok,msg){assert.ok(ok,msg);checks++;console.log('PASS',msg);}
 (async()=>{assemble('update-a');await new Promise(r=>server.listen(8176,'127.0.0.1',r));const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});try{
 const ctx=await browser.newContext(),page=await ctx.newPage(),base='http://localhost:8176';await page.clock.install();await page.goto(base+game);await page.waitForFunction(()=>navigator.serviceWorker.controller&&window.qseUpdates?.getState().current==='update-a',null,{timeout:20000});
@@ -18,7 +22,28 @@ check(requests.filter(x=>x.startsWith(game+'version.json?')).length===markerCoun
 await page.evaluate(()=>window.dispatchEvent(new Event('focus')));await page.waitForFunction(()=>window.qseUpdates.getState().latest==='update-b'&&window.qseUpdates.getState().status==='downloading',null,{timeout:20000});
 for(let i=0;i<200&&!held.length;i++)await new Promise(r=>setTimeout(r,20));
 check(await page.evaluate(()=>qseUpdates.getState().status==='downloading'&&!qseUpdates.getState().ready),'resume detects new version before package finishes');check(await page.evaluate(()=>qseBuild==='update-a'),'old engine version remains active during download');
-hold=false;held.splice(0).forEach(fn=>fn());await page.waitForFunction(()=>qseUpdates.getState().ready,null,{timeout:20000});
+await page.evaluate(()=>{qseSafeToUpdate=true;qseUpdates.open();});
+await page.waitForFunction(()=>qseUpdates.getState().progress?.total>0);
+check(await page.evaluate(()=>{const s=qseUpdates.getState(),bar=document.getElementById('qse-update-progress');return bar.value===s.progress.completed&&bar.max===s.progress.total;}),'loading uses actual completed files, not a fabricated percentage');
+for(const [width,height] of [[1672,941],[844,390],[640,360]]){
+ await page.setViewportSize({width,height});
+ const box=await page.locator('#qse-update-panel').boundingBox();
+ check(box&&box.x===0&&box.y===0&&Math.abs(box.width-width)<2&&Math.abs(box.height-height)<2,'full-screen update fits '+width+'x'+height);
+ check(await page.locator('#qse-update-close').isVisible(),'can leave loading safely '+width+'x'+height);
+ await page.screenshot({path:out+'/'+width+'x'+height+'_loading.png'});
+}
+await page.click('#qse-update-close');
+check(await page.locator('#qse-update-panel').isHidden(),'background download does not force closed loading screen open');
+await page.evaluate(()=>qseUpdates.open());await page.clock.runFor(180001);
+check(await page.evaluate(()=>qseUpdates.getState().status==='stalled'),'stalled transfer has a recovery state instead of indefinite loading');
+check(await page.locator('#qse-update-check').isEnabled(),'retry available after stalled download');
+await page.evaluate(()=>qseUpdates.check());
+await page.waitForFunction(()=>qseUpdates.getState().status==='downloading');
+const bytesBefore=await page.evaluate(()=>qseUpdates.getState().progress.loadedBytes);
+hold=false;held.splice(0).forEach(fn=>fn());
+await page.waitForFunction(before=>{const p=qseUpdates.getState().progress;return p.loadedBytes>before&&p.completed<p.total;},bytesBefore,{timeout:20000});
+check(true,'streamed bytes advance while the package is still downloading');
+await page.waitForFunction(()=>qseUpdates.getState().ready,null,{timeout:20000});
 await page.evaluate(async()=>{qseSafeToUpdate=true;const pending=qseUpdates.apply();qseSafeToUpdate=false;await pending;});
 check(await page.evaluate(async()=>qseUpdates.getState().status==='unsafe'&&!!(await navigator.serviceWorker.getRegistration()).waiting),'entering match during async check cancels activation');
 await page.evaluate(()=>{qseSafeToUpdate=false;qseUpdates.open();});await page.waitForFunction(()=>qseUpdates.getState().status==='ready');await page.evaluate(()=>qseUpdates.apply());check(await page.evaluate(()=>qseBuild==='update-a'&&qseUpdates.getState().status==='unsafe'),'unsafe match cannot restart');

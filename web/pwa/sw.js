@@ -10,6 +10,7 @@
 const BUILD = "__BUILD__";
 const FILES = "__FILES__";            // { "index.wasm": "<hash>", ... } — preenchido no deploy
 const CACHE = "qse-files";
+let installProgress = null;
 const REQUIRED = ["index.html", "index.js", "index.wasm", "index.pck"];
 
 function key(path) { return new URL(path + "?v=" + FILES[path], self.registration.scope).href; }
@@ -18,9 +19,17 @@ self.addEventListener("install", (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE);
     const clients = await self.clients.matchAll({type:"window",includeUncontrolled:true});
-    for (const client of clients) client.postMessage({type:"qse-update-progress",build:BUILD});
+    let completed = 0, loadedBytes = 0, lastReport = 0;
+    const total = Object.keys(FILES).length;
+    function report(force = false) {
+      installProgress = {completed, total, loadedBytes};
+      if (!force && Date.now() - lastReport < 250) return;
+      lastReport = Date.now();
+      for (const client of clients) client.postMessage({type:"qse-update-progress", build:BUILD, ...installProgress});
+    }
+    report(true);
     await Promise.all(Object.keys(FILES).map(async (path) => {
-      if (await cache.match(key(path))) return;                  // mesmo conteúdo: já guardado
+      if (await cache.match(key(path))) { completed++; report(true); return; }                  // mesmo conteúdo: já guardado
       try {
         const response = await fetch(key(path), {cache: "reload"});
         if (response.ok) {
@@ -31,12 +40,26 @@ self.addEventListener("install", (event) => {
             const hash = Array.from(new Uint8Array(digest)).map(x => x.toString(16).padStart(2,"0")).join("").slice(0,16);
             if (hash !== FILES[path]) throw new Error("stale page");
           }
-          await cache.put(key(path), response);
+          // Count bytes while CacheStorage consumes the stream; do not buffer the package in RAM.
+          let stored = response;
+          if (response.body && typeof TransformStream !== "undefined") {
+            const stream = response.body.pipeThrough(new TransformStream({
+              transform(chunk, controller) {
+                loadedBytes += chunk.byteLength;
+                report();
+                controller.enqueue(chunk);
+              }
+            }));
+            stored = new Response(stream, {status:response.status, statusText:response.statusText, headers:response.headers});
+          }
+          await cache.put(key(path), stored);
         }
         else if (REQUIRED.includes(path)) throw new Error(path + " " + response.status);
       } catch (error) {
         if (REQUIRED.includes(path)) throw error;
       }
+      completed++;
+      report(true);
     }));
   })());
   // Sem skipWaiting aqui: a página decide quando trocar de versão.
@@ -51,7 +74,7 @@ self.addEventListener("message", (event) => {
         const url = new URL(client.url);
         return url.origin === scope.origin && url.pathname.startsWith(scope.pathname);
       }).length;
-      event.ports[0].postMessage({build:BUILD, gameClients});
+      event.ports[0].postMessage({build:BUILD, gameClients, progress:installProgress});
     })());
   }
   if (event.data === "qse-activate-update") self.skipWaiting();

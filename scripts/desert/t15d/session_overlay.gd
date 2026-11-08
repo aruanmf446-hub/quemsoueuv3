@@ -1,5 +1,6 @@
 extends CanvasLayer
 ## Navegação local da Fase 01; a pausa não altera dados de campanha.
+const PurchasedRefills=preload("res://scripts/desert/t15d/refill_availability.gd")
 signal resume_requested
 signal restart_requested
 signal next_requested
@@ -60,7 +61,7 @@ func show_pause() -> void:
 	_title(phase_name.to_upper(),12,Color("#d9b778"))
 	_title("Pausa",28,Color.WHITE)
 	_button("Continuar",resume_requested.emit,true)
-	_button("Recargas compradas",show_refills)
+	if PurchasedRefills.ENABLED: _button("Recargas compradas",show_refills)
 	_button("Recomeçar fase",restart_requested.emit)
 	_button("Voltar aos reinos",return_requested.emit)
 	_open()
@@ -73,11 +74,11 @@ func show_settings() -> void:
 		var picker:=preload("res://scripts/ui/control_mode_picker.gd").new()
 		picker.preferences=PlayerServices.current.preferences
 		_column.add_child(picker)
-	_button("Recargas compradas",show_refills,true)
+	if PurchasedRefills.ENABLED: _button("Recargas compradas",show_refills,true)
 	_button("Voltar à pausa",show_pause)
 	_open()
 func show_refills() -> void:
-	if operation_busy: return
+	if not PurchasedRefills.ENABLED or operation_busy: return
 	_page="refills"
 	_clear()
 	_panel.add_theme_stylebox_override("panel",PlayerUI.frame_panel(20))

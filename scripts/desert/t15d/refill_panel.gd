@@ -1,5 +1,6 @@
 extends VBoxContainer
 ## Only exists inside the pause/settings overlay; never attached to the gameplay HUD.
+const Availability=preload("res://scripts/desert/t15d/refill_availability.gd")
 var phase: Node
 var _status: Label
 var _stock: Label
@@ -8,6 +9,9 @@ var _cards: Dictionary={}
 var _service: AbilityRefillService
 var _back: Button
 func _ready() -> void:
+ if not Availability.ENABLED:
+  hide()
+  return
  PlayerUI.apply_theme(self)
  add_theme_constant_override("separation",10)
  var header := PlayerUI.row(self)
@@ -30,6 +34,7 @@ func _ready() -> void:
  _refresh_buttons()
  if _service!=null: _load.call_deferred()
 func _load() -> void:
+ if not Availability.ENABLED:return
  var result := await _service.refresh()
  if not is_inside_tree(): return
  if not result.ok: _status.text=AbilityRefillService.message(result.code)
@@ -48,7 +53,7 @@ func _refresh_buttons() -> void:
  if n!=null and int(n)==0 and _status.text.is_empty(): _status.text="Você não tem recargas guardadas. Elas ficam disponíveis na loja."
  phase._session._layout.call_deferred()
 func _use(kind: String) -> void:
- if _service==null: return
+ if not Availability.ENABLED or _service==null: return
  var player: Node=phase._player
  var owner := str(PlayerServices.current.session.user.get("id",""))
  phase._session.operation_busy=true;_refresh_buttons()

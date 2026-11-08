@@ -175,6 +175,14 @@ void fragment() {
 	version.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	_brand.add_child(version)
 	header.add_child(_brand)
+	if OS.has_feature("web"):
+		for child: CanvasItem in _brand.get_children(): child.hide()
+		var update := PlayerUI.button("Verificar atualização", func() -> void:
+			JavaScriptBridge.eval("window.qseCheckForUpdate && window.qseCheckForUpdate()"))
+		update.name = "CheckGameUpdate"
+		update.custom_minimum_size.y = PlayerUI.SMALL_CONTROL_HEIGHT
+		update.add_theme_font_size_override("font_size", PlayerUI.SMALL_CONTROL_FONT)
+		_brand.add_child(update)
 	$Margin/Column/Scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 
 

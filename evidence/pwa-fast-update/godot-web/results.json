@@ -1,0 +1,29 @@
+[
+  {
+    "width": 1672,
+    "height": 941,
+    "iphoneUA": false,
+    "settingsButton": true,
+    "modalOpens": true,
+    "currentBuild": "input-fixture",
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "iphoneUA": true,
+    "settingsButton": true,
+    "modalOpens": true,
+    "currentBuild": "input-fixture",
+    "errors": []
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "iphoneUA": true,
+    "settingsButton": true,
+    "modalOpens": true,
+    "currentBuild": "input-fixture",
+    "errors": []
+  }
+]

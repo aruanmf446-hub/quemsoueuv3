@@ -18,9 +18,18 @@ if "supabase" in sw.lower() and "Supabase" not in sw: errors.append("sw.js refer
 workers = [f for f in os.listdir(root) if f.endswith(".service.worker.js") or f == "index.service.worker.js"]
 if workers: errors.append("service worker extra do Godot: " + ", ".join(workers))
 html = open(os.path.join(root, "index.html"), encoding="utf-8").read()
-for needle in ['rel="manifest"', "apple-mobile-web-app-capable", 'rel="apple-touch-icon"', 'register("sw.js")', "qseNativeInput"]:
+for needle in ['rel="manifest"', "apple-mobile-web-app-capable", 'rel="apple-touch-icon"', "qseNativeInput"]:
     if needle not in html: errors.append("index.html sem " + needle)
-if len(re.findall(r"serviceWorker\.register", html)) != 1: errors.append("index.html deve registrar exatamente 1 service worker")
+updater = open(os.path.join(root, "pwa/update.js"), encoding="utf-8").read()
+if len(re.findall(r"serviceWorker\.register", html + updater)) != 1: errors.append("index.html deve registrar exatamente 1 service worker")
+if 'src="pwa/update.js"' not in html: errors.append("shell não carrega o verificador")
+version = json.load(open(os.path.join(root, "version.json"), encoding="utf-8"))
+if version.get("schema") != 1 or not isinstance(version.get("build"), str) or not version["build"]:
+    errors.append("version.json inválido")
+else:
+    for text, pattern in [(sw, r'const BUILD = "([^"]+)"'), (html, r'window.qseBuild\s*=\s*"([^"]+)"')]:
+        match = re.search(pattern, text)
+        if not match or match.group(1) != version["build"]: errors.append("versões da página/worker/marcador divergem")
 if errors:
     print("PWA_CHECK FAIL\n- " + "\n- ".join(errors)); sys.exit(1)
 print("PWA_CHECK OK (manifest, ícones, sw único versionado, shell iOS)")

@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 root=Path(__file__).resolve().parents[2]
 keys=["Seu navegador não suporta o jogo.","INSTALAR NO IPHONE","ATUALIZAÇÃO DISPONÍVEL — REINICIAR PARA ATUALIZAR","Instalar o Quem Sou Eu no iPhone","Toque em Compartilhar (o quadrado com a seta) na barra do Safari.","Escolha Adicionar à Tela de Início.","Mantenha Abrir como App ligado (quando aparecer) e toque em Adicionar.","Depois abra pelo ícone na tela inicial. Sua conta continua no servidor; no app instalado pode ser preciso entrar de novo.","ENTENDI","NÃO MOSTRAR DE NOVO","Não foi possível abrir o jogo: ","navegador sem ","Abrindo a cidade do deserto…","Abrindo o jogo…","Baixando o jogo…","falta ~","Adicionar imagem"]
+keys += ['Verificar atualização', 'Atualizar jogo', 'Versão atual', 'Versão publicada', 'Verificando atualização…', 'Baixando atualização…', 'Atualização pronta para instalar.', 'Você está na versão mais recente.', 'Sem conexão. Tente novamente quando estiver online.', 'Não foi possível verificar. Tente novamente.', 'Volte ao menu para reiniciar com segurança.', 'Feche as outras abas e o app do jogo antes de atualizar.', 'Reiniciando para atualizar…', 'Reiniciar para atualizar', 'Abrir atualização fora do jogo', 'Fechar']
 translations={}
 for code in ['en','es','fr','ja','zh_CN','ru']:
     catalog=json.loads((root/'data/ui'/(code+'.json')).read_text())

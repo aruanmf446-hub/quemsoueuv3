@@ -1,0 +1,26 @@
+PASS automatic minute check detects before package finishes
+PASS old engine version remains active during download
+PASS unsafe match cannot restart
+PASS campaign also prevents restart
+PASS unchanged engine reused by content hash
+PASS session storage preserved
+PASS offline check preserves running version
+PASS focus detects new version without automatic restart
+PASS external updater does not start Godot
+PASS external updater blocks activation while game tab is open
+PASS external updater enters latest build after closing old game
+PASS IndexedDB decks/progress and login survive recovery
+PASS stale CDN HTML rejected without replacing current build
+PASS retry installs consistent version after stale response clears
+PASS external page fits 1672x941
+PASS check button visible without scrolling 1672x941
+PASS external page fits 844x390
+PASS check button visible without scrolling 844x390
+PASS external page fits 640x360
+PASS check button visible without scrolling 640x360
+PASS external page fits 390x844
+PASS check button visible without scrolling 390x844
+PASS version marker bypasses stale worker and HTTP cache
+PASS worker URL changes once per published build
+PASS worker remains registered
+UPDATE_TEST checks=25 failures=0

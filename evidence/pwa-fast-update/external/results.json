@@ -1,0 +1,10 @@
+{
+  "checks": 25,
+  "failures": 0,
+  "versions": [
+    "update-a",
+    "update-b",
+    "update-c",
+    "update-d"
+  ]
+}

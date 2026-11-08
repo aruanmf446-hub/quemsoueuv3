@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Atualizar jogo — Quem Sou Eu</title><meta name="description" content="Verifique e prepare a versão mais recente do Quem Sou Eu sem apagar sua conta, seus decks ou progresso.">
+<link rel="canonical" href="https://quemsoueu.cards/atualizar/"><link rel="stylesheet" href="../site.css">
+<style>
+.hero{padding:16px 16px 32px}.update-brand{display:block;width:90px}.update-brand img{width:100%;height:auto}.hero h1{font-size:30px}.update-card{width:100%;max-width:560px;text-align:left;border:1px solid currentColor;border-radius:12px;padding:20px;margin:16px 0}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0}.actions button,.actions a{font:inherit;min-height:44px;padding:10px 16px;border:1px solid var(--navy);border-radius:8px;background:transparent;color:var(--navy);text-decoration:none;cursor:pointer}
+#qse-update-apply{background:var(--navy);color:var(--cream)}button:disabled{opacity:.5;cursor:default}code{overflow-wrap:anywhere}h1::after{margin-left:auto;margin-right:auto}
+</style>
+</head>
+<body data-qse-update-game="../jogar/">
+<main class="hero"><a class="update-brand" href="../"><img src="../img/logo-qse.webp" width="440" height="200" alt="Quem Sou Eu"></a>
+<h1>Atualizar jogo</h1><p class="lede">Procure a versão mais recente, mesmo quando o jogo continua abrindo uma versão antiga.</p>
+<section class="update-card" aria-label="Versão do jogo">
+<div class="actions"><button id="qse-update-check" type="button">Verificar atualização</button><button id="qse-update-apply" type="button" disabled>Atualizar e abrir jogo</button></div>
+<p id="qse-update-status" role="status" aria-live="polite">Toque em verificar para começar.</p>
+<p>Versão no aparelho: <code id="qse-current-build">—</code><br>Versão publicada: <code id="qse-latest-build">—</code></p>
+<p>Antes de instalar, feche as outras abas e o app do jogo. O download pode levar alguns minutos.</p>
+<p>No iPhone, o app instalado pode usar um armazenamento separado do Safari. Para atualizar o app, use o botão em Ajustes dentro dele.</p>
+<p>Este processo atualiza apenas os arquivos do jogo. Não apaga login, decks, progresso ou dados salvos.</p>
+</section><a href="../jogar/">Voltar ao jogo</a><noscript>Ative o JavaScript para verificar atualizações.</noscript></main>
+<script>
+// Fresh, tiny controller. This page never starts the Godot engine.
+const script=document.createElement('script');script.src='../jogar/pwa/update.js?qse_check='+Date.now();document.body.appendChild(script);
+</script>
+</body></html>

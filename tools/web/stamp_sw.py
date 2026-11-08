@@ -5,13 +5,18 @@ Uso: python3 tools/web/stamp_sw.py <pasta_web> <build>
 O cache do service worker é guardado por conteúdo: um arquivo que não mudou entre versões
 (ex.: index.wasm, o motor) não é baixado de novo.
 """
-import hashlib, json, os, sys
+import hashlib, json, os, sys, shutil
 
-CORE = ["index.html", "index.js", "index.wasm", "index.pck", "index.audio.worklet.js",
+CORE = ["pwa/update.js","index.html", "index.js", "index.wasm", "index.pck", "index.audio.worklet.js",
         "index.audio.position.worklet.js", "voice/bridge.js", "manifest.webmanifest", "pwa/icon-180.png",
         "pwa/icon-192.png", "pwa/icon-512.png"]
 
 out, build = sys.argv[1], sys.argv[2]
+os.makedirs(os.path.join(out, "pwa"), exist_ok=True)
+shutil.copyfile(os.path.join(os.path.dirname(__file__), "../../web/pwa/update.js"), os.path.join(out, "pwa/update.js"))
+# Tiny network-only marker, deliberately excluded from the worker cache.
+with open(os.path.join(out, "version.json"), "w", encoding="utf-8") as version:
+    json.dump({"schema": 1, "build": build}, version)
 # Versão da página (mostrada no diagnóstico): gravada ANTES de calcular os hashes.
 page = os.path.join(out, "index.html")
 if os.path.isfile(page):

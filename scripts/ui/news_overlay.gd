@@ -59,6 +59,7 @@ func _ready() -> void:
 	_layout()
 	if _services != null:
 		_services.rewards.changed.connect(_render)
+		if _services.editor_content != null: _services.editor_content.changed.connect(_render)
 	_render()
 	_load.call_deferred()
 
@@ -210,7 +211,7 @@ func _banner(rewards: OfficialRewardsService) -> void:
 	var picture := TextureRect.new()
 	picture.name = "CampaignArt"
 	picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	picture.texture = _feature_cover(rewards)
 	var live: Dictionary = _services.editor_content.news_item(str(rewards.campaign.get("id", ""))) if _services.editor_content != null else {}
 	if _services.editor_content != null:
@@ -380,7 +381,7 @@ func _add_offer(grid: GridContainer, offer: Dictionary, rewards: OfficialRewards
 	content.add_theme_constant_override("separation", 5 if _compact else 9)
 	var art_slot := Panel.new()
 	art_slot.name = "RewardArtSlot"
-	art_slot.custom_minimum_size.y = 100 if _compact else 164
+	art_slot.custom_minimum_size.y = 180 if _compact else (164 if _iphone else 280)
 	art_slot.clip_contents = true
 	art_slot.add_theme_stylebox_override("panel", _style(Color("#263449"), Color("#334356"), 7, 0))
 	if _iphone:
@@ -400,10 +401,13 @@ func _add_offer(grid: GridContainer, offer: Dictionary, rewards: OfficialRewards
 	art.name = "RewardCover" if kind == "deck" else "RewardSkinPreview"
 	art.texture = _cover(id) if kind == "deck" else PlayerUI.portrait_texture(id)
 	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED if _iphone or kind != "deck" else TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	art_slot.add_child(art)
+	if kind == "deck" and _services.editor_content != null:
+		var live_cover: Dictionary = _services.editor_content.deck(id)
+		_services.editor_content.attach_cover(art, str(live_cover.get("cover_path", "")))
 	var tag := PanelContainer.new()
 	tag.name = "RewardTypeBadge"
 	tag.position = Vector2(8, 8)
@@ -574,16 +578,9 @@ func _feature_cover(rewards: OfficialRewardsService) -> Texture2D:
 
 
 func _cover(deck_id: String) -> Texture2D:
-	var filenames := {
-		"lendas_urbanas": "loira_do_banheiro",
-		"nostalgia_web": "carta_05",
-		"sol_nascente": "carta_01",
-		"pinturas": "carta_03",
-		"diva_pop": "carta_01"
-	}
-	if not filenames.has(deck_id): return null
-	var path := "res://assets/duel/decks/oficial/%s/%s.png" % [deck_id, str(filenames[deck_id])]
-	return load(path) as Texture2D if ResourceLoader.exists(path, "Texture2D") else null
+	var deck := DeckCatalog.find_deck(deck_id)
+	var path := DeckCover.resolve_item(deck)
+	return DeckCover.load_texture(path) if not path.is_empty() else null
 
 
 func _style(background: Color, outline: Color, corner: int, stroke: int) -> StyleBoxFlat:

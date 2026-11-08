@@ -1449,7 +1449,7 @@ func _render_deck(item: Dictionary) -> void:
 		var column := PlayerUI.column(margin)
 		column.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		column.add_theme_constant_override("separation", 4)
-		var image := _image(entry.image)
+		var image := _image(entry.image, true)
 		image.name = "CardImage"
 		image.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		column.add_child(image)
@@ -1473,7 +1473,7 @@ func _fit_grid() -> void:
 	var available := _physical_size().x - (56 if _compact() else 96)
 	_grid.columns = clampi(floori((available + 16) / (148 if _compact() else 236)), 1, 6)
 	var width := floorf((available - (_grid.columns - 1) * 16) / _grid.columns)
-	var image_height := clampf(_physical_size().y - 240, 120, 210) if _compact() else width * 1.35
+	var image_height := (width - 16.0) / CardFramer.LIBRARY_ASPECT
 	for button: Control in _grid.get_children():
 		button.custom_minimum_size = Vector2(width, image_height + 62)
 	_refit_margin.call_deferred()
@@ -1580,9 +1580,19 @@ func _data_text(value: String, font_size := 20, color := PlayerUI.TEXT) -> Label
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return label
 
-func _image(path: String) -> TextureRect:
+func _image(path: String, gallery := false) -> TextureRect:
 	var image := TextureRect.new()
-	image.texture = DeckCover.load_texture(path)
+	var source := DeckCover.load_texture(path)
+	image.texture = source
+	if gallery and source != null:
+		# Mesmo recorte 5:7 do editor. Prévias manuais já nesse formato permanecem intactas.
+		var key := "gallery:" + DeckCover.stamp(path)
+		if not _covers.has(key):
+			var framed := AtlasTexture.new()
+			framed.atlas = source
+			framed.region = CardFramer.region(source.get_size(), CardFramer.LIBRARY_ASPECT, {"x": DeckCover.PORTRAIT_FOCUS.x, "y": DeckCover.PORTRAIT_FOCUS.y})
+			_covers[key] = framed
+		image.texture = _covers[key]
 	image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	image.mouse_filter = Control.MOUSE_FILTER_IGNORE

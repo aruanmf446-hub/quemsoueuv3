@@ -195,5 +195,19 @@ func _run() -> void:
 	await click(hero.get_node("Indicator0"))
 	await settle()
 	check(hero._elapsed < 1.0, "manual interaction resets autoplay")
+	# Actual main_menu.gd wiring, independent from the browser test host.
+	var rewards: OfficialRewardsService=menu._services.rewards
+	rewards.state="success"
+	rewards.campaign={"id":"manual_fixture"}
+	rewards.offers=[{"id":"one","kind":"deck","claimed":false,"auto_grant":false}]
+	rewards.changed.emit()
+	check(hero.get_node("HeroNewsPending").visible and hero.get_node("HeroNewsPending").get_child(0).text=="+1", "main menu forwards pending +1 to actual hero")
+	rewards.offers.append({"id":"two","kind":"deck","claimed":false,"auto_grant":false})
+	rewards.seen=true
+	rewards.changed.emit()
+	check(hero.get_node("HeroNewsPending").get_child(0).text=="+2", "seen news keeps all pending offers")
+	for item: Dictionary in rewards.offers: item.claimed=true
+	rewards.changed.emit()
+	check(not hero.get_node("HeroNewsPending").visible, "main menu clears badge after explicit claims")
 	print("HERO_RESULT checks=", checks, " failures=", failures, " resolution=", root.size, " logical=", hero.size)
 	quit(1 if failures > 0 else 0)

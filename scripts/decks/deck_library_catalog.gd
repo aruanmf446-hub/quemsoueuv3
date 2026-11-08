@@ -10,6 +10,15 @@ const MAX_CARDS := 30
 static func display_name(id: String, source: String) -> String:
 	return str(TranslationServer.translate(source)) if OFFICIAL_IDS.has(id.get_slice("/", 0)) else source
 
+## Required claim is curated by ID, not a client-created ownership flag.
+static func requires_claim(id: String) -> bool:
+	return id == "lado_sombrio"
+
+static func can_access(id: String) -> bool:
+	if not requires_claim(id): return true
+	var services := PlayerServices.current
+	return services != null and services.session.authenticated() and services.rewards != null and services.rewards.is_deck_claimed(id)
+
 static func search_key(value: String) -> String:
 	var result := value.strip_edges().to_lower()
 	var accents := {"a": "áàâãä", "e": "éèêë", "i": "íìîï", "o": "óòôõö", "u": "úùûü", "c": "ç"}

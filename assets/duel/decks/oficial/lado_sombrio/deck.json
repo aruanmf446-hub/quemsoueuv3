@@ -46,5 +46,6 @@
       "name": "Tahnm",
       "description": "Uma criatura que habita as profundezas do oceano, pertencente a uma espécie que sofreu mutações. Ágil e adaptada aos ambientes subaquáticos, Tahnm é especialista em realizar tarefas nas regiões mais escuras e profundas dos mares."
     }
-  }
+  },
+  "requires_claim": true
 }

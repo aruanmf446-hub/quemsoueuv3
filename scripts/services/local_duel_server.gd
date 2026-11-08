@@ -35,6 +35,7 @@ var clock_offset := 0.0
 
 var _decks: Array = []
 var community_decks: Array = []
+var official_deck_access: Callable
 var _room: Dictionary = {}
 var _members: Array = []
 var _match: Dictionary = {}
@@ -79,7 +80,7 @@ func now() -> float:
 
 # --- Decks (assets/duel/decks, mesmas regras de tools/duel/sync_decks.py) ------------------
 func decks() -> Array:
-	if not _decks.is_empty(): return _decks+community_decks
+	if not _decks.is_empty(): return _available_decks()
 	var valid := RegEx.create_from_string(VALID_ID)
 	var valid_card := RegEx.create_from_string(VALID_CARD_ID)
 	var folders := Array(DirAccess.get_directories_at(DECKS_ROOT))
@@ -105,7 +106,13 @@ func decks() -> Array:
 			"order": int(info.get("order", 99)), "cards": cards})
 	_decks.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return a.id < b.id if a.order == b.order else a.order < b.order)
-	return _decks+community_decks
+	return _available_decks()
+
+
+func _available_decks() -> Array:
+	var catalog = preload("res://scripts/decks/deck_library_catalog.gd")
+	return _decks.filter(func(deck: Dictionary) -> bool:
+		return not catalog.requires_claim(str(deck.id)) or (official_deck_access.is_valid() and bool(official_deck_access.call(str(deck.id))))) + community_decks
 
 
 func default_settings() -> Dictionary:

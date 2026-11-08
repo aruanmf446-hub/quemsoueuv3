@@ -267,7 +267,9 @@ func _rewards_changed() -> void:
 	if not is_instance_valid(_news_button): return
 	var reward := _services.rewards
 	var ready := reward.state == "success" and not (str(reward.campaign.get("id", "")) == "diva_pop_2026" and DeckCatalog.find_deck("diva_pop").is_empty())
-	_news_button.text = "NOVIDADES  •  NOVO" if ready and not reward.seen else "NOVIDADES"
+	var pending := reward.pending_count() if ready else 0
+	_news_button.text = "NOVIDADES  +%d" % pending if pending > 0 else ("NOVIDADES  •  NOVO" if ready and not reward.seen else "NOVIDADES")
+	if is_instance_valid(_hero_carousel): _hero_carousel.set_pending_rewards(pending)
 	_news_button.tooltip_text = "Presentes gratuitos e novidades oficiais"
 	_maybe_show_news.call_deferred()
 

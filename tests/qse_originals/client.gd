@@ -22,6 +22,13 @@ func run() -> void:
   check(DuelService.card_name(card.id)==card.name,"duel card name: "+key)
  for legacy: String in ["lendas_urbanas","diva_pop","pinturas","nostalgia_web","sol_nascente"]:
   check(not Catalog.find_deck(legacy).qse_original,"legacy deck is not Original: "+legacy)
+ # This metadata test opens the native gallery with an explicit test-only receipt.
+ services.session.user={"id":"00000000-0000-4000-8000-000000000091"}
+ services.client.access_token="fixture-not-real"
+ services.session._expires_at=Time.get_unix_time_from_system()+86400
+ services.session.set_process(false)
+ services.rewards.state="success"
+ services.rewards.offers=[{"kind":"deck","item_id":"lado_sombrio","claimed":true,"auto_grant":false}]
  var screen: Control=load("res://scenes/player/deck_library.tscn").instantiate();root.add_child(screen)
  screen._render_deck(deck)
  for i in 3: await process_frame
@@ -31,6 +38,7 @@ func run() -> void:
  check(screen.find_child("QSEOriginalsBadge",true,false)==null,"native Original badge absent on legacy deck")
  screen.queue_free()
  var server := LocalDuelServer.new();root.add_child(server)
+ server.official_deck_access=Catalog.can_access
  var local_decks: Array=server.decks().filter(func(item:Dictionary)->bool:return item.id=="lado_sombrio")
  check(local_decks.size()==1 and local_decks[0].cards.size()==10,"local game accepts UUID-backed deck")
  var room := server.call_rpc("qse_duel_create",{"p_name":"Original","p_public":false,"p_settings":{"deck_ids":["lado_sombrio"],"cards_per_player":3}})

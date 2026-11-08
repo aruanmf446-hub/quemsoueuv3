@@ -94,7 +94,7 @@ func load_decks() -> Dictionary:
 		if local_server!=null: local_server.community_decks=community.local_entries()
 	var result := await _rpc("qse_duel_decks")
 	if result.ok and result.data is Dictionary:
-		decks = result.data.get("decks", [])
+		decks = (result.data.get("decks", []) as Array).filter(func(deck: Dictionary)->bool:return preload("res://scripts/decks/deck_library_catalog.gd").can_access(str(deck.get("id", ""))))
 		defaults = result.data.get("defaults", {})
 	return result
 
@@ -313,6 +313,7 @@ static func message(code: String) -> String:
 	match code:
 		"room_not_found": return "Nenhuma sala com esse código."
 		"room_closed": return "Esta sala foi encerrada."
+		"deck_claim_required": return "Resgate este deck em Novidades para liberar o acesso."
 		"room_full": return "A sala está cheia."
 		"kicked": return "Você foi removido desta sala pelo administrador."
 		"not_admin": return "Só o administrador pode fazer isso."

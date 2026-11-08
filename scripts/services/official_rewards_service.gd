@@ -80,7 +80,7 @@ func refresh() -> Dictionary:
 			var id := str(record.get("id", ""))
 			if known.has(id):
 				var at := int(known[id])
-				for key: String in ["claimed", "claimed_at", "created_at", "campaign_id", "revealed"]:
+				for key: String in ["claimed", "claimed_at", "created_at", "campaign_id", "revealed", "auto_grant"]:
 					offers[at][key] = record.get(key)
 			else:
 				offers.append(record)
@@ -162,9 +162,16 @@ func reveal() -> Dictionary:
 	return result
 
 
+func is_offer_pending(item: Dictionary) -> bool:
+	if not bool(item.get("claimed", false)): return true
+	if item.has("auto_grant") and not bool(item.auto_grant): return false
+	var historical := item.has("campaign_id") and str(item.campaign_id) != str(campaign.get("id", ""))
+	return not historical and not bool(item.get("revealed", revealed))
+
+
 func pending_count() -> int:
 	if state != "success": return 0
 	var count := 0
 	for item: Dictionary in offers:
-		if not bool(item.get("claimed", false)): count += 1
+		if is_offer_pending(item): count += 1
 	return count

@@ -32,14 +32,36 @@ O servidor local e o scanner de decks aceitam UUIDs completos além dos IDs
 simples existentes. A regra dos IDs das pastas não mudou. Biblioteca, leitor e
 partida local foram exercitados; há 6 decks e 57 cartas no catálogo local.
 
-## Integração online
+## Resgate obrigatório (2026-11-08)
 
-Adicionar arquivos no GitHub não insere um registro em `qse_v3.duel_decks` no
-GAME nem em campanhas de resgate/CATALOG. Esta entrega não acessa nem modifica
-Supabase. Não declarar disponibilidade desse novo deck em salas online ou
-resgate da conta sem verificar/sincronizar o catálogo autoritativo no servidor.
-O scanner `tools/duel/sync_decks.py` já entende os UUIDs e pode preparar o UPSERT
-para revisão do responsável pelo backend; nenhum SQL foi executado nesta entrega.
+`lado_sombrio` exige recibo real de `qse_rewards_claim` da conta GAME.
+A presença das imagens, abrir Novidades, marcar como visto e revelar um pacote
+não liberam esse deck. Antes do resgate ele aparece somente como oferta em
+**Novidades → Resgatar grátis**, sem entrar em buscas, Biblioteca, leitor,
+referências do criador de decks ou seleção local/online do Mata-Mata.
+
+O contador **+N acima de Novidades** conta ofertas ainda pendentes. Abrir e
+ignorar não o limpa. Após confirmação do resgate, Biblioteca e jogo local são
+atualizados; trocar de conta remove o acesso da conta anterior. Os presentes
+antigos concedidos automaticamente mantêm o comportamento existente.
+
+### GAME
+
+Migração `supabase/game/migrations/20261108220000_lado_sombrio_manual_claim.sql`
+**aplicada e registrada no GAME** em 2026-11-08. Não reaplicar.
+
+- Campanha `lado_sombrio_2026`, oferta `deck_lado_sombrio`, preço zero,
+  `auto_grant=false`; nenhum backfill nem recibo criado para usuários reais.
+- Dez cartas registradas em `qse_v3.duel_decks`, preservando UUIDs e imagens.
+- Catálogo online, configuração, entrada e início da partida exigem recibo;
+  iniciar exige resgate de todos os participantes humanos, inclusive espectadores.
+- Pendências manuais de campanhas anteriores continuam no feed enquanto ativas.
+- Nenhuma mudança no CATALOG, CHAT, pagamentos ou permissões de contas.
+
+A conferência após aplicação encontrou **zero resgates do Lado Sombrio**.
+Testes SQL com duas identidades temporárias exercitaram a implementação real no
+PostgreSQL e terminaram em ROLLBACK; não equivalem a sessões HTTP de contas reais.
+Validação do cliente e limitações em `evidence/lado-sombrio-resgate/README.md`.
 
 ## El Fuego em Personagens
 

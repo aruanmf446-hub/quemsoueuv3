@@ -22,6 +22,7 @@ var _logo: TextureRect
 var _previous: Button
 var _next: Button
 var _news: Button
+var _news_pending: PanelContainer
 var _friends: Button
 var _coins: Button
 var _emotes: Button
@@ -75,6 +76,11 @@ func _ready() -> void:
 		_dots.append(dot)
 	_news = _button("NOVIDADES", "HeroNews")
 	_news.pressed.connect(func() -> void: news_requested.emit())
+	_news_pending = PlayerUI.pill("", "equipped")
+	_news_pending.name = "HeroNewsPending"
+	_news_pending.get_child(0).add_theme_font_size_override("font_size", 20)
+	_news_pending.hide()
+	add_child(_news_pending)
 	_friends = _button("VER AMIGOS  ›", "HeroFriends")
 	_friends.pressed.connect(func() -> void: route_requested.emit("friends"))
 	_coins = _button("MOEDAS", "HeroCoins")
@@ -245,7 +251,13 @@ func _relayout() -> void:
 		shortcut.add_theme_font_size_override("font_size", 22 if iphone else 27)
 	_rect(_coins, w * 0.65, h * 0.12, w * 0.15, maxf(96 if iphone else 64, h * 0.065))
 	_rect(_emotes, w * 0.82, h * 0.12, w * 0.15, maxf(96 if iphone else 64, h * 0.065))
+	_rect(_news_pending, left + w * 0.15 - 58, h * 0.885, 58, 32)
 	_update_selection()
+
+func set_pending_rewards(count: int) -> void:
+	if not is_instance_valid(_news_pending): return
+	_news_pending.get_child(0).text = "+%d" % count
+	_news_pending.visible = count > 0
 
 func _tab_selected(index: int) -> void:
 	_elapsed = 0.0

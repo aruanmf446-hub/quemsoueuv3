@@ -32,3 +32,6 @@ func _ready() -> void:
 	add_child(navigation)
 	hero=load("res://scripts/menu/hero_carousel.gd").new()
 	add_child(hero)
+
+func update_pending() -> void:
+	hero.set_pending_rewards(PlayerServices.current.rewards.pending_count())

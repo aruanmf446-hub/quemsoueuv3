@@ -124,7 +124,7 @@ func render() -> void:
 	var requested := str(parameters.get("deck_id", ""))
 	if not requested.is_empty():
 		var item := Catalog.find_deck(requested)
-		if item.is_empty():
+		if item.is_empty() or not Catalog.can_access(requested):
 			_render_library()
 			PlayerUI.clear(_results)
 			_empty(_results, "Coleção indisponível", "Este deck não está disponível para consulta.")
@@ -282,6 +282,7 @@ func _entries() -> Array[Dictionary]:
 		_pull_owned.call_deferred()
 	var result: Array[Dictionary] = []
 	for item in _catalog:
+		if not Catalog.can_access(str(item.id)): continue
 		var images: Array = (item.cards as Array).map(func(card: Dictionary) -> String: return str(card.image))
 		result.append({"id": str(item.id), "name": str(item.name), "origin": "official" if item.official else "community", "qse_original": bool(item.get("qse_original", false)),
 			"creator": str(item.creator), "category": str(item.category), "count": int(item.count), "tags": item.get("tags", []),
@@ -1410,6 +1411,11 @@ func _check_icon(on: bool) -> Texture2D:
 
 
 func _render_deck(item: Dictionary) -> void:
+	if not Catalog.can_access(str(item.id)):
+		_deck = {}
+		_render_library()
+		banner.show_state("empty", tr("Resgate este deck em Novidades para liberar o acesso."))
+		return
 	if _deck.get("id", "") != item.id: _gallery_scroll = 0
 	_deck = item
 	_index = -1
@@ -1497,6 +1503,10 @@ func _fit_grid() -> void:
 	_refit_margin.call_deferred()
 
 func _render_card(index: int) -> void:
+	if not Catalog.can_access(str(_deck.get("id", ""))):
+		_deck = {}
+		_render_library()
+		return
 	var entries: Array = _deck.get("cards", [])
 	if index < 0 or index >= entries.size(): return
 	if _view == "deck": _gallery_scroll = $Margin/Column/Scroll.scroll_vertical
@@ -2193,6 +2203,10 @@ func _open_manual_review() -> void:
 ## A posse oficial pertence à conta GAME, não aos favoritos ou ao cache local.
 func _rewards_updated() -> void:
 	if not is_visible_in_tree(): return
+	if _view in ["deck", "reader"] and not Catalog.can_access(str(_deck.get("id", ""))):
+		_deck = {}
+		_render_library()
+		return
 	if _view == "library" and is_instance_valid(_results): _update_results()
 	elif _view == "deck" and bool(_deck.get("official", false)) and not _deck.is_empty(): _render_deck(_deck)
 

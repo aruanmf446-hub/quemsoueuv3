@@ -81,6 +81,17 @@ func _run() -> void:
 				return
 		var routes: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/ui/routes.json"))["routes"]
 		for route: String in routes:
+			if route == "wallet" and not ReleaseFeatures.COMMERCE_ENABLED:
+				var previous: Control = navigation.get("_active")
+				var previous_history: Array = navigation.get("_history").duplicate(true)
+				navigation.call("open", route, {})
+				await process_frame
+				if navigation.get("_active") != previous or navigation.get("_history") != previous_history:
+					push_error("SMOKE_DISABLED_WALLET_OPENED")
+					quit(1)
+					return
+				print("SMOKE_DISABLED_WALLET_BLOCKED")
+				continue
 			navigation.call("open", route, {})
 			for frame in range(20):
 				await physics_frame

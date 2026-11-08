@@ -25,6 +25,15 @@ jobs:
           "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --version | grep -E '^4[.]7[.]2[.]stable[.]official'
       - name: Import and open actual scenes
         run: python3 tools/godot/run_smoke.py --godot "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --output "$RUNNER_TEMP/results"
+      - name: Library presentation and real metric ordering (offline)
+        env:
+          LP_NUM_THREADS: "2"
+          XDG_DATA_HOME: ${{ runner.temp }}/library-presentation/data
+          XDG_CONFIG_HOME: ${{ runner.temp }}/library-presentation/config
+          XDG_CACHE_HOME: ${{ runner.temp }}/library-presentation/cache
+        run: |
+          "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --script res://tests/library_presentation/run.gd
+          "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --script res://tests/decks_t24/flow_test.gd
       - name: Roof contact with real rendered pavement (three resolutions)
         if: always()
         env:

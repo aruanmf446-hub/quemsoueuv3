@@ -5,13 +5,14 @@ const Catalog = preload("res://scripts/decks/deck_library_catalog.gd")
 static func references() -> Array:
 	var result: Array=[]
 	for id: String in Catalog.OFFICIAL_IDS:
+		if not Catalog.can_access(id): continue
 		var deck := Catalog.find_deck(id)
 		if not deck.is_empty(): result.append({"id":id,"name":str(deck.name)})
 	return result
 
 static func build(draft: Dictionary) -> String:
 	var reference_id := str(draft.get("style_reference","lendas_urbanas"))
-	if not Catalog.OFFICIAL_IDS.has(reference_id): reference_id="lendas_urbanas"
+	if not Catalog.OFFICIAL_IDS.has(reference_id) or not Catalog.can_access(reference_id): reference_id="lendas_urbanas"
 	var reference := Catalog.find_deck(reference_id)
 	var names: PackedStringArray=[]
 	for card: Dictionary in draft.get("cards",[]):

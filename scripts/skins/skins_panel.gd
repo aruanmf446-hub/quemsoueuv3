@@ -262,13 +262,22 @@ func close() -> void:
 	back_requested.emit()
 
 
+## Campaign-only reward: no locked teaser, search result or preview before unlock.
+func _character_visible(character_id: String) -> bool:
+	return character_id != "el_fuego" or services.inventory.is_unlocked(character_id)
+
+
+func _visible_entries() -> Array:
+	return services.inventory.entries.filter(func(entry: Dictionary) -> bool: return _character_visible(str(entry.id)))
+
+
 func render() -> void:
 	if _selected.is_empty():
 		_selected = services.inventory.equipped_id()
 	# A preview remains available while account equipment is still loading.
 	# Ownership and purchase checks continue to come from the services.
-	if services.inventory.entry(_selected).is_empty() and not services.inventory.entries.is_empty():
-		_selected = str(services.inventory.entries[0].id)
+	if (services.inventory.entry(_selected).is_empty() or not _character_visible(_selected)) and not _visible_entries().is_empty():
+		_selected = str(_visible_entries()[0].id)
 	_build_collections()
 	_rebuild_gallery()
 	# Sem texto de demonstração: o banner só aparece para erros e estados de carregamento.
@@ -486,6 +495,9 @@ func _select_neighbor(direction: int) -> void:
 
 
 func _select(character_id: String) -> void:
+	if not _character_visible(character_id):
+		if _visible_entries().is_empty(): return
+		character_id = str(_visible_entries()[0].id)
 	_selected = character_id
 	if not _selected_styles.has(character_id): _selected_styles[character_id]=services.cosmetic_shop.equipped(character_id)
 	for id: String in _cards:
@@ -1019,7 +1031,7 @@ func _equip(character_id: String) -> void:
 
 func _generate_thumbnails() -> void:
 	_generating = true
-	_paths = await _thumbnails.ensure(self, services.inventory.entries)
+	_paths = await _thumbnails.ensure(self, _visible_entries())
 	_generating = false
 	# Captura sequencial; as listas de amigos só leem PNGs existentes.
 	for character_id: String in _paths:
@@ -1078,7 +1090,7 @@ func _load_collections() -> void:
 ## "inventory" (ou lista vazia) = todos os personagens cadastrados; senão, os IDs listados.
 func _collection_ids(collection: Dictionary) -> Array[String]:
 	var all: Array[String] = []
-	for entry: Dictionary in services.inventory.entries: all.append(str(entry.id))
+	for entry: Dictionary in _visible_entries(): all.append(str(entry.id))
 	var listed: Array = collection.get("character_ids", [])
 	if str(collection.get("source", "")) == "inventory" or listed.is_empty(): return all
 	var ids: Array[String] = []

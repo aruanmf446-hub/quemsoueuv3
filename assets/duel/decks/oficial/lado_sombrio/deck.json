@@ -1,0 +1,51 @@
+{
+  "name": "Lado Sombrio",
+  "order": 5,
+  "visibility": "public",
+  "qse_original": true,
+  "category": "Fantasia",
+  "original_language": "pt-BR",
+  "cards": {
+    "0DDAFCC2-A4B3-4517-8C32-9FE398AE36ED": {
+      "name": "Construtor",
+      "description": "O Construtor é o responsável pelo arsenal do Reino do Deserto. Sua especialidade é desenvolver e fornecer os equipamentos que sustentam o poder militar do reino."
+    },
+    "32845652-37FD-439B-AF87-EA313F81E26F": {
+      "name": "Presidente Bolhas",
+      "description": "Presidente do Novo Estado e defensor do presidencialismo, Bolhas pretende derrubar os regimes imperialistas e instaurar governos democráticos nos demais Estados. Suas ambições políticas o colocam em confronto com os poderes tradicionais dos reinos."
+    },
+    "69D90FC2-8763-48B4-B4BA-C3EE6310B9CF": {
+      "name": "Linna",
+      "description": "Uma bruxa que domina a magia oculta e utiliza artefatos mágicos para invocar itens ligados à Lua de Sangue. Acompanhada por um corvo que atua como seu aliado, Linna explora os mistérios das artes ocultas."
+    },
+    "87EDBC3E-D04B-4750-B075-695E22EB46A2": {
+      "name": "Priya",
+      "description": "Imperatriz das Profundezas, Priya possui conhecimentos ancestrais sobre o fundo dos mares e mantém criaturas monstruosas como suas aliadas. Seus poderes têm origem nas práticas ocultistas de tribos que cultuam o vulcão Delca."
+    },
+    "8DB59DBB-3ECB-4D86-B6EB-D95C87587329": {
+      "name": "FH",
+      "description": "Um robô misterioso encontrado por Lana. De natureza sombria e origem desconhecida, FH guarda segredos relacionados a um mundo antigo, cuja história ainda permanece envolta em mistério."
+    },
+    "AD7AE492-2699-439E-AB72-228408049B5F": {
+      "name": "Guadalupe",
+      "description": "Guadalupe é responsável por supervisionar os trabalhadores escravizados nas minas do tirano Pimento. Sua função é controlar as atividades de mineração e garantir o cumprimento das ordens impostas pelo tirano."
+    },
+    "BBE1237A-5315-4BF6-8E1C-6998B34D75CF": {
+      "name": "Pishacha",
+      "description": "Uma figura misteriosa das lendas do Reino dos Oceanos, conhecida por sua rivalidade com as lendárias criaturas dos mares. Sua existência nunca foi comprovada, permanecendo, até então, apenas como um mito entre os habitantes do reino."
+    },
+    "F074887D-54D7-4407-ACE3-5FEF839787A0": {
+      "name": "Galack",
+      "description": "Príncipe Galack, herdeiro do Reino Solar, pertence a uma família real obcecada pelo ouro e pela luxúria. Ambicioso e conquistador, deseja expandir seu domínio e fortalecer o poder de sua linhagem."
+    },
+    "90CFE00B-A415-49BB-AA13-2A444EC4A442": {
+      "name": "Milene",
+      "description": "Princesa Milene é a irmã mais nova da família real do Reino da Floresta. Determinada a tomar o trono de sua irmã, a Princesa Michelly, esconde ambições sombrias por trás de sua aparência delicada e aparentemente inocente."
+    },
+    "A06F4A32-DF09-46E2-8DA3-92D6D79DA2CB": {
+      "name": "Tahnm",
+      "description": "Uma criatura que habita as profundezas do oceano, pertencente a uma espécie que sofreu mutações. Ágil e adaptada aos ambientes subaquáticos, Tahnm é especialista em realizar tarefas nas regiões mais escuras e profundas dos mares."
+    }
+  },
+  "requires_claim": true
+}

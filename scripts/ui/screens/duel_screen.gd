@@ -998,6 +998,7 @@ func _deck_entries() -> Array:
 	var store := DeckDrafts.for_current()
 	for deck: Dictionary in list:
 		var id := str(deck.get("id", ""))
+		if not LibraryCatalog.can_access(id): continue
 		var item := LibraryCatalog.find_deck(id)
 		var cover := services.community_decks.cover_image(id) if CommunityDecksService.is_ref(id) else str(deck.get("cover",""))
 		result.append({"id": id, "name": LibraryCatalog.display_name(id, str(deck.get("name", id))), "size": int(deck.get("size", 0)),

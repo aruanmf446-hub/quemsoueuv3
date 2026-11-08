@@ -49,10 +49,11 @@ function assemble(build) { execSync(`python3 tests/web_pwa/assemble.py ${site}/q
   check(await page.evaluate(() => getComputedStyle(document.getElementById('qse-update')).display) === 'none', 'em partida/telas internas o aviso fica oculto');
   const during = await entries();
   check(before.every(u => during.includes(u)), 'versão em uso continua intacta até o jogador aceitar');
-  await page.evaluate(() => { window.qseSafeToUpdate = true; });
+  await page.evaluate(() => { window.qseSafeToUpdate = true; window.dispatchEvent(new Event("qse-update-safety")); });
   await page.waitForTimeout(1800);
   check(await page.evaluate(() => getComputedStyle(document.getElementById('qse-update')).display) === 'block', 'no lobby aparece "Reiniciar para atualizar"');
-  await Promise.all([page.waitForNavigation({ timeout: 15000 }), page.click('#qse-update')]);
+  await page.click('#qse-update');
+  await Promise.all([page.waitForNavigation({ timeout: 15000 }), page.click('#qse-update-apply')]);
   await page.waitForFunction(() => !!navigator.serviceWorker.controller, null, { timeout: 15000 });
   await page.waitForTimeout(500);
   const after = await entries();

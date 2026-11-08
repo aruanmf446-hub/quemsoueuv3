@@ -17,6 +17,9 @@ OUTPUT = ROOT / "supabase/seed/duel_decks.sql"
 VALID = re.compile(r"^[a-z0-9_]{2,32}$")
 
 
+CARD_VALID = re.compile(r"^(?:[a-z0-9_]{2,32}|[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})$")
+
+
 def literal(value):
     return "'" + str(value).replace("'", "''") + "'"
 
@@ -32,8 +35,8 @@ def scan():
             info = json.loads((folder / "deck.json").read_text(encoding="utf-8"))
         cards = []
         for image in sorted(folder.glob("*.png")):
-            if not VALID.match(image.stem):
-                problems.append(f"carta '{folder.name}/{image.name}': renomeie com letras minúsculas, números e _")
+            if not CARD_VALID.match(image.stem):
+                problems.append(f"carta '{folder.name}/{image.name}': use um identificador simples ou UUID válido")
                 continue
             cards.append(f"{folder.name}/{image.stem}")
         if len(cards) < 2:

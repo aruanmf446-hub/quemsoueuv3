@@ -133,6 +133,7 @@ func _ready() -> void:
 	duel.client = client
 	duel.session = session
 	duel.local_server = LocalDuelServer.new()
+	duel.local_server.official_deck_access = preload("res://scripts/decks/deck_library_catalog.gd").can_access
 	duel.local_server.skin_provider = inventory.equipped_id
 	duel.local_server.nickname_provider = func() -> String:
 		return str(profile.data.nickname) if profile.has_nickname() else ("Defina seu nickname" if session.authenticated() else "Jogador local")
@@ -172,10 +173,10 @@ func _exit_tree() -> void:
 
 func _session_changed() -> void:
 	community_decks.clear()
-	# Community decks belong to the signed-in account; official local play stays independent.
+	# Community decks and manually claimed official packs belong to the signed-in account.
 	if duel.local_server!=null: duel.local_server.community_decks=[]
 	duel.decks=[]
-	if duel.is_local() and duel.in_room() and (duel.room.room.get("settings",{}).get("deck_ids",[]) as Array).any(func(id:Variant)->bool:return CommunityDecksService.is_ref(str(id))):
+	if duel.is_local() and duel.in_room() and (duel.room.room.get("settings",{}).get("deck_ids",[]) as Array).any(func(id:Variant)->bool:return CommunityDecksService.is_ref(str(id)) or preload("res://scripts/decks/deck_library_catalog.gd").requires_claim(str(id))):
 		duel.leave()
 	rewards.clear()
 	presence.stop()

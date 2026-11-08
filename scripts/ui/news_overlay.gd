@@ -253,6 +253,8 @@ func _banner(rewards: OfficialRewardsService) -> void:
 	copy.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	banner.add_child(copy)
 	var title_text := str(live.get("title", "")) if not str(live.get("title", "")).is_empty() else ("Você tem recompensas para conhecer!" if not rewards.revealed else "Seus presentes estão na sua conta!")
+	var manual := rewards.offers.any(func(item: Dictionary)->bool:return item.has("auto_grant") and not bool(item.auto_grant) and not bool(item.get("claimed", false)))
+	if manual: title_text = str(rewards.campaign.get("title", title_text))
 	var title := _label(title_text, 16 if _compact else (31 if _iphone else 27), WHITE)
 	title.autowrap_mode = TextServer.AUTOWRAP_OFF
 	title.name = "CampaignHeadline"
@@ -260,6 +262,7 @@ func _banner(rewards: OfficialRewardsService) -> void:
 	title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	copy.add_child(title)
 	var desc_text := str(live.get("description", "")) if not str(live.get("description", "")).is_empty() else ("Confira os presentes oficiais da equipe Quem Sou Eu." if not rewards.revealed else "Tudo salvo no seu perfil. Aproveite suas recompensas!")
+	if manual: desc_text = str(rewards.campaign.get("description", desc_text))
 	var description := _label(desc_text, 11 if _compact else (21 if _iphone else 17), MUTED)
 	description.name = "CampaignSubtitle"
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -316,10 +319,7 @@ func _categories(rewards: OfficialRewardsService) -> void:
 
 ## Ainda para receber: não resgatado, ou incluso num pacote que ainda não foi aberto.
 func _pending(offer: Dictionary, rewards: OfficialRewardsService) -> bool:
-	if not bool(offer.get("claimed", false)): return true
-	var historical := offer.has("campaign_id") and str(offer.get("campaign_id", "")) != str(rewards.campaign.get("id", ""))
-	var confirmed := bool(offer.get("revealed", rewards.revealed)) or historical
-	return not confirmed
+	return rewards.is_offer_pending(offer)
 
 
 func _rewards_grid(rewards: OfficialRewardsService) -> void:
@@ -476,14 +476,14 @@ func _footer(rewards: OfficialRewardsService = null) -> void:
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	footer.add_child(spacer)
 	if rewards == null: return
-	if not rewards.revealed:
+	if not rewards.revealed and rewards.offers.any(func(item: Dictionary)->bool: return bool(item.get("auto_grant", true)) and rewards.is_offer_pending(item)):
 		var redeem := _button("RESGATAR PRESENTES", true)
 		redeem.name = "RedeemGiftBundle"
 		redeem.custom_minimum_size = Vector2(158 if _compact else (320 if _iphone else 270), 39 if _compact else 49)
 		redeem.disabled = _working or rewards.offers.is_empty() or rewards.offers.all(func(o: Dictionary) -> bool: return not bool(o.get("claimed", false)))
 		redeem.pressed.connect(_reveal_gifts)
 		footer.add_child(redeem)
-	else:
+	elif rewards.revealed:
 		var received := _label("✓  PRESENTES RECEBIDOS", 11 if _compact else (20 if _iphone else 16), GOLD_SOFT)
 		received.name = "GiftsReceived"
 		received.size_flags_horizontal = Control.SIZE_SHRINK_END

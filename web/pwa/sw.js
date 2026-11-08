@@ -17,11 +17,22 @@ function key(path) { return new URL(path + "?v=" + FILES[path], self.registratio
 self.addEventListener("install", (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE);
+    const clients = await self.clients.matchAll({type:"window",includeUncontrolled:true});
+    for (const client of clients) client.postMessage({type:"qse-update-progress",build:BUILD});
     await Promise.all(Object.keys(FILES).map(async (path) => {
       if (await cache.match(key(path))) return;                  // mesmo conteúdo: já guardado
       try {
-        const response = await fetch(path, {cache: "no-cache"});
-        if (response.ok) await cache.put(key(path), response);
+        const response = await fetch(key(path), {cache: "reload"});
+        if (response.ok) {
+          // Reject a stale CDN copy of the small HTML before committing a new build.
+          if (path === "index.html") {
+            const bytes = await response.clone().arrayBuffer();
+            const digest = await crypto.subtle.digest("SHA-256", bytes);
+            const hash = Array.from(new Uint8Array(digest)).map(x => x.toString(16).padStart(2,"0")).join("").slice(0,16);
+            if (hash !== FILES[path]) throw new Error("stale page");
+          }
+          await cache.put(key(path), response);
+        }
         else if (REQUIRED.includes(path)) throw new Error(path + " " + response.status);
       } catch (error) {
         if (REQUIRED.includes(path)) throw error;
@@ -32,6 +43,17 @@ self.addEventListener("install", (event) => {
 });
 
 self.addEventListener("message", (event) => {
+  if (event.data === "qse-build-status" && event.ports[0]) {
+    event.waitUntil((async () => {
+      const scope = new URL(self.registration.scope);
+      const clients = await self.clients.matchAll({type:"window", includeUncontrolled:true});
+      const gameClients = clients.filter(client => {
+        const url = new URL(client.url);
+        return url.origin === scope.origin && url.pathname.startsWith(scope.pathname);
+      }).length;
+      event.ports[0].postMessage({build:BUILD, gameClients});
+    })());
+  }
   if (event.data === "qse-activate-update") self.skipWaiting();
 });
 

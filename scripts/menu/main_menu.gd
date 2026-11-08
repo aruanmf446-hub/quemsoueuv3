@@ -16,6 +16,7 @@ var _nickname_modal: Control
 var _hero_carousel: Control
 var _coin_return_order := ""
 var _coin_return_opening := false
+var _current_route := ""
 
 
 func _ready() -> void:
@@ -56,6 +57,7 @@ func _ready() -> void:
 	_services.rewards.changed.connect(_rewards_changed)
 	_services.preferences.changed.connect(_refresh_wallet)
 	_navigation.route_changed.connect(_route_changed)
+	_services.duel.changed.connect(func() -> void: _publish_update_safety(_current_route))
 	_refresh_profile()
 	_refresh_wallet()
 	_refresh_friends()
@@ -265,7 +267,9 @@ func _rewards_changed() -> void:
 	if not is_instance_valid(_news_button): return
 	var reward := _services.rewards
 	var ready := reward.state == "success" and not (str(reward.campaign.get("id", "")) == "diva_pop_2026" and DeckCatalog.find_deck("diva_pop").is_empty())
-	_news_button.text = "NOVIDADES  •  NOVO" if ready and not reward.seen else "NOVIDADES"
+	var pending := reward.pending_count() if ready else 0
+	_news_button.text = "NOVIDADES  +%d" % pending if pending > 0 else ("NOVIDADES  •  NOVO" if ready and not reward.seen else "NOVIDADES")
+	if is_instance_valid(_hero_carousel): _hero_carousel.set_pending_rewards(pending)
 	_news_button.tooltip_text = "Presentes gratuitos e novidades oficiais"
 	_maybe_show_news.call_deferred()
 
@@ -400,6 +404,7 @@ func _refresh_friends() -> void:
 
 
 func _route_changed(route: String) -> void:
+	_current_route = route
 	if OS.has_feature("web"):
 		JavaScriptBridge.eval("window.qseSetInternalScreen && window.qseSetInternalScreen("+("false" if route.is_empty() else "true")+")")
 	var hero_active := is_instance_valid(_hero_carousel) and bool(_hero_carousel.get("using_art"))
@@ -424,8 +429,8 @@ func _route_changed(route: String) -> void:
 func _publish_update_safety(route: String) -> void:
 	if not OS.has_feature("web"): return
 	var services := PlayerServices.current
-	var safe := not (services != null and services.duel != null and services.duel.in_room())
-	JavaScriptBridge.eval("window.qseSafeToUpdate = %s;" % ("true" if safe else "false"), true)
+	var safe := route in ["", "settings", "account"] and not (services != null and services.duel != null and services.duel.in_room())
+	JavaScriptBridge.eval("window.qseSafeToUpdate = %s; window.dispatchEvent(new Event('qse-update-safety'));" % ("true" if safe else "false"), true)
 
 
 func _notification(what: int) -> void:

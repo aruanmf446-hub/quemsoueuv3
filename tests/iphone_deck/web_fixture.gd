@@ -23,7 +23,8 @@ func _run() -> void:
 		var locale := str(JavaScriptBridge.eval("new URLSearchParams(location.search).get('lang')||'pt_BR'"))
 		if DevicePreferences._valid("locale",locale): services.preferences.set_preference("locale",locale)
 	var fake: SupabaseClient
-	if mode=="i18n": fake=preload("res://tests/i18n_expanded/fake_game.gd").new()
+	if mode=="manual_claim": fake=preload("res://tests/lado_sombrio_claim/fake_game.gd").new()
+	elif mode=="i18n": fake=preload("res://tests/i18n_expanded/fake_game.gd").new()
 	elif mode in ["languages","public_profile","friends_search","duel_admin"]: fake=preload("res://tests/profile_languages/fake_game.gd").new()
 	elif mode in ["ability_refills","refill_store"]: fake=preload("res://tests/ability_refills/fake_game.gd").new()
 	elif mode.begins_with("commerce"): fake=preload("res://tests/commerce/fake_game.gd").new()
@@ -61,7 +62,11 @@ func _run() -> void:
 	services.cosmetic_shop.client=fake
 	services.ability_refills.client=fake
 	if mode.begins_with("commerce"): await services.cosmetic_shop.refresh()
-	if mode=="commerce_entrypoints":
+	if mode=="manual_claim":
+		services.rewards.client=fake
+		await services.rewards.refresh()
+		await _i18n_screen("lobby")
+	elif mode=="commerce_entrypoints":
 		await _i18n_screen("lobby")
 	elif mode=="i18n":
 		profile.nickname="NicknameOriginal"
@@ -193,6 +198,10 @@ func _i18n_screen(screen: String) -> void:
 		"lobby":
 			ui=preload("res://tests/i18n_expanded/hero_host.gd").new()
 			add_child(ui)
+			if fixture_game.get_script()==preload("res://tests/lado_sombrio_claim/fake_game.gd"):
+				ui.hero.set_pending_rewards(services.rewards.pending_count())
+				services.rewards.changed.connect(ui.update_pending)
+				ui.hero.news_requested.connect(func()->void: ui.add_child(NewsOverlay.new()))
 			ui.hero.route_requested.connect(func(route: String)->void:
 				if route in ["wallet","emotes"]: _i18n_screen("commerce_wallet" if route=="wallet" else "commerce_emotes"))
 		"commerce_wallet":
@@ -206,6 +215,23 @@ func _i18n_screen(screen: String) -> void:
 			for entry: Dictionary in CharacterCatalog.load_entries():
 				ui._paths[str(entry.id)]="res://assets/portraits/"+str(entry.id)+".png"
 			ui.show_screen({"cosmetic_mode":"shop"})
+		"originals", "originals_gallery":
+			ui=load("res://scenes/player/deck_library.tscn").instantiate()
+			add_child(ui)
+			if screen=="originals": ui._render_deck(preload("res://scripts/decks/deck_library_catalog.gd").find_deck("lado_sombrio"))
+			else:
+				ui.show_screen()
+				ui._query="Lado Sombrio"
+				ui._update_results()
+		"skins_locked", "skins_unlocked":
+			services.progression.state="success"
+			services.progression.data={"unlocked_character_ids":PlayerContracts.initial_ids(),"equipped_character_id":"cowboy"}
+			if screen=="skins_unlocked": services.progression.data.unlocked_character_ids.append("el_fuego")
+			ui=load("res://scenes/skins/skins_panel.tscn").instantiate()
+			add_child(ui)
+			ui._generating=true
+			for entry: Dictionary in CharacterCatalog.load_entries(): ui._paths[str(entry.id)]="res://assets/portraits/"+str(entry.id)+".png"
+			ui.open("el_fuego")
 		"library", "official_cards":
 			ui=load("res://scenes/player/deck_library.tscn").instantiate()
 			add_child(ui)
@@ -247,6 +273,16 @@ func _i18n_screen(screen: String) -> void:
 	await get_tree().process_frame
 
 func _probe(args: Array) -> void:
+	if args.size() and str(args[0])=="claim_fail": fixture_game.fail_claim=true
+	if args.size() and str(args[0])=="claim_success": fixture_game.fail_claim=false
+	if args.size() and str(args[0])=="claim_refresh": await services.rewards.refresh()
+	if args.size() and str(args[0])=="claim_other_account":
+		fixture_game.user="00000000-0000-4000-8000-000000000092"
+		services.session.user={"id":fixture_game.user}
+		services.rewards.clear()
+		await services.rewards.refresh()
+	if args.size() and str(args[0]).begins_with("original_card:"):
+		ui._render_card(str(args[0]).trim_prefix("original_card:").to_int())
 	if args.size() and str(args[0]).begins_with("i18n_screen:"):
 		await _i18n_screen(str(args[0]).trim_prefix("i18n_screen:"))
 	if args.size() and str(args[0])=="start_refill_phase":
@@ -273,6 +309,9 @@ func _probe(args: Array) -> void:
 		scroll.scroll_vertical=int(scroll.get_v_scroll_bar().max_value)
 	report_sequence+=1
 	var result := {"locale":services.preferences.values.locale,"language_choice":ui.get("_language_choice"),"sequence":report_sequence,"size":[ui.size.x,ui.size.y],"controls":[],"fields":{},"cards":0,"labels":[],"emote_thumbnails":[]}
+	result.pending_rewards=services.rewards.pending_count()
+	result.lado_access=preload("res://scripts/decks/deck_library_catalog.gd").can_access("lado_sombrio")
+	result.local_lado=services.duel.local_server.decks().any(func(d:Dictionary)->bool:return str(d.id)=="lado_sombrio")
 	var margin := ui.get_node_or_null("Margin") as Control
 	if margin!=null: result.layout_width=margin.size.x * margin.scale.x
 	if ui.get("_selected_styles") is Dictionary:

@@ -1,0 +1,35 @@
+[
+  {
+    "width": 1672,
+    "height": 941,
+    "iphoneUA": false,
+    "pendingPersists": true,
+    "failedClaimBlocked": true,
+    "explicitClaimUnlocks": true,
+    "accountIsolated": true,
+    "cardsAfterClaim": 10,
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "iphoneUA": true,
+    "pendingPersists": true,
+    "failedClaimBlocked": true,
+    "explicitClaimUnlocks": true,
+    "accountIsolated": true,
+    "cardsAfterClaim": 10,
+    "errors": []
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "iphoneUA": true,
+    "pendingPersists": true,
+    "failedClaimBlocked": true,
+    "explicitClaimUnlocks": true,
+    "accountIsolated": true,
+    "cardsAfterClaim": 10,
+    "errors": []
+  }
+]

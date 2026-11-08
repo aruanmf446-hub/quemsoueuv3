@@ -9,6 +9,7 @@ stage, output, godot = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
 assert stage.resolve() != root and (stage / '.iphone_web_fixture_stage').exists()
 for name in ['scripts','scenes','data','web','tests']:
     shutil.copytree(root / name, stage / name, dirs_exist_ok=True)
+shutil.copytree(root/'assets/duel/decks/oficial/lado_sombrio',stage/'assets/duel/decks/oficial/lado_sombrio',dirs_exist_ok=True)
 if (root/'assets/emotes').exists():
     shutil.copytree(root/'assets/emotes',stage/'assets/emotes',dirs_exist_ok=True)
 if (root/'assets/ui/store').exists():

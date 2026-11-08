@@ -1,13 +1,23 @@
 extends RefCounted
 ## Read-only local catalog. Discovery lists public decks only; private content is never exposed.
 const ROOT := "res://assets/duel/decks/oficial"
-const OFFICIAL_IDS := ["lendas_urbanas", "nostalgia_web", "sol_nascente", "pinturas", "diva_pop"]
+const OFFICIAL_IDS := ["lendas_urbanas", "nostalgia_web", "sol_nascente", "pinturas", "diva_pop", "lado_sombrio"]
+const QSE_ORIGINAL_IDS := ["lado_sombrio"]
 const MIN_CARDS := 5
 const MAX_CARDS := 30
 
 ## Translate only our own catalog. Creator content keeps its author-provided name.
 static func display_name(id: String, source: String) -> String:
 	return str(TranslationServer.translate(source)) if OFFICIAL_IDS.has(id.get_slice("/", 0)) else source
+
+## Required claim is curated by ID, not a client-created ownership flag.
+static func requires_claim(id: String) -> bool:
+	return id == "lado_sombrio"
+
+static func can_access(id: String) -> bool:
+	if not requires_claim(id): return true
+	var services := PlayerServices.current
+	return services != null and services.session.authenticated() and services.rewards != null and services.rewards.is_deck_claimed(id)
 
 static func search_key(value: String) -> String:
 	var result := value.strip_edges().to_lower()
@@ -43,7 +53,7 @@ static func _parse_deck(id: String, info: Dictionary) -> Dictionary:
 	var live: Dictionary = PlayerServices.current.editor_content.deck(id) if PlayerServices.current != null and PlayerServices.current.editor_content != null else {}
 	return {
 		"id": id, "name": display_name(id, _string(live.get("title", ""), _string(remote.get("name", info.get("name", "")), id.replace("_", " ").capitalize()))),
-		"official": official, "creator": "Quem Sou Eu" if official else _string(info.get("creator", "")),
+		"official": official, "qse_original": official and QSE_ORIGINAL_IDS.has(id) and bool(info.get("qse_original", false)), "creator": "Quem Sou Eu" if official else _string(info.get("creator", "")),
 		"category": _string(live.get("subtitle", ""), _string(info.get("category", ""))),
 		"description": _string(live.get("description", ""), _string(remote.get("description", info.get("description", "")))),
 		"cover_path": _string(live.get("cover_path", "")),

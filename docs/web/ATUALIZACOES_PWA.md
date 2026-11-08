@@ -1,6 +1,6 @@
 # Atualizações rápidas do PWA
 
-Implementação preparada em branch, sem publicar esta alteração na main.
+Política aprovada pelo dono: verificar ao abrir/retornar e por ação manual, sem consultas periódicas.
 
 ## O que causava a demora
 
@@ -14,8 +14,9 @@ O botão de fechar/abrir não garantia que a instalação acabasse nos primeiros
 
 - Marcador pequeno `jogar/version.json` identifica o commit publicado, com consulta
   `no-store` e parâmetro de cache a cada verificação. Fica fora do cache do worker.
-- Consulta ao abrir, a cada minuto enquanto a página está visível e ao recuperar
-  foco, visibilidade ou conexão (com proteção contra eventos repetidos).
+- Consulta ao abrir e ao recuperar foco, visibilidade ou conexão (com proteção
+  contra eventos repetidos). Não há timer de consulta de versão, nem polling da UI;
+  segurança de reinício e idioma são publicados como eventos pelo motor/shell.
 - `sw.js?build=<commit>` muda uma vez por versão, mantém um único registro no mesmo
   escopo e usa `updateViaCache: none`. Arquivos do jogo usam a URL do hash para não
   reaproveitar uma resposta HTTP antiga sob a chave de uma versão nova.
@@ -55,7 +56,7 @@ app para a verificação imediata. Não foi feita validação em aparelho físic
 Esta solução só estará disponível no site após merge/deploy autorizado. Uma
 versão antiga não ganha o botão interno por alteração remota de configuração.
 Após a primeira publicação, a página externa pode preparar a versão nova para o
-mesmo navegador; o novo shell passa a consultar em intervalos curtos. Não orientar
+mesmo navegador; o novo shell passa a consultar nos eventos de abertura/retorno e pelo botão manual. Não orientar
 o jogador a apagar dados do site ou desinstalar para receber uma atualização.
 
 ## Validação

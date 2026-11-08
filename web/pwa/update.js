@@ -100,6 +100,7 @@
     try {
       const reg = await register(), worker = reg.waiting || reg.active;
       const info = await ask(worker);
+      if (!safe()) { emit('unsafe'); return false; }
       if (!info || info.build !== state.latest) { await check(); return false; }
       // The external recovery page cannot decide whether another game tab is in a match.
       if (info.gameClients > (external ? 0 : 1)) { emit('close-game'); return false; }
@@ -169,13 +170,13 @@
   }
   if (!external) {
     check();
-    setInterval(() => { if (document.visibilityState === 'visible') check(); }, 60000);
     const resume = () => { if (document.visibilityState === 'visible' && Date.now()-lastCheck > 3000) check(); };
     window.addEventListener('focus', resume);
     window.addEventListener('pageshow', resume);
     window.addEventListener('online', resume);
     document.addEventListener('visibilitychange', resume);
-    setInterval(render, 750);
+    window.addEventListener("qse-update-safety", render);
+    window.addEventListener("qse-locale-changed", render);
   }
   render();
 })();

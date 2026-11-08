@@ -11,10 +11,16 @@ let checks=0;function check(ok,msg){assert.ok(ok,msg);checks++;console.log('PASS
 const ctx=await browser.newContext(),page=await ctx.newPage(),base='http://localhost:8176';await page.clock.install();await page.goto(base+game);await page.waitForFunction(()=>navigator.serviceWorker.controller&&window.qseUpdates?.getState().current==='update-a',null,{timeout:20000});
 await page.evaluate(async()=>{localStorage.setItem('test-session','preserved');await new Promise((resolve,reject)=>{const req=indexedDB.open('qse-test-saves',1);req.onupgradeneeded=()=>req.result.createObjectStore('saves');req.onerror=()=>reject(req.error);req.onsuccess=()=>{const tx=req.result.transaction('saves','readwrite');tx.objectStore('saves').put('saved-deck','deck');tx.oncomplete=()=>{req.result.close();resolve();};};});});
 const wasmCount=()=>requests.filter(x=>x.startsWith(game+'index.wasm?')).length;const initialWasm=wasmCount();
-hold=true;assemble('update-b');await page.clock.fastForward(61000);await page.waitForFunction(()=>window.qseUpdates.getState().latest==='update-b'&&window.qseUpdates.getState().status==='downloading',null,{timeout:20000});
+await page.clock.runFor(100);
+const markerCount=requests.filter(x=>x.startsWith(game+'version.json?')).length;
+hold=true;assemble('update-b');await page.clock.fastForward(300000);
+check(requests.filter(x=>x.startsWith(game+'version.json?')).length===markerCount,'five minutes idle causes no periodic version requests');
+await page.evaluate(()=>window.dispatchEvent(new Event('focus')));await page.waitForFunction(()=>window.qseUpdates.getState().latest==='update-b'&&window.qseUpdates.getState().status==='downloading',null,{timeout:20000});
 for(let i=0;i<200&&!held.length;i++)await new Promise(r=>setTimeout(r,20));
-check(await page.evaluate(()=>qseUpdates.getState().status==='downloading'&&!qseUpdates.getState().ready),'automatic minute check detects before package finishes');check(await page.evaluate(()=>qseBuild==='update-a'),'old engine version remains active during download');
+check(await page.evaluate(()=>qseUpdates.getState().status==='downloading'&&!qseUpdates.getState().ready),'resume detects new version before package finishes');check(await page.evaluate(()=>qseBuild==='update-a'),'old engine version remains active during download');
 hold=false;held.splice(0).forEach(fn=>fn());await page.waitForFunction(()=>qseUpdates.getState().ready,null,{timeout:20000});
+await page.evaluate(async()=>{qseSafeToUpdate=true;const pending=qseUpdates.apply();qseSafeToUpdate=false;await pending;});
+check(await page.evaluate(async()=>qseUpdates.getState().status==='unsafe'&&!!(await navigator.serviceWorker.getRegistration()).waiting),'entering match during async check cancels activation');
 await page.evaluate(()=>{qseSafeToUpdate=false;qseUpdates.open();});await page.waitForFunction(()=>qseUpdates.getState().status==='ready');await page.evaluate(()=>qseUpdates.apply());check(await page.evaluate(()=>qseBuild==='update-a'&&qseUpdates.getState().status==='unsafe'),'unsafe match cannot restart');
 await page.evaluate(()=>{qseSafeToUpdate=true;qseStoryPlaying=true;return qseUpdates.apply();});check(await page.evaluate(()=>qseBuild==='update-a'&&qseUpdates.getState().status==='unsafe'),'campaign also prevents restart');
 await page.evaluate(()=>{qseStoryPlaying=false;return qseUpdates.check();});await page.clock.runFor(800);await Promise.all([page.waitForNavigation(),page.click('#qse-update-apply')]);await page.waitForFunction(()=>window.qseBuild==='update-b');

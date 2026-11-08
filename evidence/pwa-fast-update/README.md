@@ -1,5 +1,9 @@
 # Atualização rápida — evidências de teste
 
+Registro histórico da primeira implementação em branch. A consulta periódica
+foi removida por decisão do dono; evidências atuais em `evidence/release-originals/`.
+Os arquivos abaixo não foram reescritos para simular novos resultados.
+
 Consultar docs/web/ATUALIZACOES_PWA.md para arquitetura, uso, primeira publicação e limites.
 
 Chromium com service workers reais: 25 verificações, zero falhas. Quatro versões

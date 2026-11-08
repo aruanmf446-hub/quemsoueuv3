@@ -428,7 +428,7 @@ func _publish_update_safety(route: String) -> void:
 	if not OS.has_feature("web"): return
 	var services := PlayerServices.current
 	var safe := route in ["", "settings", "account"] and not (services != null and services.duel != null and services.duel.in_room())
-	JavaScriptBridge.eval("window.qseSafeToUpdate = %s;" % ("true" if safe else "false"), true)
+	JavaScriptBridge.eval("window.qseSafeToUpdate = %s; window.dispatchEvent(new Event('qse-update-safety'));" % ("true" if safe else "false"), true)
 
 
 func _notification(what: int) -> void:

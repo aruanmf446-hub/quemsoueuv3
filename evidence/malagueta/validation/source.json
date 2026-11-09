@@ -1,0 +1,47 @@
+[
+  {
+    "file": "scripts/desert/malagueta/chemical.gd",
+    "sha256": "b17a20c03b40ec546e782e974aff67b98d3bb4ab81a4b573b72126a48fa738d2",
+    "staging_matches": true
+  },
+  {
+    "file": "scripts/desert/malagueta/arena.gd",
+    "sha256": "4d7d6225c3ceebeff1c8e04f3f600194a4d468f4d083c1552518b5338df6aafa",
+    "staging_matches": true
+  },
+  {
+    "file": "scripts/desert/malagueta/encounter.gd",
+    "sha256": "a67a09210fbcdad12a421cbc48158c23e559c3368ef7c79232aaec0afa5d2fe7",
+    "staging_matches": true
+  },
+  {
+    "file": "scripts/desert/malagueta/target.gd",
+    "sha256": "fa1970894c09f3e2e793568556f018316ddb23c5a6eee56aff5b42c347b5e365",
+    "staging_matches": true
+  },
+  {
+    "file": "scripts/desert/malagueta/pursuer.gd",
+    "sha256": "597080dd7bdcf6e03143701f6647bb5f95e910e62876840966629dfae90fb13a",
+    "staging_matches": true
+  },
+  {
+    "file": "scripts/desert/malagueta/moving_file.gd",
+    "sha256": "3b2ccfe94bf2ee441460ccdc5ef0ef25382864ba1539f14a88f038d9b2a4fb50",
+    "staging_matches": true
+  },
+  {
+    "file": "scripts/desert/t15d/phase.gd",
+    "sha256": "ef7b0ed560a4999e30822a6ba9f5b25cf5ca4a9963ff57afccfc3a494b4080df",
+    "staging_matches": true
+  },
+  {
+    "file": "scripts/desert/t15d/cactus.gd",
+    "sha256": "4bdbe08f055da05339cbd0c09f31d3ac22bcd1dead8ebaa8c401e3c023528dc1",
+    "staging_matches": true
+  },
+  {
+    "file": "scenes/desert/phase_10.tscn",
+    "sha256": "cfbe8b4128ea6270a9cf858a168a383f4919ef0032cd291008ca6dfe3c7d8526",
+    "staging_matches": true
+  }
+]

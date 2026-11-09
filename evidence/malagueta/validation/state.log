@@ -1,0 +1,33 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+MALAGUETA_PASS phase1 green only
+MALAGUETA_PASS one green active at a time
+MALAGUETA_PASS cannot skip stun
+MALAGUETA_PASS five second stun 1
+MALAGUETA_PASS no attacks while stunned
+MALAGUETA_PASS timeout retains completed tasks
+MALAGUETA_PASS expired task rejected
+MALAGUETA_PASS out of order rejected
+MALAGUETA_PASS real task advances
+MALAGUETA_PASS duplicate task rejected
+MALAGUETA_PASS attack pattern follows task progress
+MALAGUETA_PASS five second stun 2
+MALAGUETA_PASS no attacks while stunned
+MALAGUETA_PASS timeout retains completed tasks
+MALAGUETA_PASS expired task rejected
+MALAGUETA_PASS out of order rejected
+MALAGUETA_PASS real task advances
+MALAGUETA_PASS duplicate task rejected
+MALAGUETA_PASS attack pattern follows task progress
+MALAGUETA_PASS five second stun 3
+MALAGUETA_PASS no attacks while stunned
+MALAGUETA_PASS timeout retains completed tasks
+MALAGUETA_PASS expired task rejected
+MALAGUETA_PASS out of order rejected
+MALAGUETA_PASS real task advances
+MALAGUETA_PASS duplicate task rejected
+MALAGUETA_PASS three tasks start reaction
+MALAGUETA_PASS cannot damage reaction
+MALAGUETA_PASS reaction completes boss
+MALAGUETA_PASS no attacks after defeat
+MALAGUETA_SUMMARY checks=30 failures=0

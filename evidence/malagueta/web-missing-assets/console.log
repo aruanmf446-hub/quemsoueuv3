@@ -1,0 +1,14 @@
+Failed to load resource: the server responded with a status of 404 (File not found)
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium)) - Compatibility - Using Device: WebKit - WebKit WebGL
+Build configuration: Emscripten 4.0.20, single-threaded, no GDExtension support.
+SCRIPT ERROR: Parse Error: Could not resolve external class member "MESH".
+   at: GDScript::reload (res://scripts/desert/t15d/spear_guard.gd:22)
+SCRIPT ERROR: Compile Error: Failed to compile depended scripts.
+   at: GDScript::reload (res://scripts/desert/t15d/cactus.gd:0)
+SCRIPT ERROR: Compile Error: Failed to compile depended scripts.
+   at: GDScript::reload (res://scripts/desert/t15d/phase.gd:0)
+SCRIPT ERROR: Compile Error: Failed to compile depended scripts.
+   at: GDScript::reload (res://scripts/desert/malagueta/arena.gd:0)
+ERROR: Failed to load script "res://scripts/desert/malagueta/arena.gd" with error "Compilation failed".
+   at: load (modules/gdscript/gdscript_resource_format.cpp:46)

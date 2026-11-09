@@ -1,0 +1,34 @@
+[
+  {
+    "test": "state",
+    "passed": true
+  },
+  {
+    "test": "arena",
+    "passed": true
+  },
+  {
+    "test": "combat",
+    "passed": true
+  },
+  {
+    "test": "chemicals",
+    "passed": true
+  },
+  {
+    "test": "traversal",
+    "passed": true
+  },
+  {
+    "test": "pursuit",
+    "passed": true
+  },
+  {
+    "test": "checkpoint",
+    "passed": true
+  },
+  {
+    "test": "regression",
+    "passed": true
+  }
+]

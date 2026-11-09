@@ -12,7 +12,8 @@ func frames(n: int) -> void:
 func run() -> void:
 	preload("res://tests/desert_night/tutorial_fixture.gd").experienced()
 	var titles:={}
-	for order in range(1,11):
+	# Phase 10 is now an arena; its stronger interaction/traversal tests live in tests/malagueta/.
+	for order in range(1,10):
 		var phase: Node3D=load("res://scenes/desert/phase_%02d.tscn" % order).instantiate()
 		root.add_child(phase)
 		current_scene=phase

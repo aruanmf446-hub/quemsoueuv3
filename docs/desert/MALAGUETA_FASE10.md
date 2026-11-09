@@ -32,7 +32,8 @@ zerado ou tempo de fase.
   protótipo anterior são reposicionados na entrada da arena. Interromper depois
   da Task3 retoma a reação, evitando um estado final bloqueado.
 - A reação para ataques/surgimento e chama o encerramento/progresso existente da
-  campanha. Recomeçar/checkpoint/derrota continuam no overlay original.
+  campanha e a morte original do boss (incluindo colisão e morte.fbx já existente).
+  Recomeçar/checkpoint/derrota continuam no overlay original.
 
 ## Arquivos e integração
 
@@ -82,8 +83,8 @@ mecânica, não uma nova aprovação artística.
 | Teste | Resultado |
 |---|---|
 | `tests/malagueta/state.gd` | 30 verificações: ordem, cinco segundos, falha/repetição, duplicidade e derrota. |
-| `arena.gd` | 20 verificações: piso/lima reais, câmera, F/botão TASK, cargas, vitória e progresso local após nove fases concluídas na fixture. |
-| `combat.gd` | 10 verificações: ataque real/consumo, dois golpes, defesa contra vermelho, dano sem defesa e recarga por contato. |
+| `arena.gd` | 21 verificações: piso/lima reais, câmera, F/botão TASK, cargas, vitória e progresso local após nove fases concluídas na fixture. |
+| `combat.gd` | 11 verificações: ataque real/consumo, dois golpes, defesa contra vermelho, dano sem defesa, recarga por contato e pontas cortantes. |
 | `chemicals.gd` | Verde/vermelho simultâneos, trajetórias distintas e limpeza no atordoamento. |
 | `traversal.gd` | Percurso inteiro com comandos de salto/pulo duplo, sem teletransporte; versão vulnerável terminou com 3 vidas. |
 | `pursuit.gd` | Cacto subiu até o boss, voltou ao piso e respeitou limite de três. |
@@ -111,3 +112,7 @@ sincronizada; isso não exigiu alterar o asset ou o código da lança em produç
 Evidências: `evidence/malagueta/web/` (atual), `validation/` (testes e tentativas),
 `initial-geometry/` e `web-missing-assets/` (históricos, não resultado final).
 Sem merge/publicação automática na main.
+
+A execução Web desktop foi repetida após ligar a derrota ao método original do
+boss. Os perfis móveis verificam abertura/renderização; vitória, defesa e
+interação F/TASK foram conferidas no motor nativo, não em Safari físico.

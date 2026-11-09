@@ -144,8 +144,7 @@ func _stream_world(_x: float, force := false) -> void:
 	encounter.defeated.connect(func() -> void:
 		_boss_defeated = true
 		if is_instance_valid(_boss):
-			_boss.remove_from_group("enemies")
-			_boss.health = 0
+			_boss.defeat()
 		_on_goal_entered(_player))
 	_build_malagueta()
 	if done==3: encounter.call_deferred("emit_signal","reaction_started")

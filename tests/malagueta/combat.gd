@@ -79,6 +79,15 @@ func run() -> void:
 	player.attack_charges=1
 	await tick(4)
 	check(player.attack_charges<=3 and player.attack_charges>1,"contact pickup uses existing refill")
+	# Contact with a cutting end uses the same damage path as the chemical.
+	player.set_physics_process(false)
+	player.health=3
+	player._invulnerable=0
+	player.is_defending=false
+	var file: Node3D=phase.files[0]
+	player.position=file.global_position+Vector3(-file.span*0.5-0.07,-0.4,0)
+	await tick(4)
+	check(player.health==2,"cutting edge applies normal damage")
 	phase.queue_free()
 	await tick(3)
 	print("COMBAT_SUMMARY checks=",checks," failures=",failures)

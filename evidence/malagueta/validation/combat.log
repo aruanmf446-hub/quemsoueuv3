@@ -1,0 +1,14 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+COMBAT_PASS arena floor supports spawn
+COMBAT_PASS existing attack consumes one charge
+COMBAT_PASS actual melee reaches boss
+COMBAT_PASS second real hit stuns
+COMBAT_PASS stun refills to cap
+COMBAT_PASS existing defense spends charge
+COMBAT_PASS red blocked by real shield
+COMBAT_PASS unblocked chemical applies normal damage
+COMBAT_PASS full pickup is not consumed
+COMBAT_PASS contact pickup uses existing refill
+COMBAT_PASS cutting edge applies normal damage
+COMBAT_SUMMARY checks=11 failures=0

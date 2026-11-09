@@ -1,0 +1,77 @@
+[
+  {
+    "width": 1672,
+    "height": 941,
+    "mobile": false,
+    "report": {
+      "cacti": 0,
+      "camera": [
+        0,
+        3.09999990463257
+      ],
+      "charges": [
+        3,
+        3
+      ],
+      "files": 5,
+      "phase": 10,
+      "player": [
+        -11,
+        -1.11758708953857e-8
+      ],
+      "state": 0
+    },
+    "errors": [],
+    "blocked": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "mobile": true,
+    "report": {
+      "cacti": 0,
+      "camera": [
+        0,
+        3.09999990463257
+      ],
+      "charges": [
+        3,
+        3
+      ],
+      "files": 5,
+      "phase": 10,
+      "player": [
+        -11,
+        -1.11758708953857e-8
+      ],
+      "state": 0
+    },
+    "errors": [],
+    "blocked": []
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "mobile": true,
+    "report": {
+      "cacti": 0,
+      "camera": [
+        0,
+        3.09999990463257
+      ],
+      "charges": [
+        3,
+        3
+      ],
+      "files": 5,
+      "phase": 10,
+      "player": [
+        -11,
+        -1.11758708953857e-8
+      ],
+      "state": 0
+    },
+    "errors": [],
+    "blocked": []
+  }
+]

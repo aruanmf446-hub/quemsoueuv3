@@ -10,3 +10,8 @@ func _physics_process(delta: float) -> void:
 			_model.set_rate(1.0)
 func take_damage(amount: int) -> void:
 	if amount > 0: hit_received.emit(amount)
+
+func defeat() -> void:
+	if _state==State.DEAD:return
+	health=0
+	_die() # Existing death state, collision cleanup and catalogued morte.fbx.

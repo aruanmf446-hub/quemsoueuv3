@@ -65,6 +65,7 @@ func run() -> void:
 		check(phase._raised_bridges.has("malagueta.task.%d" % task),"Task stored once")
 	phase.encounter.tick(2)
 	check(phase._boss_defeated and phase.completed,"chemical reaction triggers existing completion")
+	check(phase._boss._state==phase._boss.State.DEAD,"existing boss death state applied")
 	check(phase._saved and phase.Progress.is_completed(10),"existing progression persists phase10 completion")
 	phase.queue_free()
 	await ticks(3)

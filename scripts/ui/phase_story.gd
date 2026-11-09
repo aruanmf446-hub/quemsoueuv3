@@ -37,7 +37,7 @@ static func cards_for(order: int) -> Array:
 	var entries: Array = parsed.get("phases",{}).get("%02d" % order,[]).duplicate(true) if parsed is Dictionary else []
 	for index in range(entries.size()):
 		var atlas_entry: bool = entries[index].has("atlas_region")
-		for ext in ["webp","png","jpg","jpeg"]:
+		for ext in ["webp","png","jpg","jpeg","WEBP","PNG","JPG","JPEG"]:
 			var path := "res://assets/story/origin_%02d.%s" % [index+1,ext] if atlas_entry else "res://assets/story/fase%02d_%02d.%s" % [order,index+1,ext]
 			if ResourceLoader.exists(path):
 				entries[index].image = path

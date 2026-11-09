@@ -709,7 +709,7 @@ func _update_results() -> void:
 		_filter_panel = _filters()
 		_results.add_child(_filter_panel)
 	var titles := {"Descobrir": ["layers", "Resultados"], "Populares": ["bolt", "Decks populares"], "Recentes": ["clock", "Decks recentes"], "Favoritos": ["star", "Meus favoritos"], "Meus Decks": ["layers", "Meus decks"]}
-	_results_header(titles[_tab][0], "%s (%d)" % [tr(titles[_tab][1]), shown.size()])
+	_results_header(titles[_tab][0], tr(titles[_tab][1]) if _tab in ["Populares", "Recentes"] else "%s (%d)" % [tr(titles[_tab][1]), shown.size()])
 	if _tab == "Populares":
 		match _stats_state:
 			"ok":
@@ -748,6 +748,7 @@ func _update_results() -> void:
 	_grid.add_theme_constant_override("v_separation", 10 if _compact() else 18)
 	_results.add_child(_grid)
 	for entry in shown: _grid.add_child(_deck_tile(entry))
+	if not services.session.authenticated(): _grid.add_child(_guest_deck_tile())
 	if _tab == "Meus Decks": _grid.add_child(_create_tile())
 	_fit_tiles()
 
@@ -905,6 +906,34 @@ func _clear_filters() -> void:
 	_themes.clear()
 	_types = {"mine": true} if _tab == "Meus Decks" else {}
 	_render_library()
+
+
+func _guest_deck_tile() -> Button:
+	var tile := PlayerUI.button("", func() -> void: navigate_requested.emit("account", {}))
+	tile.name = "GuestDeckTile"
+	tile.tooltip_text = tr("Faça login para conhecer mais decks")
+	tile.clip_contents = true
+	PlayerUI.style_button(tile, false)
+	var art := TextureRect.new()
+	art.texture = preload("res://assets/ui/battle/private_back.svg")
+	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	PlayerUI.style_locked_deck_preview(art)
+	tile.add_child(art)
+	art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	art.offset_bottom = -74
+	var label := PlayerUI.label(tr("Faça login para conhecer mais decks"), 20)
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tile.add_child(label)
+	label.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	label.offset_left = 10
+	label.offset_right = -10
+	label.offset_top = -74
+	return tile
 
 
 func _guest_deck_preview() -> void:

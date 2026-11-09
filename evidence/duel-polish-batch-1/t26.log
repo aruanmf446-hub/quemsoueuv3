@@ -1,0 +1,38 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS Criar sala abre o formulário
+PASS três áreas: configuração, decks e resumo
+PASS sem campos numéricos digitáveis
+PASS max_players: opções dentro do limite do servidor [2, 4, 6, 8, 10, 12, 16, 20]
+PASS cards_per_player: opções dentro do limite do servidor [1, 2, 3, 4, 5, 6]
+PASS turn_seconds: opções dentro do limite do servidor [15, 30, 45, 60, 90, 120, 180]
+PASS selection_seconds: opções dentro do limite do servidor [10, 15, 20, 30, 45, 60, 90, 120]
+PASS tiebreak_base: opções dentro do limite do servidor [4, 5, 6, 7, 8, 9, 10, 11, 12]
+PASS tiebreak_per_player: opções dentro do limite do servidor [1, 2, 3, 4]
+PASS valor atual preservado ao abrir
+PASS lista abre
+PASS resumo atualiza ao escolher
+PASS tempo por turno no resumo
+PASS valor fora da lista ignorado
+PASS nenhum deck pré-selecionado
+PASS seleção múltipla preservada
+PASS resumo com os dois decks
+PASS remover um deck
+PASS seleção pode ficar vazia antes de enviar
+PASS busca de decks
+PASS Comprados oculto enquanto comércio está inativo
+PASS Meus decks: aviso legível sem conteúdo inventado
+PASS trocar categoria não descarta escolhas
+PASS criar envia os valores do resumo (inteiros) e nome técnico
+PASS Cancelar volta ao navegador
+T26_CRIAR_SALA checks=25 failures=0
+WARNING: 1 RID of type "Canvas" was leaked.
+   at: _free_rids (servers/rendering/renderer_canvas_cull.cpp:2733)
+WARNING: 11 RIDs of type "CanvasItem" were leaked.
+   at: _free_rids (servers/rendering/renderer_canvas_cull.cpp:2735)
+WARNING: 88 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 1 RID allocations of type 'N16RendererViewport8ViewportE' were leaked at exit.
+ERROR: 12 RID allocations of type 'PN13RendererDummy14TextureStorage12DummyTextureE' were leaked at exit.
+ERROR: 3 RID allocations of type 'PN18TextServerAdvanced22ShapedTextDataAdvancedE' were leaked at exit.
+ERROR: 1 RID allocations of type 'PN18TextServerAdvanced12FontAdvancedE' were leaked at exit.

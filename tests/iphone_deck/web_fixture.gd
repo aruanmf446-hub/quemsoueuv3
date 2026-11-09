@@ -24,7 +24,7 @@ func _run() -> void:
 		if DevicePreferences._valid("locale",locale): services.preferences.set_preference("locale",locale)
 	var fake: SupabaseClient
 	if mode=="manual_claim": fake=preload("res://tests/lado_sombrio_claim/fake_game.gd").new()
-	elif mode in ["guest_decks", "reward_history"]: fake=preload("res://tests/i18n_expanded/fake_game.gd").new()
+	elif mode in ["guest_decks", "reward_history", "duel_batch"]: fake=preload("res://tests/i18n_expanded/fake_game.gd").new()
 	elif mode=="i18n": fake=preload("res://tests/i18n_expanded/fake_game.gd").new()
 	elif mode in ["languages","public_profile","friends_search","duel_admin"]: fake=preload("res://tests/profile_languages/fake_game.gd").new()
 	elif mode in ["ability_refills","refill_store"]: fake=preload("res://tests/ability_refills/fake_game.gd").new()
@@ -67,7 +67,7 @@ func _run() -> void:
 		services.rewards.client=fake
 		await services.rewards.refresh()
 		await _i18n_screen("lobby")
-	elif mode in ["guest_decks", "reward_history"]:
+	elif mode in ["guest_decks", "reward_history", "duel_batch"]:
 		await _i18n_screen(mode)
 	elif mode=="commerce_entrypoints":
 		await _i18n_screen("lobby")
@@ -218,6 +218,12 @@ func _i18n_screen(screen: String) -> void:
 			for entry: Dictionary in CharacterCatalog.load_entries():
 				ui._paths[str(entry.id)]="res://assets/portraits/"+str(entry.id)+".png"
 			ui.show_screen({"cosmetic_mode":"shop"})
+		"duel_batch":
+			await services.duel.use_local()
+			ui=load("res://scenes/player/duel.tscn").instantiate()
+			add_child(ui)
+			ui.show_screen()
+			await ui._open_form()
 		"reward_history":
 			ui=Control.new()
 			ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -289,6 +295,28 @@ func _i18n_screen(screen: String) -> void:
 	await get_tree().process_frame
 
 func _probe(args: Array) -> void:
+	if args.size() and str(args[0])=="batch_music_show":
+		var music:=preload("res://tests/duel_polish_batch_1/music.gd").new()
+		ui.add_child(music)
+		var player:Control=load("res://scripts/audio/now_playing.gd").new()
+		ui.add_child(player)
+		player._music=music
+		player._refresh()
+		player.set_duel_notice(true)
+		player.set_mini(true)
+		music.id="next"
+		player._refresh()
+
+	if args.size() and str(args[0]).begins_with("batch_filter:"):
+		ui._deck_tab=str(args[0]).trim_prefix("batch_filter:")
+		ui._refresh_deck_grid()
+	if args.size() and str(args[0]).begins_with("batch_library_tab:"):
+		ui._tab=str(args[0]).trim_prefix("batch_library_tab:")
+		ui._update_results()
+	if args.size() and str(args[0])=="batch_scroll":
+		var scroll:=ui.get_node("Margin/Column/Scroll") as ScrollContainer
+		scroll.scroll_vertical=int(scroll.get_v_scroll_bar().max_value/2)
+
 	if args.size() and str(args[0])=="claim_fail": fixture_game.fail_claim=true
 	if args.size() and str(args[0])=="claim_success": fixture_game.fail_claim=false
 	if args.size() and str(args[0])=="claim_refresh": await services.rewards.refresh()
@@ -325,6 +353,16 @@ func _probe(args: Array) -> void:
 		scroll.scroll_vertical=int(scroll.get_v_scroll_bar().max_value)
 	report_sequence+=1
 	var result := {"locale":services.preferences.values.locale,"language_choice":ui.get("_language_choice"),"sequence":report_sequence,"size":[ui.size.x,ui.size.y],"controls":[],"fields":{},"cards":0,"labels":[],"emote_thumbnails":[]}
+	if ui.get("_form") is Dictionary:
+		result.selected_decks=ui._form.get("decks",[])
+		result.in_room=services.duel.in_room()
+		result.form_scroll_end=(ui.get_node("Margin/Column/Scroll") as Control).get_global_rect().end.y
+		var player:=ui.get_node_or_null("NowPlaying") as Control
+		if player!=null:
+			var r:=player.get_global_rect()
+			result.music_notice={"visible":player.visible,"rect":[r.position.x,r.position.y,r.size.x,r.size.y]}
+		var empty:=ui.find_child("DeckEmpty",true,false) as Label
+		if empty!=null: result.empty_width=empty.size.x
 	result.guest_route=ui.get_meta("guest_route", "")
 	result.pending_rewards=services.rewards.pending_count()
 	result.lado_access=preload("res://scripts/decks/deck_library_catalog.gd").can_access("lado_sombrio")

@@ -264,7 +264,7 @@ func close() -> void:
 
 ## Campaign-only reward: no locked teaser, search result or preview before unlock.
 func _character_visible(character_id: String) -> bool:
-	return character_id != "el_fuego" or services.inventory.is_unlocked(character_id)
+	return character_id != "lorena" and (character_id != "el_fuego" or services.inventory.is_unlocked(character_id))
 
 
 func _visible_entries() -> Array:

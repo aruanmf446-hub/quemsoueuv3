@@ -415,10 +415,11 @@ func _route_changed(route: String) -> void:
 	if is_instance_valid(_news_button): _news_button.visible = show_legacy_stage
 	# Lobby: player normal. Telas internas: versão mini no canto (some em sala/partida).
 	var now_playing := get_node_or_null("NowPlaying")
-	# Mini só onde o canto superior direito está livre (não cobre busca, filtros nem botões).
+	# Mini nas rotas existentes; Mata-Mata usa aviso transitório no rodapé.
 	const MINI_ROUTES := ["duel", "friends", "profile", "wallet", "story", "music"]
 	if now_playing != null:
 		now_playing.set_suppressed(not route.is_empty() and not MINI_ROUTES.has(route))
+		now_playing.set_duel_notice(route == "duel")
 		now_playing.set_mini(not route.is_empty())
 	if route.is_empty(): _maybe_show_news.call_deferred()
 	_publish_update_safety(route)

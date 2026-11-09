@@ -101,6 +101,12 @@ func _run() -> void:
 	check(duel.is_local(), "modo local")
 	check(screen.get("_view") == "form", "formulário da partida local")
 	check(button("Sala pública") == null and button("Só por convite") == null, "partida local sem opção pública")
+	check((screen.get("_form").decks as Array).is_empty(), "sem deck marcado ao criar")
+	var chosen := screen.find_child("DeckChoice_lendas_urbanas", true, false) as Button
+	chosen.toggled.emit(true)
+	await settle()
+	await press("✓")
+	check((screen.get("_form").decks as Array) == ["lendas_urbanas"], "deck confirmado pelo jogador")
 	screen.set_form_value("cards_per_player", 2)
 	screen.set_form_value("max_players", 4)
 	await shot("02_criar")

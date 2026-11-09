@@ -1,0 +1,41 @@
+[
+  {
+    "width": 1672,
+    "height": 941,
+    "mobile": false,
+    "noPreselection": true,
+    "purchasesHidden": true,
+    "emptyMessagesReadable": true,
+    "footerFixed": true,
+    "noticeExpires": true,
+    "guestTile": true,
+    "lorenaHidden": true,
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "mobile": true,
+    "noPreselection": true,
+    "purchasesHidden": true,
+    "emptyMessagesReadable": true,
+    "footerFixed": true,
+    "noticeExpires": true,
+    "guestTile": true,
+    "lorenaHidden": true,
+    "errors": []
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "mobile": true,
+    "noPreselection": true,
+    "purchasesHidden": true,
+    "emptyMessagesReadable": true,
+    "footerFixed": true,
+    "noticeExpires": true,
+    "guestTile": true,
+    "lorenaHidden": true,
+    "errors": []
+  }
+]

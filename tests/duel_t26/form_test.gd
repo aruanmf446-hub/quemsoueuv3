@@ -24,6 +24,13 @@ func _summary(label: String) -> String:
 	return (row.find_child("Value", true, false) as Label).text if row != null else ""
 
 
+func _pick(id: String, selected: bool) -> void:
+	var card := screen.find_child("DeckChoice_" + id, true, false) as Button
+	card.toggled.emit(selected)
+	(card.find_child("AcceptSelection", true, false) as Button).pressed.emit()
+	await _frames(3)
+
+
 func _run() -> void:
 	root.size = Vector2i(1920, 1080)
 	var services := PlayerServices.new()
@@ -67,18 +74,19 @@ func _run() -> void:
 	screen.set_form_value("turn_seconds", 77)
 	check(int(screen.get("_form").values.turn_seconds) == 90, "valor fora da lista ignorado")
 	# Decks.
-	check(screen.find_child("DeckChoice_lendas_urbanas", true, false).button_pressed, "deck padrão selecionado (contorno dourado)")
+	check((screen.get("_form").decks as Array).is_empty(), "nenhum deck pré-selecionado")
+	await _pick("lendas_urbanas", true)
 	var terror := screen.find_child("DeckChoice_demo_terror", true, false) as Button
-	terror.button_pressed = true
+	await _pick("demo_terror", true)
 	await _frames(3)
 	check((screen.get("_form").decks as Array) == ["lendas_urbanas", "demo_terror"], "seleção múltipla preservada")
 	check((screen.find_child("SummaryDeckName", true, false) as Label).text.contains("2 decks"), "resumo com os dois decks")
-	(screen.find_child("DeckChoice_lendas_urbanas", true, false) as Button).button_pressed = false
+	await _pick("lendas_urbanas", false)
 	await _frames(3)
 	check((screen.get("_form").decks as Array) == ["demo_terror"], "remover um deck")
-	(screen.find_child("DeckChoice_demo_terror", true, false) as Button).button_pressed = false
+	await _pick("demo_terror", false)
 	await _frames(3)
-	check((screen.get("_form").decks as Array) == ["demo_terror"], "não fica sem deck")
+	check((screen.get("_form").decks as Array).is_empty(), "seleção pode ficar vazia antes de enviar")
 	var search := screen.find_child("DeckSearch", true, false) as LineEdit
 	search.text = "folc"
 	search.text_changed.emit("folc")
@@ -87,13 +95,15 @@ func _run() -> void:
 	check(grid.get_children().filter(func(n: Node) -> bool: return not n.is_queued_for_deletion()).size() == 1, "busca de decks")
 	search.text = ""
 	search.text_changed.emit("")
-	(screen.find_child("DeckTab_Comprados", true, false) as Button).pressed.emit()
+	check(screen.find_child("DeckTab_Comprados", true, false) == null, "Comprados oculto enquanto comércio está inativo")
+	(screen.find_child("DeckTab_Meus_decks", true, false) as Button).pressed.emit()
 	await _frames(3)
-	check(screen.find_child("DeckEmpty", true, false) != null, "Comprados: estado indisponível, sem conteúdo inventado")
+	check(screen.find_child("DeckEmpty", true, false) != null, "Meus decks: aviso legível sem conteúdo inventado")
 	(screen.find_child("DeckTab_Todos", true, false) as Button).pressed.emit()
 	await _frames(3)
 	check(int(screen.get("_form").values.max_players) == 12, "trocar categoria não descarta escolhas")
 	# Criar: envia os mesmos valores do resumo.
+	await _pick("demo_terror", true)
 	(screen.find_child("SubmitRoom", true, false) as Button).pressed.emit()
 	await _frames(8)
 	var sent: Dictionary = fake.created.get("p_settings", {})

@@ -19,6 +19,11 @@ var _shown_id := ""
 var _suppressed := false
 ## Telas internas: versão mini (só título e controles) no canto, acima do conteúdo.
 var _mini := false
+var _duel_notice := false
+var _notice_left := 0.0
+var _last_in_room := false
+var _slide_tween: Tween
+const DUEL_NOTICE_SECONDS := 5.0
 
 func _ready() -> void:
 	name = "NowPlaying"
@@ -89,11 +94,22 @@ func set_suppressed(value: bool) -> void:
 	_suppressed = value
 	_refresh()
 
-## Fora do lobby o player continua disponível em tamanho mini (some só em sala/partida).
+## Mini nas rotas internas; no Mata-Mata usa o aviso transitório configurado pela rota.
 func set_mini(value: bool) -> void:
 	_mini = value
 	_layout()
 	_refresh()
+
+## Only Mata-Mata: transient bottom-right notice; lobby/other routes keep their behavior.
+func set_duel_notice(value: bool) -> void:
+	if _duel_notice == value: return
+	_duel_notice = value
+	_notice_left = 0.0
+	if is_instance_valid(_slide_tween): _slide_tween.kill()
+	modulate.a = 1.0
+	_layout()
+	_refresh()
+
 
 func _in_room() -> bool:
 	var services := PlayerServices.current
@@ -101,9 +117,12 @@ func _in_room() -> bool:
 
 func _refresh() -> void:
 	var available: bool = is_instance_valid(_music) and not _music.available_tracks().is_empty()
-	visible = available and not _suppressed and not (_mini and _in_room())
-	if not available: return
+	if not available:
+		hide()
+		return
 	var track: Dictionary = _music.current_track()
+	if _duel_notice and str(track.get("id", "")) != _shown_id: _notice_left = DUEL_NOTICE_SECONDS
+	visible = not _suppressed and not (_mini and _in_room()) and (not _duel_notice or _notice_left > 0.0)
 	_title.text = str(track.get("title", "Carregando música..."))
 	var artist := str(track.get("artist", ""))
 	var category := str(track.get("category", "")).to_upper()
@@ -115,18 +134,26 @@ func _refresh() -> void:
 	var id := str(track.get("id", ""))
 	if id != _shown_id and not id.is_empty():
 		_shown_id = id
+		if is_instance_valid(_slide_tween): _slide_tween.kill()
+		_layout()
 		modulate.a = 0.0
 		pivot_offset = size * 0.5
-		var slide := create_tween().set_parallel(true).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-		slide.tween_property(self, "modulate:a", 1.0, 0.35)
+		_slide_tween = create_tween().set_parallel(true).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+		_slide_tween.tween_property(self, "modulate:a", 1.0, 0.35)
 		var target := position
 		position.x += 40.0
-		slide.tween_property(self, "position:x", target.x, 0.35)
+		_slide_tween.tween_property(self, "position:x", target.x, 0.35)
 	queue_redraw()
 
 func _process(delta: float) -> void:
-	if _mini and not _suppressed and _in_room() == visible:
+	var in_room := _in_room()
+	if _mini and in_room != _last_in_room:
+		_last_in_room = in_room
 		_refresh()
+	if _duel_notice and _notice_left > 0.0:
+		_notice_left = maxf(0.0, _notice_left - delta)
+		if _notice_left <= 0.0: hide()
+		elif _notice_left < 0.25: modulate.a = _notice_left / 0.25
 	if not visible: return
 	_time += delta
 	queue_redraw()
@@ -195,8 +222,8 @@ func _layout() -> void:
 			_buttons[index].size = Vector2(62, 62)
 			_buttons[index].position = Vector2(236 + index * 66, 16)
 	custom_minimum_size = size
-	# Mini: no canto superior direito, na altura do cabeçalho das telas.
-	position = Vector2(menu.size.x - size.x - 24, 16) if _mini else Vector2(menu.size.x - size.x - 24, menu.size.y - size.y - 24)
+	# Mata-Mata: inferior direito. Demais mini: posição superior original.
+	position = Vector2(menu.size.x - size.x - 24, 16) if _mini and not _duel_notice else Vector2(menu.size.x - size.x - 24, menu.size.y - size.y - 24)
 	queue_redraw()
 
 func _music_surface() -> StyleBoxFlat:

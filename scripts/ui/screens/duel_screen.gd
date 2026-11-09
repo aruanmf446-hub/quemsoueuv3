@@ -802,10 +802,9 @@ func _render_form() -> void:
 	_form = {"name": str(duel.room.room.name) if editing else ("Partida local" if local else "Mata-Mata"), "values": {}, "pickers": {},
 		"public": bool(duel.room.room.is_public) if editing else not local, "bots_allowed": bool(base.get("bots_allowed", true)), "decks": []}
 	for field: Array in FORM_FIELDS: _form.values[field[0]] = int(base.get(field[0], field[2][0]))
-	var chosen: Array = base.get("deck_ids", [])
+	var chosen: Array = base.get("deck_ids", []) if editing else []
 	var available := _deck_entries()
 	for deck: Dictionary in available: if chosen.has(deck.id): _form.decks.append(deck.id)
-	if _form.decks.is_empty() and not available.is_empty(): _form.decks.append(available[0].id)
 	body.add_theme_constant_override("separation", 12)
 	if UIScale.is_iphone(): body.add_theme_constant_override("separation", 10)
 	# Título da página.
@@ -920,6 +919,7 @@ func _render_form() -> void:
 	tabs.add_theme_constant_override("v_separation", 8)
 	decks.add_child(tabs)
 	for tab: String in DECK_TABS:
+		if tab == "Comprados" and not ReleaseFeatures.COMMERCE_ENABLED: continue
 		var icon_name: String = {"Todos": "layers", "Favoritos": "star", "Bombando": "bolt", "Meus decks": "user", "Comprados": "crown"}[tab]
 		var chip := Button.new()
 		chip.name = "DeckTab_" + tab.replace(" ", "_")
@@ -964,10 +964,14 @@ func _render_form() -> void:
 	# Ações.
 	var actions := HBoxContainer.new()
 	actions.name = "FormActions"
+	actions.custom_minimum_size.y = 76
 	actions.add_theme_constant_override("separation", 18)
-	body.add_child(actions)
+	# Footer outside the scroll: buttons stay fully visible without changing scale.
+	$Margin/Column.add_child(actions)
+	_iphone_room_actions = actions
 	var save := Button.new()
 	save.name = "SubmitRoom"
+	save.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	save.text = tr("Salvar" if editing else "Criar sala")
 	save.icon = PremiumUI.icon("play", PremiumUI.INK, 32)
 	save.add_theme_constant_override("icon_max_width", 22)
@@ -978,6 +982,7 @@ func _render_form() -> void:
 	actions.add_child(save)
 	var cancel := Button.new()
 	cancel.name = "CancelForm"
+	cancel.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	cancel.text = tr("Cancelar")
 	cancel.add_theme_font_size_override("font_size", 17)
 	cancel.custom_minimum_size = Vector2(170, 50)
@@ -1041,7 +1046,8 @@ func _refresh_deck_grid() -> void:
 		var empty := PremiumUI.plain(reasons.get(_deck_tab, "Nenhum deck encontrado."), 13, SECONDARY)
 		empty.name = "DeckEmpty"
 		empty.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		empty.custom_minimum_size.y = 120
+		empty.custom_minimum_size = Vector2(260, 120)
+		empty.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		empty.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		holder.add_child(empty)
@@ -1152,10 +1158,6 @@ func _deck_choice(entry: Dictionary) -> Control:
 					return
 				picked.append(entry.id)
 			elif not value:
-				if picked.size() <= 1:
-					card.set_pressed_no_signal(true)
-					banner.show_state("error", tr("Escolha pelo menos um deck."))
-					return
 				picked.erase(entry.id)
 			_refresh_deck_grid()
 			_update_summary()

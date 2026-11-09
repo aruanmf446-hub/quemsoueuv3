@@ -1,0 +1,24 @@
+{
+  "status": "PROPOSAL_ONLY_NOT_APPLIED",
+  "note": "Somente registrar os três arquivos do escopo confirmado; nenhuma mudança de regras ou padrões. Requer confirmação para a política ativa.",
+  "changes": [
+    {
+      "path": "scripts/decks/deck_library_screen.gd",
+      "area": "decks",
+      "approved_blob": "7e8b48859a57c2ce63b0d58819db76ed80f4bd51",
+      "proposed_blob": "067b80dbbaede35566a407191affd40f36ad9d01"
+    },
+    {
+      "path": "scripts/audio/now_playing.gd",
+      "area": "musicas",
+      "approved_blob": "f7022785d098b28527de863565b6febdc43a0a10",
+      "proposed_blob": "7fbed2d4ade7d918b2be2ad5b38d6ed002f47bde"
+    },
+    {
+      "path": "scripts/skins/skins_panel.gd",
+      "area": "skins",
+      "approved_blob": "c1b7307bce4c8b774105da925800deb1858b0107",
+      "proposed_blob": "4585fd58221ece9427d50188c9882997fef5c672"
+    }
+  ]
+}

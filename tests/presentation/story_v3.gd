@@ -50,7 +50,8 @@ func run() -> void:
 		check(float(needed) <= label.size.y+1.0,"legenda completa quadro %d (%dpx <= %.0fpx)" % [index+1,needed,label.size.y])
 		check(label.global_position.y+needed <= carousel._story_next.global_position.y+2,"legenda não cobre Próximo quadro %d" % (index+1))
 		check(Rect2(Vector2.ZERO,root.get_visible_rect().size).encloses(carousel._story_next.get_global_rect()),"ação dentro da tela quadro %d" % (index+1))
-		check(carousel._front.get_node("Image").texture is AtlasTexture,"arte por região de atlas quadro %d" % (index+1))
+		var art: Texture2D = carousel._front.get_node("Image").texture
+		check(art is AtlasTexture if entries[index].has("atlas_region") else (art != null and not art is AtlasTexture),"arte corresponde ao arquivo/região do quadro %d" % (index+1))
 		await snap("quadro_%02d" % (index+1))
 	story._cancel()
 	await frames(2)

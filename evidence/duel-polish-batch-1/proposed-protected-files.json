@@ -1,6 +1,6 @@
 {
-  "status": "PROPOSAL_ONLY_NOT_APPLIED",
-  "note": "Somente registrar os três arquivos do escopo confirmado; nenhuma mudança de regras ou padrões. Requer confirmação para a política ativa.",
+  "status": "APPLIED_TO_REVIEW_BRANCH_WITH_OWNER_AUTHORIZATION",
+  "note": "Dono autorizou explicitamente: Publique está autorizado. Somente os três blobs foram atualizados, sem mudar padrões, regras ou controles. Publicação depende da variável e check obrigatórios no GitHub.",
   "changes": [
     {
       "path": "scripts/decks/deck_library_screen.gd",

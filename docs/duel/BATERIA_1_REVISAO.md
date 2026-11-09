@@ -52,12 +52,15 @@ Evidências: `evidence/duel-polish-batch-1/`.
 
 ## Publicação e proteção
 
-A política ativa continua intacta. Três arquivos congelados foram alterados dentro
-do escopo confirmado: Biblioteca, player e seletor de skins. O registro proposto
-em `evidence/duel-polish-batch-1/proposed-protected-files.json` **não foi aplicado**.
+O dono confirmou a atualização dos registros e publicação com **“Publique está
+autorizado”**. Foram atualizados somente os três blobs dos arquivos de Biblioteca,
+player e seletor de skins na política desta branch. Padrões, controles, regras e
+os demais 572 registros permanecem iguais. O registro da autorização está em
+`evidence/duel-polish-batch-1/proposed-protected-files.json`.
 
-Antes de publicar, é necessário confirmar a atualização somente desses registros
-na política e definir pelo dono a autorização QSE_APPROVED_CHANGE para o commit
-final e áreas decks, musicas, skins e protecao. A IA não deve criar essa variável,
+Antes de publicar, falta o dono registrar a autorização QSE_APPROVED_CHANGE no
+GitHub para o commit final e áreas decks, musicas, skins e protecao e executar o
+check Approved scope guard na branch. A API administrativa está inacessível neste
+ambiente; não declarar que variável, merge ou publicação foram realizados. A IA não deve criar essa variável,
 remover checks ou forçar push para contornar a regra. Não reabrir outras áreas.
 Nenhuma mudança de autenticação, Supabase, preços, transações ou regras de batalha.

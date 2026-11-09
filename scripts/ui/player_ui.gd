@@ -614,14 +614,14 @@ static func style_phone_picker(picker: OptionButton) -> void:
 		box.content_margin_bottom = 3
 		picker.add_theme_stylebox_override(state, box)
 
-static func style_hero_button(button: Button, primary := false, selected := false) -> void:
+static func style_hero_button(button: Button, primary := false, selected := false, transparent := false) -> void:
 	for state: String in ["normal", "hover", "pressed", "disabled", "focus"]:
 		var box := StyleBoxFlat.new()
 		box.set_corner_radius_all(8)
 		box.anti_aliasing = true
-		box.bg_color = Color("f5c45f") if primary else Color(0.02, 0.025, 0.05, 0.12)
-		if state == "hover": box.bg_color = Color("ffdb82") if primary else Color(1, 0.8, 0.4, 0.12)
-		if state == "pressed": box.bg_color = Color("dba645") if primary else Color(1, 0.8, 0.4, 0.2)
+		box.bg_color = Color("f5c45f") if primary else (Color.TRANSPARENT if transparent else Color(0.02, 0.025, 0.05, 0.12))
+		if state == "hover" and not transparent: box.bg_color = Color("ffdb82") if primary else Color(1, 0.8, 0.4, 0.12)
+		if state == "pressed" and not transparent: box.bg_color = Color("dba645") if primary else Color(1, 0.8, 0.4, 0.2)
 		if selected or primary or state == "focus":
 			box.set_border_width_all(2)
 			box.border_color = Color("fff8e7") if state == "focus" else Color("f5c45f")

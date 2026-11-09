@@ -270,7 +270,7 @@ func _tab_selected(index: int) -> void:
 		5: route_requested.emit("settings")
 
 func _update_selection() -> void:
-	for index in range(_tabs.size()): PlayerUI.style_hero_button(_tabs[index], false, index == [0, 1, 3][_slide])
+	for index in range(_tabs.size()): PlayerUI.style_hero_button(_tabs[index], false, index == [0, 1, 3][_slide], true)
 	for index in range(_dots.size()):
 		_dots[index].add_theme_color_override("font_color", GOLD if index == _slide else Color("87878c"))
 	for index in range(_actions.size()): _actions[index].disabled = _changing or index != _slide

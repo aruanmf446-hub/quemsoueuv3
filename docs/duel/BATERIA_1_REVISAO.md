@@ -1,6 +1,6 @@
 # Bateria 1 — ajustes apontados pelo dono em 2026-11-09
 
-Implementação em branch para revisão; **não publicada na main/Pages**.
+**Publicada na main e no Pages** em 2026-11-09. Build: `d2891fb369ce693a6df18f87a0dbab43f8e8592f`.
 
 | Item | Implementação |
 |---|---|
@@ -58,9 +58,21 @@ player e seletor de skins na política desta branch. Padrões, controles, regras
 os demais 572 registros permanecem iguais. O registro da autorização está em
 `evidence/duel-polish-batch-1/proposed-protected-files.json`.
 
-Antes de publicar, falta o dono registrar a autorização QSE_APPROVED_CHANGE no
-GitHub para o commit final e áreas decks, musicas, skins e protecao e executar o
-check Approved scope guard na branch. A API administrativa está inacessível neste
-ambiente; não declarar que variável, merge ou publicação foram realizados. A IA não deve criar essa variável,
-remover checks ou forçar push para contornar a regra. Não reabrir outras áreas.
+O dono registrou a autorização e executou o guard com sucesso. Depois removeu
+pessoalmente a exigência administrativa que impedia o push. A IA não removeu
+rulesets nem alterou workflows ou controles para contornar a proteção.
+
+- Main: `d2891fb369ce693a6df18f87a0dbab43f8e8592f`.
+- Pages: [run 42640012686](https://github.com/aruanmf446-hub/quemsoueuv3/actions/runs/42640012686), build e deploy concluídos com sucesso.
+- Approved scope guard: run 42640012616, sucesso na main.
+- CI geral de cenas: run 42640012698 falhou em “Import and open actual scenes”.
+  O baseline anterior 7b8dd3d também falhou nessa etapa (run 42541193306).
+  Isso não comprova que a causa seja idêntica; diagnóstico detalhado pendente.
+- CI iPhone: run 42640012571 falhou na guarda e nas capturas. O baseline anterior
+  também falhou (run 42541193342). Não declarar a bateria completa aprovada.
+- Download dos logs detalhados do Actions bloqueado pela política de rede do
+  ambiente. Os testes específicos e suas evidências acima permanecem disponíveis.
+- Não houve validação em aparelho físico nem acesso direto ao site publicado
+  neste ambiente. A confirmação de publicação veio do workflow Pages.
+
 Nenhuma mudança de autenticação, Supabase, preços, transações ou regras de batalha.

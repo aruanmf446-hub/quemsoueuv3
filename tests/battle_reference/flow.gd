@@ -113,7 +113,7 @@ func run() -> void:
 		var key := str(card.name).get_basename()
 		if landmarks.has(key):
 			var art: TextureRect = card.find_child("Art",true,false)
-			check(art.texture is AtlasTexture and art.texture.region.has_point(landmarks[key]),"subject_landmark_visible_"+key)
+			check(not art.texture is AtlasTexture and art.stretch_mode == TextureRect.STRETCH_KEEP_ASPECT_CENTERED,"subject_landmark_visible_"+key)
 	check(not screen.get_node("Margin/Column/Header").visible,"single_battle_header")
 	check(battle.find_child("CopyRoomCode",true,false)==null,"offline_no_fake_invite")
 	var voice_ui := battle.find_child("BattleVoice",true,false) as Control
@@ -142,7 +142,7 @@ func run() -> void:
 	await click(battle.find_child("ConfirmSelection",true,false))
 	check(services.duel.match().phase=="countdown","real_selection_committed")
 	(services.duel.get("_beat") as Timer).stop()
-	services.duel.local_server.clock_offset += 5.1
+	services.duel.local_server.clock_offset += services.duel.seconds_left()+0.1
 	await services.duel.refresh()
 	(services.duel.get("_beat") as Timer).stop()
 	await settle()

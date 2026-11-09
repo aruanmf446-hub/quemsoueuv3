@@ -116,7 +116,7 @@ func present(card_id: String, card_name: String, actor_name: String, hits: Array
 	art.name = "RevealCard"
 	art.texture = DuelService.card_texture(card_id)
 	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	art.custom_minimum_size = Vector2(170, 200)
 	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	art_frame.add_child(art)
@@ -231,8 +231,7 @@ func _animate(animated: Array, mode: String, accent: Color) -> void:
 		_result_title.text=_final_title
 		_result_title.add_theme_color_override("font_color",_final_title_color)
 		_frame.shadow_color=Color(accent,0.35)
-		_result_body.modulate.a=1.0
-		_react())
+		_result_body.modulate.a=1.0)
 	for item: Array in animated:
 		var node := item[0] as Control
 		if item[1] != null: tween.tween_callback(_play.bind(item[1]))

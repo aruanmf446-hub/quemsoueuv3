@@ -1,0 +1,13 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+TIMING_PASS selection starts authoritative countdown
+TIMING_PASS two players have six seconds each plus load reserve
+TIMING_PASS stale completion cannot alter match
+TIMING_PASS actual intro created
+TIMING_PASS continue advances local without waiting load reserve
+TIMING_PASS turn unobstructed after countdown
+TIMING_PASS final presentation holds across room return
+TIMING_PASS room heartbeat keeps final stage
+TIMING_PASS new match releases old result
+TIMING_PASS new match removes obsolete stage
+TIMING_SUMMARY checks=10 failures=0

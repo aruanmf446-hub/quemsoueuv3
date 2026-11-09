@@ -158,13 +158,20 @@ jobs:
     if: github.ref == 'refs/heads/main'
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url || steps.deployment_retry.outputs.page_url }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     needs: build
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+        continue-on-error: true
         with:
-          # Pacotes de jogo grandes podem ultrapassar o limite padrão de 10 minutos.
-          timeout: 1200000
+          # A API do Pages limita cada tentativa a dez minutos.
+          timeout: 600000
+      - id: deployment_retry
+        if: steps.deployment.outcome == 'failure'
+        uses: actions/deploy-pages@v4
+        with:
+          # Repete o mesmo artefato uma vez se o serviço falhar ou expirar.
+          timeout: 600000

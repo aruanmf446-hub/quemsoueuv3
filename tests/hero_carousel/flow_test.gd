@@ -209,5 +209,8 @@ func _run() -> void:
 	for item: Dictionary in rewards.offers: item.claimed=true
 	rewards.changed.emit()
 	check(not hero.get_node("HeroNewsPending").visible, "main menu clears badge after explicit claims")
+	for tab: Button in hero._tabs:
+		for state: String in ["normal", "hover", "pressed"]:
+			check(is_zero_approx((tab.get_theme_stylebox(state) as StyleBoxFlat).bg_color.a), "header has no grey background: " + str(tab.name) + "/" + state)
 	print("HERO_RESULT checks=", checks, " failures=", failures, " resolution=", root.size, " logical=", hero.size)
 	quit(1 if failures > 0 else 0)

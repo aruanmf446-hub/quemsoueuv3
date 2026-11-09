@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://tests/malagueta/web_fixture.gd" id="1_s17sx"]
+
+[node name="BossFixture" type="Node" unique_id=326091662]
+script = ExtResource("1_s17sx")

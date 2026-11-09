@@ -140,7 +140,7 @@ func _physics_process(delta: float) -> void:
 		if not chasing:
 			if position.x <= _patrol_min: _direction = 1
 			if position.x >= _patrol_max: _direction = -1
-		var direction := signf(offset.x) if chasing else _direction
+		var direction := _chase_direction(offset) if chasing else _direction
 		var pursuit_speed := (6.15 if absf(offset.x)>5.0 else 5.6) if _challenger else PURSUE_SPEED
 		var ray := PhysicsRayQueryParameters3D.create(global_position + Vector3(direction * 0.75, 0.6, 0), global_position + Vector3(direction * 0.75, -0.7, 0), 1)
 		var has_ground := not get_world_3d().direct_space_state.intersect_ray(ray).is_empty()
@@ -171,6 +171,9 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	global_position.z = 0.0
 	_model.rotation.y = _yaw_target # Patrulha lateral: nunca gira o corpo para o fundo.
+func _chase_direction(offset: Vector3) -> float:
+	return signf(offset.x)
+
 func _player_on_canopy(offset: Vector3) -> bool:
 	if not is_instance_valid(_player) or offset.y<0.9 or not _player.is_on_floor():return false
 	for i in _player.get_slide_collision_count():

@@ -1,7 +1,7 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/desert/t15d/phase.gd" id="1_vhcd4"]
+[ext_resource type="Script" path="res://scripts/desert/malagueta/arena.gd" id="1_vhcd4"]
 
-[node name="DesertPhase10" type="Node3D" unique_id=695017914]
+[node name="DesertPhase10" type="Node3D" unique_id=1650420283]
 script = ExtResource("1_vhcd4")
 phase_path = "res://data/desert/phase_10.json"

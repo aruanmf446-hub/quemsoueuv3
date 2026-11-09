@@ -75,7 +75,7 @@ func _ready() -> void:
 	get_tree().quit_on_go_back = false
 	_order = clampi(int(phase_path.get_file().get_basename().trim_prefix("phase_")),1,10)
 	_ensure_input_actions()
-	_phase = Layout.build(_order)
+	_phase = _layout_for_phase(_order)
 	_enemy_catalog = _read_json(ENEMIES_PATH).get("enemies",{})
 	# Mantém fontes FBX em cache para não reler modelos ao trocar de trecho.
 	var sources := {}
@@ -176,6 +176,9 @@ func _physics_process(delta: float) -> void:
 	_shield.active = _player.is_defending and not _player.is_dead
 	_shield.facing = _player.facing
 	_shield.position = _player.position
+func _layout_for_phase(order: int) -> Dictionary:
+	return Layout.build(order)
+
 func _ensure_input_actions() -> void:
 	super._ensure_input_actions()
 	# O protótipo legado mapeava J e K para ataque. Na campanha K é defesa.
@@ -593,8 +596,11 @@ func _is_pit_edge(x: float, left: bool) -> bool:
 func _is_exposed_edge(x: float, left: bool, kind: String) -> bool:
 	if kind != "ground": return true
 	return _is_pit_edge(x,left) or absf(x-float(_phase.bounds.min_x if left else _phase.bounds.max_x))<0.02
+func _new_cactus_actor() -> Node3D:
+	return Cactus.new()
+
 func _create_enemy() -> Node3D:
-	var enemy := Cactus.new()
+	var enemy := _new_cactus_actor()
 	var collision := CollisionShape3D.new()
 	var capsule := CapsuleShape3D.new()
 	capsule.radius = 0.35

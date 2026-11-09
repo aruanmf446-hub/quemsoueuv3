@@ -124,15 +124,18 @@ func _render() -> void:
 		_footer()
 		return
 	var rewards: OfficialRewardsService = _services.rewards
-	if rewards.state == "loading" or rewards.state == "empty":
+	var display_state := rewards.inventory_state if _history else rewards.state
+	if display_state == "loading" or display_state == "empty":
 		_message("Consultando presentes da sua conta…", false)
 		_footer()
 		return
-	if rewards.state != "success":
-		_message("Não foi possível consultar as recompensas. Nenhum resgate foi alterado.", true)
+	if display_state != "success":
+		_message("Não foi possível consultar seu histórico. Tente novamente." if _history else "Não foi possível consultar as recompensas. Nenhum resgate foi alterado.", true)
 		var retry := _button("TENTAR NOVAMENTE", true)
 		retry.name = "RetryNews"
-		retry.pressed.connect(func() -> void: rewards.refresh())
+		retry.pressed.connect(func() -> void:
+			if _history: rewards.refresh_inventory()
+			else: rewards.refresh())
 		_stack.add_child(retry)
 		_footer()
 		return
@@ -329,7 +332,7 @@ func _pending(offer: Dictionary, rewards: OfficialRewardsService) -> bool:
 func _visible_offers(rewards: OfficialRewardsService) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for offer: Dictionary in rewards.offers:
-		var included := bool(offer.get("claimed", false)) and not _pending(offer, rewards) if _history else _pending(offer, rewards)
+		var included := bool(offer.get("claimed", false)) if _history else _pending(offer, rewards)
 		if included: result.append(offer)
 	return result
 
@@ -504,6 +507,12 @@ func _footer(rewards: OfficialRewardsService = null) -> void:
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	footer.add_child(spacer)
+	if _history and _services != null and _services.session.authenticated():
+		var refresh := _button("Atualizar histórico", false)
+		refresh.name = "RefreshRewardHistory"
+		refresh.disabled = _services.rewards.inventory_state == "loading"
+		refresh.pressed.connect(func() -> void: _services.rewards.refresh_inventory())
+		footer.add_child(refresh)
 	if rewards == null or _history: return
 	if not rewards.revealed and rewards.offers.any(func(item: Dictionary)->bool: return bool(item.get("auto_grant", true)) and rewards.is_offer_pending(item)):
 		var redeem := _button("RESGATAR PRESENTES", true)

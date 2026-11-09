@@ -804,3 +804,21 @@ static func deck_modal(parent: Control, root: Control) -> VBoxContainer:
 	var panel := creator_panel(center,"accent",24)
 	panel.get_parent().custom_minimum_size.x=660
 	return panel
+
+
+## Prévia genérica de visitante: nunca recebe imagens de packs não resgatados.
+static func style_locked_deck_preview(art: TextureRect) -> void:
+	var shader := Shader.new()
+	shader.code = """shader_type canvas_item;
+void fragment() {
+ vec4 sum = vec4(0.0);
+ for (int x = -1; x <= 1; x++) {
+  for (int y = -1; y <= 1; y++) {
+   sum += texture(TEXTURE, clamp(UV + vec2(float(x), float(y)) * 0.035, vec2(0.0), vec2(1.0)));
+  }
+ }
+ COLOR = (sum / 9.0) * vec4(0.65, 0.68, 0.75, 0.8);
+}"""
+	var material := ShaderMaterial.new()
+	material.shader = shader
+	art.material = material

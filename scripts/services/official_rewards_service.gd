@@ -48,10 +48,13 @@ func refresh() -> Dictionary:
 		return ServiceResult.failure("session_changed", "unauthorized")
 	if not result.ok or not result.data is Dictionary or result.data.get("ok", false) != true:
 		_loading = false
-		inventory_state = "error"
 		state = "error"
 		error = result
+		campaign.clear()
+		offers.clear()
 		changed.emit()
+		# Histórico é uma consulta independente do feed de campanhas.
+		await refresh_inventory()
 		return result
 	campaign = result.data.get("campaign", {}) if result.data.get("campaign") is Dictionary else {}
 	seen = bool(result.data.get("seen", true))
@@ -90,8 +93,37 @@ func refresh() -> Dictionary:
 	changed.emit()
 	return result
 
+func refresh_inventory() -> Dictionary:
+	if client == null or session == null or not session.authenticated():
+		return ServiceResult.failure("not_authenticated", "unauthorized")
+	var sequence := _sequence
+	var generation := client.generation
+	inventory_state = "loading"
+	changed.emit()
+	var result: Dictionary = await client.call_rpc("qse_rewards_inventory")
+	if sequence != _sequence or generation != client.generation:
+		return ServiceResult.failure("session_changed", "unauthorized")
+	inventory_state = "error"
+	if result.ok and result.data is Dictionary and result.data.get("ok", false) == true and result.data.get("offers") is Array:
+		inventory_state = "success"
+		# Substitui apenas recibos: não apaga ofertas ainda pendentes do feed.
+		var pending: Array[Dictionary] = []
+		for item: Dictionary in offers:
+			if not bool(item.get("claimed", false)): pending.append(item)
+		offers = pending
+		for item: Variant in result.data.offers:
+			if not item is Dictionary or not item.get("id") is String or not item.get("kind") in ["deck", "skin"] or not bool(item.get("claimed", false)): continue
+			var existing := -1
+			for index in offers.size():
+				if offers[index].id == item.id: existing = index; break
+			if existing >= 0: offers[existing] = item
+			else: offers.append(item)
+	changed.emit()
+	return result
+
+
 func is_deck_claimed(deck_id: String) -> bool:
-	if state != "success": return false
+	if state != "success" and inventory_state != "success": return false
 	for item: Dictionary in offers:
 		if str(item.get("kind", "")) == "deck" and str(item.get("item_id", "")) == deck_id:
 			return bool(item.get("claimed", false))

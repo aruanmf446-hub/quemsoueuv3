@@ -1,0 +1,35 @@
+[
+  {
+    "width": 1672,
+    "height": 941,
+    "mobile": false,
+    "guestInvitation": true,
+    "actualCardsHidden": true,
+    "legacyDecksAvailable": true,
+    "loginRoute": "account",
+    "historyReceipts": true,
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "mobile": true,
+    "guestInvitation": true,
+    "actualCardsHidden": true,
+    "legacyDecksAvailable": true,
+    "loginRoute": "account",
+    "historyReceipts": true,
+    "errors": []
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "mobile": true,
+    "guestInvitation": true,
+    "actualCardsHidden": true,
+    "legacyDecksAvailable": true,
+    "loginRoute": "account",
+    "historyReceipts": true,
+    "errors": []
+  }
+]

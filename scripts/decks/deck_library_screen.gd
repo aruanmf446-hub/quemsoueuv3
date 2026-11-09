@@ -702,7 +702,9 @@ func _update_results() -> void:
 		if _tab == "Meus Decks" and entry.origin != "mine" and not bool(entry.get("owned", false)): continue
 		if _matches(entry): shown.append(entry)
 	shown = _sorted(shown)
-	if _tab == "Descobrir": _discover_top(all)
+	if _tab == "Descobrir":
+		if not services.session.authenticated() and _query.strip_edges().is_empty(): _guest_deck_preview()
+		_discover_top(all)
 	else:
 		_filter_panel = _filters()
 		_results.add_child(_filter_panel)
@@ -903,6 +905,38 @@ func _clear_filters() -> void:
 	_themes.clear()
 	_types = {"mine": true} if _tab == "Meus Decks" else {}
 	_render_library()
+
+
+func _guest_deck_preview() -> void:
+	var panel := PanelContainer.new()
+	panel.name = "GuestDeckPreview"
+	panel.add_theme_stylebox_override("panel", PlayerUI.frame_panel(20))
+	_results.add_child(panel)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 24)
+	panel.add_child(row)
+	var art := TextureRect.new()
+	art.name = "GuestDeckBlur"
+	art.texture = preload("res://assets/ui/battle/private_back.svg")
+	art.custom_minimum_size = Vector2(144, 100)
+	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	PlayerUI.style_locked_deck_preview(art)
+	row.add_child(art)
+	var copy := VBoxContainer.new()
+	copy.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(copy)
+	var title := PlayerUI.label(tr("Faça login para conhecer mais decks"), 26, PlayerUI.TEXT)
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	copy.add_child(title)
+	var note := PlayerUI.label(tr("Entre na sua conta e resgate novos decks gratuitamente em Novidades."), 20, PlayerUI.MUTED)
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	copy.add_child(note)
+	var enter := PlayerUI.button(tr("Entrar na conta"), func() -> void: navigate_requested.emit("account", {}))
+	enter.name = "GuestDeckLogin"
+	enter.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	PlayerUI.style_button(enter, true)
+	copy.add_child(enter)
 
 
 func _create_deck() -> void:

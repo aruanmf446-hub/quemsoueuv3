@@ -27,6 +27,7 @@ func _run() -> void:
 	services.client.access_token = "offline-fixture"
 	services.session._expires_at = Time.get_unix_time_from_system() + 3600.0
 	services.rewards.state = "success"
+	services.rewards.inventory_state = "success"
 	services.rewards.campaign = {"id": "test_t30", "title": "Presentes Oficiais", "subtitle": "Coleções da equipe",
 		"description": "Confira seus presentes com segurança."}
 	services.rewards.offers = [

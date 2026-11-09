@@ -24,6 +24,7 @@ func _run() -> void:
 		if DevicePreferences._valid("locale",locale): services.preferences.set_preference("locale",locale)
 	var fake: SupabaseClient
 	if mode=="manual_claim": fake=preload("res://tests/lado_sombrio_claim/fake_game.gd").new()
+	elif mode in ["guest_decks", "reward_history"]: fake=preload("res://tests/i18n_expanded/fake_game.gd").new()
 	elif mode=="i18n": fake=preload("res://tests/i18n_expanded/fake_game.gd").new()
 	elif mode in ["languages","public_profile","friends_search","duel_admin"]: fake=preload("res://tests/profile_languages/fake_game.gd").new()
 	elif mode in ["ability_refills","refill_store"]: fake=preload("res://tests/ability_refills/fake_game.gd").new()
@@ -66,6 +67,8 @@ func _run() -> void:
 		services.rewards.client=fake
 		await services.rewards.refresh()
 		await _i18n_screen("lobby")
+	elif mode in ["guest_decks", "reward_history"]:
+		await _i18n_screen(mode)
 	elif mode=="commerce_entrypoints":
 		await _i18n_screen("lobby")
 	elif mode=="i18n":
@@ -215,6 +218,19 @@ func _i18n_screen(screen: String) -> void:
 			for entry: Dictionary in CharacterCatalog.load_entries():
 				ui._paths[str(entry.id)]="res://assets/portraits/"+str(entry.id)+".png"
 			ui.show_screen({"cosmetic_mode":"shop"})
+		"reward_history":
+			ui=Control.new()
+			ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			add_child(ui)
+			ui.add_child(preload("res://tests/news_history/fixture.gd").new())
+		"guest_decks":
+			services.session.user={}
+			fixture_game.access_token=""
+			services.rewards.clear()
+			ui=load("res://scenes/player/deck_library.tscn").instantiate()
+			add_child(ui)
+			ui.navigate_requested.connect(func(route:String,_params:Dictionary)->void: ui.set_meta("guest_route",route))
+			ui.show_screen()
 		"originals", "originals_gallery":
 			ui=load("res://scenes/player/deck_library.tscn").instantiate()
 			add_child(ui)
@@ -309,6 +325,7 @@ func _probe(args: Array) -> void:
 		scroll.scroll_vertical=int(scroll.get_v_scroll_bar().max_value)
 	report_sequence+=1
 	var result := {"locale":services.preferences.values.locale,"language_choice":ui.get("_language_choice"),"sequence":report_sequence,"size":[ui.size.x,ui.size.y],"controls":[],"fields":{},"cards":0,"labels":[],"emote_thumbnails":[]}
+	result.guest_route=ui.get_meta("guest_route", "")
 	result.pending_rewards=services.rewards.pending_count()
 	result.lado_access=preload("res://scripts/decks/deck_library_catalog.gd").can_access("lado_sombrio")
 	result.local_lado=services.duel.local_server.decks().any(func(d:Dictionary)->bool:return str(d.id)=="lado_sombrio")

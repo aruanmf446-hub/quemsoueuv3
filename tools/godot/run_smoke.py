@@ -17,6 +17,10 @@ def run(name,args,timeout):
  (out/(name+'.log')).write_text(log)
  passed=code==0 and not re.search(r'(?:SCRIPT ERROR:|ERROR:|Parse Error:)',log)
  results.append({'test':name,'exit_code':code,'passed':passed});print(name,'PASS' if passed else 'FAIL',flush=True)
+ if not passed:
+  # Mostra no log do CI por que o caso falhou (erros do motor e checagens reprovadas).
+  hits=[l for l in log.splitlines() if re.search(r'ERROR|FAIL|Parse Error|   at: ',l)]
+  print('  exit_code=%s'%code,*['  | '+l[:300] for l in hits[:25]],sep='\n',flush=True)
  return passed
 version=subprocess.run([a.godot,'--version'],env=env,capture_output=True,text=True).stdout.strip()
 imported=run('import',['--editor','--import','--quit'],900)

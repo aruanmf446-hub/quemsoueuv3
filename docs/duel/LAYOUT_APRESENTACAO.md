@@ -99,3 +99,22 @@ sem erros de script ou página. Evidências atuais em
 `evidence/duel-stage-layout/web-final/results.json` e capturas ao lado.
 Isso substitui o resultado incompleto da bateria anterior descrito acima.
 Não houve validação em aparelho físico nem sessão online real.
+
+## Ritmo e animações — 10/11/2026 (branch `claude/mata-mata-responsiveness-0cqhlu`)
+
+Pedido do dono: partida com menos pressa e animações das skins sem corte.
+
+- **Partida local:** bot espera 4,0 s antes de jogar (era 2,5), suspense de 3,0 s e
+  o próximo turno só começa 1,2 s depois que a tela fecha a revelação
+  (`LocalDuelServer.finish_reveal`). `TIMING.reveal` (10 s) é apenas o prazo máximo.
+  A revelação local usa `RevealOverlay.pace = 1.3`.
+- **Palco de apresentação:** cada jogador fica em cena pelo tempo real do clipe
+  (vitória/derrota tocam uma vez até o fim; lobby fecha em voltas completas),
+  entre 3,5 e 10 s, com fades de 0,4 s. Online, o tempo da contagem do servidor
+  é repartido entre todos (`time_budget`) em vez de cortar a sequência.
+- **Trocas na tela:** faixa de jogadores e mesa só são reconstruídas quando algo
+  visível muda; texto do turno e jogador da vez entram com fade curto.
+- **Sem mudança:** servidor online (tempos em `qse_v3.duel_timing`), modelos,
+  clipes e El Fuego (continua sem `anim_2/3/4`).
+- **Verificação:** somente análise de sintaxe (`gdparse`). O Godot não pôde ser
+  executado nesta sessão; testes nativos, capturas e Web **não foram rodados**.

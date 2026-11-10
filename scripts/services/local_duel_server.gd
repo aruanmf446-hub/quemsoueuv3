@@ -19,9 +19,16 @@ const SETTING_KEYS := ["max_players", "deck_ids", "cards_per_player", "bots_allo
 const BOT_NAMES := ["Bot Areia", "Bot Duna", "Bot Oásis", "Bot Miragem", "Bot Brasa", "Bot Lua", "Bot Vento",
 	"Bot Cristal", "Bot Farol", "Bot Trovão", "Bot Neblina", "Bot Pedra", "Bot Aurora", "Bot Cometa",
 	"Bot Tempestade", "Bot Sol", "Bot Eco", "Bot Faísca", "Bot Âmbar", "Bot Estrela"]
-## Tempos fixos da apresentação (segundos), iguais a qse_v3.duel_timing.
-const TIMING := {"countdown": 5.0, "suspense": 2.5, "reveal": 6.5, "timeout": 3.5, "finished": 9.0,
-	"bot_think": 2.5, "disconnect": 30.0}
+## Tempos da apresentação (segundos). A partida local usa um ritmo mais calmo que
+## qse_v3.duel_timing (pedido do dono em 10/11/2026): o bot espera mais antes de jogar e a
+## revelação só dá lugar ao próximo turno depois que a tela termina de mostrá-la
+## (finish_reveal). "reveal" é o prazo máximo caso nenhuma tela avise.
+const TIMING := {"countdown": 5.0, "suspense": 3.0, "reveal": 10.0, "timeout": 4.5, "finished": 9.0,
+	"bot_think": 4.0, "disconnect": 30.0}
+## Respiro entre o fim da revelação na tela e o começo do próximo turno.
+const REVEAL_BREATH := 1.2
+## Reserva por participante nas apresentações (o clipe inteiro pode durar até 10 s).
+const PRESENTATION_RESERVE := 10.5
 const LOBBY_STALE := 45.0
 
 ## Nome e skin do jogador humano (a tela de Duelo preenche com o perfil/skin equipada).
@@ -121,6 +128,15 @@ func finish_presentation(match_id: String, phase: String) -> void:
 	if _match.is_empty() or str(_match.id) != match_id: return
 	if str(_match.phase) != phase or phase not in ["countdown", "finished"]: return
 	_match.phase_deadline = minf(float(_match.phase_deadline), now() + 0.2)
+
+
+## A tela avisa que terminou de mostrar a revelação `seq`: o próximo turno começa após um
+## respiro curto, em vez de correr por trás do resultado ainda aberto.
+func finish_reveal(match_id: String, seq: String) -> void:
+	if _match.is_empty() or str(_match.id) != match_id or str(_match.phase) != "reveal": return
+	if _events.is_empty() or str(_events.back().seq) != seq: return
+	_match.phase_deadline = minf(float(_match.phase_deadline), now() + REVEAL_BREATH)
+	_room.phase_deadline = _match.phase_deadline
 
 
 func default_settings() -> Dictionary:
@@ -372,7 +388,7 @@ func _check_end() -> bool:
 	if alive.size() <= 1:
 		_match.result = {"reason": "last_standing" if alive.size() == 1 else "draw", "winners": winners}
 		_event("finished", null, null, winners, 0.0)
-		_set_phase("finished", maxf(TIMING.finished, _players.size()*6.5+15.0))
+		_set_phase("finished", maxf(TIMING.finished, _players.size()*PRESENTATION_RESERVE+15.0))
 		return true
 	return false
 
@@ -443,7 +459,7 @@ func _advance() -> void:
 						_fill_cards(player.member_id)
 						player.confirmed = true
 						player.auto_selected = true
-				_set_phase("countdown", maxf(TIMING.countdown,_match.turn_order.size()*6.5+15.0))
+				_set_phase("countdown", maxf(TIMING.countdown,_match.turn_order.size()*PRESENTATION_RESERVE+15.0))
 			"countdown":
 				if now() < deadline: return
 				if _check_end(): continue

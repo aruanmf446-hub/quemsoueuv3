@@ -364,6 +364,9 @@ func refresh() -> void:
 		_hand_before_reveal.clear()
 		_last_player_states.clear()
 		_last_lives.clear()
+		_players_signature = ""
+		_public_signature = ""
+		_turn_pulse = ""
 		CharacterSlot.prepare_participants(_data.get("players",[]))
 	var available_ids: Array = _data.pool.map(func(card: Dictionary) -> String: return str(card.card_id))
 	_chosen = _chosen.filter(func(id: String) -> bool: return available_ids.has(id))
@@ -439,6 +442,9 @@ func _play_sequence(rows: Array,clip: String,duration: float,numbered := false) 
 		if _presentation==current: _presentation=null
 		if duel.is_local(): duel.local_server.finish_presentation(match_id,sequence_phase)
 		if is_instance_valid(overlay_parent): overlay_parent.render.call_deferred())
+	# Online a contagem é do servidor: reparte o tempo que existe entre todos os jogadores.
+	if not duel.is_local() and sequence_phase == "countdown":
+		_presentation.time_budget = maxf(duel.seconds_left() - 0.3, 1.0)
 	_presentation.present(rows,clip,duration,numbered)
 func _maybe_present() -> void:
 	if is_instance_valid(_presentation):
@@ -471,11 +477,21 @@ func _maybe_present() -> void:
 
 func holding_results() -> bool:
 	if not is_instance_valid(_presentation) or _presentation.get_meta("phase","") != "finished": return false
+	# Quem saiu da sala não fica preso ao palco final: a tela de entrada volta na hora.
+	if not duel.in_room(): return false
 	var live := duel.match()
 	# Preserve the final stage across the server's return to lobby, never a new match.
 	return live.is_empty() or (str(live.get("id","")) == _prepared_match and live.get("phase","") == "finished")
 
+## Texto do turno entra com um fade curto em vez de trocar de repente.
 func _render_instruction(me: Dictionary) -> void:
+	var before := _instruction.text
+	_write_instruction(me)
+	if _instruction.text != before and str(_data.get("phase","")) != "countdown":
+		for label: Label in [_instruction,_detail]:
+			label.modulate.a = 0.0
+			label.create_tween().tween_property(label,"modulate:a",1.0,0.3)
+func _write_instruction(me: Dictionary) -> void:
 	_confirm.hide()
 	_cancel.hide()
 	if _submitting: return
@@ -565,17 +581,30 @@ func _show_reveal(card_id: String, hits: Array) -> void:
 	layer.layer = 50
 	add_child(layer)
 	var overlay := RevealOverlay.new()
+	var local := duel.is_local()
+	var match_id := str(_data.get("id",""))
+	var seq := str(events.back().get("seq","")) if not events.is_empty() else ""
+	# Local: o resultado fica mais tempo na tela e o próximo turno só começa depois dele.
+	if local: overlay.pace = 1.3
 	layer.add_child(overlay)
 	overlay.tree_exited.connect(func() -> void:
+		if local and is_instance_valid(duel) and is_instance_valid(duel.local_server): duel.local_server.finish_reveal(match_id,seq)
 		_reveal_playing=false
 		if is_instance_valid(layer): layer.queue_free()
 		if is_inside_tree(): refresh.call_deferred())
 	overlay.present(card_id, _name(card_id), actor, rows, spared)
 
 
+var _players_signature := ""
+var _public_signature := ""
+var _turn_pulse := ""
 func _render_players() -> void:
-	PlayerUI.clear(_roster)
 	var players: Array = _data.get("players",[]).duplicate()
+	# Só reconstrói a faixa quando algo visível mudou: sem piscar a cada sinal do servidor.
+	var players_signature := JSON.stringify([players,_data.get("turn_member",""),_data.get("phase",""),_data.get("result"),_closed(),_suspense() or _reveal_playing])
+	if players_signature == _players_signature and _roster.get_child_count() > 0: return
+	_players_signature = players_signature
+	PlayerUI.clear(_roster)
 	var mine := players.find_custom(func(player: Dictionary) -> bool: return player.get("is_you",false))
 	if mine >= 0:
 		var local: Dictionary = players.pop_at(mine)
@@ -605,6 +634,11 @@ func _render_players() -> void:
 		panel.active = (turn or winner) and not player.eliminated
 		panel.name = "Player_" + str(player.member_id)
 		panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		if turn and _turn_pulse != str(player.member_id):
+			# A vez passa com um acender suave do novo jogador.
+			_turn_pulse = str(player.member_id)
+			panel.modulate = Color(1,1,1,0.4)
+			panel.create_tween().tween_property(panel,"modulate",Color.WHITE,0.4)
 		if players.size() <= 3:
 			# Grupo centralizado; o jogador da vez fica mais alto que os demais.
 			panel.size_flags_horizontal = Control.SIZE_FILL
@@ -705,11 +739,18 @@ func _render_public(me: Dictionary) -> void:
 		if owner_card.get_parent()==_grid:
 			focus_id=str(owner_card.get("id"))
 			focus_action=str(focus.name)
-	PlayerUI.clear(_grid)
 	var phase := str(_data.phase)
 	var choosing: bool = not _closed() and phase == "selection" and not me.is_empty() and not me.get("confirmed",false) and not me.get("eliminated",false)
 	var masking := _suspense() or _reveal_playing
 	if not masking: _public_before_reveal=_data.pool.filter(func(c: Dictionary)->bool:return not c.removed).map(func(c: Dictionary)->String:return str(c.card_id))
+	# Mesmas cartas e mesmo estado: mantém a mesa como está (sem redesenhar/piscar).
+	var public_signature := JSON.stringify([phase,_data.pool,_public_before_reveal,_chosen,_pending_pick,choosing,_is_my_turn(),masking,_submitting,_data.get("cards_per_player",1)])
+	if public_signature == _public_signature and _grid.get_child_count() > 0:
+		_confirm.hide()
+		_cancel.hide()
+		return
+	_public_signature = public_signature
+	PlayerUI.clear(_grid)
 	for item: Dictionary in _data.pool:
 		var id := str(item.card_id)
 		var out := bool(item.removed)

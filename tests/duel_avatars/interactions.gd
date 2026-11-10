@@ -127,7 +127,7 @@ func _run() -> void:
 	check(duel.match().phase=="reveal","eliminação aceita uma vez")
 	var detail: Label=battle.find_child("RoundDetail",true,false)
 	if detail!=null: check(not detail.text.contains(DuelService.card_name(target)),"carta não vaza durante suspense")
-	server.clock_offset+=2.6
+	server.clock_offset+=LocalDuelServer.TIMING.suspense+0.1
 	await duel.refresh()
 	var layer := battle.get_node("RevealOverlay")
 	var overlay: RevealOverlay=layer.get_child(0)

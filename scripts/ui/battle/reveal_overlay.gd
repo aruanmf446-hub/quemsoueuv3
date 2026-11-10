@@ -198,6 +198,9 @@ func present(card_id: String, card_name: String, actor_name: String, hits: Array
 
 
 var _intro := 1.0
+## Ritmo da animação: 1 = tempos do servidor online; a partida local usa um valor maior
+## porque o próximo turno espera a revelação terminar.
+var pace := 1.0
 
 
 ## A escala é recalculada a cada quadro: o tamanho final dos textos só existe depois do layout.
@@ -223,10 +226,10 @@ func _animate(animated: Array, mode: String, accent: Color) -> void:
 	_intro = 0.86
 	for item: Array in animated: (item[0] as Control).modulate.a = 0.0
 	var tween := create_tween()
-	tween.tween_property(self, "modulate:a", 1.0, 0.25)
-	tween.parallel().tween_property(self, "_intro", 1.0, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "modulate:a", 1.0, 0.25 * pace)
+	tween.parallel().tween_property(self, "_intro", 1.0, 0.35 * pace).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.tween_callback(_play.bind(SFX_PICK))
-	tween.tween_interval(0.3)
+	tween.tween_interval(0.3 * pace)
 	tween.tween_callback(func() -> void:
 		_result_title.text=_final_title
 		_result_title.add_theme_color_override("font_color",_final_title_color)
@@ -236,13 +239,13 @@ func _animate(animated: Array, mode: String, accent: Color) -> void:
 		var node := item[0] as Control
 		if item[1] != null: tween.tween_callback(_play.bind(item[1]))
 		node.position.x += 0.0
-		tween.tween_property(node, "modulate:a", 1.0, 0.3)
+		tween.tween_property(node, "modulate:a", 1.0, 0.3 * pace)
 		if bool(item[2]): tween.tween_callback(_eliminate_fx.bind(node))
-		tween.tween_interval(0.25)
+		tween.tween_interval(0.25 * pace)
 	# Iluminação breve nas bordas.
 	tween.tween_method(func(v: float) -> void: _frame.border_color = GOLD.lerp(accent.lightened(0.25), v), 0.0, 1.0, 0.2)
 	tween.tween_method(func(v: float) -> void: _frame.border_color = accent.lightened(0.25).lerp(GOLD, v), 0.0, 1.0, 0.45)
-	tween.tween_interval(3.2 if mode != "none" else 2.4)
+	tween.tween_interval((3.2 if mode != "none" else 2.4) * pace)
 	tween.tween_callback(close)
 
 
@@ -380,7 +383,7 @@ func close() -> void:
 	if _closing: return
 	_closing = true
 	var tween := create_tween()
-	tween.tween_property(self, "modulate:a", 0.0, 0.22)
+	tween.tween_property(self, "modulate:a", 0.0, 0.22 * pace)
 	tween.tween_callback(queue_free)
 
 

@@ -1,11 +1,12 @@
 # Malagueta — arena da fase 10
 
-Autorização de publicação (2026-11-10): após “Publique no main”, foi apresentado
-o bloqueio dos seis FBX e perguntado se o dono autorizava registrar esses
-arquivos como aprovados e configurar a autorização deste deploy, mantendo a
-proteção ativa. Resposta: “Ok autorizado”. A exceção abrange somente os seis
-FBX do Malagueta já enviados à main e seu registro no baseline; não altera
-padrões, verificador, workflows ou as demais áreas congeladas.
+Autorização de publicação (2026-11-10): o dono pediu “Publique no main” e
+confirmou “Ok autorizado” após a proposta de registrar os seis FBX e liberar
+este deploy. O registro chegou a ser preparado, mas a integração não tem acesso
+à variável do GitHub (HTTP 403). Em seguida o dono removeu os arquivos do bloqueio
+na main (26b2984/f95695a), e d99333c alinhou os workflows a essa remoção.
+Esta entrega preserva a configuração atual da main: não restaura o registro nem
+altera verificador/workflows para liberar a própria publicação.
 
 ## Troca entre serras — revisão após feedback
 

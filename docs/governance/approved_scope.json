@@ -671,6 +671,12 @@
     "web/pwa/sw.js": "db3f907f955669d11c2a678458c7706076dcd69c",
     "web/pwa/update.js": "2bdf9754c08e07d0347fda66c613a1b44310b7b3",
     "web/shell.html": "1766a0b643d7233c7e7289366e2c2e859591e18b",
-    "web/site/atualizar/index.html": "6b2ccddb0986332ff4a338f50ae5bbe742f2f8fa"
+    "web/site/atualizar/index.html": "6b2ccddb0986332ff4a338f50ae5bbe742f2f8fa",
+    "assets/characters/malagueta/Dizzy Idle.fbx": "277e6e7facd524c71f0aa0e908b5e1bf0e430195",
+    "assets/characters/malagueta/Idle.fbx": "e9ba25cb6177cf1a7c09b4bf05873701cf4cb6b8",
+    "assets/characters/malagueta/Standing Block End.fbx": "f560645a751e67b11f5f05e0fa1a749781d001e1",
+    "assets/characters/malagueta/Standing Walk Forward.fbx": "fe14acff5fa2bab16e3ab73818a5f12dfd558cd6",
+    "assets/characters/malagueta/Strut Walking.fbx": "0e6273d095b1bb4d15d0eb7c7db53a1747c26160",
+    "assets/characters/malagueta/Throw.fbx": "c8474d4dc5bb03485d88aa5fb59d6d0261801ac3"
   }
 }

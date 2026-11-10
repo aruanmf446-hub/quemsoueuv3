@@ -1,5 +1,12 @@
 # Malagueta — arena da fase 10
 
+Autorização de publicação (2026-11-10): após “Publique no main”, foi apresentado
+o bloqueio dos seis FBX e perguntado se o dono autorizava registrar esses
+arquivos como aprovados e configurar a autorização deste deploy, mantendo a
+proteção ativa. Resposta: “Ok autorizado”. A exceção abrange somente os seis
+FBX do Malagueta já enviados à main e seu registro no baseline; não altera
+padrões, verificador, workflows ou as demais áreas congeladas.
+
 ## Troca entre serras — revisão após feedback
 
 O dono reprovou as cinco serras simultâneas e pediu uma breve antecipação da

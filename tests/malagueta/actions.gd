@@ -14,6 +14,10 @@ func run()->void:
  await tick(4)
  var boss: Node3D=phase._boss
  check(boss._model.current_clip()=="base","actual boss starts with Idle")
+ var skeleton: Skeleton3D=boss._model._skeleton
+ var index: Vector3=skeleton.to_global(skeleton.get_bone_global_pose(skeleton.find_bone("mixamorig_RightHandIndex2")).origin)
+ var thumb: Vector3=skeleton.to_global(skeleton.get_bone_global_pose(skeleton.find_bone("mixamorig_RightHandThumb2")).origin)
+ check(boss._held.to_global(Vector3(0,0.16,0)).distance_to((index+thumb)*0.5)<0.04,"flask neck stays between index and thumb")
  phase._launch_chemical("red");await tick(3)
  check(boss.throwing() and boss._model.current_clip()=="throw","attack request plays Throw")
  var projectiles=phase.arena.get_children().filter(func(n: Node)->bool:return n is Chemical)

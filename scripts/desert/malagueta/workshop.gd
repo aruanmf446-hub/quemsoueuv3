@@ -2,10 +2,10 @@ extends Node3D
 ## Phase-10 set dressing, behind the route. Existing textures/art, shared simple meshes.
 var _iron: StandardMaterial3D
 var _brass: StandardMaterial3D
-var _rock: StandardMaterial3D
+var _rock: ShaderMaterial
 func _ready()->void:
  _iron=_metal(Color("#41444a"),0.62);_brass=_metal(Color("#b38541"),0.58)
- _rock=StandardMaterial3D.new();_rock.albedo_texture=preload("res://assets/desert/phase01/sandstone.png");_rock.albedo_color=Color("#665343");_rock.roughness=0.95;_rock.uv1_scale=Vector3(6,4,1)
+ _rock=ShaderMaterial.new();_rock.shader=preload("res://scripts/desert/malagueta/mine_rock.gdshader");_rock.set_shader_parameter("rock",preload("res://assets/desert/phase01/sandstone.png"))
  # Continuous mine wall descends below the playable floor and reaches the ceiling.
  _box(Vector3(0,4,-7.5),Vector3(36,26,1.5),_rock)
  for x in [-11.8,-5.8,0.2,6.2,11.8]:
@@ -15,7 +15,7 @@ func _ready()->void:
  for at in [Vector3(-8,4,1),Vector3(8,10,1)]:
   var light:=OmniLight3D.new();light.position=at;light.omni_range=9;light.light_color=Color("#ffd39b");light.light_energy=1.2;light.shadow_enabled=false;add_child(light)
  # The blade rails span the arena; only the cutter itself moves.
- for y in [1.55,3.1,4.65,6.2,7.75]:
+ for y in [1.2,3.1,5.0,6.9,8.8]:
   for dy in [-0.25,0.05]:_box(Vector3(0,y+dy,-1.38),Vector3(23.8,0.07,0.08),_iron)
   for x in [-11.7,11.7]:
    _box(Vector3(x,y-0.12,-1.2),Vector3(0.4,0.8,0.6),_iron)

@@ -19,7 +19,7 @@ func run() -> void:
 	var maximum := 0.0
 	var enemy: Node3D=phase._troops.get_child(0)
 	# Two full blade sweeps are now longer than the old 12-second patrol.
-	for frame in 2400:
+	for frame in 5400:
 		await tick(1)
 		maximum=maxf(maximum,enemy.position.y)
 		if frame%60==0: print("CACTUS_TRACE ",frame," ",enemy.position)

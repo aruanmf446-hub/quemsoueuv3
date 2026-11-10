@@ -27,8 +27,23 @@ func throw_bottle(kind: String)->bool:
  _model.play_animation("throw",false)
  return true
 func hand_position()->Vector3:
+ if is_instance_valid(_held):return _held.global_position
  var socket:=_model.get_socket(&"hand_right")
  return socket.global_position if socket!=null else global_position+Vector3.UP
+func grip_transform()->Transform3D:
+ var skeleton: Skeleton3D=_model._skeleton
+ var points: Array[Vector3]=[]
+ for name in ["mixamorig_RightHandIndex1","mixamorig_RightHandIndex2","mixamorig_RightHandThumb1","mixamorig_RightHandThumb2"]:
+  var bone:=skeleton.find_bone(name)
+  if bone<0:return _model.get_socket(&"hand_right").global_transform.orthonormalized()
+  points.append(skeleton.to_global(skeleton.get_bone_global_pose(bone).origin))
+ # Hold the neck across the curled palm, instead of putting the flask centre at the wrist.
+ var up: Vector3=(points[0]-points[2]).normalized()
+ var forward: Vector3=(points[1]-points[0]).normalized()
+ var right:=up.cross(forward).normalized()
+ var basis:=Basis(right,up,right.cross(up)).orthonormalized()
+ var palm: Vector3=(points[1]+points[3])*0.5
+ return Transform3D(basis,palm-basis.y*0.16)
 func set_stunned(value: bool)->void:
  stunned=value;_action_left=0;_throw_left=0;throw_serial+=1
  if is_instance_valid(_held):_held.visible=not value
@@ -47,8 +62,7 @@ func _physics_process(delta: float)->void:
  _action_left=maxf(0,_action_left-delta)
  _throw_left=maxf(0,_throw_left-delta)
  if is_instance_valid(_held):
-  var socket:=_model.get_socket(&"hand_right")
-  if socket!=null:_held.global_transform=socket.global_transform.orthonormalized()
+  _held.global_transform=grip_transform()
   _held.visible=not stunned and (_throw_left<=0.0 or (_model.animation_length(&"throw")/1.4-_throw_left)<0.65)
  if stunned:return
  var player:=get_tree().get_first_node_in_group("player") as Node3D

@@ -4,7 +4,7 @@ const Encounter = preload("res://scripts/desert/malagueta/encounter.gd")
 const FilePlatform = preload("res://scripts/desert/malagueta/moving_file.gd")
 const Chemical = preload("res://scripts/desert/malagueta/chemical.gd")
 @export var file_speed := 2.2
-@export var file_travel := 20.4
+@export var file_travel := 28.0
 @export var cactus_interval := 7.0
 @export var max_cacti := 3
 @export var refill_interval := 12.0
@@ -23,6 +23,8 @@ var _cactus_wait := 4.0
 var _refill_wait := 0.0
 var _spawn_serial := 0
 var _pending_throws: Array[String] = []
+var _upper_landing: StaticBody3D
+var _landing_pass_through := {}
 
 func _layout_for_phase(_number: int) -> Dictionary:
 	var data := Layout.build(10)
@@ -35,18 +37,18 @@ func _layout_for_phase(_number: int) -> Dictionary:
 	return data
 func _restore_game_checkpoint() -> void:
 	if not _loaded_run.is_empty() and int(_loaded_run.phase)==10:
-		var arena_save: bool=int(_loaded_run.get("task_steps",{}).get("malagueta.layout",0))==2
+		var arena_save: bool=int(_loaded_run.get("task_steps",{}).get("malagueta.handoff",0))==1
 		var tasks: Array=_loaded_run.get("tasks",[]).filter(func(id: String) -> bool: return id.begins_with("malagueta.task."))
 		_loaded_run.checkpoint=0 if not tasks.is_empty() else -1
 		_loaded_run.tasks=tasks
-		_loaded_run.task_steps={"malagueta.arena":1,"malagueta.layout":2}
+		_loaded_run.task_steps={"malagueta.arena":1,"malagueta.handoff":1}
 		_loaded_run.boss_defeated=tasks.size()==3
 		var at: Array=_loaded_run.position
 		if not arena_save or absf(float(at[0]))>11.0 or float(at[1])>11.5:
 			_loaded_run.position=[-11.0,0.1]
 	super._restore_game_checkpoint()
 	_task_steps["malagueta.arena"]=1
-	_task_steps["malagueta.layout"]=2
+	_task_steps["malagueta.handoff"]=1
 func _new_cactus_actor() -> Node3D:
 	return preload("res://scripts/desert/malagueta/pursuer.gd").new()
 func _ready() -> void:
@@ -76,7 +78,7 @@ func _stream_world(_x: float, force := false) -> void:
 	_world.add_child(arena)
 	files.clear()
 	_task_steps["malagueta.arena"]=1
-	_task_steps["malagueta.layout"]=2
+	_task_steps["malagueta.handoff"]=1
 	var props:=preload("res://scripts/desert/t15d/city_props.gd").new()
 	arena.add_child(props)
 	props.set("_order",10)
@@ -93,7 +95,7 @@ func _stream_world(_x: float, force := false) -> void:
 	_solid(Vector3(0,-0.5,0),Vector3(24,1,4),false)
 	for side in [-1,1]: _solid(Vector3(side*12.5,5,0),Vector3(1,12,4),true)
 	terrain.build([{"pos":[0,-0.5,0],"size":[24,1,4],"kind":"ground"}])
-	for at: Vector3 in [Vector3(-8,1.55,0),Vector3(-4.6,3.1,0),Vector3(-1.2,4.65,0),Vector3(2.2,6.2,0),Vector3(5.6,7.75,0)]:
+	for at: Vector3 in [Vector3(-8,1.2,0),Vector3(-4.6,3.1,0),Vector3(-1.2,5.0,0),Vector3(2.2,6.9,0),Vector3(5.6,8.8,0)]:
 		var file := FilePlatform.new()
 		file.position = at
 		file.speed = file_speed
@@ -105,6 +107,8 @@ func _stream_world(_x: float, force := false) -> void:
 		files.append(file)
 	# Fixed upper landing keeps melee/Task/ground-only defense accessible.
 	var landing := StaticBody3D.new()
+	_upper_landing=landing
+	_landing_pass_through.clear()
 	landing.position = Vector3(9,8.65,0)
 	var shape := CollisionShape3D.new()
 	var box := BoxShape3D.new()
@@ -192,6 +196,7 @@ func _raise_earth_bridge() -> void:
 	if _paused or completed or _player.is_dead or not _near_boss_task(): return
 	encounter.complete_task(encounter.stage())
 func _physics_process(delta: float) -> void:
+	_update_landing_support()
 	super._physics_process(delta)
 	if completed or _paused or _player.is_dead or not is_instance_valid(encounter): return
 	encounter.tick(delta)
@@ -272,3 +277,16 @@ func _solid(at: Vector3, dimensions: Vector3, visible_stone: bool) -> void:
 	if not visible_stone:
 		body.add_to_group("mining_files")
 		body.set_meta("navigation_point",Vector3(-10.5,0,0))
+
+func _update_landing_support() -> void:
+	if not is_instance_valid(_upper_landing):return
+	var actors:=get_tree().get_nodes_in_group("player")
+	actors.append_array(get_tree().get_nodes_in_group("enemies"))
+	for actor in actors:
+		if not actor is PhysicsBody3D:continue
+		var id:=actor.get_instance_id()
+		var ignored:=bool(_landing_pass_through.get(id,false))
+		if not ignored and actor.global_position.y<8.80:
+			_upper_landing.add_collision_exception_with(actor);_landing_pass_through[id]=true
+		elif ignored and actor.global_position.y>8.90:
+			_upper_landing.remove_collision_exception_with(actor);_landing_pass_through[id]=false

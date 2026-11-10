@@ -18,6 +18,17 @@ func _ready() -> void:
 	window.bossReady=true
 	_report([])
 func _report(args: Array) -> void:
+	if not args.is_empty() and str(args[0]) in ["solo","handoff"]:
+		phase.encounter.suspended=true
+		phase._clear_chemicals()
+		var time: float=4.0 if str(args[0])=="solo" else phase.files[0].entry_interval()+1.8
+		for blade in phase.files:
+			blade.elapsed=time;blade.enabled=true;blade._physics_process(0.0)
+		var support=phase.files[1] if str(args[0])=="handoff" else phase.files[0]
+		phase._player.position=support.global_position+Vector3(-0.65,0.12,0)
+		phase._player.velocity=Vector3.ZERO
+		for blade in phase.files:
+			blade._physics_process(0.0);blade.enabled=false
 	if not args.is_empty() and str(args[0]).begins_with("motion:"):
 		inspect_motion=str(args[0]).trim_prefix("motion:")
 		phase.encounter.suspended=true
@@ -37,11 +48,13 @@ func _report(args: Array) -> void:
 		phase._hud.show()
 		motion_label.hide()
 	if not args.is_empty() and str(args[0])=="phase3":
+		for blade in phase.files:blade.enabled=true
 		phase.encounter.restore(2)
 		phase.encounter.suspended=false
-		phase._player.position=phase.files[2].global_position+Vector3.UP*0.1
+		var available: Array=phase.files.filter(func(b):return b.is_available())
+		phase._player.position=available.back().global_position+Vector3.UP*0.1
 		phase._player.velocity=Vector3.ZERO
-	JavaScriptBridge.eval("window.bossReport="+JSON.stringify({"state":phase.encounter.state,"cacti":phase._troops.get_child_count(),"files":phase.files.size(),"phase":phase._order,"player":[phase._player.position.x,phase._player.position.y],"motion":inspect_motion,"clip":phase._boss._model.current_clip(),"camera":[phase._camera.position.x,phase._camera.position.y],"charges":[phase._player.attack_charges,phase._player.defense_charges]}),true)
+	JavaScriptBridge.eval("window.bossReport="+JSON.stringify({"visible_saws":phase.files.filter(func(b):return b.visible).size(),"solid_saws":phase.files.filter(func(b):return b.collision_layer!=0).size(),"state":phase.encounter.state,"cacti":phase._troops.get_child_count(),"files":phase.files.size(),"phase":phase._order,"player":[phase._player.position.x,phase._player.position.y],"motion":inspect_motion,"clip":phase._boss._model.current_clip(),"camera":[phase._camera.position.x,phase._camera.position.y],"charges":[phase._player.attack_charges,phase._player.defense_charges]}),true)
 
 func _process(_delta: float) -> void:
 	# This isolated inspection fixture is invulnerable; avoid photographing the blink-off frame.

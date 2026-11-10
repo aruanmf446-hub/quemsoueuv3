@@ -1,5 +1,45 @@
 # Malagueta — arena da fase 10
 
+## Troca entre serras — revisão após feedback
+
+O dono reprovou as cinco serras simultâneas e pediu uma breve antecipação da
+próxima para saltar entre elas. Agora cada serra atravessa uma vez, alternando
+esquerda/direita; a próxima entra 3,6 s antes da anterior sair. Só duas serras
+consecutivas coexistem na transferência. As demais ficam ocultas, sem colisão
+de piso nem monitoramento dos dentes. O ciclo recomeça após a última saída.
+
+Alturas finais: 1,2 / 3,1 / 5,0 / 6,9 / 8,8 m. O primeiro acesso fica baixo;
+os intervalos de 1,9 m e dentes mais rasos deixam folga acima da cabeça de quem
+está parado na serra inferior. O salto/pulo duplo do jogador permanece igual.
+Os perseguidores exclusivos da arena ignoram serras ausentes, aguardam sobre o
+apoio atual e recebem impulso vertical de 10,2 m/s ao trocar de nível. O patamar
+final permite subir por baixo, sem bater a cabeça; continua sustentando por cima.
+
+O gargalo do frasco agora fica entre os ossos reais do indicador e polegar.
+Este rig possui esses dedos; não depende de ossos de médio/mínimo ausentes.
+O lançamento parte da posição do frasco, preservando o tempo de soltura.
+O fundo usa coordenadas de mundo, repetição espelhada sem emendas abruptas e
+mistura de minerais menos amarelada, reutilizando a textura oficial existente.
+
+`malagueta.handoff=1` identifica o novo layout sem ampliar o contrato de save:
+partidas anteriores voltam à entrada mantendo as Tasks. O teste de checkpoint
+confirmou tanto o save válido quanto a retomada da reação final.
+
+Validação desta revisão: sequência por dois ciclos completos, ausência de piso
+invisível, quatro transferências dentro dos muros e folga dos dentes; percurso
+real pelas cinco serras até o patamar do boss, com três vidas; subida/descida e
+limite dos cactos; 21 verificações da arena, 11 de combate, 13 de ações/pegada.
+Tentativas iniciais encontraram falta de folga e bloqueio pelo patamar final;
+foram corrigidos. As evidências finais estão em `evidence/malagueta-handoff/`.
+Avisos de recursos pendentes ao encerrar alguns runners nativos estão nos logs;
+não representam uma validação de vazamentos em sessões longas.
+
+As capturas Web usam fixture identificada: o tempo é congelado em uma passagem
+solo e numa transferência, com jogador invulnerável. A travessia sem perder
+vidas foi verificada separadamente com os controles reais, sem teletransportes
+entre plataformas. Chromium com UA/DPR iPhone não equivale a Safari físico.
+Esta revisão permanece na branch, sem publicação automática na main/Pages.
+
 ## Revisão dos FBX e das lâminas — novembro de 2026
 
 Pedido do dono: usar o uniforme/skin de `Idle.fbx`, incorporar os outros cinco

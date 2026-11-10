@@ -88,3 +88,14 @@ Regressão PWA nesta sessão: com o Chromium instalado, o runner passou as
 verificações iniciais de registro/cache/manifest, mas parou em sw_test.js:45 com
 "Failed to update a ServiceWorker ... unknown error ... fetching the script".
 Não foi declarado aprovado; nenhum arquivo PWA foi alterado nesta entrega.
+
+### Resultado Web final — aprovado nas três resoluções
+
+Godot Web 4.7.2 no Chromium: 1672×941, 844×390/DPR3 e 640×360/DPR3.
+Seleção real de duas cartas e confirmação por mouse/toque, arte completa,
+geometria estável ao remover cartas/abrir mão/chat, duas imagens privadas
+contidas e clipes anim_2/anim_3/anim_4 em palco separado: todos passaram,
+sem erros de script ou página. Evidências atuais em
+`evidence/duel-stage-layout/web-final/results.json` e capturas ao lado.
+Isso substitui o resultado incompleto da bateria anterior descrito acima.
+Não houve validação em aparelho físico nem sessão online real.

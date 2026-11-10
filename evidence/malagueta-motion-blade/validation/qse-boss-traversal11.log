@@ -1,0 +1,10 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+TRAVERSE (-5.066667, 1.55, 0.0) result=true player=(-5.306583, 3.100938, 0.0) health=3
+TRAVERSE (-4.6, 3.1, 0.0) result=true player=(-4.939917, 3.100883, 0.0) health=3
+TRAVERSE (-1.2, 4.65, 0.0) result=true player=(-1.30654, 4.650563, 0.0) health=3
+TRAVERSE (2.2, 6.2, 0.0) result=true player=(2.00016, 6.200941, 0.0) health=3
+TRAVERSE (5.6, 7.75, 0.0) result=true player=(5.400161, 7.750942, 0.0) health=3
+TRAVERSE (9.0, 8.85, 0.0) result=true player=(8.800163, 8.850942, 0.0) health=3
+TRAVERSAL_HEALTH 3
+TRAVERSAL_SUMMARY failures=0

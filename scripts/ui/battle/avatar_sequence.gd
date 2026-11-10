@@ -2,7 +2,15 @@ extends Control
 ## Apresentação dedicada: um único palco, sem cartas ou controles da partida atrás.
 signal finished
 const STAGE = preload("res://scenes/lobby/lobby_stage.tscn")
+## Tempo padrão quando o personagem não tem o clipe pedido.
 const SECONDS_PER_PLAYER := 6.0
+## Cada jogador fica em cena pelo tempo real do seu clipe, dentro destes limites.
+const MIN_SLOT := 3.5
+const MAX_SLOT := 10.0
+const FADE := 0.4
+## Online: segundos disponíveis para a sequência inteira (0 = sem limite). O tempo é
+## repartido entre todos em vez de mostrar só os primeiros e cortar o resto.
+var time_budget := 0.0
 var _stage: LobbyStage
 var _title: Label
 var _context: Label
@@ -65,6 +73,7 @@ func present(entries: Array, clip: String, _duration: float, numbered := false) 
 		create_tween().tween_property(_duck, "volume_db", -10.0, 0.2)
 	CharacterSlot.prepare_participants(entries)
 	var catalog := CharacterCatalog.load_entries()
+	var started := Time.get_ticks_msec()
 	for index in range(entries.size()):
 		if not is_inside_tree() or _ending: return
 		var row: Dictionary = entries[index]
@@ -96,10 +105,15 @@ func present(entries: Array, clip: String, _duration: float, numbered := false) 
 			if not is_inside_tree() or _ending: return
 			_stage.reset_view()
 		_sound.play()
+		var hold := _slot_seconds(current_clip)
+		if time_budget > 0.0:
+			var left := time_budget - (Time.get_ticks_msec() - started) / 1000.0
+			hold = minf(hold, maxf(left / float(entries.size() - index), 1.4))
+		var edge := minf(FADE, hold * 0.25)
 		var fade := create_tween()
-		fade.tween_property(_panel, "modulate:a", 1.0, 0.25)
-		fade.tween_interval(SECONDS_PER_PLAYER - 0.5)
-		fade.tween_property(_panel, "modulate:a", 0.0, 0.25)
+		fade.tween_property(_panel, "modulate:a", 1.0, edge).set_trans(Tween.TRANS_SINE)
+		fade.tween_interval(maxf(hold - edge * 2.0, 0.1))
+		fade.tween_property(_panel, "modulate:a", 0.0, edge).set_trans(Tween.TRANS_SINE)
 		await fade.finished
 	if _duck != null:
 		var release := create_tween()
@@ -108,6 +122,15 @@ func present(entries: Array, clip: String, _duration: float, numbered := false) 
 	_ending = true
 	finished.emit()
 	queue_free()
+
+## Tempo em cena pelo clipe carregado: reações (vitória/derrota) tocam uma vez até o fim;
+## o clipe de lobby fecha em voltas completas. Nada é cortado no meio nem fica congelado.
+func _slot_seconds(clip: String) -> float:
+	var length := _stage.character.animation_length(StringName(clip))
+	if length < 0.3: return SECONDS_PER_PLAYER
+	if clip == "anim_2": return clampf(ceilf(5.0 / length) * length, MIN_SLOT, MAX_SLOT)
+	return clampf(length + FADE, MIN_SLOT, MAX_SLOT)
+
 
 func cancel() -> void:
 	if _ending: return

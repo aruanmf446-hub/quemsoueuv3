@@ -295,14 +295,14 @@ func _rules() -> void:
 	check(local._player(me).lives == 1 and local._player(bot_id).lives == 1, "atinge todos que têm a carta, inclusive quem escolheu")
 	var hidden: Dictionary = (picked.data.match.events as Array).back()
 	check(not hidden.revealed and hidden.hits == null, "atingidos só depois do suspense")
-	local.clock_offset += 6.6
+	local.clock_offset += LocalDuelServer.TIMING.reveal + 0.1
 	state = local.call_rpc("qse_duel_room", {"p_room": id})
 	check(str(state.data.match.phase) == "turns" and str(state.data.match.turn_member) == bot_id, "vez passa ao próximo vivo")
-	# Bot pensa 2,5 s e vota; sem voto do humano no prazo: falta (vida sem carta).
-	local.clock_offset += 2.6
+	# Bot pensa (TIMING.bot_think) e vota; sem voto do humano no prazo: falta (vida sem carta).
+	local.clock_offset += LocalDuelServer.TIMING.bot_think + 0.1
 	local.call_rpc("qse_duel_room", {"p_room": id})
 	check(str(local._match.phase) == "reveal" and str(local._events.back().kind) == "pick", "bot vota sozinho")
-	local.clock_offset += 6.6
+	local.clock_offset += LocalDuelServer.TIMING.reveal + 0.1
 	state = local.call_rpc("qse_duel_room", {"p_room": id})
 	if str(state.data.match.phase) == "turns" and str(state.data.match.turn_member) == me:
 		var cards_before := (local._cards[me] as Array).filter(func(k: Dictionary) -> bool: return not k.lost).size()

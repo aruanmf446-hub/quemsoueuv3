@@ -19,6 +19,7 @@ var _chosen: Array = []
 var _canvas: Control
 var _main: VBoxContainer
 var _side: VBoxContainer
+var _roster_frame: ScrollContainer
 var _roster: GridContainer
 var _board: PanelContainer
 var _board_content: VBoxContainer
@@ -105,7 +106,14 @@ func _build() -> void:
 	_roster.name = "Players"
 	_roster.add_theme_constant_override("h_separation",5)
 	_roster.add_theme_constant_override("v_separation",3)
-	_main.add_child(_roster)
+	_roster_frame = ScrollContainer.new()
+	_roster_frame.name = "PlayersScroll"
+	_roster_frame.custom_minimum_size.y = 92
+	_roster_frame.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_roster_frame.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	_main.add_child(_roster_frame)
+	_roster.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_roster_frame.add_child(_roster)
 	_board = Surface.new()
 	_board.name = "BattleBoard"
 	_board.variant = "board"
@@ -188,6 +196,7 @@ func _build() -> void:
 		_side_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
 		_canvas.add_child(_side_scroll)
 		_side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_side.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		_side_scroll.add_child(_side)
 	else:
 		_canvas.add_child(_side)
@@ -292,7 +301,14 @@ func _build_sidebar() -> void:
 	private_body.custom_minimum_size.y = 40
 	private_body.add_theme_constant_override("h_separation",3)
 	private_body.add_theme_constant_override("v_separation",3)
-	_hand.add_child(private_body)
+	var private_scroll := ScrollContainer.new()
+	private_scroll.name = "PrivateCardsScroll"
+	private_scroll.custom_minimum_size.y = 100
+	private_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	private_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	_hand.add_child(private_scroll)
+	private_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	private_scroll.add_child(private_body)
 	_hand_toggle = Style.action("Mostrar",func() -> void:
 		_private_shown = not _private_shown
 		_private_signature = ""
@@ -415,15 +431,22 @@ func _play_sequence(rows: Array,clip: String,duration: float,numbered := false) 
 	_presentation=preload("res://scripts/ui/battle/avatar_sequence.gd").new()
 	add_child(_presentation)
 	_presentation.set_meta("phase",str(_data.get("phase","")))
+	_presentation.set_meta("match_id",str(_data.get("id","")))
 	var current := _presentation
+	var match_id := str(_data.get("id",""))
+	var sequence_phase := str(_data.get("phase",""))
 	_presentation.finished.connect(func() -> void:
 		if _presentation==current: _presentation=null
-		refresh.call_deferred())
+		if duel.is_local(): duel.local_server.finish_presentation(match_id,sequence_phase)
+		if is_instance_valid(overlay_parent): overlay_parent.render.call_deferred())
 	_presentation.present(rows,clip,duration,numbered)
 func _maybe_present() -> void:
-	if is_instance_valid(_presentation) and _presentation.get_meta("phase","")=="countdown" and _data.get("phase","")!="countdown":
-		_presentation.queue_free()
-		_presentation=null
+	if is_instance_valid(_presentation):
+		var sequence_phase := str(_presentation.get_meta("phase",""))
+		var obsolete := str(_presentation.get_meta("match_id","")) != str(_data.get("id",""))
+		if obsolete or (sequence_phase in ["countdown","finished"] and _data.get("phase","") != sequence_phase):
+			_presentation.queue_free()
+			_presentation=null
 	var key := str(_data.get("id",""))
 	if _data.get("phase","")=="countdown" and _order_shown!=key:
 		var order: Array=_data.get("turn_order",[])
@@ -433,15 +456,25 @@ func _maybe_present() -> void:
 		for id in order:
 			var row := _player(_data,str(id))
 			if not row.is_empty(): rows.append(row)
-		_play_sequence(rows,"anim_2",maxf(0.35,duel.seconds_left()-0.2),true)
+		_play_sequence(rows,"anim_2",6.0,true)
 	if _data.get("phase","")=="finished" and not _reveal_playing and not is_instance_valid(_presentation) and _result_shown!=key:
 		_result_shown=key
 		var rows: Array=[]
 		var result: Dictionary=_data.get("result",{}) if _data.get("result") is Dictionary else {}
-		for id in result.get("winners",[]):
-			var row := _player(_data,str(id))
-			if not row.is_empty(): rows.append(row)
-		if not rows.is_empty(): _play_sequence(rows,"anim_4",minf(4.0,duel.seconds_left()))
+		var winners: Array = result.get("winners",[])
+		for player: Dictionary in _data.get("players",[]):
+			var row := player.duplicate(true)
+			# Only authoritative winners receive victory; everyone else gets defeat.
+			row.presentation_clip = "anim_4" if winners.has(player.member_id) else "anim_3"
+			rows.append(row)
+		if not rows.is_empty(): _play_sequence(rows,"anim_3",6.0)
+
+func holding_results() -> bool:
+	if not is_instance_valid(_presentation) or _presentation.get_meta("phase","") != "finished": return false
+	var live := duel.match()
+	# Preserve the final stage across the server's return to lobby, never a new match.
+	return live.is_empty() or (str(live.get("id","")) == _prepared_match and live.get("phase","") == "finished")
+
 func _render_instruction(me: Dictionary) -> void:
 	_confirm.hide()
 	_cancel.hide()
@@ -507,12 +540,7 @@ func _render_event() -> void:
 		_detail.text = str(_player(_data,str(event.actor)).get("nickname","Jogador"))
 		if _last_event!=str(event.seq):
 			_last_event=str(event.seq)
-			var defeated: Array=[]
-			for hit: Variant in event.get("hits",[]) if event.get("hits") is Array else []:
-				if hit is Dictionary and hit.get("eliminated",false):
-					var player := _player(_data,str(hit.get("member_id",event.actor)))
-					if not player.is_empty(): defeated.append(player)
-			if not defeated.is_empty(): _play_sequence(defeated,"anim_3",minf(3.0,duel.seconds_left()))
+			# Defeat is presented at match end, keeping the next live turn unobstructed.
 ## Revelação animada no meio da tela: carta escolhida + jogadores atingidos (✕ / caveira).
 func _show_reveal(card_id: String, hits: Array) -> void:
 	var old := get_node_or_null("RevealOverlay")
@@ -580,8 +608,8 @@ func _render_players() -> void:
 		if players.size() <= 3:
 			# Grupo centralizado; o jogador da vez fica mais alto que os demais.
 			panel.size_flags_horizontal = Control.SIZE_FILL
-			panel.custom_minimum_size = Vector2(minf(_main.size.x/maxf(players.size(),3)-8,230), 64 if panel.active else 54)
-			panel.size_flags_vertical = Control.SIZE_SHRINK_END
+			panel.custom_minimum_size = Vector2(minf(_main.size.x/maxf(players.size(),3)-8,230), 76)
+			panel.size_flags_vertical = Control.SIZE_FILL
 		_roster.add_child(panel)
 		var row := PlayerUI.row(panel)
 		row.add_theme_constant_override("separation",3)
@@ -656,6 +684,8 @@ func _render_players() -> void:
 			badge.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 			info.add_child(badge)
 		elif _data.phase == "selection" and player.confirmed: info.add_child(Style.label("PRONTO",9 if players.size() <= 5 else 11,PlayerUI.GOLD))
+		# Reserve the same status line for ready/turn/eliminated states.
+		info.custom_minimum_size.y = 64 if players.size() <= 3 else 50
 		var previous := int(_last_lives.get(player.member_id,player.lives))
 		if int(player.lives) < previous:
 			portrait.modulate = Color("#ff766b")
@@ -746,7 +776,7 @@ func _render_hand() -> void:
 	var signature := JSON.stringify(entries)+str(_private_shown)
 	if signature == _private_signature: return
 	_private_signature = signature
-	var grid: GridContainer = _hand.get_node("PrivateCards")
+	var grid: GridContainer = _hand.get_node("PrivateCardsScroll/PrivateCards")
 	PlayerUI.clear(grid)
 	grid.columns = mini(maxi(entries.size(),1),3) if _private_shown else 1
 	_hand_toggle.icon = load("res://assets/ui/battle/eye_off.svg" if _private_shown else "res://assets/ui/battle/eye.svg")
@@ -764,7 +794,7 @@ func _render_hand() -> void:
 			image.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			# T24 iOS: altura pela largura real da coluna (proporção da carta), não um valor fixo.
 			var column_width := (_hand.size.x - 12.0 - (grid.columns - 1) * 4.0) / maxf(grid.columns, 1)
-			image.custom_minimum_size.y = clampf(column_width * 1.42, 44.0, 96.0 if UIScale.is_iphone() else 120.0) if entries.size() <= 3 else 34.0
+			image.custom_minimum_size.y = clampf(column_width * 1.42, 44.0, 96.0) if entries.size() <= 3 else 34.0
 			if entry.get("lost",false): image.modulate = Color("#555967")
 			# Toque/clique amplia temporariamente (só nesta tela; ninguém mais vê).
 			image.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -882,30 +912,18 @@ func _layout() -> void:
 		_notice.reset_size()
 		_notice.position = Vector2(_main.size.x-_notice.size.x-14,_canvas.size.y-_bottom_inset-_notice.size.y-10)
 	_fit_cards.call_deferred()
-## Distribui todas as cartas sem ScrollContainer e sem ocultar opções.
-## Busca linhas/colunas pela área visual útil, em vez de impor 3 colunas
-## ou sqrt(count): 20 cartas podem usar 7x3, com arte mais alta que 5x4.
+## Pick portrait slots against the original pool. Eliminations leave room rather than
+## changing every remaining illustration's shape, size and location.
 func _best_grid_columns(count: int, usable_width: float, usable_height: float, gap: float) -> int:
-	var best := mini(count,3)
-	var best_score := -1.0
-	for columns in range(1, mini(count,10)+1):
-		var rows := ceili(float(count)/columns)
-		var width := (usable_width - (columns-1)*gap)/columns
-		var height := (usable_height - (rows-1)*gap)/rows
-		if width <= 0 or height <= 0: continue
-		# Não favorecer cards ultralargos e achatados: o retrato precisa aparecer.
-		var balance := clampf(1.0-absf(log(maxf(width/height,0.01)/1.35))*0.25,0.48,1.0)
-		var min_width := 92.0 if _canvas.size.x < 800.0 else 124.0
-		var legibility := clampf(width/min_width,0.62,1.0)
-		var caption_room := clampf(height/62.0,0.58,1.0)
-		# Peso extra para altura: 20 cartas em 7x3 usam imagens maiores
-		# do que 5x4. Em 640px não sacrificar a largura mínima das legendas.
-		var score := minf(width,178.0)*minf(height,190.0)*balance*legibility*caption_room
-		score *= pow(minf(height,220.0)/110.0,0.9)
-		if width < 72.0: score *= 0.60
-		if score > best_score:
+	var best := 1
+	var best_height := 0.0
+	for columns in range(1, mini(count, 12) + 1):
+		var rows := ceili(float(count) / columns)
+		var height := minf((usable_height - (rows - 1) * gap) / rows,
+			((usable_width - (columns - 1) * gap) / columns) * 16.0 / 9.0)
+		if height > best_height:
+			best_height = height
 			best = columns
-			best_score = score
 	return best
 
 
@@ -922,8 +940,8 @@ func _fit_cards_iphone() -> void:
 	_grid.columns = columns
 	var cell_width := floorf((width - (columns - 1) * gap) / columns)
 	for card: Control in _grid.get_children():
-		card.custom_minimum_size = Vector2(cell_width, floorf(cell_width * 1.3))
-		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		card.custom_minimum_size = Vector2(cell_width, floorf(cell_width * 16.0 / 9.0))
+		card.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		card.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 
 
@@ -932,7 +950,7 @@ func _fit_cards() -> void:
 		_fit_cards_iphone()
 		return
 	if not is_instance_valid(_grid) or _grid.size.x <= 0 or _grid.size.y <= 0: return
-	var count := _grid.get_child_count()
+	var count: int = _data.get("pool", []).size()
 	if count == 0: return
 	var side_width := _utility_width(_canvas.size.x)
 	var main_width := _canvas.size.x-side_width-20
@@ -941,17 +959,19 @@ func _fit_cards() -> void:
 	var frame := float(_board.padding*2)
 	var header := _main.get_node("BattleHeader") as Control
 	var header_height := maxf(header.custom_minimum_size.y,header.get_combined_minimum_size().y)
-	var roster_height := _roster.get_combined_minimum_size().y
+	var roster_height := _roster_frame.custom_minimum_size.y
 	var available_height := maxf(1.0,_usable_height()-header_height-roster_height-6-frame-instruction_row.get_combined_minimum_size().y-5)
 	var available_width := maxf(1.0,main_width-frame)
 	_grid.columns = _best_grid_columns(count,available_width,available_height,gap)
 	var rows := ceili(float(count)/_grid.columns)
-	var cell_width := floorf((available_width-(_grid.columns-1)*gap)/_grid.columns)
-	var cell_height := floorf((available_height-(rows-1)*gap)/rows)
+	var slot_width := (available_width-(_grid.columns-1)*gap)/_grid.columns
+	var slot_height := (available_height-(rows-1)*gap)/rows
+	var cell_height := floorf(minf(slot_height, slot_width * 16.0 / 9.0))
+	var cell_width := floorf(cell_height * 9.0 / 16.0)
 	for card: Control in _grid.get_children():
 		card.custom_minimum_size = Vector2(maxf(cell_width,1),maxf(cell_height,1))
-		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		card.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		card.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		card.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	_main.set_deferred("size",Vector2(main_width,_usable_height()))
 func _is_my_turn() -> bool:
 	var me := _me(_data)

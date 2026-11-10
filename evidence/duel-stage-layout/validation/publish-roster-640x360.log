@@ -1,0 +1,65 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+STAGE_PASS local room
+STAGE_PASS original art present bruxa_do_pantano
+STAGE_PASS full art no crop bruxa_do_pantano
+STAGE_PASS no cropped atlas bruxa_do_pantano
+STAGE_PASS portrait aspect bruxa_do_pantano
+STAGE_PASS original art present cobra_grande
+STAGE_PASS full art no crop cobra_grande
+STAGE_PASS no cropped atlas cobra_grande
+STAGE_PASS portrait aspect cobra_grande
+STAGE_PASS original art present dama_de_branco
+STAGE_PASS full art no crop dama_de_branco
+STAGE_PASS no cropped atlas dama_de_branco
+STAGE_PASS portrait aspect dama_de_branco
+STAGE_PASS original art present homem_do_saco
+STAGE_PASS full art no crop homem_do_saco
+STAGE_PASS no cropped atlas homem_do_saco
+STAGE_PASS portrait aspect homem_do_saco
+STAGE_PASS original art present homem_sorridente
+STAGE_PASS full art no crop homem_sorridente
+STAGE_PASS no cropped atlas homem_sorridente
+STAGE_PASS portrait aspect homem_sorridente
+STAGE_PASS original art present jeff_the_killer
+STAGE_PASS full art no crop jeff_the_killer
+STAGE_PASS no cropped atlas jeff_the_killer
+STAGE_PASS portrait aspect jeff_the_killer
+STAGE_PASS original art present loira_do_banheiro
+STAGE_PASS full art no crop loira_do_banheiro
+STAGE_PASS no cropped atlas loira_do_banheiro
+STAGE_PASS portrait aspect loira_do_banheiro
+STAGE_PASS original art present momo
+STAGE_PASS full art no crop momo
+STAGE_PASS no cropped atlas momo
+STAGE_PASS portrait aspect momo
+STAGE_PASS original art present slender_man
+STAGE_PASS full art no crop slender_man
+STAGE_PASS no cropped atlas slender_man
+STAGE_PASS portrait aspect slender_man
+STAGE_PASS turn transition stable BattleBoard
+STAGE_PASS turn transition stable UtilityRail
+STAGE_PASS turn transition stable BattleChat
+STAGE_PASS turn transition stable PrivatePanel
+STAGE_PASS same card size after phase
+STAGE_PASS removed cards stable BattleBoard
+STAGE_PASS removed cards stable UtilityRail
+STAGE_PASS removed cards stable BattleChat
+STAGE_PASS removed cards stable PrivatePanel
+STAGE_PASS same card size after removal
+STAGE_PASS private shown stable BattleBoard
+STAGE_PASS private shown stable UtilityRail
+STAGE_PASS private shown stable BattleChat
+STAGE_PASS private shown stable PrivatePanel
+STAGE_PASS private illustration fully visible
+STAGE_PASS private illustration fully visible
+STAGE_PASS chat toggle stable BattleBoard
+STAGE_PASS chat toggle stable UtilityRail
+STAGE_PASS chat toggle stable BattleChat
+STAGE_PASS chat toggle stable PrivatePanel
+STAGE_PASS twenty players retain roster bounds
+STAGE_PASS twenty players stable BattleBoard
+STAGE_PASS twenty players stable UtilityRail
+STAGE_PASS twenty players stable BattleChat
+STAGE_PASS twenty players stable PrivatePanel
+STAGE_SUMMARY checks=62 failures=0

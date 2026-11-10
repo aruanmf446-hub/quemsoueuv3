@@ -1,14 +1,7 @@
 extends PanelContainer
-## Landscape window on the original portrait illustration, with an undistorted focal crop.
+## Original portrait illustration, always fitted in full without focal cropping.
 signal activated
 const Style = preload("res://scripts/ui/battle/battle_style.gd")
-# Focal heights of the subjects in the existing portrait PNGs, not replacement art.
-# A uniform top crop hid Cobra Grande and cut off Slender Man / Homem Sorridente.
-const FOCAL_Y := {
-	"bruxa_do_pantano":0.20, "cobra_grande":0.50, "dama_de_branco":0.27,
-	"homem_do_saco":0.16, "homem_sorridente":0.14, "jeff_the_killer":0.30,
-	"loira_do_banheiro":0.125, "momo":0.30, "slender_man":0.13,
-}
 var id := ""
 var selected := false
 var removed := false
@@ -43,7 +36,7 @@ func setup(card_id: String, chosen: bool, out: bool, usable: bool) -> void:
 	image.name = "Art"
 	image.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	image.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	image.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var grading := ShaderMaterial.new()
@@ -79,17 +72,8 @@ func setup(card_id: String, chosen: bool, out: bool, usable: bool) -> void:
 	# iPhone: espaço para o nome em duas linhas inteiras (sem cortar a segunda linha).
 	caption_area.custom_minimum_size.y = 52 if UIScale.is_iphone() else 20
 	caption_area.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	# Nome sobre a parte de baixo da arte (como na referência), não numa faixa abaixo dela:
-	# a ilustração ocupa a carta inteira.
-	var overlay := VBoxContainer.new()
-	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	overlay.add_theme_constant_override("separation",0)
-	add_child(overlay)
-	var spacer := Control.new()
-	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	overlay.add_child(spacer)
-	overlay.add_child(caption_area)
+	# Caption has its own strip: no letters obscure the bottom of the source art.
+	column.add_child(caption_area)
 	caption_area.add_child(caption)
 	caption.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	if out:
@@ -180,15 +164,7 @@ func _crop() -> void:
 			caption.add_theme_font_size_override("font_size", 16)
 			caption_area.custom_minimum_size.y = 52
 	if _source == null or image.size.y <= 0: return
-	var source_size := _source.get_size()
-	var ratio := image.size.x / maxf(image.size.y,1)
-	var crop_height := minf(source_size.y,source_size.x / maxf(ratio,0.01))
-	var atlas := AtlasTexture.new()
-	atlas.atlas = _source
-	var focal := float(FOCAL_Y.get(id.get_file().get_basename(),0.28))
-	var top := clampf(source_size.y*focal-crop_height*0.5,0,source_size.y-crop_height)
-	atlas.region = Rect2(0,top,source_size.x,crop_height)
-	image.texture = atlas
+	image.texture = _source
 
 func _ready() -> void:
 	if selected:

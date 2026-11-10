@@ -1,0 +1,24 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+ARENA_PASS existing player opens
+ARENA_PASS five flat moving files
+ARENA_PASS only phase10 replaced
+ARENA_PASS initial charges bounded three
+ARENA_PASS file actually moves
+ARENA_PASS file respects travel
+ARENA_PASS actual player rests on moving top
+ARENA_PASS no fall through platform
+ARENA_PASS camera fixed
+ARENA_PASS upper landing supports Task
+ARENA_PASS Task fills existing skills
+ARENA_PASS failure does not advance
+ARENA_PASS Task input progresses 1
+ARENA_PASS Task stored once
+ARENA_PASS Task input progresses 2
+ARENA_PASS Task stored once
+ARENA_PASS Task input progresses 3
+ARENA_PASS Task stored once
+ARENA_PASS chemical reaction triggers existing completion
+ARENA_PASS existing boss death state applied
+ARENA_PASS existing progression persists phase10 completion
+ARENA_SUMMARY checks=21 failures=0

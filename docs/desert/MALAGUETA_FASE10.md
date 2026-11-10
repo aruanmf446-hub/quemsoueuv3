@@ -1,5 +1,96 @@
 # Malagueta — arena da fase 10
 
+Autorização de publicação (2026-11-10): o dono pediu “Publique no main” e
+confirmou “Ok autorizado” após a proposta de registrar os seis FBX e liberar
+este deploy. O registro chegou a ser preparado, mas a integração não tem acesso
+à variável do GitHub (HTTP 403). Em seguida o dono removeu os arquivos do bloqueio
+na main (26b2984/f95695a), e d99333c alinhou os workflows a essa remoção.
+Esta entrega preserva a configuração atual da main: não restaura o registro nem
+altera verificador/workflows para liberar a própria publicação.
+
+## Troca entre serras — revisão após feedback
+
+O dono reprovou as cinco serras simultâneas e pediu uma breve antecipação da
+próxima para saltar entre elas. Agora cada serra atravessa uma vez, alternando
+esquerda/direita; a próxima entra 3,6 s antes da anterior sair. Só duas serras
+consecutivas coexistem na transferência. As demais ficam ocultas, sem colisão
+de piso nem monitoramento dos dentes. O ciclo recomeça após a última saída.
+
+Alturas finais: 1,2 / 3,1 / 5,0 / 6,9 / 8,8 m. O primeiro acesso fica baixo;
+os intervalos de 1,9 m e dentes mais rasos deixam folga acima da cabeça de quem
+está parado na serra inferior. O salto/pulo duplo do jogador permanece igual.
+Os perseguidores exclusivos da arena ignoram serras ausentes, aguardam sobre o
+apoio atual e recebem impulso vertical de 10,2 m/s ao trocar de nível. O patamar
+final permite subir por baixo, sem bater a cabeça; continua sustentando por cima.
+
+O gargalo do frasco agora fica entre os ossos reais do indicador e polegar.
+Este rig possui esses dedos; não depende de ossos de médio/mínimo ausentes.
+O lançamento parte da posição do frasco, preservando o tempo de soltura.
+O fundo usa coordenadas de mundo, repetição espelhada sem emendas abruptas e
+mistura de minerais menos amarelada, reutilizando a textura oficial existente.
+
+`malagueta.handoff=1` identifica o novo layout sem ampliar o contrato de save:
+partidas anteriores voltam à entrada mantendo as Tasks. O teste de checkpoint
+confirmou tanto o save válido quanto a retomada da reação final.
+
+Validação desta revisão: sequência por dois ciclos completos, ausência de piso
+invisível, quatro transferências dentro dos muros e folga dos dentes; percurso
+real pelas cinco serras até o patamar do boss, com três vidas; subida/descida e
+limite dos cactos; 21 verificações da arena, 11 de combate, 13 de ações/pegada.
+Tentativas iniciais encontraram falta de folga e bloqueio pelo patamar final;
+foram corrigidos. As evidências finais estão em `evidence/malagueta-handoff/`.
+Avisos de recursos pendentes ao encerrar alguns runners nativos estão nos logs;
+não representam uma validação de vazamentos em sessões longas.
+
+As capturas Web usam fixture identificada: o tempo é congelado em uma passagem
+solo e numa transferência, com jogador invulnerável. A travessia sem perder
+vidas foi verificada separadamente com os controles reais, sem teletransportes
+entre plataformas. Chromium com UA/DPR iPhone não equivale a Safari físico.
+Esta revisão permanece na branch, sem publicação automática na main/Pages.
+
+## Revisão dos FBX e das lâminas — novembro de 2026
+
+Pedido do dono: usar o uniforme/skin de `Idle.fbx`, incorporar os outros cinco
+arquivos apenas como movimentos e fazer a lâmina atravessar toda a arena.
+Esta revisão substitui as descrições de arte provisória e movimentos pendentes
+do protótipo documentado abaixo. Não modifica os personagens equipáveis.
+
+- `model.gd` mantém um único modelo visível, vindo de Idle, e adapta os canais
+  de ossos dos movimentos. Parado, arremesso, caminhada com frasco, golpe,
+  atordoamento e afastamento estão ligados aos estados reais do boss.
+  A morte existente foi adaptada do rig antigo, descartando 18 canais sem ossos
+  correspondentes. A textura embutida de Idle é extraída pelo importador Godot.
+- O frasco fica na mão durante a preparação e solta após 0,65 s. Um golpe ou
+  atordoamento antes da soltura cancela o lançamento. Os ataques verde/vermelho
+  mantêm trajetórias distintas e podem coexistir na terceira etapa.
+- Cinco lâminas serrilhadas percorrem, alternadamente, 20,4 m de largura.
+  O topo liso carrega o jogador; a passagem por baixo não bloqueia a cabeça.
+  Os níveis foram afastados para a lâmina superior não cortar quem está parado
+  no nível inferior. O salto, o pulo duplo e os controles não foram alterados.
+- Trilhos, apoios, parede contínua e bancada contextualizam a oficina.
+  O guindaste existente foi reduzido para não dominar a rota.
+- Saves do layout anterior voltam à entrada mantendo as Tasks concluídas;
+  o novo layout é identificado por `malagueta.layout=2`.
+
+Verificação nativa: sete movimentos importados e deformações amostradas;
+12 verificações dos estados/animações; 21 da arena; 11 de combate; subida
+com controles reais e três vidas intactas; perseguição, checkpoint e equivalência
+das fases 1–9. As primeiras tentativas de percurso revelaram interferência entre
+níveis e timing do pulo duplo; foram corrigidas antes da tentativa aprovada.
+O teste de químicos aguarda as solturas animadas, em vez de exigir projéteis
+instantâneos. `check_design.py` aprovado. Evidências desta revisão em
+`evidence/malagueta-motion-blade/`; capturas Web são emulação Chromium,
+não Safari/iPhone físico. A prévia de movimentos usa câmera aproximada e
+seleção de clipes em fixture isolada, não representa uma luta completa.
+
+Publicação pendente: a main `b3a7cebd` já falha no Approved scope guard pelos
+seis FBX enviados pelo dono em `assets/characters/malagueta/`. Nenhuma política
+ou variável de autorização foi alterada nesta revisão. A integração está na
+branch `codex/malagueta-motion-blade`, sem merge automático. O procedimento de
+exceção pertence ao dono, conforme `docs/governance/APPROVED_SCOPE.md`.
+
+## Registro do protótipo anterior
+
 Decisão do dono: manter a fase 9 como entrada da mineradora e substituir a batalha
 na fase 10. Gameplay implementada em Godot 4.7.2, preservando a física lateral
 2.5D, personagens e controles existentes. Nenhum FBX ou animação foi criado.

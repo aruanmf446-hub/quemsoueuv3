@@ -11,6 +11,9 @@ var lifetime := 6.0
 var warning := 0.65
 var start := Vector3.ZERO
 var active := true
+var thrower: Node3D
+var throw_serial:=-1
+var _visual: Node3D
 func _ready() -> void:
 	collision_layer = 0
 	collision_mask = 2
@@ -20,20 +23,24 @@ func _ready() -> void:
 	sphere.radius = 0.25
 	shape.shape = sphere
 	add_child(shape)
-	var visual := MeshInstance3D.new()
-	var mesh := SphereMesh.new()
-	mesh.radius = 0.23
-	mesh.height = 0.46
-	mesh.radial_segments = 12
-	mesh.rings = 6
-	visual.mesh = mesh
-	visual.material_override = preload("res://scripts/desert/t15d/terrain.gd").stone_material(Color("#79dc68") if kind == "green" else Color("#e96753"))
-	add_child(visual)
+	_visual=preload("res://scripts/desert/malagueta/bottle.gd").new()
+	_visual.kind=kind
+	add_child(_visual)
+	_visual.visible=warning<=0
 	body_entered.connect(_hit)
 func _physics_process(delta: float) -> void:
 	if not active: return
 	elapsed += delta
-	if elapsed < warning: return
+	if elapsed < warning:
+		if is_instance_valid(thrower):
+			if thrower.throw_serial!=throw_serial or thrower.crystallized_left>0:
+				remove()
+				return
+			global_position=thrower.hand_position()
+			start=position
+		return
+	_visual.visible=true
+	_visual.rotation.z=(elapsed-warning)*8.0
 	var time := elapsed-warning
 	position = start + direction*speed*time
 	if kind == "green": position.y += sin(time*5.0)*amplitude

@@ -25,6 +25,7 @@ func run() -> void:
 	await ticks(25)
 	check(absf(file.position.x-initial.x)>0.05,"file actually moves")
 	check(absf(file.position.x-file.origin.x)<=file.travel+0.01,"file respects travel")
+	while file.position.x < -10.0:await ticks(1)
 	phase._player.position=file.global_position+Vector3.UP*0.08
 	phase._player.velocity=Vector3.ZERO
 	phase._player._invulnerable=100
@@ -36,7 +37,7 @@ func run() -> void:
 	await ticks(5)
 	check(phase._camera.position==cam,"camera fixed")
 	phase.encounter.suspended=true
-	phase._player.position=Vector3(7.8,6.7,0)
+	phase._player.position=Vector3(7.8,8.95,0)
 	phase._player.velocity=Vector3.ZERO
 	await ticks(15)
 	check(phase._near_boss_task(),"upper landing supports Task")

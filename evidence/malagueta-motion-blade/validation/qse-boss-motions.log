@@ -1,0 +1,27 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS Idle is the only visible model
+PASS no meshes from motion-only FBXs
+PASS original Idle uniform texture retained
+PASS imported base
+PASS all tracks resolve on Idle rig: base
+PASS sampled deformation remains bounded: base
+PASS imported throw
+PASS all tracks resolve on Idle rig: throw
+PASS sampled deformation remains bounded: throw
+PASS imported carry
+PASS all tracks resolve on Idle rig: carry
+PASS sampled deformation remains bounded: carry
+PASS imported hurt
+PASS all tracks resolve on Idle rig: hurt
+PASS sampled deformation remains bounded: hurt
+PASS imported dizzy
+PASS all tracks resolve on Idle rig: dizzy
+PASS sampled deformation remains bounded: dizzy
+PASS imported retreat
+PASS all tracks resolve on Idle rig: retreat
+PASS sampled deformation remains bounded: retreat
+PASS imported morte
+PASS all tracks resolve on Idle rig: morte
+PASS sampled deformation remains bounded: morte
+BOSS_MOTIONS failures=0 rejected legacy-only tracks=18

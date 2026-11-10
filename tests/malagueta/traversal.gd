@@ -17,29 +17,38 @@ func run() -> void:
 	await tick(10)
 	var route: Array=phase.files.slice(0,5)
 	var landing := Node3D.new()
-	landing.position=Vector3(9,6.6,0)
+	landing.position=Vector3(9,8.85,0)
 	phase.add_child(landing)
 	route.append(landing)
 	for target: Node3D in route:
-		Input.action_press("jump")
-		await tick(1)
-		Input.action_release("jump")
 		var arrived := false
-		for frame in 150:
-			var dx: float=target.global_position.x-player.global_position.x
-			Input.action_release("move_left")
-			Input.action_release("move_right")
-			if absf(dx)>0.3: Input.action_press("move_right" if dx>0 else "move_left")
-			if frame==18: Input.action_press("jump")
-			if frame==19: Input.action_release("jump")
+		var airborne := -1
+		var stable := 0
+		for frame in 4500:
+			for action in ["move_left","move_right","jump","crouch"]:Input.action_release(action)
+			var ready: bool=not target.has_method("is_available") or target.is_available()
+			var tolerance: float=0.18 if target.has_method("is_available") else 0.02
+			var on_target: bool=ready and player.is_on_floor() and absf(player.position.y-target.global_position.y)<tolerance and absf(player.position.x-target.global_position.x)<1.65
+			if on_target:
+				stable+=1
+				if stable>=4:
+					arrived=true
+					break
+			else:stable=0
+			if player.is_on_floor():
+				airborne=-1
+				var distance: float=absf(target.global_position.x-player.position.x)
+				if not on_target and ready and distance<5.3 and target.global_position.y>player.position.y-0.1:
+					Input.action_press("jump");airborne=0
+			if airborne>=0:
+				airborne+=1
+				if airborne==30:Input.action_press("jump")
+				var point: Vector3=target.future_position(0.2) if target.has_method("future_position") else target.global_position
+				var dx: float=point.x-player.position.x
+				if airborne>12 and absf(dx)>0.22:Input.action_press("move_right" if dx>0 else "move_left")
 			await tick(1)
-			if frame>24 and player.is_on_floor() and absf(player.position.y-target.global_position.y)<0.25:
-				arrived=true
-				break
-		Input.action_release("move_left")
-		Input.action_release("move_right")
-		await tick(15)
-		print("TRAVERSE ",target.global_position," result=",arrived," player=",player.position)
+		for action in ["move_left","move_right","jump","crouch"]:Input.action_release(action)
+		print("HANDOFF ",target.global_position," result=",arrived," player=",player.position," health=",player.health)
 		if not arrived:
 			failures+=1
 			break

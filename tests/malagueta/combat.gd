@@ -20,7 +20,7 @@ func run() -> void:
 	await tick(20)
 	var player: Node3D=phase._player
 	check(player.is_on_floor(),"arena floor supports spawn")
-	player.position=Vector3(7.8,6.7,0)
+	player.position=Vector3(7.8,8.95,0)
 	player.velocity=Vector3.ZERO
 	await tick(15)
 	player.facing=1

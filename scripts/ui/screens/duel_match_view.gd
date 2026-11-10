@@ -477,6 +477,8 @@ func _maybe_present() -> void:
 
 func holding_results() -> bool:
 	if not is_instance_valid(_presentation) or _presentation.get_meta("phase","") != "finished": return false
+	# Quem saiu da sala não fica preso ao palco final: a tela de entrada volta na hora.
+	if not duel.in_room(): return false
 	var live := duel.match()
 	# Preserve the final stage across the server's return to lobby, never a new match.
 	return live.is_empty() or (str(live.get("id","")) == _prepared_match and live.get("phase","") == "finished")

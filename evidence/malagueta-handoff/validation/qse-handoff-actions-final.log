@@ -1,0 +1,16 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS actual boss starts with Idle
+PASS flask neck stays between index and thumb
+PASS attack request plays Throw
+PASS flask stays in hand during windup
+PASS flask releases after actual windup
+PASS hit plays Standing Block End
+PASS hit interrupts a flask not yet released
+PASS stun plays Dizzy Idle
+PASS stunned boss has no floating bottle
+PASS stun expiry restores movement
+PASS near player selects Strut Walking
+PASS distant player selects Standing Walk Forward
+PASS defeat preserves adapted original death
+BOSS_ACTIONS failures=0

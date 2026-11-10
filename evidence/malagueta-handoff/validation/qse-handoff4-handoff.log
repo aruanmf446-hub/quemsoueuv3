@@ -1,0 +1,14 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS one saw, with only two consecutive saws during handoff
+PASS waiting saws have neither a visible mesh nor an invisible floor
+PASS handoffs follow the ascending route
+PASS handoff 0 meets inside the walls
+PASS upper cutting edge clears the standing player 0
+PASS handoff 1 meets inside the walls
+PASS upper cutting edge clears the standing player 1
+PASS handoff 2 meets inside the walls
+PASS upper cutting edge clears the standing player 2
+PASS handoff 3 meets inside the walls
+PASS upper cutting edge clears the standing player 3
+HANDOFF_SEQUENCE failures=0

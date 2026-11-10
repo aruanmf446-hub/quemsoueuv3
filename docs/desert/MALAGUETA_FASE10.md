@@ -1,5 +1,48 @@
 # Malagueta — arena da fase 10
 
+## Revisão dos FBX e das lâminas — novembro de 2026
+
+Pedido do dono: usar o uniforme/skin de `Idle.fbx`, incorporar os outros cinco
+arquivos apenas como movimentos e fazer a lâmina atravessar toda a arena.
+Esta revisão substitui as descrições de arte provisória e movimentos pendentes
+do protótipo documentado abaixo. Não modifica os personagens equipáveis.
+
+- `model.gd` mantém um único modelo visível, vindo de Idle, e adapta os canais
+  de ossos dos movimentos. Parado, arremesso, caminhada com frasco, golpe,
+  atordoamento e afastamento estão ligados aos estados reais do boss.
+  A morte existente foi adaptada do rig antigo, descartando 18 canais sem ossos
+  correspondentes. A textura embutida de Idle é extraída pelo importador Godot.
+- O frasco fica na mão durante a preparação e solta após 0,65 s. Um golpe ou
+  atordoamento antes da soltura cancela o lançamento. Os ataques verde/vermelho
+  mantêm trajetórias distintas e podem coexistir na terceira etapa.
+- Cinco lâminas serrilhadas percorrem, alternadamente, 20,4 m de largura.
+  O topo liso carrega o jogador; a passagem por baixo não bloqueia a cabeça.
+  Os níveis foram afastados para a lâmina superior não cortar quem está parado
+  no nível inferior. O salto, o pulo duplo e os controles não foram alterados.
+- Trilhos, apoios, parede contínua e bancada contextualizam a oficina.
+  O guindaste existente foi reduzido para não dominar a rota.
+- Saves do layout anterior voltam à entrada mantendo as Tasks concluídas;
+  o novo layout é identificado por `malagueta.layout=2`.
+
+Verificação nativa: sete movimentos importados e deformações amostradas;
+12 verificações dos estados/animações; 21 da arena; 11 de combate; subida
+com controles reais e três vidas intactas; perseguição, checkpoint e equivalência
+das fases 1–9. As primeiras tentativas de percurso revelaram interferência entre
+níveis e timing do pulo duplo; foram corrigidas antes da tentativa aprovada.
+O teste de químicos aguarda as solturas animadas, em vez de exigir projéteis
+instantâneos. `check_design.py` aprovado. Evidências desta revisão em
+`evidence/malagueta-motion-blade/`; capturas Web são emulação Chromium,
+não Safari/iPhone físico. A prévia de movimentos usa câmera aproximada e
+seleção de clipes em fixture isolada, não representa uma luta completa.
+
+Publicação pendente: a main `b3a7cebd` já falha no Approved scope guard pelos
+seis FBX enviados pelo dono em `assets/characters/malagueta/`. Nenhuma política
+ou variável de autorização foi alterada nesta revisão. A integração está na
+branch `codex/malagueta-motion-blade`, sem merge automático. O procedimento de
+exceção pertence ao dono, conforme `docs/governance/APPROVED_SCOPE.md`.
+
+## Registro do protótipo anterior
+
 Decisão do dono: manter a fase 9 como entrada da mineradora e substituir a batalha
 na fase 10. Gameplay implementada em Godot 4.7.2, preservando a física lateral
 2.5D, personagens e controles existentes. Nenhum FBX ou animação foi criado.

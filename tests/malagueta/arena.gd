@@ -36,7 +36,7 @@ func run() -> void:
 	await ticks(5)
 	check(phase._camera.position==cam,"camera fixed")
 	phase.encounter.suspended=true
-	phase._player.position=Vector3(7.8,6.7,0)
+	phase._player.position=Vector3(7.8,8.95,0)
 	phase._player.velocity=Vector3.ZERO
 	await ticks(15)
 	check(phase._near_boss_task(),"upper landing supports Task")

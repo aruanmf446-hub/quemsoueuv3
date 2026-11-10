@@ -6,11 +6,13 @@ func run() -> void:
 	var phase:=load("res://scenes/desert/phase_10.tscn").instantiate() as Node3D
 	root.add_child(phase)
 	current_scene=phase
-	phase.set_physics_process(false)
 	phase.encounter.restore(2)
 	phase.encounter._green_wait=0
 	phase.encounter._red_wait=0
 	phase.encounter.tick(0.1)
+	phase.encounter.suspended=true
+	# Throw animations serialize releases; the two real projectiles must still overlap.
+	for frame in 180:await physics_frame
 	var green: Node3D
 	var red: Node3D
 	for child in phase.arena.get_children():
@@ -22,11 +24,12 @@ func run() -> void:
 	print("CHEMICAL_PASS both attacks active in phase3")
 	green._physics_process(1.0)
 	red._physics_process(1.0)
-	var straight_green: Vector3=green.start+green.direction*green.speed*(1.0-green.warning)
-	var straight_red: Vector3=red.start+red.direction*red.speed*(1.0-red.warning)
+	var straight_green: Vector3=green.start+green.direction*green.speed*(green.elapsed-green.warning)
+	var straight_red: Vector3=red.start+red.direction*red.speed*(red.elapsed-red.warning)
 	assert(absf(green.position.y-straight_green.y)>0.1)
 	assert(red.position.is_equal_approx(straight_red))
 	print("CHEMICAL_PASS wave and directed red keep different trajectories")
+	phase.encounter.suspended=false
 	phase.encounter.hit(4)
 	assert(not green.active and not red.active)
 	print("CHEMICAL_PASS stun clears dangerous projectiles")

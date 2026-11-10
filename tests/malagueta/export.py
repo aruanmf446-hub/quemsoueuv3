@@ -5,6 +5,7 @@ stage,out,godot=Path(sys.argv[1]),Path(sys.argv[2]),sys.argv[3]
 assert stage.resolve()!=repo and (stage/'.iphone_web_fixture_stage').exists()
 for part in ['scripts','scenes','data','web','tests','assets']:
     shutil.copytree(repo/part,stage/part,dirs_exist_ok=True)
+shutil.copy2(repo/'icon.svg',stage/'icon.svg')
 project=(repo/'project.godot').read_text()
 project=re.sub(r'run/main_scene=.*','run/main_scene="res://tests/malagueta/web_fixture.tscn"',project)
 (stage/'project.godot').write_text(project)

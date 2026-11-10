@@ -1,0 +1,148 @@
+Failed to load resource: the server responded with a status of 404 (File not found)
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium)) - Compatibility - Using Device: WebKit - WebKit WebGL
+Build configuration: Emscripten 4.0.20, single-threaded, no GDExtension support.
+STAGE_BOOT services
+Failed to load resource: net::ERR_FAILED
+TypeError: Failed to fetch
+    at Object.create (http://127.0.0.1:8190/quemsoueuv3/index.js:1:187617)
+    at _godot_js_fetch_create (http://127.0.0.1:8190/quemsoueuv3/index.js:1:188630)
+    at wasm://wasm/096bca0a:wasm-function[58612]:0x1e291b7
+    at wasm://wasm/096bca0a:wasm-function[24047]:0xf5fe7e
+    at wasm://wasm/096bca0a:wasm-function[65608]:0x1f172e7
+    at wasm://wasm/096bca0a:wasm-function[631]:0x70032
+    at wasm://wasm/096bca0a:wasm-function[23919]:0xf37ef3
+    at wasm://wasm/096bca0a:wasm-function[23922]:0xf38833
+    at wasm://wasm/096bca0a:wasm-function[65206]:0x1efa750
+    at wasm://wasm/096bca0a:wasm-function[18792]:0xb062cf
+Failed to load resource: net::ERR_FAILED
+TypeError: Failed to fetch
+    at Object.create (http://127.0.0.1:8190/quemsoueuv3/index.js:1:187617)
+    at _godot_js_fetch_create (http://127.0.0.1:8190/quemsoueuv3/index.js:1:188630)
+    at wasm://wasm/096bca0a:wasm-function[58612]:0x1e291b7
+    at wasm://wasm/096bca0a:wasm-function[24047]:0xf5fe7e
+    at wasm://wasm/096bca0a:wasm-function[65608]:0x1f172e7
+    at wasm://wasm/096bca0a:wasm-function[631]:0x70032
+    at wasm://wasm/096bca0a:wasm-function[23919]:0xf37ef3
+    at wasm://wasm/096bca0a:wasm-function[23922]:0xf38833
+    at wasm://wasm/096bca0a:wasm-function[65206]:0x1efa750
+    at wasm://wasm/096bca0a:wasm-function[18792]:0xb062cf
+Failed to load resource: net::ERR_FAILED
+TypeError: Failed to fetch
+    at Object.create (http://127.0.0.1:8190/quemsoueuv3/index.js:1:187617)
+    at _godot_js_fetch_create (http://127.0.0.1:8190/quemsoueuv3/index.js:1:188630)
+    at wasm://wasm/096bca0a:wasm-function[58612]:0x1e291b7
+    at wasm://wasm/096bca0a:wasm-function[24047]:0xf5fe7e
+    at wasm://wasm/096bca0a:wasm-function[65608]:0x1f172e7
+    at wasm://wasm/096bca0a:wasm-function[631]:0x70032
+    at wasm://wasm/096bca0a:wasm-function[23919]:0xf37ef3
+    at wasm://wasm/096bca0a:wasm-function[23922]:0xf38833
+    at wasm://wasm/096bca0a:wasm-function[65206]:0x1efa750
+    at wasm://wasm/096bca0a:wasm-function[18792]:0xb062cf
+STAGE_BOOT local
+STAGE_BOOT bots
+STAGE_BOOT start
+STAGE_BOOT ready
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE ["reset_selection"]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE ["turns"]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE ["remove"]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE ["hand"]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE ["chat"]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE ["stage:anim_2"]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE ["stage:anim_3"]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE ["stage:anim_4"]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT
+STAGE_PROBE [""]
+STAGE_REPORT

@@ -1,0 +1,50 @@
+[
+  {
+    "width": 1672,
+    "height": 941,
+    "mobile": false,
+    "fullArt": true,
+    "stablePanels": true,
+    "stableCardSize": true,
+    "privateImagesContained": true,
+    "mouseOrTouchSelection": true,
+    "presentations": [
+      "anim_2",
+      "anim_3",
+      "anim_4"
+    ],
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "mobile": true,
+    "fullArt": true,
+    "stablePanels": true,
+    "stableCardSize": true,
+    "privateImagesContained": true,
+    "mouseOrTouchSelection": true,
+    "presentations": [
+      "anim_2",
+      "anim_3",
+      "anim_4"
+    ],
+    "errors": []
+  },
+  {
+    "width": 640,
+    "height": 360,
+    "mobile": true,
+    "fullArt": true,
+    "stablePanels": true,
+    "stableCardSize": true,
+    "privateImagesContained": true,
+    "mouseOrTouchSelection": true,
+    "presentations": [
+      "anim_2",
+      "anim_3",
+      "anim_4"
+    ],
+    "errors": []
+  }
+]

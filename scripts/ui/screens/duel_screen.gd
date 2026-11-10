@@ -84,6 +84,7 @@ func _online() -> bool:
 
 
 func render() -> void:
+	if is_instance_valid(_match_view) and _match_view.holding_results(): return
 	if is_instance_valid(_iphone_room_actions):
 		_iphone_room_actions.get_parent().remove_child(_iphone_room_actions)
 		_iphone_room_actions.queue_free()

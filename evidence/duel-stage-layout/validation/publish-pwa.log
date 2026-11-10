@@ -1,0 +1,13 @@
+PASS um único service worker registrado (1)
+PASS cache único por conteúdo ["qse-files"]
+PASS em cache: index.html
+PASS em cache: index.js
+PASS em cache: index.wasm
+PASS em cache: index.pck
+PASS em cache: manifest.webmanifest
+PASS nenhuma resposta de terceiros (Supabase/OAuth) no cache
+PASS manifest standalone/landscape/escopo
+page.evaluate: TypeError: Failed to update a ServiceWorker for scope ('http://localhost:8765/quemsoueuv3/jogar/') with script ('http://localhost:8765/quemsoueuv3/jogar/sw.js?build=build-a'): An unknown error occurred when fetching the script.
+    at /workspace/duel-qa/tests/web_pwa/sw_test.js:45:14 {
+  log: []
+}

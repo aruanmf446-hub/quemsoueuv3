@@ -115,6 +115,14 @@ func _available_decks() -> Array:
 		return not catalog.requires_claim(str(deck.id)) or (official_deck_access.is_valid() and bool(official_deck_access.call(str(deck.id))))) + community_decks
 
 
+## Local presentation can finish early after loading/fades or explicit Continue.
+## Bounded deadline remains a fallback if a view is never opened.
+func finish_presentation(match_id: String, phase: String) -> void:
+	if _match.is_empty() or str(_match.id) != match_id: return
+	if str(_match.phase) != phase or phase not in ["countdown", "finished"]: return
+	_match.phase_deadline = minf(float(_match.phase_deadline), now() + 0.2)
+
+
 func default_settings() -> Dictionary:
 	var first: Array = [decks()[0].id] if not decks().is_empty() else []
 	return {"max_players": 10, "deck_ids": first, "cards_per_player": 3, "bots_allowed": true, "turn_seconds": 60,
@@ -364,7 +372,7 @@ func _check_end() -> bool:
 	if alive.size() <= 1:
 		_match.result = {"reason": "last_standing" if alive.size() == 1 else "draw", "winners": winners}
 		_event("finished", null, null, winners, 0.0)
-		_set_phase("finished", TIMING.finished)
+		_set_phase("finished", maxf(TIMING.finished, _players.size()*6.5+15.0))
 		return true
 	return false
 
@@ -435,7 +443,7 @@ func _advance() -> void:
 						_fill_cards(player.member_id)
 						player.confirmed = true
 						player.auto_selected = true
-				_set_phase("countdown", maxf(TIMING.countdown,_match.turn_order.size()*1.8+0.4))
+				_set_phase("countdown", maxf(TIMING.countdown,_match.turn_order.size()*6.5+15.0))
 			"countdown":
 				if now() < deadline: return
 				if _check_end(): continue

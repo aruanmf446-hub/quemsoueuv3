@@ -91,6 +91,20 @@ func run() -> void:
 		await settle()
 		stable(before,"chat toggle")
 	await capture("chat_hand")
+	var players_scroll: Control=battle.find_child("PlayersScroll",true,false)
+	var roster_before := players_scroll.get_global_rect()
+	var players: Array=services.duel.room.match.players
+	var template: Dictionary=players.back().duplicate(true)
+	while players.size()<20:
+		var extra: Dictionary=template.duplicate(true)
+		extra.member_id="roster-fixture-%d" % players.size()
+		extra.nickname="Jogador %d" % players.size()
+		extra.is_you=false
+		players.append(extra)
+	battle.refresh()
+	await settle()
+	check(players_scroll.get_global_rect().is_equal_approx(roster_before),"twenty players retain roster bounds")
+	stable(before,"twenty players")
 	screen.queue_free()
 	services.queue_free()
 	await settle()

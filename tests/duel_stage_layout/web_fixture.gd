@@ -6,6 +6,7 @@ var battle: Control
 var _bridge: JavaScriptObject
 var _callback: JavaScriptObject
 var _sequence := 0
+var _selection_room: Dictionary
 func _ready() -> void:
 	_run.call_deferred()
 func settle() -> void:
@@ -32,6 +33,8 @@ func _run() -> void:
 	services.duel.local_server._match.phase_deadline=services.duel.local_server.now()+3600.0
 	services.duel._beat.stop()
 	screen._auto_refresh.stop()
+	await services.duel.refresh()
+	_selection_room=services.duel.room.duplicate(true)
 	await settle()
 	battle=screen.body.get_node("Match")
 	_callback=JavaScriptBridge.create_callback(_probe)
@@ -44,8 +47,15 @@ func _probe(args: Array) -> void:
 	print("STAGE_PROBE ",args)
 	var action := str(args[0]) if args.size()>0 else ""
 	if action=="reset_selection":
-		services.duel.room.match.phase="selection"
+		# Reset only the isolated view fixture. A real countdown may still be loading
+		# a model after confirmation; never use a fixed wall-clock sleep for it.
+		if is_instance_valid(battle.get("_presentation")):
+			battle.get("_presentation").queue_free()
+			battle.set("_presentation",null)
+		services.duel._beat.stop()
+		services.duel.room=_selection_room.duplicate(true)
 		battle.set("_chosen",[])
+		battle.set("_submitting",false)
 		battle.refresh()
 	elif action=="turns":
 		services.duel.room.match.phase="turns"
@@ -55,6 +65,7 @@ func _probe(args: Array) -> void:
 		for i in 4: services.duel.room.match.pool[i].removed=true
 		battle.refresh()
 	elif action=="hand":
+		services.duel.room.match.my_cards=services.duel.room.match.pool.slice(4,6).duplicate(true)
 		battle.set("_private_shown",true)
 		battle.set("_private_signature","")
 		battle.refresh()
@@ -69,13 +80,23 @@ func _rect(control: Control) -> Array:
 func _report() -> void:
 	print("STAGE_REPORT")
 	_sequence+=1
-	var report := {"sequence":_sequence,"size":[size.x,size.y],"phase":services.duel.match().get("phase",""),"panels":{},"cards":[],"controls":[]}
+	var report := {"sequence":_sequence,"size":[size.x,size.y],"phase":services.duel.match().get("phase",""),"panels":{},"cards":[],"controls":[],"chosen":battle.get("_chosen"),"presentation":{"active":false},"private_images":[]}
 	for key in ["BattleBoard","UtilityRail","BattleChat","PrivatePanel","Players"]:
 		var control := battle.find_child(key,true,false) as Control
 		if control!=null: report.panels[key]=_rect(control)
 	for card in battle.find_child("Cards",true,false).get_children():
 		var art := card.find_child("Art",true,false) as TextureRect
 		report.cards.append({"rect":_rect(card),"art_mode":art.stretch_mode,"cropped":art.texture is AtlasTexture})
+	var sequence: Control=battle.get("_presentation")
+	if is_instance_valid(sequence):
+		var stage: LobbyStage=sequence.get("_stage")
+		var anim: AnimationPlayer=stage.character.get("_anim_player") if is_instance_valid(stage) else null
+		report.presentation={"active":true,"clip":str(anim.assigned_animation) if is_instance_valid(anim) else "","alpha":sequence.get("_panel").modulate.a,"stage_rect":_rect(stage),"title":sequence.get("_context").text}
+	var private_scroll: ScrollContainer=battle.find_child("PrivateCardsScroll",true,false)
+	if private_scroll!=null:
+		report.private_bounds=_rect(private_scroll)
+		for image in private_scroll.find_children("Private_*","TextureRect",true,false):
+			report.private_images.append(_rect(image))
 	for button in battle.find_children("*","Button",true,false):
-		if button.is_visible_in_tree(): report.controls.append({"name":button.name,"rect":_rect(button)})
+		if button.is_visible_in_tree(): report.controls.append({"name":button.name,"rect":_rect(button),"disabled":button.disabled})
 	JavaScriptBridge.eval("window.stageReport="+JSON.stringify(report),true)

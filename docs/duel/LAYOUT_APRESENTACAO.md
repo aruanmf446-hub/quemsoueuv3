@@ -64,3 +64,27 @@ a causa não foi concluída. Os perfis Web móveis não foram alcançados.
 Não declarar a bateria Web completa aprovada. As três janelas nativas passaram
 57 checks cada na fonte final, incluindo duas imagens privadas inteiras no
 limite final de96 unidades. O export Web anterior tinha a mão vazia nesse teste.
+
+
+## Publicação autorizada — 10/11/2026
+
+O dono autorizou publicar o PR #121 na main. O runner Web foi corrigido para
+exercitar a seleção real antes dos estados simulados e esperar o fim efetivo do
+palco, incluindo o carregamento do modelo, em vez de aguardar 6,8 segundos fixos.
+A falha anterior era do roteiro de teste: ele tentava clicar nas cartas enquanto
+a apresentação ainda recebia os eventos. Não houve mudança do servidor online.
+
+Nesta revisão: 57 verificações nativas por resolução (1672×941, 844×390 e
+640×360), dez de transições e 91 da partida local completa, todas sem falhas.
+Os testes foram executados com Godot 4.7.2 na cópia isolada já importada;
+a primeira tentativa no worktree sem cache de classes não carregou PlayerServices.
+
+Verificação adicional do relato mais recente: 62 checks por resolução, zero
+falhas, incluindo vinte participantes sem alterar os limites de PlayersScroll,
+BattleBoard, UtilityRail, BattleChat e PrivatePanel. A ordem da apresentação vem
+de turn_order da autoridade; não há novo sorteio no cliente.
+
+Regressão PWA nesta sessão: com o Chromium instalado, o runner passou as
+verificações iniciais de registro/cache/manifest, mas parou em sw_test.js:45 com
+"Failed to update a ServiceWorker ... unknown error ... fetching the script".
+Não foi declarado aprovado; nenhum arquivo PWA foi alterado nesta entrega.

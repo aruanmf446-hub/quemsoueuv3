@@ -1,14 +1,3 @@
-## Proteção obrigatória de áreas aprovadas
-
-Leia [docs/governance/APPROVED_SCOPE.md](docs/governance/APPROVED_SCOPE.md) antes de editar.
-Ajustes, Amizades, músicas, decks, compras, skins, traduções, atualizações e revisão
-de decks estão congelados. Mesmo se o dono pedir uma mudança, pergunte primeiro:
-“Você já aprovou [área]. Gostaria de alterar [mudança específica]?” e aguarde a
-confirmação, salvo se ela já existir para esse mesmo escopo na conversa.
-Não contorne o check, não invente autorização e não altere a política para liberar
-seu próprio trabalho. Áreas pendentes e exceção atual estão no documento.
-
-<!-- BEGIN:godot-mcp -->
 ## Godot (managed by godot-mcp; edit outside these markers)
 
 - This is a Godot 4.7 project. Your training data may be older: use Godot 4 APIs and GDScript 2.0 syntax, never Godot 3.

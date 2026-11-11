@@ -83,7 +83,9 @@ func _ready() -> void:
 
 
 func _on_connect() -> void:
-	if services.voice.state in ["off", "error"]:
+	if services.voice.state == "connected":
+		services.voice.unlock_audio()
+	elif services.voice.state in ["off", "error"]:
 		services.voice.join_voice()
 
 
@@ -99,21 +101,36 @@ func _refresh() -> void:
 	visible = not services.duel.is_local()
 	var connected := voice.state == "connected"
 	var connecting := voice.state == "connecting"
-	_connect.visible = not connected
+	_connect.visible = not connected or voice.audio_blocked
 	_connect.disabled = connecting or not voice.eligible()
 	_connect.text = "Conectando…" if connecting else ("Tentar de novo" if voice.state == "error" else "Entrar na voz")
+	if connected and voice.audio_blocked: _connect.text = "Liberar áudio"
 	_mic.visible = connected
 	_mic.disabled = not connected or services.duel.spectating_match()
 	_leave.visible = connected
 	_mic.icon = PremiumUI.icon("mic" if voice.mic_enabled else "mic_off", GREEN if voice.mic_enabled else PlayerUI.MUTED, 40)
 	_mic.tooltip_text = "Desligar microfone" if voice.mic_enabled else "Ligar microfone"
 	match voice.state:
-		"connected": _status.text = "Ouvindo" if services.duel.spectating_match() else ""
+		"connected":
+			_status.text = "Ouvindo" if services.duel.spectating_match() else ""
+			if voice.error_code == "microphone_denied": _status.text = "Microfone bloqueado"
 		"connecting": _status.text = ""
-		"error": _status.text = "Falha na voz"
+		"error": _status.text = _error_message(voice.error_code)
 		_: _status.text = "" if voice.eligible() else "Indisponível"
+	_status.tooltip_text = _status.text + " (" + voice.error_code + ")" if not voice.error_code.is_empty() else ""
 	_status.add_theme_color_override("font_color", Color("#ff8f86") if voice.state == "error" else (GREEN if connected and voice.mic_enabled else PlayerUI.MUTED))
 	_render_speakers(connected)
+
+
+func _error_message(code: String) -> String:
+	match code:
+		"not_authenticated", "unauthorized", "session_changed": return "Sessão recusada pela voz"
+		"forbidden", "room_access_denied", "voice_access_lost": return "Voz bloqueada na sala"
+		"voice_unavailable", "game_unavailable": return "Servidor de voz indisponível"
+		"network", "rate_limit": return "Falha ao pedir acesso"
+		"bridge_unavailable", "sdk_load_failed": return "Voz não carregou"
+		"voice_connect_failed", "connection_lost": return "Conexão LiveKit falhou"
+		_: return "Falha no acesso à voz"
 
 
 ## Só quem está falando de verdade (LiveKit): nickname + ponto verde pulsando.

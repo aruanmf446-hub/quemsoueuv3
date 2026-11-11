@@ -132,7 +132,11 @@
       // Autoplay may be blocked since the token request was asynchronous.
       // The visible "Liberar áudio" button retries in a real user gesture.
       try { await localRoom.startAudio(); } catch { /* needs gesture */ }
-    } catch {
+    } catch (error) {
+      // Only the SDK's reason (e.g. "invalid API key", "token signature is invalid") is
+      // logged: never the token, URL query or room identifiers.
+      const reason = error && typeof error.message === "string" ? error.message.slice(0, 160) : "unknown";
+      console.warn("[QSEVoice] connect failed:", reason.replace(/access_token=[^&\s]+/g, "access_token=<redacted>"));
       if (nextRoom) {
         try { await nextRoom.disconnect(); } catch { /* ignore */ }
       }

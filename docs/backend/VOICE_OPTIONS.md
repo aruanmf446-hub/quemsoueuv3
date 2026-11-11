@@ -54,3 +54,11 @@ antes de existir token. Reproduzido com o SDK real; corrigido para
 A assinatura agora responde `503 voice_unavailable` com log `TOKEN_SIGN_FAILED`
 em vez de erro não tratado. **A função precisa ser publicada manualmente** no
 projeto GAME; o merge no GitHub não a publica.
+
+### Atualização — mesmo dia
+
+O código publicado no Supabase já usava `TrackSource.MICROPHONE` e `can_speak`
+(editado pelo painel). O arquivo do repositório foi alinhado a essa versão, com a
+proteção extra na assinatura. Os logs mostram a função respondendo 200: a recusa
+acontece na conexão com o LiveKit. `web/voice/bridge.js` passa a registrar no console
+o motivo informado pelo SDK (`[QSEVoice] connect failed: ...`), sem token nem IDs.

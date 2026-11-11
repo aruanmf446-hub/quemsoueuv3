@@ -16,7 +16,7 @@ const CORS = {
 const response = (value: unknown, status = 200) =>
   new Response(JSON.stringify(value), { status, headers: CORS });
 
-type Member = { tag: string; member_id: string; nickname: string };
+type Member = { can_speak: boolean; tag: string; member_id: string; nickname: string };
 type Access = { allowed: boolean; participants?: Member[] };
 
 async function identityTag(roomId: string, userId: string): Promise<string> {
@@ -104,7 +104,7 @@ const handler = withSupabase({ auth: "user" }, async (req, ctx) => {
   // ongoing room, each connected client calls this periodically. Removes
   // players who have left or been kicked, revoking their connection tokens.
   if (action === "reconcile") {
-    const allowedTags = new Set(members.map((member) => member.tag));
+    const byTag = new Map(members.map(member => [member.tag, member]));
     let removed = 0;
     try {
       // LiveKit creates a room when the first participant connects. A room
@@ -114,9 +114,15 @@ const handler = withSupabase({ auth: "user" }, async (req, ctx) => {
       if (liveRooms.some((liveRoom) => liveRoom.name === roomName)) {
         const connected = await api.listParticipants(roomName);
         for (const participant of connected) {
-          if (!allowedTags.has(participant.identity)) {
+          const member = byTag.get(participant.identity);
+          if (!member) {
             await api.removeParticipant(roomName, participant.identity);
             removed++;
+          } else if (participant.permission?.canPublish !== (member.can_speak === true)) {
+            await api.updateParticipant(roomName, participant.identity, { permission: {
+              canPublish: member.can_speak === true, canSubscribe: true, canPublishData: false,
+              canPublishSources: member.can_speak === true ? [TrackSource.MICROPHONE] : [],
+            } });
           }
         }
       }
@@ -132,7 +138,7 @@ const handler = withSupabase({ auth: "user" }, async (req, ctx) => {
     return response({
       ok: true,
       removed,
-      participants: members.map((member) => ({ tag: member.tag, nickname: member.nickname })),
+      participants: members.map((member) => ({ tag: member.tag, member_id: member.member_id, nickname: member.nickname })),
     });
   }
 
@@ -142,14 +148,15 @@ const handler = withSupabase({ auth: "user" }, async (req, ctx) => {
     identity: tag,
     ttl: "2m",
   });
+  const canPublish = members.find(member => member.tag === tag)?.can_speak === true;
   token.addGrant({
     room: roomName,
     roomJoin: true,
-    canPublish: true,
+    canPublish,
     canSubscribe: true,
     // The SDK expects TrackSource enum values; a plain "microphone" string makes
     // toJwt() throw ("Cannot convert TrackSource microphone to string").
-    canPublishSources: [TrackSource.MICROPHONE],
+    canPublishSources: canPublish ? [TrackSource.MICROPHONE] : [],
     canPublishData: false,
     roomAdmin: false,
   });
@@ -168,7 +175,7 @@ const handler = withSupabase({ auth: "user" }, async (req, ctx) => {
     server_url: config.url,
     participant_token: participantToken,
     room: roomName,
-    participants: members.map((member) => ({ tag: member.tag, nickname: member.nickname })),
+    participants: members.map((member) => ({ tag: member.tag, member_id: member.member_id, nickname: member.nickname })),
     expires_in: 120,
   });
 });

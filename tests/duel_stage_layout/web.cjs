@@ -48,10 +48,10 @@ const server = spawn('python3', ['-m', 'http.server', '8190', '--bind', '127.0.0
         const y = canvas.y + (rect[1] + rect[3] / 2) * canvas.height / state.size[1];
         if (mobile) await page.touchscreen.tap(x, y); else await page.mouse.click(x, y);
       };
-      const fullArt = state => {
+      const framedArt = state => {
         for (const card of state.cards) {
-          assert.equal(card.cropped, false);
-          assert.equal(card.art_mode, 5);
+          assert.equal(card.cropped, true);
+          assert.equal(card.art_mode, 6);
           assert.ok(Math.abs(card.rect[2] / card.rect[3] - 9 / 16) < 0.03, 'portrait card');
         }
       };
@@ -60,7 +60,7 @@ const server = spawn('python3', ['-m', 'http.server', '8190', '--bind', '127.0.0
       // Test the actual untouched selection first. Earlier versions tried input after
       // a fixed sleep for a cold-loading presentation and accidentally hit its overlay.
       let state = await until(s => s.phase === 'selection' && !s.presentation.active && s.cards.length === 9, 'initial selection');
-      fullArt(state);
+      framedArt(state);
       await tap(state.cards[0].rect, state);
       state = await until(s => s.chosen.length === 1, 'first card responds to input');
       const firstDecision = state.controls.find(c => c.name === 'AcceptSelection');
@@ -78,7 +78,7 @@ const server = spawn('python3', ['-m', 'http.server', '8190', '--bind', '127.0.0
       // pending model load. This action never exists in the production main scene.
       await report('reset_selection');
       let before = await until(s => s.phase === 'selection' && !s.presentation.active && s.cards.length === 9 && s.cards[0].rect[2] > 20, 'reset selection');
-      fullArt(before);
+      framedArt(before);
       await shot('selection');
       for (const action of ['turns', 'remove', 'hand', 'chat']) {
         await report(action);
@@ -88,7 +88,7 @@ const server = spawn('python3', ['-m', 'http.server', '8190', '--bind', '127.0.0
           for (let i = 0; i < 4; i++) assert.ok(Math.abs(now.panels[name][i] - before.panels[name][i]) < 1, `${action} stable ${name}`);
         }
         assert.ok(Math.abs(now.cards[0].rect[3] - before.cards[0].rect[3]) < 1, `${action} card height`);
-        fullArt(now);
+        framedArt(now);
         if (['hand', 'chat'].includes(action)) {
           assert.equal(now.private_images.length, 2, 'two actual private images');
           for (const rect of now.private_images) {
@@ -108,7 +108,7 @@ const server = spawn('python3', ['-m', 'http.server', '8190', '--bind', '127.0.0
         await until(s => !s.presentation.active, `presentation finished ${clip}`);
       }
       assert.deepEqual(errors, []);
-      results.push({ width, height, mobile, fullArt: true, stablePanels: true, stableCardSize: true, privateImagesContained: true, mouseOrTouchSelection: true, presentations: ['anim_2', 'anim_3', 'anim_4'], errors });
+      results.push({ width, height, mobile, framedArt: true, stablePanels: true, stableCardSize: true, privateImagesContained: true, mouseOrTouchSelection: true, presentations: ['anim_2', 'anim_3', 'anim_4'], errors });
       fs.writeFileSync(`${out}/results.json`, JSON.stringify(results, null, 2));
       console.log('DUEL_STAGE_WEB_PASS', width, height);
       await context.close();

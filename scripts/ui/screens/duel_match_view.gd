@@ -346,12 +346,13 @@ func _build_sidebar(player_column: VBoxContainer) -> void:
 	_hand.add_child(_hand_status)
 	var private_body := GridContainer.new()
 	private_body.name = "PrivateCards"
+	private_body.columns = 3
 	private_body.custom_minimum_size.y = 40
 	private_body.add_theme_constant_override("h_separation",3)
 	private_body.add_theme_constant_override("v_separation",3)
 	var private_scroll := ScrollContainer.new()
 	private_scroll.name = "PrivateCardsScroll"
-	private_scroll.custom_minimum_size.y = 100
+	private_scroll.custom_minimum_size.y = 56
 	private_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	private_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	_hand.add_child(private_scroll)
@@ -907,7 +908,7 @@ func _render_hand() -> void:
 	var entries: Array = _data.get("my_cards",[])
 	if _suspense() or _reveal_playing: entries = _hand_before_reveal
 	else: _hand_before_reveal = entries.duplicate(true)
-	var spectator := duel.spectating_match() and not (_suspense() or _reveal_playing)
+	var spectator := (duel.spectating_match() or bool(_me(_data).get("eliminated", false))) and not (_suspense() or _reveal_playing)
 	if spectator:
 		_private_shown = false
 		_close_private_preview()
@@ -916,62 +917,35 @@ func _render_hand() -> void:
 	_private_signature = signature
 	var grid: GridContainer = _hand.get_node("PrivateCardsScroll/PrivateCards")
 	PlayerUI.clear(grid)
-	grid.columns = mini(maxi(entries.size(),1),3) if _private_shown else 1
 	_hand_toggle.icon = load("res://assets/ui/battle/eye_off.svg" if _private_shown else "res://assets/ui/battle/eye.svg")
 	_hand_toggle.text = ("Ocultar" if _private_shown else "Mostrar") + " · %d" % entries.size()
 	_hand_toggle.visible = not spectator and not entries.is_empty()
-	_hand.get_node("PrivateCardsScroll").visible = _hand_toggle.visible
+	_hand.get_node("PrivateCardsScroll").visible = _hand_toggle.visible and _private_shown
 	_hand_title.text = "Você está assistindo" if spectator else "Suas cartas"
 	_hand_status.text = "Chat em modo leitura" if spectator else ("Só você vê" if _private_shown else "Seleção em andamento")
 	_hand_status.visible = spectator or entries.is_empty() or _private_shown
-	if spectator or entries.is_empty(): return
-	_hand_toggle.disabled = false
-	if _private_shown:
-		for entry: Dictionary in entries:
-			var image := TextureRect.new()
-			image.name = "Private_" + str(entry.card_id).get_file()
-			# Corte padrão das cartas (5:7, foco no rosto): a miniatura cobre o quadro inteiro.
-			image.texture = DeckCover.framed_texture(DuelService.card_texture(str(entry.card_id)), CardFramer.LIBRARY_ASPECT if entries.size() <= 3 else 16.0 / 10.0)
-			image.tooltip_text = _name(str(entry.card_id))
-			image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-			image.clip_contents = true
-			image.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-			image.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			# T24 iOS: altura pela largura real da coluna (proporção da carta), não um valor fixo.
-			var column_width := (_hand.size.x - 12.0 - (grid.columns - 1) * 4.0) / maxf(grid.columns, 1)
-			image.custom_minimum_size.y = clampf(column_width * 1.42, 44.0, 96.0) if entries.size() <= 3 else 34.0
-			if entry.get("lost",false): image.modulate = Color("#555967")
-			# Toque/clique amplia temporariamente (só nesta tela; ninguém mais vê).
-			image.mouse_filter = Control.MOUSE_FILTER_STOP
-			image.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-			image.set_meta("card_id",str(entry.card_id))
-			image.tooltip_text = _name(str(entry.card_id)) + " — toque para ampliar"
-			image.gui_input.connect(func(event: InputEvent) -> void:
-				if (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or (event is InputEventScreenTouch and event.pressed):
-					_preview_private(str(entry.card_id)))
-			grid.add_child(image)
+	if spectator or entries.is_empty() or not _private_shown: return
+	for entry: Dictionary in entries:
+		var image := TextureRect.new()
+		image.name = "Private_" + str(entry.card_id).get_file()
+		# Corte padrão das cartas (5:7, foco no rosto): a miniatura cobre o quadro inteiro.
+		image.texture = DeckCover.framed_texture(DuelService.card_texture(str(entry.card_id)), CardFramer.LIBRARY_ASPECT)
+		image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		image.clip_contents = true
+		image.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		image.custom_minimum_size = Vector2(37, 52)
+		if entry.get("lost",false): image.modulate = Color("#555967")
+		# Toque/clique amplia temporariamente (só nesta tela; ninguém mais vê).
+		image.mouse_filter = Control.MOUSE_FILTER_STOP
+		image.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		image.set_meta("card_id",str(entry.card_id))
+		image.tooltip_text = _name(str(entry.card_id)) + " — toque para ampliar"
+		image.gui_input.connect(func(event: InputEvent) -> void:
+			if (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or (event is InputEventScreenTouch and event.pressed):
+				_preview_private(str(entry.card_id)))
+		grid.add_child(image)
 
-	else:
-		# Leque com uma carta virada por carta na mão (não parece mais uma só).
-		var hidden := HBoxContainer.new()
-		hidden.name = "HiddenHand"
-		hidden.alignment = BoxContainer.ALIGNMENT_CENTER
-		hidden.add_theme_constant_override("separation",-10 if entries.size() > 3 else -4)
-		hidden.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		hidden.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		for index in range(entries.size()):
-			var back := TextureRect.new()
-			back.texture = preload("res://assets/ui/battle/private_back.svg")
-			back.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			back.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			back.custom_minimum_size = Vector2(30 if entries.size() > 3 else 36,44)
-			back.pivot_offset = Vector2(15,44)
-			back.rotation_degrees = (index-(entries.size()-1)*0.5)*6.0
-			back.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			if entries[index].get("lost",false): back.modulate = Color("#555967")
-			hidden.add_child(back)
-		grid.add_child(hidden)
 func _utility_width(width: float) -> float:
 	# iPhone: coluna lateral mais larga para as cartas escolhidas e o chat ficarem legíveis.
 	if UIScale.is_iphone(): return 210.0

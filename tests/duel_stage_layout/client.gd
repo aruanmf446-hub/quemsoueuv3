@@ -60,8 +60,9 @@ func run() -> void:
 	for card in grid.get_children():
 		var art := card.find_child("Art",true,false) as TextureRect
 		check(art != null and art.texture != null,"original art present "+card.name)
-		check(art.stretch_mode==TextureRect.STRETCH_KEEP_ASPECT_CENTERED,"full art no crop "+card.name)
-		check(not art.texture is AtlasTexture,"no cropped atlas "+card.name)
+		check(art.stretch_mode==TextureRect.STRETCH_KEEP_ASPECT_COVERED,"art covers frame "+card.name)
+		var framed := art.texture as AtlasTexture
+		check(framed != null and is_equal_approx(framed.region.size.aspect(), CardFramer.LIBRARY_ASPECT),"library crop "+card.name)
 		check(absf(card.size.x/card.size.y-9.0/16.0)<0.03,"portrait aspect "+card.name)
 	# Authority data fixture, no backend: mimic moving to turns and losing four cards.
 	services.duel.room.match.phase="turns"
@@ -87,6 +88,7 @@ func run() -> void:
 	before.PrivatePanel = open_hand.PrivatePanel
 	stable(before,"private shown")
 	var clip: Control=battle.find_child("PrivateCardsScroll",true,false)
+	check(clip.size.y <= 56.0,"compact private card strip")
 	for image: Control in battle.find_children("Private_*","TextureRect",true,false):
 		check(clip.get_global_rect().grow(1).encloses(image.get_global_rect()),"private illustration fully visible")
 	var chat := battle.find_child("BattleChat",true,false)

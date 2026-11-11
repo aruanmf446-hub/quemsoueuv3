@@ -1,5 +1,5 @@
 extends PanelContainer
-## Original portrait illustration, always fitted in full without focal cropping.
+## Carta com o mesmo enquadramento em retrato da Biblioteca.
 signal activated
 const Style = preload("res://scripts/ui/battle/battle_style.gd")
 var id := ""
@@ -9,7 +9,6 @@ var interactive := false
 var image: TextureRect
 var caption: Label
 var caption_area: Control
-var _source: Texture2D
 
 ## O GridContainer define as dimensões de cada carta conforme o viewport.
 ## Não permitir que o nome completo ou a imagem imponham largura mínima própria:
@@ -22,7 +21,6 @@ func setup(card_id: String, chosen: bool, out: bool, usable: bool) -> void:
 	removed = out
 	interactive = usable
 	name = card_id.get_file()
-	_source = DuelService.card_texture(id)
 	tooltip_text = DuelService.card_name(id)
 	mouse_filter = Control.MOUSE_FILTER_STOP if usable else Control.MOUSE_FILTER_IGNORE
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if usable else Control.CURSOR_ARROW
@@ -36,7 +34,9 @@ func setup(card_id: String, chosen: bool, out: bool, usable: bool) -> void:
 	image.name = "Art"
 	image.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	image.texture = DeckCover.framed_texture(DuelService.card_texture(id), CardFramer.LIBRARY_ASPECT)
+	image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	image.clip_contents = true
 	image.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	image.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var grading := ShaderMaterial.new()
@@ -110,7 +110,8 @@ func setup(card_id: String, chosen: bool, out: bool, usable: bool) -> void:
 	finish.selected = selected
 	finish.removed = removed
 	add_child(finish)
-	image.resized.connect(_crop)
+	resized.connect(_resize_caption)
+	_resize_caption()
 	mouse_entered.connect(func() -> void: _style(true); _lift(true))
 	mouse_exited.connect(func() -> void: _style(false); _lift(false))
 	focus_entered.connect(func() -> void: _style(true); _lift(true))
@@ -150,7 +151,7 @@ func _on_gui_input(event: InputEvent) -> void:
 		create_tween().tween_property(self,"scale",Vector2.ONE,0.1)
 		activated.emit()
 		accept_event()
-func _crop() -> void:
+func _resize_caption() -> void:
 	if is_instance_valid(caption_area):
 		var dense := size.x < 112
 		var short_row := size.y < 68
@@ -163,8 +164,6 @@ func _crop() -> void:
 			# scale. Keep card names legible and reserve both complete lines.
 			caption.add_theme_font_size_override("font_size", 16)
 			caption_area.custom_minimum_size.y = 52
-	if _source == null or image.size.y <= 0: return
-	image.texture = _source
 
 func _ready() -> void:
 	if selected:

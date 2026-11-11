@@ -88,6 +88,8 @@ func show_refills() -> void:
 	_column.add_child(panel)
 	_open()
 ## Tela de derrota: a fase fica pausada até o jogador escolher para onde voltar.
+## Arena do chefe: o checkpoint devolve vida e cargas cheias (ver malagueta/arena.gd).
+var full_restore_on_checkpoint := false
 func show_death(fell: bool, checkpoint_label: String) -> void:
 	_completion = false
 	_death = true
@@ -95,7 +97,8 @@ func show_death(fell: bool, checkpoint_label: String) -> void:
 	_title(phase_name.to_upper(),12,Color("#d9b778"))
 	_title("Você caiu" if fell else "Você foi derrotado",28,Color("#f3b4a2"))
 	var has_checkpoint := not checkpoint_label.is_empty()
-	_title(str(TranslationServer.translate("Continue do %s com 1 vida e sem cargas.")) % checkpoint_label if has_checkpoint else "Recomece a fase com a vida cheia.",14,Color("#dccdb3"))
+	var checkpoint_rule := "Continue do %s com a vida e as cargas cheias." if full_restore_on_checkpoint else "Continue do %s com 1 vida e sem cargas."
+	_title(str(TranslationServer.translate(checkpoint_rule)) % checkpoint_label if has_checkpoint else "Recomece a fase com a vida cheia.",14,Color("#dccdb3"))
 	_button("Voltar ao checkpoint" if has_checkpoint else "Recomeçar do início",checkpoint_requested.emit,true)
 	if has_checkpoint: _button("Recomeçar fase",restart_requested.emit)
 	_button("Voltar ao menu",return_requested.emit)

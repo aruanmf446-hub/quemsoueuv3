@@ -24,14 +24,20 @@ var _refill_wait := 0.0
 var _spawn_serial := 0
 var _pending_throws: Array[String] = []
 var _upper_landing: StaticBody3D
+## Entrada do jogador na arena, afastada da parede por onde a primeira serra entra.
+const ENTRY := Vector3(-9.0,0.1,0)
+## Respiro ao entrar ou voltar à arena: serras e Malagueta só começam depois dele. Antes a
+## primeira serra chegava ao ponto de entrada em meio segundo e tirava duas vidas na passada.
+@export var opening_grace := 3.5
+var _grace := 0.0
 var _landing_pass_through := {}
 
 func _layout_for_phase(_number: int) -> Dictionary:
 	var data := Layout.build(10)
-	data.merge({"player_spawn":[-11.0,0.1,0],"length":24.0,"total_length":24.0,
+	data.merge({"player_spawn":[ENTRY.x,ENTRY.y,0],"length":24.0,"total_length":24.0,
 		"bounds":{"min_x":-12.0,"max_x":12.0},"goal":{"pos":[9,9.65,0]},
 		"boss":{"id":"p10.malagueta","pos":[8.2,8.85,0],"patrol":[-1,1]},
-		"tasks":[],"platforms":[],"enemies":[],"pickups":[],"checkpoints":[{"id":"p10.arena","pos":[-11,0.1,0]}],
+		"tasks":[],"platforms":[],"enemies":[],"pickups":[],"checkpoints":[{"id":"p10.arena","pos":[ENTRY.x,ENTRY.y,0]}],
 		"holes":[{"start":1000.0,"end":1001.0}],"storms":[],"kill_plane_y":-4.0,
 		"surfaces":[{"left":-12.0,"right":12.0,"height":0.0}]},true)
 	return data
@@ -45,7 +51,7 @@ func _restore_game_checkpoint() -> void:
 		_loaded_run.boss_defeated=tasks.size()==3
 		var at: Array=_loaded_run.position
 		if not arena_save or absf(float(at[0]))>11.0 or float(at[1])>11.5:
-			_loaded_run.position=[-11.0,0.1]
+			_loaded_run.position=[ENTRY.x,ENTRY.y]
 	super._restore_game_checkpoint()
 	_task_steps["malagueta.arena"]=1
 	_task_steps["malagueta.handoff"]=1
@@ -57,6 +63,32 @@ func _ready() -> void:
 	_player.fill_ability("attack")
 	_player.fill_ability("defense")
 	_hud.notify("Alcance Malagueta pelas lâminas • ataque e use TASK quando ele atordoar")
+	_session.full_restore_on_checkpoint=true
+## Na arena do chefe a volta ao checkpoint devolve vida e cargas cheias: com 1 vida e sem
+## ataque (regra das outras fases) a luta recomeçava impossível de vencer.
+func _respawn_at_checkpoint() -> void:
+	var from_checkpoint := _checkpoint_index >= 0
+	super._respawn_at_checkpoint()
+	if not from_checkpoint: return
+	_player.health=_player.RUN_MAX_HEALTH
+	_player.health_changed.emit(_player.health,_player.RUN_MAX_HEALTH)
+	_hud._last_health=_player.health
+	_player.fill_ability("attack")
+	_player.fill_ability("defense")
+	_sync_resources()
+	_save_active_run()
+func _begin_grace() -> void:
+	_grace=opening_grace
+	for file in files:
+		file.elapsed=0.0
+		file.enabled=false
+	if is_instance_valid(encounter): encounter.suspended=true
+func _end_grace() -> void:
+	_grace=0.0
+	if not is_instance_valid(encounter): return
+	encounter.suspended=false
+	if encounter.fighting() or encounter.is_stunned():
+		for file in files: file.enabled=true
 func _build_goal() -> void:
 	_goal=Area3D.new()
 	_goal.name="BossExit"
@@ -146,7 +178,7 @@ func _stream_world(_x: float, force := false) -> void:
 	encounter.task_completed.connect(func(task: int) -> void:
 		_raised_bridges["malagueta.task.%d" % task] = true
 		_checkpoint_index=0
-		_checkpoint=Vector3(-11,0.1,0)
+		_checkpoint=ENTRY
 		_snapshot={"defeated":_defeated_ids.duplicate(),"collected":{},"tasks":_raised_bridges.duplicate(),"task_steps":_task_steps.duplicate(),"attack":3,"defense":3}
 		_clear_chemicals()
 		_save_active_run())
@@ -162,6 +194,7 @@ func _stream_world(_x: float, force := false) -> void:
 		_on_goal_entered(_player))
 	_build_malagueta()
 	if done==3: encounter.call_deferred("emit_signal","reaction_started")
+	else: _begin_grace()
 	_refill_wait = 0
 func _build_malagueta() -> void:
 	_boss = preload("res://scripts/desert/malagueta/target.gd").new()
@@ -197,6 +230,9 @@ func _raise_earth_bridge() -> void:
 	encounter.complete_task(encounter.stage())
 func _physics_process(delta: float) -> void:
 	_update_landing_support()
+	if _grace>0.0 and not _paused and not completed and not _player.is_dead:
+		_grace-=delta
+		if _grace<=0.0: _end_grace()
 	super._physics_process(delta)
 	if completed or _paused or _player.is_dead or not is_instance_valid(encounter): return
 	encounter.tick(delta)

@@ -133,6 +133,10 @@ func _build() -> void:
 	play_area.add_child(roster_margin)
 	var player_column := PlayerUI.column(roster_margin)
 	player_column.add_theme_constant_override("separation",5)
+	var players_title := Style.label("Jogadores",17,PlayerUI.TITLE_GOLD)
+	players_title.name = "PlayersTitle"
+	Style.strong(players_title)
+	player_column.add_child(players_title)
 	_roster_frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	player_column.add_child(_roster_frame)
 	_roster.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -296,7 +300,7 @@ func _build_sidebar(player_column: VBoxContainer) -> void:
 	chat_margin.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_side.add_child(chat_margin)
 	var communication := PlayerUI.column(chat_margin)
-	communication.add_theme_constant_override("separation",4)
+	communication.add_theme_constant_override("separation",14)
 	var voice := preload("res://scripts/ui/battle/battle_voice.gd").new()
 	voice.name = "BattleVoice"
 	voice.setup(overlay_parent.get("services") as PlayerServices)

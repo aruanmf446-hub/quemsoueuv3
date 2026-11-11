@@ -22,6 +22,18 @@ var _side: VBoxContainer
 var _roster_frame: ScrollContainer
 const ROSTER_WIDTH := 156.0
 const BOARD_GAP := 8
+const SIDE_TOP_MARGIN := 40
+# Centro do rosto e lado do recorte, em frações da imagem do retrato.
+const FACE_FRAMING := {
+	"cowboy": Vector3(0.50,0.49,0.70),
+	"el_fuego": Vector3(0.58,0.52,0.72),
+	"gus": Vector3(0.47,0.25,0.48),
+	"halloween": Vector3(0.48,0.51,0.67),
+	"lana": Vector3(0.43,0.40,0.57),
+	"lorena": Vector3(0.38,0.40,0.57),
+	"michelly": Vector3(0.53,0.36,0.60),
+	"rodrigo": Vector3(0.51,0.34,0.57),
+}
 var _roster: VBoxContainer
 var _board: PanelContainer
 var _board_content: VBoxContainer
@@ -116,7 +128,10 @@ func _build() -> void:
 	_roster_frame.custom_minimum_size.x = ROSTER_WIDTH
 	_roster_frame.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_roster_frame.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
-	play_area.add_child(_roster_frame)
+	var roster_margin := MarginContainer.new()
+	roster_margin.add_theme_constant_override("margin_top",SIDE_TOP_MARGIN)
+	play_area.add_child(roster_margin)
+	roster_margin.add_child(_roster_frame)
 	_roster.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_roster_frame.add_child(_roster)
 	_board = Surface.new()
@@ -282,7 +297,11 @@ func _build_sidebar() -> void:
 	chat.name = "BattleChat"
 	chat.setup(overlay_parent.get("services") as PlayerServices)
 	chat.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_side.add_child(chat)
+	var chat_margin := MarginContainer.new()
+	chat_margin.add_theme_constant_override("margin_top",SIDE_TOP_MARGIN)
+	chat_margin.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_side.add_child(chat_margin)
+	chat_margin.add_child(chat)
 	# Decisão do dono: o chat aparece também na partida local.
 	chat.visible = true
 	var private_panel := PanelContainer.new()
@@ -638,12 +657,15 @@ func _render_players() -> void:
 		_roster.add_child(panel)
 		var row := PlayerUI.row(panel)
 		row.add_theme_constant_override("separation",5)
-		var portrait := PlayerUI.portrait(str(player.skin_id),38)
+		var portrait := PlayerUI.portrait(str(player.skin_id),44)
 		if portrait.texture != null:
 			var full := portrait.texture
 			var bust := AtlasTexture.new()
 			bust.atlas = full
-			bust.region = Rect2(full.get_width()*0.14,0,full.get_width()*0.72,full.get_height()*0.58)
+			var framing: Vector3 = FACE_FRAMING.get(str(player.skin_id),Vector3(0.5,0.44,0.68))
+			var crop_size := Vector2.ONE * minf(full.get_width(),full.get_height()) * framing.z
+			var center := full.get_size() * Vector2(framing.x,framing.y)
+			bust.region = Rect2((center-crop_size*0.5).clamp(Vector2.ZERO,full.get_size()-crop_size),crop_size)
 			portrait.texture = bust
 		portrait.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE

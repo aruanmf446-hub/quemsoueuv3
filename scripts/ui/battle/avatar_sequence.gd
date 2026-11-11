@@ -8,6 +8,7 @@ const SECONDS_PER_PLAYER := 6.0
 const MIN_SLOT := 3.5
 const MAX_SLOT := 10.0
 const FADE := 0.4
+const ORDER_SLOT := 3.5
 ## Clipes contínuos (apresentação e lobby) fecham em voltas completas; reações tocam uma vez.
 const LOOPING := ["base", "anim_2"]
 ## Online: segundos disponíveis para a sequência inteira (0 = sem limite). O tempo é
@@ -134,9 +135,10 @@ func present(entries: Array, clip: String, _duration: float, numbered := false) 
 ## Tempo em cena pelo clipe carregado: reações (vitória/derrota) tocam uma vez até o fim;
 ## o clipe de lobby fecha em voltas completas. Nada é cortado no meio nem fica congelado.
 func _slot_seconds(clip: String) -> float:
+	# Ordem da partida: 3,5 s por jogador (pedido do dono; antes eram voltas completas do clipe).
+	if clip in LOOPING: return ORDER_SLOT
 	var length := _stage.character.animation_length(StringName(clip))
 	if length < 0.3: return SECONDS_PER_PLAYER
-	if clip in LOOPING: return clampf(ceilf(5.0 / length) * length, MIN_SLOT, MAX_SLOT)
 	return clampf(length + FADE, MIN_SLOT, MAX_SLOT)
 
 

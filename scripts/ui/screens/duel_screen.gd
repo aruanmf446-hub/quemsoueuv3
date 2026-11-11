@@ -1433,7 +1433,9 @@ func _member_card(member: Dictionary, admin: bool, status: String) -> Control:
 		var skin := str(member.get("character_id",""))
 		var entries := CharacterCatalog.load_entries().filter(func(e: Dictionary)->bool:return str(e.id)==skin)
 		var known: Dictionary = _room_stages.get(member_id,{})
-		var allowed: bool = mine or not known.is_empty() or not UIScale.is_handheld() or _room_stages.size()<HANDHELD_LOBBY_STAGES
+		# O limite vale só em celular/tablet de verdade; janela pequena no computador não conta.
+		var phone: bool = OS.has_feature("mobile") or OS.has_feature("web_android") or OS.has_feature("web_ios")
+		var allowed: bool = mine or not known.is_empty() or not phone or _room_stages.size()<HANDHELD_LOBBY_STAGES
 		if not member_id.is_empty() and allowed and not entries.is_empty() and entries[0].get("animations",{}).has("anim_2"):
 			if known.is_empty() or not is_instance_valid(known.stage) or str(known.skin)!=skin:
 				if not known.is_empty() and is_instance_valid(known.stage): known.stage.queue_free()
@@ -1445,7 +1447,11 @@ func _member_card(member: Dictionary, admin: bool, status: String) -> Control:
 				_room_stages[member_id]=known
 			_room_stages_used[member_id]=true
 			var stage: LobbyStage=known.stage
-			stage.custom_minimum_size=portrait.custom_minimum_size
+			# Corpo inteiro precisa de mais altura que o busto do retrato para não ficar miúdo.
+			var grow := Vector2(1.0,1.0) if UIScale.is_iphone() else Vector2(1.2,1.45)
+			stage.custom_minimum_size=portrait.custom_minimum_size*grow
+			stage.fill_ratio=0.9
+			stage.pedestal_lift=0.0
 			stage.modulate=portrait.modulate
 			stage.size_flags_horizontal=Control.SIZE_SHRINK_CENTER
 			column.add_child(stage)
@@ -1488,7 +1494,9 @@ func _animate_room_avatar(member_id: String, source: Dictionary, order := 0) -> 
 	CharacterSlot.prepare_participants([{"skin_id":str(source.id)}])
 	var entry := source.duplicate(true)
 	entry.animations={"base":source.animations.base,"anim_2":source.animations.anim_2}
-	var wait := order*3
+	# Sempre espera ao menos um quadro: nesta chamada o cartão ainda não entrou na árvore. Sem
+	# isso, quem já tinha o modelo carregado (o próprio jogador, vindo do lobby) nunca animava.
+	var wait := maxi(order*3,2)
 	while wait>0 or CharacterSlot.entry_pending(entry):
 		wait-=1
 		if not is_inside_tree():

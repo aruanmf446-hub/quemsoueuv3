@@ -139,3 +139,18 @@ Pedido do dono: partida com menos pressa e animações das skins sem corte.
 - **Verificação:** sintaxe (`gdparse`), `check_catalogs.py` e `check_design.py`.
   Sem execução local do Godot e sem capturas; o comportamento é conferido pelo
   smoke do CI e pelo dono no jogo publicado.
+
+## Ordem das animações dos personagens — 11/11/2026 (decisão do dono)
+
+| Arquivo | Uso |
+|---|---|
+| `1.fbx` (`base`) | Modelo base — apresentação antes da partida (ordem dos jogadores) |
+| `2.fbx` (`anim_2`) | Lobby — cartões da sala enquanto aguarda o início |
+| `3.fbx` (`anim_3`) | Derrota — palco de resultado dos não vencedores |
+| `4.fbx` (`anim_4`) | Vitória — palco de resultado dos vencedores |
+
+A apresentação antes da partida tocava `anim_2`; passou a tocar `base`. Se o modelo
+base de um personagem não tiver movimento próprio (clipe menor que 0,3 s), o palco
+usa o clipe de lobby como reserva. `data/characters.json` já apontava cada alias
+para o arquivo correto nos sete personagens. El Fuego segue sem `anim_2/3/4`.
+Sem execução local do Godot: o movimento em tela não foi conferido visualmente.

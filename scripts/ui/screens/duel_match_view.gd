@@ -462,7 +462,8 @@ func _maybe_present() -> void:
 		for id in order:
 			var row := _player(_data,str(id))
 			if not row.is_empty(): rows.append(row)
-		_play_sequence(rows,"anim_2",6.0,true)
+		# Apresentação antes da partida: modelo base (arquivo 1). Lobby (2) fica na sala.
+		_play_sequence(rows,"base",6.0,true)
 	if _data.get("phase","")=="finished" and not _reveal_playing and not is_instance_valid(_presentation) and _result_shown!=key:
 		_result_shown=key
 		var rows: Array=[]

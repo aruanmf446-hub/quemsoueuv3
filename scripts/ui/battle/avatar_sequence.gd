@@ -8,6 +8,8 @@ const SECONDS_PER_PLAYER := 6.0
 const MIN_SLOT := 3.5
 const MAX_SLOT := 10.0
 const FADE := 0.4
+## Clipes contínuos (apresentação e lobby) fecham em voltas completas; reações tocam uma vez.
+const LOOPING := ["base", "anim_2"]
 ## Online: segundos disponíveis para a sequência inteira (0 = sem limite). O tempo é
 ## repartido entre todos em vez de mostrar só os primeiros e cortar o resto.
 var time_budget := 0.0
@@ -92,14 +94,20 @@ func present(entries: Array, clip: String, _duration: float, numbered := false) 
 			var entry: Dictionary = candidates[0].duplicate(true)
 			var actions: Dictionary = entry.get("animations", {})
 			entry.animations = {}
-			for alias: String in ["base", current_clip]:
-				if actions.has(alias): entry.animations[alias] = actions[alias]
+			# Ordem dos arquivos de cada personagem (decisão do dono): 1 = modelo base, usado na
+			# apresentação; 2 = lobby; 3 = derrota; 4 = vitória. O clipe de lobby só entra aqui
+			# como reserva quando o modelo base não traz movimento próprio.
+			for alias: String in ["base", current_clip, "anim_2"]:
+				if alias != "anim_2" or current_clip == "base":
+					if actions.has(alias): entry.animations[alias] = actions[alias]
 			while CharacterSlot.entry_pending(entry):
 				await get_tree().process_frame
 				if not is_inside_tree() or _ending: return
 			entry.idle = current_clip
 			_stage.show_character(entry)
-			_stage.character.play_animation(StringName(current_clip), current_clip == "anim_2")
+			if current_clip == "base" and _stage.character.animation_length(&"base") < 0.3 and _stage.character.has_animation(&"anim_2"):
+				current_clip = "anim_2"
+			_stage.character.play_animation(StringName(current_clip), current_clip in LOOPING)
 			# Render a complete pose before fading in. Loading time never consumes the slot.
 			await get_tree().process_frame
 			if not is_inside_tree() or _ending: return
@@ -128,7 +136,7 @@ func present(entries: Array, clip: String, _duration: float, numbered := false) 
 func _slot_seconds(clip: String) -> float:
 	var length := _stage.character.animation_length(StringName(clip))
 	if length < 0.3: return SECONDS_PER_PLAYER
-	if clip == "anim_2": return clampf(ceilf(5.0 / length) * length, MIN_SLOT, MAX_SLOT)
+	if clip in LOOPING: return clampf(ceilf(5.0 / length) * length, MIN_SLOT, MAX_SLOT)
 	return clampf(length + FADE, MIN_SLOT, MAX_SLOT)
 
 

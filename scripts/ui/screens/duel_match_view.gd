@@ -20,7 +20,9 @@ var _canvas: Control
 var _main: VBoxContainer
 var _side: VBoxContainer
 var _roster_frame: ScrollContainer
-var _roster: GridContainer
+const ROSTER_WIDTH := 156.0
+const BOARD_GAP := 8
+var _roster: VBoxContainer
 var _board: PanelContainer
 var _board_content: VBoxContainer
 var _grid: GridContainer
@@ -102,16 +104,19 @@ func _build() -> void:
 	title.clip_text = true
 	title.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	header.add_child(title)
-	_roster = GridContainer.new()
+	var play_area := HBoxContainer.new()
+	play_area.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	play_area.add_theme_constant_override("separation",BOARD_GAP)
+	_main.add_child(play_area)
+	_roster = VBoxContainer.new()
 	_roster.name = "Players"
-	_roster.add_theme_constant_override("h_separation",5)
-	_roster.add_theme_constant_override("v_separation",3)
+	_roster.add_theme_constant_override("separation",4)
 	_roster_frame = ScrollContainer.new()
 	_roster_frame.name = "PlayersScroll"
-	_roster_frame.custom_minimum_size.y = 92
+	_roster_frame.custom_minimum_size.x = ROSTER_WIDTH
 	_roster_frame.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_roster_frame.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
-	_main.add_child(_roster_frame)
+	play_area.add_child(_roster_frame)
 	_roster.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_roster_frame.add_child(_roster)
 	_board = Surface.new()
@@ -120,7 +125,8 @@ func _build() -> void:
 	_board.padding = 7
 	_board.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_board.mouse_filter = Control.MOUSE_FILTER_PASS
-	_main.add_child(_board)
+	_board.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	play_area.add_child(_board)
 	_board_content = PlayerUI.column(_board)
 	_board_content.add_theme_constant_override("separation",5)
 	var instruction_row := PlayerUI.row(_board_content)
@@ -606,21 +612,6 @@ func _render_players() -> void:
 	if players_signature == _players_signature and _roster.get_child_count() > 0: return
 	_players_signature = players_signature
 	PlayerUI.clear(_roster)
-	# Decisão do dono: a faixa segue a ordem sorteada para todos, inclusive o próprio jogador
-	# (antes ele era deslocado para o meio da faixa).
-	_roster.columns = maxi(players.size(),1) if players.size() <= 5 else ceili(players.size()/(2.0 if players.size() <= 12 else 3.0))
-	# iPhone: no máximo 4 jogadores por linha (5 acima de 12) para os nomes caberem inteiros;
-	# o tabuleiro rola, então as linhas extras não espremem as cartas.
-	if UIScale.is_iphone() and players.size() > 3:
-		_roster.columns = 3
-	_roster.size_flags_horizontal = Control.SIZE_SHRINK_CENTER if players.size() <= 3 else Control.SIZE_EXPAND_FILL
-	# T24 iOS: linhas um pouco mais altas para retrato/nome/vidas legíveis (largura já sobrava).
-	# 6+ jogadores: células compactas que cabem inteiras na faixa (2 linhas até 12, 3 até 20).
-	var crowded := players.size() > 5
-	var packed := players.size() > 12
-	_roster.custom_minimum_size.y = 57 if not crowded else 0
-	_roster.add_theme_constant_override("h_separation",5)
-	_roster.add_theme_constant_override("v_separation",3 if not crowded else 2)
 	var winners: Array = (_data.result if _data.get("result") is Dictionary else {}).get("winners",[])
 	for source: Dictionary in players:
 		var player := source.duplicate(true)
@@ -643,61 +634,30 @@ func _render_players() -> void:
 			_turn_pulse = str(player.member_id)
 			panel.modulate = Color(1,1,1,0.4)
 			panel.create_tween().tween_property(panel,"modulate",Color.WHITE,0.4)
-		if players.size() <= 3:
-			# Grupo centralizado; o jogador da vez fica mais alto que os demais.
-			panel.size_flags_horizontal = Control.SIZE_FILL
-			panel.custom_minimum_size = Vector2(minf(_main.size.x/maxf(players.size(),3)-8,230), 76)
-			panel.size_flags_vertical = Control.SIZE_FILL
+		panel.custom_minimum_size.y = 52
 		_roster.add_child(panel)
 		var row := PlayerUI.row(panel)
-		row.add_theme_constant_override("separation",3 if players.size() <= 5 else 5)
-		if players.size() > 5:
-			# Respiro lateral: retrato e nome não encostam nos cantos chanfrados da moldura.
-			var lead := Control.new()
-			lead.custom_minimum_size.x = 3
-			lead.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			row.add_child(lead)
-		var portrait := PlayerUI.portrait(str(player.skin_id),46 if players.size() <= 3 else (32 if players.size() <= 5 else (30 if players.size() <= 12 else 22)))
-		if players.size() <= 5:
-			# Wider upper-bust crop from the packaged 720px portrait, preserving aspect.
-			# This increases the face size inside the same top strip, without a new layout.
-			var portrait_source: Texture2D = portrait.texture
-			var width := 84.0 if players.size() <= 3 else 50.0
-			var height := 56.0 if players.size() <= 3 else 40.0
-			var crop := AtlasTexture.new()
-			crop.atlas = portrait_source
-			crop.region = Rect2(0,0,portrait_source.get_width(),portrait_source.get_height()*0.88)
-			portrait.texture = crop
-			portrait.custom_minimum_size = Vector2(width,height)
-			portrait.pivot_offset = Vector2(width*0.5,height)
-			# O retrato "sai" do cartão; o jogador da vez se destaca mais.
-			portrait.scale = Vector2.ONE*(1.24 if turn or winner else 1.1)
-		elif portrait.texture != null:
-			# T24 iOS: 6–20 jogadores — recorte do busto (rosto maior) no mesmo espaço da linha.
+		row.add_theme_constant_override("separation",5)
+		var portrait := PlayerUI.portrait(str(player.skin_id),38)
+		if portrait.texture != null:
+			var full := portrait.texture
 			var bust := AtlasTexture.new()
-			var full: Texture2D = portrait.texture
 			bust.atlas = full
 			bust.region = Rect2(full.get_width()*0.14,0,full.get_width()*0.72,full.get_height()*0.58)
 			portrait.texture = bust
-			var side := 28.0 if not packed else 22.0
-			portrait.custom_minimum_size = Vector2(side*1.15,side)
-			portrait.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-			portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-			portrait.clip_contents = true
+		portrait.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		var grading := ShaderMaterial.new()
 		grading.shader = preload("res://scripts/ui/battle/battle_illustration.gdshader")
 		grading.set_shader_parameter("saturation",0.0 if player.eliminated else 1.04)
 		portrait.material = grading
 		portrait.name = "Portrait"
 		row.add_child(portrait)
-		# Até 12: nome em cima e vidas embaixo. Acima disso, tudo em uma linha por jogador.
-		var info: BoxContainer = PlayerUI.row(row) if packed else PlayerUI.column(row)
+		var info := PlayerUI.column(row)
 		info.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		info.add_theme_constant_override("separation",0 if not packed else 3)
-		var nickname := Style.label(str(player.nickname),19 if players.size() <= 3 else (17 if players.size() <= 5 else (13 if players.size() <= 12 else 12)),PlayerUI.GOLD if turn else PlayerUI.TEXT)
-		if crowded: nickname.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		info.add_theme_constant_override("separation",0)
+		var nickname := Style.label(str(player.nickname),16,PlayerUI.GOLD if turn else PlayerUI.TEXT)
 		Style.strong(nickname)
 		nickname.text = str(player.nickname)
 		nickname.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
@@ -708,45 +668,29 @@ func _render_players() -> void:
 		info.add_child(nickname)
 		var hearts := PlayerUI.row(info)
 		hearts.add_theme_constant_override("separation",2)
-		if packed: hearts.size_flags_horizontal = Control.SIZE_SHRINK_END
-		# 6+ jogadores: o estado (eliminado, pronto, vitória) ocupa o lugar das vidas, na mesma
-		# linha, em vez de abrir uma terceira linha que estourava a faixa.
-		var inline_status: bool = crowded and (uncertain or player.eliminated or winner or (_data.phase == "selection" and player.confirmed))
-		for index in range(0 if uncertain or inline_status else (int(player.lives) if players.size() <= 3 else 1)):
-			var heart := TextureRect.new()
-			heart.texture = Icons.heart(18,true)
-			heart.custom_minimum_size = Vector2(18,18) if players.size() <= 3 else (Vector2(15,15) if players.size() <= 5 else (Vector2(13,13) if players.size() <= 12 else Vector2(12,12)))
-			heart.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			heart.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			heart.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-			hearts.add_child(heart)
-		if players.size() > 3 and not uncertain and not inline_status:
-			var count := Style.label(str(player.lives),15 if players.size() <= 5 else (13 if players.size() <= 12 else 12),Color("#ff9a8f") if int(player.lives) <= 1 else PlayerUI.TEXT)
-			count.name = "Lives"
-			Style.strong(count)
-			hearts.add_child(count)
-		var status_line: Control = hearts if crowded else info
-		var status_size := 9 if players.size() <= 5 else 10
-		if uncertain: status_line.add_child(Style.label("REVELANDO…",status_size,PlayerUI.MUTED))
+		if uncertain:
+			hearts.add_child(Style.label("REVELANDO…",10,PlayerUI.MUTED))
 		elif player.eliminated:
 			nickname.add_theme_color_override("font_color",PlayerUI.MUTED)
 			portrait.modulate = Color("#555967")
-			status_line.add_child(Style.label("ELIMINADO",status_size,PlayerUI.MUTED))
-		elif winner: status_line.add_child(Style.label("VITÓRIA",10,PlayerUI.GOLD))
-		elif turn and players.size() <= 5:
-			var badge := PlayerUI.pill("NA VEZ","equipped")
-			badge.name = "TurnBadge"
-			badge.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-			info.add_child(badge)
-		elif _data.phase == "selection" and player.confirmed: status_line.add_child(Style.label("PRONTO",status_size,PlayerUI.GOLD))
-		# Reserve the same status line for ready/turn/eliminated states (até 5 jogadores).
-		info.custom_minimum_size.y = 64 if players.size() <= 3 else (50 if not crowded else 0)
-		if crowded:
-			# Mesmo respiro do lado direito (coração e número não encostam na moldura).
-			var trail := Control.new()
-			trail.custom_minimum_size.x = 5
-			trail.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			row.add_child(trail)
+			hearts.add_child(Style.label("ELIMINADO",10,PlayerUI.MUTED))
+		else:
+			var heart := TextureRect.new()
+			heart.texture = Icons.heart(16,true)
+			heart.custom_minimum_size = Vector2(16,16)
+			heart.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			heart.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			hearts.add_child(heart)
+			var count := Style.label(str(player.lives),16,Color("#ff9a8f") if int(player.lives) <= 1 else PlayerUI.TEXT)
+			count.name = "Lives"
+			hearts.add_child(count)
+			if winner: hearts.add_child(Style.label("VITÓRIA",10,PlayerUI.GOLD))
+			elif turn:
+				var badge := Style.label("NA VEZ",10,PlayerUI.GOLD)
+				badge.name = "TurnBadge"
+				hearts.add_child(badge)
+			elif _data.phase == "selection" and player.confirmed:
+				hearts.add_child(Style.label("PRONTO",10,PlayerUI.GOLD))
 		var previous := int(_last_lives.get(player.member_id,player.lives))
 		if int(player.lives) < previous:
 			portrait.modulate = Color("#ff766b")
@@ -966,14 +910,6 @@ func _layout() -> void:
 	_top_offset = inset
 	_main.position = Vector2(0,inset)
 	var target_main_width := width-side_width-20
-	# Reduzir mínimos dos avatares ANTES de definir o novo tamanho do painel.
-	# Caso contrário o próprio Container impede a janela de encolher.
-	var player_count := _roster.get_child_count()
-	if player_count > 0 and player_count <= 3:
-		var roster_gap := float(_roster.get_theme_constant("h_separation"))
-		var slot_width := maxf(48.0,floorf((target_main_width-(player_count-1)*roster_gap)/player_count)-2.0)
-		for panel: Control in _roster.get_children():
-			panel.custom_minimum_size.x = slot_width
 	_main.size = Vector2(target_main_width,_usable_height())
 	var rail: Control = _side_scroll if is_instance_valid(_side_scroll) else _side
 	rail.position = Vector2(width-side_width,inset)
@@ -1029,9 +965,8 @@ func _fit_cards() -> void:
 	var frame := float(_board.padding*2)
 	var header := _main.get_node("BattleHeader") as Control
 	var header_height := maxf(header.custom_minimum_size.y,header.get_combined_minimum_size().y)
-	var roster_height := _roster_frame.custom_minimum_size.y
-	var available_height := maxf(1.0,_usable_height()-header_height-roster_height-6-frame-instruction_row.get_combined_minimum_size().y-5)
-	var available_width := maxf(1.0,main_width-frame)
+	var available_height := maxf(1.0,_usable_height()-header_height-3-frame-instruction_row.get_combined_minimum_size().y-5)
+	var available_width := maxf(1.0,main_width-ROSTER_WIDTH-BOARD_GAP-frame)
 	_grid.columns = _best_grid_columns(count,available_width,available_height,gap)
 	var rows := ceili(float(count)/_grid.columns)
 	var slot_width := (available_width-(_grid.columns-1)*gap)/_grid.columns

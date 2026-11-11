@@ -104,6 +104,12 @@ func run() -> void:
 	battle.refresh()
 	await settle()
 	check(players_scroll.get_global_rect().is_equal_approx(roster_before),"twenty players retain roster bounds")
+	check(players_scroll.get_global_rect().end.x <= before.BattleBoard.position.x,"roster left of board")
+	var scroll := players_scroll as ScrollContainer
+	scroll.scroll_vertical = 100000
+	await settle()
+	var last := battle.find_child("Players",true,false).get_child(-1) as Control
+	check(scroll.scroll_vertical > 0 and scroll.get_global_rect().grow(1).encloses(last.get_global_rect()),"last player reachable")
 	stable(before,"twenty players")
 	screen.queue_free()
 	services.queue_free()

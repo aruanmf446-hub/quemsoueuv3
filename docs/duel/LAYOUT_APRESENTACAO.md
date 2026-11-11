@@ -10,7 +10,7 @@ Branch `work/duel-layout-avatar-stage`. Sem publicação automática nesta entre
   de recorte focal. Slot retrato 9:16, legenda separada da arte.
 - A grade considera o pool original, não a contagem restante; eliminar cartas não
   altera o formato de todas as demais. Resize real da janela continua suportado.
-- Jogadores têm faixa reservada com rolagem para grupos grandes. Chat e mão
+- Os jogadores aparecem à esquerda do tabuleiro, um por linha, na ordem sorteada. A lista tem rolagem vertical própria para grupos grandes. Chat e mão
   privada mantêm espaço ao abrir/fechar; a mão tem rolagem própria.
 - Palco opaco separado, um único viewport 3D reutilizado, nome e posição na ordem,
   fade suave e Continuar acessível por teclado. Sem FBX sobre as cartas reveladas.

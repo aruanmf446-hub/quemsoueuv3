@@ -40,6 +40,17 @@ async function run() {
   assert.equal(bridge.snapshot().mic, false, "no implicit microphone consent");
   await bridge.setMic(true);
   assert.equal(bridge.snapshot().mic, true);
+  await bridge.setMatchAccess(true, []);
+  assert.equal(bridge.snapshot().mic, false, "elimination mutes an open microphone");
+  await bridge.setMic(true);
+  assert.equal(bridge.snapshot().mic, false, "spectator cannot unmute");
+  await bridge.leave();
+  await bridge.join("wss://example.livekit.cloud", "t".repeat(80));
+  await bridge.setMic(true);
+  assert.equal(bridge.snapshot().mic, false, "reconnecting preserves spectator lock");
+  bridge.setMatchAccess(false, []);
+  await bridge.setMic(true);
+  assert.equal(bridge.snapshot().mic, true, "lobby restores microphone control");
   bridge.setAudioMuted(true);
   assert.equal(bridge.snapshot().audioMuted, true);
   await bridge.leave();

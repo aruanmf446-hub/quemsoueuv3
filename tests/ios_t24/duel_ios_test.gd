@@ -39,8 +39,8 @@ func _run() -> void:
 	services.duel.local_server.clock_offset += 120
 	await services.duel.refresh()
 	await settle()
-	var roster := battle.find_child("Players", true, false) as GridContainer
-	check(roster.get_child_count() == 10 and roster.columns == 5, "10 jogadores em 2 linhas de 5")
+	var roster := battle.find_child("Players", true, false) as VBoxContainer
+	check(roster.get_child_count() == 10 and roster.get_child(1).position.y >= roster.get_child(0).get_rect().end.y, "10 jogadores em lista vertical")
 	var slot := roster.get_child(0)
 	var portrait := slot.find_child("Portrait", true, false) as TextureRect
 	check(portrait.texture is AtlasTexture and portrait.custom_minimum_size.y >= 36, "retrato com recorte do busto (%s)" % portrait.custom_minimum_size)

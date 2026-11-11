@@ -103,12 +103,12 @@ func _refresh() -> void:
 	_connect.disabled = connecting or not voice.eligible()
 	_connect.text = "Conectando…" if connecting else ("Tentar de novo" if voice.state == "error" else "Entrar na voz")
 	_mic.visible = connected
-	_mic.disabled = not connected
+	_mic.disabled = not connected or services.duel.spectating_match()
 	_leave.visible = connected
 	_mic.icon = PremiumUI.icon("mic" if voice.mic_enabled else "mic_off", GREEN if voice.mic_enabled else PlayerUI.MUTED, 40)
 	_mic.tooltip_text = "Desligar microfone" if voice.mic_enabled else "Ligar microfone"
 	match voice.state:
-		"connected": _status.text = ""
+		"connected": _status.text = "Ouvindo" if services.duel.spectating_match() else ""
 		"connecting": _status.text = ""
 		"error": _status.text = "Falha na voz"
 		_: _status.text = "" if voice.eligible() else "Indisponível"

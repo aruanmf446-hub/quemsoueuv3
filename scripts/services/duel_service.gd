@@ -213,6 +213,12 @@ func match() -> Dictionary:
 	return room.get("match") if room.get("match") is Dictionary else {}
 
 
+func spectating_match() -> bool:
+	if str(room.get("room",{}).get("status","")) != "in_match": return false
+	for player: Dictionary in self.match().get("players",[]):
+		if player.get("is_you",false): return player.get("eliminated",false)
+	return true
+
 ## Segundos até o prazo da fase atual, pelo relógio do servidor (o do aparelho pode estar
 ## adiantado ou atrasado): diferença calculada na chegada e descontada localmente.
 func seconds_left() -> float:

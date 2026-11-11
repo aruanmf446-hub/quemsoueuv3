@@ -9,6 +9,8 @@
   const SDK_URL = "https://cdn.jsdelivr.net/npm/livekit-client@2.23.0/dist/livekit-client.umd.min.js";
   let sdkPromise = null;
   let room = null;
+  let micLocked = false;
+  let silentMembers = new Set();
   let generation = 0;
   let roster = new Map();
   const audioElements = new Set();
@@ -50,7 +52,7 @@
     const element = track.attach();
     element.autoplay = true;
     element.playsInline = true;
-    element.muted = state.audioMuted;
+    element.muted = state.audioMuted || silentMembers.has(roster.get(participant?.identity)?.member_id);
     element.dataset.qseVoice = "1";
     element.dataset.participant = participant?.identity || "";
     element.style.display = "none";
@@ -82,7 +84,8 @@
     if (!Array.isArray(members)) return;
     roster = new Map(members
       .filter((member) => member && typeof member.tag === "string")
-      .map((member) => [member.tag, String(member.nickname || "").slice(0, 80)]));
+      .map((member) => [member.tag, {nickname: String(member.nickname || "").slice(0, 80), member_id: member.member_id}]));
+    setAudioMuted(state.audioMuted);
   }
 
   async function join(url, token, members = []) {
@@ -146,10 +149,24 @@
     }
   }
 
+  function setMatchAccess(locked, silent) {
+    micLocked = !!locked;
+    silentMembers = new Set(silent);
+    setAudioMuted(state.audioMuted);
+    if (micLocked && room && state.connected) return setMic(false);
+  }
+
   async function setMic(enabled) {
-    if (!room || !state.connected) return;
+    if (!room || !state.connected || (enabled && micLocked)) return;
+    const current = room;
     try {
-      await room.localParticipant.setMicrophoneEnabled(!!enabled);
+      await current.localParticipant.setMicrophoneEnabled(!!enabled);
+      if (current !== room) return;
+      if (enabled && micLocked) {
+        await current.localParticipant.setMicrophoneEnabled(false);
+        state.mic = false;
+        return;
+      }
       state.mic = !!enabled;
       state.error = "";
     } catch {
@@ -160,7 +177,7 @@
 
   function setAudioMuted(muted) {
     state.audioMuted = !!muted;
-    for (const element of audioElements) element.muted = state.audioMuted;
+    for (const element of audioElements) element.muted = state.audioMuted || silentMembers.has(roster.get(element.dataset.participant)?.member_id);
   }
 
   async function unlockAudio() {
@@ -188,7 +205,8 @@
     const participants = room && state.connected
       ? Array.from(room.remoteParticipants.values()).map((participant) => ({
           id: participant.identity,
-          name: roster.get(participant.identity) || "",
+          name: roster.get(participant.identity)?.nickname || "",
+          member_id: roster.get(participant.identity)?.member_id || "",
           speaking: !!participant.isSpeaking,
           volume: volumes.get(participant.identity) ?? 1,
         }))
@@ -199,6 +217,6 @@
   }
 
   window.QSEVoice = Object.freeze({
-    join, leave, setMic, setAudioMuted, unlockAudio, setPlayerVolume, setRoster, snapshot,
+    join, leave, setMic, setAudioMuted, unlockAudio, setPlayerVolume, setRoster, setMatchAccess, snapshot,
   });
 })();

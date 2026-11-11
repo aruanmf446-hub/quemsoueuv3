@@ -2,6 +2,8 @@
 const fs = require("node:fs");
 const vm = require("node:vm");
 const assert = require("node:assert/strict");
+let autoplayBlocked = false;
+let connectFails = false;
 class FakeRoom {
   constructor() {
     this.listeners = new Map();
@@ -10,9 +12,15 @@ class FakeRoom {
     this.mic = false;
   }
   on(event, fn) { this.listeners.set(event, fn); return this; }
-  async connect() { this.connected = true; }
+  async connect() {
+    if (connectFails) throw new Error("connection rejected");
+    this.connected = true;
+  }
   async disconnect() { this.connected = false; }
-  async startAudio() { this.audioStarted = true; }
+  async startAudio() {
+    if (autoplayBlocked) throw new Error("autoplay denied");
+    this.audioStarted = true;
+  }
 }
 const window = {
   LivekitClient: {
@@ -23,6 +31,7 @@ const window = {
       Reconnecting: "reconnecting",
       Reconnected: "reconnected",
       Disconnected: "disconnected",
+      AudioPlaybackStatusChanged: "audioPlaybackStatusChanged",
     },
   },
 };
@@ -56,6 +65,17 @@ async function run() {
   await bridge.leave();
   assert.equal(bridge.snapshot().connected, false);
   assert.equal(bridge.snapshot().mic, false);
+  connectFails = true;
+  await bridge.join("wss://example.livekit.cloud", "t".repeat(80));
+  assert.equal(bridge.snapshot().error, "voice_connect_failed");
+  connectFails = false;
+  autoplayBlocked = true;
+  await bridge.join("wss://example.livekit.cloud", "t".repeat(80));
+  assert.equal(bridge.snapshot().connected, true, "retry connects");
+  assert.equal(bridge.snapshot().audioBlocked, true, "autoplay failure is surfaced");
+  autoplayBlocked = false;
+  await bridge.unlockAudio();
+  assert.equal(bridge.snapshot().audioBlocked, false, "gesture unlocks audio");
   console.log("PASS T32 Web LiveKit bridge contract");
 }
 run().catch((error) => { console.error(error); process.exitCode = 1; });

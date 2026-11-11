@@ -15,7 +15,7 @@
   let roster = new Map();
   const audioElements = new Set();
   const volumes = new Map();
-  const state = { status: "off", connected: false, mic: false, audioMuted: false, error: "" };
+  const state = { status: "off", connected: false, mic: false, audioMuted: false, audioBlocked: false, error: "" };
 
   function loadSDK() {
     if (window.LivekitClient) return Promise.resolve(window.LivekitClient);
@@ -72,6 +72,7 @@
     state.connected = false;
     state.mic = false;
     state.audioMuted = false;
+    state.audioBlocked = false;
     state.error = "";
     roster.clear();
     volumes.clear();
@@ -95,6 +96,7 @@
     state.error = "";
     setRoster(members);
     let nextRoom = null;
+    let failure = "sdk_load_failed";
     try {
       if (typeof url !== "string" || !url.startsWith("wss://") ||
           typeof token !== "string" || token.length < 20) {
@@ -102,6 +104,7 @@
       }
       const sdk = await loadSDK();
       if (operation !== generation) return;
+      failure = "voice_connect_failed";
       nextRoom = new sdk.Room({ adaptiveStream: true, dynacast: false });
       const localRoom = nextRoom;
       localRoom.on(sdk.RoomEvent.TrackSubscribed, (track, _pub, participant) => {
@@ -113,6 +116,9 @@
       });
       localRoom.on(sdk.RoomEvent.Reconnected, () => {
         if (room === localRoom) state.status = "connected";
+      });
+      localRoom.on(sdk.RoomEvent.AudioPlaybackStatusChanged, () => {
+        if (room === localRoom) state.audioBlocked = !localRoom.canPlaybackAudio;
       });
       localRoom.on(sdk.RoomEvent.Disconnected, () => {
         if (room === localRoom) {
@@ -134,7 +140,9 @@
       state.mic = false; // no automatic getUserMedia; permission only by button
       // Autoplay may be blocked since the token request was asynchronous.
       // The visible "Liberar áudio" button retries in a real user gesture.
-      try { await localRoom.startAudio(); } catch { /* needs gesture */ }
+      try { await localRoom.startAudio(); } catch {
+        if (room === localRoom) state.audioBlocked = true;
+      }
     } catch {
       if (nextRoom) {
         try { await nextRoom.disconnect(); } catch { /* ignore */ }
@@ -144,7 +152,7 @@
         clearAudio();
         state.connected = false;
         state.status = "error";
-        state.error = "voice_connect_failed";
+        state.error = failure;
       }
     }
   }
@@ -181,15 +189,17 @@
   }
 
   async function unlockAudio() {
-    if (!room) return;
+    const current = room;
+    if (!current) return;
     try {
-      await room.startAudio();
+      await current.startAudio();
+      if (current !== room) return;
       for (const element of audioElements) {
         try { await element.play(); } catch { /* blocked by browser policy */ }
       }
-      state.error = "";
+      if (current === room) state.audioBlocked = current.canPlaybackAudio === false;
     } catch {
-      state.error = "audio_permission_required";
+      if (current === room) state.audioBlocked = true;
     }
   }
 

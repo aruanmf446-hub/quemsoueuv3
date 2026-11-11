@@ -16,6 +16,7 @@ var state := "off" # off / connecting / connected / error
 var error_code := ""
 var mic_enabled := false
 var audio_muted := false
+var audio_blocked := false
 var participants: Array = []
 ## Fala do próprio jogador (evento real do LiveKit).
 var self_speaking := false
@@ -81,6 +82,8 @@ func join_voice() -> void:
 	_epoch += 1
 	var operation := _epoch
 	room_id = duel.room_id()
+	# Não deixe o polling do bridge anterior sobrescrever uma nova tentativa.
+	_bridge_started = false
 	state = "connecting"
 	error_code = ""
 	changed.emit()
@@ -94,8 +97,11 @@ func join_voice() -> void:
 	if not eligible() or duel.room_id() != room_id:
 		disconnect_voice()
 		return
-	if not result.ok or not result.data is Dictionary:
-		_fail("token_unavailable")
+	if not result.ok:
+		_fail(str(result.get("code", "token_unavailable")))
+		return
+	if not result.data is Dictionary:
+		_fail("invalid_token_response")
 		return
 	var data: Dictionary = result.data
 	var url := str(data.get("server_url", ""))
@@ -130,6 +136,7 @@ func disconnect_voice() -> void:
 	error_code = ""
 	mic_enabled = false
 	audio_muted = false
+	audio_blocked = false
 	participants = []
 	self_speaking = false
 	changed.emit()
@@ -174,14 +181,16 @@ func _poll() -> void:
 	var next_error := str(parsed.get("error", ""))
 	var next_mic := bool(parsed.get("mic", false))
 	var next_audio := bool(parsed.get("audioMuted", false))
+	var next_blocked := bool(parsed.get("audioBlocked", false))
 	var next_players: Array = parsed.get("participants", []) if parsed.get("participants", []) is Array else []
 	var next_self := bool(parsed.get("selfSpeaking", false))
-	if state != updated or error_code != next_error or mic_enabled != next_mic or audio_muted != next_audio or participants != next_players or self_speaking != next_self:
+	if state != updated or error_code != next_error or mic_enabled != next_mic or audio_muted != next_audio or audio_blocked != next_blocked or participants != next_players or self_speaking != next_self:
 		self_speaking = next_self
 		state = updated
 		error_code = next_error
 		mic_enabled = next_mic
 		audio_muted = next_audio
+		audio_blocked = next_blocked
 		participants = next_players
 		changed.emit()
 	if state == "connected" and not _reconciling and Time.get_ticks_msec() / 1000.0 >= _reconcile_at:

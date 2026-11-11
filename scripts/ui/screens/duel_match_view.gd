@@ -606,10 +606,8 @@ func _render_players() -> void:
 	if players_signature == _players_signature and _roster.get_child_count() > 0: return
 	_players_signature = players_signature
 	PlayerUI.clear(_roster)
-	var mine := players.find_custom(func(player: Dictionary) -> bool: return player.get("is_you",false))
-	if mine >= 0:
-		var local: Dictionary = players.pop_at(mine)
-		players.insert(floori(players.size()/2.0),local)
+	# Decisão do dono: a faixa segue a ordem sorteada para todos, inclusive o próprio jogador
+	# (antes ele era deslocado para o meio da faixa).
 	_roster.columns = maxi(players.size(),1) if players.size() <= 5 else ceili(players.size()/(2.0 if players.size() <= 12 else 3.0))
 	# iPhone: no máximo 4 jogadores por linha (5 acima de 12) para os nomes caberem inteiros;
 	# o tabuleiro rola, então as linhas extras não espremem as cartas.
@@ -620,9 +618,9 @@ func _render_players() -> void:
 	# 6+ jogadores: células compactas que cabem inteiras na faixa (2 linhas até 12, 3 até 20).
 	var crowded := players.size() > 5
 	var packed := players.size() > 12
-	_roster.custom_minimum_size.y = 57 if not crowded else 84
-	_roster.add_theme_constant_override("h_separation",5 if not crowded else 4)
-	_roster.add_theme_constant_override("v_separation",3 if not packed else 2)
+	_roster.custom_minimum_size.y = 57 if not crowded else 0
+	_roster.add_theme_constant_override("h_separation",5)
+	_roster.add_theme_constant_override("v_separation",3 if not crowded else 2)
 	var winners: Array = (_data.result if _data.get("result") is Dictionary else {}).get("winners",[])
 	for source: Dictionary in players:
 		var player := source.duplicate(true)
@@ -635,7 +633,7 @@ func _render_players() -> void:
 		var turn: bool = str(player.member_id) == str(_data.get("turn_member","")) and _data.phase in ["turns","reveal"] and not _closed() and not player.eliminated
 		var winner: bool = winners.has(player.member_id) and _data.phase == "finished" and not _reveal_playing
 		var panel := Surface.new()
-		panel.padding = 3 if players.size() <= 5 else 1
+		panel.padding = 3
 		panel.variant = "player"
 		panel.active = (turn or winner) and not player.eliminated
 		panel.name = "Player_" + str(player.member_id)
@@ -652,7 +650,13 @@ func _render_players() -> void:
 			panel.size_flags_vertical = Control.SIZE_FILL
 		_roster.add_child(panel)
 		var row := PlayerUI.row(panel)
-		row.add_theme_constant_override("separation",3)
+		row.add_theme_constant_override("separation",3 if players.size() <= 5 else 5)
+		if players.size() > 5:
+			# Respiro lateral: retrato e nome não encostam nos cantos chanfrados da moldura.
+			var lead := Control.new()
+			lead.custom_minimum_size.x = 3
+			lead.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			row.add_child(lead)
 		var portrait := PlayerUI.portrait(str(player.skin_id),46 if players.size() <= 3 else (32 if players.size() <= 5 else (30 if players.size() <= 12 else 22)))
 		if players.size() <= 5:
 			# Wider upper-bust crop from the packaged 720px portrait, preserving aspect.
@@ -675,7 +679,7 @@ func _render_players() -> void:
 			bust.atlas = full
 			bust.region = Rect2(full.get_width()*0.14,0,full.get_width()*0.72,full.get_height()*0.58)
 			portrait.texture = bust
-			var side := 30.0 if not packed else 22.0
+			var side := 28.0 if not packed else 22.0
 			portrait.custom_minimum_size = Vector2(side*1.15,side)
 			portrait.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -737,6 +741,12 @@ func _render_players() -> void:
 		elif _data.phase == "selection" and player.confirmed: status_line.add_child(Style.label("PRONTO",status_size,PlayerUI.GOLD))
 		# Reserve the same status line for ready/turn/eliminated states (até 5 jogadores).
 		info.custom_minimum_size.y = 64 if players.size() <= 3 else (50 if not crowded else 0)
+		if crowded:
+			# Mesmo respiro do lado direito (coração e número não encostam na moldura).
+			var trail := Control.new()
+			trail.custom_minimum_size.x = 5
+			trail.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			row.add_child(trail)
 		var previous := int(_last_lives.get(player.member_id,player.lives))
 		if int(player.lives) < previous:
 			portrait.modulate = Color("#ff766b")

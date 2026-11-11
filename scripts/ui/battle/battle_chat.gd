@@ -48,9 +48,15 @@ func _ready() -> void:
 	badge_style.set_content_margin_all(2)
 	_badge.add_theme_stylebox_override("normal",badge_style)
 	_header.add_child(_badge)
-	_badge.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	_badge.position = Vector2(-23,4)
-	_badge.size = Vector2(19,18)
+	# Fixo no canto direito do cabeçalho: nunca por cima do título "Chat da sala".
+	_badge.anchor_left = 1.0
+	_badge.anchor_right = 1.0
+	_badge.anchor_top = 0.0
+	_badge.anchor_bottom = 0.0
+	_badge.offset_left = -25.0
+	_badge.offset_right = -6.0
+	_badge.offset_top = 4.0
+	_badge.offset_bottom = 22.0
 	_badge.hide()
 	_body = PlayerUI.column(column)
 	_body.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -110,12 +116,12 @@ func refresh_availability() -> void:
 		show()
 	_selector.hide()
 	if duel.is_local():
-		# Local: sem servidor; as mensagens desta tela continuam. Começa recolhido (só o
-		# cabeçalho) para não tirar espaço das cartas; um toque abre.
+		# Local: sem servidor; as mensagens desta tela continuam. O painel já tem o espaço
+		# reservado na coluna, então fica aberto (antes aparecia vazio, só com o título).
+		# No iPhone continua recolhido, como definido para aquela tela.
 		if not _local_started:
 			_local_started = true
-			# iPhone: a coluna lateral é larga e alta o bastante; o chat fica aberto.
-			if not _collapsed: _toggle()
+			if _collapsed != UIScale.is_iphone(): _toggle()
 		if _owned: _stop()
 		_bot_comment()
 		_state()

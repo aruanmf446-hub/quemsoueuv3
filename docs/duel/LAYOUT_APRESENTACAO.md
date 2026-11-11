@@ -154,3 +154,18 @@ base de um personagem não tiver movimento próprio (clipe menor que 0,3 s), o p
 usa o clipe de lobby como reserva. `data/characters.json` já apontava cada alias
 para o arquivo correto nos sete personagens. El Fuego segue sem `anim_2/3/4`.
 Sem execução local do Godot: o movimento em tela não foi conferido visualmente.
+
+## Correções após conferência do dono no jogo publicado — 11/11/2026
+
+- **Lobby da sala:** o cartão do próprio jogador não animava porque o carregamento
+  era conferido antes de o cartão entrar na árvore (quem já tinha o modelo em
+  memória retornava na hora). Agora sempre espera ao menos um quadro. O limite de
+  6 palcos passou a valer só em celular/tablet (`mobile`, `web_android`,
+  `web_ios`); janela pequena no computador anima todos. Palco 20% mais largo e 45%
+  mais alto que o retrato, com `fill_ratio` 0,9, para o corpo inteiro não ficar miúdo.
+- **Faixa de jogadores:** segue a ordem sorteada para todos (o jogador local não é
+  mais deslocado para o meio). Com 6+ jogadores, células com respiro interno.
+- **Ordem da partida:** 3,5 s por jogador.
+- **Chat:** contador de não lidas fixo no canto direito do cabeçalho; na partida
+  local o chat começa aberto (o espaço já é reservado), exceto no iPhone.
+- Sem execução local do Godot; conferência visual fica com o dono.

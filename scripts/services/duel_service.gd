@@ -106,7 +106,7 @@ func list_rooms(term: String, only_open: bool) -> Dictionary:
 func create(name: String, public: bool, settings: Dictionary) -> Dictionary:
 	var community := _community()
 	if community!=null:
-		var assets := await community.ensure_ready(settings.get("deck_ids",[]))
+		var assets := await community.ensure_ready(settings.get("deck_ids",[]),["library"])
 		if not assets.ok: return assets
 	return await _apply(await _rpc("qse_duel_create", {"p_name": name.strip_edges(), "p_public": public, "p_settings": settings}))
 
@@ -183,7 +183,9 @@ func pick(card_id: String) -> Dictionary:
 ## Imagem e nome de uma carta "<deck>/<arquivo>" (assets/duel/decks/<deck>/<arquivo>.png).
 static var _deck_info := {}
 static func card_texture(card_id: String) -> Texture2D:
-	if CommunityDecksService.is_ref(card_id.get_slice("/",0)): return CommunityDecksService.texture(card_id)
+	if CommunityDecksService.is_ref(card_id.get_slice("/",0)):
+		var portrait := CommunityDecksService.texture(card_id, "library")
+		return portrait if portrait != null else CommunityDecksService.texture(card_id)
 	var path := "res://assets/duel/decks/oficial/%s.png" % card_id
 	return load(path) as Texture2D if ResourceLoader.exists(path) else null
 
@@ -266,7 +268,7 @@ func _apply(result: Dictionary) -> Dictionary:
 			return ServiceResult.failure("invalid_contract")
 		var community := _community()
 		if community!=null:
-			var assets := await community.ensure_ready(result.data.get("room",{}).get("settings",{}).get("deck_ids",[]))
+			var assets := await community.ensure_ready(result.data.get("room",{}).get("settings",{}).get("deck_ids",[]),["library"])
 			if not assets.ok: result.data["asset_error"]=str(assets.code)
 		if client!=null and epoch!=client.generation: return ServiceResult.failure("session_changed")
 		room = result.data

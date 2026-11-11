@@ -96,15 +96,14 @@
     state.error = "";
     setRoster(members);
     let nextRoom = null;
-    let failure = "sdk_load_failed";
+    let sdk;
     try {
       if (typeof url !== "string" || !url.startsWith("wss://") ||
           typeof token !== "string" || token.length < 20) {
         throw new Error("invalid_join");
       }
-      const sdk = await loadSDK();
+      sdk = await loadSDK();
       if (operation !== generation) return;
-      failure = "voice_connect_failed";
       nextRoom = new sdk.Room({ adaptiveStream: true, dynacast: false });
       const localRoom = nextRoom;
       localRoom.on(sdk.RoomEvent.TrackSubscribed, (track, _pub, participant) => {
@@ -120,12 +119,13 @@
       localRoom.on(sdk.RoomEvent.AudioPlaybackStatusChanged, () => {
         if (room === localRoom) state.audioBlocked = !localRoom.canPlaybackAudio;
       });
-      localRoom.on(sdk.RoomEvent.Disconnected, () => {
+      localRoom.on(sdk.RoomEvent.Disconnected, (reason) => {
         if (room === localRoom) {
           state.status = "error";
           state.connected = false;
           state.mic = false;
-          state.error = "connection_lost";
+          state.error = reason === sdk.DisconnectReason?.DUPLICATE_IDENTITY && reason != null
+            ? "livekit_duplicate_identity" : "connection_lost";
           clearAudio();
         }
       });
@@ -143,7 +143,8 @@
       try { await localRoom.startAudio(); } catch {
         if (room === localRoom) state.audioBlocked = true;
       }
-    } catch {
+    } catch (error) {
+      if (room === nextRoom) room = null;
       if (nextRoom) {
         try { await nextRoom.disconnect(); } catch { /* ignore */ }
       }
@@ -152,9 +153,23 @@
         clearAudio();
         state.connected = false;
         state.status = "error";
-        state.error = failure;
+        state.error = sdk ? connectionFailure(sdk, error) : "sdk_load_failed";
       }
     }
+  }
+
+  function connectionFailure(sdk, error) {
+    const reasons = sdk.ConnectionErrorReason;
+    const reason = error?.reason;
+    if (error?.status === 401 || error?.status === 403 ||
+        (reason != null && reason === reasons?.NotAllowed)) return "livekit_token_rejected";
+    if (error?.status === 404 ||
+        (reason != null && reason === reasons?.ServiceNotFound)) return "livekit_service_not_found";
+    if (reason != null && reason === reasons?.Timeout) return "livekit_timeout";
+    if (reason != null && (reason === reasons?.WebSocket || reason === reasons?.ServerUnreachable)) {
+      return "livekit_signal_unreachable";
+    }
+    return "voice_connect_failed";
   }
 
   function setMatchAccess(locked, silent) {

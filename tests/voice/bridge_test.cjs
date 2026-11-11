@@ -3,9 +3,11 @@ const fs = require("node:fs");
 const vm = require("node:vm");
 const assert = require("node:assert/strict");
 let autoplayBlocked = false;
-let connectFails = false;
+let connectFailure = null;
+let lastRoom;
 class FakeRoom {
   constructor() {
+    lastRoom = this;
     this.listeners = new Map();
     this.remoteParticipants = new Map();
     this.localParticipant = { setMicrophoneEnabled: async (value) => { this.mic = value; } };
@@ -13,7 +15,7 @@ class FakeRoom {
   }
   on(event, fn) { this.listeners.set(event, fn); return this; }
   async connect() {
-    if (connectFails) throw new Error("connection rejected");
+    if (connectFailure) throw connectFailure;
     this.connected = true;
   }
   async disconnect() { this.connected = false; }
@@ -25,6 +27,8 @@ class FakeRoom {
 const window = {
   LivekitClient: {
     Room: FakeRoom,
+    ConnectionErrorReason: { NotAllowed: 0, WebSocket: 6 },
+    DisconnectReason: { DUPLICATE_IDENTITY: 2 },
     RoomEvent: {
       TrackSubscribed: "trackSubscribed",
       TrackUnsubscribed: "trackUnsubscribed",
@@ -65,10 +69,16 @@ async function run() {
   await bridge.leave();
   assert.equal(bridge.snapshot().connected, false);
   assert.equal(bridge.snapshot().mic, false);
-  connectFails = true;
+  connectFailure = new Error("connection rejected");
   await bridge.join("wss://example.livekit.cloud", "t".repeat(80));
   assert.equal(bridge.snapshot().error, "voice_connect_failed");
-  connectFails = false;
+  connectFailure = { reason: 0 };
+  await bridge.join("wss://example.livekit.cloud", "t".repeat(80));
+  assert.equal(bridge.snapshot().error, "livekit_token_rejected");
+  connectFailure = { reason: 6 };
+  await bridge.join("wss://example.livekit.cloud", "t".repeat(80));
+  assert.equal(bridge.snapshot().error, "livekit_signal_unreachable");
+  connectFailure = null;
   autoplayBlocked = true;
   await bridge.join("wss://example.livekit.cloud", "t".repeat(80));
   assert.equal(bridge.snapshot().connected, true, "retry connects");
@@ -76,6 +86,8 @@ async function run() {
   autoplayBlocked = false;
   await bridge.unlockAudio();
   assert.equal(bridge.snapshot().audioBlocked, false, "gesture unlocks audio");
+  lastRoom.listeners.get("disconnected")(2);
+  assert.equal(bridge.snapshot().error, "livekit_duplicate_identity");
   console.log("PASS T32 Web LiveKit bridge contract");
 }
 run().catch((error) => { console.error(error); process.exitCode = 1; });

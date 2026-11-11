@@ -129,6 +129,11 @@ func _error_message(code: String) -> String:
 		"voice_unavailable", "game_unavailable": return "Servidor de voz indisponível"
 		"network", "rate_limit": return "Falha ao pedir acesso"
 		"bridge_unavailable", "sdk_load_failed": return "Voz não carregou"
+		"livekit_duplicate_identity": return "Conta conectada em outra aba ou aparelho"
+		"livekit_token_rejected": return "LiveKit recusou o token"
+		"livekit_service_not_found": return "Projeto LiveKit não encontrado"
+		"livekit_timeout": return "Tempo de conexão LiveKit esgotado"
+		"livekit_signal_unreachable": return "LiveKit inacessível pela rede"
 		"voice_connect_failed", "connection_lost": return "Conexão LiveKit falhou"
 		_: return "Falha no acesso à voz"
 

@@ -148,19 +148,19 @@ Pedido do dono: partida com menos pressa e animações das skins sem corte.
   Sem execução local do Godot e sem capturas; o comportamento é conferido pelo
   smoke do CI e pelo dono no jogo publicado.
 
-## Ordem das animações dos personagens — 11/11/2026 (decisão do dono)
+## Arquivos das animações dos personagens
 
 | Arquivo | Uso |
 |---|---|
 | `1.fbx` (`base`) | Modelo base — apresentação antes da partida (ordem dos jogadores) |
 | `2.fbx` (`anim_2`) | Lobby — cartões da sala enquanto aguarda o início |
-| `3.fbx` (`anim_3`) | Derrota — palco de resultado dos não vencedores |
-| `4.fbx` (`anim_4`) | Vitória — palco de resultado dos vencedores |
+| `4.fbx` (`anim_3`) | Derrota — palco de resultado dos não vencedores |
+| `3.fbx` (`anim_4`) | Vitória — palco de resultado dos vencedores |
 
 A apresentação antes da partida tocava `anim_2`; passou a tocar `base`. Se o modelo
 base de um personagem não tiver movimento próprio (clipe menor que 0,3 s), o palco
-usa o clipe de lobby como reserva. `data/characters.json` já apontava cada alias
-para o arquivo correto nos sete personagens. El Fuego segue sem `anim_2/3/4`.
+usa o clipe de lobby como reserva. O catálogo aponta para os movimentos dos
+arquivos conforme a tabela. El Fuego segue sem `anim_2/3/4`.
 Sem execução local do Godot: o movimento em tela não foi conferido visualmente.
 
 ## Correções após conferência do dono no jogo publicado — 11/11/2026
@@ -177,3 +177,7 @@ Sem execução local do Godot: o movimento em tela não foi conferido visualment
 - **Chat:** contador de não lidas fixo no canto direito do cabeçalho; na partida
   local o chat começa aberto (o espaço já é reservado), exceto no iPhone.
 - Sem execução local do Godot; conferência visual fica com o dono.
+
+Na coluna esquerda da partida, os jogadores ativos sobem conforme as eliminações
+são reveladas. Os eliminados seguem visíveis abaixo e a ordem relativa é preservada
+em cada grupo.

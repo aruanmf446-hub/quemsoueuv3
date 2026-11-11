@@ -527,7 +527,8 @@ func _maybe_present() -> void:
 		for player: Dictionary in _data.get("players",[]):
 			var row := player.duplicate(true)
 			# Only authoritative winners receive victory; everyone else gets defeat.
-			row.presentation_clip = "anim_4" if winners.has(player.member_id) else "anim_3"
+			var won: bool = not player.get("eliminated", false) and winners.has(player.member_id)
+			row.presentation_clip = "anim_4" if won else "anim_3"
 			rows.append(row)
 		if not rows.is_empty(): _play_sequence(rows,"anim_3",6.0)
 
@@ -684,10 +685,21 @@ func _render_players() -> void:
 			if not _player(_data,candidate).get("eliminated",true):
 				next_id = candidate
 				break
-	for source: Dictionary in players:
+	var hiding_reveal := _suspense() or _reveal_playing
+	var active_players: Array = []
+	var eliminated_players: Array = []
+	for player: Dictionary in players:
+		var visible_state: Dictionary = _last_player_states.get(player.member_id, {}) if hiding_reveal else player
+		# Só muda a posição depois que o resultado da jogada pode aparecer.
+		if visible_state.get("eliminated", false):
+			eliminated_players.append(player)
+		else:
+			active_players.append(player)
+	active_players.append_array(eliminated_players)
+	for source: Dictionary in active_players:
 		var player := source.duplicate(true)
 		var uncertain := false
-		if _suspense() or _reveal_playing:
+		if hiding_reveal:
 			if _last_player_states.has(player.member_id):
 				for key in ["lives","faults","eliminated","reason"]: player[key] = _last_player_states[player.member_id].get(key,player.get(key))
 			else: uncertain = true

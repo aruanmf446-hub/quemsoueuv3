@@ -95,16 +95,18 @@ func present(entries: Array, clip: String, _duration: float, numbered := false) 
 			var entry: Dictionary = candidates[0].duplicate(true)
 			var actions: Dictionary = entry.get("animations", {})
 			entry.animations = {}
-			# Ordem dos arquivos de cada personagem (decisão do dono): 1 = modelo base, usado na
-			# apresentação; 2 = lobby; 3 = derrota; 4 = vitória. O clipe de lobby só entra aqui
-			# como reserva quando o modelo base não traz movimento próprio.
-			for alias: String in ["base", current_clip, "anim_2"]:
-				if alias != "anim_2" or current_clip == "base":
-					if actions.has(alias): entry.animations[alias] = actions[alias]
+			# Carrega a pose base e a ação solicitada. A abertura pode usar o lobby
+			# como reserva se o modelo base não tiver movimento.
+			if actions.has("base"):
+				entry.animations["base"] = actions["base"]
+			if actions.has(current_clip):
+				entry.animations[current_clip] = actions[current_clip]
+			if current_clip == "base" and actions.has("anim_2"):
+				entry.animations["anim_2"] = actions["anim_2"]
 			while CharacterSlot.entry_pending(entry):
 				await get_tree().process_frame
 				if not is_inside_tree() or _ending: return
-			entry.idle = current_clip
+			entry.idle = current_clip if current_clip in LOOPING else ""
 			_stage.show_character(entry)
 			if current_clip == "base" and _stage.character.animation_length(&"base") < 0.3 and _stage.character.has_animation(&"anim_2"):
 				current_clip = "anim_2"

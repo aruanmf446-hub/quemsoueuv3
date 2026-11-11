@@ -30,7 +30,10 @@ func revalidate() -> void:
 	_name_label.text = entry.name
 	if character_id != _current_id:
 		_current_id = character_id
-		_stage.show_character(entry)
+		var lobby_entry := entry.duplicate()
+		if lobby_entry.get("animations", {}).has("anim_2"):
+			lobby_entry["idle"] = "anim_2"
+		_stage.show_character(lobby_entry)
 		character_changed.emit(StringName(_current_id))
 	preload("res://scripts/skins/skin_variations.gd").apply(_stage.character,PlayerServices.current.cosmetic_shop.equipped(character_id))
 

@@ -118,3 +118,24 @@ Pedido do dono: partida com menos pressa e animações das skins sem corte.
   clipes e El Fuego (continua sem `anim_2/3/4`).
 - **Verificação:** somente análise de sintaxe (`gdparse`). O Godot não pôde ser
   executado nesta sessão; testes nativos, capturas e Web **não foram rodados**.
+
+## Ajustes pedidos pelo dono — 11/11/2026
+
+- **Corte padrão das capas/cartas:** a arte cobre o quadro (foco no rosto, sem faixas
+  vazias) também no Histórico de resgates, no seletor de decks da sala, na carta
+  revelada e em "Suas cartas" (miniatura e ampliação). Helper:
+  `DeckCover.framed_texture`. A mesa continua com a arte inteira em 9:16.
+- **✓ / ✕:** grandes e no centro da carta ou deck escolhido
+  (`PlayerUI.decision_controls`), dimensionados pelo tamanho da carta.
+- **Lobby da sala:** cada participante toca `anim_2` em loop no próprio cartão
+  (um palco por jogador, perfil leve para os demais; até 6 palcos em celular).
+  O retrato só é trocado depois que o modelo carrega — não há mais cartão vazio.
+- **Revelação:** não lista mais quem não foi atingido.
+- **Faixa de jogadores com 6+:** células compactas (estado no lugar das vidas),
+  cabendo em 2 linhas até 12 jogadores e 3 linhas até 20.
+- **Modo História:** o fundo do texto acompanha o tamanho do texto e as 51 falas
+  de `phase_stories.json` foram traduzidas nos seis idiomas. Textos do HUD e dos
+  tutoriais durante a fase ainda não foram traduzidos.
+- **Verificação:** sintaxe (`gdparse`), `check_catalogs.py` e `check_design.py`.
+  Sem execução local do Godot e sem capturas; o comportamento é conferido pelo
+  smoke do CI e pelo dono no jogo publicado.

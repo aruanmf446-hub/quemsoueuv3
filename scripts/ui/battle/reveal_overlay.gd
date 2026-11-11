@@ -114,9 +114,11 @@ func present(card_id: String, card_name: String, actor_name: String, hits: Array
 	card_col.add_child(art_frame)
 	var art := TextureRect.new()
 	art.name = "RevealCard"
-	art.texture = DuelService.card_texture(card_id)
+	# Corte padrão das cartas: a arte cobre o quadro, sem faixas pretas dos lados.
+	art.texture = DeckCover.framed_texture(DuelService.card_texture(card_id), 170.0 / 200.0)
 	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	art.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	art.custom_minimum_size = Vector2(170, 200)
 	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	art_frame.add_child(art)
@@ -171,7 +173,7 @@ func present(card_id: String, card_name: String, actor_name: String, hits: Array
 			animated.append([row, SFX_HIT, false])
 	var footer_text := ""
 	if mode != "none":
-		footer_text = ("Não atingidos: " + _join(spared)) if not spared.is_empty() else ""
+		# Decisão do dono: a revelação não lista quem não foi atingido.
 		if mode == "eliminated" and spared.size() > 0 and struck.is_empty(): footer_text = "Outros jogadores continuam na partida"
 	if not footer_text.is_empty():
 		var footer := _label(footer_text, 16, TEAL)

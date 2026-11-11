@@ -154,7 +154,9 @@ func _card(card_index: int) -> Control:
 	for field in ["eyebrow", "title", "message"]:
 		var label := Label.new()
 		label.name = field.capitalize()
-		label.text = str(data.get(field, "")).replace("\n\n","\n")
+		# Tradução pelo texto original (data/ui/<idioma>.json); o rótulo não traduz de novo.
+		label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		label.text = tr(str(data.get(field, ""))).replace("\n\n","\n")
 		label.add_theme_font_override("font", _font)
 		label.add_theme_color_override("font_color", Color("#e4bc78") if field == "eyebrow" else Color.WHITE)
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -169,12 +171,20 @@ func _layout_card(frame: Control) -> void:
 	var panel := frame.get_node("Caption") as Panel
 	var side := 32.0
 	var height := 370.0 if manual_story else 260.0
+	var panel_width := maxf(1.0,size.x-side*2)
+	# No modo história o botão "Próximo" fica no canto direito do bloco: o texto não passa por baixo.
+	var message_width := maxf(1.0,panel_width-48.0-(264.0 if manual_story else 0.0))
+	if manual_story:
+		# Fundo do tamanho do texto (pedido do dono): só o necessário, nunca maior que antes.
+		var message := panel.get_node("Message") as Label
+		var text_height := _font.get_multiline_string_size(message.text,HORIZONTAL_ALIGNMENT_LEFT,message_width,24).y
+		height = clampf(108.0+text_height+22.0,188.0,370.0)
 	panel.position = Vector2(side,size.y-height-24.0)
-	panel.size = Vector2(maxf(1.0,size.x-side*2),height)
-	for row: Array in [["Eyebrow",16.0,18,28.0],["Title",50.0,34,48.0],["Message",108.0,24,height-190.0 if manual_story else height-124.0]]:
+	panel.size = Vector2(panel_width,height)
+	for row: Array in [["Eyebrow",16.0,18,28.0],["Title",50.0,34,48.0],["Message",108.0,24,height-124.0]]:
 		var label := panel.get_node(row[0]) as Label
 		label.position = Vector2(24,float(row[1]))
-		label.size = Vector2(maxf(1.0,panel.size.x-48),float(row[3]))
+		label.size = Vector2(message_width if row[0] == "Message" else maxf(1.0,panel_width-48),float(row[3]))
 		label.add_theme_font_size_override("font_size",int(row[2]))
 func _layout() -> void:
 	if _front != null: _layout_card(_front)

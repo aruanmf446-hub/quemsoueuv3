@@ -422,6 +422,12 @@ func _add_offer(grid: GridContainer, offer: Dictionary, rewards: OfficialRewards
 	art.texture = _cover(id) if kind == "deck" else PlayerUI.portrait_texture(id)
 	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	if kind == "deck":
+		# Corte padrão das capas (o mesmo da Biblioteca): a arte cobre o quadro, sem faixas.
+		art.texture = DeckCover.framed_texture(art.texture, DeckCover.ASPECT)
+		art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		art.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		art_slot.clip_contents = true
 	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	art_slot.add_child(art)

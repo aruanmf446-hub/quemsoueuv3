@@ -121,6 +121,24 @@ static func framed(path: String, aspect := ASPECT, focus := PORTRAIT_FOCUS, zoom
 	return atlas
 
 
+## Mesmo recorte de `framed` para uma textura já carregada (cartas do Mata-Mata, inclusive
+## as de decks da comunidade). É o corte padrão das cartas: a moldura fica sempre coberta,
+## com foco no rosto, sem faixas vazias dos lados.
+static var _framed_sources := {}
+static func framed_texture(source: Texture2D, aspect := ASPECT, focus := PORTRAIT_FOCUS) -> Texture2D:
+	if source == null: return null
+	var key := "%d|%.3f|%.2f,%.2f" % [source.get_instance_id(), aspect, focus.x, focus.y]
+	if _framed_sources.has(key) and _framed_sources[key].atlas == source: return _framed_sources[key]
+	var size := Vector2(source.get_size())
+	var region_size := Vector2(size.x, size.x / maxf(aspect, 0.01))
+	if region_size.y > size.y: region_size = Vector2(size.y * aspect, size.y)
+	var atlas := AtlasTexture.new()
+	atlas.atlas = source
+	atlas.region = Rect2((focus * size - region_size * 0.5).clamp(Vector2.ZERO, size - region_size), region_size)
+	_framed_sources[key] = atlas
+	return atlas
+
+
 ## Capa de um rascunho: {path, mode, card_id, focus}. path vazio = sem imagem (monograma).
 static func resolve_draft(store: DeckDrafts, draft: Dictionary) -> Dictionary:
 	var choice: Dictionary = draft.get("cover", {}) if draft.get("cover") is Dictionary else {}

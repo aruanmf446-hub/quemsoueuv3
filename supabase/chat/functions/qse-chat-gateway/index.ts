@@ -92,7 +92,7 @@ async function canMessage(token: string, peerId: string): Promise<boolean | null
 
 // 16D: autorização pontual (SEM cache) no GAME para membro atual de sala;
 // recusa sala encerrada, saída, kick, sala inexistente ou falha da rede.
-type RoomParticipant = { tag: string; member_id: string; nickname: string };
+type RoomParticipant = { can_speak: boolean; tag: string; member_id: string; nickname: string };
 type RoomAccess = { allowed: boolean; participants: RoomParticipant[] };
 
 // GAME valida a identidade e devolve tags pseudonimas e nomes, nunca IDs GAME ao cliente.
@@ -284,6 +284,9 @@ export default {
             return respond({error:"invalid_request_id"},400);
           if (!body.length || [...body].length > MAX_MESSAGE_CHARS)
             return respond({error:"invalid_body"},400);
+          const tag = await roomSenderTag(room.game_room_id, userId);
+          if (!permitted.participants.some(member => member.tag === tag && member.can_speak === true))
+            return respond({error:"spectator_read_only"},403);
           const {data,error} = await db.rpc("qse_chat_room_send",{
             p_sender:userId,p_conversation_id:id,p_request_id:requestId,p_body:body,
           });

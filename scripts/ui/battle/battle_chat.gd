@@ -162,7 +162,8 @@ func _state() -> void:
 	elif chat.messages().is_empty(): text = "Nenhuma mensagem ainda."
 	_status.text = text
 	_status.visible = not text.is_empty()
-	_input.editable = services.duel.is_local() or (_owned and chat.is_open())
+	_input.editable = not services.duel.spectating_match() and (services.duel.is_local() or (_owned and chat.is_open()))
+	_input.placeholder_text = "Somente leitura" if services.duel.spectating_match() else "Mensagem…"
 	_send.disabled = not _input.editable or chat.sending
 func _append(id: String) -> void:
 	if not _owned or not is_inside_tree() or id != _chat.conversation_id: return
@@ -191,7 +192,7 @@ func _append(id: String) -> void:
 		_messages.add_child(bubble)
 		_rendered[str(message.id)] = bubble
 		added += 1
-	if _collapsed: _unread += added
+	if _collapsed and added > 0: _notify_unread(added)
 	_badge.text = str(_unread)
 	_badge.visible = _unread > 0
 	_state()
@@ -224,6 +225,7 @@ func _send_local() -> void:
 
 
 func _send_text() -> void:
+	if services.duel.spectating_match(): return
 	if services.duel.is_local():
 		_send_local()
 		return
@@ -267,7 +269,7 @@ var _bot_last_ms := -10000
 func _bot_comment() -> void:
 	var data := services.duel.match()
 	if data.is_empty(): return
-	var bots: Array=data.get("players",[]).filter(func(p: Dictionary)->bool:return p.get("is_bot",false))
+	var bots: Array=data.get("players",[]).filter(func(p: Dictionary)->bool:return p.get("is_bot",false) and not p.get("eliminated",false))
 	if bots.is_empty(): return
 	var events: Array=data.get("events",[])
 	var key := "%s:%s:%s" % [data.get("id",""),data.get("phase",""),events.back().get("seq",0) if not events.is_empty() else 0]
@@ -287,6 +289,12 @@ func _bot_comment() -> void:
 	_messages.add_child(bubble)
 	_local_count+=1
 	if _collapsed:
-		_unread+=1
+		_notify_unread(1)
 		_badge.text=str(_unread)
 		_badge.show()
+
+
+func _notify_unread(count: int) -> void:
+	_unread += count
+	_badge.modulate = Color(1.6,1.6,1.6)
+	_badge.create_tween().tween_property(_badge,"modulate",Color.WHITE,0.35)

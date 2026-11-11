@@ -4,6 +4,14 @@ Pedido do dono em 09/11/2026: estabilizar jogadores/chat/cartas e separar as
 animações dos avatares da galeria, reutilizando modelos e clipes existentes.
 Branch `work/duel-layout-avatar-stage`. Sem publicação automática nesta entrega.
 
+## Atualização da partida e do espectador
+
+O tabuleiro centraliza as cartas verticalmente. A coluna esquerda reúne a ordem da rodada, vidas e mão privada. O relógio acompanha a instrução do turno. A mão vazia fica compacta. Na eliminação, a mão passa a mostrar o estado de espectador.
+
+A voz usa o LiveKit no cliente Web. A sala continua acessível para leitura e escuta durante a eliminação. O envio de texto consulta o GAME e a emissão e reconciliação de permissões de voz consultam a mesma regra. O cliente também silencia o microfone e a reprodução de jogadores eliminados ao receber o estado da partida.
+
+Para disponibilizar esta revisão online, aplicar primeiro a migração GAME `20261111150000_spectator_communication.sql`, depois as funções `qse-voice-token` (GAME) e `qse-chat-gateway` (CHAT) e o cliente Web correspondente. A alteração está preparada no repositório.
+
 ## Implementação
 
 - A carta usa a imagem original inteira (KEEP_ASPECT_CENTERED), sem AtlasTexture

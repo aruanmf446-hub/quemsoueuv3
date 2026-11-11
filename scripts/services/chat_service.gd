@@ -311,5 +311,6 @@ static func message_for(code: String) -> String:
 		"duplicate_send": return "Enviando a mensagem anterior…"
 		"empty_message": return "Escreva uma mensagem."
 		"message_too_long": return "Mensagem longa demais."
+		"spectator_read_only": return "Espectadores só podem ler o chat."
 		"room_access_denied": return "Você não está mais nesta sala."
 	return "Não foi possível falar com o chat agora."

@@ -81,6 +81,10 @@ func run() -> void:
 	battle.set("_private_signature","")
 	battle.refresh()
 	await settle()
+	var open_hand := geometry()
+	check(open_hand.PrivatePanel.size.y > before.PrivatePanel.size.y,"empty hand is compact")
+	check(is_equal_approx(open_hand.PrivatePanel.end.y,before.PrivatePanel.end.y),"hand anchored at bottom")
+	before.PrivatePanel = open_hand.PrivatePanel
 	stable(before,"private shown")
 	var clip: Control=battle.find_child("PrivateCardsScroll",true,false)
 	for image: Control in battle.find_children("Private_*","TextureRect",true,false):
@@ -111,6 +115,20 @@ func run() -> void:
 	var last := battle.find_child("Players",true,false).get_child(-1) as Control
 	check(scroll.scroll_vertical > 0 and scroll.get_global_rect().grow(1).encloses(last.get_global_rect()),"last player reachable")
 	stable(before,"twenty players")
+	for player: Dictionary in players:
+		if player.get("is_you",false): player.eliminated = true
+	services.duel.changed.emit()
+	battle.refresh()
+	await settle()
+	var input := battle.find_child("ChatInput",true,false) as LineEdit
+	check(services.duel.spectating_match() and not input.editable,"spectator chat is read-only")
+	var message_count := int(chat.get("_local_count"))
+	input.text = "mensagem bloqueada"
+	chat.call("_send_text")
+	check(int(chat.get("_local_count")) == message_count,"spectator cannot send directly")
+	check(not battle.find_child("TogglePrivateCards",true,false).visible,"spectator hand concealed")
+	input.clear()
+	await capture("spectator")
 	screen.queue_free()
 	services.queue_free()
 	await settle()

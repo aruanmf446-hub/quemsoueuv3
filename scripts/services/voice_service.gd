@@ -24,6 +24,7 @@ var _epoch := 0
 var _reconciling := false
 var _reconcile_at := 0.0
 var _bridge_started := false
+var _access_signature := ""
 var _poller: Timer
 
 
@@ -52,10 +53,26 @@ func eligible() -> bool:
 func _room_changed() -> void:
 	if not eligible() or (not room_id.is_empty() and duel.room_id() != room_id):
 		disconnect_voice()
-	elif state == "connected" and not room_id.is_empty():
+	elif _bridge_started and state in ["connected","connecting"]:
+		_sync_match_access()
+	if state == "connected" and not room_id.is_empty():
 		# A room revision (e.g. admin kick) triggers prompt roster reconciliation.
 		_reconcile_at = minf(_reconcile_at, Time.get_ticks_msec() / 1000.0 + 3.0)
 
+
+func _sync_match_access() -> void:
+	var silent := []
+	for player: Dictionary in duel.match().get("players",[]):
+		if player.get("eliminated",false): silent.append(str(player.member_id))
+	var signature := JSON.stringify([duel.spectating_match(),silent])
+	if signature == _access_signature: return
+	_access_signature = signature
+	JavaScriptBridge.eval("window.QSEVoice.setMatchAccess.apply(null," + signature + ")")
+	_reconcile_at = 0.0
+	if duel.spectating_match():
+		mic_enabled = false
+		self_speaking = false
+	changed.emit()
 
 ## Called explicitly by a player button; no background or lobby auto-join.
 func join_voice() -> void:
@@ -90,6 +107,8 @@ func join_voice() -> void:
 		_fail("bridge_unavailable")
 		return
 	_bridge_started = true
+	_access_signature = ""
+	_sync_match_access()
 	JavaScriptBridge.eval("window.QSEVoice.join(" + JSON.stringify(url) + "," + JSON.stringify(token) + "," + JSON.stringify(data.get("participants", [])) + ")")
 	_reconcile_at = Time.get_ticks_msec() / 1000.0 + RECONCILE_SECONDS
 
@@ -121,7 +140,7 @@ func disconnect_voice() -> void:
 
 
 func toggle_microphone() -> void:
-	if state != "connected" or not supported(): return
+	if state != "connected" or not supported() or duel.spectating_match(): return
 	JavaScriptBridge.eval("window.QSEVoice.setMic(" + str(not mic_enabled).to_lower() + ")")
 
 

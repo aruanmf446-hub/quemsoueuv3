@@ -131,7 +131,10 @@ func _build() -> void:
 	var roster_margin := MarginContainer.new()
 	roster_margin.add_theme_constant_override("margin_top",SIDE_TOP_MARGIN)
 	play_area.add_child(roster_margin)
-	roster_margin.add_child(_roster_frame)
+	var player_column := PlayerUI.column(roster_margin)
+	player_column.add_theme_constant_override("separation",5)
+	_roster_frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	player_column.add_child(_roster_frame)
 	_roster.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_roster_frame.add_child(_roster)
 	_board = Surface.new()
@@ -221,8 +224,8 @@ func _build() -> void:
 		_side_scroll.add_child(_side)
 	else:
 		_canvas.add_child(_side)
-	_build_sidebar()
-func _build_sidebar() -> void:
+	_build_sidebar(player_column)
+func _build_sidebar(player_column: VBoxContainer) -> void:
 	var controls := PlayerUI.row(_side)
 	controls.name = "RoomControls"
 	controls.add_theme_constant_override("separation",4)
@@ -288,26 +291,39 @@ func _build_sidebar() -> void:
 	else:
 		room_text.add_child(Style.label("Partida local",16,PlayerUI.GOLD))
 		room_text.add_child(Style.label("Só neste aparelho · sem convite",12,PlayerUI.MUTED))
-	var voice := preload("res://scripts/ui/battle/battle_voice.gd").new()
-	voice.name = "BattleVoice"
-	voice.setup(overlay_parent.get("services") as PlayerServices)
-	voice.visible = not duel.is_local()
-	_side.add_child(voice)
-	var chat := ChatPanel.new()
-	chat.name = "BattleChat"
-	chat.setup(overlay_parent.get("services") as PlayerServices)
-	chat.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var chat_margin := MarginContainer.new()
 	chat_margin.add_theme_constant_override("margin_top",SIDE_TOP_MARGIN)
 	chat_margin.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_side.add_child(chat_margin)
-	chat_margin.add_child(chat)
+	var communication := PlayerUI.column(chat_margin)
+	communication.add_theme_constant_override("separation",4)
+	var voice := preload("res://scripts/ui/battle/battle_voice.gd").new()
+	voice.name = "BattleVoice"
+	voice.setup(overlay_parent.get("services") as PlayerServices)
+	voice.visible = not duel.is_local()
+	communication.add_child(voice)
+	if duel.is_local():
+		var local_voice := Button.new()
+		local_voice.text = "Chat de voz"
+		PlayerUI.style_button(local_voice,false)
+		local_voice.add_theme_font_size_override("font_size",14)
+		local_voice.icon = PremiumUI.icon("mic_off",PlayerUI.MUTED,32)
+		local_voice.add_theme_constant_override("icon_max_width",18)
+		local_voice.custom_minimum_size = Vector2(0,32)
+		local_voice.disabled = true
+		local_voice.tooltip_text = "Disponível em partidas online"
+		communication.add_child(local_voice)
+	var chat := ChatPanel.new()
+	chat.name = "BattleChat"
+	chat.setup(overlay_parent.get("services") as PlayerServices)
+	chat.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	communication.add_child(chat)
 	# Decisão do dono: o chat aparece também na partida local.
 	chat.visible = true
 	var private_panel := PanelContainer.new()
 	private_panel.name = "PrivatePanel"
 	private_panel.add_theme_stylebox_override("panel",Style.panel(6))
-	_side.add_child(private_panel)
+	player_column.add_child(private_panel)
 	_hand = PlayerUI.column(private_panel)
 	_hand.add_theme_constant_override("separation",3)
 	var hand_header := PlayerUI.row(_hand)
@@ -339,6 +355,7 @@ func _build_sidebar() -> void:
 		_private_signature = ""
 		_render_hand(),"eye")
 	_hand_toggle.name = "TogglePrivateCards"
+	_hand_toggle.clip_text = true
 	_hand_toggle.custom_minimum_size.y = 40
 	_hand_toggle.add_theme_font_size_override("font_size",16)
 	_hand.add_child(_hand_toggle)
@@ -814,7 +831,7 @@ func _render_hand() -> void:
 	PlayerUI.clear(grid)
 	grid.columns = mini(maxi(entries.size(),1),3) if _private_shown else 1
 	_hand_toggle.icon = load("res://assets/ui/battle/eye_off.svg" if _private_shown else "res://assets/ui/battle/eye.svg")
-	_hand_toggle.text = ("Ocultar cartas" if _private_shown else "Mostrar cartas") + " · %d" % entries.size()
+	_hand_toggle.text = ("Ocultar" if _private_shown else "Mostrar") + " · %d" % entries.size()
 	_hand_toggle.disabled = entries.is_empty()
 	if _private_shown:
 		for entry: Dictionary in entries:

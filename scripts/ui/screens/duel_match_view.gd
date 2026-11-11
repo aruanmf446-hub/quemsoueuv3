@@ -616,7 +616,12 @@ func _render_players() -> void:
 		_roster.columns = 3
 	_roster.size_flags_horizontal = Control.SIZE_SHRINK_CENTER if players.size() <= 3 else Control.SIZE_EXPAND_FILL
 	# T24 iOS: linhas um pouco mais altas para retrato/nome/vidas legíveis (largura já sobrava).
-	_roster.custom_minimum_size.y = 57 if players.size() <= 5 else (80 if players.size() <= 12 else 99)
+	# 6+ jogadores: células compactas que cabem inteiras na faixa (2 linhas até 12, 3 até 20).
+	var crowded := players.size() > 5
+	var packed := players.size() > 12
+	_roster.custom_minimum_size.y = 57 if not crowded else 84
+	_roster.add_theme_constant_override("h_separation",5 if not crowded else 4)
+	_roster.add_theme_constant_override("v_separation",3 if not packed else 2)
 	var winners: Array = (_data.result if _data.get("result") is Dictionary else {}).get("winners",[])
 	for source: Dictionary in players:
 		var player := source.duplicate(true)
@@ -647,7 +652,7 @@ func _render_players() -> void:
 		_roster.add_child(panel)
 		var row := PlayerUI.row(panel)
 		row.add_theme_constant_override("separation",3)
-		var portrait := PlayerUI.portrait(str(player.skin_id),46 if players.size() <= 3 else (32 if players.size() <= 5 else (36 if players.size() <= 12 else 28)))
+		var portrait := PlayerUI.portrait(str(player.skin_id),46 if players.size() <= 3 else (32 if players.size() <= 5 else (30 if players.size() <= 12 else 22)))
 		if players.size() <= 5:
 			# Wider upper-bust crop from the packaged 720px portrait, preserving aspect.
 			# This increases the face size inside the same top strip, without a new layout.
@@ -669,8 +674,9 @@ func _render_players() -> void:
 			bust.atlas = full
 			bust.region = Rect2(full.get_width()*0.14,0,full.get_width()*0.72,full.get_height()*0.58)
 			portrait.texture = bust
-			var side := 36.0 if players.size() <= 12 else 28.0
+			var side := 30.0 if not packed else 22.0
 			portrait.custom_minimum_size = Vector2(side*1.15,side)
+			portrait.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 			portrait.clip_contents = true
@@ -680,10 +686,13 @@ func _render_players() -> void:
 		portrait.material = grading
 		portrait.name = "Portrait"
 		row.add_child(portrait)
-		var info := PlayerUI.column(row)
+		# Até 12: nome em cima e vidas embaixo. Acima disso, tudo em uma linha por jogador.
+		var info: BoxContainer = PlayerUI.row(row) if packed else PlayerUI.column(row)
 		info.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		info.add_theme_constant_override("separation",0)
-		var nickname := Style.label(str(player.nickname),19 if players.size() <= 3 else (17 if players.size() <= 5 else (15 if players.size() <= 12 else 13)),PlayerUI.GOLD if turn else PlayerUI.TEXT)
+		info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		info.add_theme_constant_override("separation",0 if not packed else 3)
+		var nickname := Style.label(str(player.nickname),19 if players.size() <= 3 else (17 if players.size() <= 5 else (13 if players.size() <= 12 else 12)),PlayerUI.GOLD if turn else PlayerUI.TEXT)
+		if crowded: nickname.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		Style.strong(nickname)
 		nickname.text = str(player.nickname)
 		nickname.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
@@ -694,32 +703,39 @@ func _render_players() -> void:
 		info.add_child(nickname)
 		var hearts := PlayerUI.row(info)
 		hearts.add_theme_constant_override("separation",2)
-		for index in range(0 if uncertain else (int(player.lives) if players.size() <= 3 else 1)):
+		if packed: hearts.size_flags_horizontal = Control.SIZE_SHRINK_END
+		# 6+ jogadores: o estado (eliminado, pronto, vitória) ocupa o lugar das vidas, na mesma
+		# linha, em vez de abrir uma terceira linha que estourava a faixa.
+		var inline_status: bool = crowded and (uncertain or player.eliminated or winner or (_data.phase == "selection" and player.confirmed))
+		for index in range(0 if uncertain or inline_status else (int(player.lives) if players.size() <= 3 else 1)):
 			var heart := TextureRect.new()
 			heart.texture = Icons.heart(18,true)
-			heart.custom_minimum_size = Vector2(18,18) if players.size() <= 3 else (Vector2(15,15) if players.size() <= 5 else (Vector2(16,16) if players.size() <= 12 else Vector2(14,14)))
+			heart.custom_minimum_size = Vector2(18,18) if players.size() <= 3 else (Vector2(15,15) if players.size() <= 5 else (Vector2(13,13) if players.size() <= 12 else Vector2(12,12)))
 			heart.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			heart.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			heart.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			hearts.add_child(heart)
-		if players.size() > 3 and not uncertain:
-			var count := Style.label(str(player.lives),15 if players.size() <= 5 else (16 if players.size() <= 12 else 14),Color("#ff9a8f") if int(player.lives) <= 1 else PlayerUI.TEXT)
+		if players.size() > 3 and not uncertain and not inline_status:
+			var count := Style.label(str(player.lives),15 if players.size() <= 5 else (13 if players.size() <= 12 else 12),Color("#ff9a8f") if int(player.lives) <= 1 else PlayerUI.TEXT)
 			count.name = "Lives"
 			Style.strong(count)
 			hearts.add_child(count)
-		if uncertain: info.add_child(Style.label("REVELANDO…",9,PlayerUI.MUTED))
+		var status_line: Control = hearts if crowded else info
+		var status_size := 9 if players.size() <= 5 else 10
+		if uncertain: status_line.add_child(Style.label("REVELANDO…",status_size,PlayerUI.MUTED))
 		elif player.eliminated:
 			nickname.add_theme_color_override("font_color",PlayerUI.MUTED)
 			portrait.modulate = Color("#555967")
-			info.add_child(Style.label("ELIMINADO",9 if players.size() <= 5 else 11,PlayerUI.MUTED))
-		elif winner: info.add_child(Style.label("VITÓRIA",10,PlayerUI.GOLD))
+			status_line.add_child(Style.label("ELIMINADO",status_size,PlayerUI.MUTED))
+		elif winner: status_line.add_child(Style.label("VITÓRIA",10,PlayerUI.GOLD))
 		elif turn and players.size() <= 5:
 			var badge := PlayerUI.pill("NA VEZ","equipped")
 			badge.name = "TurnBadge"
 			badge.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 			info.add_child(badge)
-		elif _data.phase == "selection" and player.confirmed: info.add_child(Style.label("PRONTO",9 if players.size() <= 5 else 11,PlayerUI.GOLD))
-		# Reserve the same status line for ready/turn/eliminated states.
-		info.custom_minimum_size.y = 64 if players.size() <= 3 else 50
+		elif _data.phase == "selection" and player.confirmed: status_line.add_child(Style.label("PRONTO",status_size,PlayerUI.GOLD))
+		# Reserve the same status line for ready/turn/eliminated states (até 5 jogadores).
+		info.custom_minimum_size.y = 64 if players.size() <= 3 else (50 if not crowded else 0)
 		var previous := int(_last_lives.get(player.member_id,player.lives))
 		if int(player.lives) < previous:
 			portrait.modulate = Color("#ff766b")
@@ -827,10 +843,12 @@ func _render_hand() -> void:
 		for entry: Dictionary in entries:
 			var image := TextureRect.new()
 			image.name = "Private_" + str(entry.card_id).get_file()
-			image.texture = DuelService.card_texture(str(entry.card_id))
+			# Corte padrão das cartas (5:7, foco no rosto): a miniatura cobre o quadro inteiro.
+			image.texture = DeckCover.framed_texture(DuelService.card_texture(str(entry.card_id)), CardFramer.LIBRARY_ASPECT if entries.size() <= 3 else 16.0 / 10.0)
 			image.tooltip_text = _name(str(entry.card_id))
 			image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+			image.clip_contents = true
 			image.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 			image.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			# T24 iOS: altura pela largura real da coluna (proporção da carta), não um valor fixo.
@@ -1078,9 +1096,9 @@ func _preview_private(card_id: String) -> void:
 		row.add_child(card)
 		var image := TextureRect.new()
 		image.name = "PreviewCard"
-		image.texture = DuelService.card_texture(str(entry.card_id))
+		image.texture = DeckCover.framed_texture(DuelService.card_texture(str(entry.card_id)), 1.0 / 1.42)
 		image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		image.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 		image.custom_minimum_size = Vector2(height/1.42,height)
 		image.mouse_filter = Control.MOUSE_FILTER_IGNORE

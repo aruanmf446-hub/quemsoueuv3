@@ -671,13 +671,13 @@ static func decision_controls(parent: Control,confirm: Callable,cancel: Callable
 	overlay.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	parent.add_child(overlay)
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	# ✓ e ✕ grandes no centro da carta/deck escolhido (decisão do dono), não no canto.
 	var row := HBoxContainer.new()
+	row.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	row.alignment=BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation",8)
 	overlay.add_child(row)
-	row.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	row.offset_left=-100
-	row.offset_right=-4
-	row.offset_top=4
-	row.offset_bottom=48
+	row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for spec in [["✓",confirm,Color("#62db91"),"Confirmar "],["✕",cancel,Color("#ff7979"),"Cancelar "]]:
 		var button := PlayerUI.button(spec[0],spec[1])
 		button.name="AcceptSelection" if spec[0]=="✓" else "RejectSelection"
@@ -685,13 +685,26 @@ static func decision_controls(parent: Control,confirm: Callable,cancel: Callable
 		PlayerUI.style_button(button,false)
 		for state in ["normal","hover","pressed","hover_pressed","focus","disabled"]:
 			var box := button.get_theme_stylebox(state).duplicate() as StyleBoxFlat
-			box.set_content_margin_all(6)
+			box.set_content_margin_all(4)
+			# Fundo firme e borda na cor da ação: legível sobre qualquer arte.
+			box.bg_color=Color(0.03,0.06,0.10,0.94) if state!="hover" else Color(0.08,0.12,0.18,0.96)
+			var tint: Color=spec[2]
+			box.border_color=Color(tint,0.45 if state=="disabled" else 1.0)
+			box.set_border_width_all(2)
+			box.set_corner_radius_all(10)
 			button.add_theme_stylebox_override(state,box)
 		for state in ["font_color","font_hover_color","font_focus_color","font_pressed_color","font_hover_pressed_color"]:
 			button.add_theme_color_override(state,spec[2])
-		button.add_theme_font_size_override("font_size",24)
-		button.custom_minimum_size=Vector2(44,44)
+		button.size_flags_vertical=Control.SIZE_SHRINK_CENTER
 		row.add_child(button)
+	# O tamanho acompanha a carta: grande onde há espaço, sempre cabendo os dois lado a lado.
+	var fit := func() -> void:
+		var side := clampf(minf((overlay.size.x-20.0)*0.5,overlay.size.y*0.36),26.0,96.0)
+		for button: Button in row.get_children():
+			button.custom_minimum_size=Vector2(side,side)
+			button.add_theme_font_size_override("font_size",int(side*0.56))
+	overlay.resized.connect(fit)
+	fit.call()
 	return overlay
 
 

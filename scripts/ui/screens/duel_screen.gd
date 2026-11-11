@@ -1,7 +1,12 @@
 extends PlayerScreen
 var _iphone_room_actions: Control
 var _room_stage: LobbyStage
-var _room_stage_skin := ""
+## Um palco por participante da sala (animação de lobby em loop), preservado entre os
+## sinais do servidor: member_id -> {stage, skin, ready, loading, portrait}.
+var _room_stages := {}
+var _room_stages_used := {}
+## Celular/tablet: limite de palcos 3D simultâneos; os demais continuam com o retrato.
+const HANDHELD_LOBBY_STAGES := 6
 ## Duelo (multiplayer), etapa 1: salas online. Três vistas na mesma tela:
 ## - "browse": salas públicas (no lobby), filtros e entrada por código de convite;
 ## - "form": criar sala ou (ADM) editar as configurações da sala;
@@ -97,12 +102,18 @@ func render() -> void:
 	heading.text = tr("Mata-Mata · Partida local") if duel.is_local() else tr("Mata-Mata")
 	if is_instance_valid(_match_view) and _match_view.get_parent() == body: body.remove_child(_match_view)
 	# Mantém a mesma instância animada entre heartbeats do lobby.
-	if is_instance_valid(_room_stage):
-		if _room_stage.get_parent()!=null: _room_stage.get_parent().remove_child(_room_stage)
-		if in_battle or not duel.in_room() or _view=="form":
-			_room_stage.queue_free()
-			_room_stage=null
-			_room_stage_skin=""
+	var drop_stages: bool = in_battle or not duel.in_room() or _view=="form"
+	for member_id: String in _room_stages.keys():
+		var kept: Variant = _room_stages[member_id].stage
+		if not is_instance_valid(kept):
+			_room_stages.erase(member_id)
+			continue
+		if kept.get_parent()!=null: kept.get_parent().remove_child(kept)
+		if drop_stages:
+			kept.queue_free()
+			_room_stages.erase(member_id)
+	if drop_stages: _room_stage=null
+	_room_stages_used.clear()
 	PlayerUI.clear(body)
 	banner.show_state("success")
 	if duel.room.has("asset_error"): banner.show_state("error",CommunityService.message(str(duel.room.asset_error)))
@@ -1100,15 +1111,15 @@ func _deck_choice(entry: Dictionary) -> Control:
 			box = PremiumUI.flat(Color.TRANSPARENT, PremiumUI.GOLD_LIGHT, 12, 2, 0)
 			box.draw_center = false
 		card.add_theme_stylebox_override(state, box)
-	# Capa INTEIRA sobre o fundo escuro do card, sem distorção nem corte.
+	# Corte padrão das capas (o mesmo da Biblioteca): a arte cobre o quadro, sem faixas.
 	var has_cover := DeckCover.exists(str(entry.cover))
 	var cover := TextureRect.new()
 	cover.name = "Cover"
 	cover.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	cover.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	cover.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	cover.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	cover.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	cover.texture = DeckCover.load_texture(str(entry.cover)) if has_cover else null
+	cover.texture = DeckCover.framed(str(entry.cover), DeckCover.ASPECT, DeckCover.PORTRAIT_FOCUS) if has_cover else null
 	card.add_child(cover)
 	cover.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	cover.offset_left = 6
@@ -1336,6 +1347,12 @@ func _render_room() -> void:
 	body.add_child(grid)
 	for member: Dictionary in duel.room.members:
 		grid.add_child(_member_card(member, admin, str(data.status)))
+	# Quem saiu da sala (ou trocou de skin) libera o palco que ocupava.
+	for member_id: String in _room_stages.keys():
+		if _room_stages_used.has(member_id): continue
+		var unused: Variant = _room_stages[member_id].stage
+		if is_instance_valid(unused): unused.queue_free()
+		_room_stages.erase(member_id)
 	var summary := str(TranslationServer.translate("%d cartas por jogador  ·  %ds por turno  ·  %ds de seleção  ·  Bots %s  ·  Decks: %s")) % [int(settings.cards_per_player),
 		int(settings.turn_seconds), int(settings.selection_seconds), "permitidos" if settings.bots_allowed else "desativados",
 		", ".join((data.get("decks", []) as Array).map(func(d: Dictionary) -> String: return LibraryCatalog.display_name(str(d.get("id", "")), str(d.get("name", "")))))]
@@ -1408,24 +1425,36 @@ func _member_card(member: Dictionary, admin: bool, status: String) -> Control:
 	portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	if not bool(member.get("online", true)) or member.get("role") == "spectator": portrait.modulate = Color(0.55, 0.58, 0.65)
 	column.add_child(portrait)
-	# Um único avatar 3D em repouso na sala; os demais são apresentados um a um
-	# antes da partida. Não multiplica viewports pelo número de participantes.
-	if member.get("is_you",false) and status=="lobby":
+	# Lobby da sala: cada participante toca a animação de lobby (anim_2) em loop no próprio
+	# cartão. O retrato só sai quando o modelo já está carregado; nunca fica um cartão vazio.
+	if status=="lobby":
+		var member_id := str(member.get("member_id",""))
+		var mine := bool(member.get("is_you",false))
 		var skin := str(member.get("character_id",""))
 		var entries := CharacterCatalog.load_entries().filter(func(e: Dictionary)->bool:return str(e.id)==skin)
-		if not entries.is_empty() and entries[0].get("animations",{}).has("anim_2"):
-			if not is_instance_valid(_room_stage):
-				_room_stage=preload("res://scenes/lobby/lobby_stage.tscn").instantiate()
-				_room_stage.name="LobbyAvatarCurrent"
-			_room_stage.custom_minimum_size=portrait.custom_minimum_size
-			_room_stage.modulate=portrait.modulate
-			_room_stage.size_flags_horizontal=Control.SIZE_SHRINK_CENTER
-			column.add_child(_room_stage)
-			portrait.hide()
-			if _room_stage_skin!=skin:
-				_room_stage_skin=skin
-				CharacterSlot.prepare_participants([{"skin_id":skin}])
-				_animate_room_avatar(entries[0])
+		var known: Dictionary = _room_stages.get(member_id,{})
+		var allowed: bool = mine or not known.is_empty() or not UIScale.is_handheld() or _room_stages.size()<HANDHELD_LOBBY_STAGES
+		if not member_id.is_empty() and allowed and not entries.is_empty() and entries[0].get("animations",{}).has("anim_2"):
+			if known.is_empty() or not is_instance_valid(known.stage) or str(known.skin)!=skin:
+				if not known.is_empty() and is_instance_valid(known.stage): known.stage.queue_free()
+				var fresh: LobbyStage=preload("res://scenes/lobby/lobby_stage.tscn").instantiate()
+				fresh.name="LobbyAvatarCurrent" if mine else "LobbyAvatar"
+				# Os demais participantes usam o perfil leve: vários palcos pequenos ao mesmo tempo.
+				if not mine: fresh.profile_name="baixo"
+				known={"stage":fresh,"skin":skin,"ready":false,"loading":false,"portrait":null}
+				_room_stages[member_id]=known
+			_room_stages_used[member_id]=true
+			var stage: LobbyStage=known.stage
+			stage.custom_minimum_size=portrait.custom_minimum_size
+			stage.modulate=portrait.modulate
+			stage.size_flags_horizontal=Control.SIZE_SHRINK_CENTER
+			column.add_child(stage)
+			stage.visible=bool(known.ready)
+			portrait.visible=not bool(known.ready)
+			known.portrait=portrait
+			if mine: _room_stage=stage
+			if not known.ready and not known.loading:
+				_animate_room_avatar(member_id,entries[0],_room_stages_used.size()-1)
 	var nickname := PlayerUI.label(str(member.get("nickname", "")), 19, Color.WHITE)
 	nickname.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	nickname.autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -1449,15 +1478,38 @@ func _member_card(member: Dictionary, admin: bool, status: String) -> Control:
 	return card
 
 
-func _animate_room_avatar(source: Dictionary) -> void:
+## Carrega o modelo e o clipe de lobby de um participante sem travar a tela. `order` escalona
+## as cargas (um modelo a cada poucos quadros). Se algo falhar, o retrato continua no cartão e
+## a próxima atualização da sala tenta de novo.
+func _animate_room_avatar(member_id: String, source: Dictionary, order := 0) -> void:
+	var slot: Dictionary = _room_stages.get(member_id,{})
+	if slot.is_empty(): return
+	slot.loading=true
+	CharacterSlot.prepare_participants([{"skin_id":str(source.id)}])
 	var entry := source.duplicate(true)
 	entry.animations={"base":source.animations.base,"anim_2":source.animations.anim_2}
-	while CharacterSlot.entry_pending(entry):
+	var wait := order*3
+	while wait>0 or CharacterSlot.entry_pending(entry):
+		wait-=1
+		if not is_inside_tree():
+			slot.loading=false
+			return
 		await get_tree().process_frame
-		if not is_inside_tree() or not is_instance_valid(_room_stage): return
-	if not is_instance_valid(_room_stage) or not _room_stage.is_inside_tree() or _room_stage_skin!=str(entry.id): return
+	slot.loading=false
+	if not is_inside_tree() or _room_stages.get(member_id,{})!=slot: return
+	if not is_instance_valid(slot.stage) or str(slot.skin)!=str(entry.id): return
+	var stage: LobbyStage=slot.stage
+	if not stage.is_inside_tree(): return
 	entry.idle="anim_2"
-	_room_stage.show_character(entry)
+	stage.show_character(entry)
+	stage.character.play_animation(&"anim_2",true)
+	if not stage.character.has_animation(&"anim_2"): return
+	slot.ready=true
+	# Um quadro já com a pose do clipe antes de trocar o retrato pelo modelo.
+	await get_tree().process_frame
+	if not is_instance_valid(stage): return
+	stage.show()
+	if slot.portrait is Control and is_instance_valid(slot.portrait): (slot.portrait as Control).hide()
 
 
 ## Ação no servidor (Callable do DuelService) com aviso de erro; devolve o resultado.
@@ -1482,7 +1534,10 @@ func animate_in() -> void:
 
 
 func _exit_tree() -> void:
-	if is_instance_valid(_room_stage) and _room_stage.get_parent()==null: _room_stage.free()
+	for member_id: String in _room_stages.keys():
+		var orphan: Variant = _room_stages[member_id].stage
+		if is_instance_valid(orphan) and orphan.get_parent()==null: orphan.free()
+	_room_stages.clear()
 	# The match is detached while another room view is rendered.
 	if is_instance_valid(_match_view) and _match_view.get_parent() == null: _match_view.free()
 

@@ -1,6 +1,6 @@
 // T32 — LiveKit room tokens, issued only after GAME authorization.
 // Never place LiveKit API credentials in the Godot or web client.
-import { AccessToken, RoomServiceClient } from "npm:livekit-server-sdk@2.19.2";
+import { AccessToken, RoomServiceClient, TrackSource } from "npm:livekit-server-sdk@2.19.2";
 import { withSupabase } from "npm:@supabase/server@1";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -147,14 +147,26 @@ const handler = withSupabase({ auth: "user" }, async (req, ctx) => {
     roomJoin: true,
     canPublish: true,
     canSubscribe: true,
-    canPublishSources: ["microphone"],
+    // The SDK expects TrackSource enum values; a plain "microphone" string makes
+    // toJwt() throw ("Cannot convert TrackSource microphone to string").
+    canPublishSources: [TrackSource.MICROPHONE],
     canPublishData: false,
     roomAdmin: false,
   });
 
+  let participantToken = "";
+  try {
+    participantToken = await token.toJwt();
+  } catch (e) {
+    console.error("qse-voice-token: TOKEN_SIGN_FAILED", {
+      kind: e instanceof Error ? e.name : "unknown",
+    });
+    return response({ code: "voice_unavailable" }, 503);
+  }
+
   return response({
     server_url: config.url,
-    participant_token: await token.toJwt(),
+    participant_token: participantToken,
     room: roomName,
     participants: members.map((member) => ({ tag: member.tag, nickname: member.nickname })),
     expires_in: 120,

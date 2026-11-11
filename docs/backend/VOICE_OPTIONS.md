@@ -43,3 +43,14 @@ Offline/CI: node tests/voice/bridge_test.cjs e Godot headless tests/voice/flow_t
 Checklist manual pendente: 2 contas na mesma sala, 1 conta em outra sala, permissão negada, reprodução automática bloqueada, isolamento, expulsão, saída, reconexão, PWA iPhone, verificação de franquia do LiveKit Build, Android e Windows (quando existirem clientes nativos).
 
 O endpoint responderá 503 voice_unavailable quando o LiveKit não estiver configurado corretamente. Não afirmar conclusão geral sem esses testes.
+
+## Correção do token — 11/11/2026
+
+`qse-voice-token` passava `canPublishSources: ["microphone"]` (texto). O
+`livekit-server-sdk@2.19.2` espera o enum `TrackSource` e, ao assinar, lança
+`TypeError: Cannot convert TrackSource microphone to string`: todo `join` falhava
+antes de existir token. Reproduzido com o SDK real; corrigido para
+`[TrackSource.MICROPHONE]` (o JWT continua com `"canPublishSources":["microphone"]`).
+A assinatura agora responde `503 voice_unavailable` com log `TOKEN_SIGN_FAILED`
+em vez de erro não tratado. **A função precisa ser publicada manualmente** no
+projeto GAME; o merge no GitHub não a publica.

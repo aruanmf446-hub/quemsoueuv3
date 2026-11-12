@@ -103,6 +103,12 @@ func _clear_items() -> void:
  for node in nearby:
   if node is Area3D or node.has_meta("pedestal"):blockers.append((node as Node3D).global_position.x)
  if is_instance_valid(_player):blockers.append(_player.global_position.x)
+ # Mecanismos de Task (portão, guincho, alavanca) também ficam livres de figurantes.
+ var stage: Variant=_player.get_parent().get("_phase") if is_instance_valid(_player) and _player.get_parent()!=null else null
+ if stage is Dictionary:
+  for task: Dictionary in stage.get("tasks",[]):
+   for x: float in [float(task.start)-4.0,float(task.start)-2.0,float(task.start),(float(task.start)+float(task.end))*0.5,float(task.end)]:
+    if x>span.x-3.0 and x<span.y+3.0:blockers.append(x)
  if blockers.is_empty():return
  var low:=INF
  var high:=-INF

@@ -6,6 +6,7 @@ static var _plan := {}
 static var _textures := {}
 static var _resolved := {}
 static var _surfaces := {}
+static var _tasks := {}
 const PALETTES := [
  ["capital_house","capital_merchant","capital_balcony_house","capital_watchtower"],
  ["capital_balcony_house","capital_house","capital_merchant"],
@@ -84,6 +85,7 @@ static func placements(order: int) -> Array:
 	_read()
 	var stage := Layout.build(order)
 	_surfaces[order]=stage.surfaces
+	_tasks[order]=stage.tasks
 	var result: Array=[]
 	for index in range(_plan.stages[order-1].slots.size()):
 		var slot: Dictionary=_plan.stages[order-1].slots[index]
@@ -128,6 +130,97 @@ const DISTRICT_SETS := {
 		 [["capital_archway",0.30,5.4,-9.0],["capital_balcony_house",0.74,7.0,-11.4]]],
 		[[["capital_balcony_house",0.20,7.0,-11.0],["capital_merchant",0.54,6.8,-11.6],["capital_palm_garden",0.84,3.8,-6.2]],
 		 [["capital_merchant",0.26,7.0,-10.8],["capital_balcony_house",0.74,7.0,-11.6]]]],
+	# 2 · Telhados da Capital: o que muda é o que aparece por cima e por trás das lajes.
+	# Quinto valor = apoio no próprio telhado (toldos, vasos e pérgolas de terraço).
+	2: [
+		[[["capital_watchtower",0.50,5.2,-8.0]],
+		 [["capital_watchtower",0.25,4.8,-8.5],["capital_watchtower",0.78,5.6,-9.5]]],
+		[[["capital_house",0.30,7.0,-11.0],["capital_palm_garden",0.72,2.6,-1.6,0.0]],
+		 [["capital_balcony_house",0.50,7.0,-11.0]]],
+		[[["capital_market_stall",0.50,3.0,-1.6,0.0]],
+		 [["capital_market_stall",0.30,2.8,-1.6,0.0],["capital_palm_garden",0.76,2.4,-1.7,0.0]]],
+		[[["capital_house",0.50,7.4,-11.0]],
+		 [["capital_merchant",0.50,7.0,-11.4]]],
+		[[["capital_watchtower",0.30,5.6,-8.0],["capital_watchtower",0.72,6.2,-10.0]],
+		 [["capital_watchtower",0.50,6.4,-9.0]]],
+		[[["capital_watchtower",0.50,7.0,-10.5]],
+		 [["capital_watchtower",0.22,5.2,-8.0],["capital_watchtower",0.80,5.2,-8.0]]],
+		[[["capital_palm_garden",0.50,2.8,-1.6,0.0]],
+		 [["capital_archway",0.50,3.6,-1.7,0.0]]],
+		[[["capital_market_stall",0.28,3.0,-1.6,0.0],["capital_market_stall",0.72,3.0,-1.6,0.0]],
+		 [["capital_market_stall",0.50,3.2,-1.6,0.0],["capital_palm_garden",0.85,2.2,-1.7,0.0]]]],
+	# 4 · Aqueduto do Deserto: da ponte de acesso ao reservatório e à saída verde.
+	4: [
+		[[["capital_watchtower",0.15,3.4,-6.4],["capital_archway",0.60,5.6,-10.4]],
+		 [["capital_house",0.30,5.0,-17.2],["capital_watchtower",0.80,3.4,-6.4]]],
+		[[["capital_archway",0.20,5.8,-10.0],["capital_archway",0.50,6.6,-11.4],["capital_archway",0.80,5.8,-10.0]],
+		 [["capital_archway",0.32,6.4,-10.4],["capital_archway",0.72,6.4,-11.0]]],
+		[[["desert_oasis_fountain",0.30,3.2,-6.6],["capital_palm_garden",0.78,3.8,-6.8]],
+		 [["capital_palm_garden",0.25,4.0,-6.8],["desert_oasis_fountain",0.70,3.0,-6.4]]],
+		[[["desert_ancient_ruins",0.30,5.4,-10.6],["desert_oasis_fountain",0.74,3.4,-6.6]],
+		 [["desert_ancient_ruins",0.62,5.8,-10.8]]],
+		[[["desert_ancient_ruins",0.25,5.6,-10.4],["desert_timber_bridge",0.70,6.6,-9.6]],
+		 [["desert_timber_bridge",0.40,7.0,-9.6],["desert_ancient_ruins",0.84,5.0,-11.0]]],
+		[[["capital_archway",0.50,6.2,-10.6],["capital_palm_garden",0.14,3.6,-6.6],["capital_palm_garden",0.86,3.6,-6.6]],
+		 [["capital_palm_garden",0.30,4.2,-6.8],["capital_archway",0.72,5.6,-10.8]]],
+		[[["desert_oasis_fountain",0.25,3.6,-6.4],["desert_oasis_fountain",0.50,4.2,-7.2],["desert_oasis_fountain",0.75,3.6,-6.4]],
+		 [["desert_oasis_fountain",0.40,4.0,-6.6],["capital_house",0.80,5.0,-17.2]]],
+		[[["capital_palm_garden",0.20,4.4,-6.4],["capital_palm_garden",0.52,4.8,-7.4],["capital_palm_garden",0.82,4.2,-6.6]],
+		 [["capital_palm_garden",0.30,4.6,-6.6],["desert_oasis_fountain",0.68,3.4,-6.4]]]],
+	# 5 · Jardins do Oásis: margem próxima (z -5,5) e margem distante (z -20), com o rio no meio.
+	5: [
+		[[["capital_palm_garden",0.20,4.6,-5.5],["capital_palm_garden",0.55,3.8,-20.0],["capital_palm_garden",0.85,4.2,-5.5]],
+		 [["capital_palm_garden",0.35,5.0,-5.5],["capital_palm_garden",0.75,4.0,-20.0]]],
+		[[["capital_palm_garden",0.25,3.6,-20.0],["capital_palm_garden",0.70,4.0,-5.5]],
+		 [["capital_palm_garden",0.30,3.8,-5.5],["capital_house",0.72,5.0,-20.5]]],
+		[[["desert_ancient_ruins",0.30,4.2,-20.0],["capital_palm_garden",0.72,3.6,-5.5]],
+		 [["desert_ancient_ruins",0.60,4.4,-20.4],["capital_palm_garden",0.16,3.4,-5.5]]],
+		[[["desert_oasis_fountain",0.25,3.4,-5.4],["desert_oasis_fountain",0.62,4.0,-5.4],["capital_palm_garden",0.88,3.4,-20.0]],
+		 [["desert_oasis_fountain",0.45,4.2,-5.4],["desert_ancient_ruins",0.82,4.4,-20.0]]],
+		[[["desert_timber_bridge",0.50,7.0,-20.0]],
+		 [["desert_timber_bridge",0.35,6.6,-20.0],["capital_palm_garden",0.82,4.0,-5.5]]],
+		[[["capital_palm_garden",0.18,4.0,-5.5],["desert_oasis_fountain",0.50,3.4,-5.4],["capital_palm_garden",0.82,4.0,-5.5]],
+		 [["capital_house",0.30,5.0,-20.5],["capital_palm_garden",0.74,4.4,-5.5]]],
+		[[["capital_palm_garden",0.70,4.2,-20.0]],
+		 [["capital_palm_garden",0.28,4.6,-5.5]]],
+		[[["capital_archway",0.50,5.6,-20.0],["desert_ancient_ruins",0.16,4.4,-20.2]],
+		 [["desert_ancient_ruins",0.30,4.4,-20.0],["capital_archway",0.72,5.2,-20.0]]]],
+	# 6 · Ruínas Enterradas: monumento, colunas, câmaras de cristal e a saída vigiada.
+	6: [
+		[[["desert_ancient_ruins",0.50,7.4,-9.8],["desert_mine_crystals",0.14,2.8,-7.0]],
+		 [["capital_archway",0.40,5.6,-9.8],["desert_ancient_ruins",0.80,5.0,-10.2]]],
+		[[["desert_ancient_ruins",0.20,5.0,-9.8],["desert_ancient_ruins",0.50,5.6,-10.2],["desert_ancient_ruins",0.80,5.0,-9.8]],
+		 [["desert_ancient_ruins",0.30,5.6,-9.8],["desert_ancient_ruins",0.72,5.2,-10.2]]],
+		[[["desert_mine_crystals",0.30,3.2,-7.0],["desert_ancient_ruins",0.74,5.0,-10.0]],
+		 [["desert_mine_crystals",0.60,3.6,-7.4]]],
+		[[["capital_archway",0.25,5.0,-9.8],["capital_archway",0.72,5.4,-10.2]],
+		 [["capital_archway",0.50,5.8,-9.8],["desert_ancient_ruins",0.86,4.4,-10.2]]],
+		[[["desert_mine_crystals",0.18,3.0,-7.0],["desert_mine_crystals",0.50,3.8,-7.6],["desert_mine_crystals",0.82,3.0,-7.0]],
+		 [["desert_mine_crystals",0.34,3.6,-7.2],["desert_mine_crystals",0.72,3.2,-7.8]]],
+		[[["desert_oasis_fountain",0.50,3.6,-6.8],["desert_ancient_ruins",0.16,4.6,-10.0]],
+		 [["capital_house",0.30,6.0,-10.2],["desert_oasis_fountain",0.74,3.2,-6.8]]],
+		[[["desert_mine_crystals",0.70,3.4,-7.2]],
+		 [["desert_ancient_ruins",0.30,4.8,-10.0]]],
+		[[["capital_archway",0.50,6.4,-9.8],["capital_watchtower",0.14,3.0,-7.4]],
+		 [["capital_watchtower",0.24,3.2,-7.4],["capital_archway",0.68,5.6,-9.8]]]],
+	# 8 · Posto de Controle: quartel, não mercado. Portões, torres e depósito.
+	8: [
+		[[["capital_watchtower",0.20,3.6,-7.0],["desert_military_gate",0.60,7.2,-10.0]],
+		 [["desert_military_gate",0.40,7.0,-10.2],["capital_watchtower",0.84,3.4,-7.2]]],
+		[[["capital_watchtower",0.16,3.4,-7.0],["capital_house",0.50,6.2,-11.6],["capital_watchtower",0.84,3.4,-7.0]],
+		 [["capital_house",0.30,6.2,-11.4],["capital_watchtower",0.72,3.8,-7.2]]],
+		[[["desert_military_gate",0.28,7.0,-10.4],["desert_military_gate",0.74,7.0,-10.8]],
+		 [["desert_military_gate",0.50,7.6,-10.2]]],
+		[[["capital_watchtower",0.20,3.8,-7.0],["capital_watchtower",0.50,4.8,-9.4],["capital_watchtower",0.80,3.8,-7.0]],
+		 [["capital_watchtower",0.30,4.2,-7.4],["capital_watchtower",0.70,4.2,-8.6]]],
+		[[["capital_merchant",0.30,6.6,-11.0],["capital_house",0.76,6.0,-11.8]],
+		 [["capital_house",0.26,6.2,-11.6],["capital_merchant",0.72,6.4,-11.0]]],
+		[[["desert_timber_bridge",0.50,7.2,-9.6],["capital_watchtower",0.12,3.2,-7.0]],
+		 [["capital_watchtower",0.30,3.6,-7.2],["desert_timber_bridge",0.72,7.0,-9.8]]],
+		[[["desert_military_gate",0.50,8.4,-10.0],["capital_watchtower",0.10,3.4,-7.0],["capital_watchtower",0.90,3.4,-7.0]],
+		 [["capital_archway",0.30,5.4,-9.2],["desert_military_gate",0.72,7.4,-10.2]]],
+		[[["desert_mining_gantry",0.30,5.4,-10.6],["desert_mine_crystals",0.74,3.0,-7.4]],
+		 [["desert_mine_crystals",0.26,3.2,-7.4],["desert_mining_gantry",0.70,5.6,-10.8]]]],
 	# 3 · Bazar da Cidade: praças de bancas, mercadores e fonte.
 	3: [
 		[[["capital_market_stall",0.16,3.6,-5.6],["capital_market_stall",0.40,3.4,-6.2],["capital_merchant",0.72,7.0,-10.4],["capital_market_stall",0.90,3.2,-5.8]],
@@ -254,7 +347,16 @@ static func composition(order: int, slot: int, left: float, right: float, top: f
 		if order in [4,5,6,7,9,10] and not DISTRICT_SETS.has(order) and not (order == 10 and slot == 47):
 			fraction = 0.48 + (fraction-0.5)*0.55 + (0.035 if slot%3==1 else -0.02)
 		var x := clampf(lerpf(left,right,fraction),left+0.6+width*0.5,right-0.6-width*0.5)
-		result.append({"asset":String(part[0]),"x":x,"y":top-9.0 if order == 2 else (top-0.6 if float(part[3]) < -9.0 and order!=5 else top),"z":float(part[3]),"width":width})
+		# A frente de uma Task fica limpa: portão, guincho e alavanca não disputam com o cenário.
+		var crowded := false
+		if float(part[3]) > -9.0:
+			for task: Dictionary in _tasks.get(order,[]):
+				var focus := (float(task.start)+float(task.end))*0.5 if task.task_kind=="gate" else float(task.start)-1.5
+				if absf(x-focus) < width*0.5+2.6: crowded = true
+		if crowded: continue
+		var y := top-9.0 if order == 2 else (top-0.6 if float(part[3]) < -9.0 and order!=5 else top)
+		if part.size() > 4: y = top+float(part[4])
+		result.append({"asset":String(part[0]),"x":x,"y":y,"z":float(part[3]),"width":width})
 	return result
 
 ## Aquecimento restrito à região atual, incluindo todas as variantes dos conjuntos.

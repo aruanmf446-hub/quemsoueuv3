@@ -42,8 +42,12 @@ func build_surface(platform: Dictionary, order: int) -> void:
 			if module%3 == 2 and width > 4: _water_strip(Vector3(x,top-2.2,-2.8),Vector2(1.8,4.2),true)
 		6,10:
 			_cave_wall(left,right,top)
-			for column in range(ceili(left/4.0),floori(right/4.0)):
-				_box(Vector3(column*4,top-1.8,-0.8),Vector3(0.4,3.1,2.8),"wood" if order == 10 else "stone")
+			# Ruínas: fundação maciça sob a laje. Antes sobrava um filete claro do pátio
+			# de fundo aparecendo por baixo do piso, de ponta a ponta da tela.
+			if order == 6: _ground_base(x,width,top)
+			else:
+				for column in range(ceili(left/4.0),floori(right/4.0)):
+					_box(Vector3(column*4,top-1.8,-0.8),Vector3(0.4,3.1,2.8),"wood")
 			if order==10 and material=="wood": _painted_facade(left,right,top-0.18,2.12,"desert_timber_bridge",7.0)
 			if order == 10:
 				for z: float in [-0.75,0.75]: _box(Vector3(x,top+0.035,z),Vector3(width,0.07,0.08),"metal")
@@ -65,7 +69,8 @@ func build_surface(platform: Dictionary, order: int) -> void:
 	for marker in range(ceili((left+1)/7.0),floori((right-1)/7.0)+1):
 		var at := Vector3(marker*7.0,top,-2.1)
 		if order == 4 and marker%3 == 1: _water_strip(at+Vector3(0,-1.5,-0.7),Vector2(1.6,3.0),true)
-		if order in [6,10] and marker%3==0: _underground(at,marker)
+		# Só a mina usa os pórticos de escora; nas ruínas eram molduras de caixa sobre a arte.
+		if order == 10 and marker%3==0: _underground(at,marker)
 	_flush()
 
 func _ground_base(x: float,width: float,top: float) -> void:
@@ -199,7 +204,7 @@ func _cave_wall(left: float,right: float,top: float) -> void:
 	for index in range(ceili(left/6.0),floori(right/6.0)+1):
 		for row in range(2):
 			var basis := Basis(Vector3.FORWARD,sin(index*1.7+row)*0.3).scaled(Vector3(3.3,2.8,1.5))
-			var position := Vector3(index*6.0+sin(row*1.7)*0.5,top+row*4.3-0.6,-11.0-sin(index*1.3)*0.4)
+			var position := Vector3(index*6.0+sin(row*1.7)*0.5,top+row*4.3-0.6,(-12.2 if _theme == 6 else -11.0)-sin(index*1.3)*0.4)
 			transforms.append(Transform3D(basis,position))
 	if transforms.is_empty(): return
 	var rock := MultiMeshInstance3D.new()

@@ -142,3 +142,10 @@ Conferido com o motor real (Godot 4.7.2) em capturas ao longo de cada fase.
   portão, o guincho nem a alavanca.
 - Ritmo (fases 3 a 9): recarga, poder e guarda deixam de cair sempre no mesmo metro da laje.
   IDs, quantidades e a laje dona de cada item não mudam.
+
+## Tasks em pontos próprios por fase — 12/11/2026
+
+As duas Tasks deixavam de variar: sempre na laje 7 e a 58% do percurso. Das fases 4 a 9
+cada fase tem agora os seus pontos (`first`/`second` em `CampaignLayout.build`). Fases 1, 2
+e 10 mantêm tutorial, telhados e arena; a fase 3 muda só a primeira (a segunda fica junto da
+banca auditada). IDs das Tasks e ações não mudam, então saves em andamento seguem válidos.

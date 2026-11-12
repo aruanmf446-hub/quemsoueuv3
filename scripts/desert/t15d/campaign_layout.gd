@@ -146,7 +146,11 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 	 [["lift","Içar passarela da galeria"]]
 	][order-1]
 	for i in plans.size():
-		var module := 7 if i==0 else floori(modules*0.58)
+		# Cada fase tem as suas Tasks em pontos próprios do percurso (antes: sempre na laje 7
+		# e a 58%). Fases 1, 2 e 10 mantêm os pontos do tutorial, dos telhados e da arena.
+		var first: int = [7,7,9,5,8,10,8,5,9,7][order-1]
+		var second: float = [0.58,0.58,0.58,0.54,0.62,0.55,0.64,0.50,0.60,0.58][order-1]
+		var module := first if i==0 else floori(modules*second)
 		var floor: Dictionary=surfaces[module]
 		# A área de operação da Task fica livre de balcões/caixas aleatórios.
 		platforms=platforms.filter(func(p: Dictionary) -> bool:return int(p.get("module",-1))!=module or p.kind=="ground")

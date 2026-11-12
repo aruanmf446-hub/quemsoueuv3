@@ -109,3 +109,22 @@ por fase; não é medida da experiência humana. Picos de processamento em softw
 são registrados nos logs; não se declara desempenho de aparelho a partir deles.
 Não foram testados OAuth ou serviços online. Supabase, autenticação, economia,
 menu musical e outros sistemas compartilhados não foram alterados.
+
+## Refinamento de identidade — 12/11/2026 (pedido do dono)
+
+Conferido com o motor real (Godot 4.7.2) em capturas ao longo de cada fase.
+
+- **Cenário por distrito** (`kingdom_assets.gd`, `DISTRICT_SETS`): as fases 1, 3, 7 e
+  9 deixaram de repetir três arranjos do começo ao fim. Cada um dos oito distritos
+  nomeados tem o seu conjunto: a fase 1 é portão, muralha, torres e defesas (sem
+  bancas); a 3 é praça de bancas, mercadores e fonte; a 7 é estrada com pontes,
+  ruínas e postos de carga; a 9 termina no portal monumental da mineradora.
+  Só módulos aprovados; nenhuma colisão muda.
+- **Horizonte por fase** (`night_scenery.gd`, `SKY`): cada fase ao ar livre tem a sua
+  hora e o seu clima sobre a mesma panorâmica aprovada. A capital distante some no
+  oásis (5) e na entrada da mineradora (9).
+- **Cidadãos** (`background_people.gd`): grupos de entrada variam por lugar; nos
+  telhados só há um vigia com lanterna por trecho; ninguém fica sobre recarga,
+  checkpoint, Task ou ponto de entrada (o grupo desliza para um trecho livre).
+- **Pendente:** distritos das fases 2, 4, 5, 6 e 8; caixas translúcidas nas ruínas
+  (fase 6); posição de Tasks, inimigos e recargas, hoje no mesmo padrão em todas.

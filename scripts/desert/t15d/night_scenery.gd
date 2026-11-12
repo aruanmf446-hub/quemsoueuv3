@@ -11,6 +11,19 @@ var travel := 0.0
 var parallax_offset := 0.0
 var district := 0
 var place_index := -1
+## [cor do horizonte, espelhar]: entardecer na capital, noite alta nos telhados, lanternas no
+## bazar, madrugada fria no aqueduto, luar esverdeado no oásis, poeira âmbar na estrada,
+## alerta avermelhado no posto militar e fumaça escura na mineradora.
+const SKY := {
+	1: [Color(0.72,0.75,0.90),false],
+	2: [Color(0.46,0.54,0.88),true],
+	3: [Color(0.90,0.72,0.72),false],
+	4: [Color(0.58,0.80,0.92),true],
+	5: [Color(0.56,0.86,0.80),false],
+	7: [Color(0.98,0.76,0.60),true],
+	8: [Color(0.90,0.60,0.62),false],
+	9: [Color(0.48,0.48,0.62),true],
+}
 func configure(order: int,length: float = 1452.0,start: float = -8.0) -> void:
 	_order = clampi(order,1,10)
 	_length = length
@@ -22,10 +35,17 @@ func _ready() -> void:
 	_panorama.texture = load("res://assets/desert/modular/capital_desert.res")
 	_panorama.pixel_size = 0.01
 	_panorama.shaded = false
-	_panorama.modulate = Color(0.72,0.75,0.90)
+	# Cada fase tem a sua hora e o seu clima no horizonte (mesma panorâmica aprovada):
+	# antes o fundo era idêntico em todas as fases ao ar livre.
+	var sky: Array = SKY.get(_order,SKY[1])
+	_panorama.modulate = sky[0]
+	_panorama.flip_h = sky[1]
 	_panorama.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	_panorama.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(_panorama)
+	# A capital só aparece ao longe onde ela está por perto; no oásis e na entrada da
+	# mineradora o horizonte é só deserto.
+	if _order in [5,9]: return
 	_skyline = preload("res://scripts/desert/t15d/capital_skyline.gd").new()
 	_skyline.configure(_order)
 	add_child(_skyline)

@@ -15,6 +15,8 @@ static func populated(order: int,slot: int) -> bool:
  # Operários ficam na entrada da mina; a arena de Malagueta continua livre.
  if order==10 and slot>=modules-2:return false
  var sector:=modules/8
+ # Telhados: só o vigia na entrada de cada trecho; ninguém passeando de laje em laje.
+ if order==2:return slot%sector==0
  var district:=mini(7,slot/sector)
  var offsets: Array=[1,3,2,4,1,4,2,3] if order!=2 else [2,7,4,10,3,9,5,11]
  var original:=clampi(int(offsets[(district+order)%8]),1,sector-2)
@@ -36,8 +38,24 @@ func configure(order: int,slot: int,left: float,right: float,top: float) -> void
  var ids: Array=[]
  var entry: bool=slot%(int(MODULES[order-1])/8)==0
  if entry:
-  context="conversation" if order in [1,3,5] else "workers"
-  ids=[2,3]
+  # Entradas de distrito: grupos diferentes a cada trecho, conforme o lugar. Antes era
+  # sempre o mesmo par (homem de avental + cacto de gorro) em todas as fases.
+  if order==2:
+   # Telhados: só um vigia com lanterna; moradores não ficam passeando nas lajes.
+   context="watch"
+   ids=[3]
+  elif order in [6,8]:
+   context="watch"
+   ids=[3] if rng.randf()<0.6 else [3,2]
+  elif order in [7,9,10]:
+   context="workers"
+   ids=[2] if rng.randf()<0.5 else [2,3]
+  else:
+   context="conversation"
+   var locals: Array=[0,1,2,3,4,5,7]
+   var first: int=locals[rng.randi_range(0,locals.size()-1)]
+   ids=[first]
+   if rng.randf()<0.7:ids.append(locals[(locals.find(first)+1+rng.randi_range(0,4))%locals.size()])
  elif order in [1,3] and asset in ["capital_merchant","capital_market_stall"]:
   context="market"
   ids=[0,1,2,3] if slot%3==0 else [0,1,5]
@@ -59,7 +77,7 @@ func configure(order: int,slot: int,left: float,right: float,top: float) -> void
  if entry:x=clampf(lerpf(left,right,0.33) if slot==0 else left+3.0,left+half+0.5,right-half-0.5)
  var family_human:=rng.randf()<0.6
  for i in ids.size():
-  var human: bool=(i==0) if entry else (family_human if context=="family" else rng.randf()<0.55)
+  var human: bool=(order==2 or rng.randf()<0.5) if entry else (family_human if context=="family" else rng.randf()<0.55)
   var spacing: float=1.05 if context!="family" else 0.88
   var px:=x+(i-float(ids.size()-1)*0.5)*spacing+rng.randf_range(-0.09,0.09)
   # Pista 2,5D: fachadas/telhados pintados são planos opacos, não volumes.
@@ -67,12 +85,42 @@ func configure(order: int,slot: int,left: float,right: float,top: float) -> void
   # Fica na borda próxima do cenário, ainda atrás do jogador em z=0.
   var z:=-0.18-rng.randf_range(0,0.06)
   _citizen(human,int(ids[i]),Vector3(px,top,z),rng.randf_range(1.32,1.50),i>=maxi(1,ids.size()/2),rng.randf()<0.45)
+ _clear_items.call_deferred()
  var ancestor:=get_parent()
  while ancestor!=null:
   if ancestor.has_method("_stream_world"):
    _player=ancestor._player
    break
   ancestor=ancestor.get_parent()
+## Cidadão não fica em cima de recarga, checkpoint, Task nem do ponto de entrada do jogador:
+## o grupo desliza para o trecho livre mais próximo da laje, ou sai de cena se não couber.
+func _clear_items() -> void:
+ if _members.is_empty() or not is_inside_tree():return
+ var span: Vector2=get_meta("surface_span",Vector2.ZERO)
+ var blockers: Array[float]=[]
+ var nearby: Array=get_parent().get_children()
+ if get_parent().get_parent()!=null:nearby.append_array(get_parent().get_parent().get_children())
+ for node in nearby:
+  if node is Area3D or node.has_meta("pedestal"):blockers.append((node as Node3D).global_position.x)
+ if is_instance_valid(_player):blockers.append(_player.global_position.x)
+ if blockers.is_empty():return
+ var low:=INF
+ var high:=-INF
+ for member: Dictionary in _members:
+  low=minf(low,member.sprite.global_position.x)
+  high=maxf(high,member.sprite.global_position.x)
+ var clear:=func(shift: float) -> bool:
+  if low+shift<span.x+1.0 or high+shift>span.y-1.0:return false
+  for x: float in blockers:
+   if x>low+shift-2.0 and x<high+shift+2.0:return false
+  return true
+ if clear.call(0.0):return
+ for shift: float in [2.5,-2.5,4.5,-4.5,6.5,-6.5,9.0,-9.0]:
+  if clear.call(shift):
+   for member: Dictionary in _members:member.sprite.position.x+=shift
+   return
+ for member: Dictionary in _members:member.sprite.queue_free()
+ _members.clear()
 func _citizen(human: bool,id: int,at: Vector3,height: float,flip: bool,reacts: bool) -> void:
  if _feet.is_empty():_feet=JSON.parse_string(FileAccess.get_file_as_string("res://assets/desert/npc_citizens/frames.json"))
  var sprite:=Sprite3D.new()

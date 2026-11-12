@@ -107,6 +107,83 @@ static func placements(order: int) -> Array:
 	_resolved[order]=result
 	return result
 
+## Conjuntos por distrito (mesma ordem de Layout.STAGE_DISTRICTS): [módulo, fração da laje,
+## largura em metros, profundidade z]. Só módulos aprovados; nada altera a física.
+const DISTRICT_SETS := {
+	# 1 · Portões da Capital: entrada militar, sem bancas de mercado.
+	1: [
+		[[["capital_watchtower",0.14,3.6,-7.5],["capital_archway",0.50,6.4,-9.6],["capital_watchtower",0.86,3.6,-7.5]],
+		 [["desert_military_gate",0.52,7.6,-10.2],["capital_watchtower",0.14,3.4,-7.8]]],
+		[[["capital_watchtower",0.20,3.4,-7.0],["capital_house",0.52,6.8,-11.6],["capital_watchtower",0.84,3.4,-7.0]],
+		 [["capital_watchtower",0.50,4.0,-7.4],["capital_house",0.20,6.6,-11.8]]],
+		[[["capital_house",0.18,7.0,-11.0],["capital_balcony_house",0.50,7.0,-11.6],["capital_house",0.82,6.6,-10.6]],
+		 [["capital_balcony_house",0.24,7.0,-11.0],["capital_house",0.76,7.0,-11.4],["capital_palm_garden",0.52,3.6,-6.2]]],
+		[[["capital_archway",0.22,5.0,-9.0],["capital_palm_garden",0.54,4.6,-6.2],["capital_balcony_house",0.84,7.0,-11.4]],
+		 [["capital_palm_garden",0.24,4.0,-6.4],["capital_archway",0.62,5.6,-9.4]]],
+		[[["capital_watchtower",0.18,3.8,-7.0],["capital_watchtower",0.50,4.6,-9.2],["capital_watchtower",0.82,3.6,-7.4]],
+		 [["capital_watchtower",0.30,4.2,-7.6],["capital_house",0.74,6.6,-11.6]]],
+		[[["desert_military_gate",0.50,7.4,-10.0],["capital_watchtower",0.13,3.2,-7.0],["capital_watchtower",0.87,3.2,-7.0]],
+		 [["capital_watchtower",0.22,3.6,-7.2],["desert_military_gate",0.68,7.0,-10.4]]],
+		[[["capital_archway",0.20,5.0,-8.6],["capital_archway",0.50,5.6,-9.8],["capital_archway",0.80,5.0,-8.6]],
+		 [["capital_archway",0.30,5.4,-9.0],["capital_balcony_house",0.74,7.0,-11.4]]],
+		[[["capital_balcony_house",0.20,7.0,-11.0],["capital_merchant",0.54,6.8,-11.6],["capital_palm_garden",0.84,3.8,-6.2]],
+		 [["capital_merchant",0.26,7.0,-10.8],["capital_balcony_house",0.74,7.0,-11.6]]]],
+	# 3 · Bazar da Cidade: praças de bancas, mercadores e fonte.
+	3: [
+		[[["capital_market_stall",0.16,3.6,-5.6],["capital_market_stall",0.40,3.4,-6.2],["capital_merchant",0.72,7.0,-10.4],["capital_market_stall",0.90,3.2,-5.8]],
+		 [["capital_market_stall",0.22,3.6,-5.8],["desert_oasis_fountain",0.52,3.4,-6.4],["capital_market_stall",0.82,3.6,-5.6]]],
+		[[["capital_merchant",0.20,7.0,-10.4],["capital_merchant",0.52,6.8,-11.2],["capital_merchant",0.84,7.0,-10.2]],
+		 [["capital_merchant",0.28,7.2,-10.6],["capital_balcony_house",0.74,7.0,-11.4],["capital_market_stall",0.52,3.2,-5.8]]],
+		[[["capital_archway",0.20,5.0,-8.8],["capital_market_stall",0.50,3.4,-5.8],["capital_archway",0.80,5.0,-8.8]],
+		 [["capital_archway",0.34,5.4,-9.2],["capital_archway",0.70,5.4,-9.6]]],
+		[[["capital_house",0.20,6.8,-11.0],["capital_market_stall",0.50,3.6,-5.8],["capital_house",0.80,6.8,-11.6]],
+		 [["capital_merchant",0.26,7.0,-10.8],["capital_house",0.74,6.8,-11.4]]],
+		[[["capital_palm_garden",0.16,4.2,-6.6],["desert_oasis_fountain",0.50,3.8,-6.2],["capital_market_stall",0.84,3.6,-5.8]],
+		 [["capital_market_stall",0.20,3.4,-5.8],["capital_palm_garden",0.54,4.6,-6.8],["capital_merchant",0.86,6.6,-10.6]]],
+		[[["capital_market_stall",0.14,3.4,-5.6],["capital_market_stall",0.38,3.6,-6.0],["capital_market_stall",0.62,3.4,-5.6],["capital_market_stall",0.86,3.6,-6.0]],
+		 [["capital_market_stall",0.24,3.6,-5.8],["capital_merchant",0.58,7.0,-10.6],["capital_market_stall",0.88,3.2,-5.8]]],
+		[[["capital_archway",0.22,5.2,-9.0],["capital_merchant",0.62,7.0,-10.8]],
+		 [["capital_house",0.24,6.8,-11.2],["capital_archway",0.68,5.4,-9.2]]],
+		[[["capital_archway",0.50,6.2,-9.6],["capital_watchtower",0.16,3.4,-7.4],["capital_palm_garden",0.84,3.8,-6.4]],
+		 [["capital_watchtower",0.24,3.6,-7.4],["capital_archway",0.66,5.6,-9.4]]]],
+	# 7 · Estrada da Mineração: pontes, ruínas de beira de estrada e postos de carga.
+	7: [
+		[[["desert_mining_gantry",0.30,5.6,-10.4],["capital_house",0.76,6.2,-11.8]],
+		 [["capital_house",0.26,6.2,-11.6],["desert_mining_gantry",0.72,5.4,-10.8]]],
+		[[["desert_ancient_ruins",0.30,5.6,-11.0],["desert_mine_crystals",0.74,3.0,-7.4]],
+		 [["desert_ancient_ruins",0.62,6.0,-11.4]]],
+		[[["desert_timber_bridge",0.50,7.4,-9.6],["desert_mine_crystals",0.16,2.8,-7.6]],
+		 [["desert_timber_bridge",0.36,7.0,-9.8],["desert_ancient_ruins",0.82,5.0,-11.6]]],
+		[[["desert_ancient_ruins",0.24,5.4,-11.4],["desert_mine_crystals",0.60,3.4,-7.2],["desert_mine_crystals",0.84,2.6,-8.4]],
+		 [["desert_mine_crystals",0.30,3.6,-7.6],["desert_ancient_ruins",0.72,5.8,-11.2]]],
+		[[["capital_watchtower",0.50,4.4,-8.0],["desert_mine_crystals",0.18,3.0,-7.4]],
+		 [["capital_watchtower",0.30,4.0,-7.8],["desert_ancient_ruins",0.74,5.4,-11.4]]],
+		[[["desert_mining_gantry",0.24,5.8,-10.2],["desert_mining_gantry",0.74,5.2,-11.4]],
+		 [["desert_mining_gantry",0.50,6.4,-10.4],["desert_mine_crystals",0.16,3.2,-7.6]]],
+		[[["desert_timber_bridge",0.30,7.0,-9.8],["desert_mining_gantry",0.78,5.4,-10.8]],
+		 [["desert_mining_gantry",0.28,5.4,-10.8],["desert_timber_bridge",0.72,7.0,-9.8]]],
+		[[["desert_military_gate",0.50,7.4,-10.0],["capital_watchtower",0.14,3.4,-7.4]],
+		 [["capital_watchtower",0.22,3.6,-7.4],["desert_military_gate",0.66,7.0,-10.2]]]],
+	# 9 · Entrada da Mineradora: instalações de pedra, pátios e o portal monumental no fim.
+	9: [
+		[[["desert_mine_crystals",0.22,3.6,-7.4],["desert_ancient_ruins",0.66,5.8,-11.2]],
+		 [["desert_mine_crystals",0.30,3.2,-7.8],["desert_mine_crystals",0.72,3.8,-7.2]]],
+		[[["desert_timber_bridge",0.50,7.6,-9.6]],
+		 [["desert_timber_bridge",0.34,7.0,-9.8],["desert_mine_crystals",0.84,3.0,-7.6]]],
+		[[["capital_house",0.22,6.2,-11.4],["capital_house",0.56,6.0,-12.0],["desert_mine_crystals",0.86,3.0,-7.4]],
+		 [["capital_house",0.30,6.4,-11.6],["desert_mining_gantry",0.76,5.2,-10.8]]],
+		[[["desert_mining_gantry",0.50,6.0,-10.4],["desert_mine_crystals",0.16,3.2,-7.4],["desert_mine_crystals",0.84,3.2,-7.4]],
+		 [["desert_mine_crystals",0.24,3.6,-7.2],["desert_mining_gantry",0.70,5.6,-10.8]]],
+		[[["desert_mining_gantry",0.22,5.8,-10.2],["desert_mining_gantry",0.52,6.4,-11.4],["desert_mining_gantry",0.82,5.4,-10.4]],
+		 [["desert_mining_gantry",0.32,6.0,-10.4],["desert_mining_gantry",0.72,5.6,-11.2]]],
+		[[["capital_archway",0.24,5.0,-9.0],["capital_house",0.66,6.4,-11.6]],
+		 [["capital_house",0.24,6.2,-11.6],["capital_archway",0.70,5.2,-9.2]]],
+		[[["capital_watchtower",0.18,3.6,-7.4],["desert_mine_crystals",0.52,4.0,-7.2],["capital_watchtower",0.86,3.6,-7.4]],
+		 [["desert_mine_crystals",0.26,3.8,-7.4],["capital_watchtower",0.72,3.8,-7.6]]],
+		[[["desert_mine_entrance",0.50,9.0,-10.0]],
+		 [["desert_mine_entrance",0.56,9.0,-10.0],["desert_mine_crystals",0.12,3.0,-7.4]]]],
+}
+
 ## Conjuntos decorativos ancorados em uma laje real. Nunca alteram a física.
 ## Posições relativas e duas profundidades formam ruas e praças, em vez de uma grade.
 static func composition(order: int, slot: int, left: float, right: float, top: float) -> Array[Dictionary]:
@@ -161,6 +238,12 @@ static func composition(order: int, slot: int, left: float, right: float, top: f
 	# Arena silenciosa: nenhum guindaste novo atrás da luta contra Malagueta.
 	if order == 10 and slot == 47:
 		variants = [[["desert_mine_crystals",0.12,3.0,-9.0],["desert_mine_crystals",0.88,3.0,-9.0]]]
+	# Identidade por distrito: cada trecho nomeado da fase tem o seu próprio conjunto, em vez
+	# de três arranjos repetidos do começo ao fim (pedido do dono em 11/11/2026).
+	if DISTRICT_SETS.has(order) and not (order == 10 and slot == 47):
+		var count: int = (_surfaces[order] as Array).size()
+		var themed: Array = DISTRICT_SETS[order][clampi(slot*8/maxi(count,1),0,7)]
+		if not themed.is_empty(): variants = themed
 	var result: Array[Dictionary] = []
 	for part: Array in variants[posmod(slot,variants.size())]:
 		var width := float(part[2])
@@ -168,7 +251,7 @@ static func composition(order: int, slot: int, left: float, right: float, top: f
 		var fraction := float(part[1])
 		# Jardins e instalações formam núcleos próximos, com respiro nas aproximações.
 		# A arena conserva os cristais laterais e seu centro livre.
-		if order in [4,5,6,7,9,10] and not (order == 10 and slot == 47):
+		if order in [4,5,6,7,9,10] and not DISTRICT_SETS.has(order) and not (order == 10 and slot == 47):
 			fraction = 0.48 + (fraction-0.5)*0.55 + (0.035 if slot%3==1 else -0.02)
 		var x := clampf(lerpf(left,right,fraction),left+0.6+width*0.5,right-0.6-width*0.5)
 		result.append({"asset":String(part[0]),"x":x,"y":top-9.0 if order == 2 else (top-0.6 if float(part[3]) < -9.0 and order!=5 else top),"z":float(part[3]),"width":width})
@@ -180,4 +263,8 @@ static func composition_ids(order: int) -> Array[String]:
 	for variant in 3:
 		for part: Dictionary in composition(order,variant,0,40,0):
 			if not result.has(part.asset): result.append(part.asset)
+	for district: Array in DISTRICT_SETS.get(order,[]):
+		for variant: Array in district:
+			for part: Array in variant:
+				if not result.has(String(part[0])): result.append(String(part[0]))
 	return result

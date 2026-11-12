@@ -221,3 +221,17 @@ devolvia 1 vida e nenhuma carga, de novo sob a serra.
   Malagueta sem atacar; o ciclo das serras recomeça do zero.
 - Cada serra fere no máximo uma vez por passada.
 - Checkpoint da arena devolve vida e cargas cheias; a tela de derrota informa isso.
+
+## Arena legível — 12/11/2026
+
+Conferido no motor: a câmera fixa em 18 m deixava o herói com 9% da altura da tela,
+escuro sobre fundo escuro e, com controles de toque, nascendo sob o direcional.
+
+- Câmera enquadra a arena sem sobra (`max(15, 25,2/aspecto)`), com o chão a 20% da
+  altura: o herói fica acima dos controles de toque.
+- Entrada em x = −6,5 e recargas em ±4,2, fora da área dos controles.
+- Luz própria acompanhando o jogador; ambiente mais claro; guindaste no fundo central.
+- Serras em aço claro com dentes em brasa e faixa dourada no topo; seta laranja
+  piscando na parede 1,8 s antes de cada serra entrar.
+- No respiro inicial o chefe não ataca, mas já recebe dano.
+- `tests/malagueta/*.gd`: seis roteiros passam (arena 21/21, combate 11/11).

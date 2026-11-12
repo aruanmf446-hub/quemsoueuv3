@@ -13,6 +13,7 @@ func run() -> void:
 	# Isolated local fixture: phase10 is entered after completing the preceding nine.
 	assert(preload("res://scripts/desert/t15d/campaign_progress.gd").merge_highest(OwnerStorage.owner_id(),9)==OK)
 	var phase := load("res://scenes/desert/phase_10.tscn").instantiate() as Node3D
+	phase.set("opening_grace",0.0) # mecânica sem o respiro de entrada
 	root.add_child(phase)
 	current_scene=phase
 	await ticks(5)

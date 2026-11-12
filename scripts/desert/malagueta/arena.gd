@@ -25,11 +25,14 @@ var _spawn_serial := 0
 var _pending_throws: Array[String] = []
 var _upper_landing: StaticBody3D
 ## Entrada do jogador na arena, afastada da parede por onde a primeira serra entra.
-const ENTRY := Vector3(-9.0,0.1,0)
+const ENTRY := Vector3(-6.5,0.1,0)
 ## Respiro ao entrar ou voltar à arena: serras e Malagueta só começam depois dele. Antes a
 ## primeira serra chegava ao ponto de entrada em meio segundo e tirava duas vidas na passada.
 @export var opening_grace := 3.5
 var _grace := 0.0
+## Aviso piscante na parede por onde a próxima serra vai entrar, na altura dela.
+var _warnings: Array[MeshInstance3D] = []
+var _player_light: OmniLight3D
 var _landing_pass_through := {}
 
 func _layout_for_phase(_number: int) -> Dictionary:
@@ -62,7 +65,15 @@ func _ready() -> void:
 	# Starting the boss must never depend on arriving with spare attack charges.
 	_player.fill_ability("attack")
 	_player.fill_ability("defense")
-	_hud.notify("Alcance Malagueta pelas lâminas • ataque e use TASK quando ele atordoar")
+	_hud.notify("Suba pulando nas serras • o aviso laranja mostra de onde vem a próxima")
+	# O herói escuro sumia no fundo da mina: uma luz própria acompanha o jogador.
+	_player_light=OmniLight3D.new()
+	_player_light.light_color=Color("#ffe2b8")
+	_player_light.light_energy=1.8
+	_player_light.omni_range=5.5
+	_player_light.shadow_enabled=false
+	_player_light.position=Vector3(0,1.3,1.6)
+	_player.add_child(_player_light)
 	_session.full_restore_on_checkpoint=true
 ## Na arena do chefe a volta ao checkpoint devolve vida e cargas cheias: com 1 vida e sem
 ## ataque (regra das outras fases) a luta recomeçava impossível de vencer.
@@ -79,14 +90,13 @@ func _respawn_at_checkpoint() -> void:
 	_save_active_run()
 func _begin_grace() -> void:
 	_grace=opening_grace
+	if opening_grace<=0.0: return
 	for file in files:
 		file.elapsed=0.0
 		file.enabled=false
-	if is_instance_valid(encounter): encounter.suspended=true
 func _end_grace() -> void:
 	_grace=0.0
 	if not is_instance_valid(encounter): return
-	encounter.suspended=false
 	if encounter.fighting() or encounter.is_stunned():
 		for file in files: file.enabled=true
 func _build_goal() -> void:
@@ -99,7 +109,7 @@ func _build_goal() -> void:
 	# Completion is called by the real third Task/reaction, never by crossing a portal.
 func _build_environment() -> void:
 	super._build_environment()
-	_environment.ambient_light_energy=0.65
+	_environment.ambient_light_energy=1.05
 func _stream_world(_x: float, force := false) -> void:
 	if is_instance_valid(arena) and not arena.is_queued_for_deletion() and not force: return
 	if is_instance_valid(arena):
@@ -116,9 +126,11 @@ func _stream_world(_x: float, force := false) -> void:
 	props.set("_order",10)
 	var workshop:=preload("res://scripts/desert/malagueta/workshop.gd").new()
 	arena.add_child(workshop)
-	props.place_asset("desert_mining_gantry",Vector3(-6.8,-0.3,-6),7.0)
-	props.place_asset("desert_mine_crystals",Vector3(-10,-0.1,-4),2.8)
-	props.place_asset("desert_mine_crystals",Vector3(3,-0.1,-4),2.8)
+	# O guindaste saiu de trás do ponto de entrada (escondia o herói) e foi para o fundo
+	# central; os cristais ficam nos cantos.
+	props.place_asset("desert_mining_gantry",Vector3(1.5,-0.3,-6),6.4)
+	props.place_asset("desert_mine_crystals",Vector3(-10.6,-0.1,-4),2.6)
+	props.place_asset("desert_mine_crystals",Vector3(-3.4,-0.1,-4.4),2.4)
 	props._lantern(Vector3(-10,2.0,-2))
 	props._lantern(Vector3(10,10.0,-2))
 	props._flush()
@@ -137,6 +149,25 @@ func _stream_world(_x: float, force := false) -> void:
 		file.sweep_count = 5
 		arena.add_child(file)
 		files.append(file)
+	_warnings.clear()
+	var warning_material:=StandardMaterial3D.new()
+	warning_material.albedo_color=Color("#ff8a2a")
+	warning_material.emission_enabled=true
+	warning_material.emission=Color("#ff7a1a")
+	warning_material.emission_energy_multiplier=2.2
+	warning_material.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED
+	for file in files:
+		var marker:=MeshInstance3D.new()
+		var arrow:=PrismMesh.new()
+		arrow.size=Vector3(0.7,0.9,0.25)
+		marker.mesh=arrow
+		marker.material_override=warning_material
+		var from_left: bool=file.sweep_index%2==0
+		marker.position=Vector3(-11.2 if from_left else 11.2,file.origin.y,0.6)
+		marker.rotation.z=-PI*0.5 if from_left else PI*0.5
+		marker.visible=false
+		arena.add_child(marker)
+		_warnings.append(marker)
 	# Fixed upper landing keeps melee/Task/ground-only defense accessible.
 	var landing := StaticBody3D.new()
 	_upper_landing=landing
@@ -214,8 +245,12 @@ func _build_malagueta() -> void:
 	_boss.setup(_enemy_catalog.malagueta,_phase.boss)
 	_boss.hit_received.connect(func(amount: int) -> void: encounter.hit(amount))
 func _follow_camera(_delta: float) -> void:
-	_camera.size = 18.0
-	_camera.position = Vector3(0,5.7,24)
+	# Enquadra a arena inteira (24 m) sem sobra: antes a câmera ficava em 18 m de altura e o
+	# herói virava um ponto. Em telas largas (celular deitado) aproxima ainda mais.
+	var aspect:=maxf(get_viewport().get_visible_rect().size.aspect(),1.0)
+	_camera.size = maxf(15.0,25.2/aspect)
+	# Chão a 20% da altura da tela: o herói fica acima dos controles de toque.
+	_camera.position = Vector3(0,_camera.size*0.30,24)
 	_camera.rotation = Vector3.ZERO
 func _update_progress() -> void:
 	if is_instance_valid(encounter): _hud.update_progress(encounter.completed_tasks/3.0,_elapsed,"Malagueta • Task %d/3" % encounter.completed_tasks)
@@ -233,9 +268,14 @@ func _physics_process(delta: float) -> void:
 	if _grace>0.0 and not _paused and not completed and not _player.is_dead:
 		_grace-=delta
 		if _grace<=0.0: _end_grace()
+	for index in mini(files.size(),_warnings.size()):
+		var file:=files[index]
+		var soon: bool=(file.enabled and not file.is_available() and file.is_available(1.8)) or (index==0 and _grace>0.0 and _grace<1.8)
+		_warnings[index].visible=soon and int(Time.get_ticks_msec()/160)%2==0
 	super._physics_process(delta)
 	if completed or _paused or _player.is_dead or not is_instance_valid(encounter): return
-	encounter.tick(delta)
+	# No respiro o chefe não ataca, mas já pode ser atingido.
+	if _grace<=0.0: encounter.tick(delta)
 	if encounter.fighting() and not _pending_throws.is_empty() and not _boss.throwing():
 		var kind: String=_pending_throws[0]
 		if _boss.throw_bottle(kind):
@@ -244,8 +284,9 @@ func _physics_process(delta: float) -> void:
 	_refill_wait -= delta
 	if _refill_wait <= 0 and encounter.fighting():
 		_refill_wait = refill_interval
-		_spawn_refill("attack",Vector3(-8,0.1,0))
-		_spawn_refill("defense",Vector3(8,0.1,0))
+		# Recargas no miolo da arena, fora da área coberta pelos controles de toque.
+		_spawn_refill("attack",Vector3(-4.2,0.1,0))
+		_spawn_refill("defense",Vector3(4.2,0.1,0))
 func _spawn_refill(kind: String, at: Vector3) -> void:
 	for item in arena.get_children():
 		if item is Pickup and item.kind == kind: return

@@ -12,6 +12,8 @@ var enabled := true
 var direction := 1.0
 @export var handoff_seconds := 3.6
 var _active := false
+## Uma serra fere no máximo uma vez por passada (antes a frente e a traseira tiravam duas vidas).
+var _hit_wait := 0.0
 var _danger_areas: Array[Area3D] = []
 var _pass_through := {}
 static var _steel: StandardMaterial3D
@@ -54,7 +56,9 @@ func _danger(at: Vector3,size: Vector3)->void:
  var area:=Area3D.new();area.collision_layer=0;area.collision_mask=2
  var shape:=CollisionShape3D.new();var mesh:=BoxShape3D.new();mesh.size=size;shape.shape=mesh;shape.position=at;area.add_child(shape);add_child(area);_danger_areas.append(area)
  area.body_entered.connect(func(body: Node3D)->void:
-  if enabled and _active and body.is_in_group("player"):body.take_damage(damage,global_position.x))
+  if enabled and _active and _hit_wait<=0.0 and body.is_in_group("player"):
+   _hit_wait=2.4
+   body.take_damage(damage,global_position.x))
 func crossing_duration()->float:
  return maxf(travel,span+24.0)/maxf(speed,0.01)
 func entry_interval()->float:
@@ -78,6 +82,7 @@ func _set_active(value: bool)->void:
  for area in _danger_areas:area.set_deferred("monitoring",value)
 func _physics_process(delta: float)->void:
  if not enabled:return
+ _hit_wait=maxf(_hit_wait-delta,0.0)
  var previous:=position.x
  elapsed+=delta
  position=future_position(0.0)

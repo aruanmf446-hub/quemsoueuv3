@@ -207,3 +207,17 @@ Sem merge/publicação automática na main.
 A execução Web desktop foi repetida após ligar a derrota ao método original do
 boss. Os perfis móveis verificam abertura/renderização; vitória, defesa e
 interação F/TASK foram conferidas no motor nativo, não em Safari físico.
+
+## Correção de jogabilidade — 11/11/2026 (conferido no jogo publicado)
+
+Jogando a fase 10 em produção (visitante, Chromium), o jogador perdia duas vidas
+em 5 s e era derrotado em 7 s sem agir: a primeira serra entra pela parede
+esquerda a 1,2 m do chão e alcançava o ponto de entrada (x = −11) em 0,55 s; a
+frente e a traseira da mesma serra feriam em sequência. A volta ao checkpoint
+devolvia 1 vida e nenhuma carga, de novo sob a serra.
+
+- Entrada e checkpoint em x = −9 (`ENTRY`), longe da parede de entrada da serra.
+- Respiro de 3,5 s ao entrar ou voltar (`opening_grace`): serras paradas e
+  Malagueta sem atacar; o ciclo das serras recomeça do zero.
+- Cada serra fere no máximo uma vez por passada.
+- Checkpoint da arena devolve vida e cargas cheias; a tela de derrota informa isso.

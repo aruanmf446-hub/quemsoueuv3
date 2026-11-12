@@ -75,17 +75,20 @@ static func build(order: int, minimum_seconds: float = 180.0) -> Dictionary:
 			holes.append({"id":"%s.gap.%02d" % [prefix,index],"start":end,"end":right,"width":gap,"from_y":top,"to_y":next_top,"stepping":false,"ferry":false,"crumble_bridge":crumble,"earth_bridge":false})
 		# Guarda e itens pertencem à mesma laje. Recargas antecipam desafios;
 		# nenhuma é colocada em abismo, sobre obstáculo ou na peça destrutível.
-		var guard_x := left+(6.0 if order == 2 else (23.0 if index == 0 else 13.0))
+		# Ritmo: a partir da fase 3 guarda, recarga e poder não caem sempre no mesmo metro da laje.
+		var varied := order >= 3 and order < 10 and index > 0
+		var supply_offset: float = [8.0,5.5,10.5,6.5,11.0,4.5][(index+order)%6] if varied else 8.0
+		var guard_x := left+(6.0 if order == 2 else (23.0 if index == 0 else (float([13.0,18.0,9.5,21.0,15.0][(index/2+order)%5]) if varied else 13.0)))
 		if index%(10 if order == 2 else 2) == 0 and not (order == 2 and index == 0):
 			enemies.append({"id":"%s.cactus.%02d" % [prefix,index],"type":"cactus","pos":[guard_x,top+0.02,0],"patrol":[left+1,end-1],"district":district,"challenger":order<10,"elite":order in [3,5,7,8,9] and index%12==6})
 		var supply_index := index/5 if order == 2 else index
 		var kind: String = ["attack","defense","attack","health"][supply_index%4]
 		if order != 2 or index%5 == 0:
-			pickups.append({"id":"%s.supply.%02d" % [prefix,index],"kind":kind,"pos":[spawn_x+2 if index == 0 and order == 2 else (spawn_x+4 if index == 0 else left+(7.0 if order == 2 else 8)),top,0],"surface":index})
+			pickups.append({"id":"%s.supply.%02d" % [prefix,index],"kind":kind,"pos":[spawn_x+2 if index == 0 and order == 2 else (spawn_x+4 if index == 0 else left+(7.0 if order == 2 else supply_offset)),top,0],"surface":index})
 		for ability: String in ["rupture","amber","dash"]:
 			if order < ABILITY_PHASE[ability]: continue
 			if index%(24 if order == 2 else 8) == ({"rupture":1,"amber":9,"dash":17}[ability] if order == 2 else {"rupture":1,"amber":3,"dash":5}[ability]):
-				pickups.append({"id":"%s.%s.%02d" % [prefix,ability,index],"kind":ability,"pos":[left+(3.6 if order == 2 else 12),top,0],"surface":index})
+				pickups.append({"id":"%s.%s.%02d" % [prefix,ability,index],"kind":ability,"pos":[left+(3.6 if order == 2 else (14.5 if supply_offset > 9.0 else 12.0)),top,0],"surface":index})
 		# Patamares e obstáculos apoiados na mesma superfície do módulo.
 		var stair_run := index%sector_modules == (3 if order==10 else mini(sector_modules-2,[3,4,4,3,2,4,3,5,3][order-1]+int(index/sector_modules)%2))
 		if order==2: stair_run=false # O teto da própria casa é a rota, sem plataforma sobreposta.

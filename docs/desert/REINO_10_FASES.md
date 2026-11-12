@@ -128,3 +128,17 @@ Conferido com o motor real (Godot 4.7.2) em capturas ao longo de cada fase.
   checkpoint, Task ou ponto de entrada (o grupo desliza para um trecho livre).
 - **Pendente:** distritos das fases 2, 4, 5, 6 e 8; caixas translúcidas nas ruínas
   (fase 6); posição de Tasks, inimigos e recargas, hoje no mesmo padrão em todas.
+
+## Refino de 12/11/2026 (segunda leva): fases 2, 4, 5, 6 e 8
+
+- `KingdomAssets.DISTRICT_SETS` agora cobre também as fases 2, 4, 5, 6 e 8: cada um dos oito
+  trechos nomeados tem o seu conjunto (telhados com terraços de tecido, cúpulas e torres;
+  aqueduto com arcos, colunas, reservatório e saída verde; oásis com duas margens; ruínas
+  com monumento, colunas e câmaras de cristal; posto de controle com portões, torres e
+  depósito, sem bancas de mercado). Um quinto valor apoia a peça no próprio telhado (fase 2).
+- Fase 6: fundação maciça sob a laje (some o filete claro que atravessava a tela), sem as
+  molduras de caixa sobre a arte e com as rochas da caverna recuadas para não cortar as ruínas.
+- A frente de cada Task fica limpa: o cenário de primeiro plano e os figurantes não ocupam o
+  portão, o guincho nem a alavanca.
+- Ritmo (fases 3 a 9): recarga, poder e guarda deixam de cair sempre no mesmo metro da laje.
+  IDs, quantidades e a laje dona de cada item não mudam.

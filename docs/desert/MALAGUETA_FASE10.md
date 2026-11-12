@@ -235,3 +235,13 @@ escuro sobre fundo escuro e, com controles de toque, nascendo sob o direcional.
   piscando na parede 1,8 s antes de cada serra entrar.
 - No respiro inicial o chefe não ataca, mas já recebe dano.
 - `tests/malagueta/*.gd`: seis roteiros passam (arena 21/21, combate 11/11).
+
+## Escada fixa até o chefe — 12/11/2026
+
+Pedido do dono: a arena precisava ser entendida e jogável. Antes, a única subida era a
+sequência das cinco serras; quem caía esperava o ciclo inteiro (cerca de 50 s) recomeçar.
+Agora há quatro degraus de pedra fixos na parede direita (1,2 / 3,1 / 5,0 / 6,9 m), sob o
+patamar do chefe. Ficam na altura das serras: a serra desliza sob os pés, sem ferir; os
+dentes continuam ferindo por baixo e pelos lados. Os degraus deixam passar por baixo, como
+o patamar. As serras seguem como perigo e como atalho. `tests/malagueta/steps.gd` sobe do
+chão ao patamar só com pulo e pulo duplo e confere que nenhuma vida é perdida.

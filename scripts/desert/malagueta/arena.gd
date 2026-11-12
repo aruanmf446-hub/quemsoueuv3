@@ -34,6 +34,8 @@ var _grace := 0.0
 var _warnings: Array[MeshInstance3D] = []
 var _player_light: OmniLight3D
 var _landing_pass_through := {}
+var _steps: Array[StaticBody3D] = []
+var _step_pass_through := {}
 
 func _layout_for_phase(_number: int) -> Dictionary:
 	var data := Layout.build(10)
@@ -65,7 +67,7 @@ func _ready() -> void:
 	# Starting the boss must never depend on arriving with spare attack charges.
 	_player.fill_ability("attack")
 	_player.fill_ability("defense")
-	_hud.notify("Suba pulando nas serras • o aviso laranja mostra de onde vem a próxima")
+	_hud.notify("Suba pelos degraus de pedra à direita • serras ferem por baixo; o aviso laranja mostra a próxima")
 	# O herói escuro sumia no fundo da mina: uma luz própria acompanha o jogador.
 	_player_light=OmniLight3D.new()
 	_player_light.light_color=Color("#ffe2b8")
@@ -186,6 +188,44 @@ func _stream_world(_x: float, force := false) -> void:
 	landing.add_child(mesh)
 	arena.add_child(landing)
 	landing.add_to_group("mining_files")
+	# Escada fixa até o patamar do chefe: a subida não depende mais de esperar o ciclo das
+	# serras. Os degraus ficam na altura das serras (elas deslizam sob os pés, sem ferir) e
+	# deixam passar por baixo, como o patamar.
+	_steps.clear()
+	_step_pass_through.clear()
+	var lip:=StandardMaterial3D.new()
+	lip.albedo_color=Color("#f2c14e")
+	lip.emission_enabled=true
+	lip.emission=Color("#d99a2b")
+	lip.emission_energy_multiplier=0.7
+	lip.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED
+	var stone:=StandardMaterial3D.new()
+	stone.albedo_color=Color("#a89a86")
+	stone.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED
+	for top: float in [1.2,3.1,5.0,6.9]:
+		var step:=StaticBody3D.new()
+		step.position=Vector3(10.6,top-0.15,0)
+		var step_shape:=CollisionShape3D.new()
+		var step_box:=BoxShape3D.new()
+		step_box.size=Vector3(2.6,0.3,2)
+		step_shape.shape=step_box
+		step.add_child(step_shape)
+		var slab:=MeshInstance3D.new()
+		var slab_mesh:=BoxMesh.new()
+		slab_mesh.size=step_box.size
+		slab.mesh=slab_mesh
+		slab.material_override=stone
+		step.add_child(slab)
+		var edge:=MeshInstance3D.new()
+		var edge_mesh:=BoxMesh.new()
+		edge_mesh.size=Vector3(2.6,0.09,0.5)
+		edge.mesh=edge_mesh
+		edge.material_override=lip
+		edge.position=Vector3(0,0.12,0.78)
+		step.add_child(edge)
+		step.set_meta("one_way_top",top)
+		arena.add_child(step)
+		_steps.append(step)
 	encounter = Encounter.new()
 	arena.add_child(encounter)
 	encounter.damage_to_stun=damage_to_stun
@@ -367,3 +407,12 @@ func _update_landing_support() -> void:
 			_upper_landing.add_collision_exception_with(actor);_landing_pass_through[id]=true
 		elif ignored and actor.global_position.y>8.90:
 			_upper_landing.remove_collision_exception_with(actor);_landing_pass_through[id]=false
+		for step in _steps:
+			if not is_instance_valid(step):continue
+			var key:=str(id)+":"+str(step.get_instance_id())
+			var top:=float(step.get_meta("one_way_top"))
+			var skipped:=bool(_step_pass_through.get(key,false))
+			if not skipped and actor.global_position.y<top-0.05:
+				step.add_collision_exception_with(actor);_step_pass_through[key]=true
+			elif skipped and actor.global_position.y>top+0.05:
+				step.remove_collision_exception_with(actor);_step_pass_through[key]=false

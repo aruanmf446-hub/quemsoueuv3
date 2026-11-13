@@ -245,3 +245,9 @@ patamar do chefe. Ficam na altura das serras: a serra desliza sob os pés, sem f
 dentes continuam ferindo por baixo e pelos lados. Os degraus deixam passar por baixo, como
 o patamar. As serras seguem como perigo e como atalho. `tests/malagueta/steps.gd` sobe do
 chão ao patamar só com pulo e pulo duplo e confere que nenhuma vida é perdida.
+
+## Janela da Task e textos — 13/11/2026
+
+O atordoamento do Malagueta passa de 5 s para 7 s (`stun_seconds`): 5 s mal davam para
+chegar ao frasco. Os avisos da arena (atordoado, Task, frasco) passam por `tr()` e têm
+tradução nos seis idiomas; os testes leem `stun_seconds` em vez de um número fixo.

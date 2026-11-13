@@ -33,7 +33,7 @@ func run()->void:
  phase.encounter.suspended=false;phase.encounter.hit(4);await tick(2)
  check(boss.stunned and boss._model.current_clip()=="dizzy","stun plays Dizzy Idle")
  check(not boss._held.visible,"stunned boss has no floating bottle")
- phase.encounter.tick(6);phase.encounter.suspended=true;await tick(2)
+ phase.encounter.tick(phase.encounter.stun_seconds+1.0);phase.encounter.suspended=true;await tick(2)
  check(not boss.stunned,"stun expiry restores movement")
  phase._player.position=Vector3(7.8,8.85,0);boss._time=3.5
  await tick(4)

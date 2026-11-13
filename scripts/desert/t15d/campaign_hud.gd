@@ -255,7 +255,7 @@ func update_resources(player: Node) -> void:
 	_defense.modulate = Color.WHITE if player.defense_charges > 0 else Color(0.58,0.58,0.58)
 func update_progress(share: float, seconds: float, district: String) -> void:
 	_bar.value = share*100.0
-	_district.text = district.to_upper()
+	_district.text = tr(district).to_upper()
 	_progress.text = "%d%%   ·   %02d:%02d" % [roundi(share*100),int(seconds)/60,int(seconds)%60]
 ## Tempestade: véu cor de areia e grãos atravessando a tela (abaixo dos painéis).
 var _storm_veil: ColorRect
@@ -311,7 +311,7 @@ func announce_place(text: String) -> void:
 		_root.add_child(_place)
 	var screen := _root.size
 	_place.add_theme_font_size_override("font_size",30)
-	_place.text = text.to_upper()
+	_place.text = tr(text).to_upper()
 	_place.position = Vector2(0,screen.y*0.22)
 	_place.size = Vector2(screen.x,44)
 	_place.modulate.a = 0.0

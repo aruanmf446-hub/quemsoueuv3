@@ -489,7 +489,7 @@ func _build_chunk_details(chunk: Node3D, index: int) -> void:
 			item.position = _vec3(spawn.pos)
 			item.collected.connect(_on_pickup_collected)
 			item.full_touched.connect(func(kind: String) -> void:
-				if is_instance_valid(_hud): _hud.notify({"attack":"Ataque cheio","defense":"Defesa cheia","health":"Vida cheia"}.get(kind,"Cheio")+" • item preservado"))
+				if is_instance_valid(_hud): _hud.notify(tr("%s • item preservado") % tr(str({"attack":"Ataque cheio","defense":"Defesa cheia","health":"Vida cheia"}.get(kind,"Cheio")))))
 			chunk.add_child(item)
 	for hole: Dictionary in _phase.holes:
 		var middle := (float(hole.start)+float(hole.end))*0.5
@@ -1022,7 +1022,7 @@ func _respawn_at_checkpoint() -> void:
 	_stream_world(_player.position.x,true)
 	_follow_camera(1.0)
 	_sync_resources()
-	_hud.notify("De volta ao checkpoint %d" % (_checkpoint_index+1))
+	_hud.notify(tr("De volta ao checkpoint %d") % (_checkpoint_index+1))
 	_safe_position=_player.position
 	_save_active_run()
 func _respawn_player() -> void:

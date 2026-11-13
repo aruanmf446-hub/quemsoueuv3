@@ -10,7 +10,8 @@ const Chemical = preload("res://scripts/desert/malagueta/chemical.gd")
 @export var refill_interval := 12.0
 @export var hazard_damage := 1
 @export var damage_to_stun := 4
-@export var stun_seconds := 5.0
+## Janela para a Task depois de atordoar o chefe: 5 s mal dava para chegar ao frasco.
+@export var stun_seconds := 7.0
 @export var green_interval := 3.2
 @export var green_speed := 4.0
 @export var green_amplitude := 0.45
@@ -243,7 +244,7 @@ func _stream_world(_x: float, force := false) -> void:
 		if is_instance_valid(_boss): _boss.set_stunned(true)
 		_player.fill_ability("attack")
 		_player.fill_ability("defense")
-		if is_instance_valid(_hud): _hud.notify("Malagueta atordoado • TASK disponível por 5 segundos"))
+		if is_instance_valid(_hud): _hud.notify(tr("Malagueta atordoado • TASK disponível por %d segundos") % roundi(stun_seconds)))
 	encounter.state_changed.connect(func() -> void:
 		if is_instance_valid(_boss) and encounter.fighting() and _boss.stunned: _boss.set_stunned(false))
 	encounter.task_completed.connect(func(task: int) -> void:
@@ -293,11 +294,11 @@ func _follow_camera(_delta: float) -> void:
 	_camera.position = Vector3(0,_camera.size*0.30,24)
 	_camera.rotation = Vector3.ZERO
 func _update_progress() -> void:
-	if is_instance_valid(encounter): _hud.update_progress(encounter.completed_tasks/3.0,_elapsed,"Malagueta • Task %d/3" % encounter.completed_tasks)
+	if is_instance_valid(encounter): _hud.update_progress(encounter.completed_tasks/3.0,_elapsed,tr("Malagueta • Task %d/3") % encounter.completed_tasks)
 func _update_bridge_hint() -> void:
 	if not is_instance_valid(encounter): return
 	var available: bool = encounter.is_stunned() and _near_boss_task()
-	_hud.set_bridge_task(available,"Frasco %d • %.1f s · F" % [encounter.stage(),encounter.remaining] if encounter.is_stunned() else "")
+	_hud.set_bridge_task(available,tr("Frasco %d • %.1f s · F") % [encounter.stage(),encounter.remaining] if encounter.is_stunned() else "")
 func _near_boss_task() -> bool:
 	return _player.is_on_floor() and absf(_player.position.x-9.0) <= 2.1 and absf(_player.position.y-8.85) < 0.4
 func _raise_earth_bridge() -> void:

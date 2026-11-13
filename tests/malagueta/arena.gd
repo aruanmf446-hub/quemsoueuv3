@@ -47,7 +47,7 @@ func run() -> void:
 	phase.encounter.suspended=false
 	phase.encounter.hit(4)
 	check(phase._player.attack_charges==3 and phase._player.defense_charges==3,"Task fills existing skills")
-	phase.encounter.tick(5.01)
+	phase.encounter.tick(phase.encounter.stun_seconds+0.01)
 	check(phase.encounter.completed_tasks==0,"failure does not advance")
 	for task in range(1,4):
 		phase.encounter.hit(4)
